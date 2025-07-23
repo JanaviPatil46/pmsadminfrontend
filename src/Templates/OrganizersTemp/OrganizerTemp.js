@@ -1,0 +1,2221 @@
+import React, { useState, useEffect, useRef } from 'react';
+import Section from './organizertempSection';
+import { toast } from 'react-toastify';
+import { CircularProgress, TableContainer } from "@mui/material";
+import 'react-toastify/dist/ReactToastify.css';
+import {ListItemText,ListItem,List,Popover,
+  Box, Button, TextField, IconButton, Typography, Alert, Table, TableBody, TableCell, TableHead, TableRow, Paper, Dialog,
+  DialogContent,
+  Drawer, InputLabel,
+  LinearProgress, Select, MenuItem, Tooltip,
+  FormControl, FormControlLabel, Switch, FormGroup,TablePagination
+} from '@mui/material';
+import { useNavigate } from "react-router-dom";
+import { CiMenuKebab } from "react-icons/ci";
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { IoClose } from "react-icons/io5";
+import axios from "axios";
+import debounce from "lodash.debounce";
+const OrganizersTemp = () => {
+
+  const ORGANIZER_TEMP_API = process.env.REACT_APP_ORGANIZER_TEMP_URL;
+  const navigate = useNavigate();
+  // const handlePreview = () => {
+  //   // Gather all the necessary data for the preview
+  // const data = {
+
+  //   sections, // This contains all your sections and their elements
+  // };
+
+  // // You can also use any other required data from your state here
+  // console.log("Data for preview:", data);
+
+  //   // Navigate to the desired path with data if necessary (you might want to pass it through state)
+  //   navigate('/organizerpreview', { state: { data } });
+  // };
+
+  const [shortcuts, setShortcuts] = useState([]);
+  const [filteredShortcuts, setFilteredShortcuts] = useState([]);
+  const [selectedOption, setSelectedOption] = useState("contacts");
+  const [selectedShortcut, setSelectedShortcut] = useState("");
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [showDropdown, setShowDropdown] = useState(false);
+  useEffect(() => {
+    // Simulate filtered shortcuts based on some logic (e.g., search)
+    setFilteredShortcuts(shortcuts.filter((shortcut) => shortcut.title.toLowerCase().includes("")));
+  }, [shortcuts]);
+
+  useEffect(() => {
+    // Set shortcuts based on selected option
+    if (selectedOption === "contacts") {
+      const contactShortcuts = [
+        { title: "Account Shortcodes", isBold: true },
+        { title: "Account Name", isBold: false, value: "ACCOUNT_NAME" },
+        { title: "Custom field:Website", isBold: false, value: "ACCOUNT_CUSTOM_FIELD:Website" },
+        { title: "Contact Shortcodes", isBold: true },
+        { title: "Contact Name", isBold: false, value: "CONTACT_NAME" },
+        { title: "First Name", isBold: false, value: "FIRST_NAME" },
+        { title: "Middle Name", isBold: false, value: "MIDDLE_NAME" },
+        { title: "Last Name", isBold: false, value: "LAST_NAME" },
+        { title: "Phone number", isBold: false, value: "PHONE_NUMBER" },
+        { title: "Country", isBold: false, value: "COUNTRY" },
+        { title: "Company name", isBold: false, value: "COMPANY_NAME " },
+        { title: "Street address", isBold: false, value: "STREET_ADDRESS" },
+        { title: "City", isBold: false, value: "CITY" },
+        { title: "State/Province", isBold: false, value: "STATE / PROVINCE" },
+        { title: "Zip/Postal code", isBold: false, value: "ZIP / POSTAL CODE" },
+        { title: "Custom field:Email", isBold: false, value: "CONTACT_CUSTOM_FIELD:Email" },
+        { title: "Date Shortcodes", isBold: true },
+        { title: "Current day full date", isBold: false, value: "CURRENT_DAY_FULL_DATE" },
+        { title: "Current day number", isBold: false, value: "CURRENT_DAY_NUMBER" },
+        { title: "Current day name", isBold: false, value: "CURRENT_DAY_NAME" },
+        { title: "Current week", isBold: false, value: "CURRENT_WEEK" },
+        { title: "Current month number", isBold: false, value: "CURRENT_MONTH_NUMBER" },
+        { title: "Current month name", isBold: false, value: "CURRENT_MONTH_NAME" },
+        { title: "Current quarter", isBold: false, value: "CURRENT_QUARTER" },
+        { title: "Current year", isBold: false, value: "CURRENT_YEAR" },
+        { title: "Last day full date", isBold: false, value: "LAST_DAY_FULL_DATE" },
+        { title: "Last day number", isBold: false, value: "LAST_DAY_NUMBER" },
+        { title: "Last day name", isBold: false, value: "LAST_DAY_NAME" },
+        { title: "Last week", isBold: false, value: "LAST_WEEK" },
+        { title: "Last month number", isBold: false, value: "LAST_MONTH_NUMBER" },
+        { title: "Last month name", isBold: false, value: "LAST_MONTH_NAME" },
+        { title: "Last quarter", isBold: false, value: "LAST_QUARTER" },
+        { title: "Last_year", isBold: false, value: "LAST_YEAR" },
+        { title: "Next day full date", isBold: false, value: "NEXT_DAY_FULL_DATE" },
+        { title: "Next day number", isBold: false, value: "NEXT_DAY_NUMBER" },
+        { title: "Next day name", isBold: false, value: "NEXT_DAY_NAME" },
+        { title: "Next week", isBold: false, value: "NEXT_WEEK" },
+        { title: "Next month number", isBold: false, value: "NEXT_MONTH_NUMBER" },
+        { title: "Next month name", isBold: false, value: "NEXT_MONTH_NAME" },
+        { title: "Next quarter", isBold: false, value: "NEXT_QUARTER" },
+        { title: "Next year", isBold: false, value: "NEXT_YEAR" },
+      ];
+      setShortcuts(contactShortcuts);
+    } else if (selectedOption === "account") {
+      const accountShortcuts = [
+        { title: "Account Shortcodes", isBold: true },
+        { title: "Account Name", isBold: false, value: "ACCOUNT_NAME" },
+        { title: "Custom field:Website", isBold: false, value: "ACCOUNT_CUSTOM_FIELD:Website" },
+        { title: "Date Shortcodes", isBold: true },
+        { title: "Current day full date", isBold: false, value: "CURRENT_DAY_FULL_DATE" },
+        { title: "Current day number", isBold: false, value: "CURRENT_DAY_NUMBER" },
+        { title: "Current day name", isBold: false, value: "CURRENT_DAY_NAME" },
+        { title: "Current week", isBold: false, value: "CURRENT_WEEK" },
+        { title: "Current month number", isBold: false, value: "CURRENT_MONTH_NUMBER" },
+        { title: "Current month name", isBold: false, value: "CURRENT_MONTH_NAME" },
+        { title: "Current quarter", isBold: false, value: "CURRENT_QUARTER" },
+        { title: "Current year", isBold: false, value: "CURRENT_YEAR" },
+        { title: "Last day full date", isBold: false, value: "LAST_DAY_FULL_DATE" },
+        { title: "Last day number", isBold: false, value: "LAST_DAY_NUMBER" },
+        { title: "Last day name", isBold: false, value: "LAST_DAY_NAME" },
+        { title: "Last week", isBold: false, value: "LAST_WEEK" },
+        { title: "Last month number", isBold: false, value: "LAST_MONTH_NUMBER" },
+        { title: "Last month name", isBold: false, value: "LAST_MONTH_NAME" },
+        { title: "Last quarter", isBold: false, value: "LAST_QUARTER" },
+        { title: "Last_year", isBold: false, value: "LAST_YEAR" },
+        { title: "Next day full date", isBold: false, value: "NEXT_DAY_FULL_DATE" },
+        { title: "Next day number", isBold: false, value: "NEXT_DAY_NUMBER" },
+        { title: "Next day name", isBold: false, value: "NEXT_DAY_NAME" },
+        { title: "Next week", isBold: false, value: "NEXT_WEEK" },
+        { title: "Next month number", isBold: false, value: "NEXT_MONTH_NUMBER" },
+        { title: "Next month name", isBold: false, value: "NEXT_MONTH_NAME" },
+        { title: "Next quarter", isBold: false, value: "NEXT_QUARTER" },
+        { title: "Next year", isBold: false, value: "NEXT_YEAR" },
+      ];
+      setShortcuts(accountShortcuts);
+    }
+  }, [selectedOption]);
+  const handleCloseDropdown = () => {
+    setShowDropdown(false);
+    setAnchorEl(null);
+  };
+  const [cursorPosition, setCursorPosition] = useState(0);
+  const textFieldRef = useRef(null);
+  const handlejobName = (e) => {
+    const { value,selectionStart  } = e.target;
+    setOrganizerName(value);
+    setCursorPosition(selectionStart);
+  };
+  const toggleDropdown = (event) => {
+    setAnchorEl(event.currentTarget);
+    setShowDropdown(!showDropdown);
+  };
+
+  // const handleAddShortcut = (shortcut) => {
+  //   setOrganizerName((prevText) => prevText + `[${shortcut}]`);
+  //   setShowDropdown(false);
+  // };
+  const handleAddShortcut = (shortcut) => {
+    setOrganizerName((prevText) => {
+        const newText =
+            prevText.slice(0, cursorPosition) + `[${shortcut}]` + prevText.slice(cursorPosition);
+        return newText;
+    });
+
+    setTimeout(() => {
+        if (textFieldRef.current) {
+            textFieldRef.current.focus();
+            textFieldRef.current.setSelectionRange(cursorPosition + shortcut.length + 2, cursorPosition + shortcut.length + 2);
+        }
+    }, 0);
+
+    setShowDropdown(false);
+};
+  const [templateName, setTemplateName] = useState('');
+  const [organizerName, setOrganizerName] = useState('');
+  const [sections, setSections] = useState([]);
+  const [selectedSection, setSelectedSection] = useState(null);
+  // const [sectionSettings, setSectionSettings] = useState({}); 
+  const handleSectionSaveData = (settings) => {
+    // Update the specific section with the new settings
+    setSections((prevSections) =>
+      prevSections.map((section) =>
+        section.id === selectedSection.id
+    ? { ...section, sectionsettings: settings }
+          : section
+      )
+    );
+  };
+  const addSection = () => {
+    const newSection = {
+      id: Date.now(), name: `Section ${sections.length + 1}`, text: '', formElements: [], sectionSettings: {
+        sectionRepeatingMode: false,
+        buttonName: '',
+        conditional: false,
+        mode: '',
+        conditions: [
+          {
+            question: '',
+            answer: ''
+          }
+        ]
+      }
+    };
+    setSections([...sections, newSection]);
+    setSelectedSection(newSection);
+
+  };
+  console.log(sections)
+  // console.log(selectedSection)
+
+  const handleSectionClick = (section) => {
+    setSelectedSection(section);
+  };
+
+  const handleDeleteSection = (id) => {
+    const newSections = sections.filter(section => section.id !== id);
+    setSections(newSections);
+    if (selectedSection && selectedSection.id === id) {
+      setSelectedSection(null);
+    }
+  };
+  const handleUpdateSection = (id, newText, newFormElements, newSectionSettings) => {
+    setSections(prevSections => prevSections.map(section =>
+      section.id === id
+        ? {
+          ...section,
+          text: newText,
+          formElements: newFormElements,
+          sectionSettings: {
+            ...section.sectionSettings, // retain existing settings
+            ...newSectionSettings // apply updates
+          }
+        }
+        : section
+    ));
+  };
+  // const handleDuplicateSection = (sectionId) => {
+  //   const sectionToDuplicate = sections.find(section => section.id === sectionId);
+  //   if (sectionToDuplicate) {
+  //     const duplicatedSection = {
+  //       ...sectionToDuplicate,
+  //       text: `${sectionToDuplicate.text} (Copy)`,
+  //       id: Date.now(), // Assign a new ID for the duplicated section
+  //     };
+  //     setSections([...sections, duplicatedSection]);
+  //   }
+  // };
+  const handleDuplicateSection = (sectionId) => {
+  const sectionToDuplicate = sections.find(section => section.id === sectionId);
+  
+  if (sectionToDuplicate) {
+    const newSectionId = Date.now(); // Or use a UUID generator for better uniqueness
+
+    const duplicatedFormElements = sectionToDuplicate.formElements.map(element => ({
+      ...element,
+      id: Date.now() + Math.floor(Math.random() * 1000), // Ensure unique ID
+      sectionid: newSectionId,
+    }));
+
+    const duplicatedSection = {
+      ...sectionToDuplicate,
+      id: newSectionId,
+      text: `${sectionToDuplicate.text} (Copy)`,
+      formElements: duplicatedFormElements,
+    };
+
+    setSections([...sections, duplicatedSection]);
+  }
+};
+
+  const [showOrganizerTemplateForm, setShowOrganizerTemplateForm] = useState(false);
+
+  const handleCreateInvoiceClick = () => {
+    setShowOrganizerTemplateForm(true);
+  };
+  function truncateText(text, maxWords) {
+    const words = text.split(' ');
+    if (words.length > maxWords) {
+      return words.slice(0, maxWords).join(' ') + ' ..';
+    }
+    return text;
+  }
+  const handleFormSave = (elementId, formData) => {
+    setSections(prevSections =>
+      prevSections.map(section => ({
+        ...section,
+        formElements: section.formElements.map(el =>
+          el.id === elementId ? { ...el, questionsectionsettings: formData } : el
+        )
+      }))
+    );
+  };
+  const saveandexitOrganizerTemp = () => {
+
+    console.log(sections)
+    if (!validateForm()) {
+      return; // Prevent form submission if validation fails
+    }
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    const organizersettings = {
+      notifyaboutdocumentupload: loginChecked, // Example state
+      organizerselfservice: notifyChecked,          // Example state
+      automaticallysealaftersubmission: emailSyncChecked, // Example state
+      sendreminderstoclient: autoSaveChecked,        // Example state
+      daysuntilnextreminder: daysuntilNextReminder,        // Example state
+      numberofreminders: noOfReminder                 // Example state
+    };
+
+
+    const raw = JSON.stringify({
+      templatename: templateName,
+      organizerName: organizerName,
+
+      sections: sections.map(section => ({
+        name: section.text,
+        text: section.text,
+        id: section.id.toString(),
+        sectionsettings: section.sectionsettings || {},
+        formElements: section.formElements.map(element => ({
+          type: element.type,
+          id: element.id,
+          sectionid: element.sectionid,
+          options: element.options.map(option => ({
+            id: option.id,
+            text: option.text
+          })),
+          text: element.text,
+
+          questionsectionsettings: element.questionsectionsettings || {}
+        })),
+
+      })),
+      organizersettings: organizersettings,
+      active: true
+    });
+
+    console.log(raw)
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow"
+    };
+    const url = `${ORGANIZER_TEMP_API}/workflow/organizers/organizertemplate`;
+    fetch(url, requestOptions)
+      .then((response) => response.json())
+      .then((result) => {
+        console.log(result)
+        if (result && result.message === "Organizer Template created successfully") {
+          toast.success("Organizer Template created successfully");
+          setShowOrganizerTemplateForm(false);
+          setTemplateName('');
+          setOrganizerName('');
+          setSections([]);
+          setSelectedSection(null);
+          fetchOrganizerTemplates();
+          setNotifyChecked(false);
+          setLoginChecked(false);
+          setAutoSaveChecked(false);
+          setEmailSyncChecked(false);
+          setNoOfReminder(1);
+          setDaysuntilNextReminder(3);
+
+        } else {
+          toast.error(result.error || "Failed to create Organizer Template");
+        }
+      })
+      .catch((error) => console.error(error));
+  }
+  const saveOrganizerTemp = () => {
+
+    console.log(sections)
+    if (!validateForm()) {
+      return; // Prevent form submission if validation fails
+    }
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    const organizersettings = {
+      notifyaboutdocumentupload: loginChecked, // Example state
+      organizerselfservice: notifyChecked,          // Example state
+      automaticallysealaftersubmission: emailSyncChecked, // Example state
+      sendreminderstoclient: autoSaveChecked,        // Example state
+      daysuntilnextreminder: daysuntilNextReminder,        // Example state
+      numberofreminders: noOfReminder                 // Example state
+    };
+
+    const raw = JSON.stringify({
+      templatename: templateName,
+      organizerName: organizerName,
+      sections: sections.map(section => ({
+        name: section.text,
+        text: section.text,
+        id: section.id.toString(),
+        sectionsettings: section.sectionsettings || {},
+        formElements: section.formElements.map(element => ({
+          type: element.type,
+          id: element.id,
+          sectionid: element.sectionid,
+          options: element.options.map(option => ({
+            id: option.id,
+            text: option.text
+          })),
+          text: element.text,
+          questionsectionsettings: element.questionsectionsettings || {}
+        })),
+
+      })),
+      organizersettings: organizersettings,
+      active: true
+    });
+
+    console.log(raw)
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow"
+    };
+
+    const url = `${ORGANIZER_TEMP_API}/workflow/organizers/organizertemplate`;
+    fetch(url, requestOptions)
+      .then((response) => response.json())
+      .then((result) => {
+        console.log(result)
+        if (result && result.message === "Organizer Template created successfully") {
+          toast.success("Organizer Template created successfully");
+
+
+        } else {
+          toast.error(result.error || "Failed to create Organizer Template");
+        }
+      })
+      .catch((error) => console.error(error));
+  }
+  const [organizerTemplatesData, setOrganizerTemplatesData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const fetchOrganizerTemplates = async () => {
+    setLoading(true);
+    const loaderDelay = new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const url = `${ORGANIZER_TEMP_API}/workflow/organizers/organizertemplate`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Failed to fetch email templates');
+      }
+      const data = await response.json();
+
+      setOrganizerTemplatesData(data.OrganizerTemplates);
+
+    } catch (error) {
+      console.error('Error fetching email templates:', error);
+
+    }
+    finally {
+      await loaderDelay;
+      setLoading(false); // Stop loader
+    }
+  };
+  const handleEdit = (_id) => {
+    navigate('OrganizerTempUpdate/' + _id)
+
+  };
+  //delete template
+  const handleDelete = (_id) => {
+    // Show a confirmation prompt
+    const isConfirmed = window.confirm("Are you sure you want to delete this organizer template?");
+
+    // Proceed with deletion if confirmed
+    if (isConfirmed) {
+      const requestOptions = {
+        method: "DELETE",
+        redirect: "follow"
+      };
+      const url = `${ORGANIZER_TEMP_API}/workflow/organizers/organizertemplate/`;
+      fetch(url + _id, requestOptions)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Failed to delete item');
+          }
+          return response.text();
+        })
+        .then((result) => {
+          console.log(result);
+          toast.success('Item deleted successfully');
+          fetchOrganizerTemplates();
+          // setshowOrganizerTemplateForm(false);
+        })
+        .catch((error) => {
+          console.error(error);
+          toast.error('Failed to delete item');
+        });
+    }
+  };
+  useEffect(() => {
+    fetchOrganizerTemplates();
+  }, []);
+  const [tempIdget, setTempIdGet] = useState("");
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const toggleMenu = (_id) => {
+    setOpenMenuId(openMenuId === _id ? null : _id);
+    setTempIdGet(_id);
+  };
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest(".menu-container")) {
+        setOpenMenuId(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+  
+  const [isFormDirty, setIsFormDirty] = useState(false);
+  const handleCancel = () => {
+
+    if (isFormDirty) {
+      const confirmClose = window.confirm('You have unsaved changes. Are you sure you want to cancel?');
+      if (!confirmClose) {
+        return;
+      }
+    }
+    setShowOrganizerTemplateForm(false);
+  };
+
+  // Detect form changes
+  useEffect(() => {
+    if (templateName || organizerName) {
+      setIsFormDirty(true);
+    } else {
+      setIsFormDirty(false);
+    }
+  }, [templateName, organizerName]);
+
+  const [templateNameError, setTemplateNameError] = useState('');
+  const [organizerError, setOrganizerError] = useState('');
+
+  const validateForm = () => {
+    let isValid = true;
+    if (!templateName) {
+      setTemplateNameError("Template name is required");
+
+      isValid = false;
+    } else {
+      setTemplateNameError('');
+    }
+
+    if (!organizerName) {
+      setOrganizerError('Organizer name is required');
+      isValid = false;
+    } else {
+      setOrganizerError('');
+    }
+    return isValid;
+  };
+
+  const handleDuplicateTemplate = async (templateId) => {
+    // Find the template by its ID
+    const templateToDuplicate = organizerTemplatesData.find(template => template._id === templateId);
+    if (!templateToDuplicate) {
+      toast.error('Template not found');
+      return;
+    }
+    // Create a new template object (with new ID and modified template name)
+    const duplicatedTemplate = {
+      ...templateToDuplicate,
+      templatename: `${templateToDuplicate.templatename} (Copy)`, // Indicate it's a duplicate
+      // _id: undefined, // Remove the ID since we want to create a new one
+      sections: templateToDuplicate.sections.map(section => ({
+        ...section,
+        id: Date.now().toString() + section.id, // Generate a new unique ID for the section
+      })),
+    };
+    try {
+      // Prepare request options
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+
+      const raw = JSON.stringify(duplicatedTemplate);
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow"
+      };
+
+      // Send the duplicated template to the server
+      const response = await fetch(`${ORGANIZER_TEMP_API}/workflow/organizers/organizertemplate`, requestOptions);
+      const result = await response.json();
+
+      if (result.message === "Organizer Template created successfully") {
+        toast.success("Template duplicated successfully");
+        fetchOrganizerTemplates(); // Refresh the list after duplication
+      } else {
+        toast.error(result.error || "Failed to duplicate template");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error duplicating template");
+    }
+  };
+
+  const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
+  const handlePreview = () => {
+    setPreviewDialogOpen(true); // Open the dialog
+    const data = {
+
+      sections, // This contains all your sections and their elements
+    };
+
+    // You can also use any other required data from your state here
+    console.log("Data for preview:", data);
+  };
+
+  const handleClosePreview = () => {
+    setPreviewDialogOpen(false); // Close the dialog
+  };
+
+  const [startDate, setStartDate] = useState(null);
+  const [activeStep, setActiveStep] = useState(0);
+  // const totalSteps = sections.length;
+
+  const handleStartDateChange = (date) => {
+    setStartDate(date);
+  };
+
+  const handleNext = () => {
+    if (activeStep < totalSteps - 1) {
+      setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    }
+  };
+
+  const handleBack = () => {
+    if (activeStep > 0) {
+      setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    }
+  };
+
+  const handleDropdownChange = (event) => {
+    const selectedIndex = event.target.value;
+    setActiveStep(selectedIndex);
+  };
+
+  const [radioValues, setRadioValues] = useState({});
+  const [checkboxValues, setCheckboxValues] = useState({});
+  const [answeredElements, setAnsweredElements] = useState({});
+
+  // const handleRadioChange = (value, elementText) => {
+  //   setRadioValues((prevValues) => ({
+  //     ...prevValues,
+  //     [elementText]: value,
+  //   }));
+  //   setAnsweredElements((prevAnswered) => ({
+  //     ...prevAnswered,
+  //     [elementText]: true,
+  //   }));
+  // };
+  const handleRadioChange = (value, elementText, sectionId) => {
+    const key = `${sectionId}_${elementText}`;
+    setRadioValues((prevValues) => ({
+      ...prevValues,
+      [key]: value,
+    }));
+    setAnsweredElements((prevAnswered) => ({
+      ...prevAnswered,
+      [key]: true,
+    }));
+  };
+  const handleCheckboxChange = (value, elementText, sectionId) => {
+    const key = `${sectionId}_${elementText}`;
+    setCheckboxValues((prevValues) => ({
+      ...prevValues,
+      [key]: {
+        ...prevValues[key],
+        [value]: !prevValues[key]?.[value],
+      },
+    }));
+    setAnsweredElements((prevAnswered) => ({
+      ...prevAnswered,
+      [key]: true,
+    }));
+  };
+  // const handleCheckboxChange = (value, elementText) => {
+  //   setCheckboxValues((prevValues) => ({
+  //     ...prevValues,
+  //     [elementText]: {
+  //       ...prevValues[elementText],
+  //       [value]: !prevValues[elementText]?.[value],
+  //     },
+  //   }));
+  //   setAnsweredElements((prevAnswered) => ({
+  //     ...prevAnswered,
+  //     [elementText]: true,
+  //   }));
+  // };
+const [selectedYesNoValues, setSelectedYesNoValues] = useState({});
+  const handleYesNoChange = (value, elementText, sectionId) => {
+    const key = `${sectionId}_${elementText}`;
+    setSelectedYesNoValues((prevValues) => ({
+      ...prevValues,
+      [key]: value,
+    }));
+    setAnsweredElements((prevAnswered) => ({
+      ...prevAnswered,
+      [key]: true,
+    }));
+  };
+  // const [selectedValue, setSelectedValue] = useState(null);
+  // const handleChange = (event, elementText) => {
+  //   setSelectedValue(event.target.value);
+  //   setAnsweredElements((prevAnswered) => ({
+  //     ...prevAnswered,
+  //     [elementText]: true,
+  //   }));
+  // };
+
+  const [inputValues, setInputValues] = useState({});
+  // const handleInputChange = (event, elementText) => {
+  //   const { value } = event.target;
+  //   setInputValues((prevValues) => ({
+  //     ...prevValues,
+  //     [elementText]: value,
+  //   }));
+  //   setAnsweredElements((prevAnswered) => ({
+  //     ...prevAnswered,
+  //     [elementText]: true,
+  //   }));
+  // };
+ const handleInputChange = (event, elementText, sectionId) => {
+    const key = `${sectionId}_${elementText}`;
+    const { value } = event.target;
+    setInputValues((prevValues) => ({
+      ...prevValues,
+      [key]: value,
+    }));
+    setAnsweredElements((prevAnswered) => ({
+      ...prevAnswered,
+      [key]: true,
+    }));
+  };
+  const [selectedDropdownValues, setSelectedDropdownValues] = useState({});
+  // const handleDropdownValueChange = (event, elementText) => {
+  //   setSelectedDropdownValue(event.target.value);
+  //   setAnsweredElements((prevAnswered) => ({
+  //     ...prevAnswered,
+  //     [elementText]: true,
+  //   }));
+  // };
+ const handleDropdownValueChange = (event, elementText, sectionId) => {
+    const key = `${sectionId}_${elementText}`;
+    setSelectedDropdownValues((prevValues) => ({
+      ...prevValues,
+      [key]: event.target.value,
+    }));
+    setAnsweredElements((prevAnswered) => ({
+      ...prevAnswered,
+      [key]: true,
+    }));
+  };
+  const stripHtmlTags = (html) => {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    return tempDiv.innerText || tempDiv.textContent || '';
+  };
+
+
+
+
+  // const shouldShowElement = (element) => {
+  //   const settings = element.questionsectionsettings;
+
+  //   // If the element isn't conditional, show it by default
+  //   if (!settings?.conditional) return true;
+
+  //   const conditions = settings?.conditions || [];
+
+  //   // Check if all conditions are satisfied
+  //   for (const condition of conditions) {
+  //     const { question, answer } = condition;
+
+  //     if (question && answer) {
+  //       const radioAnswer = radioValues[question];
+  //       const checkboxAnswer = checkboxValues[question];
+  //       const dropdownAnswer = selectedDropdownValue;
+
+  //       // For radio buttons
+  //       if (radioAnswer !== undefined && radioAnswer === answer) {
+  //         continue;
+  //       }
+
+  //       // For checkboxes: check if the condition answer is in the selected checkbox values
+  //       if (checkboxAnswer && checkboxAnswer[answer]) {
+  //         continue;
+  //       }
+
+  //       // For dropdowns: check if the condition answer matches the selected dropdown value
+  //       if (dropdownAnswer !== undefined && dropdownAnswer === answer) {
+  //         continue;
+  //       }
+
+  //       // If any condition is not satisfied, hide the element
+  //       return false;
+  //     }
+  //   }
+
+  //   // All conditions are satisfied, show the element
+  //   return true;
+  // };
+const shouldShowElement = (element, sectionId) => {
+    const settings = element.questionsectionsettings;
+    if (!settings?.conditional) return true;
+    const conditions = settings?.conditions || [];
+
+    for (const condition of conditions) {
+      const { question, answer } = condition;
+      if (!question || !answer) continue;
+
+      // Check all possible sections for the answer
+      let conditionMet = false;
+
+      // Check radio values
+      for (const key in radioValues) {
+        if (key.endsWith(`_${question}`) && radioValues[key] === answer) {
+          conditionMet = true;
+          break;
+        }
+      }
+      if (conditionMet) continue;
+
+      // Check checkbox values
+      for (const key in checkboxValues) {
+        if (key.endsWith(`_${question}`) && checkboxValues[key]?.[answer]) {
+          conditionMet = true;
+          break;
+        }
+      }
+      if (conditionMet) continue;
+
+      // Check dropdown values
+      for (const key in selectedDropdownValues) {
+        if (
+          key.endsWith(`_${question}`) &&
+          selectedDropdownValues[key] === answer
+        ) {
+          conditionMet = true;
+          break;
+        }
+      }
+      if (conditionMet) continue;
+      // Check Yes/No values
+      for (const key in selectedYesNoValues) {
+        if (
+          key.endsWith(`_${question}`) &&
+          selectedYesNoValues[key] === answer
+        ) {
+          conditionMet = true;
+          break;
+        }
+      }
+      if (conditionMet) continue;
+      // If we get here, no condition was met
+      return false;
+    }
+
+    return true;
+  };
+
+  const totalElements = sections[activeStep]?.formElements.length || 0;
+  const answeredCount = sections[activeStep]?.formElements.filter(
+    (element) => answeredElements[element.text]
+  ).length || 0;
+
+  // const shouldShowSection = (section) => {
+  //   const settings = section.sectionSettings;
+
+  //   // If the section isn't conditional, show it by default
+  //   if (!settings?.conditional) return true;
+
+  //   const conditions = settings?.conditions || [];
+
+  //   // Check if every condition is satisfied
+  //   return conditions.every((condition) => {
+  //     const { question, answer } = condition;
+
+  //     if (question && answer) {
+  //       const radioAnswer = radioValues[question];
+  //       const checkboxAnswer = checkboxValues[question];
+  //       const dropdownAnswer = selectedDropdownValue;
+
+  //       // For radio buttons
+  //       if (radioAnswer === answer) return true;
+
+  //       // For checkboxes: check if the condition answer is in the selected checkbox values
+  //       if (checkboxAnswer && checkboxAnswer[answer]) return true;
+
+  //       // For dropdowns: check if the condition answer matches the selected dropdown value
+  //       if (dropdownAnswer === answer) return true;
+  //     }
+
+  //     // If a condition is not satisfied, return false
+  //     return false;
+  //   });
+  // };
+
+const shouldShowSection = (section) => {
+    if (!section.sectionsettings?.conditional) return true;
+    const conditions = section.sectionsettings.conditions || [];
+
+    return conditions.every((condition) => {
+      if (!condition.question || !condition.answer) return false;
+
+      // Check all possible sections for the answer
+      for (const key in radioValues) {
+        if (
+          key.endsWith(`_${condition.question}`) &&
+          radioValues[key] === condition.answer
+        ) {
+          return true;
+        }
+      }
+
+      for (const key in checkboxValues) {
+        if (
+          key.endsWith(`_${condition.question}`) &&
+          checkboxValues[key]?.[condition.answer]
+        ) {
+          return true;
+        }
+      }
+
+      for (const key in selectedDropdownValues) {
+        if (
+          key.endsWith(`_${condition.question}`) &&
+          selectedDropdownValues[key] === condition.answer
+        ) {
+          return true;
+        }
+      }
+      // Check Yes/No values
+      for (const key in selectedYesNoValues) {
+        if (
+          key.endsWith(`_${condition.question}`) &&
+          selectedYesNoValues[key] === condition.answer
+        ) {
+          return true;
+        }
+      }
+      return false;
+    });
+  };
+
+  const getVisibleSections = () => sections.filter(shouldShowSection);
+
+  const visibleSections = getVisibleSections();
+  const totalSteps = visibleSections.length;
+
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const handleDrawerOpen = () => {
+    setIsDrawerOpen(true);
+  };
+  const handleDrawerClose = () => {
+    setIsDrawerOpen(false);
+  };
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
+
+  const [loginChecked, setLoginChecked] = useState(false);
+  const [notifyChecked, setNotifyChecked] = useState(false);
+  const [emailSyncChecked, setEmailSyncChecked] = useState(false);
+  const [autoSaveChecked, setAutoSaveChecked] = useState(false);
+
+  // Handlers for toggling switches
+  const handleLoginToggle = (checked) => {
+    setLoginChecked(checked);
+  };
+
+  const handleNotifyToggle = (checked) => {
+    setNotifyChecked(checked);
+  };
+
+  const handleEmailSyncToggle = (checked) => {
+    setEmailSyncChecked(checked);
+  };
+
+  const handleAutoSaveToggle = (checked) => {
+    setAutoSaveChecked(checked);
+  };
+  const [daysuntilNextReminder, setDaysuntilNextReminder] = useState('3');
+  const [noOfReminder, setNoOfReminder] = useState(1);
+  
+  
+  
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(30);
+  
+  
+     const handleChangePage = (_, newPage) => {
+      setPage(newPage);
+    };
+  
+    const handleChangeRowsPerPage = (event) => {
+      setRowsPerPage(parseInt(event.target.value, 10));
+      setPage(0);
+    };
+     // Compute paginated tasks
+     const paginatedOrganizers = organizerTemplatesData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  
+  
+
+     // Debounced function to check template name existence
+     const checkTemplateName = async (name) => {
+         try {
+           const res = await axios.get(`${ORGANIZER_TEMP_API}/workflow/organizers/check-name`, {
+             params: { name },
+           });
+           if (res.data.exists) {
+             setTemplateNameError('Template name already exists');
+           } else {
+             setTemplateNameError('');
+           }
+         } catch (err) {
+           console.error(err);
+           setTemplateNameError('');
+         }
+       };
+     
+      const debouncedCheck = debounce((name) => {
+         if (name.trim()) checkTemplateName(name);
+         else setTemplateNameError('');
+       }, 500);
+     
+       useEffect(() => {
+         debouncedCheck(templateName);
+         return debouncedCheck.cancel;
+       }, [templateName]);
+  
+  return (
+    <Box p={3}>
+      {!showOrganizerTemplateForm && (
+        <Box >
+
+          <Button variant="contained" onClick={handleCreateInvoiceClick} sx={{
+              backgroundColor: 'var(--color-save-btn)',  // Normal background
+             
+              '&:hover': {
+                backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
+              },
+              borderRadius:'15px', mb:2
+            }}>Create Template</Button>
+          {/* <MaterialReactTable columns={columns} table={table} /> */}
+          <Box>
+            {loading ? (<Box sx={{display:'flex',alignItems:'center', justifyContent:'center'}}> <CircularProgress style={{fontSize:'300px', color:'blue'}}/></Box>
+          ):( 
+          <Box>
+
+          <TableContainer component={Paper} sx={{ overflow: "visible" }}> 
+         
+          <Table sx={{ width:'100%' }} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell  style={{
+                      fontSize: "12px",
+                      fontWeight: "bold",
+                      padding: "16px",
+                    }}
+                    width="200">Template Name</TableCell>
+                  <TableCell  style={{
+                      fontSize: "12px",
+                      fontWeight: "bold",
+                      padding: "16px",
+                    }}
+                    width="100">Used in Pipelines</TableCell>
+                  <TableCell  style={{
+                      fontSize: "12px",
+                      fontWeight: "bold",
+                      padding: "16px",
+                    }}
+                    width="100">Settings</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {paginatedOrganizers.map((row) => (
+                  <TableRow key={row._id}>
+                    <TableCell>
+                      <Typography
+                       style={{
+                        fontSize: "12px",
+                        padding: "4px 8px",
+                        lineHeight: "1",
+                        cursor: "pointer",
+                        color: "#3f51b5",
+                      }}
+                        onClick={() => handleEdit(row._id)}
+                      >
+                        {row.templatename}
+                      </Typography>
+                    </TableCell>
+                    <TableCell></TableCell>
+                    <TableCell  style={{
+                        fontSize: "12px",
+                        padding: "4px 8px",
+                        lineHeight: "1",
+                        cursor: "pointer",
+                      }}>
+                      <IconButton onClick={() => toggleMenu(row._id)} style={{ color: '#2c59fa' }}>
+                        <CiMenuKebab style={{ fontSize: '25px' }} />
+                        {openMenuId === row._id && (
+                          <Box
+                            sx={{
+                              position: 'absolute',
+                              zIndex: 1,
+                              backgroundColor: '#fff',
+                              boxShadow: 1,
+                              borderRadius: 1,
+                              p: 1,
+                              // left:0,
+                              right: '30px',
+                              m: 2,
+                              top: '10px', width: '150px', textAlign: 'start'
+                            }}
+                          >
+                            <Typography sx={{ fontSize: '12px', fontWeight: 'bold' }}>Publice to Marketplace</Typography>
+                            <Typography
+                              sx={{ fontSize: '12px', fontWeight: 'bold' }}
+                              onClick={() => handleEdit(row._id)}
+                            >
+                              Edit
+                            </Typography>
+                            <Typography sx={{ fontSize: '12px', fontWeight: 'bold' }} onClick={() => handleDuplicateTemplate(row._id)}>Duplicate</Typography>
+                            <Typography
+                              sx={{ fontSize: '12px', color: 'red', fontWeight: 'bold' }}
+                              onClick={() => handleDelete(row._id)}
+                            >
+                              Delete
+                            </Typography>
+                          </Box>
+                        )}
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+            </TableContainer>
+            <TablePagination
+rowsPerPageOptions={[30,40,50,60,100]}
+component="div"
+count={organizerTemplatesData.length}
+rowsPerPage={rowsPerPage}
+page={page}
+onPageChange={handleChangePage}
+onRowsPerPageChange={handleChangeRowsPerPage}
+/>
+            </Box>
+            )}
+            
+          
+          </Box>
+
+        </Box>
+      )}
+      {showOrganizerTemplateForm && (
+        <>
+          <Box>
+            <Box sx={{ display: 'flex', alighItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+              <Typography variant='h4'>Create Template</Typography>
+              <Box>
+                <Button variant="text" onClick={handlePreview} >Preview</Button>
+                <Button variant="text" onClick={handleDrawerOpen} >Setting</Button>
+              </Box>
+
+            </Box>
+            <Box>
+              <InputLabel sx={{color:'black'}}>Template Name</InputLabel>
+              <TextField
+
+                value={templateName}
+                onChange={(e) => setTemplateName(e.target.value)}
+                fullWidth
+                size="small"
+
+                placeholder='Template name'
+                sx={{ backgroundColor: '#fff', mt: 2 }}
+                className='organizer-input-label'
+                error={!!templateNameError}
+              />
+              {(!!templateNameError) && <Alert sx={{
+                width: '96%',
+                p: '0', // Adjust padding to control the size
+                pl: '4%', height: '23px',
+                borderRadius: '10px',
+                borderTopLeftRadius: '0',
+                borderTopRightRadius: '0',
+                fontSize: '15px',
+                display: 'flex',
+                alignItems: 'center', // Center content vertically
+                '& .MuiAlert-icon': {
+                  fontSize: '16px', // Adjust the size of the icon
+                  mr: '8px', // Add margin to the right of the icon
+                },
+              }} variant="filled" severity="error" >
+                {templateNameError}
+              </Alert>}
+            </Box>
+            <Box mt={2}>
+              <label className='organizer-input-label'>Organizer name</label>
+              <TextField
+              inputRef={textFieldRef}
+              value={organizerName}
+              onChange={handlejobName}
+              onClick={(e) => setCursorPosition(e.target.selectionStart)}
+                // value={organizerName + selectedShortcut}
+                // onChange={handlejobName}
+                
+                fullWidth
+                size="small"
+                error={!!organizerError}
+                placeholder='Organizer name'
+                className='organizer-input-label'
+                sx={{ backgroundColor: '#fff', mt: 2 }}
+              />
+              {(!!organizerError) && <Alert sx={{
+                width: '96%',
+                p: '0', // Adjust padding to control the size
+                pl: '4%', height: '23px',
+                borderRadius: '10px',
+                borderTopLeftRadius: '0',
+                borderTopRightRadius: '0',
+                fontSize: '15px',
+                display: 'flex',
+                alignItems: 'center', // Center content vertically
+                '& .MuiAlert-icon': {
+                  fontSize: '16px', // Adjust the size of the icon
+                  mr: '8px', // Add margin to the right of the icon
+                },
+              }} variant="filled" severity="error" >
+                {organizerError}
+              </Alert>}
+
+              <Box>
+                  <Button variant="contained" color="primary" onClick={toggleDropdown} sx={{
+                            backgroundColor: 'var(--color-save-btn)',  // Normal background
+                           
+                            '&:hover': {
+                              backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
+                            },
+                            borderRadius:'15px', mt: 2
+                          }}>
+                    Add Shortcode
+                  </Button>
+
+                  <Popover
+                    open={showDropdown}
+                    anchorEl={anchorEl}
+                    onClose={handleCloseDropdown}
+                    anchorOrigin={{
+                      vertical: "bottom",
+                      horizontal: "left",
+                    }}
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "left",
+                    }}
+                  >
+                    <Box>
+                      <List className="dropdown-list" sx={{ width: "300px", height: "300px", cursor: "pointer" }}>
+                        {filteredShortcuts.map((shortcut, index) => (
+                          <ListItem key={index} onClick={() => handleAddShortcut(shortcut.value)}>
+                            <ListItemText
+                              primary={shortcut.title}
+                              primaryTypographyProps={{
+                                style: {
+                                  fontWeight: shortcut.isBold ? "bold" : "normal",
+                                },
+                              }}
+                            />
+                          </ListItem>
+                        ))}
+                      </List>
+                    </Box>
+                  </Popover>
+                </Box>
+            </Box>
+
+          </Box>
+          <Box className="organizer-container" sx={{ display: "flex", marginTop: "40px", height: "auto", width: "100%", gap: 3 }}>
+            <Box className="left-org-container" sx={{ padding: '10px', width: "30%", height: "auto", p: 2 }}>
+              <Box className="smooth-dnd-container vertical" >
+                {sections.map((section) => (
+                  <Box key={section.id} sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    
+                  }}>
+                    <TextField
+                      placeholder={`Section Name`}
+                      className='section-name'
+                      size="small"
+                      margin='normal'
+                      value={truncateText(section.text, 5)}
+                      InputProps={{
+                        readOnly: true
+                      }}
+                      sx={{ backgroundColor: selectedSection?.id === section.id ? "#E0F7FA" : "#fff", cursor: "pointer" }}
+                      onClick={() => handleSectionClick(section)}
+                      fullWidth
+                    />
+
+                  </Box>
+                ))}
+              </Box>
+              <Box sx={{ width: "50%", height: "25px", marginTop: "20px" }}>
+                <Button
+                  variant="contained"
+                  onClick={addSection}
+                  sx={{
+                    backgroundColor: 'var(--color-save-btn)',  // Normal background
+                   
+                    '&:hover': {
+                      backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
+                    },
+                    borderRadius:'15px', 
+                  }}
+                >
+                  New section
+                </Button>
+              </Box>
+            </Box>
+            <Box className="right-container" sx={{ borderRadius: '20px', width: "70%", height: "auto" }}>
+              {selectedSection && (
+                <Section
+                  section={selectedSection}
+                  onDelete={handleDeleteSection}
+                  onUpdate={handleUpdateSection}
+                  onDuplicate={handleDuplicateSection}
+                  onSaveFormData={handleFormSave}
+                  onSaveSectionData={handleSectionSaveData}
+                  sections={sections}
+                />
+              )}
+            </Box>
+          </Box>
+          <Box sx={{ display: "flex", gap: "10px", marginLeft: "10px", marginBottom: "20px", marginTop: '20px' }}>
+            <Button type="submit"
+              variant="contained"
+              color="primary"
+              onClick={saveandexitOrganizerTemp}  sx={{
+                backgroundColor: 'var(--color-save-btn)',  // Normal background
+               
+                '&:hover': {
+                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
+                },
+                borderRadius:'15px', 
+              }}>Save & exit</Button>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              onClick={saveOrganizerTemp}
+              sx={{
+                backgroundColor: 'var(--color-save-btn)',  // Normal background
+               
+                '&:hover': {
+                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
+                },
+                borderRadius:'15px', width:'80px'
+              }}
+            >
+              Save
+            </Button>
+            <Button
+              type="button"
+              variant="outlined"
+              color="primary"
+              onClick={handleCancel}
+              sx={{
+                borderColor: 'var(--color-border-cancel-btn)',  // Normal background
+               color:'var(--color-save-btn)',
+                '&:hover': {
+                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
+                  color:'#fff',
+                  border:"none"
+                },
+                width:'80px',borderRadius:'15px'
+              }}
+            >
+              Cancel
+            </Button>
+          </Box>
+
+
+          <Drawer
+            anchor='right'
+            open={isDrawerOpen}
+            onClose={handleDrawerClose}
+            PaperProps={{
+              id: 'tag-drawer',
+              sx: {
+                borderRadius: isSmallScreen ? '0' : '10px 0 0 10px',
+                width: isSmallScreen ? '100%' : 500,
+                maxWidth: '100%',
+                [theme.breakpoints.down('sm')]: {
+                  width: '100%',
+                },
+
+              }
+            }}
+          >
+            <Box sx={{ borderRadius: isSmallScreen ? '0' : '15px' }} role="presentation">
+              <Box>
+                <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '15px', background: "#EEEEEE" }}>
+                  <Typography variant="h6" >
+                    Organizer settings
+                  </Typography>
+                  <IoClose onClick={handleDrawerClose} style={{ cursor: 'pointer' }} />
+                </Box>
+                <Box sx={{ pr: 2, pl: 2, pt: 2 }}>
+                  <FormGroup>
+                    {/* Switch for Login */}
+                    <FormControlLabel
+                      control={<Switch checked={loginChecked} onChange={(event) => handleLoginToggle(event.target.checked)} />}
+                      label="Notify about document upload"
+                    />
+                    {/* Switch for Notify */}
+                    <FormControlLabel
+                      control={<Switch checked={notifyChecked} onChange={(event) => handleNotifyToggle(event.target.checked)} />}
+                      label="Organizer self service"
+                    />
+                    {/* Switch for Email Sync */}
+                    <FormControlLabel
+                      control={<Switch checked={emailSyncChecked} onChange={(event) => handleEmailSyncToggle(event.target.checked)} />}
+                      label="Automatically seal after submission"
+                    />
+                    {/* Switch for Auto-Save */}
+                    <FormControlLabel
+                      control={<Switch checked={autoSaveChecked} onChange={(event) => handleAutoSaveToggle(event.target.checked)} />}
+                      label="Send reminders to clients"
+                    />
+
+                    {autoSaveChecked && (
+                      <Box mb={3}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, mt: 2 }}>
+
+                          <Box>
+                            <InputLabel sx={{ color: 'black' }}>Days until next reminder</InputLabel>
+                            <TextField
+                              // margin="normal"
+                              fullWidth
+                              name="Daysuntilnextreminder"
+                              value={daysuntilNextReminder}
+                              onChange={(e) => setDaysuntilNextReminder(e.target.value)}
+                              placeholder="Days until next reminder"
+                              size="small"
+                              sx={{ mt: 2 }}
+                            />
+                          </Box>
+
+                          <Box>
+                            <InputLabel sx={{ color: 'black' }}>No Of reminders</InputLabel>
+                            <TextField
+
+                              fullWidth
+                              name="No Of reminders"
+                              value={noOfReminder}
+                              onChange={(e) => setNoOfReminder(e.target.value)}
+
+                              placeholder="NoOfreminders"
+                              size="small"
+                              sx={{ mt: 2 }}
+                            />
+                          </Box>
+
+                        </Box>
+                      </Box>
+                    )}
+                  </FormGroup>
+                </Box>
+              </Box>
+            </Box>
+          </Drawer>
+
+          <Dialog open={previewDialogOpen} onClose={handleClosePreview} fullScreen >
+
+            <DialogContent >
+
+
+              <Box>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '2px solid #3FA2F6', p: 2, mb: 3, borderRadius: '10px', backgroundColor: '#96C9F4' }}>
+                      <Box >
+                        <Typography fontWeight='bold'>Preview mode</Typography>
+                        <Typography>The client sees your organizer like this</Typography>
+                      </Box>
+                      <Button variant='text' onClick={handleClosePreview} >Back to edit</Button>
+                    </Box>
+                    <Typography variant='text' gutterBottom>
+                      {organizerName}
+                    </Typography>
+
+                    <FormControl fullWidth sx={{ marginBottom: '10px', marginTop: '10px' }}>
+                      {/* <Select
+                        value={activeStep}
+                        onChange={handleDropdownChange}
+                        size="small"
+                      >
+                        
+                       
+                        {visibleSections.map((section, index) => {
+                                              // Calculate answered elements count for this specific section
+                                              const answeredCount = section.formElements.reduce(
+                                                (count, element) => {
+                                                  const key = `${section.id}_${element.text}`;
+                                                  return count + (answeredElements[key] ? 1 : 0);
+                                                },
+                                                0
+                                              );
+                        
+                                              const totalElements = section.formElements.length;
+                        
+                                              return (
+                                                <MenuItem key={section.id} value={index}>
+                                                  {section.text} ({answeredCount}/{totalElements})
+                                                </MenuItem>
+                                              );
+                                            })}
+                      </Select> */}
+
+                      <Select
+  value={activeStep}
+  onChange={handleDropdownChange}
+  size="small"
+>
+  {visibleSections.map((section, index) => {
+    // Filter form elements that are actually visible
+    const visibleElements = section.formElements.filter((el) =>
+      shouldShowElement(el, section.id)
+    );
+
+    // Count answered visible elements
+    const answeredCount = visibleElements.reduce((count, element) => {
+      const key = `${section.id}_${element.text}`;
+      return count + (answeredElements[key] ? 1 : 0);
+    }, 0);
+
+    const totalVisibleElements = visibleElements.length;
+
+    return (
+      <MenuItem key={section.id} value={index}>
+        {section.text} ({answeredCount}/{totalVisibleElements})
+      </MenuItem>
+    );
+  })}
+</Select>
+
+                    </FormControl>
+
+                    <Box mt={2} mb={2}>
+                      <LinearProgress variant="determinate" value={(activeStep + 1) / totalSteps * 100} />
+                    </Box>
+
+                  
+                    <Box sx={{ pl: 20, pr: 20 }}>
+                      {/* {visibleSections.map((section, sectionIndex) => (
+                        sectionIndex === activeStep && (
+                          <Box key={section.text}>
+                            {section.formElements.map((element) => (
+                              shouldShowElement(element) && (
+                                <Box key={element.text} >
+                                  {(element.type === 'Free Entry'  || element.type === 'Email') && (
+                                    <Box>
+                                      <Typography fontSize='18px' mb={1} mt={1}>{element.text}</Typography>
+                                      <TextField
+                                        variant="outlined"
+                                        size="small"
+                                        multiline
+                                        fullWidth
+                                        // margin='normal'
+                                        placeholder={`${element.type} Answer`}
+                                        inputProps={{
+                                          type: element.type === 'Free Entry' ? 'text' : element.type.toLowerCase(),
+                                        }}
+                                        maxRows={8}
+                                        style={{ display: 'block', marginTop: '15px' }}
+                                        value={inputValues[element.text] || ''}
+                                        onChange={(e) => handleInputChange(e, element.text)}
+                                      />
+                                    </Box>
+                                  )}
+{(  element.type === 'Number') && (
+                                    <Box>
+                                      <Typography fontSize='18px' mb={1} mt={1}>{element.text}</Typography>
+                                      
+                                      <TextField
+  variant="outlined"
+  size="small"
+  multiline
+  fullWidth
+  placeholder={`${element.type} Answer`}
+  inputProps={{
+    type: "text", // Keep as text to prevent default number input styling
+    inputMode: "numeric", // Mobile keyboard optimization
+    pattern: "[0-9]*", // Ensures only numbers
+  }}
+  maxRows={8}
+  style={{ display: "block", marginTop: "15px" }}
+  value={inputValues[element.text] || ""}
+  onChange={(e) => {
+    const numericValue = e.target.value.replace(/\D/g, ""); // Remove non-numeric characters
+    handleInputChange({ target: { value: numericValue } }, element.text);
+  }}
+/>
+
+                                    </Box>
+                                  )}
+                                  {element.type === 'Radio Buttons' && (
+                                    <Box>
+                                      <Typography fontSize='18px' mb={1} mt={1} >{element.text}</Typography>
+                                      <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                                        {element.options.map((option) => (
+                                          <Button
+                                            key={option.text}
+                                            variant={radioValues[element.text] === option.text ? 'contained' : 'outlined'}
+                                            onClick={() => handleRadioChange(option.text, element.text)}
+                                            sx={{
+                                              // width: '80px',
+                                              borderRadius: '15px',
+                                              ...(radioValues[element.text] === option.text
+                                                ? {
+                                                    backgroundColor: 'var(--color-save-btn)',  // Normal background
+                                                    '&:hover': {
+                                                      backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
+                                                    },
+                                                  }
+                                                : {
+                                                    borderColor: 'var(--color-border-cancel-btn)',  // Normal border color
+                                                    color: 'var(--color-save-btn)',
+                                                    '&:hover': {
+                                                      backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
+                                                      color: '#fff',
+                                                      border: 'none',
+                                                    },
+                                                  }),
+                                            }} 
+                                         >
+                                            {option.text}
+                                          </Button>
+                                        ))}
+                                      </Box>
+                                    </Box>
+                                  )}
+
+                                  {element.type === 'Checkboxes' && (
+                                    <Box>
+                                      <Typography fontSize='18px' >{element.text}</Typography>
+                                      <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                                        {element.options.map((option) => (
+                                          <Button
+                                            key={option.text}
+                                            variant={checkboxValues[element.text]?.[option.text] ? 'contained' : 'outlined'}
+                                            onClick={() => handleCheckboxChange(option.text, element.text)}
+                                            sx={{
+                                              // width: '80px',
+                                              borderRadius: '15px',
+                                              ...(checkboxValues[element.text]?.[option.text]
+                                                ? {
+                                                    backgroundColor: 'var(--color-save-btn)',  // Normal background
+                                                    '&:hover': {
+                                                      backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
+                                                    },
+                                                  }
+                                                : {
+                                                    borderColor: 'var(--color-border-cancel-btn)',  // Normal border color
+                                                    color: 'var(--color-save-btn)',
+                                                    '&:hover': {
+                                                      backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
+                                                      color: '#fff',
+                                                      border: 'none',
+                                                    },
+                                                  }),
+                                            }}
+                                         >
+                                            {option.text}
+                                          </Button>
+                                        ))}
+                                      </Box>
+                                    </Box>
+                                  )}
+
+                                  {element.type === 'Yes/No' && (
+                                    <Box>
+                                      <Typography fontSize='18px' >{element.text}</Typography>
+                                      <Box sx={{ display: 'flex', gap: 1 }}>
+                                        {element.options.map((option) => (
+                                          <Button
+                                            key={option.text}
+                                            variant={selectedValue === option.text ? 'contained' : 'outlined'}
+                                            onClick={(event) => handleChange(event, element.text)}
+                                            sx={{
+                                              // width: '80px',
+                                              borderRadius: '15px',
+                                              ...(selectedValue === option.text
+                                                ? {
+                                                    backgroundColor: 'var(--color-save-btn)',  // Normal background
+                                                    '&:hover': {
+                                                      backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
+                                                    },
+                                                  }
+                                                : {
+                                                    borderColor: 'var(--color-border-cancel-btn)',  // Normal border color
+                                                    color: 'var(--color-save-btn)',
+                                                    '&:hover': {
+                                                      backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
+                                                      color: '#fff',
+                                                      border: 'none',
+                                                    },
+                                                  }),
+                                            }} 
+                                         >
+                                            {option.text}
+                                          </Button>
+                                        ))}
+                                      </Box>
+                                    </Box>
+                                  )}
+
+                                  {element.type === 'Dropdown' && (
+                                    <Box>
+                                      <Typography fontSize='18px' >{element.text}</Typography>
+                                      <FormControl fullWidth>
+                                        <Select
+                                          value={selectedDropdownValue}
+                                          onChange={(event) => handleDropdownValueChange(event, element.text)}
+                                          size="small"
+                                        >
+                                          {element.options.map((option) => (
+                                            <MenuItem key={option.text} value={option.text}>
+                                              {option.text}
+                                            </MenuItem>
+                                          ))}
+                                        </Select>
+                                      </FormControl>
+                                    </Box>
+                                  )}
+
+                                  {element.type === 'Date' && (
+                                    <Box>
+                                      <Typography fontSize='18px' >{element.text}</Typography>
+                                      <DatePicker
+                                        format="DD/MM/YYYY"
+                                        sx={{ width: '100%', backgroundColor: '#fff' }}
+                                        selected={startDate}
+                                        onChange={handleStartDateChange}
+                                        renderInput={(params) => <TextField {...params} size="small" />}
+                                        onOpen={() => setAnsweredElements((prevAnswered) => ({
+                                          ...prevAnswered,
+                                          [element.text]: true,
+                                        }))}
+                                      />
+                                    </Box>
+                                  )}
+                                 
+                                  {element.type === "File Upload" && (
+                                    <Box>
+                                      <Typography fontSize='18px' mb={1} mt={2}>{element.text}</Typography>
+                                      
+                                      <Tooltip title="Unavailable in preview mode" placement="top">
+                                        <Box sx={{ position: 'relative', width: '100%' }}>
+                                          <TextField
+                                            variant="outlined"
+                                            size="small"
+                                            fullWidth
+                                            // margin="normal"
+                                            disabled
+                                            placeholder="Add Document"
+                                            sx={{
+                                              cursor: 'not-allowed',
+                                              '& .MuiInputBase-input': {
+                                                pointerEvents: 'none',
+                                                cursor: 'not-allowed',
+                                              },
+                                            }}
+                                          />
+                                        </Box>
+                                      </Tooltip>
+                                    </Box>
+                                  )}
+                                  {element.type === "Text Editor" && (
+                                    <Box mt={2} mb={2}>
+                                      <Typography>{stripHtmlTags(element.text)}</Typography>
+                                    </Box>
+                                  )}
+                                </Box>
+                              )
+                            ))}
+                          </Box>
+                        )
+                      ))} */}
+
+
+ {visibleSections.map(
+                    (section, sectionIndex) =>
+                      sectionIndex === activeStep && (
+                        <Box key={section.id}>
+                          {section.formElements.map(
+                            (element) =>
+                              shouldShowElement(element, section.id) && (
+                                <Box key={`${section.id}_${element.id}`}>
+                                  {/* Text Editor */}
+                                  {element.type === "Text Editor" && (
+                                    <Box mt={2} mb={2}>
+                                      <Typography>
+                                        {stripHtmlTags(element.text)}
+                                      </Typography>
+                                    </Box>
+                                  )}
+
+                                  {/* Free Entry or Email */}
+                                  {(element.type === "Free Entry" ||
+                                    element.type === "Email") && (
+                                    <Box>
+                                      <Typography fontSize="18px" mb={1} mt={1}>
+                                        {element.text}
+                                      </Typography>
+                                      <TextField
+                                        variant="outlined"
+                                        size="small"
+                                        multiline
+                                        fullWidth
+                                        placeholder={`${element.type} Answer`}
+                                        inputProps={{
+                                          type:
+                                            element.type === "Free Entry"
+                                              ? "text"
+                                              : element.type.toLowerCase(),
+                                        }}
+                                        maxRows={8}
+                                        style={{ display: "block" }}
+                                        value={
+                                          inputValues[
+                                            `${section.id}_${element.text}`
+                                          ] || ""
+                                        }
+                                        onChange={(e) =>
+                                          handleInputChange(
+                                            e,
+                                            element.text,
+                                            section.id
+                                          )
+                                        }
+                                      />
+                                    </Box>
+                                  )}
+
+                                  {/* Number */}
+                                  {element.type === "Number" && (
+                                    <Box>
+                                      <Typography fontSize="18px" mb={1} mt={1}>
+                                        {element.text}
+                                      </Typography>
+                                      <TextField
+                                        variant="outlined"
+                                        size="small"
+                                        multiline
+                                        fullWidth
+                                        placeholder={`${element.type} Answer`}
+                                        inputProps={{
+                                          type: "text",
+                                          inputMode: "numeric",
+                                          pattern: "[0-9]*",
+                                        }}
+                                        maxRows={8}
+                                        style={{
+                                          display: "block",
+                                          marginTop: "15px",
+                                        }}
+                                        value={
+                                          inputValues[
+                                            `${section.id}_${element.text}`
+                                          ] || ""
+                                        }
+                                        onChange={(e) => {
+                                          const numericValue =
+                                            e.target.value.replace(/\D/g, "");
+                                          handleInputChange(
+                                            { target: { value: numericValue } },
+                                            element.text,
+                                            section.id
+                                          );
+                                        }}
+                                      />
+                                    </Box>
+                                  )}
+
+                                  {/* Radio Buttons */}
+                                  {element.type === "Radio Buttons" && (
+                                    <Box>
+                                      <Typography fontSize="18px" mb={1} mt={1}>
+                                        {element.text}
+                                      </Typography>
+                                      <Box
+                                        sx={{
+                                          display: "flex",
+                                          gap: 1,
+                                          flexWrap: "wrap",
+                                        }}
+                                      >
+                                        {element.options.map((option) => (
+                                          <Button
+                                            key={option.text}
+                                            variant={
+                                              radioValues[
+                                                `${section.id}_${element.text}`
+                                              ] === option.text
+                                                ? "contained"
+                                                : "outlined"
+                                            }
+                                            onClick={() =>
+                                              handleRadioChange(
+                                                option.text,
+                                                element.text,
+                                                section.id
+                                              )
+                                            }
+                                            sx={{
+                                              borderRadius: "15px",
+                                              ...(radioValues[
+                                                `${section.id}_${element.text}`
+                                              ] === option.text
+                                                ? {
+                                                    backgroundColor:
+                                                      "var(--color-save-btn)",
+                                                    "&:hover": {
+                                                      backgroundColor:
+                                                        "var(--color-save-hover-btn)",
+                                                    },
+                                                  }
+                                                : {
+                                                    borderColor:
+                                                      "var(--color-border-cancel-btn)",
+                                                    color:
+                                                      "var(--color-save-btn)",
+                                                    "&:hover": {
+                                                      backgroundColor:
+                                                        "var(--color-save-hover-btn)",
+                                                      color: "#fff",
+                                                      border: "none",
+                                                    },
+                                                  }),
+                                            }}
+                                          >
+                                            {option.text}
+                                          </Button>
+                                        ))}
+                                      </Box>
+                                    </Box>
+                                  )}
+
+                                  {/* Checkboxes */}
+                                  {element.type === "Checkboxes" && (
+                                    <Box>
+                                      <Typography fontSize="18px">
+                                        {element.text}
+                                      </Typography>
+                                      <Box
+                                        sx={{
+                                          display: "flex",
+                                          gap: 1,
+                                          flexWrap: "wrap",
+                                        }}
+                                      >
+                                        {element.options.map((option) => (
+                                          <Button
+                                            key={option.text}
+                                            variant={
+                                              checkboxValues[
+                                                `${section.id}_${element.text}`
+                                              ]?.[option.text]
+                                                ? "contained"
+                                                : "outlined"
+                                            }
+                                            onClick={() =>
+                                              handleCheckboxChange(
+                                                option.text,
+                                                element.text,
+                                                section.id
+                                              )
+                                            }
+                                            sx={{
+                                              borderRadius: "15px",
+                                              ...(checkboxValues[
+                                                `${section.id}_${element.text}`
+                                              ]?.[option.text]
+                                                ? {
+                                                    backgroundColor:
+                                                      "var(--color-save-btn)",
+                                                    "&:hover": {
+                                                      backgroundColor:
+                                                        "var(--color-save-hover-btn)",
+                                                    },
+                                                  }
+                                                : {
+                                                    borderColor:
+                                                      "var(--color-border-cancel-btn)",
+                                                    color:
+                                                      "var(--color-save-btn)",
+                                                    "&:hover": {
+                                                      backgroundColor:
+                                                        "var(--color-save-hover-btn)",
+                                                      color: "#fff",
+                                                      border: "none",
+                                                    },
+                                                  }),
+                                            }}
+                                          >
+                                            {option.text}
+                                          </Button>
+                                        ))}
+                                      </Box>
+                                    </Box>
+                                  )}
+
+                                  {/* Yes/No */}
+                                  {element.type === "Yes/No" && (
+                                    <Box>
+                                      <Typography fontSize="18px">
+                                        {element.text}
+                                      </Typography>
+                                      <Box sx={{ display: "flex", gap: 1 }}>
+                                        {element.options.map((option) => (
+                                          <Button
+                                            key={option.text}
+                                            variant={
+                                              selectedYesNoValues[
+                                                `${section.id}_${element.text}`
+                                              ] === option.text
+                                                ? "contained"
+                                                : "outlined"
+                                            }
+                                            onClick={() =>
+                                              handleYesNoChange(
+                                                option.text,
+                                                element.text,
+                                                section.id
+                                              )
+                                            }
+                                            sx={{
+                                              borderRadius: "15px",
+                                              ...(selectedYesNoValues[
+                                                `${section.id}_${element.text}`
+                                              ] === option.text
+                                                ? {
+                                                    backgroundColor:
+                                                      "var(--color-save-btn)",
+                                                    "&:hover": {
+                                                      backgroundColor:
+                                                        "var(--color-save-hover-btn)",
+                                                    },
+                                                  }
+                                                : {
+                                                    borderColor:
+                                                      "var(--color-border-cancel-btn)",
+                                                    color:
+                                                      "var(--color-save-btn)",
+                                                    "&:hover": {
+                                                      backgroundColor:
+                                                        "var(--color-save-hover-btn)",
+                                                      color: "#fff",
+                                                      border: "none",
+                                                    },
+                                                  }),
+                                            }}
+                                          >
+                                            {option.text}
+                                          </Button>
+                                        ))}
+                                      </Box>
+                                    </Box>
+                                  )}
+
+                                  {/* Dropdown */}
+                                  {element.type === "Dropdown" && (
+                                    <Box>
+                                      <Typography fontSize="18px">
+                                        {element.text}
+                                      </Typography>
+                                      <FormControl fullWidth>
+                                        <Select
+                                          value={
+                                            selectedDropdownValues[
+                                              `${section.id}_${element.text}`
+                                            ] || ""
+                                          }
+                                          onChange={(event) =>
+                                            handleDropdownValueChange(
+                                              event,
+                                              element.text,
+                                              section.id
+                                            )
+                                          }
+                                          size="small"
+                                        >
+                                          {element.options.map((option) => (
+                                            <MenuItem
+                                              key={option.text}
+                                              value={option.text}
+                                            >
+                                              {option.text}
+                                            </MenuItem>
+                                          ))}
+                                        </Select>
+                                      </FormControl>
+                                    </Box>
+                                  )}
+
+                                  {/* Date */}
+                                  {element.type === "Date" && (
+                                    <Box>
+                                      <Typography fontSize="18px">
+                                        {element.text}
+                                      </Typography>
+                                      <DatePicker
+                                        format="DD/MM/YYYY"
+                                        sx={{
+                                          width: "100%",
+                                          backgroundColor: "#fff",
+                                        }}
+                                        selected={startDate}
+                                        onChange={handleStartDateChange}
+                                        renderInput={(params) => (
+                                          <TextField {...params} size="small" />
+                                        )}
+                                        onOpen={() =>
+                                          setAnsweredElements(
+                                            (prevAnswered) => ({
+                                              ...prevAnswered,
+                                              [`${section.id}_${element.text}`]: true,
+                                            })
+                                          )
+                                        }
+                                      />
+                                    </Box>
+                                  )}
+
+                                  {/* File Upload */}
+                                  {element.type === "File Upload" && (
+                                    <Box>
+                                      <Typography fontSize="18px" mb={1} mt={2}>
+                                        {element.text}
+                                      </Typography>
+                                      <Tooltip
+                                        title="Unavailable in preview mode"
+                                        placement="top"
+                                      >
+                                        <Box
+                                          sx={{
+                                            position: "relative",
+                                            width: "100%",
+                                          }}
+                                        >
+                                          <TextField
+                                            variant="outlined"
+                                            size="small"
+                                            fullWidth
+                                            disabled
+                                            placeholder="Add Document"
+                                            sx={{
+                                              cursor: "not-allowed",
+                                              "& .MuiInputBase-input": {
+                                                pointerEvents: "none",
+                                                cursor: "not-allowed",
+                                              },
+                                            }}
+                                          />
+                                        </Box>
+                                      </Tooltip>
+                                    </Box>
+                                  )}
+                                </Box>
+                              )
+                          )}
+                        </Box>
+                      )
+                  )}
+                      <Box mt={3} display='flex' gap={3} alignItems='center'>
+                        <Button disabled={activeStep === 0} onClick={handleBack} variant='contained' sx={{
+                backgroundColor: 'var(--color-save-btn)',  // Normal background
+               
+                '&:hover': {
+                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
+                },
+               width:'80px',borderRadius:'15px'
+              }}>
+                          Back
+                        </Button>
+                        <Button onClick={handleNext} disabled={activeStep === totalSteps - 1} variant='contained' sx={{
+                backgroundColor: 'var(--color-save-btn)',  // Normal background
+               
+                '&:hover': {
+                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
+                },
+               width:'80px',borderRadius:'15px'
+              }}>
+                          Next
+                        </Button>
+                      </Box>
+                    </Box>
+                  </Box>
+                </LocalizationProvider>
+              </Box>
+            </DialogContent>
+
+          </Dialog>
+        </>
+      )}
+
+    </Box>
+  );
+};
+
+export default OrganizersTemp;
