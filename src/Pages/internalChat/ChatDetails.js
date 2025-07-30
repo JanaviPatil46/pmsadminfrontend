@@ -115,57 +115,7 @@ import {
   
   
  
-    // const updateChatDescription = (message = "") => {
-    //     const contentToSend = message.trim() || editorContent.trim();
-    //     if (!contentToSend) return;
-    //     const userRole = localStorage.getItem("userRole");
-    //     const newDescription = {
-    //       message: contentToSend,
-    //       fromwhome: userRole,
-    //       senderid: loginUserId,
-    //     };
-    
-    //     if (replyTo) {
-    //       newDescription.replyTo = replyTo._id;
-    //     }
-    
-      
-    //     const raw = JSON.stringify({
-    //         // teammemberid:chat.teammemberid._id,
-    //       description: [newDescription],
-    //     });
-    
-
-    //     console.log("rae new message",raw)
-    //     fetch(
-    //       `http://127.0.0.1:8016/api/internalchat/send`,
-    //       {
-    //         method: "POST",
-    //         headers: {
-    //           "Content-Type": "application/json",
-    //         },
-    //         body: raw,
-    //       }
-    //     )
-    //       .then((response) => {
-    //         if (!response.ok) throw new Error("Failed to update");
-    //         return response.json();
-    //       })
-    //       .then(() => {
-    //         toast.success("Message sent");
-    //         setEditorContent("");
-    //         setReplyTo(null);
-    //         //  securemessagechatsend(chatId);
-    //         // updatechatStatus(chatId);
-    //     getsChatlist()
-    //         getsChatDetails();
-    //       })
-    //       .catch(() => {
-    //         toast.error("Send failed");
-    //       });
-    //   };
-  
-
+   
     const updateChatDescription = (message = "") => {
       const contentToSend = message.trim() || editorContent.trim();
       if (!contentToSend || !chat?._id) return;
@@ -224,7 +174,7 @@ import {
         });
   
         const response = await fetch(
-          `${INTERNALCHAT}/api/internalchat/bymessageid/delete`,
+          `${INTERNALCHAT}/api/internalchat/${chatId}/message/bymessageid/delete`,
           {
             method: "DELETE",
             headers: {
@@ -261,12 +211,7 @@ import {
               justifyContent: "space-between",
             }}
           >
-            {/* <Box>
-              <Typography variant="h6" gutterBottom>
-                {chat.teammemberid.username}
-              </Typography>
-             
-            </Box> */}
+            
             
           </Box>
   
@@ -345,13 +290,42 @@ import {
     const isAdmin = desc.fromwhome?.toLowerCase() === "admin";
     const messageTime = desc.time ? formatDate(desc.time) : "Just now";
   
-    let senderDisplayName = "";
-    if (isClient && desc.senderid?.username) {
-      senderDisplayName = desc.senderid.username;
-    } else if (isAdmin && desc.senderid?.username) {
+    // let senderDisplayName = "";
+    // if (isClient && desc.senderid?.username) {
+    //   senderDisplayName = desc.senderid.username;
+    // } else if (isAdmin && desc.senderid?.username) {
+    //   senderDisplayName = "You";
+    // }
+
+    // Determine if the sender is the current user
+  const isCurrentUser = 
+    (desc.senderid?._id === loginUserId) || 
+    (desc.senderid === loginUserId);
+
+  // Your specific sender display name logic
+  let senderDisplayName = "";
+  if (desc.senderid) {
+    if (isCurrentUser) {
       senderDisplayName = "You";
+    } else if (isClient && desc.senderid.username) {
+      senderDisplayName = desc.senderid.username;
+    } else if (isAdmin && desc.senderid.username) {
+      senderDisplayName = desc.senderid.username;
     }
-  
+  }
+
+  // Determine sender display name
+  // let senderDisplayName = "";
+  // if (desc.senderid) {
+  //   // Check if the message sender is the current logged-in user
+  //   if (desc.senderid._id === loginUserId || desc.senderid === loginUserId) {
+  //     senderDisplayName = "You";
+  //   } else if (isClient && desc.senderid.username) {
+  //     senderDisplayName = desc.senderid.username;
+  //   } else if (isAdmin && desc.senderid.username) {
+  //     senderDisplayName = desc.senderid.username;
+  //   }
+  // }
     return (
       <Box
         ref={(el) => {
@@ -361,7 +335,7 @@ import {
         }}
         sx={{
           display: "flex",
-          justifyContent: isClient ? "flex-start" : "flex-end",
+          justifyContent: isCurrentUser ? "flex-end" : "flex-start",
           mb: 2,
           position: "relative",
         }}
@@ -434,7 +408,7 @@ import {
               >
                 Reply
               </MenuItem>
-              {selectedMessage?.fromwhome?.toLowerCase() === "admin" && (
+              {/* {selectedMessage?.fromwhome?.toLowerCase() === "admin" && (
                 <MenuItem
                   onClick={() => {
                     handleDeleteMessage(selectedMessage);
@@ -443,7 +417,20 @@ import {
                 >
                   Delete
                 </MenuItem>
-              )}
+              )} */}
+              {selectedMessage && 
+  ((selectedMessage.senderid?._id === loginUserId) || 
+   (selectedMessage.senderid === loginUserId)) && (
+  <MenuItem
+    onClick={() => {
+      handleDeleteMessage(selectedMessage);
+      setAnchorEl(null);
+    }}
+  >
+    {/* <DeleteIcon fontSize="small" sx={{ mr: 1 }} /> */}
+    Delete
+  </MenuItem>
+)}
             </Menu>
           </Box>
   

@@ -105,6 +105,7 @@ import AccountOrganizers from "./Pages/Organizers/AccountOrganizers.js"
 import ActiveOrganizers from "./Pages/Organizers/ActiveOrganizers.js";
 import ArchivedOrganizers from "./Pages/Organizers/ArchivedOrganizers.js";
 import InternalCommunication from  "./Pages/internalChat/internalCommunication.js"
+import Bulkaccount from "./Pages/Bulkaccount.js";
 const App = () => {
   return (
     <BrowserRouter>
@@ -149,6 +150,7 @@ const App = () => {
           <Route path="archivedjob" element={<ArchivedJob/>}/>
           </Route>
           <Route path="pipelines" element={<Pipeline />} />
+          <Route path="/bulkaccount" element={<Bulkaccount/>}/>
           <Route path="/organizerpreview" element={<PreviewOrganizer />} />
           <Route path="/import/accounts" element={<AccountImport/>}/>
           <Route path="/import/contacts" element={<ContactImport/>}/>
