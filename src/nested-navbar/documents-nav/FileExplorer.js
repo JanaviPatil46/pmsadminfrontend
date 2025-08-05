@@ -400,24 +400,7 @@ const handleDeleteFile = async () => {
   if (isFile) {
     const { permissions = {} } = content;
 
-    // return (
-    //   <div style={{ paddingLeft: 20, marginBottom: 10 }}>
-    //     📄 <span>{content.filename}</span>
-    //     <div style={{ display: "flex", gap: "10px", marginTop: 5 }}>
-    //       {["canView", "canDownload", "canUpdate", "canDelete"].map((perm) => (
-    //         <label key={perm} style={{cursor:'pointer'}}>
-    //           <input
-    //             type="checkbox"
-    //             checked={permissions[perm]}
-    //             onChange={(e) => handlePermissionChange(perm, e.target.checked)}
-
-    //           />
-    //           {perm.replace("can", "")}
-    //         </label>
-    //       ))}
-    //     </div>
-    //   </div>
-    // );
+   
 
     return (
 
