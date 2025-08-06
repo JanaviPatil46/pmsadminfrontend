@@ -135,9 +135,10 @@ const MyAccount = () => {
   const [currentImage, setCurrentImage] = useState(null);
   const [preview, setPreview] = useState(currentImage);
   const [isUploading, setIsUploading] = useState(false);
-  const [emailsync,setEmailSync]=useState('')
-   useEffect(() => {
+  const [emailsync, setEmailSync] = useState("");
+  useEffect(() => {
     console.log("Email sync updated:", emailsync);
+    // updateEmailSync(emailsync)
   }, [emailsync]);
   const fetchData = async () => {
     try {
@@ -152,7 +153,7 @@ const MyAccount = () => {
       setuserdata(data);
       console.log("dta", data);
       setCurrentImage(data.profilePicture);
-setEmailSync(data.emailSyncEmail)
+      setEmailSync(data.emailSyncEmail);
       if (data.role === "TeamMember") {
         fetchTeamMemberData(data.email);
       } else {
@@ -164,6 +165,27 @@ setEmailSync(data.emailSyncEmail)
       console.error("Error fetching data:", error);
     }
   };
+  // 🔁 Optional: Update email sync to backend when changed
+  const updateEmailSync = async (newEmailSyncValue) => {
+    try {
+      const url = `${LOGIN_API}/common/user/${loginuserid}`;
+      const response = await fetch(url, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ emailSyncEmail: newEmailSyncValue }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update email sync");
+      }
+
+      console.log("Email sync updated on server");
+    } catch (error) {
+      console.error("Error updating email sync:", error);
+    }
+  };
   useEffect(() => {
     if (currentImage) {
       // Replace 'uploads/' with 'profilepicture/' in the path
@@ -172,7 +194,7 @@ setEmailSync(data.emailSyncEmail)
         "profilepicture/"
       );
       setPreview(`${LOGIN_API}/${transformedUrl}`);
-      console.log("ghfhgf",`${LOGIN_API}/${transformedUrl}`)
+      console.log("ghfhgf", `${LOGIN_API}/${transformedUrl}`);
     }
   }, [currentImage]);
   const handleImageChange = (e) => {
@@ -1212,25 +1234,25 @@ setEmailSync(data.emailSyncEmail)
       handleLogin(); // Trigger Gmail API sign-in
     }
   };
-  const EMAIL_SYNC = process.env.REACT_APP_EMAILSYNC_API
-   const [emailList, setEmailList] = useState([]);
-   const handleGoogleLogin = () => {
+  const EMAIL_SYNC = process.env.REACT_APP_EMAILSYNC_API;
+  const [emailList, setEmailList] = useState([]);
+  const handleGoogleLogin = () => {
     window.location.href = `${EMAIL_SYNC}/emailsync/auth/google`;
   };
   const updateUserEmailSync = async (userId, emailSyncValue) => {
-  try {
-    await axios.patch(`${LOGIN_API}/common/user/${userId}`, {
-      emailSyncEmail: emailSyncValue,
-    });
-    console.log("✅ User updated with emailSync field.");
-  } catch (error) {
-    console.error("❌ Failed to update user with emailSync field:", error);
-  }
-};
+    try {
+      await axios.patch(`${LOGIN_API}/common/user/${userId}`, {
+        emailSyncEmail: emailSyncValue,
+      });
+      console.log("✅ User updated with emailSync field.");
+    } catch (error) {
+      console.error("❌ Failed to update user with emailSync field:", error);
+    }
+  };
 
-   const handleTokenLogin = async () => {
-    const targetEmail =  emailsync;
-console.log("target", targetEmail)
+  const handleTokenLogin = async () => {
+    const targetEmail = emailsync;
+    console.log("target", targetEmail);
     if (!targetEmail) {
       alert("⚠️ Please enter your email or login with Google first.");
       return;
@@ -1245,7 +1267,7 @@ console.log("target", targetEmail)
       // setProfile(res.data.profile);
       setEmailList(res.data.emails || []);
       localStorage.setItem("gmail_user_email", targetEmail);
-      setEmailSync(targetEmail)
+      setEmailSync(targetEmail);
 
       await updateUserEmailSync(loginuserid, targetEmail);
       alert("✅ Logged in using refresh token!");
@@ -1255,7 +1277,7 @@ console.log("target", targetEmail)
     }
   };
 
-   const handleEmailSync = async () => {
+  const handleEmailSync = async () => {
     if (!emailsync) {
       alert("⚠️ Please enter an email address.");
       return;
@@ -1275,6 +1297,9 @@ console.log("target", targetEmail)
         setEmail(emailsync);
         await handleGoogleLogin();
       }
+
+      // ✅ After successful sync, update the user with emailsync
+      await updateEmailSync(emailsync);
     } catch (error) {
       console.error("Email sync failed", error);
       alert("❌ Something went wrong while checking email existence.");
@@ -1373,57 +1398,10 @@ console.log("target", targetEmail)
     fetchLastUploadedImage();
   }, []);
 
-  // const handleImageChange = (e) => {
-  //   const file = e.target.files[0];
-  //   if (file) {
-  //     const reader = new FileReader();
-  //     reader.onload = () => {
-  //       setImage(reader.result); // Set the base64 image data
-  //       console.log("vinayak", reader.result);
-  //     };
-  //     reader.readAsDataURL(file);
-  //   }
-  // };
-
   const handleCroppedImage = (cropped) => {
     setCroppedImage(cropped); // Set the cropped image data
     setImage(null); // Hide the cropper
   };
-
-  // const handleSubmit = async () => {
-  //   if (croppedImage) {
-  //     try {
-  //       // Convert the blob URL to a Blob object
-  //       const response = await fetch(croppedImage);
-  //       const blob = await response.blob();
-
-  //       // Create a File object (optional: you can give it a name and MIME type)
-  //       const file = new File([blob], "cropped_image.jpg", { type: blob.type });
-
-  //       // Prepare FormData
-  //       const formData = new FormData();
-  //       formData.append("image", file); // Add the File object
-
-  //       // Make POST request using axios
-  //       axios
-  //         .post(`${LOGIN_API}/userprofilepic`, formData, {
-  //           headers: {
-  //             "Content-Type": "multipart/form-data",
-  //           },
-  //         })
-  //         .then((response) => {
-  //           console.log("Image uploaded successfully:", response.data);
-  //         })
-  //         .catch((error) => {
-  //           console.error("Error uploading image:", error);
-  //         });
-  //     } catch (error) {
-  //       console.error("Error converting blob URL to Blob:", error);
-  //     }
-  //   } else {
-  //     console.error("No cropped image to send!");
-  //   }
-  // };
 
   const handleSubmit = async (userId) => {
     if (!userId) {
@@ -1507,24 +1485,24 @@ console.log("target", targetEmail)
             </Box>
 
             {!isEditable && (
-              <Box mt={3} sx={{display:'flex', alignItems:'center', gap:5}}>
-                 <Avatar
-                      src={preview || currentImage}
-                      sx={{
-                        width: 120,
-                        height: 120,
-                        border: "2px solid #eee",
-                      }}
-                    />
-                    <Box>
-                      <Typography variant="h5">
-                  {firstName} {lastname}
-                </Typography>
-                <Typography variant="body1">
-                {phonenumber}
-                </Typography>
-                      </Box>
-                
+              <Box
+                mt={3}
+                sx={{ display: "flex", alignItems: "center", gap: 5 }}
+              >
+                <Avatar
+                  src={preview || currentImage}
+                  sx={{
+                    width: 120,
+                    height: 120,
+                    border: "2px solid #eee",
+                  }}
+                />
+                <Box>
+                  <Typography variant="h5">
+                    {firstName} {lastname}
+                  </Typography>
+                  <Typography variant="body1">{phonenumber}</Typography>
+                </Box>
               </Box>
             )}
             {isEditable && (
@@ -1699,11 +1677,6 @@ console.log("target", targetEmail)
                   variant="contained"
                   color="primary"
                   onClick={handleSaveButtonClick}
-                  // sx={{
-                  //   mt: 2,
-                  //   width: isSmallScreen ? "100%" : "auto",
-                  //   borderRadius: "10px",
-                  // }}
                   sx={{
                     backgroundColor: "var(--color-save-btn)", // Normal background
 
@@ -1722,11 +1695,6 @@ console.log("target", targetEmail)
                   variant="outlined"
                   color="primary"
                   onClick={handleCancelButtonClick}
-                  // sx={{
-                  //   mt: 2,
-                  //   width: isSmallScreen ? "100%" : "auto",
-                  //   borderRadius: "10px",
-                  // }}
                   sx={{
                     borderColor: "var(--color-border-cancel-btn)", // Normal background
                     color: "var(--color-save-btn)",
@@ -1843,11 +1811,6 @@ console.log("target", targetEmail)
                         type="submit"
                         variant="contained"
                         color="primary"
-                        // sx={{
-                        //   mt: 2,
-                        //   width: isSmallScreen ? "100%" : "auto",
-                        //   borderRadius: "10px",
-                        // }}
                         sx={{
                           backgroundColor: "var(--color-save-btn)", // Normal background
 
@@ -1867,11 +1830,6 @@ console.log("target", targetEmail)
                         variant="outlined"
                         color="primary"
                         onClick={handleCloseAlert}
-                        // sx={{
-                        //   mt: 2,
-                        //   width: isSmallScreen ? "100%" : "auto",
-                        //   borderRadius: "10px",
-                        // }}
                         sx={{
                           borderColor: "var(--color-border-cancel-btn)", // Normal background
                           color: "var(--color-save-btn)",
@@ -1954,8 +1912,6 @@ console.log("target", targetEmail)
                     size="small"
                     disabled={!isLoginEditable}
                     placeholder="Confirm Password"
-                    // onChange={handleConfirmPasswordChange}
-                    // onPaste={handleConfirmPasswordPaste} // Allow pasting
                     sx={{ width: "100%", borderRadius: "10px", mt: 1 }}
                     endAdornment={
                       <InputAdornment
@@ -2709,6 +2665,11 @@ console.log("target", targetEmail)
                     // value={emailId}
                     value={emailsync}
                     onChange={(e) => setEmailSync(e.target.value)}
+                    //                    onChange={(e) => {
+                    //   const newValue = e.target.value;
+                    //   setEmailSync(newValue);
+                    //   updateEmailSync(newValue);
+                    // }}
                     size="small"
                     margin="normal"
                     fullWidth

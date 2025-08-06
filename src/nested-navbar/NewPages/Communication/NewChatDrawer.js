@@ -363,7 +363,13 @@ const NewChatDrawer = ({ open, handleClose, accountwiseChatlist, data,isActiveTr
   const handleAbsolutesDates = (checked) => {
     setAbsoluteDates(checked);
   };
+ 
 
+  useEffect(() => {
+    if (logindata?.user?.id) {
+      setLoginUserId(logindata.user.id);
+    }
+  }, [logindata]);
   ///for drawer save btn
   const saveChat = () => {
     const myHeaders = new Headers();
@@ -399,6 +405,7 @@ const NewChatDrawer = ({ open, handleClose, accountwiseChatlist, data,isActiveTr
       clienttasks: subtaskData,
       // isclienttaskchecked: SubtaskSwitch,
       active: "true",
+      adminUserId:loginUserId
     });
     const requestOptions = {
       method: "POST",

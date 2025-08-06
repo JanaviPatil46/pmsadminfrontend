@@ -14,10 +14,24 @@ import micropms from "../Images/micropms.png";
 function ResetPassword() {
   //  const API_KEY = process.env.REACT_APP_API_IP;
 
-  // const { id, token } = useParams()
+  const { id, token } = useParams()
   const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
-  const history = useNavigate();
+   const navigate = useNavigate();
 
+    // Store token in localStorage when component mounts
+  useEffect(() => {
+    if (token && id) {
+      localStorage.setItem("resetpasstoken", token);
+      console.log("Token extracted from URL:", token);
+    } else {
+      // Check for existing token in case of page refresh
+      const storedToken = localStorage.getItem("resetpasstoken");
+      if (!storedToken) {
+        toast.error("Invalid reset link. Please request a new password reset.");
+        navigate("/login");
+      }
+    }
+  }, [token, id, navigate]);
   const [userEmail, setUserEmail] = useState("");
 
   const getuser = (id) => {
@@ -96,7 +110,7 @@ function ResetPassword() {
         Cookies.remove("resetpasstoken");
         localStorage.removeItem("resetpasstoken");
         toast("Password Updated successfully.");
-
+navigate("/login")
         // Handle success, if needed
       })
       .catch((error) => {
@@ -158,7 +172,7 @@ function ResetPassword() {
   };
 
   const handleSubmit = () => {
-    history("/login");
+    navigate("/login");
 
     if (password !== confirmPassword) {
       toast.error("Passwords do not match!");

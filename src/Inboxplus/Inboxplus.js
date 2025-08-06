@@ -892,7 +892,7 @@
 // //   );
 // // }
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect ,useContext} from "react";
 import axios from "axios";
 import {
   Card,
@@ -1242,7 +1242,43 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 
 // export default Inboxplus;
 
+import { LoginContext } from "../Sidebar/Context/Context";
+
 const Inboxplus = () => {
+   const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
+     const { logindata } = useContext(LoginContext);
+     const [loginuserid, setLoginUserId] = useState();
+     const [userdata, setuserdata] = useState();
+     const [emailSyncEmail,setEmailSyncEmail]= useState("")
+     console.log("logged data",logindata)
+     useEffect(() => {
+       if (logindata?.user?.id) {
+         setLoginUserId(logindata.user.id);
+       }
+     }, [logindata]);
+     // Fetch data after loginuserid is set
+     useEffect(() => {
+       if (loginuserid) {
+         fetchData();
+       }
+     }, [loginuserid]);
+      const fetchData = async () => {
+         try {
+           const url = `${LOGIN_API}/common/user/${loginuserid}`;
+           console.log("jjj", url);
+           const response = await fetch(url);
+           const data = await response.json();
+     
+         
+     
+           setuserdata(data);
+           setEmailSyncEmail(data.emailSyncEmail)
+           console.log("dta", data);
+          
+         } catch (error) {
+           console.error("Error fetching data:", error);
+         }
+       };
   const EMAIL_SYNC = process.env.REACT_APP_EMAILSYNC_API;
   const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
   const [emailList, setEmailList] = useState([]);
@@ -1285,18 +1321,18 @@ const Inboxplus = () => {
 
   useEffect(() => {
     const fetchEmails = async () => {
-      const savedEmail = localStorage.getItem("gmail_user_email");
-      if (!savedEmail) return;
+      // const savedEmail = localStorage.getItem("gmail_user_email");
+      // if (!savedEmail) return;
 
       try {
         if (userRole === "Admin") {
           const res = await axios.get(
-            `${EMAIL_SYNC}/emailsync/user/login-with-token/${savedEmail}`
+            `${EMAIL_SYNC}/emailsync/user/login-with-token/${emailSyncEmail}`
           );
           setEmailList(res.data.emails || []);
         } else if (userRole === "TeamMember" && accountIds.length > 0) {
           const res = await axios.get(
-            `${EMAIL_SYNC}/emailsync/user/login-with-token/${savedEmail}`
+            `${EMAIL_SYNC}/emailsync/user/login-with-token/${emailSyncEmail}`
           );
           const filteredEmails = (res.data.emails || []).filter((email) => {
             return accountIds.some((accountId) =>

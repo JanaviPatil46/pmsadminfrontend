@@ -25,6 +25,7 @@ import {
   FormControlLabel,
   Alert, Modal,  OutlinedInput,
 } from "@mui/material";
+import { useContext } from "react";
 import { RxCross2 } from "react-icons/rx";
 import { useTheme } from "@mui/material/styles";
 import ArrowForwardIosRoundedIcon from "@mui/icons-material/ArrowForwardIosRounded";
@@ -45,7 +46,7 @@ import TagsMultiSelectDropDown from "../Templates/TagsMultiSelectDropDown"
 import MultiSelectDropdown from "../Templates/MultiSelectDropdown"
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-
+import { LoginContext } from "../Sidebar/Context/Context";
 import debounce from "lodash.debounce";
 const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
@@ -53,7 +54,15 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
   const CONTACT_API = process.env.REACT_APP_CONTACTS_URL;
   const API_KEY = process.env.REACT_APP_FOLDER_URL;
+   const { logindata } = useContext(LoginContext);
   
+    const [loginUserId, setLoginUserId] = useState();
+  
+    useEffect(() => {
+      if (logindata?.user?.id) {
+        setLoginUserId(logindata.user.id);
+      }
+    }, [logindata]);
   const ITEM_HEIGHT = 48;
   const ITEM_PADDING_TOP = 8;
   const MenuProps = {
@@ -554,6 +563,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
         tags: combinedValues || [], // Default to an empty array if null or undefined
         teamMember: combinedTeamMemberValues || [], // Default to an empty array if null or undefined
         foldertemplate: selectedTemplate?.value || null, // Default to empty string if null or undefined
+        adminUserId:loginUserId
       });
 
       const requestOptions = {
@@ -598,6 +608,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
         city: cCity || "", // Default to empty string if null or undefined
         postalCode: cZipPostalCode || "", // Default to empty string if null or undefined
         foldertemplate: selectedTemplate?.value || null, // Default to empty string if null or undefined
+      adminUserId:loginUserId
       });
       console.log(raw);
       const requestOptions = {
