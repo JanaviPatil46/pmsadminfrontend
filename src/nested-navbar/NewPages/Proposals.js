@@ -71,10 +71,11 @@ const Proposals = () => {
         })
         .then((result) => {
           console.log(result);
+              fetchPrprosalsAllData(data);
           toast.success("Item deleted successfully");
 
           // Fetch the updated data after deletion
-          fetchPrprosalsAllData(data);
+      
         })
         .catch((error) => {
           console.error(error);

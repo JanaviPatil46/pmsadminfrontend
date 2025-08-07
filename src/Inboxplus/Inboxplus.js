@@ -1273,7 +1273,7 @@ const Inboxplus = () => {
      
            setuserdata(data);
            setEmailSyncEmail(data.emailSyncEmail)
-           console.log("dta", data);
+           console.log("dta", data.emailSyncEmail);
           
          } catch (error) {
            console.error("Error fetching data:", error);
@@ -1323,7 +1323,7 @@ const Inboxplus = () => {
     const fetchEmails = async () => {
       // const savedEmail = localStorage.getItem("gmail_user_email");
       // if (!savedEmail) return;
-
+console.log("emailSyncEmail",emailSyncEmail)
       try {
         if (userRole === "Admin") {
           const res = await axios.get(
@@ -1347,7 +1347,7 @@ const Inboxplus = () => {
     };
 
     fetchEmails();
-  }, [userRole, accountIds]);
+  }, [userRole, accountIds,emailSyncEmail]);
 
   const fetchTeamMemberAccounts = async (userId) => {
     try {
