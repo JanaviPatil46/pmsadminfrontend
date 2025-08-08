@@ -589,6 +589,7 @@ const handleOpenDialog = (organizer) => {
         open={openDialog}
         handleClose={handleCloseDialog}
         organizer={selectedOrganizer}
+        accountid={data}
       />
     </Box>
   );

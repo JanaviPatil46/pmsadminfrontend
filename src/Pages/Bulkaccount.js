@@ -2,7 +2,7 @@
 
 
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useContext } from 'react';
 import {
   Box,
   Typography,
@@ -16,6 +16,7 @@ import {
   MenuItem
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { LoginContext } from "../Sidebar/Context/Context";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
@@ -55,7 +56,15 @@ const ClientFormList = () => {
   const [loading, setLoading] = useState(false);
   const [aliasCount, setAliasCount] = useState(1);
   const [startingNumber, setStartingNumber] = useState(1);
-
+const { logindata } = useContext(LoginContext);
+  const [loginuserid, setLoginUserId] = useState("");
+    useEffect(() => {
+    if (logindata?.user?.id) {
+      const id = logindata.user.id;
+      setLoginUserId(id);
+     
+    }
+  }, [logindata]);
 // const API_KEY = "http://127.0.0.1";
 // const API_KEY = "http://192.168.1.8";
 const API_KEY = "https://www.snptaxes.com"
@@ -185,6 +194,7 @@ const handleSubmit = async (e) => {
             tags: [],
             teamMember: [],
             foldertemplate: client.folderTemplate?.value || null,
+            adminUserId:loginuserid,
             // folderTemplate: "6880af879d336c88c84278e2",
             active: true
           }),

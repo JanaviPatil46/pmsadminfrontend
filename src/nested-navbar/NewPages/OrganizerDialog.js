@@ -921,7 +921,7 @@ import {
   IconButton,
   Box,
   TextField,
-  Button,
+  Button, Input,
 } from "@mui/material";
 import { LinearProgress } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
@@ -934,8 +934,9 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { toast } from "react-toastify";
 import dayjs from "dayjs";
 import { debounce } from "lodash";
+import UploadDrawer from "./UploadDrawer";
 import { LoginContext } from "../../Sidebar/Context/Context";
-const OrganizerDialog = ({ open, handleClose, organizer }) => {
+const OrganizerDialog = ({ open, handleClose, organizer,accountid }) => {
     const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
    const { logindata } = useContext(LoginContext);
   const [loginuserid, setLoginUserId] = useState();
@@ -946,7 +947,7 @@ const OrganizerDialog = ({ open, handleClose, organizer }) => {
   }, [logindata]);
     useEffect(() => {
     if (loginuserid) {
-      fetchData();
+       fetchData(loginuserid);
     }
   }, [loginuserid]);
    const [username, setUsername] = useState("");
@@ -980,7 +981,9 @@ console.log("sections",sections)
   const [answeredElements, setAnsweredElements] = useState({});
   const [activeStep, setActiveStep] = useState(0);
   const [startDate, setStartDate] = useState(dayjs());
-
+const [uploadedFiles, setUploadedFiles] = useState({}); // Stores file names for each file upload question
+ const [file, setFile] = useState(null);
+  const [isDocumentForm, setIsDocumentForm] = useState(false);
   // Create a debounced auto-save function
   const debouncedAutoSave = useCallback(
     debounce(async (data) => {
@@ -1039,7 +1042,13 @@ console.log("sections",sections)
               })) || [],
             text: question?.text || "",
             textvalue: getQuestionTextValue(question, section.id),
-            questionsectionsettings: question?.questionsectionsettings 
+            questionsectionsettings: question?.questionsectionsettings ,
+             ...(question.type === "File Upload" && {
+            fileMetadata: {
+              fileName: uploadedFiles[`${section.id}_${question.text}`] || "",
+              // Add other metadata like upload date, size, etc.
+            }
+          })
           })) || [],
           
       })) || [],
@@ -1065,6 +1074,7 @@ console.log("sections",sections)
     selectedYesNoValues,
     selectedDropdownValues,
     startDate,
+     uploadedFiles,
     debouncedAutoSave,
   ]);
 
@@ -1321,6 +1331,8 @@ console.log("sections",sections)
         return startDate?.toISOString() || "";
       case "Text Editor":
         return question.text || "";
+         case "File Upload":
+      return uploadedFiles[key] || "";
       default:
         return "";
     }
@@ -1350,6 +1362,7 @@ console.log("sections",sections)
       const newSelectedYesNoValues = {};
       const newSelectedDropdownValues = {};
       const newAnsweredElements = {};
+       const newUploadedFiles = {};
       let initialDate = dayjs();
 
       organizer.sections.forEach((section) => {
@@ -1387,6 +1400,12 @@ console.log("sections",sections)
               case "Date":
                 initialDate = dayjs(element.textvalue);
                 break;
+                     case "File Upload":
+              // If there's a textvalue, assume it's a file name
+              if (element.textvalue) {
+                newUploadedFiles[key] = element.textvalue;
+              }
+              break;
             }
           }
         });
@@ -1399,6 +1418,7 @@ console.log("sections",sections)
       setSelectedDropdownValues(newSelectedDropdownValues);
       setAnsweredElements(newAnsweredElements);
       setStartDate(initialDate);
+        setUploadedFiles(newUploadedFiles);
     }
   }, [organizer]);
 
@@ -1408,6 +1428,7 @@ console.log("sections",sections)
   };
 
   return (
+    <>
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Dialog fullScreen open={open} onClose={handleClose}>
         <DialogTitle
@@ -1786,7 +1807,7 @@ console.log("sections",sections)
                               </Box>
                             )}
 
-                            {element.type === "File Upload" && (
+                            {/* {element.type === "File Upload" && (
                               <Box mt={2}>
                                 <Typography
                                   variant="subtitle2"
@@ -1798,7 +1819,88 @@ console.log("sections",sections)
                                 </Typography>
                                 This file upload question
                               </Box>
-                            )}
+                            )} */}
+                            {element.type === "File Upload" && (
+  <Box mt={2}>
+    <Typography
+      variant="subtitle2"
+      component="p"
+      gutterBottom
+      sx={{ fontWeight: "550" }}
+    >
+      {element.text}
+    </Typography>
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+      {/* <IconButton
+        component="label"
+        htmlFor={`fileInput_${section.id}_${element.id}`}
+        sx={{ color: "#e87800" }}
+        disabled={isElementActive(element)}
+      >
+        <HiDocumentArrowUp size={24} />
+      </IconButton> */}
+      <Typography
+        variant="body1"
+        component="label"
+        htmlFor={`fileInput_${section.id}_${element.id}`}
+        sx={{ cursor: isElementActive(element) ? 'default' : 'pointer', }}
+      >
+        Upload Document
+      </Typography>
+      <Input
+        type="file"
+        id={`fileInput_${section.id}_${element.id}`}
+        onChange={(e) => {
+          const selectedFile = e.target.files[0];
+          if (selectedFile) {
+            setFile(selectedFile);
+            setIsDocumentForm(true);
+            // Store the temporary file name in state
+            const key = `${section.id}_${element.text}`;
+            setUploadedFiles(prev => ({
+              ...prev,
+              [key]: selectedFile.name
+            }));
+            setAnsweredElements(prev => ({
+              ...prev,
+              [key]: true
+            }));
+          }
+        }}
+        sx={{ display: "none" }}
+        disabled={isElementActive(element)}
+      />
+    </Box>
+    {uploadedFiles[`${section.id}_${element.text}`] && (
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
+        <Typography variant="caption">
+          Selected file: {uploadedFiles[`${section.id}_${element.text}`]}
+        </Typography>
+        <IconButton
+          size="small"
+          onClick={() => {
+            const key = `${section.id}_${element.text}`;
+            setUploadedFiles(prev => {
+              const newState = {...prev};
+              delete newState[key];
+              return newState;
+            });
+            setAnsweredElements(prev => ({
+              ...prev,
+              [key]: false
+            }));
+            // Trigger auto-save with the removed file
+            const data = prepareSubmitData(false);
+            debouncedAutoSave(data);
+          }}
+          disabled={isElementActive(element)}
+        >
+          <CloseIcon fontSize="small" />
+        </IconButton>
+      </Box>
+    )}
+  </Box>
+)}
                           </Box>
                         )
                     )}
@@ -1841,6 +1943,52 @@ console.log("sections",sections)
         </DialogContent>
       </Dialog>
     </LocalizationProvider>
+    <UploadDrawer
+  open={isDocumentForm}
+  onClose={() => setIsDocumentForm(false)}
+  file={file}
+  organizer={organizer}
+  accountId={accountid}
+   uploadedFiles={uploadedFiles}  // Pass the state down
+  setUploadedFiles={setUploadedFiles} 
+  onUploadSuccess={(fileData) => {
+    console.log("File uploaded successfully:", fileData);
+    // Update local state with the file name
+    const key = Object.keys(uploadedFiles).find(
+      k => uploadedFiles[k] === file?.name
+    );
+    
+    if (key) {
+      setUploadedFiles(prev => ({
+        ...prev,
+        [key]: fileData.fileName
+      }));
+      
+      // Trigger auto-save with the new file name
+      const data = prepareSubmitData(false);
+      debouncedAutoSave(data);
+    }
+    
+    setFile(null);
+    setIsDocumentForm(false);
+  }}
+  onUploadError={(error) => {
+    console.error("File upload failed:", error);
+    // Clear the file selection if upload fails
+    const key = Object.keys(uploadedFiles).find(
+      k => uploadedFiles[k] === file?.name
+    );
+    if (key) {
+      setUploadedFiles(prev => {
+        const newState = {...prev};
+        delete newState[key];
+        return newState;
+      });
+    }
+    setFile(null);
+  }}
+/>
+</>
   );
 };
 
