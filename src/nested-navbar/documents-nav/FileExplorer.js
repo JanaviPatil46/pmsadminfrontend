@@ -279,8 +279,10 @@ const Folder = ({
   content,
   onSelectPath,
   currentPath = "",
-  onPermissionUpdate,
+  onPermissionUpdate,clientEmail
 }) => {
+
+  console.log("clientEmail",clientEmail)
   const [isOpen, setIsOpen] = useState(false);
   const isFile = content.filename;
   const fullPath = currentPath ? `${currentPath}/${name}` : name;
@@ -347,9 +349,7 @@ const handleDeleteFile = async () => {
 
     alert("File deleted successfully!");
 
-    // Optionally trigger re-fetch or update file list in parent
-    // e.g., call a prop method like onFileDeleted(content._id)
-    // window.location.reload(); // or refetch files if you prefer
+ 
   } catch (err) {
     console.error("File deletion failed:", err);
     alert("Failed to delete the file.");
@@ -373,6 +373,37 @@ const handleDeleteFile = async () => {
       console.error("Failed to request signature:", err);
     }
   };
+
+  const handleRequestApproval = async () => {
+  handleMenuClose();
+
+  try {
+    // Build file URL
+    const fileUrl = `${DOCS_MANAGMENTS}/${content.filePath}/${content.filename}`;
+
+    // Prepare payload for backend
+    const payload = {
+      accountId: content.accountId,
+      filename: content.filename,
+      fileUrl: fileUrl,
+      clientEmail: clientEmail, // assuming this comes from backend data
+    };
+console.log("payload",payload)
+    const res = await fetch(`${DOCS_MANAGMENTS}/approvals/request-approval`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) throw new Error("Failed to send approval request.");
+
+    alert(`Approval request sent to ${payload.clientEmail}`);
+  } catch (err) {
+    console.error("Approval request failed:", err);
+    alert("Failed to send approval request.");
+  }
+};
+
   const [submissions, setSubmissions] = useState([]);
   // Poll submissions
   useEffect(() => {
@@ -440,6 +471,10 @@ const handleDeleteFile = async () => {
       {content.filename.toLowerCase().endsWith(".pdf") && (
         <MenuItem onClick={handleRequestSignature}>Request Signature</MenuItem>
       )}
+       {content.filename.toLowerCase().endsWith(".pdf") && (
+  <MenuItem onClick={handleRequestApproval}>Approval</MenuItem>
+)}
+
       <MenuItem onClick={handleMenuClose}>Rename</MenuItem>
       <MenuItem onClick={handleMenuClose}>Download</MenuItem>
   {permissions.canDelete && (
@@ -496,6 +531,7 @@ const handleDeleteFile = async () => {
             onSelectPath={onSelectPath}
             currentPath={fullPath}
             onPermissionUpdate={onPermissionUpdate}
+            clientEmail={clientEmail}
           />
         ))}
     </div>
@@ -562,10 +598,22 @@ const FileExplorer = ({ onPathSelect, accountId }) => {
       )
     );
   };
-
+  const [clientEmail, setClientEmail] = useState(""); // store client email
+  const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
+  const fetchAccountDetails = async () => {
+    try {
+      const res = await fetch(`${ACCOUNT_API}/accounts/accountdetails/${accountId}`);
+      const data = await res.json();
+    setClientEmail(data.account.contacts[0].email);
+      console.log(data.account.contacts[0].email); // adjust key if it's different
+    } catch (err) {
+      console.error("Failed to fetch account details", err);
+    }
+  };
   useEffect(() => {
     if (accountId) {
       fetchFiles();
+      fetchAccountDetails()
     }
   }, [accountId]);
 
@@ -578,9 +626,11 @@ const FileExplorer = ({ onPathSelect, accountId }) => {
           key={name}
           name={name}
           content={content}
+          //  content={{ ...content, clientEmail }}
           onSelectPath={onPathSelect}
           currentPath=""
           onPermissionUpdate={updateFilePermissionsLocally}
+          clientEmail={clientEmail}
         />
       ))}
     </div>
