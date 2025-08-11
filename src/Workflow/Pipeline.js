@@ -2858,7 +2858,7 @@ sx={{
               <Box mt={2}>
                 <InputLabel sx={{ color: "black" }}>Start Date</InputLabel>
                 <DatePicker
-                  format="DD/MM/YYYY"
+                   format="MM/DD/YYYY"
                   sx={{ width: "100%", backgroundColor: "#fff", mt: 2 }}
                   // value={startDate}
                   // onChange={handleStartDateChange}
@@ -2872,7 +2872,7 @@ sx={{
               <Box mt={2}>
                 <InputLabel sx={{ color: "black" }}>Due Date</InputLabel>
                 <DatePicker
-                  format="DD/MM/YYYY"
+                   format="MM/DD/YYYY"
                   sx={{ width: "100%", backgroundColor: "#fff", mt: 2 }}
                   // value={dueDate}
                   // onChange={handleDueDateChange}

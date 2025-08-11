@@ -1153,7 +1153,7 @@ const handleUserChange = (newSelectedUsers) => {
                               Start Date
                             </Typography>
                             <DatePicker
-                              format="DD/MM/YYYY"
+                          format="MM/DD/YYYY"
                               sx={{ width: "100%", backgroundColor: "#fff" }}
                               selected={startDate}
                               onChange={handleStartDateChange}
@@ -1173,7 +1173,7 @@ const handleUserChange = (newSelectedUsers) => {
                               Due Date
                             </Typography>
                             <DatePicker
-                              format="DD/MM/YYYY"
+                            format="MM/DD/YYYY"
                               sx={{ width: "100%", backgroundColor: "#fff" }}
                               selected={dueDate}
                               onChange={handleDueDateChange}

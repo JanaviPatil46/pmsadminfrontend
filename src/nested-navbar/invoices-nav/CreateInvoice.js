@@ -1116,7 +1116,7 @@ setNumberOfreminder(result.invoiceTemplate.numberOfreminder)
                 <FormControl fullWidth>
                   <FormLabel sx={{ marginBottom: "8px", color: "black" }}>Date</FormLabel>
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DatePicker format="DD/MM/YYYY" sx={{ width: "100%", backgroundColor: "#fff" }} selected={startDate} onChange={handleStartDateChange} renderInput={(params) => <TextField {...params} size="small" />} />
+                    <DatePicker  format="MM/DD/YYYY" sx={{ width: "100%", backgroundColor: "#fff" }} selected={startDate} onChange={handleStartDateChange} renderInput={(params) => <TextField {...params} size="small" />} />
                   </LocalizationProvider>
                 </FormControl>
               </Box>

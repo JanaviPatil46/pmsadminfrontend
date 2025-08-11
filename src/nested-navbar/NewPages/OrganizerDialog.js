@@ -802,7 +802,7 @@
 //                                   {element.text}
 //                                 </Typography>
 //                                 {/* <DatePicker
-//                                   format="DD/MM/YYYY"
+//                                    format="MM/DD/YYYY"
 //                                   sx={{
 //                                     width: "100%",
 //                                     backgroundColor: "#fff",
@@ -820,7 +820,7 @@
 //                                   }
 //                                 /> */}
 //                                 <DatePicker
-//                                   format="DD/MM/YYYY"
+//                                    format="MM/DD/YYYY"
 //                                   sx={{
 //                                     width: "100%",
 //                                     backgroundColor: "#fff",
@@ -1000,7 +1000,8 @@ const [uploadedFiles, setUploadedFiles] = useState({}); // Stores file names for
           redirect: "follow",
         };
 
-        const url = `${ORGANIZER_TEMP_API}/workflow/orgaccwise/autosave/${organizer._id}`;
+        // const url = `${ORGANIZER_TEMP_API}/workflow/orgaccwise/autosave/${organizer._id}`;
+          const url = `${ORGANIZER_TEMP_API}/workflow/orgaccwise/organizeraccountwise/${organizer._id}`;
         const response = await fetch(url, requestOptions);
         const result = await response.json();
 
@@ -1784,7 +1785,7 @@ const [uploadedFiles, setUploadedFiles] = useState({}); // Stores file names for
                                   {element.text}
                                 </Typography>
                                 <DatePicker
-                                  format="DD/MM/YYYY"
+                                   format="MM/DD/YYYY"
                                   sx={{
                                     width: "100%",
                                     backgroundColor: "#fff",

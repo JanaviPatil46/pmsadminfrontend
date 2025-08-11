@@ -62,6 +62,7 @@ const NewTaskDrawer = ({ open, onClose, fetchTasksData, isEditMode, taskData,fet
       const response = await fetch(`${ACCOUNT_API}/accounts/account/accountdetailslist/true`);
       const data = await response.json();
       setaccountdata(data.accountlist);
+      console.log("accountlist",data.accountlist)
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -1017,7 +1018,7 @@ console.log("rew",raw)
                     Start Date
                   </Typography>
                   <DatePicker
-                    format="DD/MM/YYYY"
+                     format="MM/DD/YYYY"
                     sx={{ width: "100%", backgroundColor: "#fff" }}
                     value={StartsDateNew}
                     onChange={handleStartDateChange}
@@ -1029,7 +1030,7 @@ console.log("rew",raw)
                 <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
                   <Typography className="task-input-label">Due Date</Typography>
                   <DatePicker
-                    format="DD/MM/YYYY"
+                  format="MM/DD/YYYY"
                     sx={{ width: "100%", backgroundColor: "#fff" }}
                     value={DueDateNew}
                     onChange={handleDueDateChange}

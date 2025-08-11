@@ -1178,7 +1178,7 @@ const Example = ({ charLimit = 4000 }) => {
 
             <Typography>Start Date</Typography>
             <DatePicker
-              format="DD/MM/YYYY"
+               format="MM/DD/YYYY"
               sx={{ width: "100%", backgroundColor: "#fff" }}
               // value={startDate}
               // onChange={handleStartDateChange}
@@ -1189,7 +1189,7 @@ const Example = ({ charLimit = 4000 }) => {
 
             <Typography>Due Date</Typography>
             <DatePicker
-              format="DD/MM/YYYY"
+               format="MM/DD/YYYY"
               sx={{ width: "100%", backgroundColor: "#fff" }}
               // value={dueDate}
               // onChange={handleDueDateChange}

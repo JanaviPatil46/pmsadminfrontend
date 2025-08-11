@@ -1591,7 +1591,7 @@ const Example = ({ charLimit = 4000 }) => {
            <Box mt={2}>
                          <InputLabel sx={{ color: "black" }}>Start Date</InputLabel>
             <DatePicker
-              format="DD/MM/YYYY"
+               format="MM/DD/YYYY"
               sx={{ width: "100%", backgroundColor: "#fff" }}
               // value={startDate}
               // onChange={handleStartDateChange}
@@ -1604,7 +1604,7 @@ const Example = ({ charLimit = 4000 }) => {
               <InputLabel sx={{ color: "black" }}>Due Date</InputLabel>
             <Typography>Due Date</Typography>
             <DatePicker
-              format="DD/MM/YYYY"
+               format="MM/DD/YYYY"
               sx={{ width: "100%", backgroundColor: "#fff" }}
               // value={dueDate}
               // onChange={handleDueDateChange}

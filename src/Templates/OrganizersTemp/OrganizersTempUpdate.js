@@ -1637,7 +1637,7 @@ const OrganizersTempUpdate = () => {
                                 <Box>
                                   <Typography fontSize='18px' >{element.text}</Typography>
                                   <DatePicker
-                                    format="DD/MM/YYYY"
+                                     format="MM/DD/YYYY"
                                     sx={{ width: '100%', backgroundColor: '#fff' }}
                                     selected={startDate}
                                     onChange={handleStartDateChange}
@@ -2008,7 +2008,7 @@ const OrganizersTempUpdate = () => {
                                         {element.text}
                                       </Typography>
                                       <DatePicker
-                                        format="DD/MM/YYYY"
+                                         format="MM/DD/YYYY"
                                         sx={{
                                           width: "100%",
                                           backgroundColor: "#fff",

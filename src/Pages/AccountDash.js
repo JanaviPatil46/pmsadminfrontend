@@ -92,7 +92,7 @@ const AccountsDash = () => {
           <NavLink to={`/clients/accounts/accountsdash/proposals/${data}`}> Proposals & ELs</NavLink>
           <NavLink to={`/clients/accounts/accountsdash/notes/${data}`}> Notes</NavLink>
           <NavLink to={`/clients/accounts/accountsdash/workflow/${data}/pipelines`}> Workflow</NavLink>
-          <NavLink to={`/clients/accounts/accountsdash/setpassword/${data}`}> Set Password</NavLink>
+          {/* <NavLink to={`/clients/accounts/accountsdash/setpassword/${data}`}> Set Password</NavLink> */}
         </Box>
       </Box>
       <Box pl={3} pr={3}>

@@ -711,11 +711,11 @@ const [selectedUser, setSelectedUser] = useState([]);
                   <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
                     <Typography>Start Date</Typography>
 
-                    <DatePicker format="DD/MM/YYYY" sx={{ width: "100%" }} value={StartsDateNew} onChange={handleStartDateChange} renderInput={(params) => <TextField {...params} size="small" />} />
+                    <DatePicker  format="MM/DD/YYYY" sx={{ width: "100%" }} value={StartsDateNew} onChange={handleStartDateChange} renderInput={(params) => <TextField {...params} size="small" />} />
                   </Box>
                   <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
                     <Typography>Due Date</Typography>
-                    <DatePicker format="DD/MM/YYYY" sx={{ width: "100%" }} value={DueDateNew} onChange={handleDueDateChange} renderInput={(params) => <TextField {...params} size="small" />} />
+                    <DatePicker  format="MM/DD/YYYY" sx={{ width: "100%" }} value={DueDateNew} onChange={handleDueDateChange} renderInput={(params) => <TextField {...params} size="small" />} />
                   </Box>
                 </>
               )}

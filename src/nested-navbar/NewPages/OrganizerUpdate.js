@@ -205,7 +205,7 @@ const CreateOrganizerUpdate = ({ OrganizerData, onClose }) => {
             {expandedSection === section.id && (
               <TableContainer component={Paper}>
                 <Table sx={{ minWidth: 650 }} aria-label="form elements table">
-                  <TableHead>
+                  {/* <TableHead>
                     <TableRow>
                       <TableCell>
                         <strong>Question</strong>
@@ -218,45 +218,23 @@ const CreateOrganizerUpdate = ({ OrganizerData, onClose }) => {
                         <strong>Reviewed</strong>
                       </TableCell>
                     </TableRow>
-                  </TableHead>
+                  </TableHead> */}
+<TableHead>
+  <TableRow>
+    <TableCell sx={{ width: "40%" }}>
+      <strong>Question</strong>
+    </TableCell>
+    <TableCell sx={{ width: "40%",textAlign:'start'  }}>
+      <strong>Answer</strong>
+    </TableCell>
+    <TableCell sx={{ width: "20%",textAlign:'start'  }}>
+      <strong>Reviewed</strong>
+    </TableCell>
+  </TableRow>
+</TableHead>
 
                   <TableBody>
-                    {/* {section.formElements.map((formElement) => (
-                      <TableRow key={formElement.id}>
-                        <TableCell>
-                          {formElement.type === "Text Editor"
-                            ? "Text Block"
-                            : formElement.text}
-                        </TableCell>
-                        <TableCell>
-                          {formElement.type === "Text Editor" ? (
-                            <Box
-                              sx={{ cursor: "pointer", color: "blue" }}
-                              onClick={() => handleOpenDrawer(formElement.text)}
-                            >
-                              Display
-                            </Box>
-                          ) : (
-                            formElement.textvalue || ""
-                          )}
-                        </TableCell>
-
-                        <TableCell>
-                          {formElement.type !== "Text Editor" && (
-                            <Checkbox
-                              checked={formElement.active || false}
-                              onChange={(e) =>
-                                handleCheckboxChange(
-                                  section.id,
-                                  formElement.id,
-                                  e.target.checked
-                                )
-                              }
-                            />
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    ))} */}
+                   
                     {section.formElements
                       .filter(
                         (formElement) =>
@@ -270,7 +248,7 @@ const CreateOrganizerUpdate = ({ OrganizerData, onClose }) => {
                               ? "Text Block"
                               : formElement.text}
                           </TableCell>
-                          <TableCell>
+                          <TableCell >
                             {formElement.type === "Text Editor" ? (
                               <Box
                                 sx={{ cursor: "pointer", color: "blue" }}
@@ -284,7 +262,7 @@ const CreateOrganizerUpdate = ({ OrganizerData, onClose }) => {
                               formElement.textvalue || ""
                             )}
                           </TableCell>
-                          <TableCell>
+                          <TableCell sx={{textAlign:'center'}}>
                             {formElement.type !== "Text Editor" && (
                               <Checkbox
                                 checked={formElement.active || false}
@@ -307,7 +285,7 @@ const CreateOrganizerUpdate = ({ OrganizerData, onClose }) => {
           </Box>
         ))
       ) : (
-        <Typography variant="body1">Loading sections...</Typography>
+        <Typography variant="body1"></Typography>
       )}
 
       <Button onClick={onClose}>Back</Button>

@@ -63,6 +63,7 @@ import OrganizerDialog from "../Pages/Organizers/ClientSelectionDialog";
 import ChatForm from "../Pages/ChatForm";
 import JobDrawer from "../Jobs/JobDrawer";
 import NotificationsIcon from "@mui/icons-material/Notifications";
+
 function Sidebar() {
   const StyledBadge = styled(Badge)(({ theme }) => ({
     "& .MuiBadge-badge": {
@@ -366,28 +367,60 @@ function Sidebar() {
   // };
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isOrganizerDialogOpen, setIsOrganizerDialogOpen] = useState(false);
-  const handleNewItemClick = (label) => {
-    console.log("menu", label);
-    if (
-      label === "Account" ||
-      label === "Contact" ||
-      label === "Task" ||
-      label === "Chat" ||
-      label === "Jobs"
-    ) {
-      setRightDrawerContent(label);
+// Get accountId from cookie
+const accountIdFromCookie = Cookies.get("accountId");
+
+const handleNewItemClick = (label) => {
+  console.log("menu", label);
+  if (
+    label === "Account" ||
+    label === "Contact" ||
+    label === "Task" ||
+    label === "Chat" ||
+    label === "Jobs"
+  ) {
+    setRightDrawerContent(label);
+    setIsRightDrawerOpen(true);
+  }
+  else if (label === "Invoice") {
+    if (accountIdFromCookie) {
+      // If accountId exists in cookie, open drawer with that account
+      const accountFromCookie = {
+        value: accountIdFromCookie,
+        label: "Account from Cookie" // You might want to fetch the actual account name
+      };
+      setSelectedAccount(accountFromCookie);
       setIsRightDrawerOpen(true);
-    }
-    // else if (label === "Jobs") {
-    //   setIsRightDrawerOpen(false);
-    //   setIsDrawerOpen(false);
-    // }
-    else if (label === "Invoice") {
+    } else {
+      // No accountId in cookie, show dialog
       setIsDialogOpen(true);
-    } else if (label === "Organizer") {
-      setIsOrganizerDialogOpen(true);
     }
-  };
+  } else if (label === "Organizer") {
+    setIsOrganizerDialogOpen(true);
+  }
+};
+  // const handleNewItemClick = (label) => {
+  //   console.log("menu", label);
+  //   if (
+  //     label === "Account" ||
+  //     label === "Contact" ||
+  //     label === "Task" ||
+  //     label === "Chat" ||
+  //     label === "Jobs"
+  //   ) {
+  //     setRightDrawerContent(label);
+  //     setIsRightDrawerOpen(true);
+  //   }
+  //   // else if (label === "Jobs") {
+  //   //   setIsRightDrawerOpen(false);
+  //   //   setIsDrawerOpen(false);
+  //   // }
+  //   else if (label === "Invoice") {
+  //     setIsDialogOpen(true);
+  //   } else if (label === "Organizer") {
+  //     setIsOrganizerDialogOpen(true);
+  //   }
+  // };
   const [theme, setTheme] = useState("light-theme");
   const toggleTheme = () => {
     if (theme === "dark-theme") {

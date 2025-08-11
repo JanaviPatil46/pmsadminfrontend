@@ -987,7 +987,7 @@ fetch(`${ORGANIZER_TEMP_API}/organizersendemail`, requestOptions)
                                     <Box>
                                       <Typography fontSize="18px">{element.text}</Typography>
                                       <DatePicker
-                                        format="DD/MM/YYYY"
+                                         format="MM/DD/YYYY"
                                         sx={{ width: "100%", backgroundColor: "#fff" }}
                                         selected={startDate}
                                         onChange={handleStartDateChange}
@@ -1362,7 +1362,7 @@ fetch(`${ORGANIZER_TEMP_API}/organizersendemail`, requestOptions)
                                         {element.text}
                                       </Typography>
                                       <DatePicker
-                                        format="DD/MM/YYYY"
+                                         format="MM/DD/YYYY"
                                         sx={{
                                           width: "100%",
                                           backgroundColor: "#fff",

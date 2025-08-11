@@ -790,7 +790,7 @@ const Invoice = ({ charLimit = 4000, serviceandinvoiceSettings, serviceandinvoic
                   <>
                     <Grid item xs={12} md={4}>
                       <InputLabel>Date</InputLabel>
-                      <DatePicker format="DD/MM/YYYY" sx={{ width: "100%", backgroundColor: "#fff" }} selected={startDate} onChange={handleStartDateChange} renderInput={(params) => <TextField {...params} size="small" />} />
+                      <DatePicker  format="MM/DD/YYYY" sx={{ width: "100%", backgroundColor: "#fff" }} selected={startDate} onChange={handleStartDateChange} renderInput={(params) => <TextField {...params} size="small" />} />
                     </Grid>
                     <Grid item xs={12} md={4}>
                       <InputLabel>Time</InputLabel>

@@ -134,12 +134,12 @@ console.log("accountIdFromCookie", accountIdFromCookie);
   }
 };
 
-
+const accountoptions = accountdata;
   
-  const accountoptions = accountdata.map((account) => ({
-    value: account.id,
-    label: account.Name,
-  }));
+  // const accountoptions = accountdata.map((account) => ({
+  //   value: account.id,
+  //   label: account.Name,
+  // }));
 
   //   *********joblist*******
   const JOBS_API = process.env.REACT_APP_ADD_JOBS_URL;
@@ -862,7 +862,7 @@ console.log("accountIdFromCookie", accountIdFromCookie);
                     Start Date
                   </Typography>
                   <DatePicker
-                    format="DD/MM/YYYY"
+                     format="MM/DD/YYYY"
                     sx={{ width: "100%", backgroundColor: "#fff" }}
                     value={StartsDateNew}
                     onChange={handleStartDateChange}
@@ -874,7 +874,7 @@ console.log("accountIdFromCookie", accountIdFromCookie);
                 <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
                   <Typography className="task-input-label">Due Date</Typography>
                   <DatePicker
-                    format="DD/MM/YYYY"
+                     format="MM/DD/YYYY"
                     sx={{ width: "100%", backgroundColor: "#fff" }}
                     value={DueDateNew}
                     onChange={handleDueDateChange}

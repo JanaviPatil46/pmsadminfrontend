@@ -503,7 +503,7 @@
 //                                                 <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
 //                                                     <Typography className='task-input-label'>Start Date</Typography>
 //                                                     <DatePicker
-//                                                         format="DD/MM/YYYY"
+//                                                          format="MM/DD/YYYY"
 //                                                         sx={{ width: '100%', backgroundColor: '#fff' }}
 //                                                         value={StartsDateNew} onChange={handleStartDateChange}
 //                                                         renderInput={(params) => <TextField {...params} size="small" />}
@@ -512,7 +512,7 @@
 //                                                 <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
 //                                                     <Typography className='task-input-label'>Due Date</Typography>
 //                                                     <DatePicker
-//                                                         format="DD/MM/YYYY"
+//                                                          format="MM/DD/YYYY"
 //                                                         sx={{ width: '100%', backgroundColor: '#fff' }}
 //                                                         value={DueDateNew} onChange={handleDueDateChange}
 //                                                         renderInput={(params) => <TextField {...params} size="small" />}
@@ -1455,7 +1455,7 @@ placeholder="Assignees"
                                                 <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
                                                     <Typography className='task-input-label'>Start Date</Typography>
                                                     <DatePicker
-                                                        format="DD/MM/YYYY"
+                                                         format="MM/DD/YYYY"
                                                         sx={{ width: '100%', backgroundColor: '#fff' }}
                                                         value={StartsDateNew} onChange={handleStartDateChange}
                                                         renderInput={(params) => <TextField {...params} size="small" />}
@@ -1464,7 +1464,7 @@ placeholder="Assignees"
                                                 <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
                                                     <Typography className='task-input-label'>Due Date</Typography>
                                                     <DatePicker
-                                                        format="DD/MM/YYYY"
+                                                   format="MM/DD/YYYY"
                                                         sx={{ width: '100%', backgroundColor: '#fff' }}
                                                         value={DueDateNew} onChange={handleDueDateChange}
                                                         renderInput={(params) => <TextField {...params} size="small" />}

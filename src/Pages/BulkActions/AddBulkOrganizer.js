@@ -971,7 +971,7 @@ const handleYesNoChange = (value, elementText, sectionId) => {
                                     <Box>
                                       <Typography fontSize="18px">{element.text}</Typography>
                                       <DatePicker
-                                        format="DD/MM/YYYY"
+                                         format="MM/DD/YYYY"
                                         sx={{ width: "100%", backgroundColor: "#fff" }}
                                         selected={startDate}
                                         onChange={handleStartDateChange}
@@ -1346,7 +1346,7 @@ const handleYesNoChange = (value, elementText, sectionId) => {
                                         {element.text}
                                       </Typography>
                                       <DatePicker
-                                        format="DD/MM/YYYY"
+                                         format="MM/DD/YYYY"
                                         sx={{
                                           width: "100%",
                                           backgroundColor: "#fff",

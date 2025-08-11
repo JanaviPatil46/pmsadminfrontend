@@ -48,6 +48,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { LoginContext } from "../Sidebar/Context/Context";
 import debounce from "lodash.debounce";
+import { createFilterOptions } from "@mui/material/Autocomplete";
 const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
   const USER_API = process.env.REACT_APP_USER_URL;
@@ -1272,36 +1273,62 @@ const handleOpenModal = (id) => {
 
   const getSelectedIds = () => selectedContacts.join(", ");
 
+
+
   // const setFilteredContact = () => {
-  //   setFilteredContacts(
-  //     allContactData.filter((contact) =>
-  //       contact.name && contact.name.toLowerCase().includes(searchQuery.toLowerCase())
-  //     )
-  //   );
+  //   console.log("Search Query:", searchQuery);
+  //   console.log("All Contacts Data:", allContactData);
+
+  //   if (!searchQuery) {
+  //     console.warn("Search query is empty");
+  //     setFilteredContacts(allContactData); // Show all contacts if there's no search query
+  //     return;
+  //   }
+
+  //   const lowerCaseQuery = searchQuery.toLowerCase();
+  //   const filtered = allContactData.filter((contact) => {
+  //     console.log("Contact Name:", contact.name); // Log each contact name for inspection
+  //     return (
+  //       contact.name && contact.name.toLowerCase().includes(lowerCaseQuery)
+  //     );
+  //   });
+
+  //   setFilteredContacts(filtered);
+  //   console.log("Filtered Contacts:", filtered); // Log the result of filtering
   // };
+const setFilteredContact = () => {
+  console.log("Search Query:", searchQuery);
+  console.log("All Contacts Data:", allContactData);
 
-  const setFilteredContact = () => {
-    console.log("Search Query:", searchQuery);
-    console.log("All Contacts Data:", allContactData);
+  if (!searchQuery) {
+    console.warn("Search query is empty");
+    setFilteredContacts(allContactData); // Show all contacts if there's no search query
+    return;
+  }
 
-    if (!searchQuery) {
-      console.warn("Search query is empty");
-      setFilteredContacts(allContactData); // Show all contacts if there's no search query
-      return;
-    }
+  const lowerCaseQuery = searchQuery.toLowerCase();
 
-    const lowerCaseQuery = searchQuery.toLowerCase();
-    const filtered = allContactData.filter((contact) => {
-      console.log("Contact Name:", contact.name); // Log each contact name for inspection
-      return (
-        contact.name && contact.name.toLowerCase().includes(lowerCaseQuery)
-      );
-    });
+  const filtered = allContactData.filter((contact) => {
+    const nameMatch =
+      contact.name &&
+      contact.name.toLowerCase().includes(lowerCaseQuery);
 
-    setFilteredContacts(filtered);
-    console.log("Filtered Contacts:", filtered); // Log the result of filtering
-  };
+    const emailMatch =
+      contact.email &&
+      contact.email.toLowerCase().includes(lowerCaseQuery);
 
+    return nameMatch || emailMatch;
+  });
+
+  setFilteredContacts(filtered);
+  console.log("Filtered Contacts news:", filtered);
+};
+
+const filterOptions = createFilterOptions({
+  matchFrom: "any",
+  stringify: (option) =>
+    `${option.name} ${option.email} ${option.phoneNumbers.join(" ")}`,
+});
   console.log(allContactData);
   console.log(filteredContacts);
   const handleClickOpen = () => {
@@ -1311,7 +1338,7 @@ const handleOpenModal = (id) => {
   };
 
   console.log(contactData);
-  console.log(filteredContacts);
+  console.log("filteredContacts",filteredContacts);
 
   useEffect(() => {
     setFilteredContact();
@@ -2764,6 +2791,7 @@ const handleOpenModal = (id) => {
                         multiple
                         options={filteredContacts}
                         getOptionLabel={(option) => option.name}
+                         filterOptions={filterOptions}
                         // onInputChange={(event, newValue) => setSearchQuery(newValue)}
                         onChange={(event, newValue) => {
                           const ids = newValue.map((contact) => contact.id);

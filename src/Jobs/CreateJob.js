@@ -2891,7 +2891,7 @@ const CreateJob = ({ charLimit = 4000 }) => {
                     <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
                       <Typography>Start Date</Typography>
                       <DatePicker
-                        format="DD/MM/YYYY"
+                         format="MM/DD/YYYY"
                         sx={{ width: "100%", backgroundColor: "#fff" }}
                         // value={startDate}
                         // onChange={handleStartDateChange}
@@ -2905,7 +2905,7 @@ const CreateJob = ({ charLimit = 4000 }) => {
                     <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
                       <Typography>Due Date</Typography>
                       <DatePicker
-                        format="DD/MM/YYYY"
+                         format="MM/DD/YYYY"
                         sx={{ width: "100%", backgroundColor: "#fff" }}
                         // value={dueDate}
                         // onChange={handleDueDateChange}

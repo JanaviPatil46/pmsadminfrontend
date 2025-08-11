@@ -1186,11 +1186,11 @@ onRowsPerPageChange={handleChangeRowsPerPage}
                   <>
                     <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
                  <Typography>Start Date</Typography>
-                      <DatePicker format="DD/MM/YYYY" sx={{ width: "100%", backgroundColor: "#fff" }} selected={startDate} onChange={handleStartDateChange} renderInput={(params) => <TextField {...params} size="small" />} />
+                      <DatePicker  format="MM/DD/YYYY" sx={{ width: "100%", backgroundColor: "#fff" }} selected={startDate} onChange={handleStartDateChange} renderInput={(params) => <TextField {...params} size="small" />} />
                     </Box>
                     <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
                     <Typography >Due Date</Typography>
-                      <DatePicker format="DD/MM/YYYY" sx={{ width: "100%", backgroundColor: "#fff" }} selected={dueDate} onChange={handleDueDateChange} renderInput={(params) => <TextField {...params} size="small" />} />
+                      <DatePicker  format="MM/DD/YYYY" sx={{ width: "100%", backgroundColor: "#fff" }} selected={dueDate} onChange={handleDueDateChange} renderInput={(params) => <TextField {...params} size="small" />} />
                     </Box>
                   </>
                 )}

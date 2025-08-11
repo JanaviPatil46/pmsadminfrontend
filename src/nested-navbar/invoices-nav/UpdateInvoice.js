@@ -1319,7 +1319,7 @@ if (result.invoice.teammember) {
                       // label="Select Date"
                       value={startDate} // Pass the Day.js object as the value
                       onChange={handleStartDateChange} // Handle date change
-                      format="DD/MM/YYYY" // Format the date display
+                       format="MM/DD/YYYY" // Format the date display
                       sx={{ width: "100%", backgroundColor: "#fff" }}
                       renderInput={(params) => <TextField {...params} size="small" sx={{ width: "100%" }} />}
                     />
