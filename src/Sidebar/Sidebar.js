@@ -63,7 +63,7 @@ import OrganizerDialog from "../Pages/Organizers/ClientSelectionDialog";
 import ChatForm from "../Pages/ChatForm";
 import JobDrawer from "../Jobs/JobDrawer";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-
+import InvoiceDrawer from "../Billing/InvoiceDrawer";
 function Sidebar() {
   const StyledBadge = styled(Badge)(({ theme }) => ({
     "& .MuiBadge-badge": {
@@ -297,32 +297,7 @@ function Sidebar() {
     }
   }, [isDrawerOpen]);
 
-  //   useEffect(() => {
-  //     if (isDrawerOpen) {
-  //       const fetchNewSidebarData = async () => {
-  //         try {
-  //           const response = await axios.get(`${NEW_SIDEBAR_API}/newsidebar/`);
-  //           let NewSidebarData = response.data;
-
-  //  // Retrieve team member data if the user is a team member
-  //  const teamMemberData = JSON.parse(localStorage.getItem("teamMemberData"));
-  //  if (teamMemberData) {
-  //    // Add a flag to disable "Accounts" based on manageAccounts
-  //    NewSidebarData = NewSidebarData.map(item =>
-  //      item.label === "Account" && !teamMemberData.manageAccounts
-  //        ? { ...item, disabled: true }
-  //        : item
-  //    );
-  //  }
-  //           setNewSidebarItems(NewSidebarData);
-  //         } catch (error) {
-  //           console.error("Error fetching new sidebar data:", error);
-  //         }
-  //       };
-
-  //       fetchNewSidebarData();
-  //     }
-  //   }, [isDrawerOpen]);
+  
 
   const handleToggleSidebar = () => {
     if (isSmallScreen) {
@@ -353,25 +328,17 @@ function Sidebar() {
   const handleNewDrawerClose = () => {
     setIsRightDrawerOpen(false);
   };
-  // const handleNewItemClick = (label) => {
-  //   if (label === "Account" || label === "Contact" || label === "Task") {
-  //     setRightDrawerContent(label);
-  //     setIsRightDrawerOpen(true);
-  //   }
-  //   if (label === "Jobs") {
-  //     setIsDrawerOpen(false);
-  //   }
-  //   if (label === "Invoice") {
-  //     setIsDialogOpen(true);
-  //   }
-  // };
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isOrganizerDialogOpen, setIsOrganizerDialogOpen] = useState(false);
 // Get accountId from cookie
-const accountIdFromCookie = Cookies.get("accountId");
 
+const [isInvoiceDrawerOpen, setIsInvoiceDrawerOpen] = useState(false);
+// const [selectedAccount, setSelectedAccount] = useState(null);
 const handleNewItemClick = (label) => {
   console.log("menu", label);
+  const accountIdFromCookie = Cookies.get("accountId");
+const accountNameFromCppkie =Cookies.get("accountName")
   if (
     label === "Account" ||
     label === "Contact" ||
@@ -381,20 +348,19 @@ const handleNewItemClick = (label) => {
   ) {
     setRightDrawerContent(label);
     setIsRightDrawerOpen(true);
-  }
-  else if (label === "Invoice") {
-    if (accountIdFromCookie) {
-      // If accountId exists in cookie, open drawer with that account
-      const accountFromCookie = {
+  } else if (label === "Invoice") {
+    if (accountIdFromCookie && accountNameFromCppkie) {
+      // If account ID exists in cookies, directly open the invoice drawer
+      setSelectedAccount({
         value: accountIdFromCookie,
-        label: "Account from Cookie" // You might want to fetch the actual account name
-      };
-      setSelectedAccount(accountFromCookie);
-      setIsRightDrawerOpen(true);
+        label: accountNameFromCppkie // Temporary label until we fetch the name
+      });
+      setIsInvoiceDrawerOpen(true);
     } else {
-      // No accountId in cookie, show dialog
+      // Show client selection dialog
       setIsDialogOpen(true);
     }
+  
   } else if (label === "Organizer") {
     setIsOrganizerDialogOpen(true);
   }
@@ -411,10 +377,7 @@ const handleNewItemClick = (label) => {
   //     setRightDrawerContent(label);
   //     setIsRightDrawerOpen(true);
   //   }
-  //   // else if (label === "Jobs") {
-  //   //   setIsRightDrawerOpen(false);
-  //   //   setIsDrawerOpen(false);
-  //   // }
+  
   //   else if (label === "Invoice") {
   //     setIsDialogOpen(true);
   //   } else if (label === "Organizer") {
@@ -1378,7 +1341,22 @@ const handleNewItemClick = (label) => {
         onClose={() => setIsDialogOpen(false)}
         handleDrawerClose={handleDrawerClose}
       />
-
+{/* {
+  !accountIdFromCookie && (
+    <ClientSelectionDialog
+      open={isDialogOpen}
+      onClose={() => setIsDialogOpen(false)}
+      handleDrawerClose={handleDrawerClose}
+    />
+  )
+} */}
+<InvoiceDrawer
+  isDrawerOpen={isInvoiceDrawerOpen}
+  setDrawerOpen={setIsInvoiceDrawerOpen}
+  selectedAccount={selectedAccount}
+  handleDrawerClose={() => setIsInvoiceDrawerOpen(false)}
+  leftsidebarDrawer={handleDrawerClose}
+/>
       <OrganizerDialog
         open={isOrganizerDialogOpen}
         onClose={() => setIsOrganizerDialogOpen(false)}

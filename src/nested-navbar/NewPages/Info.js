@@ -52,6 +52,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Accountupdate from "./accountupdate";
 import ChevronDownIcon from "@mui/icons-material/ExpandMore";
 import { toast } from "react-toastify";
+import Cookies from "js-cookie";
 const Info = () => {
   const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
   const theme = useTheme();
@@ -350,14 +351,17 @@ const Info = () => {
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [contactName, setContactName] = useState(null);
+
   const [contactdescription, setContactDescription] = useState(null);
   // Derived state for menu open/close
   const menuOpen = Boolean(anchorEl);
 
-  const handleMenuClick = (event, id, contactName) => {
+  const handleMenuClick = (event, id, contactName,email) => {
+    console.log("contactemail",email)
     setAnchorEl(event.currentTarget);
     setSelectedContact(id); // Set the selected contact ID here
     setContactName(contactName);
+    setContactEmail(email)
   };
 
   const handleMenuClose = () => {
@@ -466,6 +470,7 @@ const Info = () => {
   const [isNewDrawerOpen, setIsNewDrawerOpen] = useState(false);
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const [descriptionModalOpen, setDescriptionModalOpen] = useState(false);
+  const [resetPasswordDialogOpen, setResetPasswordDialogOpen] = useState(false);
   const [description, setDescription] = useState("");
   //********************Add Contacts */
   const [selectedContacts, setSelectedContacts] = useState([]);
@@ -477,7 +482,64 @@ const Info = () => {
   const getSelectedIds = () => {
     return selectedContacts.join(", "); // Just join the IDs array into a string
   };
+// Handler for the reset password menu item
+const handleResetPassword = () => {
+  setResetPasswordDialogOpen(true);
+  handleMenuClose();
+};
+  const SEVER_PORT = process.env.REACT_APP_CLIENT_SERVER_URI;
+    const [emailError, setEmailError] = useState(false);
+  const [emailErrorMessage, setEmailErrorMessage] = useState("");
+// Handler for confirming password reset
+const confirmResetPassword = async (e) => {
+  if (e) e.preventDefault();
 
+  // Validation
+  if (!contactEmail) {
+    setEmailError(true);
+    setEmailErrorMessage("Email is required");
+    return;
+  } else if (!contactEmail.includes("@")) {
+    setEmailError(true);
+    setEmailErrorMessage("Email must include @");
+    return;
+  } else {
+    setEmailError(false);
+    setEmailErrorMessage("");
+  }
+
+  try {
+    const clientResetURL = `${SEVER_PORT}/client/client/resetpassword`;
+    const apiURL = `${LOGIN_API}/resetpass/forgotpassword/`;
+
+    const response = await fetch(apiURL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: contactEmail,  // Fixed syntax here
+        url: clientResetURL,
+      }),
+    });
+
+    const res = await response.json();
+
+    if (response.status === 200) {
+      localStorage.setItem("resetpasstoken", res.result.token);
+      Cookies.set("resetpasstoken", res.result.token);
+      toast.success("Check your email for the reset link.");
+      setResetPasswordDialogOpen(false); // Close the dialog on success
+    } else if (response.status === 400) {
+      toast.error("Invalid user!");
+    } else {
+      toast.error("An error occurred. Please try again.");
+    }
+  } catch (error) {
+    console.error("Password reset error:", error);
+    toast.error("Network error. Please try again.");
+  }
+};
   useEffect(() => {
     setFilteredContacts(
       contactData.filter((contact) =>
@@ -1259,7 +1321,7 @@ const Info = () => {
                                       aria-label="more options"
                                       size="small"
                                       onClick={(e) =>
-                                        handleMenuClick(e, _id, contactName)
+                                        handleMenuClick(e, _id, contactName,email)
                                       }
                                     >
                                       <MoreVertIcon />
@@ -1288,18 +1350,7 @@ const Info = () => {
                                   onChange={() => handleSwitchChange(contact)}
                                 />
                               </TableCell>
-                              {/* <TableCell>
-                                <Switch
-                                  checked={notify}
-                                  
-                                />
-                              </TableCell>
-                              <TableCell>
-                                <Switch
-                                  checked={emailSync}
-                                 
-                                />
-                              </TableCell> */}
+                           
                               <TableCell>
   <Switch
     checked={notify}
@@ -1329,8 +1380,38 @@ const Info = () => {
                         Edit Description
                       </MenuItem>
                       <MenuItem onClick={handleUnlink}>Unlink</MenuItem>
+                       <MenuItem onClick={handleResetPassword}>  {/* New option */}
+    Reset Password
+  </MenuItem>
                     </Menu>
-
+<Dialog
+  open={resetPasswordDialogOpen}
+  onClose={() => setResetPasswordDialogOpen(false)}
+  aria-labelledby="reset-password-dialog-title"
+>
+  <DialogTitle id="reset-password-dialog-title">
+    Reset Password
+    <Button onClick={() => setResetPasswordDialogOpen(false)} color="secondary">
+      X
+    </Button>
+  </DialogTitle>
+  <DialogContent>
+    <Typography>
+      Are you sure you want to reset the password for <strong>{contactEmail}</strong>?
+    </Typography>
+    <Typography sx={{ mt: 2 }}>
+      The user will receive an email with instructions to set a new password.
+    </Typography>
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={() => setResetPasswordDialogOpen(false)} color="primary">
+      Cancel
+    </Button>
+    <Button onClick={confirmResetPassword} color="primary" variant="contained">
+      Reset Password
+    </Button>
+  </DialogActions>
+</Dialog>
                     {/* Description Modal */}
                     <Dialog
                       open={descriptionModalOpen}

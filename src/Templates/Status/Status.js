@@ -119,10 +119,7 @@ const Status = ({ onStatusChange, selectedStatus }) => {
       },
     },
   }
-  const calculateWidth = (label) => {
-    const textWidth = label.length * 9;
-    return Math.min(textWidth, 220);
-  };
+
   return (
     <Box>
       <InputLabel sx={{color:'black',mb:2}}>Status</InputLabel>

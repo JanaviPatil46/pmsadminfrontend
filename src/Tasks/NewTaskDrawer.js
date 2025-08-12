@@ -833,34 +833,7 @@ console.log("rew",raw)
                       <InputLabel sx={{ color: "black" }}>
                         Task Assignee
                       </InputLabel>
-                      {/* <Autocomplete
-                        multiple
-                        sx={{ mt: 2 }}
-                        options={options}
-                        size="small"
-                        getOptionLabel={(option) => option.label}
-                        value={AssigneesNew}
-                        onChange={handleuserChange}
-                        renderOption={(props, option) => (
-                          <Box
-                            component="li"
-                            {...props}
-                            sx={{ cursor: "pointer", margin: "5px 10px" }} // Add cursor pointer style
-                          >
-                            {option.label}
-                          </Box>
-                        )}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            variant="outlined"
-                            placeholder="Assignees"
-                          />
-                        )}
-                        isOptionEqualToValue={(option, value) =>
-                          option.value === value.value
-                        }
-                      /> */}
+                      
                       <MultiSelectDropdown 
                         value={selectedUser}
                         onChange={handleUserChange}

@@ -21,6 +21,7 @@ const AccountsDash = () => {
   useEffect(() => {
   return () => {
     Cookies.remove('accountId');
+    Cookies.remove('accountName');
     console.log("accountId cookie removed");
   };
 }, []);
@@ -43,6 +44,7 @@ const AccountsDash = () => {
         console.log(result);
 
         setAccName(result.accountlist.Name);
+         Cookies.set('accountName', result.accountlist.Name);
       })
       .catch((error) => console.error(error));
   }, [data]);

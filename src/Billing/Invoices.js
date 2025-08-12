@@ -1229,98 +1229,9 @@ const Invoices = ({ charLimit = 4000 }) => {
       >
         Create Invoice
       </Button>
-      {/* <MaterialReactTable columns={columns} table={table} /> */}
+     
       <Box sx={{ marginTop: 3 }}>
-        {/* <TableContainer component={Paper} sx={{ overflow: "visible" }}>
-
-        <Table style={{ width: "100%" }}>
-          <TableHead>
-            <TableRow>
-              <TableCell style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="100">Invoice Number</TableCell>
-              <TableCell style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="100">Settings</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {billingInvoice.map((row) => {
-              return (
-                <TableRow key={row._id}>
-                  <TableCell
-                    style={{
-                    
-                      fontSize: "12px",
-                          padding: "4px 8px",
-                          lineHeight: "1",
-                      fontWeight: "normal",
-                      cursor: "pointer", color: "#3f51b5" 
-                    }}
-                    onClick={() => handleEdit(row._id)}
-                  >
-                    {row.invoicenumber}
-                  </TableCell>
-                  <TableCell style={{
-                          fontSize: "12px",
-                          padding: "4px 8px",
-                          lineHeight: "1",
-                        }}>
-                    <IconButton
-                      onClick={() => toggleMenu(row._id)}
-                      style={{ color: "#2c59fa" }}
-                    >
-                      <CiMenuKebab style={{ fontSize: "25px" }} />
-                      {openMenuId === row._id && (
-                        <Box
-                          sx={{
-                            position: "absolute",
-                            zIndex: 1,
-                            backgroundColor: "#fff",
-                            boxShadow: 1,
-                            borderRadius: 1,
-                            p: 1,
-                            left: "20px",
-
-                            m: 2,
-                            top: "10px",
-                            textAlign: "start",
-                          }}
-                        >
-                          
-                          <Typography
-                            sx={{ fontSize: "12px", fontWeight: "bold" }}
-                            onClick={() => handleEdit(row._id)}
-                          >
-                            Edit
-                          </Typography>
-                          
-                          <Typography
-                            sx={{
-                              fontSize: "12px",
-                              color: "red",
-                              fontWeight: "bold",
-                            }}
-                            onClick={() => handleDelete(row._id)}
-                          >
-                            Delete
-                          </Typography>
-                        </Box>
-                      )}
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer> */}
+       
 
         <TableContainer component={Paper} sx={{ overflow: "visible" }}>
           <Table sx={{ width: "100%" }}>
@@ -1532,16 +1443,11 @@ const Invoices = ({ charLimit = 4000 }) => {
         PaperProps={{
           sx: {
             width: "60%",
-            // padding: 2,
+            
           },
         }}
       >
-        {/* <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: 2 }}>
-          <Typography variant="h6">Create Invoice</Typography>
-          <IconButton onClick={handleClose}>
-            <CloseIcon />
-          </IconButton>
-        </Box> */}
+       
         <Box
           sx={{
             display: "flex",
@@ -1656,14 +1562,7 @@ const Invoices = ({ charLimit = 4000 }) => {
                   </Typography>
                 </Box>
 
-                {/* <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Typography sx={{ marginBottom: 2, ml: 2, fontSize: 13 }} >{firstContactEmail || "No email available"}</Typography>
-                  <Typography fontSize={13}>
-                    Date: <Typography component="span" sx={{ mr: 2, marginBottom: 2, fontSize: 13 }}>
-                      {startDate ? startDate.format('YYYY-MM-DD') : 'N/A'}
-                    </Typography>
-                  </Typography>
-                </Box> */}
+                
 
                 <Box
                   sx={{
@@ -1733,30 +1632,11 @@ const Invoices = ({ charLimit = 4000 }) => {
                 </Table>
               </TableContainer>
 
-              {/* Summary Section */}
+             
               <Box
-              // sx={{
-              //   display: 'flex',
-              //   flexDirection: 'column',
-              //   alignItems: 'flex-end',
-              //   marginRight: 3,
-              //   mt: 0
-              // }}
+             
               >
-                {/* <Typography sx={{ textAlign: 'right', width: '100%' }}>
-                  <strong>Subtotal:</strong> ${subtotal || '0.00'}
-                </Typography>
-                <Typography sx={{ textAlign: 'right', width: '100%' }}>
-                  <strong>Tax Rate:</strong> {taxRate || '0.00'}%
-                </Typography>
-                <Typography sx={{ textAlign: 'right', width: '100%' }}>
-                  <strong>Tax Total:</strong> ${taxTotal?.toFixed(2) || '0.00'}
-                </Typography>
-                <Typography
-                  sx={{ textAlign: 'right', fontWeight: 'bold', width: '100%', marginTop: 1 }}
-                >
-                  <strong>Total:</strong> ${totalAmount || '0.00'}
-                </Typography> */}
+               
                 <Table sx={{ width: "50%", ml: "auto" }}>
                   <TableBody>
                     <TableRow>

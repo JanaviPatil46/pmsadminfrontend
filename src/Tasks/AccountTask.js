@@ -59,44 +59,7 @@ const AccountTask = ({ handleNewDrawerClose, handleDrawerClose }) => {
     fetchAccountData();
   }, []);
 
-  // const fetchAccountData = async () => {
-  //   try {
-  //     const response = await fetch(
-  //       `${ACCOUNT_API}/accounts/account/accountdetailslist/true`
-  //     );
-  //     const data = await response.json();
-  //     setaccountdata(data.accountlist);
-  //   } catch (error) {
-  //     console.error("Error fetching data:", error);
-  //   }
-  // };
 
-  // const fetchAccountData = async () => {
-  //   try {
-  //     const response = await fetch(
-  //       `${ACCOUNT_API}/accounts/account/accountdetailslist/true`
-  //     );
-  //     const data = await response.json();
-
-  //     const accountList = data.accountlist || [];
-  //     setaccountdata(accountList);
-
-  //     // Get accountId from cookie
-  //     const accountIdFromCookie = Cookies.get("accountId");
-  //     console.log("hhh", accountIdFromCookie);
-  //     if (accountIdFromCookie) {
-  //       const matchedAccount = accountoptions.find(
-  //         (acc) => acc.value === accountIdFromCookie
-  //       );
-  //       console.log("macc", matchedAccount);
-  //       if (matchedAccount) {
-  //         setSelectedaccount(matchedAccount); // NOT [matchedAccount], just the object
-  //       }
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching data:", error);
-  //   }
-  // };
 
 
 const fetchAccountData = async () => {
@@ -206,28 +169,7 @@ const accountoptions = accountdata;
 
   const [subtasks, setSubtasks] = useState([]);
   const [checkedSubtasks, setCheckedSubtasks] = useState([]);
-  // const [checkedSubtasks, setCheckedSubtasks] = useState(
-  //   subtasks.filter((subtask) => subtask.checked).map((subtask) => subtask.id)
-  // );
 
-  // const handleCheckboxChange = (subtaskId) => {
-  //   // Update only the checked state of the specific subtask being changed
-  //   setSubtasks((prevSubtasks) =>
-  //     prevSubtasks.map(
-  //       (subtask) =>
-  //         subtask.id === subtaskId
-  //           ? { ...subtask, checked: !subtask.checked } // Toggle checked state for the clicked subtask
-  //           : subtask // Keep other subtasks the same
-  //     )
-  //   );
-
-  //   // Update checkedSubtasks to only reflect the clicked subtask's change
-  //   setCheckedSubtasks((prevCheckedSubtasks) => {
-
-  //     // If it is not checked, we add it to the checked list
-  //     return [...prevCheckedSubtasks, subtaskId]; // Add if not checked
-  //   });
-  // };
 
   const handleCheckboxChange = (subtaskId) => {
     setSubtasks((prevSubtasks) =>
@@ -246,11 +188,6 @@ const accountoptions = accountdata;
     );
   };
 
-  // // Optional: Use useEffect to log after state updates
-  // useEffect(() => {
-  //   console.log("Updated checkedSubtasks:", checkedSubtasks);
-  //   console.log("Updated subtasks:", subtasks);
-  // }, [checkedSubtasks, subtasks]);
 
   const handleAddSubtask = () => {
     const newId = String(subtasks.length + 1);
@@ -326,13 +263,7 @@ const accountoptions = accountdata;
     value: user._id,
     label: user.username,
   }));
-  // const handleuserChange = (event, newValue) => {
-  //   setAssigneesNew(newValue);
-  //   // Map selected options to their values and send as an array
-  //   const selectedValues = newValue.map((option) => option.value);
-  //   // console.log(selectedValues);
-  //   setCombinedValues(selectedValues);
-  // };
+ 
   const [selectedUser, setSelectedUser] = useState([]);
   const handleUserChange = (newSelectedUsers) => {
     setSelectedUser(newSelectedUsers);
@@ -367,34 +298,7 @@ const accountoptions = accountdata;
     const padding = 10; // padding on either side
     return baseWidth + charWidth * tagName.length + padding;
   };
-  const tagsoptions = tags.map((tag) => ({
-    value: tag._id,
-    label: tag.tagName,
-    colour: tag.tagColour,
-
-    customStyle: {
-      backgroundColor: tag.tagColour,
-      color: "#fff",
-      borderRadius: "8px",
-      alignItems: "center",
-      textAlign: "center",
-      marginBottom: "5px",
-      padding: "2px,8px",
-      fontSize: "10px",
-      width: `${calculateWidth(tag.tagName)}px`,
-      margin: "7px",
-      cursor: "pointer",
-    },
-    customTagStyle: {
-      backgroundColor: tag.tagColour,
-      color: "#fff",
-      alignItems: "center",
-      textAlign: "center",
-      padding: "2px,8px",
-      fontSize: "10px",
-      cursor: "pointer",
-    },
-  }));
+ 
 
   const handleTagChange = (newSelectedTags) => {
     setTagsNew(newSelectedTags);
@@ -677,34 +581,7 @@ const accountoptions = accountdata;
                       <InputLabel sx={{ color: "black" }}>
                         Task Assignee
                       </InputLabel>
-                      {/* <Autocomplete
-                        multiple
-                        sx={{ mt: 2 }}
-                        options={options}
-                        size="small"
-                        getOptionLabel={(option) => option.label}
-                        value={AssigneesNew}
-                        onChange={handleuserChange}
-                        renderOption={(props, option) => (
-                          <Box
-                            component="li"
-                            {...props}
-                            sx={{ cursor: "pointer", margin: "5px 10px" }} // Add cursor pointer style
-                          >
-                            {option.label}
-                          </Box>
-                        )}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            variant="outlined"
-                            placeholder="Assignees"
-                          />
-                        )}
-                        isOptionEqualToValue={(option, value) =>
-                          option.value === value.value
-                        }
-                      /> */}
+                      
                       <MultiSelectDropdown
                         value={selectedUser}
                         onChange={handleUserChange}
@@ -761,95 +638,7 @@ const accountoptions = accountdata;
               </Box>
               <Box mt={2} mr={1}>
                 <InputLabel sx={{ color: "black", mb: 1 }}>Tags</InputLabel>
-                {/* <FormControl sx={{ width: "100%" }}>
-                  <Select
-                    multiple
-                    size="small"
-                    id="tags-outlined"
-                    value={combinedTagsValues}
-                    onChange={handleTagChange}
-                    input={<OutlinedInput />}
-                    displayEmpty
-                    renderValue={(selected) => {
-                      if (selected.length === 0) {
-                        return (
-                          <span style={{ color: "#aaa" }}>Select tags...</span>
-                        );
-                      }
-                      return (
-                        <Box
-                          sx={{
-                            display: "flex",
-                            flexWrap: "wrap",
-                            gap: "6px",
-                            padding: "6px",
-                          }}
-                        >
-                          {selected.map((value) => {
-                            const option = tagsoptions.find(
-                              (opt) => opt.value === value
-                            );
-                            return (
-                              <Chip
-                                key={value}
-                                label={option?.label}
-                                sx={{
-                                  backgroundColor: option?.colour,
-                                  color: "#fff",
-                                  fontWeight: 500,
-                                  fontSize: "10px",
-                                  borderRadius: "16px",
-                                  height: "20px",
-                                  cursor: "pointer",
-                                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)",
-                                }}
-                              />
-                            );
-                          })}
-                        </Box>
-                      );
-                    }}
-                    MenuProps={{
-                      PaperProps: {
-                        style: { maxHeight: 250 },
-                      },
-                    }}
-                    sx={{
-                      borderRadius: "10px",
-                      "& .MuiOutlinedInput-root": { borderRadius: "10px" },
-                    }}
-                  >
-                    {tagsoptions.map((option) => {
-                      const dynamicWidth = Math.min(
-                        option.label.length * 8 + 16,
-                        150
-                      );
-                      return (
-                        <MenuItem
-                          key={option.value}
-                          value={option.value}
-                          sx={{
-                            backgroundColor: option.colour,
-                            color: "#fff",
-                            fontSize: "10px",
-                            borderRadius: "10px",
-                            margin: "5px",
-                            textAlign: "center",
-                            padding: "4px 9px",
-                            minWidth: `${dynamicWidth}px`,
-                            maxWidth: `${dynamicWidth}px`,
-                            "&:hover": {
-                              backgroundColor: option.colour,
-                              color: "#fff",
-                            },
-                          }}
-                        >
-                          {option.label}
-                        </MenuItem>
-                      );
-                    })}
-                  </Select>
-                </FormControl> */}
+                
                 <TagsMultiSelectDropDown
                   value={tagsNew}
                   onChange={handleTagChange}
