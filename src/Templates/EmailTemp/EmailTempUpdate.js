@@ -163,7 +163,7 @@ const EmailTempUpdate = () => {
     formData.append("from", selecteduser.value);
     formData.append("emailsubject", inputText);
     formData.append("emailbody", emailBody);
-
+    formData.append("mode", selectedOption);
     // Append files to FormData
     if (files && files.length > 0) {
       files.forEach((file) => {
@@ -206,7 +206,7 @@ const EmailTempUpdate = () => {
     formData.append("from", selecteduser ? selecteduser.value : "");
     formData.append("emailsubject", inputText);
     formData.append("emailbody", emailBody);
-
+    formData.append("mode", selectedOption);
     // Append each selected file to formData
     selectedFiles.forEach((file) => {
       formData.append("files", file);
@@ -266,16 +266,17 @@ const EmailTempUpdate = () => {
 
     fetchEmailData();
   }, []);
-const [mode, setMode]= useState("")
+  const [mode, setMode] = useState("");
   const tempallvalue = (data) => {
     console.log(data);
     setTemplateName(data.templatename);
+    setSelectedOption(data.mode);
     setInputText(data.emailsubject);
     setSelectedUser(
       data.from ? { value: data.from._id, label: data.from.username } : null
     );
     setEmailBody(data.emailbody);
-    setSelectedOption(data.mode)
+    setSelectedOption(data.mode);
     const transformedFiles = data.attachments.map((attachment) => ({
       name: attachment.filename, // Use 'name' instead of 'filename'
       size: attachment.size, // Keep 'size' as is

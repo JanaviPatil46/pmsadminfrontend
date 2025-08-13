@@ -279,7 +279,8 @@ const Folder = ({
   content,
   onSelectPath,
   currentPath = "",
-  onPermissionUpdate,clientEmail
+  onPermissionUpdate,clientEmail,approvedFiles,
+  setApprovedFiles 
 }) => {
 
   console.log("clientEmail",clientEmail)
@@ -398,6 +399,8 @@ console.log("payload",payload)
     if (!res.ok) throw new Error("Failed to send approval request.");
 
     alert(`Approval request sent to ${payload.clientEmail}`);
+     // ✅ Mark file as approved
+      setApprovedFiles((prev) => new Set(prev).add(content._id));
   } catch (err) {
     console.error("Approval request failed:", err);
     alert("Failed to send approval request.");
@@ -431,7 +434,7 @@ console.log("payload",payload)
   if (isFile) {
     const { permissions = {} } = content;
 
-   
+    const isApproved = approvedFiles?.has(content._id);
 
     return (
 
@@ -472,7 +475,8 @@ console.log("payload",payload)
         <MenuItem onClick={handleRequestSignature}>Request Signature</MenuItem>
       )}
        {content.filename.toLowerCase().endsWith(".pdf") && (
-  <MenuItem onClick={handleRequestApproval}>Approval</MenuItem>
+  <MenuItem   onClick={handleRequestApproval}
+            disabled={isApproved} >Approval</MenuItem>
 )}
 
       <MenuItem onClick={handleMenuClose}>Rename</MenuItem>
@@ -532,6 +536,8 @@ console.log("payload",payload)
             currentPath={fullPath}
             onPermissionUpdate={onPermissionUpdate}
             clientEmail={clientEmail}
+            approvedFiles={approvedFiles}
+  setApprovedFiles ={setApprovedFiles}
           />
         ))}
     </div>
@@ -599,6 +605,7 @@ const FileExplorer = ({ onPathSelect, accountId }) => {
     );
   };
   const [clientEmail, setClientEmail] = useState(""); // store client email
+   const [approvedFiles, setApprovedFiles] = useState(new Set());
   const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
   const fetchAccountDetails = async () => {
     try {
@@ -631,6 +638,8 @@ const FileExplorer = ({ onPathSelect, accountId }) => {
           currentPath=""
           onPermissionUpdate={updateFilePermissionsLocally}
           clientEmail={clientEmail}
+          approvedFiles={approvedFiles}
+          setApprovedFiles={setApprovedFiles}
         />
       ))}
     </div>
