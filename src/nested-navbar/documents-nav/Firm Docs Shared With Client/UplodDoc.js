@@ -248,6 +248,8 @@ console.log("accc",onUploadSuccess)
       canDownload: true,
       canDelete: false,
       canUpdate: false,
+      canApprove:true,
+      canEsign:true
     };
     data.append("permissions", JSON.stringify(permissions));
   

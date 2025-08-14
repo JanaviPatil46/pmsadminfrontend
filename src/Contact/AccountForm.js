@@ -741,12 +741,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
     setContactCount(contactCount + 1);
   };
 
-  // const handleContactInputChange = (index, event) => {
-  //   const { name, value } = event.target;
-  //   const updatedContacts = [...contacts];
-  //   updatedContacts[index] = { ...updatedContacts[index], [name]: value };
-  //   setContacts(updatedContacts);
-  // };
+
 
   const handleContactInputChange = (index, event) => {
     const { name, value } = event.target;
@@ -764,23 +759,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
 
     setContacts(updatedContacts);
 
-    // Dynamically validate first name and last name
-    // if (name === "firstName" && !value.trim()) {
-    //   setFirstNameError("First name is required.");
-    // } else if (name === "firstName") {
-    //   setFirstNameError("");
-    // }
-
-    // if (name === "lastName" && !value.trim()) {
-    //   setLastNameError("Last name is required.");
-    // } else if (name === "lastName") {
-    //   setLastNameError("");
-    // }
-    // if (name === "email" && !value.trim()) {
-    //   setEmaileError("Email is required.");
-    // } else if (name === "email") {
-    //   setEmaileError("");
-    // }
+ 
     if (name === "firstName") {
     setFirstNameError(trimmedValue ? "" : "First name is required.");
   }

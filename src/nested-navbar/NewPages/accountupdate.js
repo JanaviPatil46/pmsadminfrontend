@@ -49,7 +49,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import ContactUpdateForm from "./contactupdate";
 import MultiSelectDropdown from "../../Templates/MultiSelectDropdown";
 import TagsMultiSelectDropDown from "../../Templates/TagsMultiSelectDropDown";
-const Accountupdate = ({ onClose, selectedAccount }) => {
+const Accountupdate = ({ onClose, selectedAccount,onArchive  }) => {
   const theme = useTheme();
   const USER_API = process.env.REACT_APP_USER_URL;
   const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
@@ -933,8 +933,19 @@ const Accountupdate = ({ onClose, selectedAccount }) => {
           borderBottom: "1px solid grey",
         }}
       >
-        <Typography variant="h6">Edit account</Typography>
-        <RxCross2 style={{ cursor: "pointer" }} onClick={onClose} />
+        {/* <Typography variant="h6">Edit account</Typography>
+         <Button variant="outlined" color="error" onClick={() => onArchive(selectedAccount?._id)}>
+          Archive Account
+        </Button>
+        <RxCross2 style={{ cursor: "pointer" }} onClick={onClose} /> */}
+         <Typography variant="h6">Edit account</Typography>
+        
+        <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2, alignItems:'center', gap:3 }}>
+        <Button variant="outlined" color="error" onClick={() => onArchive(selectedAccount?._id)}>
+          Archive Account
+        </Button>
+               <RxCross2 style={{ cursor: "pointer" }} onClick={onClose} /> 
+      </Box>
       </Box>
       <Box className="account-form" sx={{ height: "90vh", overflowY: "auto" }}>
         <Box>

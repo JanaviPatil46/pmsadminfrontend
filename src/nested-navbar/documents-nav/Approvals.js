@@ -60,7 +60,7 @@ const Approvals = () => {
             ) : (
               <TableRow>
                 <TableCell colSpan={4} align="center">
-                  No pending approvals found.
+                
                 </TableCell>
               </TableRow>
             )}

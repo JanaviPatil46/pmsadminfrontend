@@ -33,7 +33,7 @@ import React, { useEffect, useState } from "react";
 import { BiArchiveOut } from "react-icons/bi";
 import { LuUserCircle2 } from "react-icons/lu";
 import { MdEdit } from "react-icons/md";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   Drawer,
   useMediaQuery,
@@ -746,150 +746,51 @@ const confirmResetPassword = async (e) => {
       })
       .catch((error) => console.error(error));
   };
+  const navigate =useNavigate()
+const handleArchive = (accId) => {
+  if (!accId) return;
+
+  const confirmArchive = window.confirm("Are you sure you want to archive this account?");
+  if (!confirmArchive) return;
+
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+
+  const raw = JSON.stringify({
+    active: false, // archiving → set active to false
+  });
+
+  const requestOptions = {
+    method: "PATCH",
+    headers: myHeaders,
+    body: raw,
+    redirect: "follow",
+  };
+
+  const url = `${ACCOUNT_API}/accounts/accountdetails/${accId}`;
+  fetch(url, requestOptions)
+    .then((response) => response.json())
+    .then((result) => {
+      console.log(result);
+      toast.success("Account archived successfully");
+      navigate('/clients/accounts/archivedaccounts')
+      fetchAccount(); // Refresh account details after archive
+    })
+    .catch((error) => {
+      console.error(error);
+      toast.error("An error occurred while archiving the account");
+    });
+};
 
   return (
     <Box sx={{ width: "100%", padding: 2, mt: 4 }}>
       <Grid container rowSpacing={2} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
         <Grid item xs={12} sm={6}>
           <Card sx={{ boxShadow: 3, borderRadius: 2, mr: 5 }}>
-            {/* <CardContent>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Typography variant="h5" fontWeight="bold">
-                  Account Details
-                </Typography>
-                <Box>
-                  <IconButton>
-                    <BiArchiveOut />
-                  </IconButton>
-                  <IconButton onClick={() => setIsNewDrawerOpen(true)}>
-                    <MdEdit />_ Edit
-                  </IconButton>
-                </Box>
-                <Drawer
-                  anchor="right"
-                  open={isNewDrawerOpen}
-                  onClose={() => setIsNewDrawerOpen(false)}
-                  PaperProps={{
-                    sx: {
-                      borderRadius: isSmallScreen ? "0" : "10px 0 0 10px",
-                      width: isSmallScreen ? "100%" : "650px",
-                    },
-                  }}
-                >
-                  <Accountupdate
-                    selectedAccount={accountDatabyid}
-                    // onClose={() => setIsNewDrawerOpen(false)}
-                    onClose={() => {
-                      setIsNewDrawerOpen(false);
-                      fetchAccount(); // Call fetchAccount when the drawer closes
-                    }}
-                  />
-                </Drawer>
-              </Box>
-              <Box sx={{ mt: 1 }}>
-                <Divider />
-              </Box>
-              <Box sx={{ mt: 2 }}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <LuUserCircle2 style={{ width: "80px", height: "80px" }} />
-                  <Box>
-                    <Typography sx={{ fontWeight: "bold", fontSize: "20px" }}>
-                      {accName}
-                    </Typography>
-                    <Typography sx={{ fontSize: "15px" }}>
-                      {usertype}
-                    </Typography>
-                  </Box>
-                  <Button variant="outlined">
-                    Log in as account (read-only)
-                  </Button>
-                </Box>
-              </Box>
-              <Box mt={3}>
-                <Typography fontWeight="bold">Account Info</Typography>
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "20px",
-                    mt: 2,
-                  }}
-                >
-                  <Typography>Tags</Typography>
-                  <Typography>
-                    <Box sx={{ display: "flex", gap: "10px" }}>
-                      {tags.map((tag) => (
-                        <Typography
-                          key={tag._id}
-                          sx={{
-                            backgroundColor: tag.tagColour,
-                            color: "white",
-                            borderRadius: "60px",
-                            padding: "0.2rem 0.5rem",
-                            display: "flex",
-                            alignItems: "center",
-                            fontWeight: "bold",
-                            fontSize: "12px",
-                          }}
-                        >
-                          {tag.tagName}
-                        </Typography>
-                      ))}
-                    </Box>
-                  </Typography>
-                </Box>
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "20px",
-                    mt: 2,
-                   
-                  }}
-                >
-                  <Typography>Team Members</Typography>
-                  <Typography
-                    sx={{ display: "flex", alignItems: "center", gap: 2 }}
-                  >
-                    {" "}
-                    {teams &&
-                      teams.map((team, index) => (
-                        <h5
-                          key={index}
-                          style={{
-                            backgroundColor: "lightgrey",
-                            color: "black",
-                            borderRadius: "60px",
-                            display: "flex",
-                            padding: "0.2rem 0.5rem",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            marginRight: "5px",
-                            fontSize: "12px",
-                          }}
-                        >
-                          {team.username}
-                        </h5>
-                      ))}
-                  </Typography>
-                </Box>
-              </Box>
-            </CardContent> */}
+            
             <CardContent>
               {/* Header section */}
-              <Box
+              {/* <Box
                 sx={{
                   display: "flex",
                   alignItems: "center",
@@ -932,7 +833,73 @@ const confirmResetPassword = async (e) => {
                     }}
                   />
                 </Drawer>
-              </Box>
+              </Box> */}
+<Box
+  sx={{
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    mb: 2,
+    p: 2,
+    borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
+    backgroundColor: "background.paper",
+    borderRadius: 2,
+    boxShadow: (theme) => theme.shadows[1],
+  }}
+>
+  <Typography variant="h5" fontWeight={600} color="text.primary">
+    Account Details
+  </Typography>
+
+  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+    <IconButton
+      sx={{
+        color: "text.secondary",
+        transition: "all 0.2s",
+        "&:hover": { color: "primary.main", transform: "scale(1.1)" },
+      }}
+    onClick={() => handleArchive(data)}
+    >
+      <BiArchiveOut size={22} />
+    </IconButton>
+
+    <IconButton
+      sx={{
+        color: "text.secondary",
+        transition: "all 0.2s",
+        "&:hover": {
+          color: "primary.main",
+          transform: "scale(1.1)",
+        },
+      }}
+      onClick={() => setIsNewDrawerOpen(true)}
+      disabled={storedData?.teammember?.manageAccounts === false}
+    >
+      <MdEdit size={22} />
+    </IconButton>
+  </Box>
+
+  <Drawer
+    anchor="right"
+    open={isNewDrawerOpen}
+    onClose={() => setIsNewDrawerOpen(false)}
+    PaperProps={{
+      sx: {
+        borderRadius: isSmallScreen ? 0 : "10px 0 0 10px",
+        width: isSmallScreen ? "100%" : 650,
+      },
+    }}
+  >
+    <Accountupdate
+      selectedAccount={accountDatabyid}
+      onClose={() => {
+        setIsNewDrawerOpen(false);
+        fetchAccount();
+      }}
+      onArchive={handleArchive}
+    />
+  </Drawer>
+</Box>
 
               <Divider sx={{ mb: 3 }} />
 

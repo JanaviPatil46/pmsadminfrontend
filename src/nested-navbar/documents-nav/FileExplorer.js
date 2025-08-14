@@ -1,289 +1,23 @@
-// import React, { useEffect, useState } from "react";
-
-// // Component to display folders and files
-
-// // const Folder = ({ name, content, onSelectPath, currentPath = "" }) => {
-// //   console.log("firm client docs",content)
-// //   const [isOpen, setIsOpen] = useState(false);
-// //   const isFile = content.filename;
-// //   const fullPath = currentPath ? `${currentPath}/${name}` : name;
-
-// //   if (isFile) {
-// //     return (
-// //       <div style={{ paddingLeft: 20 }}>
-// //         📄 <span>{content.filename}</span>
-// //       </div>
-// //     );
-// //   }
-
-// //   const handleClick = () => {
-// //     setIsOpen(!isOpen);
-// //     if (onSelectPath) {
-// //       onSelectPath(fullPath);
-// //     }
-// //   };
-
-// //   return (
-// //     <div style={{ paddingLeft: 20 }}>
-// //       <div onClick={handleClick} style={{ cursor: "pointer" }}>
-// //         {isOpen ? "📂" : "📁"} <span>{name}</span>
-// //       </div>
-// //       {isOpen &&
-// //         Object.entries(content).map(([childName, childContent]) => (
-// //           <Folder
-// //             key={childName}
-// //             name={childName}
-// //             content={childContent}
-// //             onSelectPath={onSelectPath}
-// //             currentPath={fullPath}
-// //           />
-// //         ))}
-// //     </div>
-// //   );
-// // };
-
-// // const Folder = ({ name, content, onSelectPath, currentPath = "" }) => {
-// //   const [isOpen, setIsOpen] = useState(false);
-// //   const isFile = content.filename;
-// //   const fullPath = currentPath ? `${currentPath}/${name}` : name;
-
-// //   if (isFile) {
-// //     const { permissions = {} } = content;
-
-// //     return (
-// //       <div style={{ paddingLeft: 20, marginBottom: 10 }}>
-// //         📄 <span>{content.filename}</span>
-// //         <div style={{ display: "flex", gap: "10px", marginTop: 5 }}>
-// //           <label>
-// //             <input type="checkbox" checked={permissions.canView}  />
-// //             View
-// //           </label>
-// //           <label>
-// //             <input type="checkbox" checked={permissions.canDownload}  />
-// //             Download
-// //           </label>
-// //           <label>
-// //             <input type="checkbox" checked={permissions.canUpdate}  />
-// //             Update
-// //           </label>
-// //           <label>
-// //             <input type="checkbox" checked={permissions.canDelete}  />
-// //             Delete
-// //           </label>
-// //         </div>
-// //       </div>
-// //     );
-// //   }
-
-// //   const handleClick = () => {
-// //     setIsOpen(!isOpen);
-// //     if (onSelectPath) {
-// //       onSelectPath(fullPath);
-// //     }
-// //   };
-
-// //   return (
-// //     <div style={{ paddingLeft: 20 }}>
-// //       <div onClick={handleClick} style={{ cursor: "pointer" }}>
-// //         {isOpen ? "📂" : "📁"} <span>{name}</span>
-// //       </div>
-// //       {isOpen &&
-// //         Object.entries(content).map(([childName, childContent]) => (
-// //           <Folder
-// //             key={childName}
-// //             name={childName}
-// //             content={childContent}
-// //             onSelectPath={onSelectPath}
-// //             currentPath={fullPath}
-// //           />
-// //         ))}
-// //     </div>
-// //   );
-// // };
-
-// const Folder = ({ name, content, onSelectPath, currentPath = "" }) => {
-//   console.log("nbhds", content);
-//   const DOCS_MANAGMENTS = process.env.REACT_APP_CLIENT_DOCS_MANAGE;
-//   const [isOpen, setIsOpen] = useState(false);
-//   const isFile = content.filename;
-//   const fullPath = currentPath ? `${currentPath}/${name}` : name;
-
-//   const handlePermissionChange = async (permKey, value) => {
-//     const updatedPermissions = {
-//       ...content.permissions,
-//       [permKey]: value,
-//     };
-
-//     try {
-//       const response = await fetch(
-//         `${DOCS_MANAGMENTS}/firmDocs/permissions/${content._id}`,
-//         {
-//           method: "PATCH",
-//           headers: {
-//             "Content-Type": "application/json",
-//           },
-//           body: JSON.stringify({ permissions: updatedPermissions }),
-//         }
-//       );
-//       console.log("data update", updatedPermissions);
-//       if (!response.ok) {
-//         throw new Error("Failed to update permissions");
-//       }
-
-//       // Optional: Show toast or success message
-//     } catch (err) {
-//       console.error("Permission update error:", err);
-//       // Optional: Show error message
-//     }
-//   };
-
-//   if (isFile) {
-//     const { permissions = {} } = content;
-
-//     return (
-//       <div style={{ paddingLeft: 20, marginBottom: 10 }}>
-//         📄 <span>{content.filename}</span>
-//         <div style={{ display: "flex", gap: "10px", marginTop: 5 }}>
-//           {["canView", "canDownload", "canUpdate", "canDelete"].map((perm) => (
-//             <label key={perm}>
-//               <input
-//                 type="checkbox"
-//                 checked={permissions[perm]}
-//                 onChange={(e) => handlePermissionChange(perm, e.target.checked)}
-//               />
-//               {perm.replace("can", "")}
-//             </label>
-//           ))}
-//         </div>
-//       </div>
-//     );
-//   }
-
-//   const handleClick = () => {
-//     setIsOpen(!isOpen);
-//     if (onSelectPath) {
-//       onSelectPath(fullPath);
-//     }
-//   };
-
-//   return (
-//     <div style={{ paddingLeft: 20 }}>
-//       <div onClick={handleClick} style={{ cursor: "pointer" }}>
-//         {isOpen ? "📂" : "📁"} <span>{name}</span>
-//       </div>
-//       {isOpen &&
-//         Object.entries(content).map(([childName, childContent]) => (
-//           <Folder
-//             key={childName}
-//             name={childName}
-//             content={childContent}
-//             onSelectPath={onSelectPath}
-//             currentPath={fullPath}
-//           />
-//         ))}
-//     </div>
-//   );
-// };
-
-// const buildFileTree = (files, folderStart) => {
-//   const root = {};
-
-//   // Ensure the base folder exists
-//   const parts = folderStart.split("/");
-//   let current = root;
-//   parts.forEach((part) => {
-//     if (!current[part]) {
-//       current[part] = {};
-//     }
-//     current = current[part];
-//   });
-
-//   files.forEach((file) => {
-//     let path = file.filePath.replace(/\\/g, "/"); // Normalize slashes
-//     const index = path.toLowerCase().indexOf(folderStart.toLowerCase());
-
-//     if (index === -1) return;
-//     path = path.slice(index); // Trim before folderStart
-
-//     const fileParts = path.split("/");
-
-//     let current = root;
-
-//     // Build path
-//     fileParts.forEach((part) => {
-//       if (!current[part]) {
-//         current[part] = {};
-//       }
-//       current = current[part];
-//     });
-
-//     // Skip default.txt
-//     if (file.filename !== "#$default.txt") {
-//       current[file.filename] = file;
-//     }
-//   });
-
-//   return root;
-// };
-
-// const DOCS_MANAGMENTS = process.env.REACT_APP_CLIENT_DOCS_MANAGE;
-
-// const FileExplorer = ({ onPathSelect, accountId }) => {
-//   const [files, setFiles] = useState([]);
-//   const folderName = "Firm Docs Shared With Client";
-
-//   const fetchFiles = async () => {
-//     try {
-//       const res = await fetch(`${DOCS_MANAGMENTS}/firmDocs/files/${accountId}`);
-//       const data = await res.json();
-//       setFiles(data.files || []);
-//     } catch (err) {
-//       console.error("Failed to fetch files", err);
-//     }
-//   };
-
-//   useEffect(() => {
-//     if (accountId) {
-//       fetchFiles(); // Only fetch when drawer is opened
-//     }
-//   }, [accountId]);
-//   const fileTree = buildFileTree(files, folderName);
-
-//   return (
-//     <div>
-//       {Object.entries(fileTree).map(([name, content]) => (
-//         <Folder
-//           key={name}
-//           name={name}
-//           content={content}
-//           onSelectPath={onPathSelect}
-//         />
-//       ))}
-//     </div>
-//   );
-// };
-
-// export default FileExplorer;
-
 import React, { useEffect, useState } from "react";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { Menu, MenuItem } from "@mui/material";
 import { DocusealBuilder } from "@docuseal/react";
 import { Dialog, DialogTitle, DialogContent, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import customCss from "./docuseal-dark-theme.css"
+import customCss from "./docuseal-dark-theme.css";
 const DOCS_MANAGMENTS = process.env.REACT_APP_CLIENT_DOCS_MANAGE;
-const SIGNATURE_API =process.env.REACT_APP_ESIGNATURE_API
+const SIGNATURE_API = process.env.REACT_APP_ESIGNATURE_API;
 const Folder = ({
   name,
   content,
   onSelectPath,
   currentPath = "",
-  onPermissionUpdate,clientEmail,approvedFiles,
-  setApprovedFiles 
+  onPermissionUpdate,
+  clientEmail,
+  approvedFiles,
+  setApprovedFiles,accountId
 }) => {
-
-  console.log("clientEmail",clientEmail)
+  console.log("clientEmail", clientEmail);
   const [isOpen, setIsOpen] = useState(false);
   const isFile = content.filename;
   const fullPath = currentPath ? `${currentPath}/${name}` : name;
@@ -328,84 +62,94 @@ const Folder = ({
     }
   };
 
-const handleDeleteFile = async () => {
-  handleMenuClose();
+  const handleDeleteFile = async () => {
+    handleMenuClose();
 
-  if (!content.permissions?.canDelete) {
-    alert("You don't have permission to delete this file.");
-    return;
-  }
-
-  const confirmDelete = window.confirm(`Are you sure you want to delete "${content.filename}"?`);
-  if (!confirmDelete) return;
-
-  try {
-    const res = await fetch(`${DOCS_MANAGMENTS}/firmDocs/delete/${content.accountId}/${content.filename}`, {
-      method: "DELETE",
-    });
-
-    if (!res.ok) {
-      throw new Error("Failed to delete the file.");
+    if (!content.permissions?.canDelete) {
+      alert("You don't have permission to delete this file.");
+      return;
     }
 
-    alert("File deleted successfully!");
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete "${content.filename}"?`
+    );
+    if (!confirmDelete) return;
 
- 
-  } catch (err) {
-    console.error("File deletion failed:", err);
-    alert("Failed to delete the file.");
-  }
-};
+    try {
+      const res = await fetch(
+        `${DOCS_MANAGMENTS}/firmDocs/delete/${content.accountId}/${content.filename}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error("Failed to delete the file.");
+      }
+
+      alert("File deleted successfully!");
+    } catch (err) {
+      console.error("File deletion failed:", err);
+      alert("Failed to delete the file.");
+    }
+  };
 
   const handleRequestSignature = async () => {
     handleMenuClose();
     try {
       const fileUrl = `https://snptaxes.com/${content.filePath}/${content.filename}`;
       const fileName = content.filename;
+      // const accountId = accountId;
       const res = await fetch(
-        `${SIGNATURE_API}/api/generate-token?url=${encodeURIComponent(fileUrl)}&name=${encodeURIComponent(fileName)}`
+       `${SIGNATURE_API}/api/generate-token?url=${encodeURIComponent(fileUrl)}&name=${encodeURIComponent(fileName)}&accountId=${accountId}`
+        // `${SIGNATURE_API}/api/generate-token?url=${encodeURIComponent(fileUrl)}&name=${encodeURIComponent(fileName)}`
       );
       const data = await res.json();
       setToken(data.token);
       setShowBuilderFor(content._id);
       setOpenDialog(true);
       setPolling(true);
+
+        // ✅ Immediately disable further e-sign requests
+    await handlePermissionChange("canEsign", false);
     } catch (err) {
       console.error("Failed to request signature:", err);
     }
   };
 
   const handleRequestApproval = async () => {
-  handleMenuClose();
+    handleMenuClose();
 
-  try {
-    // Build file URL
-    const fileUrl = `${DOCS_MANAGMENTS}/${content.filePath}/${content.filename}`;
+    try {
+      // Build file URL
+      const fileUrl = `${DOCS_MANAGMENTS}/${content.filePath}/${content.filename}`;
 
-    // Prepare payload for backend
-    const payload = {
-      accountId: content.accountId,
-      filename: content.filename,
-      fileUrl: fileUrl,
-      clientEmail: clientEmail, // assuming this comes from backend data
-    };
-console.log("payload",payload)
-    const res = await fetch(`${DOCS_MANAGMENTS}/approvals/request-approval`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+      // Prepare payload for backend
+      const payload = {
+        accountId: content.accountId,
+        filename: content.filename,
+        fileUrl: fileUrl,
+        clientEmail: clientEmail, // assuming this comes from backend data
+      };
+      console.log("payload", payload);
+      const res = await fetch(`${DOCS_MANAGMENTS}/approvals/request-approval`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-    if (!res.ok) throw new Error("Failed to send approval request.");
+      if (!res.ok) throw new Error("Failed to send approval request.");
 
-    alert(`Approval request sent to ${payload.clientEmail}`);
-     // ✅ Mark file as approved
+      alert(`Approval request sent to ${payload.clientEmail}`);
+      // ✅ Mark file as approved
       setApprovedFiles((prev) => new Set(prev).add(content._id));
-  } catch (err) {
-    console.error("Approval request failed:", err);
-    alert("Failed to send approval request.");
-  }
-};
+        // ✅ Immediately disable further e-sign requests
+    await handlePermissionChange("canEsign", false);
+    } catch (err) {
+      console.error("Approval request failed:", err);
+      alert("Failed to send approval request.");
+    }
+  };
 
   const [submissions, setSubmissions] = useState([]);
   // Poll submissions
@@ -434,85 +178,121 @@ console.log("payload",payload)
   if (isFile) {
     const { permissions = {} } = content;
 
-    const isApproved = approvedFiles?.has(content._id);
+    
 
     return (
-
       <div
-  style={{
-    paddingLeft: 20,
-    marginBottom: 10,
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    width: "100%",
-  }}
->
-  {/* Left side: filename + permissions */}
-  <div style={{ display: "flex", flexDirection: "column" }}>
-    <div>📄 <span>{content.filename}</span></div>
-    <div style={{ display: "flex", gap: "10px", marginTop: 5 }}>
-      {["canView", "canDownload", "canUpdate", "canDelete"].map((perm) => (
-        <label key={perm} style={{ cursor: "pointer" }}>
-          <input
-            type="checkbox"
-            checked={permissions[perm]}
-            onChange={(e) => handlePermissionChange(perm, e.target.checked)}
-          />
-          {perm.replace("can", "")}
-        </label>
-      ))}
-    </div>
-  </div>
-
-  {/* Right side: three-dot icon */}
-  <div>
-    <IconButton onClick={handleMenuOpen}>
-      <MoreVertIcon />
-    </IconButton>
-    <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-      {content.filename.toLowerCase().endsWith(".pdf") && (
-        <MenuItem onClick={handleRequestSignature}>Request Signature</MenuItem>
-      )}
-       {content.filename.toLowerCase().endsWith(".pdf") && (
-  <MenuItem   onClick={handleRequestApproval}
-            disabled={isApproved} >Approval</MenuItem>
-)}
-
-      <MenuItem onClick={handleMenuClose}>Rename</MenuItem>
-      <MenuItem onClick={handleMenuClose}>Download</MenuItem>
-  {permissions.canDelete && (
-  <MenuItem onClick={handleDeleteFile}>Delete</MenuItem>
-)}
-
-    </Menu>
-  </div>
-
-  {/* Dialog remains unchanged */}
-  <Dialog
-    open={openDialog && showBuilderFor === content._id}
-    onClose={() => setOpenDialog(false)}
-    fullWidth
-    maxWidth="lg"
-  >
-    <DialogTitle>
-      {content.filename}
-      <IconButton
-        aria-label="close"
-        onClick={() => setOpenDialog(false)}
-        style={{ position: "absolute", right: 8, top: 8 }}
+        style={{
+          paddingLeft: 20,
+          marginBottom: 10,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          width: "100%",
+        }}
       >
-        <CloseIcon />
-      </IconButton>
-    </DialogTitle>
-    <DialogContent dividers>
-      {token && <div className="app">
-      <DocusealBuilder token={token} customCss={customCss}  />
-    </div>}
-    </DialogContent>
-  </Dialog>
-</div>
+        {/* Left side: filename + permissions */}
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <div>
+            📄 <span>{content.filename}</span>
+          </div>
+          <div style={{ display: "flex", gap: "10px", marginTop: 5 }}>
+            {["canView", "canDownload", "canUpdate", "canDelete"].map(
+              (perm) => (
+                <label key={perm} style={{ cursor: "pointer" }}>
+                  <input
+                    type="checkbox"
+                    checked={permissions[perm]}
+                    onChange={(e) =>
+                      handlePermissionChange(perm, e.target.checked)
+                    }
+                  />
+                  {perm.replace("can", "")}
+                </label>
+              )
+            )}
+          </div>
+        </div>
 
+        {/* Right side: three-dot icon */}
+        <div>
+          <IconButton onClick={handleMenuOpen}>
+            <MoreVertIcon />
+          </IconButton>
+        
+          <Menu
+  anchorEl={anchorEl}
+  open={Boolean(anchorEl)}
+  onClose={handleMenuClose}
+>
+  {content.filename.toLowerCase().endsWith(".pdf") && (
+    <MenuItem
+      onClick={handleRequestSignature}
+      disabled={!permissions.canEsign} // depends on canEsign
+    >
+      Request Signature
+    </MenuItem>
+  )}
+
+  {content.filename.toLowerCase().endsWith(".pdf") && (
+    <MenuItem
+      onClick={handleRequestApproval}
+      disabled={!permissions.canApprove} // depends on canApprove
+    >
+      Approval
+    </MenuItem>
+  )}
+
+  <MenuItem
+    onClick={handleMenuClose}
+    disabled={!permissions.canUpdate} // depends on canUpdate
+  >
+    Rename
+  </MenuItem>
+
+  <MenuItem
+    onClick={handleMenuClose}
+    disabled={!permissions.canDownload} // depends on canDownload
+  >
+    Download
+  </MenuItem>
+
+  <MenuItem
+    onClick={handleDeleteFile}
+    disabled={!permissions.canDelete} // depends on canDelete
+  >
+    Delete
+  </MenuItem>
+</Menu>
+
+        </div>
+
+        {/* Dialog remains unchanged */}
+        <Dialog
+          open={openDialog && showBuilderFor === content._id}
+          onClose={() => setOpenDialog(false)}
+          fullWidth
+          maxWidth="lg"
+        >
+          <DialogTitle>
+            {content.filename}
+            <IconButton
+              aria-label="close"
+              onClick={() => setOpenDialog(false)}
+              style={{ position: "absolute", right: 8, top: 8 }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
+          <DialogContent dividers>
+            {token && (
+              <div className="app">
+                <DocusealBuilder token={token} customCss={customCss} />
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+      </div>
     );
   }
 
@@ -537,7 +317,8 @@ console.log("payload",payload)
             onPermissionUpdate={onPermissionUpdate}
             clientEmail={clientEmail}
             approvedFiles={approvedFiles}
-  setApprovedFiles ={setApprovedFiles}
+            setApprovedFiles={setApprovedFiles}
+             accountId={accountId}
           />
         ))}
     </div>
@@ -605,13 +386,15 @@ const FileExplorer = ({ onPathSelect, accountId }) => {
     );
   };
   const [clientEmail, setClientEmail] = useState(""); // store client email
-   const [approvedFiles, setApprovedFiles] = useState(new Set());
+  const [approvedFiles, setApprovedFiles] = useState(new Set());
   const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
   const fetchAccountDetails = async () => {
     try {
-      const res = await fetch(`${ACCOUNT_API}/accounts/accountdetails/${accountId}`);
+      const res = await fetch(
+        `${ACCOUNT_API}/accounts/accountdetails/${accountId}`
+      );
       const data = await res.json();
-    setClientEmail(data.account.contacts[0].email);
+      setClientEmail(data.account.contacts[0].email);
       console.log(data.account.contacts[0].email); // adjust key if it's different
     } catch (err) {
       console.error("Failed to fetch account details", err);
@@ -620,7 +403,7 @@ const FileExplorer = ({ onPathSelect, accountId }) => {
   useEffect(() => {
     if (accountId) {
       fetchFiles();
-      fetchAccountDetails()
+      fetchAccountDetails();
     }
   }, [accountId]);
 
@@ -640,6 +423,7 @@ const FileExplorer = ({ onPathSelect, accountId }) => {
           clientEmail={clientEmail}
           approvedFiles={approvedFiles}
           setApprovedFiles={setApprovedFiles}
+          accountId={accountId}
         />
       ))}
     </div>
