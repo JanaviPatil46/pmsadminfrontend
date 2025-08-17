@@ -540,7 +540,7 @@ const handleUpdateStatus = (invoiceNumber, status) => {
                     padding: "4px 8px",
                     lineHeight: "1",
                     cursor: "pointer",
-                  }}>{new Intl.DateTimeFormat("en-GB", {
+                  }}>{new Intl.DateTimeFormat("en-US", {
                     day: "2-digit",
                     month: "2-digit",
                     year: "numeric",

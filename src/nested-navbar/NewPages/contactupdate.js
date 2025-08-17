@@ -114,7 +114,7 @@ setPhoneNumbers(
   const [countries, setCountries] = useState([]);
   useEffect(() => {
     axios
-      .get("https://restcountries.com/v3.1/all")
+      .get("https://restcountries.com/v3.1/all?fields=name,cca2")
       .then((response) => {
         const countryData = response.data.map((country) => ({
           name: country.name.common,

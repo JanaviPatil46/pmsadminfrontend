@@ -19,8 +19,9 @@ import {
   FormControl,
   FormControlLabel,
   Switch,
-  FormGroup,
+  FormGroup,InputAdornment
 } from "@mui/material";
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { toast } from "react-toastify";
 import { useNavigate, useParams } from "react-router-dom";
 import Section from "./organizertempSection";
@@ -30,7 +31,79 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { IoClose } from "react-icons/io5";
+import { useDrag, useDrop, DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+
+const SectionItem = ({ section, onClick, onDrop, index, truncateText, isSelected }) => {
+  const [{ isDragging }, drag] = useDrag(() => ({
+    type: 'SECTION',
+    item: { id: section.id, index },
+    collect: (monitor) => ({
+      isDragging: !!monitor.isDragging(),
+    }),
+  }));
+
+  const [, drop] = useDrop({
+    accept: 'SECTION',
+    hover: (item) => {
+      if (item.index !== index) {
+        onDrop(item.index, index);
+        item.index = index;
+      }
+    },
+  });
+
+  return (
+    <Box 
+      ref={(node) => drag(drop(node))}
+      key={section.id} 
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        opacity: isDragging ? 0.5 : 1,
+        cursor: 'move',
+        mb: 1,
+      }}
+    >
+      <TextField
+        placeholder={`Section Name`}
+        className='section-name'
+        size="small"
+        margin='normal'
+        value={truncateText(section.text, 5)}
+        InputProps={{
+          readOnly: true,
+          startAdornment: (
+            <InputAdornment position="start">
+              <DragIndicatorIcon sx={{ cursor: 'move' }} />
+            </InputAdornment>
+          ),
+        }}
+        sx={{ 
+          backgroundColor: isSelected ? "#E0F7FA" : "#fff", 
+          cursor: "pointer",
+          width: '100%',
+        }}
+        onClick={() => onClick(section)}
+        fullWidth
+      />
+    </Box>
+  );
+};
 const OrganizersTempUpdate = () => {
+  const moveSection = (fromIndex, toIndex) => {
+    const newSections = [...sections];
+    const [movedSection] = newSections.splice(fromIndex, 1);
+    newSections.splice(toIndex, 0, movedSection);
+    setSections(newSections);
+  };
+// const truncateText = (text, maxWords) => {
+//     const words = text.split(' ');
+//     if (words.length > maxWords) {
+//       return words.slice(0, maxWords).join(' ') + ' ..';
+//     }
+//     return text;
+//   };
   const ORGANIZER_TEMP_API = process.env.REACT_APP_ORGANIZER_TEMP_URL;
 
   const { id } = useParams();
@@ -965,6 +1038,7 @@ const OrganizersTempUpdate = () => {
   const totalSteps = visibleSections.length;
   return (
     <>
+    <DndProvider backend={HTML5Backend}>
       <Box>
         <Box
           sx={{
@@ -1085,35 +1159,19 @@ const OrganizersTempUpdate = () => {
           className="left-org-container"
           sx={{ padding: "10px", width: "30%", height: "auto", p: 2 }}
         >
-          <Box className="smooth-dnd-container vertical">
-            {sections.map((section) => (
-              <Box
-                key={section.id}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <TextField
-                  placeholder={`Section Name`}
-                  className="section-name"
-                  size="small"
-                  margin="normal"
-                  value={truncateText(section.text, 5)}
-                  InputProps={{
-                    readOnly: true,
-                  }}
-                  sx={{
-                    backgroundColor:
-                      selectedSection?.id === section.id ? "#E0F7FA" : "#fff",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => handleSectionClick(section)}
-                  fullWidth
-                />
-              </Box>
-            ))}
-          </Box>
+         <Box >
+                  {sections.map((section, index) => (
+                    <SectionItem 
+                      key={section.id}
+                      section={section}
+                      index={index}
+                      onClick={handleSectionClick}
+                      onDrop={moveSection}
+                      truncateText={truncateText}
+                      isSelected={selectedSection?.id === section.id}
+                    />
+                  ))}
+                </Box>
           <Box sx={{ width: "50%", height: "25px", marginTop: "20px" }}>
             <Button
               variant="contained"
@@ -2111,6 +2169,7 @@ const OrganizersTempUpdate = () => {
           </Box>
         </DialogContent>
       </Dialog>
+      </DndProvider>
     </>
   );
 };

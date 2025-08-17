@@ -54,10 +54,10 @@ const PendingTasks = () => {
         const formattedTasks = result.taskList.map((task) => ({
           ...task,
           startDate: task.StartDate
-            ? new Date(task.StartDate).toLocaleDateString("en-GB")
+            ? new Date(task.StartDate).toLocaleDateString("en-US")
             : "",
           dueDate: task.EndDate
-            ? new Date(task.EndDate).toLocaleDateString("en-GB")
+            ? new Date(task.EndDate).toLocaleDateString("en-US")
             : "",
           description: task.Description.replace(/<[^>]+>/g, ""), // Remove HTML tags
         }));

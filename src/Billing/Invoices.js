@@ -1369,7 +1369,7 @@ const Invoices = ({ charLimit = 4000 }) => {
                     </TableCell>
 
                     <TableCell>{row.invoiceStatus}</TableCell>
-                    <TableCell>{new Intl.DateTimeFormat("en-GB", {
+                    <TableCell>{new Intl.DateTimeFormat("en-US", {
                     day: "2-digit",
                     month: "2-digit",
                     year: "numeric",

@@ -402,7 +402,7 @@ const CountryAutocomplete = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("https://restcountries.com/v3.1/all?fields=name,cca2,idd,flag")
+    fetch("https://restcountries.com/v3.1/all?fields=name,cca2")
       .then(res => res.json())
       .then(data => {
         const sorted = data.sort((a, b) =>

@@ -42,6 +42,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { format } from "date-fns";
+import TagsMultiSelectDropDown from "./Accounts/TagsMultiSelectDropDown"
 const ContactTable = () => {
   const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
   console.log("bhvh", storedData);
@@ -49,7 +50,7 @@ const ContactTable = () => {
   const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
   const [contactData, setContactData] = useState([]);
   const [uniqueTags, setUniqueTags] = useState([]);
-  const [filterValue, setFilterValue] = useState(null);
+  
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState(null);
   const [tags, setTags] = useState([]);
@@ -127,12 +128,7 @@ const ContactTable = () => {
       cursor: "pointer",
     },
   }));
-  // const handleTagChange = (event, newValue) => {
-  //   setSelectedTags(newValue.map((option) => option.label));
-  //   // Send selectedValues array to your backend
-  //   console.log("Selected Values:", newValue.map((option) => option.label));
-
-  // };
+  
   const handleTagChange = (event) => {
     const selectedValues = event.target.value;
     setSelectedTags(selectedValues);
@@ -167,19 +163,7 @@ const ContactTable = () => {
       });
     }
 
-    // Filter by text in name, email, or companyName
-    // if (filterText) {
-    //   filtered = filtered.filter((contact) => {
-    //     const name = contact.name?.toLowerCase() || "";
-    //     const email = contact.email?.toLowerCase() || "";
-    //     const companyName = contact.companyName?.toLowerCase() || "";
-    //     return (
-    //       name.includes(filterText.toLowerCase()) ||
-    //       email.includes(filterText.toLowerCase()) ||
-    //       companyName.includes(filterText.toLowerCase())
-    //     );
-    //   });
-    // }
+
     Object.entries(filterText).forEach(([filterKey, filterVal]) => {
       if (filterVal) {
         filtered = filtered.filter((contact) => {
@@ -248,11 +232,7 @@ const ContactTable = () => {
     setPage(0); // Reset to first page when changing rows per page
   };
 
-  // Pagination: Slice the contact data based on page and rowsPerPage
-  // const paginatedData = contactData.slice(
-  //   page * rowsPerPage,
-  //   page * rowsPerPage + rowsPerPage
-  // );
+
 
   // Slice data based on pagination
   const paginatedData = useMemo(() => {
@@ -425,50 +405,7 @@ const ContactTable = () => {
     setMenuAnchor(null);
   };
 
-  // const clearFilter = (filter) => {
-  //   setSelectedFilters(selectedFilters.filter((f) => f !== filter));
-  //   // setFilterValues({ ...filterValues, [filter]: "" });
-  //   setFilterText("");
-  //   if (filter === "tags") setSelectedTags([]);
-  // };
 
-  // const handleDateOptionChange = (option) => {
-  //   const today = new Date();
-  //   let startDate = null;
-  //   let endDate = new Date(today.setHours(23, 59, 59, 999));
-
-  //   switch(option) {
-  //     case 'today':
-  //       startDate = new Date(today.setHours(0, 0, 0, 0));
-  //       break;
-  //     case 'yesterday':
-  //       startDate = new Date(today);
-  //       startDate.setDate(today.getDate() - 1);
-  //       startDate.setHours(0, 0, 0, 0);
-  //       endDate = new Date(startDate);
-  //       endDate.setHours(23, 59, 59, 999);
-  //       break;
-  //     case 'lastWeek':
-  //       startDate = new Date(today);
-  //       startDate.setDate(today.getDate() - 7);
-  //       startDate.setHours(0, 0, 0, 0);
-  //       break;
-  //     case 'lastMonth':
-  //       startDate = new Date(today);
-  //       startDate.setDate(today.getDate() - 30);
-  //       startDate.setHours(0, 0, 0, 0);
-  //       break;
-  //     default:
-  //       startDate = dateFilter.startDate;
-  //       endDate = dateFilter.endDate;
-  //   }
-
-  //   setDateFilter({
-  //     option,
-  //     startDate,
-  //     endDate
-  //   });
-  // };
   const handleDateOptionChange = (option) => {
     const today = new Date();
     let startDate = null;
@@ -519,11 +456,7 @@ const ContactTable = () => {
           ? "Custom Range"
           : `${format(startDate, "MMM-dd-yyyy")} to ${format(endDate, "MMM-dd-yyyy")}`,
     });
-    // setDateFilter({
-    //   option,
-    //   startDate,
-    //   endDate,
-    // });
+ 
   };
   // Handler for updated date option change
   const handleUpdatedDateOptionChange = (option) => {
@@ -660,153 +593,6 @@ const ContactTable = () => {
           )}
         </Drawer>
 
-        {/* Filter Button and Dropdown */}
-        {/* <Box display="flex" alignItems="center" mb={2}>
-        <Button
-          variant="contained"
-          onClick={handleMenuOpen}
-          sx={{
-            backgroundColor: "var(--color-save-btn)", // Normal background
-
-            "&:hover": {
-              backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-            },
-            borderRadius: "15px",
-          }}
-        >
-          Filter by
-        </Button>
-        <Menu
-          anchorEl={menuAnchor}
-          open={Boolean(menuAnchor)}
-          onClose={handleMenuClose}
-        >
-          <MenuItem onClick={() => handleFilterOptionClick("name")}>
-            Name
-          </MenuItem>
-          <MenuItem onClick={() => handleFilterOptionClick("email")}>
-            Email
-          </MenuItem>
-          <MenuItem onClick={() => handleFilterOptionClick("companyName")}>
-            Company Name
-          </MenuItem>
-          <MenuItem onClick={() => handleFilterOptionClick("tags")}>
-            Tags
-          </MenuItem>
-        </Menu>
-        {selectedFilters.map((filter) => (
-          <Box display="flex" alignItems="center" ml={2}>
-            {filter === "tags" ? (
-              <FormControl sx={{ width: "100%" }}>
-                <Select
-                  multiple
-                  displayEmpty
-                  fullWidth
-                  value={selectedTags}
-                  onChange={handleTagChange}
-                  input={<OutlinedInput placeholder="Tags" />}
-                  renderValue={(selected) =>
-                    selected.length > 0 ? (
-                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                        {selected.map((label) => {
-                          const option = tagsoptions.find(
-                            (tag) => tag.label === label
-                          );
-                          return (
-                            <Chip
-                              key={label}
-                              label={label}
-                              sx={{
-                                backgroundColor: option?.colour,
-                                color: "#fff",
-                                fontWeight: 500,
-                                fontSize: "10px",
-                                borderRadius: "16px",
-                                height: "20px",
-                                cursor: "pointer",
-                                boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)",
-                                "& .MuiChip-deleteIcon": {
-                                  color: "#fff",
-                                  opacity: 0.7,
-                                  transition: "opacity 0.2s",
-                                  "&:hover": { opacity: 1 },
-                                },
-                              }}
-                            />
-                          );
-                        })}
-                      </Box>
-                    ) : (
-                      "Tags"
-                    )
-                  }
-                  style={{ width: "250px", marginRight: "10px" }}
-                  MenuProps={{
-                    PaperProps: {
-                      style: {
-                        maxHeight: 200, // Set the maximum height of the dropdown
-                        overflowY: "auto", // Enable scrolling
-                      },
-                    },
-                  }}
-                >
-                  {tagsoptions.map((option) => {
-                    const canvas = document.createElement("canvas");
-                    const context = canvas.getContext("2d");
-                    context.font = "12px Arial"; // Match the font size/style of MenuItem
-
-                    const textWidth = context.measureText(option.label).width; // Get precise width
-                    const dynamicWidth = Math.min(textWidth + 16, 150); // Add padding & set max width
-                    return (
-                      <MenuItem
-                        key={option.label}
-                        value={option.label}
-                        sx={{
-                          backgroundColor: option.colour,
-                          color: "#fff",
-                          fontSize: "10px",
-                          borderRadius: "10px",
-                          margin: "5px",
-                          textAlign: "center",
-                          display: "flex",
-                          justifyContent: "center",
-                          padding: "4px 9px",
-                          // alignItems: "center",
-                          // paddingLeft: "10px",
-                          whiteSpace: "nowrap", // Prevent line breaks
-                          // textAlign: "left", // Ensure text is left-aligned
-                          // paddingLeft: "10px", // Add left padding for proper alignment
-                          minWidth: `${dynamicWidth}px`,
-                          maxWidth: `${dynamicWidth}px`, // Dynamically set maxWidth
-                          "&:hover": {
-                            backgroundColor: option.colour,
-                            color: "#fff",
-                          },
-                        }}
-                      >
-                        {option.label}
-                      </MenuItem>
-                    );
-                  })}
-                </Select>
-              </FormControl>
-            ) : (
-              <TextField
-                label={`Search by ${filter}`}
-                variant="outlined"
-                size="small"
-                value={filterText}
-                onChange={(e) => setFilterText(e.target.value)}
-                // style={{ flex: 1 }}
-                sx={{ width: "200px" }}
-              />
-            )}
-            <IconButton onClick={() => clearFilter(filter)} sx={{ ml: 1 }}>
-              <DeleteIcon color="error" />
-            </IconButton>
-          </Box>
-        ))}
-      </Box> */}
         <Box display="flex" alignItems="center" mb={2}>
           <Button
             variant="contained"
@@ -850,97 +636,119 @@ const ContactTable = () => {
           {selectedFilters.map((filter) => (
             <Box display="flex" alignItems="center" ml={2} key={filter}>
               {filter === "tags" ? (
-                <FormControl sx={{ width: "100%" }}>
-                  {/* Your existing tags select component */}
-                  <Select
-                    multiple
-                    displayEmpty
-                    fullWidth
-                    value={selectedTags}
-                    onChange={handleTagChange}
-                    input={<OutlinedInput placeholder="Tags" />}
-                    renderValue={(selected) =>
-                      selected.length > 0 ? (
-                        <Box
-                          sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}
-                        >
-                          {selected.map((label) => {
-                            const option = tagsoptions.find(
-                              (tag) => tag.label === label
-                            );
-                            return (
-                              <Chip
-                                key={label}
-                                label={label}
-                                sx={{
-                                  backgroundColor: option?.colour,
-                                  color: "#fff",
-                                  fontWeight: 500,
-                                  fontSize: "10px",
-                                  borderRadius: "16px",
-                                  height: "20px",
-                                  cursor: "pointer",
-                                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)",
-                                  "& .MuiChip-deleteIcon": {
-                                    color: "#fff",
-                                    opacity: 0.7,
-                                    transition: "opacity 0.2s",
-                                    "&:hover": { opacity: 1 },
-                                  },
-                                }}
-                              />
-                            );
-                          })}
-                        </Box>
-                      ) : (
-                        "Tags"
-                      )
-                    }
-                    style={{ width: "250px", marginRight: "10px" }}
-                    MenuProps={{
-                      PaperProps: {
-                        style: {
-                          maxHeight: 200,
-                          overflowY: "auto",
-                        },
-                      },
-                    }}
-                  >
-                    {tagsoptions.map((option) => {
-                      const canvas = document.createElement("canvas");
-                      const context = canvas.getContext("2d");
-                      context.font = "12px Arial";
-                      const textWidth = context.measureText(option.label).width;
-                      const dynamicWidth = Math.min(textWidth + 16, 150);
-                      return (
-                        <MenuItem
-                          key={option.label}
-                          value={option.label}
-                          sx={{
-                            backgroundColor: option.colour,
-                            color: "#fff",
-                            fontSize: "10px",
-                            borderRadius: "10px",
-                            margin: "5px",
-                            textAlign: "center",
-                            display: "flex",
-                            justifyContent: "center",
-                            padding: "4px 9px",
-                            whiteSpace: "nowrap",
-                            minWidth: `${dynamicWidth}px`,
-                            maxWidth: `${dynamicWidth}px`,
-                            "&:hover": {
-                              backgroundColor: option.colour,
-                              color: "#fff",
-                            },
-                          }}
-                        >
-                          {option.label}
-                        </MenuItem>
-                      );
-                    })}
-                  </Select>
-                </FormControl>
+                // <FormControl sx={{ width: "100%" }}>
+                //   {/* Your existing tags select component */}
+                //   <Select
+                //     multiple
+                //     displayEmpty
+                //     fullWidth
+                //     value={selectedTags}
+                //     onChange={handleTagChange}
+                //     input={<OutlinedInput placeholder="Tags" />}
+                //     renderValue={(selected) =>
+                //       selected.length > 0 ? (
+                //         <Box
+                //           sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}
+                //         >
+                //           {selected.map((label) => {
+                //             const option = tagsoptions.find(
+                //               (tag) => tag.label === label
+                //             );
+                //             return (
+                //               <Chip
+                //                 key={label}
+                //                 label={label}
+                //                 sx={{
+                //                   backgroundColor: option?.colour,
+                //                   color: "#fff",
+                //                   fontWeight: 500,
+                //                   fontSize: "10px",
+                //                   borderRadius: "16px",
+                //                   height: "20px",
+                //                   cursor: "pointer",
+                //                   boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)",
+                //                   "& .MuiChip-deleteIcon": {
+                //                     color: "#fff",
+                //                     opacity: 0.7,
+                //                     transition: "opacity 0.2s",
+                //                     "&:hover": { opacity: 1 },
+                //                   },
+                //                 }}
+                //               />
+                //             );
+                //           })}
+                //         </Box>
+                //       ) : (
+                //         "Tags"
+                //       )
+                //     }
+                //     style={{ width: "250px", marginRight: "10px" }}
+                //     MenuProps={{
+                //       PaperProps: {
+                //         style: {
+                //           maxHeight: 200,
+                //           overflowY: "auto",
+                //         },
+                //       },
+                //     }}
+                //   >
+                //     {tagsoptions.map((option) => {
+                //       const canvas = document.createElement("canvas");
+                //       const context = canvas.getContext("2d");
+                //       context.font = "12px Arial";
+                //       const textWidth = context.measureText(option.label).width;
+                //       const dynamicWidth = Math.min(textWidth + 16, 150);
+                //       return (
+                //         <MenuItem
+                //           key={option.label}
+                //           value={option.label}
+                //           sx={{
+                //             backgroundColor: option.colour,
+                //             color: "#fff",
+                //             fontSize: "10px",
+                //             borderRadius: "10px",
+                //             margin: "5px",
+                //             textAlign: "center",
+                //             display: "flex",
+                //             justifyContent: "center",
+                //             padding: "4px 9px",
+                //             whiteSpace: "nowrap",
+                //             minWidth: `${dynamicWidth}px`,
+                //             maxWidth: `${dynamicWidth}px`,
+                //             "&:hover": {
+                //               backgroundColor: option.colour,
+                //               color: "#fff",
+                //             },
+                //           }}
+                //         >
+                //           {option.label}
+                //         </MenuItem>
+                //       );
+                //     })}
+                //   </Select>
+                // </FormControl>
+                <Box sx={{ width: "250px" }}>
+        <TagsMultiSelectDropDown
+          value={selectedTags.map(tagName => {
+            const tag = tags.find(t => t.tagName === tagName);
+            return tag ? {
+              value: tag._id,
+              label: tag.tagName,
+              colour: tag.tagColour
+            } : null;
+          }).filter(Boolean)}
+          onChange={(selected) => {
+            setSelectedTags(selected.map(item => item.label));
+          }}
+          options={tagsoptions.map(option => ({
+            value: option.value,
+            label: option.label,
+            colour: option.colour
+          }))}
+          placeholder="Select tags"
+          width="250px"
+        />
+      </Box>
               ) : filter === "createdAt" ? (
                 <Box display="flex" alignItems="center" gap={2}>
                   <Typography>Date Created</Typography>

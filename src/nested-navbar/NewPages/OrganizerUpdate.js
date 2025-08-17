@@ -64,13 +64,7 @@ const CreateOrganizerUpdate = ({ OrganizerData, onClose }) => {
         setOrganizerId(selectedOrganizer._id);
         setSections(selectedOrganizer.sections);
         // Loop through the sections and form elements to log text and textvalue
-        selectedOrganizer.sections.forEach((section) => {
-          console.log(`Section: ${section.name} - ${section.text}`);
-          section.formElements.forEach((formElement) => {
-            console.log(`Form Element: ${formElement.text}`);
-            console.log(`Text Value: ${formElement.textvalue}`);
-          });
-        });
+        
       })
       .catch((error) => console.error(error));
   };
@@ -123,9 +117,7 @@ const CreateOrganizerUpdate = ({ OrganizerData, onClose }) => {
   };
   // Filter sections based on conditional settings and toggle state
   const filteredSections = sections.filter((section) => {
-    // Show section if:
-    // 1. Conditional is false OR
-    // 2. Conditional is true AND showConditional is true
+
     return !section.sectionsettings?.conditional || showConditional;
   });
   return (
@@ -172,8 +164,7 @@ const CreateOrganizerUpdate = ({ OrganizerData, onClose }) => {
                   ml: 1,
                 }}
               >
-                {/* ({section.formElements.filter((el) => el.textvalue).length} /{" "}
-                {section.formElements.length}) */}
+                
                 (
                 {
                   section.formElements.filter(
@@ -205,20 +196,7 @@ const CreateOrganizerUpdate = ({ OrganizerData, onClose }) => {
             {expandedSection === section.id && (
               <TableContainer component={Paper}>
                 <Table sx={{ minWidth: 650 }} aria-label="form elements table">
-                  {/* <TableHead>
-                    <TableRow>
-                      <TableCell>
-                        <strong>Question</strong>
-                      </TableCell>
-                      <TableCell>
-                        <strong>Answer</strong>
-                      </TableCell>
-
-                      <TableCell>
-                        <strong>Reviewed</strong>
-                      </TableCell>
-                    </TableRow>
-                  </TableHead> */}
+                  
 <TableHead>
   <TableRow>
     <TableCell sx={{ width: "40%" }}>
@@ -259,7 +237,11 @@ const CreateOrganizerUpdate = ({ OrganizerData, onClose }) => {
                                 Display
                               </Box>
                             ) : (
-                              formElement.textvalue || ""
+                              // formElement.textvalue || ""
+                              <div style={{ whiteSpace: "pre-line" }}>
+  {formElement.textvalue}
+</div>
+
                             )}
                           </TableCell>
                           <TableCell sx={{textAlign:'center'}}>
