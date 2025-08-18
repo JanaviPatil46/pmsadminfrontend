@@ -51,7 +51,7 @@ import debounce from "lodash.debounce";
 import { createFilterOptions } from "@mui/material/Autocomplete";
 const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
-  const USER_API = process.env.REACT_APP_USER_URL;
+
   const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
   const CONTACT_API = process.env.REACT_APP_CONTACTS_URL;
   const API_KEY = process.env.REACT_APP_FOLDER_URL;
@@ -66,14 +66,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
     }, [logindata]);
   const ITEM_HEIGHT = 48;
   const ITEM_PADDING_TOP = 8;
-  const MenuProps = {
-    PaperProps: {
-      style: {
-        maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-        width: "auto",
-      },
-    },
-  };
+  
   const theme = useTheme();
   const navigate = useNavigate();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
@@ -81,7 +74,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   const [accountType, setAccountType] = useState("Individual");
   const [accountName, setaccountName] = useState("");
   const [companyname, setcompanyname] = useState("");
-  const [cCountry, SetCCountry] = useState(null);
+ 
   const [countries, setCountries] = useState([]);
   const [newUserId, setNewUserId] = useState("");
   // const [state, setstate] = useState('')
@@ -98,7 +91,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   const [firstNameError, setFirstNameError] = useState("");
   const [lastNameError, setLastNameError] = useState("");
   const [emailError, setEmaileError] = useState("");
-  // const [companyfoldertemplateError, setCompanyFolderTemplateError] = useState("");
+
   const validateForm = () => {
     let isValid = true;
     if (!accountName) {
@@ -124,40 +117,9 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
       setFolderTemplateError("");
     }
 
-    // selectedTemplate
-    // Folder Temaplte is required
-
     return isValid;
   };
-  // const validateContactForm = () => {
-  //   let isValid = true;
-  //   if (!firstName) {
-  //     setFirstNameError("First name is required");
 
-  //     isValid = false;
-  //   } else {
-  //     setFirstNameError("");
-  //   }
-
-  //     if (!lastName) {
-  //       setLastNameError("Last Name is required.");
-  //       isValid = false;
-  //     } else {
-  //       setLastNameError("");
-  //     }
-
-  //   if (!email) {
-  //     setEmaileError("Email is required.");
-  //     isValid = false;
-  //   } else {
-  //     setEmaileError("");
-  //   }
-
-  // // selectedTemplate
-  // // Folder Temaplte is required
-
-  //   return isValid;
-  // };
 
   const validateContactForm = () => {
     let isValid = true;
@@ -224,11 +186,6 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
     }
   };
 
-  // const handleUserChange = (event, selectedOptions) => {
-  //   setSelectedUser(selectedOptions);
-  //   const selectedValues = selectedOptions.map((option) => option.value);
-  //   setCombinedTeamMemberValues(selectedValues);
-  // };
   const handleUserChange = (newSelectedUsers) => {
     setSelectedUser(newSelectedUsers);
     console.log(newSelectedUsers)
@@ -236,10 +193,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
     setCombinedTeamMemberValues(selectedValues);
     console.log(selectedValues)
   };
-  const options = userData.map((user) => ({
-    value: user._id,
-    label: user.username,
-  }));
+
   useEffect(() => {
     axios
       .get("https://restcountries.com/v3.1/all?fields=name,cca2")
@@ -253,43 +207,9 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
       .catch((error) => console.error("Error fetching country data:", error));
   }, []);
 
-  //   useEffect(() => {
-  //     axios
-  //         .get('https://restcountries.com/v3.1/all')
-  //         .then((response) => {
-  //             const countryData = response.data.map((country) => ({
-  //                 name: country.name.common,
-  //                 code: country.cca2,
-  //             }));
-  //             setCountries(countryData);
-  //         })
-  //         .catch((error) =>
-  //             console.error('Error fetching country data:', error)
-  //         );
-  // }, []);
 
   const [selectedTags, setSelectedTags] = useState([]);
   const [combinedValues, setCombinedValues] = useState();
-
-  // const handleTagChange = (event, newValue) => {
-  //   setSelectedTags(newValue.map((option) => option.value));
-  //   // Send selectedValues array to your backend
-  //   console.log(
-  //     "Selected Values:",
-  //     newValue.map((option) => option.value)
-  //   );
-  //   // Assuming setCombinedValues is a function to send the values to your backend
-  //   setCombinedValues(newValue.map((option) => option.value));
-  // };
-  // const handleTagChange = (event) => {
-  //   const selectedValues = event.target.value;
-  //   setSelectedTags(selectedValues);
-
-  //   // Send selectedValues array to your backend
-  //   console.log("Selected Values:", selectedValues);
-  //   // Assuming setCombinedValues is a function to send the values to your backend
-  //   setCombinedValues(selectedValues);
-  // };
 
   const handleTagChange = (newSelectedTags) => {
     setSelectedTags(newSelectedTags);
@@ -409,123 +329,11 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   const [AccountId, setAccountId] = useState();
   const [folderTempId, setFolderTempId] = useState();
   const [selectedCountry, setSelectedCountry] = useState(null);
-  const [selectedContactCountry, setSelectedContactCountry] = useState(null);
-  // create account
-  // const handleSubmit = () => {
-  //   const myHeaders = new Headers();
-  //   myHeaders.append("Content-Type", "application/json");
 
-  //   if (accountType === "Individual") {
-  //     const raw = JSON.stringify({
-  //       clientType: accountType,
-  //       accountName: accountName,
-  //       tags: combinedValues,
-  //       teamMember: combinedTeamMemberValues,
-  //     });
-
-  //     const requestOptions = {
-  //       method: "POST",
-  //       headers: myHeaders,
-  //       body: raw,
-  //       redirect: "follow",
-  //     };
-  //     const url = `${ACCOUNT_API}/accounts/accountdetails`;
-  //     fetch(url, requestOptions)
-  //       .then((response) => response.json())
-  //       .then((result) => {
-  //         console.log(result);
-  //         console.log(result.newAccount._id); // Log the result
-  //         setAccountId(result.newAccount._id);
-  //         setAccountData(result.newAccount)
-  //         fetchAccountDataById(result.newAccount._id)
-  //         // updateContactsAccountId(result.newAccount._id);
-  //         toast.success("Form submitted successfully"); // Display success toast
-  //         // window.location.reload();
-  //         // handleDrawerClose();
-  //         // handleNewDrawerClose();
-  //         // navigate('/clients/accounts');
-  //       })
-  //       .catch((error) => {
-  //         console.error(error); // Log the error
-  //         toast.error("An error occurred while submitting the form"); // Display error toast
-  //       });
-  //   } else if (accountType === "Company") {
-  //     const raw = JSON.stringify({
-  //       clientType: accountType,
-  //       accountName: accountName,
-  //       tags: combinedValues,
-  //       teamMember: combinedTeamMemberValues,
-  //       companyName: companyname,
-  //       country: selectedCountry,
-  //       streetAddress: cStreetAddress,
-  //       state: cStateProvince,
-  //       city: cCity,
-  //       postalCode: cZipPostalCode,
-  //     });
-  //     console.log(raw);
-  //     const requestOptions = {
-  //       method: "POST",
-  //       headers: myHeaders,
-  //       body: raw,
-  //       redirect: "follow",
-  //     };
-  //     const url = `${ACCOUNT_API}/accounts/accountdetails`;
-  //     fetch(url, requestOptions)
-  //       .then((response) => response.json())
-  //       .then((result) => {
-  //         console.log(result); // Log the result
-  //         console.log(result.newAccount._id);
-  //         setAccountId(result.newAccount._id);
-  //          setAccountData(result.newAccount)
-  //         fetchAccountDataById(result.newAccount._id)
-  //         // updateContactsAccountId(result.newAccount._id);
-  //         toast.success("Form submitted successfully"); // Display success toast
-  //         // window.location.reload();
-  //         // handleDrawerClose();
-  //         // handleNewDrawerClose();
-  //       })
-  //       .catch((error) => {
-  //         console.error(error); // Log the error
-  //         toast.error("An error occurred while submitting the form"); // Display error toast
-  //       });
-  //   }
-  //   //todo contact
-  // };
-
-  // const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
   const SEVER_PORT = process.env.REACT_APP_SERVER_URI;
   const CLIENT_PORT = process.env.REACT_APP_CLIENT_SERVER_URI;
 
-  // const clientCreatedmail = (email) => {
-  //   const port = window.location.port;
-  //   const urlportlogin = `${SEVER_PORT}/`;
-  //   console.log(urlportlogin)
-
-  //   const myHeaders = new Headers();
-  //   myHeaders.append("Content-Type", "application/json");
-
-  //   const url = urlportlogin;
-  //   const raw = JSON.stringify({
-  //     email: email,
-  //     url: url,
-  //   });
-
-  //   const requestOptions = {
-  //     method: "POST",
-  //     headers: myHeaders,
-  //     body: raw,
-  //     redirect: "follow",
-  //   };
-  //   const urlusersavedmail = `${LOGIN_API}/clientmail/clientsavedemail/`;
-  //   fetch(urlusersavedmail, requestOptions)
-  //     .then((response) => response.json())
-
-  //     .then((result) => {
-  //       console.log(result);
-  //     })
-  //     .catch((error) => console.error(error));
-  // };
-
+  
   const updateAcountUserId = (UserId, accountuserid) => {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
@@ -684,11 +492,6 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   };
   const [phoneNumbers, setPhoneNumbers] = useState([]);
 
-  // const handleDeletePhoneNumber = (id) => {
-  //   setPhoneNumbers((prevPhoneNumbers) =>
-  //     prevPhoneNumbers.filter((item) => item.id !== id)
-  //   );
-  // };
   const handleDeletePhoneNumber = (phoneIndex) => {
     setPhoneNumbers((prevPhoneNumbers) => {
       // Create a new array excluding the phone number at the specified index
@@ -699,21 +502,9 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   //for creating multiple forms when click on Add New Contact
   const [contactCount, setContactCount] = useState(1);
 
-  //*Dipeeka */
-
-  // const updateContactsAccountId = (newAccountId) => {
-  //   setContacts(contacts.map(contact => ({
-  //     ...contact,
-  //     accountid: newAccountId
-  //   })));
-  // };
   const [contacts, setContacts] = useState([]);
 
-  // const [contacts, setContacts] = useState([{ firstName: "", middleName: "", lastName: "", contactName: "", companyName: "", note: "", ssn: "", email: "", login: "false", notify: "false", emailSync: "false", tags: [], phoneNumbers: [], country: "", streetAddress: "", city: "", state: "", postalCode: "", accountid: AccountId }]);
-
-  console.log(contacts);
-
-  const addNewContact = () => {
+   const addNewContact = () => {
     setContacts([
       ...contacts,
       {
@@ -781,31 +572,6 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
     };
     setContacts(updatedContacts);
   };
-
-  // const handleContactPhoneNumberChange = (index, phoneIndex, phoneValue) => {
-  //   setContacts((prevContacts) => {
-  //     const updatedContacts = [...prevContacts];
-  //     const contact = updatedContacts[index];
-
-  //     // Ensure the phoneNumbers array has enough elements
-  //     if (contact.phoneNumbers.length <= phoneIndex) {
-  //       contact.phoneNumbers = [
-  //         ...contact.phoneNumbers,
-  //         ...Array(phoneIndex + 1 - contact.phoneNumbers.length).fill({
-  //           phone: "",
-  //         }),
-  //       ];
-  //     }
-
-  //     // Update the phone number
-  //     contact.phoneNumbers[phoneIndex] = {
-  //       ...contact.phoneNumbers[phoneIndex],
-  //       phone: phoneValue,
-  //     };
-  //     return updatedContacts;
-  //   });
-  // };
-
 const handleContactPhoneNumberChange = (index, phoneIndex, phoneValue, countryData) => {
   setContacts((prevContacts) => {
     const updatedContacts = [...prevContacts];
@@ -840,24 +606,6 @@ const handleContactPhoneNumberChange = (index, phoneIndex, phoneValue, countryDa
     return updatedContacts;
   });
 };
-
-
-
-
-  // const handleContactAddressChange = (index, field, value) => {
-  //   setContacts((prevContacts) => {
-  //     const updatedContacts = [...prevContacts];
-  //     updatedContacts[index] = {
-  //       ...updatedContacts[index],
-  //       address: {
-  //         ...updatedContacts[index].address,
-  //         [field]: value
-  //       }
-  //     };
-  //     return updatedContacts;
-  //   });
-  // };
-
   const handleContactAddressChange = (index, field, value) => {
     setContacts((prevContacts) => {
       const updatedContacts = [...prevContacts];
@@ -966,14 +714,9 @@ const handleContactPhoneNumberChange = (index, phoneIndex, phoneValue, countryDa
         updateAcountUserId(result._id, accountid);
         clientalldata(result._id, email, firstName, middleName, lastName);
 
-
         // clientemail to activate client portal
         clientCreatedmail(email, personalMessage, result._id);
 
-
-        
-        // Optional: Trigger user created email notification
-        // userCreatedmail();
       })
       .catch((error) => console.error(error));
   };
@@ -1129,7 +872,7 @@ const handleOpenModal = (id) => {
   const [open, setOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [expandedContact, setExpandedContact] = useState(null);
-  const [uniqueTags, setUniqueTags] = useState([]);
+
   const [anchorEl, setAnchorEl] = useState(null);
   const menuOpen = Boolean(anchorEl);
   const [selectedContact, setSelectedContact] = useState(null);
@@ -1180,15 +923,7 @@ const handleOpenModal = (id) => {
   };
 
   const [allContactData, setAllContactData] = useState([]);
-  // const fetchContacts = async () => {
-  //   try {
-  //     const response = await axios.get(`${CONTACT_API}/contacts/contactlist/list/`);
-  //     console.log(response)
-  //     setAllContactData(response.data.contactlist);
-  //   } catch (error) {
-  //     console.error("API Error:", error);
-  //   }
-  // };
+
 
   const fetchContacts = async () => {
     try {
@@ -1252,29 +987,6 @@ const handleOpenModal = (id) => {
 
   const getSelectedIds = () => selectedContacts.join(", ");
 
-
-
-  // const setFilteredContact = () => {
-  //   console.log("Search Query:", searchQuery);
-  //   console.log("All Contacts Data:", allContactData);
-
-  //   if (!searchQuery) {
-  //     console.warn("Search query is empty");
-  //     setFilteredContacts(allContactData); // Show all contacts if there's no search query
-  //     return;
-  //   }
-
-  //   const lowerCaseQuery = searchQuery.toLowerCase();
-  //   const filtered = allContactData.filter((contact) => {
-  //     console.log("Contact Name:", contact.name); // Log each contact name for inspection
-  //     return (
-  //       contact.name && contact.name.toLowerCase().includes(lowerCaseQuery)
-  //     );
-  //   });
-
-  //   setFilteredContacts(filtered);
-  //   console.log("Filtered Contacts:", filtered); // Log the result of filtering
-  // };
 const setFilteredContact = () => {
   console.log("Search Query:", searchQuery);
   console.log("All Contacts Data:", allContactData);
@@ -1288,15 +1000,13 @@ const setFilteredContact = () => {
   const lowerCaseQuery = searchQuery.toLowerCase();
 
   const filtered = allContactData.filter((contact) => {
-    const nameMatch =
-      contact.name &&
-      contact.name.toLowerCase().includes(lowerCaseQuery);
+
 
     const emailMatch =
       contact.email &&
       contact.email.toLowerCase().includes(lowerCaseQuery);
 
-    return nameMatch || emailMatch;
+    return  emailMatch;
   });
 
   setFilteredContacts(filtered);
@@ -1315,10 +1025,6 @@ const filterOptions = createFilterOptions({
     fetchContacts();
     // setFilteredContact();
   };
-
-  console.log(contactData);
-  console.log("filteredContacts",filteredContacts);
-
   useEffect(() => {
     setFilteredContact();
   }, [searchQuery, allContactData]);
@@ -1331,119 +1037,6 @@ const filterOptions = createFilterOptions({
     setOpen(false);
   };
 
-  console.log(newUserId);
-
-  // const createNewSidebarData = ()=>{
-  //   let data = JSON.stringify({
-  //     "userrole": "client",
-  //     "userstatus": "active",
-  //     "sidebardata": [
-  //       {
-  //         "label": "Inbox +",
-  //         "path": "/inbox",
-  //         "icon": "LiaMoneyBillSolid",
-  //         "permissions": true
-  //       },
-  //       {
-  //         "label": "Templates",
-  //         "path": "/firmtemp/templates/tasks",
-  //         "icon": "LuWorkflow",
-  //         "permissions": false,
-  //         "submenu": [
-  //           {
-  //             "label": "Firm Templates",
-  //             "path": "/firmtemp/templates/tasks",
-  //             "icon": "GoDotFill",
-  //             "permissions": true
-  //           },
-  //           {
-  //             "label": "Services",
-  //             "path": "/firmtemp/service",
-  //             "icon": "GoDotFill",
-  //             "permissions": true
-  //           },
-  //           {
-  //             "label": "Teams & Plans",
-  //             "path": "/firmtemp/teammember",
-  //             "icon": "LiaMoneyBillSolid",
-  //             "permission": true
-  //           },
-  //           {
-  //             "label": "Tags",
-  //             "path": "/firmtemp/tags",
-  //             "icon": "LiaMoneyBillSolid",
-  //             "permission": true
-  //           },
-  //           {
-  //             "label": "Pipeline Templates",
-  //             "path": "/firmtemp/pipelines",
-  //             "icon": "GoDotFill",
-  //             "permissions": true
-  //           }
-  //         ]
-  //       },
-  //       {
-  //         "label": "Clients",
-  //         "path": "clients/accounts",
-  //         "icon": "IoPeopleOutline",
-  //         "permissions": true,
-  //         "submenu": [
-  //             {
-  //                 "label": "Accounts",
-  //                 "path": "clients/accounts",
-  //                 "icon": "GoDotFill",
-  //                 "permissions": true
-  //             },
-  //             {
-  //                 "label": "Contacts",
-  //                 "path": "clients/contacts",
-  //                 "icon": "GoDotFill",
-  //                 "permissions": true
-  //             }
-  //         ]
-  //     },
-  //     {
-  //         "label": "Workflow",
-  //         "path": "workflow/tasks",
-  //         "icon": "LuWorkflow",
-  //         "permissions": true,
-  //         "submenu": [
-  //             {
-  //                 "label": "Tasks",
-  //                 "path": "workflow/tasks",
-  //                 "icon": "GoDotFill",
-  //                 "permissions": true
-  //             },
-  //             {
-  //                 "label": "Jobs",
-  //                 "path": "workflow/jobs",
-  //                 "icon": "GoDotFill",
-  //                 "permissions": false
-  //             }
-  //         ]
-  //     }
-  //     ]
-  //   });
-
-  //   let config = {
-  //     method: 'post',
-  //     maxBodyLength: Infinity,
-  //     url: 'http://127.0.0.1:7000/api/create',
-  //     headers: {
-  //       'Content-Type': 'application/json'
-  //     },
-  //     data : data
-  //   };
-
-  //   axios.request(config)
-  //   .then((response) => {
-  //     console.log(JSON.stringify(response.data));
-  //   })
-  //   .catch((error) => {
-  //     console.log(error);
-  //   });
-
-  // }
   const clientCreatedmail = (email, personalMessage, userid) => {
     const port = window.location.port;
     const urlportlogin = `${CLIENT_PORT}/client/updatepassword`;

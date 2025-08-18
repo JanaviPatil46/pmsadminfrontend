@@ -49,9 +49,7 @@ const Clientfacing = () => {
     setIsDrawerOpen(true);
   };
 
-  const handleDrawerClose = () => {
-    setIsDrawerOpen(false);
-  };
+  
 
  
 
@@ -196,6 +194,18 @@ const validateForm = () => {
     setClientFacingDescription("");
     setSelectedColor("");
     handleDrawerClose();
+  };
+
+  const handleDrawerClose = () => {
+    setIsDrawerOpen(false);
+     setClientFacingName("");
+    setClientFacingDescription("");
+    setSelectedColor("");
+    setErrors({
+  name: "",
+  description: "",
+  color: ""
+})
   };
   const handleupdateclientstatus = () => {
     updateJobFacing(jobId);

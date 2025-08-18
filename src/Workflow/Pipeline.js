@@ -177,16 +177,9 @@ const Pipeline = ({ charLimit = 4000 }) => {
     }
   }, [userRole]);
   const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
+   const [isActiveTrue, setIsActiveTrue] = useState(true);
   const fetchJobData = async () => {
-    // try {
-    //   const url = `${JOBS_API}/workflow/jobs/job/joblist/list/true`;
-    // const response = await fetch(url);
-    // const data = await response.json();
-    // setJobs(data.jobList);
-    //   console.log("result",data.jobList)
-    // } catch (error) {
-    //   console.error("Error fetching job data:", error);
-    // }
+    
     try {
       const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
       console.log("Received stored teamMemberData:", storedData);
@@ -194,16 +187,13 @@ const Pipeline = ({ charLimit = 4000 }) => {
       const viewAllAccounts = storedData?.teammember?.viewallAccounts;
       console.log("User role is:", userRole);
       let url = "";
-      // let url = userRole === "Admin"
-      // ? `${JOBS_API}/workflow/jobs/job/joblist/list/true`
-      // : `${JOBS_API}/workflow/jobs/joblist/list/${loginuserid}/true`;
+     
       if (userRole === "Admin") {
         // Admin fetches all jobs
         url = `${JOBS_API}/workflow/jobs/job/joblist/list/true`;
       } else if (userRole === "TeamMember") {
         if (!viewAllAccounts) {
-          // If TeamMember has no access, do not fetch data
-          // alert("You do not have permission to view accounts.");
+          
           setJobs([]); // Set empty job data
           return;
         }
@@ -238,7 +228,126 @@ const Pipeline = ({ charLimit = 4000 }) => {
       console.error("Error fetching data:", error);
     }
   };
+// const fetchJobData = async () => {
+//   setLoading(true);
+//   const loaderDelay = new Promise((resolve) => setTimeout(resolve, 1000));
 
+//   try {
+//     const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
+//     console.log("Received stored teamMemberData:", storedData);
+
+//     const loginuserid = storedData?.teammember?.userid;
+//     const viewAllAccounts = storedData?.teammember?.viewallAccounts;
+
+//     console.log("User role is:", userRole);
+//     console.log("access:", viewAllAccounts);
+
+//     let url = "";
+
+//     if (userRole === "Admin") {
+//       // ✅ Fetch active accounts first
+//       const accountsResponse = await axios.get(
+//         `${ACCOUNT_API}/accounts/account/accountdetailslist/${isActiveTrue}`
+//       );
+
+//       const accountsData = accountsResponse.data.accountlist;
+//       console.log("Admin accounts fetched:", accountsData);
+
+//       if (!accountsData || accountsData.length === 0) {
+//         console.warn("No active accounts found for Admin.");
+//         setJobs([]);
+//         await loaderDelay;
+//         setLoading(false);
+//         return;
+//       }
+
+//       const accountIds = accountsData.map((account) => account.id).join(",");
+//       url = `${JOBS_API}/workflow/jobs/job/joblist/list/true/${accountIds}`;
+//     } 
+    
+//     else if (userRole === "TeamMember") {
+//       if (viewAllAccounts) {
+//         // TeamMember with full access gets all jobs
+//         // url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}`;
+//         // ✅ Fetch active accounts first
+//       const accountsResponse = await axios.get(
+//         `${ACCOUNT_API}/accounts/account/accountdetailslist/${isActiveTrue}`
+//       );
+
+//       const accountsData = accountsResponse.data.accountlist;
+//       console.log("Admin accounts fetched:", accountsData);
+
+//       if (!accountsData || accountsData.length === 0) {
+//         console.warn("No active accounts found for Admin.");
+//         setJobs([]);
+//         await loaderDelay;
+//         setLoading(false);
+//         return;
+//       }
+
+//       const accountIds = accountsData.map((account) => account.id).join(",");
+//       url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
+//       } else {
+//         // TeamMember with restricted access → fetch user's accounts
+//         const accountsResponse = await axios.get(
+//           `${ACCOUNT_API}/accounts/getaccounts/${loginuserid}/${isActiveTrue}`
+//         );
+
+//         const accountsData = accountsResponse.data.accountlist;
+//         console.log("Accounts fetched:", accountsData);
+
+//         if (!accountsData || accountsData.length === 0) {
+//           console.warn("No accounts found for user.");
+//           setJobs([]);
+//           await loaderDelay;
+//           setLoading(false);
+//           return;
+//         }
+
+//         const accountIds = accountsData.map((account) => account.id).join(",");
+//         url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
+//       }
+//     }
+
+//     if (!url) {
+//       await loaderDelay;
+//       setLoading(false);
+//       return;
+//     }
+
+//     console.log("Fetching jobs from URL:", url);
+
+//     const jobListResponse = await axios.get(url);
+//       // const data = await response.json();
+//       console.log("joblistss",jobListResponse.data.jobList)
+//       setJobs(jobListResponse.data.jobList);
+//     // const formattedData = jobListResponse.data.jobList.map((job) => ({
+//     //   ...job,
+//     //   StartDate: job.StartDate
+//     //     ? format(new Date(job.StartDate), "MMMM dd, yyyy")
+//     //     : "",
+//     //   DueDate: job.DueDate
+//     //     ? format(new Date(job.DueDate), "MMMM dd, yyyy")
+//     //     : "",
+//     //   updatedAt: formatDistanceToNow(new Date(job.updatedAt), { addSuffix: true }),
+//     //   JobAssignee: Array.isArray(job.JobAssignee)
+//     //     ? job.JobAssignee.join(", ")
+//     //     : job.JobAssignee,
+//     //   clientfacingstatus: {
+//     //     statusName: job.ClientFacingStatus?.statusName || "",
+//     //     statusColor: job.ClientFacingStatus?.statusColor || "",
+//     //   },
+//     // }));
+
+//     // setJobs(formattedData);
+//     console.log("Formatted Job Data:", jobListResponse.data.jobList);
+//   } catch (error) {
+//     console.error("Error fetching data:", error);
+//   } finally {
+//     await loaderDelay;
+//     setLoading(false);
+//   }
+// };
   const fetchStages = async (pipelineId) => {
     try {
       const url = `${PIPELINE_API}/workflow/pipeline/pipeline/${pipelineId}`;
@@ -457,7 +566,7 @@ const Pipeline = ({ charLimit = 4000 }) => {
     const [accountTags, setAccountTags] = useState([]);
 
     const AccountsTag = (accountId) => {
-      console.log(accountId);
+      console.log("accountId for tags",accountId);
       const requestOptions = {
         method: "GET",
         redirect: "follow",
@@ -1700,6 +1809,7 @@ sx={{
   };
 
   const JobCard = ({ job }) => {
+    console.log("nbfhjsg",job)
     const [{ isDragging }, drag] = useDrag({
       type: "JOB_CARD",
       item: { id: job.id },
@@ -3109,6 +3219,7 @@ sx={{
 
     const stageJobs = jobs.filter(
       (job) =>
+         
         job.Pipeline === selectedPipeline.pipelineName &&
         job.Stage.includes(stage.name)
     );
