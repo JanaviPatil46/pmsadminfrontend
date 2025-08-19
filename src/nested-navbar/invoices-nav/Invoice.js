@@ -74,24 +74,7 @@ const fetchInvoices = async (data) => {
       console.error("Error fetching invoices:", error);
     }
   };
-  // const fetchInvoices = async (data) => {
-  //   try {
-  //     const requestOptions = {
-  //       method: "GET",
-  //       redirect: "follow",
-  //     };
-
-  //     fetch(`${INVOICES_API}/workflow/invoices/invoice/invoicelistby/accountid/${data}`, requestOptions)
-  //       .then((response) => response.json())
-  //       .then((result) => {
-  //         console.log(result);
-  //         setAccountInvoicesData(result.invoice);
-  //       })
-  //       .catch((error) => console.error(error));
-  //   } catch (error) {
-  //     console.error("Error fetching email templates:", error);
-  //   }
-  // };
+ 
 
   console.log(accountInvoicesData);
 

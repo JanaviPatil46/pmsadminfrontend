@@ -16,6 +16,7 @@ import {
   Typography,
   Button,
 } from "@mui/material";
+import axios from "axios";
 import { toast } from "react-toastify";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import NewTaskDrawer from "./NewTaskDrawer";
@@ -30,6 +31,7 @@ const PendingTasks = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedTaskData, setSelectedTaskData] = useState(null);
   const ACCOUNT_TASKS_API = process.env.REACT_APP_TASKS_API;
+    const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
   const [taskData, setTasksData] = useState([]);
   const [selectedTask, setSelectedTask] = useState("");
   const [selected, setSelected] = useState([]);
@@ -42,32 +44,70 @@ const PendingTasks = () => {
     setSelected(newSelected);
   };
 
-  const fetchTasksData = () => {
-    const requestOptions = {
-      method: "GET",
-      redirect: "follow",
-    };
+  // const fetchTasksData = () => {
+  //   const requestOptions = {
+  //     method: "GET",
+  //     redirect: "follow",
+  //   };
 
-    fetch(`${ACCOUNT_TASKS_API}/accountstasks/tasklist/true`, requestOptions)
-      .then((response) => response.json())
-      .then((result) => {
-        const formattedTasks = result.taskList.map((task) => ({
-          ...task,
-          startDate: task.StartDate
-            ? new Date(task.StartDate).toLocaleDateString("en-US")
-            : "",
-          dueDate: task.EndDate
-            ? new Date(task.EndDate).toLocaleDateString("en-US")
-            : "",
-          description: task.Description.replace(/<[^>]+>/g, ""), // Remove HTML tags
-        }));
+  //   fetch(`${ACCOUNT_TASKS_API}/accountstasks/tasklist/true`, requestOptions)
+  //     .then((response) => response.json())
+  //     .then((result) => {
+  //       const formattedTasks = result.taskList.map((task) => ({
+  //         ...task,
+  //         startDate: task.StartDate
+  //           ? new Date(task.StartDate).toLocaleDateString("en-US")
+  //           : "",
+  //         dueDate: task.EndDate
+  //           ? new Date(task.EndDate).toLocaleDateString("en-US")
+  //           : "",
+  //         description: task.Description.replace(/<[^>]+>/g, ""), // Remove HTML tags
+  //       }));
 
-        console.log(formattedTasks);
-        setTasksData(formattedTasks);
-      })
-      .catch((error) => console.error(error));
-  };
+  //       console.log(formattedTasks);
+  //       setTasksData(formattedTasks);
+  //     })
+  //     .catch((error) => console.error(error));
+  // };
+const fetchTasksData = async () => {
+  try {
+    // ✅ Step 1: Fetch active accounts
+    const accountsResponse = await axios.get(
+      `${ACCOUNT_API}/accounts/account/accountdetailslist/true`
+    );
 
+    const accountsData = accountsResponse.data.accountlist || [];
+    console.log("Active accounts:", accountsData);
+
+    // ✅ Step 2: Collect account IDs
+    const accountIds = accountsData.map((account) => account.id).join(",");
+    console.log("Account IDs string:", accountIds);
+
+    // ✅ Step 3: Fetch tasks by all accountIds
+    const tasksResponse = await axios.get(
+      `${ACCOUNT_TASKS_API}/accountstasks/tasks/taskslist/byaccount/${accountIds}`
+    );
+
+    const taskList = tasksResponse.data.taskList || [];
+
+    // ✅ Step 4: Format tasks
+    const formattedTasks = taskList.map((task) => ({
+      ...task,
+      startDate: task.StartDate
+        ? new Date(task.StartDate).toLocaleDateString("en-US")
+        : "",
+      dueDate: task.EndDate
+        ? new Date(task.EndDate).toLocaleDateString("en-US")
+        : "",
+      description: task.Description?.replace(/<[^>]+>/g, "") || "",
+    }));
+
+    console.log("Formatted Tasks:", formattedTasks);
+    setTasksData(formattedTasks);
+  } catch (error) {
+    console.error("Error fetching tasks:", error);
+  }
+};
   useEffect(() => {
     fetchTasksData();
   }, []);

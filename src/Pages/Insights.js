@@ -394,68 +394,280 @@
 // // }
 
 
-import React, { useEffect, useState } from "react";
-import { Autocomplete, TextField, CircularProgress } from "@mui/material";
+// import React, { useEffect, useState } from "react";
+// import { Autocomplete, TextField, CircularProgress } from "@mui/material";
 
-const CountryAutocomplete = () => {
-  const [countries, setCountries] = useState([]);
-  const [loading, setLoading] = useState(true);
+// const CountryAutocomplete = () => {
+//   const [countries, setCountries] = useState([]);
+//   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetch("https://restcountries.com/v3.1/all?fields=name,cca2")
-      .then(res => res.json())
-      .then(data => {
-        const sorted = data.sort((a, b) =>
-          a.name.common.localeCompare(b.name.common)
-        );
-        setCountries(sorted);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error("Error fetching countries:", err);
-        setLoading(false);
-      });
-  }, []);
+//   useEffect(() => {
+//     fetch("https://restcountries.com/v3.1/all?fields=name,cca2")
+//       .then(res => res.json())
+//       .then(data => {
+//         const sorted = data.sort((a, b) =>
+//           a.name.common.localeCompare(b.name.common)
+//         );
+//         setCountries(sorted);
+//         setLoading(false);
+//       })
+//       .catch(err => {
+//         console.error("Error fetching countries:", err);
+//         setLoading(false);
+//       });
+//   }, []);
+
+//   return (
+//     <Autocomplete
+//       options={countries}
+//       getOptionLabel={(option) => option.name.common}
+//       loading={loading}
+//       onChange={(event, value) => {
+//         console.log("Selected country:", value);
+//       }}
+//       renderInput={(params) => (
+//         <TextField
+//           {...params}
+//           label="Select Country"
+//           InputProps={{
+//             ...params.InputProps,
+//             endAdornment: (
+//               <>
+//                 {loading ? <CircularProgress size={20} /> : null}
+//                 {params.InputProps.endAdornment}
+//               </>
+//             ),
+//           }}
+//         />
+//       )}
+//       renderOption={(props, option) => {
+//         const callingCode = option.idd?.root
+//           ? `${option.idd.root}${option.idd.suffixes?.[0] || ""}`
+//           : "";
+//         return (
+//           <li {...props} key={option.cca2}>
+//             <span style={{ fontSize: "1.2rem", marginRight: 8 }}>
+//               {option.flag}
+//             </span>
+//             {option.name.common} {callingCode && `(${callingCode})`}
+//           </li>
+//         );
+//       }}
+//       sx={{ width: 300 }}
+//     />
+//   );
+// };
+
+// export default CountryAutocomplete;
+
+
+import React, { useState } from 'react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  IconButton,
+  Menu,
+  MenuItem,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Button,
+  Box,
+  Typography
+} from '@mui/material';
+import {
+  MoreVert as MoreVertIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon
+} from '@mui/icons-material';
+
+// Sample data
+const initialData = [
+  { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Admin' },
+  { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'User' },
+  { id: 3, name: 'Bob Johnson', email: 'bob@example.com', role: 'Editor' },
+];
+
+const MuiTableWithActions = () => {
+  const [data, setData] = useState(initialData);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [editForm, setEditForm] = useState({});
+
+  const handleMenuOpen = (event, row) => {
+    setAnchorEl(event.currentTarget);
+    setSelectedRow(row);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setSelectedRow(null);
+  };
+
+  const handleEdit = () => {
+    if (selectedRow) {
+      setEditForm(selectedRow);
+      setEditDialogOpen(true);
+      handleMenuClose();
+    }
+  };
+
+  const handleDelete = () => {
+    setDeleteDialogOpen(true);
+    handleMenuClose();
+  };
+
+  const handleEditSubmit = () => {
+    setData(prevData =>
+      prevData.map(item =>
+        item.id === editForm.id ? editForm : item
+      )
+    );
+    setEditDialogOpen(false);
+    setEditForm({});
+  };
+
+  const handleDeleteConfirm = () => {
+    setData(prevData => prevData.filter(item => item.id !== selectedRow.id));
+    setDeleteDialogOpen(false);
+    setSelectedRow(null);
+  };
+
+  const handleInputChange = (field, value) => {
+    setEditForm(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
 
   return (
-    <Autocomplete
-      options={countries}
-      getOptionLabel={(option) => option.name.common}
-      loading={loading}
-      onChange={(event, value) => {
-        console.log("Selected country:", value);
-      }}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          label="Select Country"
-          InputProps={{
-            ...params.InputProps,
-            endAdornment: (
-              <>
-                {loading ? <CircularProgress size={20} /> : null}
-                {params.InputProps.endAdornment}
-              </>
-            ),
-          }}
-        />
-      )}
-      renderOption={(props, option) => {
-        const callingCode = option.idd?.root
-          ? `${option.idd.root}${option.idd.suffixes?.[0] || ""}`
-          : "";
-        return (
-          <li {...props} key={option.cca2}>
-            <span style={{ fontSize: "1.2rem", marginRight: 8 }}>
-              {option.flag}
-            </span>
-            {option.name.common} {callingCode && `(${callingCode})`}
-          </li>
-        );
-      }}
-      sx={{ width: 300 }}
-    />
+    <Box sx={{ padding: 3 }}>
+      <Typography variant="h4" gutterBottom>
+        User Management
+      </Typography>
+      
+      <TableContainer component={Paper}>
+        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+          <TableHead>
+            <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
+              <TableCell><strong>ID</strong></TableCell>
+              <TableCell><strong>Name</strong></TableCell>
+              <TableCell><strong>Email</strong></TableCell>
+              <TableCell><strong>Role</strong></TableCell>
+              <TableCell><strong>Actions</strong></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {data.map((row) => (
+              <TableRow
+                key={row.id}
+                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+              >
+                <TableCell>{row.id}</TableCell>
+                <TableCell>{row.name}</TableCell>
+                <TableCell>{row.email}</TableCell>
+                <TableCell>{row.role}</TableCell>
+                <TableCell>
+                  <IconButton
+                    size="small"
+                    onClick={(event) => handleMenuOpen(event, row)}
+                  >
+                    <MoreVertIcon />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      {/* Action Menu */}
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+      >
+        <MenuItem onClick={handleEdit}>
+          <EditIcon sx={{ marginRight: 1, fontSize: 20 }} />
+          Edit
+        </MenuItem>
+        <MenuItem onClick={handleDelete} sx={{ color: 'error.main' }}>
+          <DeleteIcon sx={{ marginRight: 1, fontSize: 20 }} />
+          Delete
+        </MenuItem>
+      </Menu>
+
+      {/* Edit Dialog */}
+      <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)}>
+        <DialogTitle>Edit User</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Name"
+            fullWidth
+            variant="outlined"
+            value={editForm.name || ''}
+            onChange={(e) => handleInputChange('name', e.target.value)}
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            margin="dense"
+            label="Email"
+            type="email"
+            fullWidth
+            variant="outlined"
+            value={editForm.email || ''}
+            onChange={(e) => handleInputChange('email', e.target.value)}
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            margin="dense"
+            label="Role"
+            fullWidth
+            variant="outlined"
+            value={editForm.role || ''}
+            onChange={(e) => handleInputChange('role', e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
+          <Button onClick={handleEditSubmit} variant="contained">
+            Save Changes
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to delete {selectedRow?.name}?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+          <Button 
+            onClick={handleDeleteConfirm} 
+            variant="contained" 
+            color="error"
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 };
 
-export default CountryAutocomplete;
+export default MuiTableWithActions;

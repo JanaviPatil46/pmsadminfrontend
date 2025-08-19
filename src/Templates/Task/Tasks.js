@@ -6,13 +6,11 @@ import {
   Box,
   Button,
   Typography,
-  Container,
   Autocomplete,
   TextField,
   IconButton,
   Switch,
   FormControlLabel,
-  Chip,
   Alert,
   Checkbox,
   TableContainer,
@@ -23,11 +21,7 @@ import {
   TableRow,
   Paper,
   TablePagination,
-  FormControl,
-  OutlinedInput,
-  MenuItem,
-  Select,
-  InputLabel,
+  InputLabel,MenuItem,Menu
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import Editor from "../Texteditor/Editor";
@@ -45,10 +39,10 @@ import { PiDotsSixVerticalBold } from "react-icons/pi";
 import { CircularProgress } from "@mui/material";
 import MultiSelectDropdown from "../MultiSelectDropdown"
 import TagsMultiSelectDropDown  from "../TagsMultiSelectDropDown"
-import { Menu,  } from "@mui/material";
+
 const Tasks = () => {
   const TASK_API = process.env.REACT_APP_TASK_TEMP_URL;
-  const USER_API = process.env.REACT_APP_USER_URL;
+
   const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
 
   const navigate = useNavigate();
@@ -170,12 +164,7 @@ const Tasks = () => {
     value: user._id,
     label: user.username,
   }));
-  // const handleUserChange = (event, selectedOptions) => {
-  //   setSelectedUser(selectedOptions);
-  //   const selectedValues = selectedOptions.map((option) => option.value);
-  //   setCombinedValues(selectedValues);
-  //   console.log("selected",selectedValues)
-  // };
+
 // Add this handler function
 const handleUserChange = (newSelectedUsers) => {
   setSelectedUser(newSelectedUsers);
@@ -202,68 +191,8 @@ const handleUserChange = (newSelectedUsers) => {
       console.error("Error fetching data:", error);
     }
   };
-  //  for tags
-  const calculateWidth = (tagName) => {
-    const baseWidth = 10; // base width for each tag
-    const charWidth = 8; // approximate width of each character
-    const padding = 10; // padding on either side
-    return baseWidth + charWidth * tagName.length + padding;
-  };
-  const tagsoptions = tags.map((tag) => ({
-    value: tag._id,
-    label: tag.tagName,
-    colour: tag.tagColour,
-    customStyle: {
-      backgroundColor: tag.tagColour,
-      color: "#fff",
-      borderRadius: "8px",
-      alignItems: "center",
-      textAlign: "center",
-      marginBottom: "5px",
-      padding: "2px,8px",
-      fontSize: "10px",
-      width: `${calculateWidth(tag.tagName)}px`,
-      margin: "7px",
-      cursor: "pointer",
-    },
-    customTagStyle: {
-      backgroundColor: tag.tagColour,
-      color: "#fff",
-      alignItems: "center",
-      textAlign: "center",
-      padding: "2px,8px",
-      fontSize: "10px",
-      cursor: "pointer",
-    },
-  }));
-  // const handleTagChange = (event, newValue) => {
-  //   setSelectedTags(newValue.map((option) => option.value));
-  //   // Send selectedValues array to your backend
-  //   console.log("Selected Values:", newValue.map((option) => option.value));
-  //   // Assuming setCombinedValues is a function to send the values to your backend
-  //   setCombinedTagsValues(newValue.map((option) => option.value));
-  // };
-  // task temp
-  const ITEM_HEIGHT = 48;
-  const ITEM_PADDING_TOP = 8;
-  const MenuProps = {
-    PaperProps: {
-      style: {
-        maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-        width: "auto",
-      },
-    },
-  };
-  // const handleTagChange = (event) => {
-  //   const selectedValues = event.target.value;
-  //   setSelectedTags(selectedValues);
-
-  //   // Send selectedValues array to your backend
-  //   console.log("Selected Values:", selectedValues);
-  //   // Assuming setCombinedValues is a function to send the values to your backend
-  //   setCombinedTagsValues(selectedValues);
-  // };
-  const handleTagChange = (newSelectedTags) => {
+  
+   const handleTagChange = (newSelectedTags) => {
     setSelectedTags(newSelectedTags);
     console.log(newSelectedTags)
     const selectedValues = newSelectedTags.map((option) => option.value);
@@ -407,8 +336,7 @@ const handleUserChange = (newSelectedUsers) => {
     if (!validateForm()) {
       return; // Prevent form submission if validation fails
     }
-    // const subtaskData = subtasks.map(({ id, text, isChecked }) => ({ id, text, isChecked }));
-    // console.log(subtaskData)
+    
     const subtaskData = subtasks.map(({ id, text }) => ({
       id,
       text,
@@ -554,6 +482,7 @@ const handleUserChange = (newSelectedUsers) => {
         .then((result) => {
           // console.log(result);
           toast.success("Item deleted successfully");
+          handleMenuClose()
           fetchTaskData();
           // setshowOrganizerTemplateForm(false);
         })
@@ -565,23 +494,23 @@ const handleUserChange = (newSelectedUsers) => {
   };
   const [tempIdget, setTempIdGet] = useState("");
   const [openMenuId, setOpenMenuId] = useState(null);
-  const toggleMenu = (_id) => {
-    setOpenMenuId(openMenuId === _id ? null : _id);
+    const [anchorEl, setAnchorEl] = useState(null);
+  // const toggleMenu = (_id) => {
+  //   setOpenMenuId(openMenuId === _id ? null : _id);
+  //   setTempIdGet(_id);
+  // };
+
+
+    const toggleMenu = (event, _id) => {
+    setAnchorEl(event.currentTarget);
+    setOpenMenuId(_id);
     setTempIdGet(_id);
   };
- 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (!event.target.closest(".menu-container")) {
-        setOpenMenuId(null);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-  
+    const handleMenuClose = () => {
+    setAnchorEl(null);
+    setOpenMenuId(null);
+    setTempIdGet(null);
+  };
   const [templateNameError, setTemplateNameError] = useState("");
 
   const validateForm = () => {
@@ -696,7 +625,7 @@ const handleUserChange = (newSelectedUsers) => {
                 />
               </Box>
             ) : (
-              // <MaterialReactTable columns={columns} table={table} />
+              
               <Box>
                 <TableContainer component={Paper} sx={{ overflow: "visible" }}>
                   <Table sx={{ width: "100%" }}>
@@ -744,65 +673,78 @@ const handleUserChange = (newSelectedUsers) => {
                           </TableCell>
 
                           <TableCell
-                            style={{
-                              fontSize: "12px",
-                              padding: "4px 8px",
-                              lineHeight: "1",
-                              cursor: "pointer",
-                            }}
-                          >
-                            <IconButton
-                              onClick={() => toggleMenu(row._id)}
-                              style={{ color: "#2c59fa" }}
-                            >
-                              <CiMenuKebab />
-                              {openMenuId === row._id && (
-                                <Box
-                                  sx={{
-                                    position: "absolute",
-                                    zIndex: 1,
-                                    backgroundColor: "#fff",
-                                    boxShadow: 1,
-                                    borderRadius: 1,
-                                    p: 1,
-                                    left: "20px",
+                  style={{
+                    fontSize: "12px",
+                    padding: "4px 8px",
+                    lineHeight: "1",
+                  }}
+                >
+                  <IconButton
+                    onClick={(event) => toggleMenu(event, row._id)}
+                    style={{ color: "#2c59fa" }}
+                    size="small"
+                  >
+                    <CiMenuKebab />
+                  </IconButton>
 
-                                    m: 2,
-                                    top: "10px",
-                                    textAlign: "start",
-                                  }}
-                                >
-                                  {/* <Typography sx={{ fontSize: '12px', fontWeight: 'bold' }}>Publice to Marketplace</Typography> */}
-
-                                  <Typography
-                                    sx={{
-                                      fontSize: "12px",
-                                      fontWeight: "bold",
-                                    }}
-                                    onClick={() => handleEdit(row._id)}
-                                  >
-                                    Edit 
-                                  </Typography>
-                                  <Typography
-                                    sx={{
-                                      fontSize: "12px",
-                                      color: "red",
-                                      fontWeight: "bold",
-                                    }}
-                                    onClick={() => handleDelete(row._id)}
-                                  >
-                                    Delete
-                                  </Typography>
-                                </Box>
-                              )}
-                            </IconButton>
-                          </TableCell>
+                  {/* MUI Menu */}
+                
+                </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
                   </Table>
                 </TableContainer>
-
+ <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+        PaperProps={{
+          sx: {
+            mt: 3,
+            ml: 1,
+            boxShadow: 3,
+            borderRadius: 1,
+            minWidth: 120,
+            '& .MuiMenuItem-root': {
+              fontSize: '12px',
+              padding: '8px 16px',
+            }
+          }
+        }}
+      >
+        <MenuItem 
+          onClick={() => handleEdit(tempIdget)}
+          sx={{ 
+            fontWeight: "bold",
+            '&:hover': {
+              backgroundColor: '#f5f5f5'
+            }
+          }}
+        >
+          Edit
+        </MenuItem>
+        <MenuItem 
+          onClick={() => handleDelete(tempIdget)}
+          sx={{ 
+            color: "error.main", 
+            fontWeight: "bold",
+            '&:hover': {
+              backgroundColor: '#ffebee'
+            }
+          }}
+        >
+          Delete
+        </MenuItem>
+      </Menu>
                 <TablePagination
                   rowsPerPageOptions={[30, 40, 50, 60, 100]}
                   component="div"
@@ -814,7 +756,7 @@ const handleUserChange = (newSelectedUsers) => {
                 />
               </Box>
             )}
-            {/* <MaterialReactTable columns={columns} table={table} /> */}
+          
           </Box>
         ) : (
           <Box sx={{ mt: 2 }}>
@@ -889,48 +831,11 @@ const handleUserChange = (newSelectedUsers) => {
                       </Box>
                       <Box sx={{ width: "100%" }}>
                         <Grid container spacing={2}>
-                          {/* <Grid item xs={12} sm={6}>
-                            <Box>
-                              <label className="task-input-label">
-                                Task Assignee
-                              </label>
-                              <Autocomplete
-                                multiple
-                                sx={{ background: "#fff", mt: 2 }}
-                                options={options}
-                                size="small"
-                                getOptionLabel={(option) => option.label}
-                                value={selectedUser}
-                                onChange={handleUserChange}
-                                renderOption={(props, option) => (
-                                  <Box
-                                    component="li"
-                                    {...props}
-                                    sx={{
-                                      cursor: "pointer",
-                                      margin: "5px 10px",
-                                    }} // Add cursor pointer style
-                                  >
-                                    {option.label}
-                                  </Box>
-                                )}
-                                renderInput={(params) => (
-                                  <TextField
-                                    {...params}
-                                    variant="outlined"
-                                    placeholder="Assignees"
-                                  />
-                                )}
-                                isOptionEqualToValue={(option, value) =>
-                                  option.value === value.value
-                                }
-                              />
-                            </Box>
-                          </Grid> */}
+                          
                           <Grid item xs={12} sm={6} pr={3}>
   
     <InputLabel sx={{color:'black',mb:2}}>Task Assignee</InputLabel>
-    {/* // With internal options (fetches data automatically) */}
+  
 <MultiSelectDropdown 
   value={selectedUser}
   onChange={handleUserChange}
@@ -955,160 +860,13 @@ const handleUserChange = (newSelectedUsers) => {
                         />
                       </Box>
 
-                      {/* <Box mt={2}>
-                        <label className='task-input-label'>Tags</label>
-                        <Autocomplete
-                          multiple
-                          size='small'
-                          id="tags-outlined"
-                          options={tagsoptions}
-                          getOptionLabel={(option) => option.label}
-                          value={tagsoptions.filter(option => selectedTags.includes(option.value))}
-                          onChange={handleTagChange}
-                          renderTags={(selected, getTagProps) =>
-                            selected.map((option, index) => (
-                              <Chip
-                                key={option.value}
-                                label={option.label}
-                                style={option.customTagStyle}
-                                {...getTagProps({ index })}
-                              />
-                            ))
-                          }
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              variant="outlined"
-                              placeholder="Tags"
-                              sx={{ width: '100%', marginTop: '8px', backgroundColor: '#fff' }}
-                            />
-                          )}
-                          renderOption={(props, option) => (
-                            <Box component="li" {...props} style={option.customStyle}>
-                              {option.label}
-                            </Box>
-                          )}
-                        />
-                      </Box> */}
+                      
                       <Box mt={1} mr={1}>
                         <InputLabel sx={{ color: "black", mb: 1 }}>
                           Tags
                         </InputLabel>
 
-                        {/* <FormControl sx={{ width: "100%" }}>
-                          <Select
-                            multiple
-                            size="small"
-                            fullWidth
-                            value={selectedTags}
-                            onChange={handleTagChange}
-                            input={<OutlinedInput />}
-                            displayEmpty // Enables placeholder when no value is selected
-                            renderValue={(selected) => {
-                              if (selected.length === 0) {
-                                return (
-                                  <span style={{ color: "#aaa" }}>
-                                    Select tags...
-                                  </span>
-                                ); // Placeholder
-                              }
-                              return (
-                                <Box
-                                  sx={{
-                                    display: "flex",
-                                    flexWrap: "wrap",
-                                    gap: "6px",
-                                    padding: "6px",
-                                    borderRadius: "10px",
-                                  }}
-                                >
-                                  {selected.map((value) => {
-                                    const option = tagsoptions.find(
-                                      (opt) => opt.value === value
-                                    );
-                                    return (
-                                      <Chip
-                                        key={value}
-                                        label={option?.label}
-                                        sx={{
-                                          backgroundColor: option?.colour,
-                                          color: "#fff",
-                                          fontWeight: 500,
-                                          fontSize: "10px",
-                                          borderRadius: "16px",
-                                          height: "20px",
-                                          cursor: "pointer",
-                                          boxShadow:
-                                            "0px 2px 4px rgba(0, 0, 0, 0.2)",
-                                          "& .MuiChip-deleteIcon": {
-                                            color: "#fff",
-                                            opacity: 0.7,
-                                            transition: "opacity 0.2s",
-                                            "&:hover": { opacity: 1 },
-                                          },
-                                        }}
-                                      />
-                                    );
-                                  })}
-                                </Box>
-                              );
-                            }}
-                            MenuProps={MenuProps}
-                            sx={{
-                              borderRadius: "10px",
-                              "& .MuiOutlinedInput-root": {
-                                borderRadius: "10px",
-                              },
-                            }}
-                          >
-                            {tagsoptions.map((option) => {
-                              // const dynamicWidth = Math.min(option.label.length * 10, 150); // Adjust width dynamically
-                              // Create a canvas element to measure the actual text width
-                              const canvas = document.createElement("canvas");
-                              const context = canvas.getContext("2d");
-                              context.font = "12px Arial"; // Match the font size/style of MenuItem
-
-                              const textWidth = context.measureText(
-                                option.label
-                              ).width; // Get precise width
-                              const dynamicWidth = Math.min(
-                                textWidth + 16,
-                                150
-                              ); // Add padding & set max width
-                              return (
-                                <MenuItem
-                                  key={option.value}
-                                  value={option.value}
-                                  sx={{
-                                    backgroundColor: option.colour,
-                                    color: "#fff",
-                                    fontSize: "10px",
-                                    borderRadius: "10px",
-                                    margin: "5px",
-                                    textAlign: "center",
-                                    display: "flex",
-                                    justifyContent: "center",
-                                    padding: "4px 9px",
-                                    // alignItems: "center",
-                                    // paddingLeft: "10px",
-                                    whiteSpace: "nowrap", // Prevent line breaks
-                                    // textAlign: "left", // Ensure text is left-aligned
-                                    // paddingLeft: "10px", // Add left padding for proper alignment
-                                    minWidth: `${dynamicWidth}px`,
-                                    maxWidth: `${dynamicWidth}px`, // Dynamically set maxWidth
-                                    "&:hover": {
-                                      backgroundColor: option.colour,
-                                      color: "#fff",
-                                    },
-                                  }}
-                                >
-                                  {option.label}
-                                </MenuItem>
-                              );
-                              
-                            })}
-                          </Select>
-                        </FormControl> */}
+                       
                         <TagsMultiSelectDropDown 
   value={selectedTags}
   onChange={handleTagChange}

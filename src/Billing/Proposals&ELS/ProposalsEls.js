@@ -15,8 +15,9 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import { CiMenuKebab } from "react-icons/ci";
 import { toast } from "react-toastify";
-
+import axios from "axios";
 const ProposalsEls = () => {
+    const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
   const PROPOSAL_API = process.env.REACT_APP_PROPOSAL_URL;
   const [ProposalsTemplates, setProposalsTemplates] = useState([]);
   const [tempIdget, setTempIdGet] = useState("");
@@ -24,21 +25,47 @@ const ProposalsEls = () => {
 
   const navigate = useNavigate();
 
-  const fetchPrprosalsAllData = async () => {
-    try {
-      const url = `${PROPOSAL_API}/proposalandels/proposalaccountwise/allproposallist/list`;
+  // const fetchPrprosalsAllData = async () => {
+  //   try {
+  //     const url = `${PROPOSAL_API}/proposalandels/proposalaccountwise/allproposallist/list`;
 
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error("Failed to fetch Proposals templates");
-      }
-      const result = await response.json();
-      console.log(result.proposalesandelsAccountwise);
-      setProposalsTemplates(result.proposalesandelsAccountwise);
-    } catch (error) {
-      console.error("Error fetching Proposals  templates:", error);
-    }
-  };
+  //     const response = await fetch(url);
+  //     if (!response.ok) {
+  //       throw new Error("Failed to fetch Proposals templates");
+  //     }
+  //     const result = await response.json();
+  //     console.log(result.proposalesandelsAccountwise);
+  //     setProposalsTemplates(result.proposalesandelsAccountwise);
+  //   } catch (error) {
+  //     console.error("Error fetching Proposals  templates:", error);
+  //   }
+  // };
+const fetchPrprosalsAllData = async () => {
+  try {
+    // Step 1: Fetch active accounts
+    const accountsResponse = await axios.get(
+      `${ACCOUNT_API}/accounts/account/accountdetailslist/true`
+    );
+
+    const accountsData = accountsResponse.data.accountlist || [];
+    if (!accountsData.length) return;
+
+    // Step 2: Build accountIds string
+    const accountIds = accountsData.map((acc) => acc.id).join(",");
+
+    // Step 3: Fetch proposals for all accounts in one request
+    const url = `${PROPOSAL_API}/proposalandels/proposalaccountwise/proposalbyaccount/${accountIds}`;
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Failed to fetch proposals");
+
+    const result = await response.json();
+    console.log("Proposals:", result.proposalesandelsAccountwise);
+
+    setProposalsTemplates(result.proposalesandelsAccountwise || []);
+  } catch (error) {
+    console.error("Error fetching proposals:", error);
+  }
+};
 
   useEffect(() => {
     fetchPrprosalsAllData();

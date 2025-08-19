@@ -794,6 +794,7 @@ const MyStepper = () => {
         .then((result) => {
           console.log(result);
           toast.success("Item deleted successfully");
+          handleCloseOptions()
           setShowForm(false);
           fetchPrprosalsAllData();
           fetchServiceData();
@@ -816,21 +817,34 @@ const MyStepper = () => {
 
   const [tempIdget, setTempIdGet] = useState("");
   const [openMenuId, setOpenMenuId] = useState(null);
-  const toggleMenu = (_id) => {
-    setOpenMenuId(openMenuId === _id ? null : _id);
+  // const toggleMenu = (_id) => {
+  //   setOpenMenuId(openMenuId === _id ? null : _id);
+  //   setTempIdGet(_id);
+  // };
+  
+    const toggleMenu = (event, _id) => {
+    setAnchorEl(event.currentTarget);
+    setOpenMenuId(_id);
     setTempIdGet(_id);
   };
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (!event.target.closest(".menu-container")) {
-        setOpenMenuId(null);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+    const handleCloseOptions = () => {
+    setAnchorEl(null);
+    setOpenMenuId(null);
+    setTempIdGet(null);
+  };
+  // const [anchorEl, setAnchorEl] = useState(null);
+  
+  // useEffect(() => {
+  //   const handleClickOutside = (event) => {
+  //     if (!event.target.closest(".menu-container")) {
+  //       setOpenMenuId(null);
+  //     }
+  //   };
+  //   document.addEventListener("mousedown", handleClickOutside);
+  //   return () => {
+  //     document.removeEventListener("mousedown", handleClickOutside);
+  //   };
+  // }, []);
   
   //*****Payments */
 
@@ -850,77 +864,7 @@ const MyStepper = () => {
     setPaymentAmount(value);
   };
 
-  const columns = useMemo(
-    () => [
-      {
-        accessorKey: "templatename",
-        header: "Template Name",
-        Cell: ({ row }) => (
-          <Typography sx={{ color: "#2c59fa", cursor: "pointer", fontWeight: "bold" }} onClick={() => handleEdit(row.original._id)}>
-            {row.original.templatename}
-          </Typography>
-        ),
-      },
-      {
-        accessorKey: "proposalname",
-        header: "Proposal Name",
-        Cell: ({ row }) => (
-          <Typography sx={{ color: "#2c59fa", cursor: "pointer", fontWeight: "bold" }} onClick={() => handleEdit(row.original._id)}>
-            {row.original.proposalname}
-          </Typography>
-        ),
-      },
-      {
-        accessorKey: "Setting",
-        header: "Setting",
-        Cell: ({ row }) => (
-          <IconButton onClick={() => toggleMenu(row.original._id)} style={{ color: "#2c59fa" }}>
-            <CiMenuKebab style={{ fontSize: "25px" }} />
-            {openMenuId === row.original._id && (
-              <Box sx={{ position: "absolute", zIndex: 1, backgroundColor: "#fff", boxShadow: 1, borderRadius: 1, p: 1, left: "30px", m: 2 }}>
-                <Typography
-                  sx={{ fontSize: "12px", fontWeight: "bold" }}
-                  onClick={() => {
-                    handleEdit(row.original._id);
-                  }}
-                >
-                  Edit
-                </Typography>
-                <Typography sx={{ fontSize: "12px", color: "red", fontWeight: "bold" }} onClick={() => handleDelete(row.original._id)}>
-                  Delete
-                </Typography>
-                <Typography sx={{ fontSize: "12px", color: "green", fontWeight: "bold" }} onClick={() => handleDuplicateProposal(row.original._id)}>
-                  Duplicate
-                </Typography>
-              </Box>
-            )}
-          </IconButton>
-        ),
-      },
-    ],
-    [openMenuId]
-  );
-
-  // console.log(ProposalsTemplates);
-  const table = useMaterialReactTable({
-    columns,
-    data: ProposalsTemplates,
-    enableBottomToolbar: true,
-    enableStickyHeader: true,
-    columnFilterDisplayMode: "custom", // Render own filtering UI
-    enableRowSelection: true, // Enable row selection
-    enablePagination: true,
-    muiTableContainerProps: { sx: { maxHeight: "400px" } },
-    initialState: {
-      columnPinning: { left: ["mrt-row-select", "tagName"], right: ["settings"] },
-    },
-    muiTableBodyCellProps: {
-      sx: (theme) => ({
-        backgroundColor: theme.palette.mode === "dark-theme" ? theme.palette.grey[900] : theme.palette.grey[50],
-      }),
-    },
-  });
-
+ 
   const [anchorElNew, setAnchorElNew] = useState(null);
   const [selectedRow, setSelectedRow] = useState(null);
 
@@ -2083,63 +2027,80 @@ const MyStepper = () => {
                       </Typography>
                     </TableCell>
 
-                    <TableCell
-                      style={{
-                        fontSize: "12px",
-                        padding: "4px 8px",
-                        lineHeight: "1",
-                        cursor: "pointer",
-                      }}
-                    >
-                      <IconButton
-                        onClick={() => toggleMenu(row._id)}
-                        style={{ color: "#2c59fa" }}
-                      >
-                        <CiMenuKebab />
-                        {openMenuId === row._id && (
-                          <Box
-                            sx={{
-                              position: "absolute",
-                              zIndex: 1,
-                              backgroundColor: "#fff",
-                              boxShadow: 1,
-                              borderRadius: 1,
-                              p: 1,
-                              left: "20px",
-
-                              m: 2,
-                              top: "10px",
-                              textAlign: "start",
-                            }}
-                          >
-                            {/* <Typography sx={{ fontSize: '12px', fontWeight: 'bold' }}>Publice to Marketplace</Typography> */}
-
-                            <Typography
-                              sx={{ fontSize: "12px", fontWeight: "bold" }}
-                              onClick={() => handleEdit(row._id)}
-                            >
-                              Edit 
-                            </Typography>
-                            <Typography
-                              sx={{
-                                fontSize: "12px",
-                                color: "red",
-                                fontWeight: "bold",
-                              }}
-                              onClick={() => handleDelete(row._id)}
-                            >
-                              Delete
-                            </Typography>
-                          </Box>
-                        )}
-                      </IconButton>
-                    </TableCell>
+              
+                     <TableCell
+                                     style={{
+                                       fontSize: "12px",
+                                       padding: "4px 8px",
+                                       lineHeight: "1",
+                                     }}
+                                   >
+                                     <IconButton
+                                       onClick={(event) => toggleMenu(event, row._id)}
+                                       style={{ color: "#2c59fa" }}
+                                       size="small"
+                                     >
+                                       <CiMenuKebab />
+                                     </IconButton>
+                   
+                                     {/* MUI Menu */}
+                                   
+                                   </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           </TableContainer>
-
+ <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleCloseOptions}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+        PaperProps={{
+          sx: {
+            mt: 3,
+            ml: 1,
+            boxShadow: 3,
+            borderRadius: 1,
+            minWidth: 120,
+            '& .MuiMenuItem-root': {
+              fontSize: '12px',
+              padding: '8px 16px',
+            }
+          }
+        }}
+      >
+        <MenuItem 
+          onClick={() => handleEdit(tempIdget)}
+          sx={{ 
+            fontWeight: "bold",
+            '&:hover': {
+              backgroundColor: '#f5f5f5'
+            }
+          }}
+        >
+          Edit
+        </MenuItem>
+        <MenuItem 
+          onClick={() => handleDelete(tempIdget)}
+          sx={{ 
+            color: "error.main", 
+            fontWeight: "bold",
+            '&:hover': {
+              backgroundColor: '#ffebee'
+            }
+          }}
+        >
+          Delete
+        </MenuItem>
+      </Menu>
 <TablePagination
 rowsPerPageOptions={[5, 10, 25]}
 component="div"

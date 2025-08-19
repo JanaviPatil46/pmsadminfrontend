@@ -1,4 +1,4 @@
-import { Box, FormControlLabel, Button, Autocomplete, InputLabel, TextField,IconButton, Divider,Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material'
+import { Menu,MenuItem,Box, FormControlLabel, Button, Autocomplete, InputLabel, TextField,IconButton, Divider,Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material'
 import React, { useState, useEffect } from 'react';
 import Drawer from '@mui/material/Drawer';
 import { useTheme, useMediaQuery, Typography } from '@mui/material';
@@ -226,39 +226,31 @@ const paginatedServices = ServiceTemplates.slice(
 );
       const [tempIdget, setTempIdGet] = useState("");
       const [openMenuId, setOpenMenuId] = useState(null);
-      const toggleMenu = (_id) => {
-        setOpenMenuId(openMenuId === _id ? null : _id);
-        setTempIdGet(_id);
-      };
+        const toggleMenu = (event, _id) => {
+    setAnchorEl(event.currentTarget);
+    setOpenMenuId(_id);
+    setTempIdGet(_id);
+  };
+    const handleMenuClose = () => {
+    setAnchorEl(null);
+    setOpenMenuId(null);
+    setTempIdGet(null);
+  };
+      const [anchorEl, setAnchorEl] = useState(null);
+        const open = Boolean(anchorEl);
+      
+        const handleClick = (event) => {
+          setAnchorEl(event.currentTarget);
+        };
+      
+        const handleClose = () => {
+          setAnchorEl(null);
+        };
       const handleEdit = (_id) => {
 
         navigate("/servicesUpdate/" + _id);
       };
-      //delete template
-    //   const handleDelete = (_id) => {
-    //     const requestOptions = {
-    //         method: "DELETE",
-    //         redirect: "follow",
-    //       };
-    //       const url = `${SERVICE_API}/workflow/services/servicetemplate/` ;
-    //       fetch(url + _id, requestOptions)
-    //         .then((response) => {
-    //           if (!response.ok) {
-    //             throw new Error("Failed to delete item");
-    //           }
-    //           return response.json();
-    //         })
-    //         .then((result) => {
-    //           console.log(result);
-    //           toast.success("Item deleted successfully");
-    //           fetchServicesData()
-    //         })
-    //         .catch((error) => {
-    //           console.error(error);
-    //           toast.error("Failed to delete item");
-    //         })
-    
-    //   };
+     
     const handleDelete = (_id) => {
         // Show a confirmation prompt
         const isConfirmed = window.confirm("Are you sure you want to delete this service?");
@@ -280,6 +272,7 @@ const paginatedServices = ServiceTemplates.slice(
             .then((result) => {
               console.log(result);
               toast.success("Item deleted successfully");
+              handleMenuClose()
               fetchServicesData(); // Refresh data
             })
             .catch((error) => {
@@ -289,89 +282,7 @@ const paginatedServices = ServiceTemplates.slice(
         }
       };
       
-      // const columns = [
-      //   {
-      //     accessorKey: 'serviceName', // Access the template name
-      //     header: 'Name',
-      //     Cell: ({ row }) => (
-      //       <Typography
-      //         sx={{ color: "#2c59fa", cursor: "pointer", fontWeight: 'bold' }}
-      //         onClick={() => handleEdit(row.original._id)}
-      //       >
-      //         {row.original.serviceName}
-      //       </Typography>
-      //     ),
-      //   },
-      //   {
-      //       accessorKey: 'description', // Access the template name
-      //       header: 'Description',
-      //   },
-      //   {
-      //       accessorKey: 'rate', // Access the template name
-      //       header: 'Rate',
-      //   },
-      //   {
-      //       accessorKey: 'ratetype', // Access the template name
-      //       header: 'Rate Type',
-      //   },
-      //   // {
-      //   //     accessorKey: 'tax', // Access the tax
-      //   //     header: 'Tax',
-      //   //     Cell: ({ row }) => (
-      //   //       <Checkbox
-      //   //         checked={row.original.tax} // Display as checked if tax is true
-      //   //         // disabled // Make it non-interactive
-      //   //         color="primary"
-      //   //       />
-      //   //     ),
-      //   //   },
-      //   {
-      //       accessorKey: 'category', // Access the template name
-      //       header: 'Category',
-      //       Cell: ({ row }) => {
-      //           // Find the category name based on the category ID
-      //           const category = categoryData.find((cat) => cat._id === row.original.category);
-      //           return <Typography>{category ? category.categoryName : "N/A"}</Typography>;
-      //         },
-      //   },
-      //   {
-      //     accessorKey: 'settings', // Add settings column
-      //     header: 'Settings',
-      //     Cell: ({ row }) => (
-      //       <IconButton onClick={() => toggleMenu(row.original._id)} style={{ color: "#2c59fa" }}>
-      //         <CiMenuKebab style={{ fontSize: "25px" }} />
-      //         {openMenuId === row.original._id && (
-      //           <Box sx={{ position: 'absolute', zIndex: 1, backgroundColor: '#fff', boxShadow: 1, borderRadius: 1, p: 1, left: '30px', m: 2 }}>
-      //             <Typography sx={{ fontSize: '12px', fontWeight: 'bold' }} onClick={() => {
-      //               handleEdit(row.original._id);
-                   
-      //             }} >Edit</Typography>
-      //             <Typography sx={{ fontSize: '12px', color: 'red', fontWeight: 'bold' }} onClick={() => handleDelete(row.original._id)}>Delete</Typography>
-      //           </Box>
-      //         )}
-      //       </IconButton>
     
-      //     ),
-      //   },
-      // ];
-      // const table = useMaterialReactTable({
-      //   columns,
-      //   data:ServiceTemplates,
-      //   enableBottomToolbar: true,
-      //   enableStickyHeader: true,
-      //   columnFilterDisplayMode: "custom", // Render own filtering UI
-      //   enableRowSelection: true, // Enable row selection
-      //   enablePagination: true,
-      //   muiTableContainerProps: { sx: { maxHeight: "400px" } },
-      //   initialState: {
-      //       columnPinning: { left: ["mrt-row-select", "Name"], },
-      //     },
-      //   muiTableBodyCellProps: {
-      //     sx: (theme) => ({
-      //       backgroundColor: theme.palette.mode === "dark-theme" ? theme.palette.grey[900] : theme.palette.grey[50],
-      //     }),
-      //   },
-      // });
     return (
         <Box>
             <Button onClick={setIsNewDrawerOpen} variant="contained" color="primary"   sx={{
@@ -524,62 +435,131 @@ const paginatedServices = ServiceTemplates.slice(
                                 {row.category?.categoryName || ""}
                               </TableCell>
                              
-                           
+{/* 
                               <TableCell
-                                style={{
-                                  fontSize: "12px",
-                                  padding: "4px 8px",
-                                  lineHeight: "1",
-                                }}
-                              >
-                                <IconButton
-                                  onClick={() => toggleMenu(row._id)}
-                                  style={{ color: "#2c59fa" }}
-                                >
-                                  <CiMenuKebab />
-                                  {openMenuId === row._id && (
-                                    <Box
-                                      sx={{
-                                        position: "absolute",
-                                        zIndex: 1,
-                                        backgroundColor: "#fff",
-                                        boxShadow: 1,
-                                        borderRadius: 1,
-                                        p: 1,
-                                        left: "20px",
-              
-                                        m: 2,
-                                        top: "10px",
-                                        textAlign: "start",
-                                      }}
-                                    >
-                                      <Typography
-                                        sx={{ fontSize: "12px", fontWeight: "bold" }}
-                                        onClick={() => handleEdit(row._id)}
-                                      >
-                                        Edit   
-                                      </Typography>
-                                      <Typography
-                                        sx={{
-                                          fontSize: "12px",
-                                          color: "red",
-                                          fontWeight: "bold",
-                                        }}
-                                        onClick={() => handleDelete(row._id)}
-                                      >
-                                        Delete
-                                      </Typography>
-                                      
-                                    </Box>
-                                  )}
-                                </IconButton>
-                              </TableCell>
+      style={{
+        fontSize: "12px",
+        padding: "4px 8px",
+        lineHeight: "1",
+        cursor: "pointer",
+      }}
+    >
+      <IconButton
+        onClick={handleClick}
+        style={{ color: "#2c59fa" }}
+      >
+        <CiMenuKebab />
+      </IconButton>
+
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        PaperProps={{
+          style: {
+            minWidth: "100px",
+          },
+        }}
+      >
+        <MenuItem
+          onClick={() => {
+            handleEdit(row._id);
+            handleClose();
+          }}
+          sx={{ color: "blue" }}
+        >
+           Edit
+        </MenuItem>
+
+        <MenuItem
+          onClick={() => {
+            handleDelete(row._id);
+            handleClose();
+          }}
+          sx={{ color: "red" }}
+        >
+           Delete
+        </MenuItem>
+
+        
+
+        
+      </Menu>
+    </TableCell> */}
+    <TableCell
+                      style={{
+                        fontSize: "12px",
+                        padding: "4px 8px",
+                        lineHeight: "1",
+                      }}
+                    >
+                      <IconButton
+                        onClick={(event) => toggleMenu(event, row._id)}
+                        style={{ color: "#2c59fa" }}
+                        size="small"
+                      >
+                        <CiMenuKebab />
+                      </IconButton>
+    
+                      {/* MUI Menu */}
+                    
+                    </TableCell>
                             </TableRow>
                           ))}
                         </TableBody>
                       </Table>
                      
                     </TableContainer>
+                     <Menu
+                            anchorEl={anchorEl}
+                            open={Boolean(anchorEl)}
+                            onClose={handleMenuClose}
+                            anchorOrigin={{
+                              vertical: 'top',
+                              horizontal: 'right',
+                            }}
+                            transformOrigin={{
+                              vertical: 'top',
+                              horizontal: 'left',
+                            }}
+                            PaperProps={{
+                              sx: {
+                                mt: 3,
+                                ml: 1,
+                                boxShadow: 3,
+                                borderRadius: 1,
+                                minWidth: 120,
+                                '& .MuiMenuItem-root': {
+                                  fontSize: '12px',
+                                  padding: '8px 16px',
+                                }
+                              }
+                            }}
+                          >
+                            <MenuItem 
+                              onClick={() => handleEdit(tempIdget)}
+                              sx={{ 
+                                fontWeight: "bold",
+                                '&:hover': {
+                                  backgroundColor: '#f5f5f5'
+                                }
+                              }}
+                            >
+                              Edit
+                            </MenuItem>
+                            <MenuItem 
+                              onClick={() => handleDelete(tempIdget)}
+                              sx={{ 
+                                color: "error.main", 
+                                fontWeight: "bold",
+                                '&:hover': {
+                                  backgroundColor: '#ffebee'
+                                }
+                              }}
+                            >
+                              Delete
+                            </MenuItem>
+                          </Menu>
                     <TablePagination
     rowsPerPageOptions={[30,40,50,60,100]}
       component="div"

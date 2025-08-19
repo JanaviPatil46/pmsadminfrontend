@@ -25,7 +25,7 @@ import {
   TableRow,
   Paper,
   TablePagination,
-  InputLabel,
+  InputLabel,Menu,MenuItem
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import {
@@ -624,21 +624,33 @@ const EmailTemp = () => {
 
   const [tempIdget, setTempIdGet] = useState("");
   const [openMenuId, setOpenMenuId] = useState(null);
-  const toggleMenu = (_id) => {
-    setOpenMenuId(openMenuId === _id ? null : _id);
+  
+  // const toggleMenu = (_id) => {
+  //   setOpenMenuId(openMenuId === _id ? null : _id);
+  //   setTempIdGet(_id);
+  // };
+
+     const toggleMenu = (event, _id) => {
+    setAnchorEl(event.currentTarget);
+    setOpenMenuId(_id);
     setTempIdGet(_id);
   };
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (!event.target.closest(".menu-container")) {
-        setOpenMenuId(null);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+    const handleMenuClose = () => {
+    setAnchorEl(null);
+    setOpenMenuId(null);
+    setTempIdGet(null);
+  };
+  // useEffect(() => {
+  //   const handleClickOutside = (event) => {
+  //     if (!event.target.closest(".menu-container")) {
+  //       setOpenMenuId(null);
+  //     }
+  //   };
+  //   document.addEventListener("mousedown", handleClickOutside);
+  //   return () => {
+  //     document.removeEventListener("mousedown", handleClickOutside);
+  //   };
+  // }, []);
   
 
  
@@ -862,7 +874,7 @@ const EmailTemp = () => {
                           </Typography>
                         </TableCell>
 
-                        <TableCell
+                        {/* <TableCell
                           style={{
                             fontSize: "12px",
                             padding: "4px 8px",
@@ -891,7 +903,7 @@ const EmailTemp = () => {
                                   textAlign: "start",
                                 }}
                               >
-                                {/* <Typography sx={{ fontSize: '12px', fontWeight: 'bold' }}>Publice to Marketplace</Typography> */}
+                               
 
                                 <Typography
                                   sx={{ fontSize: "12px", fontWeight: "bold" }}
@@ -912,13 +924,80 @@ const EmailTemp = () => {
                               </Box>
                             )}
                           </IconButton>
-                        </TableCell>
+                        </TableCell> */}
+                                                  <TableCell
+                                                                   style={{
+                                                                     fontSize: "12px",
+                                                                     padding: "4px 8px",
+                                                                     lineHeight: "1",
+                                                                   }}
+                                                                 >
+                                                                   <IconButton
+                                                                     onClick={(event) => toggleMenu(event, row._id)}
+                                                                     style={{ color: "#2c59fa" }}
+                                                                     size="small"
+                                                                   >
+                                                                     <CiMenuKebab />
+                                                                   </IconButton>
+                                                 
+                                                                   {/* MUI Menu */}
+                                                                 
+                                                                 </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
               </TableContainer>
-
+ <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+        PaperProps={{
+          sx: {
+            mt: 3,
+            ml: 1,
+            boxShadow: 3,
+            borderRadius: 1,
+            minWidth: 120,
+            '& .MuiMenuItem-root': {
+              fontSize: '12px',
+              padding: '8px 16px',
+            }
+          }
+        }}
+      >
+        <MenuItem 
+          onClick={() => handleEdit(tempIdget)}
+          sx={{ 
+            fontWeight: "bold",
+            '&:hover': {
+              backgroundColor: '#f5f5f5'
+            }
+          }}
+        >
+          Edit
+        </MenuItem>
+        <MenuItem 
+          onClick={() => handleDelete(tempIdget)}
+          sx={{ 
+            color: "error.main", 
+            fontWeight: "bold",
+            '&:hover': {
+              backgroundColor: '#ffebee'
+            }
+          }}
+        >
+          Delete
+        </MenuItem>
+      </Menu>
               <TablePagination
                 rowsPerPageOptions={[30, 40, 50, 60, 100]}
                 component="div"

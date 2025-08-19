@@ -113,96 +113,8 @@ const Example = ({ charLimit = 4000 }) => {
 
   const [loading, setLoading] = useState(false); // Loader state
  
-const fetchData = async () => {
-  setLoading(true); // Start loading
-  const loaderDelay = new Promise((resolve) => setTimeout(resolve, 1000));
-
-  try {
-    const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
-    console.log("Received stored teamMemberData:", storedData);
-
-    const loginuserid = storedData?.teammember?.userid;
-    const viewAllAccounts = storedData?.teammember?.viewallAccounts;
-
-    console.log("User role is:", userRole);
-    console.log("access:", viewAllAccounts);
-
-    let url = "";
-
-    if (userRole === "Admin") {
-      // Admin fetches all jobs
-      url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}`;
-    } 
-    
-    else if (userRole === "TeamMember") {
-      if (viewAllAccounts) {
-        // TeamMember with full access gets all jobs
-        url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}`;
-      } else {
-        // TeamMember with restricted access → fetch user's accounts
-        const accountsResponse = await axios.get(
-          `${ACCOUNT_API}/accounts/getaccounts/${loginuserid}/${isActiveTrue}`
-        );
-
-        const accountsData = accountsResponse.data.accountlist;
-        console.log("Accounts fetched:", accountsData);
-
-        if (!accountsData || accountsData.length === 0) {
-          console.warn("No accounts found for user.");
-          setJobData([]);
-          await loaderDelay;
-          setLoading(false);
-          return;
-        }
-
-        const accountIds = accountsData.map((account) => account.id).join(",");
-        url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
-      }
-    }
-
-    if (!url) {
-      await loaderDelay;
-      setLoading(false);
-      return;
-    }
-
-    console.log("Fetching jobs from URL:", url);
-
-    const jobListResponse = await axios.get(url);
-
-    const formattedData = jobListResponse.data.jobList.map((job) => ({
-      ...job,
-      StartDate: job.StartDate
-        ? format(new Date(job.StartDate), "MMMM dd, yyyy")
-        : "",
-      DueDate: job.DueDate
-        ? format(new Date(job.DueDate), "MMMM dd, yyyy")
-        : "",
-      updatedAt: formatDistanceToNow(new Date(job.updatedAt), { addSuffix: true }),
-      JobAssignee: Array.isArray(job.JobAssignee)
-        ? job.JobAssignee.join(", ")
-        : job.JobAssignee,
-      clientfacingstatus: {
-        statusName: job.ClientFacingStatus?.statusName || "",
-        statusColor: job.ClientFacingStatus?.statusColor || "",
-      },
-    }));
-
-    setJobData(formattedData);
-    console.log("Formatted Job Data:", formattedData);
-  } 
-  catch (error) {
-    console.error("Error fetching data:", error);
-  } 
-  finally {
-    await loaderDelay;
-    setLoading(false);
-  }
-};
-
-
 // const fetchData = async () => {
-//   setLoading(true);
+//   setLoading(true); // Start loading
 //   const loaderDelay = new Promise((resolve) => setTimeout(resolve, 1000));
 
 //   try {
@@ -218,48 +130,14 @@ const fetchData = async () => {
 //     let url = "";
 
 //     if (userRole === "Admin") {
-//       // ✅ Fetch active accounts first
-//       const accountsResponse = await axios.get(
-//         `${ACCOUNT_API}/accounts/account/accountdetailslist/${isActiveTrue}`
-//       );
-
-//       const accountsData = accountsResponse.data.accountlist;
-//       console.log("Admin accounts fetched:", accountsData);
-
-//       if (!accountsData || accountsData.length === 0) {
-//         console.warn("No active accounts found for Admin.");
-//         setJobData([]);
-//         await loaderDelay;
-//         setLoading(false);
-//         return;
-//       }
-
-//       const accountIds = accountsData.map((account) => account.id).join(",");
-//       url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
+//       // Admin fetches all jobs
+//       url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}`;
 //     } 
     
 //     else if (userRole === "TeamMember") {
 //       if (viewAllAccounts) {
 //         // TeamMember with full access gets all jobs
-//         // url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}`;
-//         // ✅ Fetch active accounts first
-//       const accountsResponse = await axios.get(
-//         `${ACCOUNT_API}/accounts/account/accountdetailslist/${isActiveTrue}`
-//       );
-
-//       const accountsData = accountsResponse.data.accountlist;
-//       console.log("Admin accounts fetched:", accountsData);
-
-//       if (!accountsData || accountsData.length === 0) {
-//         console.warn("No active accounts found for Admin.");
-//         setJobData([]);
-//         await loaderDelay;
-//         setLoading(false);
-//         return;
-//       }
-
-//       const accountIds = accountsData.map((account) => account.id).join(",");
-//       url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
+//         url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}`;
 //       } else {
 //         // TeamMember with restricted access → fetch user's accounts
 //         const accountsResponse = await axios.get(
@@ -312,13 +190,135 @@ const fetchData = async () => {
 
 //     setJobData(formattedData);
 //     console.log("Formatted Job Data:", formattedData);
-//   } catch (error) {
+//   } 
+//   catch (error) {
 //     console.error("Error fetching data:", error);
-//   } finally {
+//   } 
+//   finally {
 //     await loaderDelay;
 //     setLoading(false);
 //   }
 // };
+
+
+const fetchData = async () => {
+  setLoading(true);
+  const loaderDelay = new Promise((resolve) => setTimeout(resolve, 1000));
+
+  try {
+    const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
+    console.log("Received stored teamMemberData:", storedData);
+
+    const loginuserid = storedData?.teammember?.userid;
+    const viewAllAccounts = storedData?.teammember?.viewallAccounts;
+
+    console.log("User role is:", userRole);
+    console.log("access:", viewAllAccounts);
+
+    let url = "";
+
+    if (userRole === "Admin") {
+      // ✅ Fetch active accounts first
+      const accountsResponse = await axios.get(
+        `${ACCOUNT_API}/accounts/account/accountdetailslist/${isActiveTrue}`
+      );
+
+      const accountsData = accountsResponse.data.accountlist;
+      console.log("Admin accounts fetched:", accountsData);
+
+      if (!accountsData || accountsData.length === 0) {
+        console.warn("No active accounts found for Admin.");
+        setJobData([]);
+        await loaderDelay;
+        setLoading(false);
+        return;
+      }
+
+      const accountIds = accountsData.map((account) => account.id).join(",");
+      url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
+    } 
+    
+    else if (userRole === "TeamMember") {
+      if (viewAllAccounts) {
+        // TeamMember with full access gets all jobs
+        // url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}`;
+        // ✅ Fetch active accounts first
+      const accountsResponse = await axios.get(
+        `${ACCOUNT_API}/accounts/account/accountdetailslist/${isActiveTrue}`
+      );
+
+      const accountsData = accountsResponse.data.accountlist;
+      console.log("Admin accounts fetched:", accountsData);
+
+      if (!accountsData || accountsData.length === 0) {
+        console.warn("No active accounts found for Admin.");
+        setJobData([]);
+        await loaderDelay;
+        setLoading(false);
+        return;
+      }
+
+      const accountIds = accountsData.map((account) => account.id).join(",");
+      url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
+      } else {
+        // TeamMember with restricted access → fetch user's accounts
+        const accountsResponse = await axios.get(
+          `${ACCOUNT_API}/accounts/getaccounts/${loginuserid}/${isActiveTrue}`
+        );
+
+        const accountsData = accountsResponse.data.accountlist;
+        console.log("Accounts fetched:", accountsData);
+
+        if (!accountsData || accountsData.length === 0) {
+          console.warn("No accounts found for user.");
+          setJobData([]);
+          await loaderDelay;
+          setLoading(false);
+          return;
+        }
+
+        const accountIds = accountsData.map((account) => account.id).join(",");
+        url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
+      }
+    }
+
+    if (!url) {
+      await loaderDelay;
+      setLoading(false);
+      return;
+    }
+
+    console.log("Fetching jobs from URL:", url);
+
+    const jobListResponse = await axios.get(url);
+
+    const formattedData = jobListResponse.data.jobList.map((job) => ({
+      ...job,
+      StartDate: job.StartDate
+        ? format(new Date(job.StartDate), "MMMM dd, yyyy")
+        : "",
+      DueDate: job.DueDate
+        ? format(new Date(job.DueDate), "MMMM dd, yyyy")
+        : "",
+      updatedAt: formatDistanceToNow(new Date(job.updatedAt), { addSuffix: true }),
+      JobAssignee: Array.isArray(job.JobAssignee)
+        ? job.JobAssignee.join(", ")
+        : job.JobAssignee,
+      clientfacingstatus: {
+        statusName: job.ClientFacingStatus?.statusName || "",
+        statusColor: job.ClientFacingStatus?.statusColor || "",
+      },
+    }));
+
+    setJobData(formattedData);
+    console.log("Formatted Job Data:", formattedData);
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  } finally {
+    await loaderDelay;
+    setLoading(false);
+  }
+};
 
   const [filters, setFilters] = useState({
     jobAssignees: [],
@@ -2107,7 +2107,8 @@ const getPriorityStyle = (priority) => {
                           lineHeight: "1",
                         }}
                       >
-                        {row.Stage}
+                        {/* {.Stage} */}
+                        {row.Stages?.map(stage => stage.name).join(", ")}
                       </TableCell>
                       <TableCell
                         style={{

@@ -4,7 +4,7 @@ import {  TableContainer,
   Paper,Chip,
   Table,
   TableHead,
-  TableRow,
+  TableRow,Menu,
   TableCell,
   TableBody,TablePagination,Box, Button, Typography, Drawer, Select, MenuItem, IconButton, TextField,Alert, 
   InputLabel} from '@mui/material';
@@ -169,6 +169,7 @@ const Tags = () => {
   }
   console.log(tagidget);
   const handleDelete = (_id) => {
+    console.log("hgh",_id)
     // Show a confirmation prompt
     const isConfirmed = window.confirm("Are you sure you want to delete this tag?");
 
@@ -190,6 +191,7 @@ const Tags = () => {
         .then((result) => {
           console.log(result);
           toast.success('Tagdata deleted successfully');
+          handleMenuClose()
           fetchData();
           setOpenMenuId(false);
         })
@@ -199,22 +201,39 @@ const Tags = () => {
         });
     }
   };
-
-  const toggleMenu = (_id) => {
-    setOpenMenuId(openMenuId === _id ? null : _id);
-    setTagidGet(_id);
+  const [tempIdget, setTempIdGet] = useState("");
+   const toggleMenu = (event, _id) => {
+    setAnchorEl(event.currentTarget);
+    setOpenMenuId(_id);
+    setTempIdGet(_id);
   };
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (!event.target.closest(".menu-container")) {
-        setOpenMenuId(null);
-      }
+    const handleMenuClose = () => {
+    setAnchorEl(null);
+    setOpenMenuId(null);
+    setTempIdGet(null);
+  };
+  const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
+  
+    const handleClick = (event) => {
+      setAnchorEl(event.currentTarget);
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+  
+    const handleClose = () => {
+      setAnchorEl(null);
     };
-  }, []);
+    
+  // useEffect(() => {
+  //   const handleClickOutside = (event) => {
+  //     if (!event.target.closest(".menu-container")) {
+  //       setOpenMenuId(null);
+  //     }
+  //   };
+  //   document.addEventListener("mousedown", handleClickOutside);
+  //   return () => {
+  //     document.removeEventListener("mousedown", handleClickOutside);
+  //   };
+  // }, []);
   
   const handleClear = () => {
     setInputValue("");
@@ -554,54 +573,135 @@ const Tags = () => {
                         cursor: "pointer",
                         
                       }}>{row.pipelines}</TableCell>
+  <TableCell
+                  style={{
+                    fontSize: "12px",
+                    padding: "4px 8px",
+                    lineHeight: "1",
+                  }}
+                >
+                  <IconButton
+                    onClick={(event) => toggleMenu(event, row._id)}
+                    style={{ color: "#2c59fa" }}
+                    size="small"
+                  >
+                    <CiMenuKebab />
+                  </IconButton>
 
-              {/* Settings (Menu) */}
-              <TableCell style={{
-                        fontSize: "12px",
-                        padding: "4px 8px",
-                        lineHeight: "1",
-                        cursor: "pointer",
-                      }}>
-                <IconButton onClick={() => toggleMenu(row._id)} style={{ color: "#2c59fa" }}>
-                  <CiMenuKebab  />
-                </IconButton>
-                {openMenuId === row._id && (
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      zIndex: 1,
-                      backgroundColor: "#fff",
-                      boxShadow: 1,
-                      borderRadius: 1,
-                      p: 1,
-                      // left: "30px",
-                      m: 2,
+                  {/* MUI Menu */}
+                
+                </TableCell>
+               {/* <TableCell
+                    style={{
+                      fontSize: "12px",
+                      padding: "4px 8px",
+                      lineHeight: "1",
+                      cursor: "pointer",
                     }}
                   >
-                    <Typography
-                      sx={{ fontSize: "12px", fontWeight: "bold",cursor:'pointer' }}
-                      onClick={() => {
-                        handleEdit(row._id);
-                        handleUpdateDrawerOpen();
+                    <IconButton
+                      onClick={handleClick}
+                      style={{ color: "#2c59fa" }}
+                    >
+                      <CiMenuKebab />
+                    </IconButton>
+              
+                    <Menu
+                      anchorEl={anchorEl}
+                      open={open}
+                      onClose={handleClose}
+                      PaperProps={{
+                        style: {
+                          minWidth: "100px",
+                        },
                       }}
                     >
-                      Edit
-                    </Typography>
-                    <Typography
-                      sx={{ fontSize: "12px", color: "red", fontWeight: "bold",cursor:'pointer' }}
-                      onClick={() => handleDelete(row._id)}
-                    >
-                      Delete
-                    </Typography>
-                  </Box>
-                )}
-              </TableCell>
+                      <MenuItem
+                        
+                         onClick={() => {
+                        handleEdit(row._id);
+                        handleUpdateDrawerOpen();
+                        handleClose();
+                      }}
+                        sx={{ color: "blue" }}
+                      >
+                         Edit
+                      </MenuItem>
+              
+                      <MenuItem
+                        onClick={() => {
+                          handleDelete(row._id);
+                          handleClose();
+                        }}
+                        sx={{ color: "red" }}
+                      >
+                         Delete
+                      </MenuItem>
+              
+                      
+              
+                      
+                    </Menu>
+                  </TableCell> */}
             </TableRow>
           ))}
         </TableBody>
       </Table>
 
-      
+       <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleMenuClose}
+              anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
+              PaperProps={{
+                sx: {
+                  mt: 3,
+                  ml: 1,
+                  boxShadow: 3,
+                  borderRadius: 1,
+                  minWidth: 120,
+                  '& .MuiMenuItem-root': {
+                    fontSize: '12px',
+                    padding: '8px 16px',
+                  }
+                }
+              }}
+            >
+              <MenuItem 
+               onClick={() => {
+                        handleEdit(tempIdget);
+                        handleUpdateDrawerOpen();
+                        handleClose();
+                      }}
+                sx={{ 
+                  fontWeight: "bold",
+                  '&:hover': {
+                    backgroundColor: '#f5f5f5'
+                  }
+                }}
+              >
+                Edit
+              </MenuItem>
+              <MenuItem 
+                onClick={() => handleDelete(tempIdget)}
+                sx={{ 
+                  color: "error.main", 
+                  fontWeight: "bold",
+                  '&:hover': {
+                    backgroundColor: '#ffebee'
+                  }
+                }}
+              >
+                Delete
+              </MenuItem>
+            </Menu>
     </TableContainer>
     {/* Pagination */}
     <TablePagination

@@ -54,6 +54,7 @@ import { RxCross2 } from "react-icons/rx";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import CreatableSelect from "react-select/creatable";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import PlagiarismIcon from "@mui/icons-material/Plagiarism";
 const Invoices = ({ charLimit = 4000 }) => {
   const theme = useTheme();
@@ -715,17 +716,69 @@ const Invoices = ({ charLimit = 4000 }) => {
     
     return today > dueDate && isUnpaid && hasBalanceDue;
   };
-  const fetchInvoiceData = async () => {
-    try {
-      const url = `${INVOICE_NEW}/workflow/invoices/invoice`;
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error("Failed to fetch email templates");
-      }
-      const data = await response.json();
+  // const fetchInvoiceData = async () => {
+  //   try {
+  //     const url = `${INVOICE_NEW}/workflow/invoices/invoice`;
+  //     const response = await fetch(url);
+  //     if (!response.ok) {
+  //       throw new Error("Failed to fetch email templates");
+  //     }
+  //     const data = await response.json();
 
-      // setBillingInvoice(data.invoice);
-       if (data.invoice) {
+  //     // setBillingInvoice(data.invoice);
+  //      if (data.invoice) {
+  //     const updatedInvoices = await Promise.all(
+  //       data.invoice.map(async (invoice) => {
+  //         if (isInvoiceOverdue(invoice)) {
+  //           await fetch(
+  //             `${INVOICE_NEW}/workflow/invoices/invoicestatus/${invoice.invoicenumber}`,
+  //             {
+  //               method: "PATCH",
+  //               headers: { "Content-Type": "application/json" },
+  //               body: JSON.stringify({ invoiceStatus: "Overdue" }),
+  //             }
+  //           );
+  //           return { ...invoice, invoiceStatus: "Overdue" };
+  //         }
+  //         return invoice;
+  //       })
+  //     );
+  //     setBillingInvoice(updatedInvoices);
+  //   }
+  //   } catch (error) {
+  //     console.error("Error fetching email templates:", error);
+  //   }
+  // };
+
+
+const fetchInvoiceData = async () => {
+  try {
+    // ✅ Step 1: Get active accounts
+    const accountsResponse = await axios.get(
+      `${ACCOUNT_API}/accounts/account/accountdetailslist/true`
+    );
+
+    const accountsData = accountsResponse.data.accountlist || [];
+    if (!accountsData.length) {
+      console.log("No active accounts found");
+      return;
+    }
+
+    // ✅ Step 2: Prepare accountIds string
+    const accountIds = accountsData.map((account) => account.id).join(",");
+    console.log("Active Account IDs:", accountIds);
+
+    // ✅ Step 3: Fetch invoices for these accounts
+    const url = `${INVOICE_NEW}/workflow/invoices/invoice/invoicelistby/accountid/${accountIds}`;
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error("Failed to fetch invoices");
+    }
+
+    const data = await response.json();
+
+    if (data.invoice) {
+      // ✅ Step 4: Check overdue status & update
       const updatedInvoices = await Promise.all(
         data.invoice.map(async (invoice) => {
           if (isInvoiceOverdue(invoice)) {
@@ -742,12 +795,13 @@ const Invoices = ({ charLimit = 4000 }) => {
           return invoice;
         })
       );
+
       setBillingInvoice(updatedInvoices);
     }
-    } catch (error) {
-      console.error("Error fetching email templates:", error);
-    }
-  };
+  } catch (error) {
+    console.error("Error fetching invoices:", error);
+  }
+};
 
   useEffect(() => {
     fetchInvoiceData();

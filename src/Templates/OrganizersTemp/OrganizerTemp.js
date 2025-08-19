@@ -5,7 +5,7 @@ import { CircularProgress, TableContainer } from "@mui/material";
 import 'react-toastify/dist/ReactToastify.css';
 import {ListItemText,ListItem,List,Popover,
   Box, Button, TextField, IconButton, Typography, Alert, Table, TableBody, TableCell, TableHead, TableRow, Paper, Dialog,
-  DialogContent,
+  DialogContent,Menu,
   Drawer, InputLabel,
   LinearProgress, Select, MenuItem, Tooltip,
   FormControl, FormControlLabel, Switch, FormGroup,TablePagination,InputAdornment
@@ -529,6 +529,7 @@ const truncateText = (text, maxWords) => {
         .then((result) => {
           console.log(result);
           toast.success('Item deleted successfully');
+          handleMenuClose()
           fetchOrganizerTemplates();
           // setshowOrganizerTemplateForm(false);
         })
@@ -543,21 +544,23 @@ const truncateText = (text, maxWords) => {
   }, []);
   const [tempIdget, setTempIdGet] = useState("");
   const [openMenuId, setOpenMenuId] = useState(null);
-  const toggleMenu = (_id) => {
-    setOpenMenuId(openMenuId === _id ? null : _id);
+  // const toggleMenu = (_id) => {
+  //   setOpenMenuId(openMenuId === _id ? null : _id);
+  //   setTempIdGet(_id);
+  // };
+   const toggleMenu = (event, _id) => {
+    setAnchorEl(event.currentTarget);
+    setOpenMenuId(_id);
     setTempIdGet(_id);
   };
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (!event.target.closest(".menu-container")) {
-        setOpenMenuId(null);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+    const handleMenuClose = () => {
+    setAnchorEl(null);
+    setOpenMenuId(null);
+    setTempIdGet(null);
+  };
+
+    
+  
   
   const [isFormDirty, setIsFormDirty] = useState(false);
   const handleCancel = () => {
@@ -1016,52 +1019,151 @@ const shouldShowSection = (section) => {
                       </Typography>
                     </TableCell>
                     <TableCell></TableCell>
-                    <TableCell  style={{
-                        fontSize: "12px",
-                        padding: "4px 8px",
-                        lineHeight: "1",
-                        cursor: "pointer",
-                      }}>
-                      <IconButton onClick={() => toggleMenu(row._id)} style={{ color: '#2c59fa' }}>
-                        <CiMenuKebab style={{ fontSize: '25px' }} />
-                        {openMenuId === row._id && (
-                          <Box
-                            sx={{
-                              position: 'absolute',
-                              zIndex: 1,
-                              backgroundColor: '#fff',
-                              boxShadow: 1,
-                              borderRadius: 1,
-                              p: 1,
-                              // left:0,
-                              right: '30px',
-                              m: 2,
-                              top: '10px', width: '150px', textAlign: 'start'
+                    
+                    {/* <TableCell
+                          style={{
+                            fontSize: "12px",
+                            padding: "4px 8px",
+                            lineHeight: "1",
+                            cursor: "pointer",
+                          }}
+                        >
+                          <IconButton
+                            onClick={handleClick}
+                            style={{ color: "#2c59fa" }}
+                          >
+                            <CiMenuKebab />
+                          </IconButton>
+                    
+                          <Menu
+                            anchorEl={anchorEl}
+                            open={open}
+                            onClose={handleClose}
+                            PaperProps={{
+                              style: {
+                                minWidth: "100px",
+                              },
                             }}
                           >
-                            <Typography sx={{ fontSize: '12px', fontWeight: 'bold' }}>Publice to Marketplace</Typography>
-                            <Typography
-                              sx={{ fontSize: '12px', fontWeight: 'bold' }}
-                              onClick={() => handleEdit(row._id)}
+                            <MenuItem sx={{ color: "blue" }}>
+                             Publice to Marketplace</MenuItem>
+                            <MenuItem
+                              onClick={() => {
+                                handleEdit(row._id);
+                                handleClose();
+                              }}
+                              sx={{ color: "blue" }}
                             >
-                              Edit
-                            </Typography>
-                            <Typography sx={{ fontSize: '12px', fontWeight: 'bold' }} onClick={() => handleDuplicateTemplate(row._id)}>Duplicate</Typography>
-                            <Typography
-                              sx={{ fontSize: '12px', color: 'red', fontWeight: 'bold' }}
-                              onClick={() => handleDelete(row._id)}
+                               Edit
+                            </MenuItem>
+                     <MenuItem 
+                             onClick={() => {
+                                handleDuplicateTemplate(row._id);
+                                handleClose();
+                              }}
+                                sx={{ color: "blue" }}
+                            // onClick={() => handleDuplicateTemplate(row._id)}
                             >
-                              Delete
-                            </Typography>
-                          </Box>
-                        )}
-                      </IconButton>
-                    </TableCell>
+Duplicate
+                            </MenuItem>
+                            <MenuItem
+                              onClick={() => {
+                                handleDelete(row._id);
+                                handleClose();
+                              }}
+                              sx={{ color: "red" }}
+                            >
+                               Delete
+                            </MenuItem>
+                    
+                           
+                    
+                            
+                          </Menu>
+                        </TableCell> */}
+                         <TableCell
+                                          style={{
+                                            fontSize: "12px",
+                                            padding: "4px 8px",
+                                            lineHeight: "1",
+                                          }}
+                                        >
+                                          <IconButton
+                                            onClick={(event) => toggleMenu(event, row._id)}
+                                            style={{ color: "#2c59fa" }}
+                                            size="small"
+                                          >
+                                            <CiMenuKebab />
+                                          </IconButton>
+                        
+                                          {/* MUI Menu */}
+                                        
+                                        </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
             </TableContainer>
+             <Menu
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    onClose={handleMenuClose}
+                    anchorOrigin={{
+                      vertical: 'top',
+                      horizontal: 'right',
+                    }}
+                    transformOrigin={{
+                      vertical: 'top',
+                      horizontal: 'left',
+                    }}
+                    PaperProps={{
+                      sx: {
+                        mt: 3,
+                        ml: 1,
+                        boxShadow: 3,
+                        borderRadius: 1,
+                        minWidth: 120,
+                        '& .MuiMenuItem-root': {
+                          fontSize: '12px',
+                          padding: '8px 16px',
+                        }
+                      }
+                    }}
+                  >
+                    <MenuItem 
+                      onClick={() => handleEdit(tempIdget)}
+                      sx={{ 
+                        fontWeight: "bold",
+                        '&:hover': {
+                          backgroundColor: '#f5f5f5'
+                        }
+                      }}
+                    >
+                      Edit
+                    </MenuItem>
+                     <MenuItem 
+                             onClick={() => {
+                                handleDuplicateTemplate(tempIdget);
+                                handleMenuClose();
+                              }}
+                                sx={{ color: "blue" }}
+                           
+                            >
+Duplicate
+                            </MenuItem>
+                    <MenuItem 
+                      onClick={() => handleDelete(tempIdget)}
+                      sx={{ 
+                        color: "error.main", 
+                        fontWeight: "bold",
+                        '&:hover': {
+                          backgroundColor: '#ffebee'
+                        }
+                      }}
+                    >
+                      Delete
+                    </MenuItem>
+                  </Menu>
             <TablePagination
 rowsPerPageOptions={[30,40,50,60,100]}
 component="div"
