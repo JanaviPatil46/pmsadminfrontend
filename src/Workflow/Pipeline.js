@@ -1809,7 +1809,7 @@ sx={{
   };
 
   const JobCard = ({ job }) => {
-    console.log("nbfhjsg",job)
+    // console.log("nbfhjsg",job)
     const [{ isDragging }, drag] = useDrag({
       type: "JOB_CARD",
       item: { id: job.id },

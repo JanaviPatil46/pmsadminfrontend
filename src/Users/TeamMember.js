@@ -24,8 +24,11 @@ import { unstable_ClassNameGenerator as ClassNameGenerator } from "@mui/material
 ClassNameGenerator.configure((componentName) => `foo-bar-${componentName}`); //autoclassnameGenerator
 
 const TeamMember = () => {
-  const navigate = useNavigate();
+
+
   const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
+
+  
   const WINDOWS_PORT = process.env.REACT_APP_SERVER_URI;
   const [loading, setLoading] = useState(true);
   const [teamMembers, setTeamMembers] = useState([]);
@@ -47,28 +50,7 @@ const TeamMember = () => {
      useEffect(() => {
         fetchuserData();
       }, []);
-  // const fetchData = async () => {
-  //   try {
-  //     const requestOptions = {
-  //       method: "GET",
-  //       redirect: "follow",
-  //     };
-
-  //     const url = `${LOGIN_API}/admin/teammember/teammemberlist/list/true`;
-
-  //     const response = await fetch(url, requestOptions);
-  //     const result = await response.json();
-
-  //     setTeamMembers(result.teamMemberslist);
-  //     setLoading(false);
-  //   } catch (error) {
-  //     console.error(error);
-  //     setLoading(false);
-  //   }
-  // };
-  // useEffect(() => {
-  //   fetchData();
-  // }, []);
+ 
    const fetchData = async () => {
       try {
         const requestOptions = {
@@ -293,88 +275,12 @@ const TeamMember = () => {
     const exists = await checkEmailExists(enteredEmail);
     setEmailValidation(exists ? "Email already exists" : "");
   };
-
-  console.log(firstName);
-  console.log(middleName);
-  console.log(lastName);
-  console.log(email);
-  console.log(selectedOption);
   const [firstNameValidation, setFirstNameValidation] = useState("");
   const [lastNameValidation, setLastNameValidation] = useState("");
   const [emailValidation, setEmailValidation] = useState("");
   const [teamMemberIdUpdate, setTeamMemberId] = useState("");
 
-  // const createNewSidebarData = ()=>{
-  //   let data = JSON.stringify({
-  //     "userrole": "admin",
-  //     "userstatus": "active",
-  //     "sidebardata": [
-  //       {
-  //         "label": "Inbox +",
-  //         "path": "/inbox",
-  //         "icon": "LiaMoneyBillSolid",
-  //         "permissions": true
-  //       },
-  //       {
-  //         "label": "Templates",
-  //         "path": "/firmtemp/templates/tasks",
-  //         "icon": "LuWorkflow",
-  //         "permissions": false,
-  //         "submenu": [
-  //           {
-  //             "label": "Firm Templates",
-  //             "path": "/firmtemp/templates/tasks",
-  //             "icon": "GoDotFill",
-  //             "permissions": true
-  //           },
-  //           {
-  //             "label": "Services",
-  //             "path": "/firmtemp/service",
-  //             "icon": "GoDotFill",
-  //             "permissions": true
-  //           },
-  //           {
-  //             "label": "Teams & Plans",
-  //             "path": "/firmtemp/teammember",
-  //             "icon": "LiaMoneyBillSolid",
-  //             "permission": true
-  //           },
-  //           {
-  //             "label": "Tags",
-  //             "path": "/firmtemp/tags",
-  //             "icon": "LiaMoneyBillSolid",
-  //             "permission": true
-  //           },
-  //           {
-  //             "label": "Pipeline Templates",
-  //             "path": "/firmtemp/pipelines",
-  //             "icon": "GoDotFill",
-  //             "permissions": true
-  //           }
-  //         ]
-  //       }
-  //     ]
-  //   });
-
-  //   let config = {
-  //     method: 'post',
-  //     maxBodyLength: Infinity,
-  //     url: 'http://127.0.0.1:7000/api/create',
-  //     headers: {
-  //       'Content-Type': 'application/json'
-  //     },
-  //     data : data
-  //   };
-
-  //   axios.request(config)
-  //   .then((response) => {
-  //     console.log(JSON.stringify(response.data));
-  //   })
-  //   .catch((error) => {
-  //     console.log(error);
-  //   });
-
-  // }
+ 
   //todo handle submit indivisual
   const handleSubmitTeamMember = async () => {
     if (firstName === "") {
@@ -619,9 +525,9 @@ const username = [firstName,middleName,lastName].filter(Boolean).join(" ")
       .then((response) => response.json())
       .then((result) => {
         console.log(result);
-        toast.success("Team Member created successfully!");
-       handleNewDrawerClose()
-
+//         toast.success("Team Member created successfully!");
+//        handleNewDrawerClose()
+// fetchData();
         // navigate
       })
 
@@ -655,12 +561,15 @@ const username = [firstName,middleName,lastName].filter(Boolean).join(" ")
       .then((response) => response.text())
       .then((result) => {
         console.log(result);
-        toast.success("Team Member saved successfully!");
+        // toast.success("Team Member saved successfully!");
         // createNewSidebarData();
         // handleNewDrawerClose();
         // fetchData();
         // navigate("/firmtemp/teammember/activemember");
         // window.location.reload();
+           toast.success("Team Member created successfully!");
+       handleNewDrawerClose()
+fetchData();
       })
       .catch((error) => {
         console.error(error);
@@ -741,7 +650,7 @@ const username = [firstName,middleName,lastName].filter(Boolean).join(" ")
           </Box>
           </Box>
         <Box mt={2}>
-          <Outlet />
+          <Outlet context={{ fetchData, teamMembers, loading }}/>
         </Box>
       </Box>
 
@@ -771,7 +680,7 @@ const username = [firstName,middleName,lastName].filter(Boolean).join(" ")
             >
               <Typography variant="h6">
                 {" "}
-                Add Team Member
+                Add New Team Member
               </Typography>
               <CloseRoundedIcon
                 onClick={handleNewDrawerClose}
@@ -1573,7 +1482,7 @@ const username = [firstName,middleName,lastName].filter(Boolean).join(" ")
             </Button>
           </Box>
 
-          <ToastContainer />
+          
         </Box>
       </Drawer>
     </Box>

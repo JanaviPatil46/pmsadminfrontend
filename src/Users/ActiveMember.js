@@ -9,6 +9,7 @@ import {
   useMaterialReactTable,
 } from "material-react-table";
 import Drawer from "@mui/material/Drawer";
+import { useOutletContext } from "react-router-dom";
 import {
   Select,
   Menu,
@@ -41,7 +42,7 @@ import { useNavigate } from "react-router-dom";
 
 const ActiveMember = () => {
   // http://68.251.138.236:8880
-
+  const { fetchData, teamMembers, loading } = useOutletContext();
   const { logindata } = useContext(LoginContext);
 
   // const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
@@ -71,8 +72,8 @@ const ActiveMember = () => {
   const handleNewDrawerClose = () => {
     setIsUpdateDrawerOpen(false);
   };
-  const [loading, setLoading] = useState(true);
-  const [teamMembers, setTeamMembers] = useState([]);
+  // const [loading, setLoading] = useState(true);
+  // const [teamMembers, setTeamMembers] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedRow, setSelectedRow] = useState(null);
 
@@ -87,44 +88,44 @@ const ActiveMember = () => {
     handleMenuClose();
   };
 
-  const fetchData = async () => {
-    try {
-      const requestOptions = {
-        method: "GET",
-        redirect: "follow",
-      };
+  // const fetchData = async () => {
+  //   try {
+  //     const requestOptions = {
+  //       method: "GET",
+  //       redirect: "follow",
+  //     };
 
-      const url = `${LOGIN_API}/admin/teammember/teammemberlist/list/true`;
+  //     const url = `${LOGIN_API}/admin/teammember/teammemberlist/list/true`;
 
-      const response = await fetch(url, requestOptions);
-      const result = await response.json();
+  //     const response = await fetch(url, requestOptions);
+  //     const result = await response.json();
 
-      const loggedInUser = {
-        _id: userData._id,
-        FirstName: userData.username, // Assuming you want to display the username in FirstName
-        MiddleName: "",
-        LastName: "",
-        // Name: userData.username,
-        Email: userData.email,
-        Role: userData.role,
-        has2FA: "Disabled",
-        Created: userData.updatedAt,
-      };
+  //     const loggedInUser = {
+  //       _id: userData._id,
+  //       FirstName: userData.username, // Assuming you want to display the username in FirstName
+  //       MiddleName: "",
+  //       LastName: "",
+  //       // Name: userData.username,
+  //       Email: userData.email,
+  //       Role: userData.role,
+  //       has2FA: "Disabled",
+  //       Created: userData.updatedAt,
+  //     };
 
-      const updatedTeamMembers = [loggedInUser, ...result.teamMemberslist];
+  //     const updatedTeamMembers = [loggedInUser, ...result.teamMemberslist];
 
-      setTeamMembers(updatedTeamMembers);
-      setLoading(false);
-    } catch (error) {
-      console.error(error);
-      setLoading(false);
-    }
-  };
-  useEffect(() => {
-    if (userData) {
-      fetchData();
-    }
-  }, [userData]);
+  //     setTeamMembers(updatedTeamMembers);
+  //     setLoading(false);
+  //   } catch (error) {
+  //     console.error(error);
+  //     setLoading(false);
+  //   }
+  // };
+  // useEffect(() => {
+  //   if (userData) {
+  //     fetchData();
+  //   }
+  // }, [userData]);
 
   const [tempIdget, setTempIdGet] = useState("");
   const [openMenuId, setOpenMenuId] = useState(null);

@@ -211,12 +211,7 @@ const filteredData = sortedData.filter((row) => {
     ? row.Type.toLowerCase() === filters.type.toLowerCase()
     : true;
   
-  // Team Member filter (now handles multiple selections)
-// const teamMemberMatch = filters.teamMember.length > 0
-//   ? filters.teamMember.some(selectedMember => 
-//       row.Team.some(member => member.username === selectedMember)
-//     )
-//   : true;
+
 // Team Member filter (matches by ID)
   const teamMemberMatch = filters.teamMember.length > 0
     ? row.Team.some(member => 
@@ -237,30 +232,7 @@ const filteredData = sortedData.filter((row) => {
   
   return accountNameMatch && typeMatch && teamMemberMatch && tagMatch;
 });
-  // const filteredData = sortedData.filter((row) => {
-  //   const accountNameMatch = row.Name.toLowerCase().includes(
-  //     filters.accountName.toLowerCase()
-  //   );
-  //   const typeMatch = filters.type
-  //     ? row.Type.toLowerCase() === filters.type.toLowerCase()
-  //     : true;
-  //   const teamMemberMatch = filters.teamMember
-  //     ? row.Team.some((member) => member.username === filters.teamMember)
-  //     : true;
-   
-  //   const tagMatch = filters.tags.length
-  //     ? row.Tags &&
-  //       Array.isArray(row.Tags) &&
-  //       filters.tags.some((tag) =>
-  //         row.Tags.some(
-  //           (rowTag) =>
-  //             rowTag.tagName === tag.tagName &&
-  //             rowTag.tagColour === tag.tagColour
-  //         )
-  //       )
-  //     : true;
-  //   return accountNameMatch && typeMatch && teamMemberMatch && tagMatch;
-  // });
+ 
   const handleFilterButtonClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -288,25 +260,7 @@ const clearFilter = (filterField) => {
     }));
   };
   
-  const handleMultiSelectChange = (name, values) => {
-    setFilters((prevFilters) => ({ ...prevFilters, [name]: values }));
-  };
-  // const teamMemberOptions = Array.from(
-  //   new Set(
-  //     accountData.flatMap((row) => row.Team.map((member) => member.username))
-  //   )
-  // );
 
-  const teamMemberOptions = Array.from(
-  new Set(
-    accountData.flatMap((row) => 
-      row.Team.map((member) => ({
-        id: member._id,  // or whatever property holds the ID
-        username: member.username
-      }))
-    )
-  )
-);
   const [tags, setTags] = useState([]);
 
   useEffect(() => {
@@ -569,96 +523,6 @@ const clearFilter = (filterField) => {
 
  
 
-  const handleDeleteSelected = async () => {
-    const isConfirmed = window.confirm(
-      "Are you sure you want to delete the selected accounts?"
-    );
-
-    if (isConfirmed) {
-      try {
-        // Delete selected accounts and extract their data
-        const deletedAccounts = await Promise.all(
-          selected.map(async (id) => {
-            try {
-              const response = await axios.delete(
-                `${ACCOUNT_API}/accounts/accountdetails/${id}`
-              );
-              console.log("Deleted Account Response:", response.data);
-              return response.data.deletedAccount || null; // Ensure deletedAccount exists
-            } catch (error) {
-              console.error(`Failed to delete account with ID ${id}:`, error);
-              return null; // Skip failed deletions
-            }
-          })
-        );
-
-        // Filter out null responses and extract user IDs
-        const userIds = deletedAccounts
-          .filter((acc) => acc && acc.userid) // Skip if userid is missing
-          .map((acc) => acc.userid);
-
-        if (userIds.length === 0) {
-          console.warn(
-            "No user IDs found in deleted accounts. Skipping user deletion."
-          );
-        } else {
-          // Get user data and client data before deletion
-          const usersData = await Promise.all(
-            userIds.map(async (userid) => {
-              const response = await axios.get(
-                `${LOGIN_API}/common/user/${userid}`
-              );
-              return response.data;
-            })
-          );
-
-          const clientsData = await Promise.all(
-            userIds.map(async (userid) => {
-              console.log("clientid", userid);
-              const response = await axios.get(
-                `${LOGIN_API}/admin/client/${userid}`
-              );
-              return response.data;
-            })
-          );
-
-          // Extract client IDs from retrieved client data
-          const clientIds = clientsData
-            .map((clientObj) => clientObj.client?._id)
-            .filter((id) => id);
-
-          console.log("clients", clientsData);
-
-          // Delete users if userIds exist
-          await Promise.all(
-            userIds.map((userid) =>
-              axios.delete(`${LOGIN_API}/common/user/${userid}`)
-            )
-          );
-
-          // Delete clients if clientIds exist
-          if (clientIds.length > 0) {
-            await Promise.all(
-              clientIds.map((clientId) =>
-                axios.delete(`${LOGIN_API}/admin/clientsignup/${clientId}`)
-              )
-            );
-          }
-        }
-
-        // Update UI to remove deleted accounts
-        setAccountData((prevContacts) =>
-          prevContacts.filter((account) => !selected.includes(account.id))
-        );
-
-        toast.success("Selected account(s) deleted successfully!");
-        setSelected([]); // Clear selected contacts
-      } catch (error) {
-        console.error("Delete API Error:", error);
-        toast.error("Failed to delete selected accounts, users, or clients.");
-      }
-    }
-  };
 
   return (
     <>

@@ -90,6 +90,8 @@ console.log("accountIdFromCookie", accountIdFromCookie);
 
       if (matchedAccount) {
         setSelectedaccount(matchedAccount);
+        console.log("matchedAccount",matchedAccount)
+        fetchJobList(matchedAccount.value);
       }
     }
   } catch (error) {
@@ -121,7 +123,7 @@ const accountoptions = accountdata;
     };
 
     fetch(
-      `${JOBS_API}/Workflow/jobs/accountjoblist/${accountId}`,
+      `${JOBS_API}/workflow/jobs/accountjoblist/${accountId}`,
       requestOptions
     )
       .then((response) => response.json())
