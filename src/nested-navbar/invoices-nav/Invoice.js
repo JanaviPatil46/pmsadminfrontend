@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { DialogActions,Dialog ,DialogTitle,Checkbox,DialogContent, Autocomplete, Switch, FormControlLabel, Box, Button, Drawer, Typography, Chip, IconButton, Divider, Select, MenuItem, InputLabel, TextField, FormControl, FormLabel, InputAdornment, Popover, ListItem, List, ListItemText, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
+import { DialogActions,Dialog ,DialogTitle,Menu,Checkbox,DialogContent, Autocomplete, Switch, FormControlLabel, Box, Button, Drawer, Typography, Chip, IconButton, Divider, Select, MenuItem, InputLabel, TextField, FormControl, FormLabel, InputAdornment, Popover, ListItem, List, ListItemText, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
 import { CiMenuKebab } from "react-icons/ci";
 import { toast } from "react-toastify";
 import { useNavigate, useParams, useRouteLoaderData } from "react-router-dom";
@@ -77,42 +77,82 @@ const fetchInvoices = async (data) => {
  
 
   console.log(accountInvoicesData);
-
-  const toggleMenu = (_id) => {
-    setOpenMenuId(openMenuId === _id ? null : _id);
+ const [anchorEl, setAnchorEl] = useState(null);
+  // const toggleMenu = (_id) => {
+  //   setOpenMenuId(openMenuId === _id ? null : _id);
+  //   setTempIdGet(_id);
+  // };
+    const toggleMenu = (event, _id) => {
+    setAnchorEl(event.currentTarget);
+    setOpenMenuId(_id);
     setTempIdGet(_id);
   };
-
-  const handleDelete = (_id) => {
-    // Show a confirmation prompt
-    const isConfirmed = window.confirm("Are you sure you want to delete this organizer template?");
-
-    // Proceed with deletion if confirmed
-    if (isConfirmed) {
-      const requestOptions = {
-        method: "DELETE",
-        redirect: "follow",
-      };
-      const url = `${INVOICES_API}/workflow/invoices/invoice/`;
-      fetch(url + _id, requestOptions)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Failed to delete item");
-          }
-          return response.text();
-        })
-        .then((result) => {
-          console.log(result);
-          toast.success("Item deleted successfully");
-          fetchInvoices(data);
-          // setshowOrganizerTemplateForm(false);
-        })
-        .catch((error) => {
-          console.error(error);
-          toast.error("Failed to delete item");
-        });
-    }
+    const handleMenuClose = () => {
+    setAnchorEl(null);
+    setOpenMenuId(null);
+    setTempIdGet(null);
   };
+const handleDelete = async (_id) => {
+  const isConfirmed = window.confirm("Are you sure you want to delete this invoice?");
+  if (!isConfirmed) return;
+
+  try {
+    const requestOptions = {
+      method: "DELETE",
+      redirect: "follow",
+    };
+    const url = `${INVOICES_API}/workflow/invoices/invoice/${_id}`;
+
+    const response = await fetch(url, requestOptions);
+
+    if (!response.ok) {
+      throw new Error("Failed to delete item");
+    }
+
+    toast.success("Invoice deleted successfully");
+   handleMenuClose()
+    // ✅ Optimistic UI update: remove the deleted invoice from state
+    setAccountInvoicesData((prev) => prev.filter((inv) => inv._id !== _id));
+
+    // ✅ Also refresh from backend to stay in sync
+    await fetchInvoices(data);
+
+  } catch (error) {
+    console.error(error);
+    toast.error("Failed to delete invoice");
+  }
+};
+
+  // const handleDelete = (_id) => {
+  //   // Show a confirmation prompt
+  //   const isConfirmed = window.confirm("Are you sure you want to delete this organizer template?");
+
+  //   // Proceed with deletion if confirmed
+  //   if (isConfirmed) {
+  //     const requestOptions = {
+  //       method: "DELETE",
+  //       redirect: "follow",
+  //     };
+  //     const url = `${INVOICES_API}/workflow/invoices/invoice/`;
+  //     fetch(url + _id, requestOptions)
+  //       .then((response) => {
+  //         if (!response.ok) {
+  //           throw new Error("Failed to delete item");
+  //         }
+  //         return response.text();
+  //       })
+  //       .then((result) => {
+  //         console.log(result);
+  //         toast.success("Item deleted successfully");
+  //         fetchInvoices(data);
+  //         // setshowOrganizerTemplateForm(false);
+  //       })
+  //       .catch((error) => {
+  //         console.error(error);
+  //         toast.error("Failed to delete item");
+  //       });
+  //   }
+  // };
   const [openDialog, setOpenDialog] = useState(false);
 const [selectedStatus, setSelectedStatus] = useState("");
 const [currentInvoice, setCurrentInvoice] = useState(null);
@@ -153,6 +193,7 @@ const handleUpdateStatus = (invoiceNumber, status) => {
   const [invoiceId, SetInvoiceId] = useState();
   const handleEdit = (_id) => {
     setShowInvoiceUpdateForm(true);
+    handleMenuClose()
     SetInvoiceId(_id);
     // navigate("/" + _id);
   };
@@ -190,6 +231,7 @@ const handleUpdateStatus = (invoiceNumber, status) => {
       console.log(result);
       if (result.message === "Invoice created successfully") {
         toast.success("Invoice duplicated successfully");
+        handleMenuClose()
         fetchInvoices(data); // Refresh the list after duplication
       } else {
         toast.error(result.error || "Failed to duplicate Invoice");
@@ -330,6 +372,7 @@ const handleUpdateStatus = (invoiceNumber, status) => {
         </html>
       `);
       printWindow.document.close();
+      handleMenuClose()
     } catch (error) {
       console.error("Error printing invoice:", error);
       toast.error("Failed to print invoice");
@@ -398,6 +441,7 @@ const handleUpdateStatus = (invoiceNumber, status) => {
       document.body.removeChild(a);
 
       toast.success("Invoice downloaded successfully");
+         handleMenuClose()
     } catch (error) {
       console.error("Error downloading invoice:", error);
       toast.error("Failed to download invoice");
@@ -553,7 +597,7 @@ const handleUpdateStatus = (invoiceNumber, status) => {
                     cursor: "pointer",
                   }}> </TableCell>
                   <TableCell>{row.description}</TableCell>
-                  <TableCell style={{
+                  {/* <TableCell style={{
                     fontSize: "12px",
                     padding: "4px 8px",
                     lineHeight: "1",
@@ -595,12 +639,7 @@ const handleUpdateStatus = (invoiceNumber, status) => {
                           <Typography sx={{ fontSize: "12px", color: "red", fontWeight: "bold" }} onClick={() => handleDelete(row._id)}>
                             Delete
                           </Typography>
-                          {/* <Typography
-  sx={{ fontSize: "12px", fontWeight: "bold" }}
-  onClick={() => handleUpdateStatus(row.invoicenumber)}
->
-  Update Status
-</Typography> */}
+                         
 <Typography
   sx={{ fontSize: "12px", fontWeight: "bold" }}
   onClick={() => {
@@ -618,7 +657,25 @@ const handleUpdateStatus = (invoiceNumber, status) => {
                         </Box>
                       )}
                     </IconButton>
-                  </TableCell>
+                  </TableCell> */}
+                  <TableCell
+                                                    style={{
+                                                      fontSize: "12px",
+                                                      padding: "4px 8px",
+                                                      lineHeight: "1",
+                                                    }}
+                                                  >
+                                                    <IconButton
+                                                      onClick={(event) => toggleMenu(event, row._id)}
+                                                      style={{ color: "#2c59fa" }}
+                                                      size="small"
+                                                    >
+                                                      <CiMenuKebab />
+                                                    </IconButton>
+                                  
+                                                    {/* MUI Menu */}
+                                                  
+                                                  </TableCell>
                 </TableRow>
                 
               ))
@@ -628,6 +685,90 @@ const handleUpdateStatus = (invoiceNumber, status) => {
           </TableBody>
         </Table>
         </TableContainer>
+         <Menu
+                      anchorEl={anchorEl}
+                      open={Boolean(anchorEl)}
+                      onClose={handleMenuClose}
+                      anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                      }}
+                      transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'left',
+                      }}
+                      PaperProps={{
+                        sx: {
+                          mt: 3,
+                          ml: 1,
+                          boxShadow: 3,
+                          borderRadius: 1,
+                          minWidth: 120,
+                          '& .MuiMenuItem-root': {
+                            fontSize: '12px',
+                            padding: '8px 16px',
+                          }
+                        }
+                      }}
+                    >
+                      <MenuItem 
+                        onClick={() => handleEdit(tempIdget)}
+                        sx={{ 
+                          fontWeight: "bold",
+                          '&:hover': {
+                            backgroundColor: '#f5f5f5'
+                          }
+                        }}
+                      >
+                        Edit
+                      </MenuItem>
+                      <MenuItem 
+                        onClick={() => handleDelete(tempIdget)}
+                        sx={{ 
+                          color: "error.main", 
+                          fontWeight: "bold",
+                          '&:hover': {
+                            backgroundColor: '#ffebee'
+                          }
+                        }}
+                      >
+                        Delete
+                      </MenuItem>
+                       <MenuItem 
+                        onClick={() => handleDuplicate(tempIdget)}
+                        sx={{ 
+                          fontWeight: "bold",
+                          '&:hover': {
+                            backgroundColor: '#f5f5f5'
+                          }
+                        }}
+                      >
+                        Duplicate
+                      </MenuItem>
+                       <MenuItem 
+                        onClick={() => handlePrint(tempIdget)}
+                       sx={{ 
+                          fontWeight: "bold",
+                          '&:hover': {
+                            backgroundColor: '#f5f5f5'
+                          }
+                        }}
+                      >
+                        Print
+                      </MenuItem>
+                       <MenuItem 
+                        onClick={() => handleDownload(tempIdget)}
+                       sx={{ 
+                          fontWeight: "bold",
+                          '&:hover': {
+                            backgroundColor: '#f5f5f5'
+                          }
+                        }}
+                      >
+                        Download
+                      </MenuItem>
+
+                    </Menu>
         <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
   <DialogTitle>Update Invoice Status</DialogTitle>
   <DialogContent>
@@ -689,61 +830,3 @@ const handleUpdateStatus = (invoiceNumber, status) => {
 export default Invoice;
 
 
-{/* {
-            accountInvoicesData.map((row) => (
-              <TableRow key={row._id}>
-                <TableCell>
-                  <Typography sx={{ color: "#2c59fa", cursor: "pointer", fontWeight: "bold" }} onClick={() => handleEdit(row._id)}>
-                    {row.invoicenumber}
-                  </Typography>
-                </TableCell>
-                <TableCell></TableCell>
-                <TableCell>{row.createdAt}</TableCell>
-                <TableCell>${row.summary.total}</TableCell>
-                <TableCell>${}</TableCell> 
-                <TableCell>${row.summary.total} </TableCell>
-                <TableCell> </TableCell>
-                <TableCell>{row.description}</TableCell>
-                <TableCell sx={{ textAlign: "end" }}>
-                  <IconButton onClick={() => toggleMenu(row._id)} style={{ color: "#2c59fa" }}>
-                    <CiMenuKebab style={{ fontSize: "25px" }} />
-                    {openMenuId === row._id && (
-                      <Box
-                        sx={{
-                          position: "absolute",
-                          zIndex: 1,
-                          backgroundColor: "#fff",
-                          boxShadow: 1,
-                          borderRadius: 1,
-                          p: 1,
-                          
-                          right: "30px",
-                          m: 2,
-                          top: "10px",
-                          width: "150px",
-                          textAlign: "start",
-                        }}
-                      >
-                        <Typography sx={{ fontSize: "12px", fontWeight: "bold" }} onClick={() => handleEdit(row._id)}>
-                          Edit
-                        </Typography>
-
-                        <Typography sx={{ fontSize: "12px", fontWeight: "bold" }} onClick={() => handleDuplicate(row._id)}>
-                          Duplicate
-                        </Typography>
-                        <Typography sx={{ fontSize: "12px", fontWeight: "bold" }} onClick={() => handlePrint(row._id)}>
-                          Print
-                        </Typography>
-                        <Typography sx={{ fontSize: "12px", fontWeight: "bold" }} onClick={() => handleDownload(row._id)}>
-                          Download
-                        </Typography>
-
-                        <Typography sx={{ fontSize: "12px", color: "red", fontWeight: "bold" }} onClick={() => handleDelete(row._id)}>
-                          Delete
-                        </Typography>
-                      </Box>
-                    )}
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))} */}

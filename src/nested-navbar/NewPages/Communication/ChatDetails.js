@@ -524,6 +524,9 @@ onChatAction();
             gridTemplateColumns: "1fr auto",
             gap: 2,
             alignItems: "start",
+            // border:'2px solid red',
+            height:'35vh',
+            overflowY:'auto'
           }}
         >
           {replyTo && (

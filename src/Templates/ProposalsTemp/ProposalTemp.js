@@ -20,6 +20,7 @@ import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import EditorShortcodes from "../Texteditor/EditorShortcodes";
 import { useTheme } from "@mui/material/styles";
 import MultiSelectDropdown from "../MultiSelectDropdown"
+
 const MyStepper = () => {
   const PROPOSAL_API = process.env.REACT_APP_PROPOSAL_TEMP_URL;
   const USER_API = process.env.REACT_APP_USER_URL;
@@ -91,11 +92,18 @@ const MyStepper = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
-  const handleReset = () => {
-    createsaveProposaltemp();
+  // const handleReset = () => {
+  //   createsaveProposaltemp();
+  //   setActiveStep(0);
+  //   setShowStepper(false); // Hide stepper and show the create template button
+  // };
+const handleReset = () => { 
+  const isSaved = createsaveProposaltemp();
+  if (isSaved) {  
     setActiveStep(0);
-    setShowStepper(false); // Hide stepper and show the create template button
-  };
+    setShowStepper(false); // only hide stepper if validation & save passed
+  }
+};
 
   const handleStepClick = (step) => {
     setActiveStep(step);
@@ -482,21 +490,59 @@ const MyStepper = () => {
     const { value } = e.target;
     setTermsandConditionName(value);
   };
+const [proposalNameError, setProposalNameError] = useState("");
 
-  const validateForm = () => {
-    let tempErrors = {};
-    let isValid = true;
-    if (!templatename) tempErrors.templatename = "Template name is required";
-    // if (!jobName) tempErrors.jobName = "Job name is required";
-    setErrors(tempErrors);
-    // return isValid;
-    return Object.keys(tempErrors).length === 0;
-  };
+  const [introductionBodyError, setIntroductionBodyError] = useState("");
+  const [termsBodyError, setTermsBodyError] = useState("");
+  const [selctedOptionError, setSelectedOptionError] = useState("");
+  // const validateForm = () => {
+  //   let tempErrors = {};
+  //   let isValid = true;
+  //   if (!templatename) tempErrors.templatename = "Template name is required";
+  //   // if (!jobName) tempErrors.jobName = "Job name is required";
+  //   setErrors(tempErrors);
+  //   // return isValid;
+  //   return Object.keys(tempErrors).length === 0;
+  // };
+ const validateForm = () => {
+  let isValid = true;
+  const currentStep = steps[activeStep];
 
+  // Common validation for all steps
+  if (!proposalName) {
+    setProposalNameError("Name is required");
+    isValid = false;
+  } else {
+    setProposalNameError("");
+  }
+
+  // Step-specific validation
+  if (currentStep === "Introduction" && !introductionContent) {
+    setIntroductionBodyError("Body is required");
+    isValid = false;
+  } else {
+    setIntroductionBodyError("");
+  }
+
+  if (currentStep === "Terms" && !termsContent) {
+    setTermsBodyError("Body is required");
+    isValid = false;
+  } else {
+    setTermsBodyError("");
+  }
+
+  if ((currentStep === "Services & Invoices" || currentStep === "Payments") && !activeOption) {
+    setSelectedOptionError("An option must be selected");
+    isValid = false;
+  } else {
+    setSelectedOptionError("");
+  }
+
+  return isValid;
+};
   const createsaveProposaltemp = () => {
     if (!validateForm()) {
-      // toast.error("Please fix the validation errors.");
-      return;
+      return false;
     }
     console.log(invoiceData);
     const currentStep = steps[activeStep];
@@ -631,7 +677,7 @@ const MyStepper = () => {
           terms: stepsVisibility.Terms,
           servicesandinvoices: stepsVisibility.ServicesInvoices,
           introductiontext: introductionContent,
-          // servicesandinvoiceid: "66fa83ffe6e0f4ca11c2204d",
+         
           custommessageinemail: stepsVisibility.CustomEmailMessage,
           custommessageinemailtext: description,
           reminders: stepsVisibility.Reminders,
@@ -642,12 +688,7 @@ const MyStepper = () => {
           termsandconditionsname: termsandconditionname,
           termsandconditions: termsContent,
           servicesandinvoicetempid: invoiceData.servicesandinvoicetempid,
-          // invoicetemplatename: invoiceData.invoicetemplatename,
-          // invoiceteammember: invoiceData.invoiceteammember,
-          // issueinvoice: invoiceData.issueinvoice,
-          // specificdate: invoiceData.specificdate,
-          // specifictime: invoiceData.specifictime,
-          // description: invoiceData.description,
+          
           lineItems: lineItems,
           summary: {
             subtotal: subtotal,
@@ -655,12 +696,10 @@ const MyStepper = () => {
             taxTotal: taxTotal,
             total: totalAmount,
           },
-          // notetoclient: invoiceData.notetoclient,
+          
           Addinvoiceoraskfordeposit: addInvoice,
           Additemizedserviceswithoutcreatinginvoices: addInvoiceitemized,
-          // paymentterms: paymentterms,
-          // paymentduedate: paymentduedate,
-          // paymentamount: paymentamount,
+          
           active: true,
         }),
       };
@@ -682,84 +721,86 @@ const MyStepper = () => {
         });
     }
   }
-    console.log(options.body);
+
+   return true;
+    
   };
 
-  const handleDuplicateProposal = async (id) => {
-    try {
-      // Find the template you're duplicating
-      const originalData = ProposalsTemplates.find((row) => row._id === id);
-      console.log(originalData);
-      if (!originalData) {
-        toast.error("Template not found");
-        return;
-      }
+  // const handleDuplicateProposal = async (id) => {
+  //   try {
+  //     // Find the template you're duplicating
+  //     const originalData = ProposalsTemplates.find((row) => row._id === id);
+  //     console.log(originalData);
+  //     if (!originalData) {
+  //       toast.error("Template not found");
+  //       return;
+  //     }
 
-      // Duplicate the template (you can modify it here if needed)
-      const duplicatedTemplate = {
-        ...originalData,
-        _id: generateNewId(), // Generate a new ID for the duplicated template
-        templatename: `${originalData.templatename} copy`, // Modify the template name
-      }; // Generate a new ID for the duplicated template
+  //     // Duplicate the template (you can modify it here if needed)
+  //     const duplicatedTemplate = {
+  //       ...originalData,
+  //       _id: generateNewId(), // Generate a new ID for the duplicated template
+  //       templatename: `${originalData.templatename} copy`, // Modify the template name
+  //     }; // Generate a new ID for the duplicated template
 
-      console.log(duplicatedTemplate);
+  //     console.log(duplicatedTemplate);
 
-      // Call the API to save the duplicated template
-      const response = await fetch(`${PROPOSAL_API}/workflow/proposalesandels/proposalesandels`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          templatename: duplicatedTemplate.templatename,
-          proposalname: duplicatedTemplate.proposalname,
-          teammember: duplicatedTemplate.teammember,
-          introduction: duplicatedTemplate.introduction,
-          terms: duplicatedTemplate.terms,
-          servicesandinvoices: duplicatedTemplate.servicesandinvoices,
-          introductiontext: duplicatedTemplate.introductiontext,
-          custommessageinemail: duplicatedTemplate.custommessageinemail,
-          custommessageinemailtext: duplicatedTemplate.custommessageinemailtext,
-          reminders: duplicatedTemplate.reminders,
-          daysuntilnextreminder: duplicatedTemplate.daysuntilnextreminder,
-          numberofreminder: duplicatedTemplate.numberofreminder,
-          introductiontextname: duplicatedTemplate.introductiontextname,
-          termsandconditionsname: duplicatedTemplate.termsandconditionsname,
-          termsandconditions: duplicatedTemplate.termsandconditions,
-          // other fields you want to duplicate...
+  //     // Call the API to save the duplicated template
+  //     const response = await fetch(`${PROPOSAL_API}/workflow/proposalesandels/proposalesandels`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         templatename: duplicatedTemplate.templatename,
+  //         proposalname: duplicatedTemplate.proposalname,
+  //         teammember: duplicatedTemplate.teammember,
+  //         introduction: duplicatedTemplate.introduction,
+  //         terms: duplicatedTemplate.terms,
+  //         servicesandinvoices: duplicatedTemplate.servicesandinvoices,
+  //         introductiontext: duplicatedTemplate.introductiontext,
+  //         custommessageinemail: duplicatedTemplate.custommessageinemail,
+  //         custommessageinemailtext: duplicatedTemplate.custommessageinemailtext,
+  //         reminders: duplicatedTemplate.reminders,
+  //         daysuntilnextreminder: duplicatedTemplate.daysuntilnextreminder,
+  //         numberofreminder: duplicatedTemplate.numberofreminder,
+  //         introductiontextname: duplicatedTemplate.introductiontextname,
+  //         termsandconditionsname: duplicatedTemplate.termsandconditionsname,
+  //         termsandconditions: duplicatedTemplate.termsandconditions,
+  //         // other fields you want to duplicate...
 
-          servicesandinvoicetempid: duplicatedTemplate.servicesandinvoicetempid,
-          invoicetemplatename: duplicatedTemplate.invoicetemplatename,
-          invoiceteammember: duplicatedTemplate.invoiceteammember,
-          issueinvoice: duplicatedTemplate.issueinvoice,
-          specificdate: duplicatedTemplate.specificdate,
-          specifictime: duplicatedTemplate.specifictime,
-          description: duplicatedTemplate.description,
-          lineItems: duplicatedTemplate.lineItems,
-          summary: duplicatedTemplate.summary,
-          notetoclient: duplicatedTemplate.notetoclient,
-          Addinvoiceoraskfordeposit: duplicatedTemplate.Addinvoiceoraskfordeposit,
-          Additemizedserviceswithoutcreatinginvoices: duplicatedTemplate.Additemizedserviceswithoutcreatinginvoices,
-          active: true,
-          paymentamount: duplicatedTemplate.paymentamount,
-          paymentduedate: duplicatedTemplate.paymentduedate,
-          paymentterms: duplicatedTemplate.paymentterms,
-        }),
-      });
+  //         servicesandinvoicetempid: duplicatedTemplate.servicesandinvoicetempid,
+  //         invoicetemplatename: duplicatedTemplate.invoicetemplatename,
+  //         invoiceteammember: duplicatedTemplate.invoiceteammember,
+  //         issueinvoice: duplicatedTemplate.issueinvoice,
+  //         specificdate: duplicatedTemplate.specificdate,
+  //         specifictime: duplicatedTemplate.specifictime,
+  //         description: duplicatedTemplate.description,
+  //         lineItems: duplicatedTemplate.lineItems,
+  //         summary: duplicatedTemplate.summary,
+  //         notetoclient: duplicatedTemplate.notetoclient,
+  //         Addinvoiceoraskfordeposit: duplicatedTemplate.Addinvoiceoraskfordeposit,
+  //         Additemizedserviceswithoutcreatinginvoices: duplicatedTemplate.Additemizedserviceswithoutcreatinginvoices,
+  //         active: true,
+  //         paymentamount: duplicatedTemplate.paymentamount,
+  //         paymentduedate: duplicatedTemplate.paymentduedate,
+  //         paymentterms: duplicatedTemplate.paymentterms,
+  //       }),
+  //     });
 
-      const result = await response.json();
+  //     const result = await response.json();
 
-      if (result && result.message === "ProposalesAndEls Template created successfully") {
-        fetchPrprosalsAllData(); // Fetch the updated data
-        toast.success("Template duplicated successfully");
-      } else {
-        toast.error(result.message || "Failed to duplicate template");
-      }
-    } catch (error) {
-      console.error("Error duplicating template:", error);
-      toast.error("An error occurred while duplicating the template");
-    }
-  };
+  //     if (result && result.message === "ProposalesAndEls Template created successfully") {
+  //       fetchPrprosalsAllData(); // Fetch the updated data
+  //       toast.success("Template duplicated successfully");
+  //     } else {
+  //       toast.error(result.message || "Failed to duplicate template");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error duplicating template:", error);
+  //     toast.error("An error occurred while duplicating the template");
+  //   }
+  // };
 
   // Function to generate a new unique ID for the duplicated template
   const generateNewId = () => {
@@ -1177,11 +1218,36 @@ const MyStepper = () => {
                     <TextField fullWidth 
                     // value={proposalName + selectedShortcut} 
                     // onChange={handleProposalName} 
+                      error={!!proposalNameError}
                     inputRef={textFieldRef}
                     value={proposalName} 
                     onChange={handleProposalName} 
                     onClick={(e) => setCursorPosition(e.target.selectionStart)}
                     placeholder="Proposal name (visible to clients)" size="small" sx={{ mt: 2, backgroundColor: "#fff" }} />
+                     {!!proposalNameError && (
+                                          <Alert
+                                            sx={{
+                                              width: "96%",
+                                              p: "0", // Adjust padding to control the size
+                                              pl: "4%",
+                                              height: "23px",
+                                              borderRadius: "10px",
+                                              borderTopLeftRadius: "0",
+                                              borderTopRightRadius: "0",
+                                              fontSize: "15px",
+                                              display: "flex",
+                                              alignItems: "center", // Center content vertically
+                                              "& .MuiAlert-icon": {
+                                                fontSize: "16px", // Adjust the size of the icon
+                                                mr: "8px", // Add margin to the right of the icon
+                                              },
+                                            }}
+                                            variant="filled"
+                                            severity="error"
+                                          >
+                                            {proposalNameError}
+                                          </Alert>
+                                        )}
                     <Box>
                       <Button variant="contained" color="primary" onClick={toggleDropdown} sx={{
                             backgroundColor: 'var(--color-save-btn)',  // Normal background
@@ -1356,6 +1422,30 @@ const MyStepper = () => {
               />
             </Box>
             <Editor onChange={handleIntroductionChange} content={introductionContent} />
+           {!!introductionBodyError && (
+                        <Alert
+                          sx={{
+                            width: "96%",
+                            p: 0,
+                            pl: "4%",
+                            height: "23px",
+                            borderRadius: "10px",
+                            borderTopLeftRadius: 0,
+                            borderTopRightRadius: 0,
+                            fontSize: "15px",
+                            display: "flex",
+                            alignItems: "center",
+                            "& .MuiAlert-icon": {
+                              fontSize: "16px",
+                              mr: "8px",
+                            },
+                          }}
+                          variant="filled"
+                          severity="error"
+                        >
+                          {introductionBodyError}
+                        </Alert>
+                      )}
           </Box>
         );
       case steps.indexOf("Terms"):
@@ -1376,6 +1466,30 @@ const MyStepper = () => {
               />
             </Box>
             <TermEditor onChange={handleTermsChange} content={termsContent} />
+         {!!termsBodyError && (
+                       <Alert
+                         sx={{
+                           width: "96%",
+                           p: 0,
+                           pl: "4%",
+                           height: "23px",
+                           borderRadius: "10px",
+                           borderTopLeftRadius: 0,
+                           borderTopRightRadius: 0,
+                           fontSize: "15px",
+                           display: "flex",
+                           alignItems: "center",
+                           "& .MuiAlert-icon": {
+                             fontSize: "16px",
+                             mr: "8px",
+                           },
+                         }}
+                         variant="filled"
+                         severity="error"
+                       >
+                         {termsBodyError}
+                       </Alert>
+                     )}
           </Box>
         );
       case steps.indexOf("Services & Invoices"):
@@ -1416,7 +1530,30 @@ const MyStepper = () => {
               Add itemized services without creating invoices
               <Typography component="p">No invoice or deposit request will be created</Typography>
             </Typography>
-
+ {!!selctedOptionError && (
+              <Alert
+                sx={{
+                  width: "96%",
+                  p: 0,
+                  pl: "4%",
+                  height: "23px",
+                  borderRadius: "10px",
+                  borderTopLeftRadius: 0,
+                  borderTopRightRadius: 0,
+                  fontSize: "15px",
+                  display: "flex",
+                  alignItems: "center",
+                  "& .MuiAlert-icon": {
+                    fontSize: "16px",
+                    mr: "8px",
+                  },
+                }}
+                variant="filled"
+                severity="error"
+              >
+                {selctedOptionError}
+              </Alert>
+            )}
             {/* Render the forms conditionally based on activeOption state */}
             <Box mt={3}>
               {activeOption === "invoice" && (
@@ -1924,13 +2061,31 @@ const MyStepper = () => {
           <Grid container spacing={3} mr={5} p={5}>
             <Grid item xs={8}>
               <Box sx={{ p: 2, backgroundColor: "#fff" }}>
-                <Stepper activeStep={activeStep}>
+                {/* <Stepper activeStep={activeStep}>
                   {steps.map((label, index) => (
                     <Step key={index} onClick={() => handleStepClick(index)}>
                       <StepLabel style={{ cursor: "pointer" }}>{label}</StepLabel>
                     </Step>
                   ))}
-                </Stepper>
+                </Stepper> */}
+                <Stepper activeStep={activeStep}>
+                                {steps.map((label, index) => {
+                                  // Check if the step has an error
+                                  const isError =
+                                    (index === 0 && !!proposalNameError) ||
+                                    (index === 1 && !!introductionBodyError) ||
+                                    (index === 2 && !!termsBodyError) ||
+                                    (index === 3 && !!selctedOptionError);
+                
+                                  return (
+                                    <Step key={index} onClick={() => handleStepClick(index)}>
+                                      <StepLabel error={isError} style={{ cursor: "pointer" }}>
+                                        {label}
+                                      </StepLabel>
+                                    </Step>
+                                  );
+                                })}
+                              </Stepper>
               </Box>
             </Grid>
             <Grid item xs={4} sx={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}>

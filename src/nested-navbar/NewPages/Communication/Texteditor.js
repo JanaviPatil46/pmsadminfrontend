@@ -60,19 +60,40 @@ export default function Editor({ initialContent, onChange,value }) {
   };
 
   return (
-    <Box
-      sx={{height:'250px'}}
-    >
-      <ReactQuill
-        // value={editorContent}
-        value={value}
-        onChange={handleChange}
-        modules={modules}
-        formats={formats}
-        theme="snow"
-        style={{ height: '150px' }}
-      />
-    </Box>
+    // <Box
+    //   sx={{
+    //   "& .ql-editor": {
+    //     minHeight: "150px",
+    //     height: "auto",
+    //     overflowY: "visible"
+    //   }
+    // }}
+    // >
+    //   <ReactQuill
+    //     // value={editorContent}
+    //     value={value}
+    //     onChange={handleChange}
+    //     modules={modules}
+    //     formats={formats}
+    //     theme="snow"
+    //     style={{ height: '150px' }}
+    //   />
+    // </Box>
+     <Box sx={{
+          "& .ql-editor": {
+            minHeight: "150px",
+            height: "auto",
+            overflowY: "visible"
+          }
+        }}>
+          <ReactQuill
+            value={editorContent}
+            onChange={handleChange}
+            modules={modules}
+            formats={formats}
+            theme="snow"
+          />
+        </Box>
   );
 }
 

@@ -461,7 +461,33 @@ setNumberOfreminder(result.invoiceTemplate.numberOfreminder)
     amount: item.amount.replace("$", ""), // Removing '$' sign from amount
     tax: item.tax.toString(), // Converting boolean to string
   }));
+  const [errors, setErrors] = useState({
+  invoiceTemplate: "",
+  lineItems: "",
+});
+const validateInvoice = () => {
+  let valid = true;
+  let newErrors = { invoiceTemplate: "", lineItems: "" };
+
+  if (!selectInvoiceTemp?.value) {
+    newErrors.invoiceTemplate = "Invoice template is required";
+    valid = false;
+  }
+
+  if (!lineItems || lineItems.length === 0) {
+    newErrors.lineItems = "At least one line item is required";
+    valid = false;
+  } 
+
+  setErrors(newErrors); // ✅ updates error state (clears if fields are valid)
+  return valid;
+};
+
+
   const createinvoice = () => {
+  if (!validateInvoice()) {
+    return; // stop if invalid
+  }
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
@@ -918,14 +944,7 @@ setNumberOfreminder(result.invoiceTemplate.numberOfreminder)
 
 
 
-                {/* <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Typography sx={{ marginBottom: 2, ml: 2, fontSize: 13 }} >{firstContactEmail || "No email available"}</Typography>
-                  <Typography fontSize={13}>
-                    Date: <Typography component="span" sx={{ mr: 2, marginBottom: 2, fontSize: 13 }}>
-                      {startDate ? startDate.format('YYYY-MM-DD') : 'N/A'}
-                    </Typography>
-                  </Typography>
-                </Box> */}
+                
 
 
                 <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -977,31 +996,6 @@ setNumberOfreminder(result.invoiceTemplate.numberOfreminder)
                 </Table>
               </TableContainer>
 
-              {/* Summary Section */}
-              {/* <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-end',
-                  marginRight: 3,
-                  mt: 0
-                }}
-              >
-                <Typography sx={{ textAlign: 'right', width: '100%' }}>
-                  <strong>Subtotal:</strong> ${subtotal || '0.00'}
-                </Typography>
-                <Typography sx={{ textAlign: 'right', width: '100%' }}>
-                  <strong>Tax Rate:</strong> {taxRate || '0.00'}%
-                </Typography>
-                <Typography sx={{ textAlign: 'right', width: '100%' }}>
-                  <strong>Tax Total:</strong> ${taxTotal?.toFixed(2) || '0.00'}
-                </Typography>
-                <Typography
-                  sx={{ textAlign: 'right', fontWeight: 'bold', width: '100%', marginTop: 1 }}
-                >
-                  <strong>Total:</strong> ${totalAmount || '0.00'}
-                </Typography>
-              </Box> */}
 <Table sx={{ width: "50%", ml: "auto" }}>
                   <TableBody>
                     <TableRow>
@@ -1093,6 +1087,11 @@ setNumberOfreminder(result.invoiceTemplate.numberOfreminder)
               <Box>
                 <InputLabel sx={{ color: "black" }}>Invoice Template</InputLabel>
                 <Autocomplete options={invoiceoptions} sx={{ mt: 1, mb: 2, backgroundColor: "#fff" }} size="small" value={selectInvoiceTemp} onChange={handleInvoiceTempChange} isOptionEqualToValue={(option, value) => option.value === value.value} getOptionLabel={(option) => option.label || ""} renderInput={(params) => <TextField {...params} placeholder="Invoice Template" />} isClearable={true} />
+               {errors.invoiceTemplate && (
+    <Typography sx={{ color: "red", fontSize: 12 }}>
+      {errors.invoiceTemplate}
+    </Typography>
+  )}
               </Box>
             </Grid>
           </Grid>
@@ -1322,7 +1321,11 @@ setNumberOfreminder(result.invoiceTemplate.numberOfreminder)
                 <CiDiscount1 /> Discount
               </Box>
             </Box>
-
+ {errors.lineItems && (
+  <Typography sx={{ color: "red", fontSize: 12,}}>
+    {errors.lineItems}
+  </Typography>
+)}
             <Box>
               <Box>
                 <Typography sx={{ mt: 2, mb: 2 }} variant="h5">
@@ -1356,6 +1359,8 @@ setNumberOfreminder(result.invoiceTemplate.numberOfreminder)
               </TableContainer>
             </Box>
           </Box>
+         
+
           <Box sx={{ pt: 4, display: "flex", alignItems: "center", gap: 5 }}>
             <Button variant="contained" color="primary" onClick={createinvoice} sx={{
                 backgroundColor: 'var(--color-save-btn)',  // Normal background

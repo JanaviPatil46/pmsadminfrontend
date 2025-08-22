@@ -26,7 +26,7 @@ import { Switch, FormControlLabel, Checkbox } from "@mui/material";
 import HelpOutlineRoundedIcon from "@mui/icons-material/HelpOutlineRounded";
 import { NavLink } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import { LoginContext } from "../Sidebar/Context/Context";
 import { gapi } from "gapi-script";
 import Cookies from "js-cookie";
@@ -1656,7 +1656,7 @@ const MyAccount = () => {
                         size="small"
                         margin="normal"
                         fullWidth
-                        placeholder="Last name"
+                        placeholder="Phone Number"
                       />
                     </Box>
                   </Box>
@@ -2732,6 +2732,7 @@ const MyAccount = () => {
           </Box>
         </Box>
       </Box>
+      <ToastContainer/>
     </>
   );
 };

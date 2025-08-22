@@ -35,7 +35,7 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 import { FiPlusCircle } from "react-icons/fi";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-const NewTaskDrawer = ({ open, onClose, fetchTasksData, isEditMode, taskData,fetchCompletedTasks }) => {
+const NewTaskDrawer = ({ open, onClose, isEditMode, taskData }) => {
 
  
   const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
@@ -44,7 +44,7 @@ const NewTaskDrawer = ({ open, onClose, fetchTasksData, isEditMode, taskData,fet
   const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
   const [accountdata, setaccountdata] = useState([]);
   const [selectedaccount, setSelectedaccount] = useState(null);
-  const [errorTooltip, setErrorTooltip] = useState("");
+
   const handleAccountChange = (selectedOptions) => {
     setSelectedaccount(selectedOptions);
     console.log("aacounts", selectedOptions);
@@ -130,7 +130,7 @@ const NewTaskDrawer = ({ open, onClose, fetchTasksData, isEditMode, taskData,fet
   const [selectedtemp, setselectedTemp] = useState(null);
   const [tempNameNew, setTempNameNew] = useState("");
   const [tagsNew, setTagsNew] = useState([]);
-  const [AssigneesNew, setAssigneesNew] = useState([]);
+ 
 
   const [priority, setPriority] = useState("Medium");
   const [status, setStatus] = useState("No status");
@@ -139,29 +139,6 @@ const NewTaskDrawer = ({ open, onClose, fetchTasksData, isEditMode, taskData,fet
 
   const [subtasks, setSubtasks] = useState([]);
   const [checkedSubtasks, setCheckedSubtasks] = useState([]);
-  // const [checkedSubtasks, setCheckedSubtasks] = useState(
-  //   subtasks.filter((subtask) => subtask.checked).map((subtask) => subtask.id)
-  // );
-
-  // const handleCheckboxChange = (subtaskId) => {
-  //   // Update only the checked state of the specific subtask being changed
-  //   setSubtasks((prevSubtasks) =>
-  //     prevSubtasks.map(
-  //       (subtask) =>
-  //         subtask.id === subtaskId
-  //           ? { ...subtask, checked: !subtask.checked } // Toggle checked state for the clicked subtask
-  //           : subtask // Keep other subtasks the same
-  //     )
-  //   );
-
-  //   // Update checkedSubtasks to only reflect the clicked subtask's change
-  //   setCheckedSubtasks((prevCheckedSubtasks) => {
-      
-  //     // If it is not checked, we add it to the checked list
-  //     return [...prevCheckedSubtasks, subtaskId]; // Add if not checked
-  //   });
-  // };
-
   const handleCheckboxChange = (subtaskId) => {
     setSubtasks((prevSubtasks) =>
       prevSubtasks.map((subtask) =>
@@ -177,13 +154,7 @@ const NewTaskDrawer = ({ open, onClose, fetchTasksData, isEditMode, taskData,fet
         : [...prevCheckedSubtasks, subtaskId] // Add new checked item
     );
   };
-  
 
-  // // Optional: Use useEffect to log after state updates
-  // useEffect(() => {
-  //   console.log("Updated checkedSubtasks:", checkedSubtasks);
-  //   console.log("Updated subtasks:", subtasks);
-  // }, [checkedSubtasks, subtasks]);
 
   const handleAddSubtask = () => {
     const newId = String(subtasks.length + 1);
@@ -255,17 +226,7 @@ const NewTaskDrawer = ({ open, onClose, fetchTasksData, isEditMode, taskData,fet
       console.error("Error fetching data:", error);
     }
   };
-  const options = userData.map((user) => ({
-    value: user._id,
-    label: user.username,
-  }));
-  // const handleuserChange = (event, newValue) => {
-  //   setAssigneesNew(newValue);
-  //   // Map selected options to their values and send as an array
-  //   const selectedValues = newValue.map((option) => option.value);
-  //   // console.log(selectedValues);
-  //   setCombinedValues(selectedValues);
-  // };
+
     const [selectedUser, setSelectedUser] = useState([]);
   const handleUserChange = (newSelectedUsers) => {
     setSelectedUser(newSelectedUsers);
@@ -300,48 +261,6 @@ const NewTaskDrawer = ({ open, onClose, fetchTasksData, isEditMode, taskData,fet
     const padding = 10; // padding on either side
     return baseWidth + charWidth * tagName.length + padding;
   };
-  const tagsoptions = tags.map((tag) => ({
-    value: tag._id,
-    label: tag.tagName,
-    colour: tag.tagColour,
-
-    customStyle: {
-      backgroundColor: tag.tagColour,
-      color: "#fff",
-      borderRadius: "8px",
-      alignItems: "center",
-      textAlign: "center",
-      marginBottom: "5px",
-      padding: "2px,8px",
-      fontSize: "10px",
-      width: `${calculateWidth(tag.tagName)}px`,
-      margin: "7px",
-      cursor: "pointer",
-    },
-    customTagStyle: {
-      backgroundColor: tag.tagColour,
-      color: "#fff",
-      alignItems: "center",
-      textAlign: "center",
-      padding: "2px,8px",
-      fontSize: "10px",
-      cursor: "pointer",
-    },
-  }));
-  // const handleTagChange = (event) => {
-  //   const { value } = event.target;
-
-  //   // Ensure the selected value is stored correctly
-  //   setTagsNew(value);
-
-  //   // Extract selected tag values
-  //   const selectedTagsValues = value.map((val) => {
-  //     const option = tagsoptions.find((opt) => opt.value === val);
-  //     return option?.value;
-  //   });
-
-  //   setCombinedTagsValues(selectedTagsValues);
-  // };
  
   const handleTagChange = (newSelectedTags) => {
     setTagsNew(newSelectedTags);
@@ -364,29 +283,6 @@ const NewTaskDrawer = ({ open, onClose, fetchTasksData, isEditMode, taskData,fet
         const data = await response.json();
         
         console.log("tasktemp",data)
-        // Extract and process assigneesData
-        // if (data.taskTemplate && data.taskTemplate.taskassignees) {
-        //   const innerArray = data.taskTemplate.taskassignees[0]; // Extract the inner array
-
-        //   if (innerArray) {
-        //     // console.log("Task Assignees:", innerArray);
-
-        //     const assigneesData = innerArray.map((assignee) => ({
-        //       value: assignee._id,
-        //       label: assignee.username,
-        //     }));
-        //     // console.log("Assignees Data:", assigneesData); // Log the processed assigneesData
-
-        //     setSelectedUser(assigneesData);
-
-        //     const selectedValues = assigneesData.map((option) => option.value);
-        //     setCombinedValues(selectedValues);
-        //     console.log("Selected Assignees:", selectedValues);
-        //   } else {
-        //     console.log("taskassignees contains an unexpected structure.");
-        //   }
-        // }
-
         if (data.taskTemplate && Array.isArray(data.taskTemplate.taskassignees)) {
           // Flatten the array in case of unnecessary nesting
           const flatAssignees = data.taskTemplate.taskassignees.flat();
@@ -508,28 +404,7 @@ const NewTaskDrawer = ({ open, onClose, fetchTasksData, isEditMode, taskData,fet
         const selectedValues = assigneesData.map((option) => option.value);
         setCombinedValues(selectedValues);
     }
-    
-    //   if (taskData.taskList && (taskData.taskList.Assignees)) {
-    //     const innerArray = taskData.taskList.Assignees[0]; // Extract the inner array
-
-    //     if ((innerArray)) {
-    //         // console.log("Task Assignees:", innerArray);
-
-    //         const assigneesData = innerArray.map((assignee) => ({
-    //             value: assignee._id,
-    //             label: assignee.username,
-    //         }));
-    //         // console.log("Assignees Data:", assigneesData); // Log the processed assigneesData
-
-    //         setAssigneesNew(assigneesData);
-
-    //         const selectedValues = assigneesData.map((option) => option.value);
-    //         setCombinedValues(selectedValues);
-    //         // console.log("Selected Assignees:", selectedValues);
-    //     } else {
-    //         console.log("taskassignees contains an unexpected structure.");
-    //     }
-    // }
+   
       // Pre-fill tags
       if (taskData.taskList && Array.isArray(taskData.taskList.Tags)) {
         const tagsData = taskData.taskList.Tags.map((tag) => ({
@@ -580,70 +455,31 @@ const NewTaskDrawer = ({ open, onClose, fetchTasksData, isEditMode, taskData,fet
   }, [isEditMode, taskData]);
 console.log("accounts",selectedaccount)
 
-//   const createTask = async ()=>{
-//     const myHeaders = new Headers();
-// myHeaders.append("Content-Type", "application/json");
 
-// const subtaskData = subtasks.map(({ id, text }) => ({
-//     id,
-//     text,
-
-//     checked: checkedSubtasks.includes(id), // Check if ID is in the checkedSubtasks array
-//   }));
-
-// const raw = JSON.stringify({
-//   accounts: selectedaccount.value,
-//   job: selectedJob.value,
-//   templatename: selectedtemp.value,
-//   taskname: tempNameNew,
-//   status: status,
-//   taskassignees: combinedValues,
-//   priority: priority,
-//   description: taskDiscription,
-//   tasktags: combinedTagsValues,
-//   issubtaskschecked: SubtaskSwitch,
-//   startdate: StartsDateNew,
-//   enddate: DueDateNew,
-//   subtasks: subtaskData
-// });
-// console.log(raw)
-// const requestOptions = {
-//   method: "POST",
-//   headers: myHeaders,
-//   body: raw,
-//   redirect: "follow"
-// };
-
-// fetch(`${ACCOUNT_TASKS_API}/accountstasks/newtask`, requestOptions)
-//   .then((response) => response.json())
-//   .then((result) => {
-//     console.log(result)
-//     toast.success("Task Created successfully")
-    
-//     onClose();
-//     // fetchTasksData();
-//     // Clear all fields after successful submission
-//     setselectedTemp(null);
-//     setSelectedJob(null);
-//     setSelectedaccount(null);
-//     setTempNameNew("");
-//     setStatus("");
-//     setCombinedValues([]);
-//     setAssigneesNew([])
-//     setPriority("");
-//     setTaskDescription("");
-//     setCombinedTagsValues([]);
-//     setSubtaskSwitch(false);
-//     setStartsDateNew(null);
-//     setDueDateNew(null);
-//     setSubtasks([]);
-//     setCheckedSubtasks([]);
-// } )
-//   .catch((error) => console.error(error));
-//   }
   const navigate = useNavigate();
+const [errors, setErrors] = useState({ account: false, template: false });
 
 const createTask = async () => {
+let hasError = false;
+
+  if (!selectedaccount?.value) {
+    setErrors((prev) => ({ ...prev, account: true }));
+    hasError = true;
+  } else {
+    setErrors((prev) => ({ ...prev, account: false }));
+  }
+
+  if (!selectedtemp?.value) {
+    setErrors((prev) => ({ ...prev, template: true }));
+    hasError = true;
+  } else {
+    setErrors((prev) => ({ ...prev, template: false }));
+  }
+
+  if (hasError) {
+    toast.error("Please fill in the required fields");
+    return;
+  }
   const myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
 
@@ -742,8 +578,12 @@ console.log("rew",raw)
                   options={accountoptions}
                   getOptionLabel={(option) => option.label}
                   value={selectedaccount}
-                  // onChange={handleAccountChange}
-                  onChange={(event, newValue) => handleAccountChange(newValue)}
+                  onChange={(event, newValue) => {
+    handleAccountChange(newValue);
+    // clear error if value selected
+    setErrors((prev) => ({ ...prev, account: !newValue }));
+  }}
+                  // onChange={(event, newValue) => handleAccountChange(newValue)}
                 isOptionEqualToValue={(option, value) =>
                   option.value === value.value
                 }
@@ -762,7 +602,8 @@ console.log("rew",raw)
                       placeholder="Select Account"
                       variant="outlined"
                       size="small"
-                      sx={{ backgroundColor: "#fff" }}
+                      sx={{ backgroundColor: "#fff" }}  error={errors.account}
+      helperText={errors.account ? "Account is required" : ""}
                     />
                   )}
                   sx={{ width: "100%", marginTop: "8px" }}
@@ -796,7 +637,12 @@ console.log("rew",raw)
                   options={taskTemplateOptions}
                   getOptionLabel={(option) => option.label}
                   value={selectedtemp}
-                  onChange={handletemp}
+                  // onChange={handletemp}
+                   onChange={(event, newValue) => {
+    handletemp(event, newValue); // pass both args properly
+    // clear error if value selected
+    setErrors((prev) => ({ ...prev, template: !newValue }));
+  }}
                   isOptionEqualToValue={(option, value) =>
                     option.value === value.value
                   }
@@ -817,7 +663,8 @@ console.log("rew",raw)
                         sx={{ backgroundColor: "#fff" }}
                         placeholder="Select Template"
                         variant="outlined"
-                        size="small"
+                        size="small"  error={errors.template}
+      helperText={errors.template ? "Template is required" : ""}
                       />
                     </>
                   )}
@@ -890,95 +737,7 @@ console.log("rew",raw)
               </Box>
               <Box mt={2} mr={1}>
                 <InputLabel sx={{ color: "black", mb: 1 }}>Tags</InputLabel>
-                {/* <FormControl sx={{ width: "100%" }}>
-                  <Select
-                    multiple
-                    size="small"
-                    id="tags-outlined"
-                    value={combinedTagsValues}
-                    onChange={handleTagChange}
-                    input={<OutlinedInput />}
-                    displayEmpty
-                    renderValue={(selected) => {
-                      if (selected.length === 0) {
-                        return (
-                          <span style={{ color: "#aaa" }}>Select tags...</span>
-                        );
-                      }
-                      return (
-                        <Box
-                          sx={{
-                            display: "flex",
-                            flexWrap: "wrap",
-                            gap: "6px",
-                            padding: "6px",
-                          }}
-                        >
-                          {selected.map((value) => {
-                            const option = tagsoptions.find(
-                              (opt) => opt.value === value
-                            );
-                            return (
-                              <Chip
-                                key={value}
-                                label={option?.label}
-                                sx={{
-                                  backgroundColor: option?.colour,
-                                  color: "#fff",
-                                  fontWeight: 500,
-                                  fontSize: "10px",
-                                  borderRadius: "16px",
-                                  height: "20px",
-                                  cursor: "pointer",
-                                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)",
-                                }}
-                              />
-                            );
-                          })}
-                        </Box>
-                      );
-                    }}
-                    MenuProps={{
-                      PaperProps: {
-                        style: { maxHeight: 250 },
-                      },
-                    }}
-                    sx={{
-                      borderRadius: "10px",
-                      "& .MuiOutlinedInput-root": { borderRadius: "10px" },
-                    }}
-                  >
-                    {tagsoptions.map((option) => {
-                      const dynamicWidth = Math.min(
-                        option.label.length * 8 + 16,
-                        150
-                      );
-                      return (
-                        <MenuItem
-                          key={option.value}
-                          value={option.value}
-                          sx={{
-                            backgroundColor: option.colour,
-                            color: "#fff",
-                            fontSize: "10px",
-                            borderRadius: "10px",
-                            margin: "5px",
-                            textAlign: "center",
-                            padding: "4px 9px",
-                            minWidth: `${dynamicWidth}px`,
-                            maxWidth: `${dynamicWidth}px`,
-                            "&:hover": {
-                              backgroundColor: option.colour,
-                              color: "#fff",
-                            },
-                          }}
-                        >
-                          {option.label}
-                        </MenuItem>
-                      );
-                    })}
-                  </Select>
-                </FormControl> */}
+               
                                    <TagsMultiSelectDropDown 
                   value={tagsNew}
                   onChange={handleTagChange}

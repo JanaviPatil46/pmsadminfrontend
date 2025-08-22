@@ -210,7 +210,7 @@ import Quill from "quill";
 import "quill-emoji";
 
 Quill.register("modules/emoji", require("quill-emoji"));
-export default function Editor({ initialContent, onChange }) {
+export default function Editor({ initialContent, onChange, }) {
   const [editorContent, setEditorContent] = useState(initialContent);
 
   // Toolbar configuration similar to what you had in mui-tiptap

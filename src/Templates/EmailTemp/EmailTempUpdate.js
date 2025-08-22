@@ -45,6 +45,7 @@ const EmailTempUpdate = () => {
 
   const handleChange = (event) => {
     setSelectedOption(event.target.value);
+    console.log("selectedOption",event.target.value)
   };
   const toggleDropdown = (event) => {
     setAnchorEl(event.currentTarget);
@@ -170,7 +171,7 @@ const EmailTempUpdate = () => {
         formData.append("attachments", file); // Use "attachments" as the field name
       });
     }
-
+console.log("formdata",formData)
     const requestOptions = {
       method: "PATCH",
       body: formData,

@@ -423,8 +423,28 @@ const accountoptions = accountdata;
   };
 
   const navigate = useNavigate();
-
+const [errors, setErrors] = useState({ account: false, template: false });
   const createTask = async () => {
+    let hasError = false;
+
+  if (!selectedaccount?.value) {
+    setErrors((prev) => ({ ...prev, account: true }));
+    hasError = true;
+  } else {
+    setErrors((prev) => ({ ...prev, account: false }));
+  }
+
+  if (!selectedtemp?.value) {
+    setErrors((prev) => ({ ...prev, template: true }));
+    hasError = true;
+  } else {
+    setErrors((prev) => ({ ...prev, template: false }));
+  }
+
+  if (hasError) {
+    toast.error("Please fill in the required fields");
+    return;
+  }
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
@@ -494,8 +514,12 @@ const accountoptions = accountdata;
                   options={accountoptions}
                   getOptionLabel={(option) => option.label}
                   value={selectedaccount}
-                  // onChange={handleAccountChange}
-                  onChange={(event, newValue) => handleAccountChange(newValue)}
+                  onChange={(event, newValue) => {
+    handleAccountChange(newValue);
+    // clear error if value selected
+    setErrors((prev) => ({ ...prev, account: !newValue }));
+  }}
+                  // onChange={(event, newValue) => handleAccountChange(newValue)}
                   isOptionEqualToValue={(option, value) =>
                     option.value === value.value
                   }
@@ -515,6 +539,8 @@ const accountoptions = accountdata;
                       variant="outlined"
                       size="small"
                       sx={{ backgroundColor: "#fff" }}
+                      error={errors.account}
+      helperText={errors.account ? "Account is required" : ""}
                     />
                   )}
                   sx={{ width: "100%", marginTop: "8px" }}
@@ -546,7 +572,12 @@ const accountoptions = accountdata;
                   options={taskTemplateOptions}
                   getOptionLabel={(option) => option.label}
                   value={selectedtemp}
-                  onChange={handletemp}
+                  // onChange={handletemp}
+                  onChange={(event, newValue) => {
+    handletemp(event, newValue); // pass both args properly
+    // clear error if value selected
+    setErrors((prev) => ({ ...prev, template: !newValue }));
+  }}
                   isOptionEqualToValue={(option, value) =>
                     option.value === value.value
                   }
@@ -568,6 +599,8 @@ const accountoptions = accountdata;
                         placeholder="Select Template"
                         variant="outlined"
                         size="small"
+                        error={errors.template}
+      helperText={errors.template ? "Template is required" : ""}
                       />
                     </>
                   )}
