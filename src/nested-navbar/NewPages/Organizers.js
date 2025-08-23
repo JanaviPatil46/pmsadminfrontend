@@ -56,39 +56,69 @@ const Organizers = () => {
     fetchOrganizerTemplates();
     console.log("Archive action triggered.");
   };
+const handleArchive = (_id, isActive) => {
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
 
-  const handleArchive = (_id) => {
-    console.log(_id);
-    // handleSubmit(id);
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
+  // Toggle active state
+  const raw = JSON.stringify({
+    active: !isActive,
+  });
 
-    const raw = JSON.stringify({
-      active: !isActiveTrue,
-    });
-    console.log(raw);
-    const requestOptions = {
-      method: "PATCH",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-    };
-    const url = `${ORGANIZER_TEMP_API}/workflow/orgaccwise/organizeraccountwise/${_id}`;
-
-    fetch(url, requestOptions)
-      .then((response) => response.json())
-      .then((result) => {
-        console.log(result);
-        // console.log(result.updatedAccount); // Log the result
-        // setAccountId(result.updatedAccount._id);
-        toast.success("orgnizer updated successfully"); // Display success toast
-        fetchOrganizerTemplates(data);
-      })
-      .catch((error) => {
-        console.error(error); // Log the error
-        toast.error("An error occurred while submitting the form"); // Display error toast
-      });
+  const requestOptions = {
+    method: "PATCH",
+    headers: myHeaders,
+    body: raw,
+    redirect: "follow",
   };
+
+  fetch(`${ORGANIZER_TEMP_API}/workflow/orgaccwise/organizeraccountwise/active-archive/${_id}`, requestOptions)
+    .then((response) => response.json())
+    .then((result) => {
+      console.log(result);
+      // if (result.message === "Organizer AccountWise Updated successfully") {
+        toast.success("Organizer updated successfully");
+        fetchOrganizerTemplates(data);
+      // }
+    })
+    .catch((error) => {
+      console.error(error);
+      toast.error("An error occurred while updating organizer");
+    });
+};
+
+  // const handleArchive = (_id) => {
+  //   console.log(_id);
+  //   // handleSubmit(id);
+  //   const myHeaders = new Headers();
+  //   myHeaders.append("Content-Type", "application/json");
+
+  //   const raw = JSON.stringify({
+  //     active: !isActiveTrue,
+  //   });
+  //   console.log(raw);
+  //   const requestOptions = {
+  //     method: "PATCH",
+  //     headers: myHeaders,
+  //     body: raw,
+  //     redirect: "follow",
+  //   };
+  //   const url = `${ORGANIZER_TEMP_API}/workflow/orgaccwise/organizeraccountwise/active-archive/${_id}`;
+
+  //   fetch(url, requestOptions)
+  //     .then((response) => response.json())
+  //     .then((result) => {
+  //       console.log(result);
+  //       // console.log(result.updatedAccount); // Log the result
+  //       // setAccountId(result.updatedAccount._id);
+  //       toast.success("orgnizer updated successfully"); // Display success toast
+  //       fetchOrganizerTemplates(data);
+  //     })
+  //     .catch((error) => {
+  //       console.error(error); // Log the error
+  //       toast.error("An error occurred while submitting the form"); // Display error toast
+  //     });
+  // };
   const fetchOrganizerTemplates = async (accountid) => {
     try {
       // const url = http://127.0.0.1:7600/workflow/orgaccwise/organizeraccountwise/${isActiveTrue}/${accountid};
@@ -220,14 +250,16 @@ const Organizers = () => {
       const printWindow = window.open("", "_blank");
 
       // Constructing the sections HTML
-      const sectionsHtml = organizer.organizertemplateid.sections
+      const sectionsHtml = organizer.sections
         .map((section) => {
           const formElementsHtml = section.formElements
             .map((element) => {
               return `
             <div style="margin-bottom: 20px;">
               <strong >${element.text}</strong>
-             
+              <span style="margin-left: 5px; display: block; margin-top: 5px;">
+                <strong >Answer:</strong>  ${element.textvalue ?? "________"}
+                </span>
             </div>
           `;
             })
@@ -273,6 +305,55 @@ const Organizers = () => {
       toast.error("Organizer not found.");
     }
   };
+
+//   const printOrganizerData = (id) => {
+//   const organizer = organizerTemplatesData.find((org) => org._id === id);
+//   if (!organizer) {
+//     toast.error("Organizer not found.");
+//     return;
+//   }
+// console.log("organizerdata",organizer)
+//   // Build sections with questions + answers
+//   const sectionsHtml = organizer.sections
+//     .map((section) => {
+//       const formElementsHtml = section.formElements
+//         .map((element) => {
+//           return `
+//             <div style="margin-bottom: 10px;">
+//               <strong>${element.text}:</strong>
+//               <span style="margin-left: 8px;">
+//                 ${element.textvalue ?? "________"}   <!-- print the answer if available -->
+//               </span>
+//             </div>
+//           `;
+//         })
+//         .join("");
+
+//       return `
+//         <div style="margin-bottom: 20px;">
+//           <h3>${section.name}</h3>
+//           ${formElementsHtml}
+//         </div>
+//       `;
+//     })
+//     .join("");
+
+//   // Create a printable section in DOM
+//   const printArea = document.createElement("div");
+//   printArea.innerHTML = `
+//     <div style="font-family: Arial, sans-serif; padding: 20px;">
+//       <h1 style="color: #2c59fa;">Organizer Data</h1>
+//       ${sectionsHtml}
+//     </div>
+//   `;
+//   document.body.appendChild(printArea);
+
+//   // Print only that area
+//   const originalContent = document.body.innerHTML;
+//   document.body.innerHTML = printArea.innerHTML;
+//   window.print();
+//   document.body.innerHTML = originalContent; // restore the page after print
+// };
 
    const [openDialog, setOpenDialog] = useState(false);
   // const [selectedOrganizer, setSelectedOrganizer] = useState(null);
@@ -527,7 +608,7 @@ const handleOpenDialog = (organizer) => {
                             textAlign: "start",
                           }}
                         >
-                          {/* <Typography sx={{ fontSize: '12px', fontWeight: 'bold' }}>Publice to Marketplace</Typography> */}
+                       
                           <Typography
                             sx={{ fontSize: "12px", fontWeight: "bold" }}
                             // onClick={() => handleSealed(row._id)}
@@ -553,12 +634,20 @@ const handleOpenDialog = (organizer) => {
                           >
                             Change Answers    
                           </Typography>
-                          <Typography
+                          {/* <Typography
                             onClick={() => handleArchive(row._id)}
                             sx={{ fontSize: "12px", fontWeight: "bold" }}
                           >
                             Archived    
-                          </Typography>
+                          </Typography> */}
+                  
+<Typography
+  onClick={() => handleArchive(row._id, row.active)}
+  sx={{ fontSize: "12px", fontWeight: "bold", cursor: "pointer" }}
+>
+  {row.active ? "Archive" : "Restore"}
+</Typography>
+
                           <Typography
                             sx={{ fontSize: "12px", fontWeight: "bold" }}
                             onClick={() => printOrganizerData(row._id)}

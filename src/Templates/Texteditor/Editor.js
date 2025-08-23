@@ -81,6 +81,7 @@ export default function Editor({ initialContent, onChange, }) {
   }
 }}>
   <ReactQuill
+  
     value={editorContent}
     onChange={handleChange}
     modules={modules}

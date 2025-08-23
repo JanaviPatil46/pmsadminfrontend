@@ -37,7 +37,7 @@ import { RxCross2 } from "react-icons/rx";
 const CreateOrganizerUpdate = ({ OrganizerData, onClose }) => {
   const ORGANIZER_TEMP_API = process.env.REACT_APP_ORGANIZER_TEMP_URL;
   const { data } = useParams();
-  const [expandedSection, setExpandedSection] = useState(null);
+  // const [expandedSection, setExpandedSection] = useState(null);
   const [organizerTemp, setOrganizerTemp] = useState(null);
   const [sections, setSections] = useState([]);
   const [organizerId, setOrganizerId] = useState("");
@@ -64,16 +64,27 @@ const CreateOrganizerUpdate = ({ OrganizerData, onClose }) => {
         setOrganizerId(selectedOrganizer._id);
         setSections(selectedOrganizer.sections);
         // Loop through the sections and form elements to log text and textvalue
-        
       })
       .catch((error) => console.error(error));
   };
   console.log(organizerTemp);
-  const handleToggleSection = (sectionId) => {
-    setExpandedSection((prevExpandedSection) =>
-      prevExpandedSection === sectionId ? null : sectionId
-    );
-  };
+  // const handleToggleSection = (sectionId) => {
+  //   setExpandedSection((prevExpandedSection) =>
+  //     prevExpandedSection === sectionId ? null : sectionId
+  //   );
+  // };
+  // use array instead of single value
+const [expandedSections, setExpandedSections] = useState([]);
+
+// toggle function
+const handleToggleSection = (sectionId) => {
+  setExpandedSections((prevExpanded) =>
+    prevExpanded.includes(sectionId)
+      ? prevExpanded.filter((id) => id !== sectionId) // close it
+      : [...prevExpanded, sectionId] // open it
+  );
+};
+
   const [drawerOpen, setDrawerOpen] = useState(false); // State to manage Drawer visibility
   const [drawerContent, setDrawerContent] = useState(""); // State to store content for Drawer
   const handleOpenDrawer = (content) => {
@@ -117,7 +128,6 @@ const CreateOrganizerUpdate = ({ OrganizerData, onClose }) => {
   };
   // Filter sections based on conditional settings and toggle state
   const filteredSections = sections.filter((section) => {
-
     return !section.sectionsettings?.conditional || showConditional;
   });
   return (
@@ -164,7 +174,6 @@ const CreateOrganizerUpdate = ({ OrganizerData, onClose }) => {
                   ml: 1,
                 }}
               >
-                
                 (
                 {
                   section.formElements.filter(
@@ -184,35 +193,38 @@ const CreateOrganizerUpdate = ({ OrganizerData, onClose }) => {
                 }
                 )
               </Typography>
-              <IconButton onClick={() => handleToggleSection(section.id)}>
+              {/* <IconButton onClick={() => handleToggleSection(section.id)}>
                 {expandedSection === section.id ? (
                   <ExpandLess />
                 ) : (
                   <ExpandMore />
                 )}
-              </IconButton>
+              </IconButton> */}
+              <IconButton onClick={() => handleToggleSection(section.id)}>
+  {expandedSections.includes(section.id) ? <ExpandLess /> : <ExpandMore />}
+</IconButton>
+
             </Box>
 
-            {expandedSection === section.id && (
+            {/* {expandedSection === section.id && ( */}
+            {expandedSections.includes(section.id) && (
               <TableContainer component={Paper}>
                 <Table sx={{ minWidth: 650 }} aria-label="form elements table">
-                  
-<TableHead>
-  <TableRow>
-    <TableCell sx={{ width: "40%" }}>
-      <strong>Question</strong>
-    </TableCell>
-    <TableCell sx={{ width: "40%",textAlign:'start'  }}>
-      <strong>Answer</strong>
-    </TableCell>
-    <TableCell sx={{ width: "20%",textAlign:'start'  }}>
-      <strong>Reviewed</strong>
-    </TableCell>
-  </TableRow>
-</TableHead>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ width: "40%" }}>
+                        <strong>Question</strong>
+                      </TableCell>
+                      <TableCell sx={{ width: "40%", textAlign: "start" }}>
+                        <strong>Answer</strong>
+                      </TableCell>
+                      <TableCell sx={{ width: "20%", textAlign: "start" }}>
+                        <strong>Reviewed</strong>
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
 
                   <TableBody>
-                   
                     {section.formElements
                       .filter(
                         (formElement) =>
@@ -226,7 +238,7 @@ const CreateOrganizerUpdate = ({ OrganizerData, onClose }) => {
                               ? "Text Block"
                               : formElement.text}
                           </TableCell>
-                          <TableCell >
+                          <TableCell>
                             {formElement.type === "Text Editor" ? (
                               <Box
                                 sx={{ cursor: "pointer", color: "blue" }}
@@ -239,12 +251,11 @@ const CreateOrganizerUpdate = ({ OrganizerData, onClose }) => {
                             ) : (
                               // formElement.textvalue || ""
                               <div style={{ whiteSpace: "pre-line" }}>
-  {formElement.textvalue}
-</div>
-
+                                {formElement.textvalue}
+                              </div>
                             )}
                           </TableCell>
-                          <TableCell sx={{textAlign:'center'}}>
+                          <TableCell sx={{ textAlign: "center" }}>
                             {formElement.type !== "Text Editor" && (
                               <Checkbox
                                 checked={formElement.active || false}

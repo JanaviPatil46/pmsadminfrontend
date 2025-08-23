@@ -1,5 +1,26 @@
-import React, { useState, useEffect, useMemo ,useRef} from "react";
-import { TableContainer,Stepper, Drawer, Step, StepLabel, Button, Typography, Box, Grid, TextField, FormControl, FormControlLabel, Switch, List, ListItem, ListItemText, Popover, Autocomplete, Alert, InputLabel } from "@mui/material";
+import React, { useState, useEffect, useMemo, useRef } from "react";
+import {
+  TableContainer,
+  Stepper,
+  Drawer,
+  Step,
+  StepLabel,
+  Button,
+  Typography,
+  Box,
+  Grid,
+  TextField,
+  FormControl,
+  FormControlLabel,
+  Switch,
+  List,
+  ListItem,
+  ListItemText,
+  Popover,
+  Autocomplete,
+  Alert,
+  InputLabel,
+} from "@mui/material";
 import Editor from "../Texteditor/Editor";
 import TermEditor from "../Texteditor/TermEditor";
 import CreatableSelect from "react-select/creatable";
@@ -8,9 +29,25 @@ import { CiDiscount1 } from "react-icons/ci";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { RiCloseLine } from "react-icons/ri";
 import Invoice from "./Invoice";
-import { Divider, Menu, Paper,
-  TablePagination,MenuItem, useMediaQuery, Table, TableHead, TableBody, TableRow, TableCell, Checkbox, IconButton } from "@mui/material";
-import { MaterialReactTable, useMaterialReactTable } from "material-react-table";
+import {
+  Divider,
+  Menu,
+  Paper,
+  TablePagination,
+  MenuItem,
+  useMediaQuery,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  Checkbox,
+  IconButton,
+} from "@mui/material";
+import {
+  MaterialReactTable,
+  useMaterialReactTable,
+} from "material-react-table";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { CiMenuKebab } from "react-icons/ci";
@@ -19,7 +56,7 @@ import { CircularProgress } from "@mui/material";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import EditorShortcodes from "../Texteditor/EditorShortcodes";
 import { useTheme } from "@mui/material/styles";
-import MultiSelectDropdown from "../MultiSelectDropdown"
+import MultiSelectDropdown from "../MultiSelectDropdown";
 
 const MyStepper = () => {
   const PROPOSAL_API = process.env.REACT_APP_PROPOSAL_TEMP_URL;
@@ -82,7 +119,12 @@ const MyStepper = () => {
     Reminders: true,
   });
 
-  const steps = ["General"].concat(stepsVisibility.Introduction ? ["Introduction"] : [], stepsVisibility.Terms ? ["Terms"] : [], stepsVisibility.ServicesInvoices ? ["Services & Invoices"] : [], activeOption === "invoice" ? ["Payments"] : []);
+  const steps = ["General"].concat(
+    stepsVisibility.Introduction ? ["Introduction"] : [],
+    stepsVisibility.Terms ? ["Terms"] : [],
+    stepsVisibility.ServicesInvoices ? ["Services & Invoices"] : [],
+    activeOption === "invoice" ? ["Payments"] : []
+  );
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -97,13 +139,13 @@ const MyStepper = () => {
   //   setActiveStep(0);
   //   setShowStepper(false); // Hide stepper and show the create template button
   // };
-const handleReset = () => { 
-  const isSaved = createsaveProposaltemp();
-  if (isSaved) {  
-    setActiveStep(0);
-    setShowStepper(false); // only hide stepper if validation & save passed
-  }
-};
+  const handleReset = () => {
+    const isSaved = createsaveProposaltemp();
+    if (isSaved) {
+      setActiveStep(0);
+      setShowStepper(false); // only hide stepper if validation & save passed
+    }
+  };
 
   const handleStepClick = (step) => {
     setActiveStep(step);
@@ -150,20 +192,25 @@ const handleReset = () => {
   // };
   const handleAddShortcut = (shortcut) => {
     setProposalName((prevText) => {
-        const newText =
-            prevText.slice(0, cursorPosition) + `[${shortcut}]` + prevText.slice(cursorPosition);
-        return newText;
+      const newText =
+        prevText.slice(0, cursorPosition) +
+        `[${shortcut}]` +
+        prevText.slice(cursorPosition);
+      return newText;
     });
 
     setTimeout(() => {
-        if (textFieldRef.current) {
-            textFieldRef.current.focus();
-            textFieldRef.current.setSelectionRange(cursorPosition + shortcut.length + 2, cursorPosition + shortcut.length + 2);
-        }
+      if (textFieldRef.current) {
+        textFieldRef.current.focus();
+        textFieldRef.current.setSelectionRange(
+          cursorPosition + shortcut.length + 2,
+          cursorPosition + shortcut.length + 2
+        );
+      }
     }, 0);
 
     setShowDropdown(false);
-};
+  };
 
   const handleAddShortcutforCustomEmail = (shortcut) => {
     setCustomMessageInEmail((prevText) => prevText + `[${shortcut}]`);
@@ -172,7 +219,9 @@ const handleReset = () => {
 
   useEffect(() => {
     // Simulate filtered shortcuts based on some logic (e.g., search)
-    setFilteredShortcuts(shortcuts.filter((shortcut) => shortcut.title.toLowerCase().includes("")));
+    setFilteredShortcuts(
+      shortcuts.filter((shortcut) => shortcut.title.toLowerCase().includes(""))
+    );
   }, [shortcuts]);
 
   useEffect(() => {
@@ -181,7 +230,11 @@ const handleReset = () => {
       const contactShortcuts = [
         { title: "Account Shortcodes", isBold: true },
         { title: "Account Name", isBold: false, value: "ACCOUNT_NAME" },
-        { title: "Custom field:Website", isBold: false, value: "ACCOUNT_CUSTOM_FIELD:Website" },
+        {
+          title: "Custom field:Website",
+          isBold: false,
+          value: "ACCOUNT_CUSTOM_FIELD:Website",
+        },
         { title: "Contact Shortcodes", isBold: true },
         { title: "Contact Name", isBold: false, value: "CONTACT_NAME" },
         { title: "First Name", isBold: false, value: "FIRST_NAME" },
@@ -194,29 +247,65 @@ const handleReset = () => {
         { title: "City", isBold: false, value: "CITY" },
         { title: "State/Province", isBold: false, value: "STATE / PROVINCE" },
         { title: "Zip/Postal code", isBold: false, value: "ZIP / POSTAL CODE" },
-        { title: "Custom field:Email", isBold: false, value: "CONTACT_CUSTOM_FIELD:Email" },
+        {
+          title: "Custom field:Email",
+          isBold: false,
+          value: "CONTACT_CUSTOM_FIELD:Email",
+        },
         { title: "Date Shortcodes", isBold: true },
-        { title: "Current day full date", isBold: false, value: "CURRENT_DAY_FULL_DATE" },
-        { title: "Current day number", isBold: false, value: "CURRENT_DAY_NUMBER" },
+        {
+          title: "Current day full date",
+          isBold: false,
+          value: "CURRENT_DAY_FULL_DATE",
+        },
+        {
+          title: "Current day number",
+          isBold: false,
+          value: "CURRENT_DAY_NUMBER",
+        },
         { title: "Current day name", isBold: false, value: "CURRENT_DAY_NAME" },
         { title: "Current week", isBold: false, value: "CURRENT_WEEK" },
-        { title: "Current month number", isBold: false, value: "CURRENT_MONTH_NUMBER" },
-        { title: "Current month name", isBold: false, value: "CURRENT_MONTH_NAME" },
+        {
+          title: "Current month number",
+          isBold: false,
+          value: "CURRENT_MONTH_NUMBER",
+        },
+        {
+          title: "Current month name",
+          isBold: false,
+          value: "CURRENT_MONTH_NAME",
+        },
         { title: "Current quarter", isBold: false, value: "CURRENT_QUARTER" },
         { title: "Current year", isBold: false, value: "CURRENT_YEAR" },
-        { title: "Last day full date", isBold: false, value: "LAST_DAY_FULL_DATE" },
+        {
+          title: "Last day full date",
+          isBold: false,
+          value: "LAST_DAY_FULL_DATE",
+        },
         { title: "Last day number", isBold: false, value: "LAST_DAY_NUMBER" },
         { title: "Last day name", isBold: false, value: "LAST_DAY_NAME" },
         { title: "Last week", isBold: false, value: "LAST_WEEK" },
-        { title: "Last month number", isBold: false, value: "LAST_MONTH_NUMBER" },
+        {
+          title: "Last month number",
+          isBold: false,
+          value: "LAST_MONTH_NUMBER",
+        },
         { title: "Last month name", isBold: false, value: "LAST_MONTH_NAME" },
         { title: "Last quarter", isBold: false, value: "LAST_QUARTER" },
         { title: "Last_year", isBold: false, value: "LAST_YEAR" },
-        { title: "Next day full date", isBold: false, value: "NEXT_DAY_FULL_DATE" },
+        {
+          title: "Next day full date",
+          isBold: false,
+          value: "NEXT_DAY_FULL_DATE",
+        },
         { title: "Next day number", isBold: false, value: "NEXT_DAY_NUMBER" },
         { title: "Next day name", isBold: false, value: "NEXT_DAY_NAME" },
         { title: "Next week", isBold: false, value: "NEXT_WEEK" },
-        { title: "Next month number", isBold: false, value: "NEXT_MONTH_NUMBER" },
+        {
+          title: "Next month number",
+          isBold: false,
+          value: "NEXT_MONTH_NUMBER",
+        },
         { title: "Next month name", isBold: false, value: "NEXT_MONTH_NAME" },
         { title: "Next quarter", isBold: false, value: "NEXT_QUARTER" },
         { title: "Next year", isBold: false, value: "NEXT_YEAR" },
@@ -226,29 +315,65 @@ const handleReset = () => {
       const accountShortcuts = [
         { title: "Account Shortcodes", isBold: true },
         { title: "Account Name", isBold: false, value: "ACCOUNT_NAME" },
-        { title: "Custom field:Website", isBold: false, value: "ACCOUNT_CUSTOM_FIELD:Website" },
+        {
+          title: "Custom field:Website",
+          isBold: false,
+          value: "ACCOUNT_CUSTOM_FIELD:Website",
+        },
         { title: "Date Shortcodes", isBold: true },
-        { title: "Current day full date", isBold: false, value: "CURRENT_DAY_FULL_DATE" },
-        { title: "Current day number", isBold: false, value: "CURRENT_DAY_NUMBER" },
+        {
+          title: "Current day full date",
+          isBold: false,
+          value: "CURRENT_DAY_FULL_DATE",
+        },
+        {
+          title: "Current day number",
+          isBold: false,
+          value: "CURRENT_DAY_NUMBER",
+        },
         { title: "Current day name", isBold: false, value: "CURRENT_DAY_NAME" },
         { title: "Current week", isBold: false, value: "CURRENT_WEEK" },
-        { title: "Current month number", isBold: false, value: "CURRENT_MONTH_NUMBER" },
-        { title: "Current month name", isBold: false, value: "CURRENT_MONTH_NAME" },
+        {
+          title: "Current month number",
+          isBold: false,
+          value: "CURRENT_MONTH_NUMBER",
+        },
+        {
+          title: "Current month name",
+          isBold: false,
+          value: "CURRENT_MONTH_NAME",
+        },
         { title: "Current quarter", isBold: false, value: "CURRENT_QUARTER" },
         { title: "Current year", isBold: false, value: "CURRENT_YEAR" },
-        { title: "Last day full date", isBold: false, value: "LAST_DAY_FULL_DATE" },
+        {
+          title: "Last day full date",
+          isBold: false,
+          value: "LAST_DAY_FULL_DATE",
+        },
         { title: "Last day number", isBold: false, value: "LAST_DAY_NUMBER" },
         { title: "Last day name", isBold: false, value: "LAST_DAY_NAME" },
         { title: "Last week", isBold: false, value: "LAST_WEEK" },
-        { title: "Last month number", isBold: false, value: "LAST_MONTH_NUMBER" },
+        {
+          title: "Last month number",
+          isBold: false,
+          value: "LAST_MONTH_NUMBER",
+        },
         { title: "Last month name", isBold: false, value: "LAST_MONTH_NAME" },
         { title: "Last quarter", isBold: false, value: "LAST_QUARTER" },
         { title: "Last_year", isBold: false, value: "LAST_YEAR" },
-        { title: "Next day full date", isBold: false, value: "NEXT_DAY_FULL_DATE" },
+        {
+          title: "Next day full date",
+          isBold: false,
+          value: "NEXT_DAY_FULL_DATE",
+        },
         { title: "Next day number", isBold: false, value: "NEXT_DAY_NUMBER" },
         { title: "Next day name", isBold: false, value: "NEXT_DAY_NAME" },
         { title: "Next week", isBold: false, value: "NEXT_WEEK" },
-        { title: "Next month number", isBold: false, value: "NEXT_MONTH_NUMBER" },
+        {
+          title: "Next month number",
+          isBold: false,
+          value: "NEXT_MONTH_NUMBER",
+        },
         { title: "Next month name", isBold: false, value: "NEXT_MONTH_NAME" },
         { title: "Next quarter", isBold: false, value: "NEXT_QUARTER" },
         { title: "Next year", isBold: false, value: "NEXT_YEAR" },
@@ -261,10 +386,10 @@ const handleReset = () => {
     setAnchorEl(null);
     setShowDropdown(false);
   };
- const [cursorPosition, setCursorPosition] = useState(0);
+  const [cursorPosition, setCursorPosition] = useState(0);
   const textFieldRef = useRef(null);
   const handleProposalName = (e) => {
-    const { value,selectionStart  } = e.target;
+    const { value, selectionStart } = e.target;
     setProposalName(value);
     setCursorPosition(selectionStart);
   };
@@ -300,13 +425,13 @@ const handleReset = () => {
   //   const selectedValues = selectedOptions.map((option) => option.value);
   //   setCombinedTeamMemberValues(selectedValues);
   // };
- const [combinedValues, setCombinedValues] = useState();
+  const [combinedValues, setCombinedValues] = useState();
   const handleUserChange = (newSelectedUsers) => {
     setSelectedUser(newSelectedUsers);
-    console.log(newSelectedUsers)
+    console.log(newSelectedUsers);
     const selectedValues = newSelectedUsers.map((option) => option.value);
     setCombinedValues(selectedValues);
-    console.log(selectedValues)
+    console.log(selectedValues);
   };
   const options = userData.map((user) => ({
     value: user._id,
@@ -346,13 +471,15 @@ const handleReset = () => {
       .then((result) => {
         console.log(result);
 
-        const service = Array.isArray(result.serviceTemplate) ? result.serviceTemplate[0] : result.serviceTemplate;
-       // Ensure rate is correctly parsed
-      const rawRate = service.rate || "0.00";  // Fallback to "0.00" if undefined
-      const numericRate = parseFloat(rawRate.replace(/[^0-9.]/g, "")); // Remove $ and other non-numeric chars
+        const service = Array.isArray(result.serviceTemplate)
+          ? result.serviceTemplate[0]
+          : result.serviceTemplate;
+        // Ensure rate is correctly parsed
+        const rawRate = service.rate || "0.00"; // Fallback to "0.00" if undefined
+        const numericRate = parseFloat(rawRate.replace(/[^0-9.]/g, "")); // Remove $ and other non-numeric chars
 
-      const rate = !isNaN(numericRate) ? numericRate.toFixed(2) : "0.00";
-      const amount = rate; // Assuming amount is same as rate
+        const rate = !isNaN(numericRate) ? numericRate.toFixed(2) : "0.00";
+        const amount = rate; // Assuming amount is same as rate
         const updatedRow = {
           productName: service.serviceName || "", // Assuming serviceName corresponds to productName
           description: service.description || "",
@@ -386,9 +513,37 @@ const handleReset = () => {
     }
   };
   // add row
-  const [rows, setRows] = useState([{ productName: "", description: "", rate: "$0.00", qty: "1", amount: "$0.00", tax: false, isDiscount: false }]);
+  const [rows, setRows] = useState([
+    {
+      productName: "",
+      description: "",
+      rate: "$0.00",
+      qty: "1",
+      amount: "$0.00",
+      tax: false,
+      isDiscount: false,
+    },
+  ]);
   const addRow = (isDiscountRow = false) => {
-    const newRow = isDiscountRow ? { productName: "", description: "", rate: "$-10.00", qty: "1", amount: "$-10.00", tax: false, isDiscount: true } : { productName: "", description: "", rate: "$0.00", qty: "1", amount: "$0.00", tax: false, isDiscount: false };
+    const newRow = isDiscountRow
+      ? {
+          productName: "",
+          description: "",
+          rate: "$-10.00",
+          qty: "1",
+          amount: "$-10.00",
+          tax: false,
+          isDiscount: true,
+        }
+      : {
+          productName: "",
+          description: "",
+          rate: "$0.00",
+          qty: "1",
+          amount: "$0.00",
+          tax: false,
+          isDiscount: false,
+        };
     setRows([...rows, newRow]);
   };
   const deleteRow = (index) => {
@@ -446,14 +601,14 @@ const handleReset = () => {
       calculateTotal(subtotal, taxRate);
     };
     calculateSubtotal();
-  }, [rows,taxRate]);
+  }, [rows, taxRate]);
 
   const [ProposalsTemplates, setProposalsTemplates] = useState([]);
 
   useEffect(() => {
     fetchPrprosalsAllData();
   }, []);
- const [loading, setLoading] = useState(true); // Loader state
+  const [loading, setLoading] = useState(true); // Loader state
   const fetchPrprosalsAllData = async () => {
     setLoading(true); // Start loader
 
@@ -470,8 +625,7 @@ const handleReset = () => {
       console.log(data);
     } catch (error) {
       console.error("Error fetching Proposals  templates:", error);
-    }
-    finally {
+    } finally {
       // Wait for the fetch and the 3-second timer to complete
       await loaderDelay;
       setLoading(false); // Stop loader
@@ -490,7 +644,7 @@ const handleReset = () => {
     const { value } = e.target;
     setTermsandConditionName(value);
   };
-const [proposalNameError, setProposalNameError] = useState("");
+  const [proposalNameError, setProposalNameError] = useState("");
 
   const [introductionBodyError, setIntroductionBodyError] = useState("");
   const [termsBodyError, setTermsBodyError] = useState("");
@@ -504,42 +658,45 @@ const [proposalNameError, setProposalNameError] = useState("");
   //   // return isValid;
   //   return Object.keys(tempErrors).length === 0;
   // };
- const validateForm = () => {
-  let isValid = true;
-  const currentStep = steps[activeStep];
+  const validateForm = () => {
+    let isValid = true;
+    const currentStep = steps[activeStep];
 
-  // Common validation for all steps
-  if (!proposalName) {
-    setProposalNameError("Name is required");
-    isValid = false;
-  } else {
-    setProposalNameError("");
-  }
+    // Common validation for all steps
+    if (!proposalName) {
+      setProposalNameError("Name is required");
+      isValid = false;
+    } else {
+      setProposalNameError("");
+    }
 
-  // Step-specific validation
-  if (currentStep === "Introduction" && !introductionContent) {
-    setIntroductionBodyError("Body is required");
-    isValid = false;
-  } else {
-    setIntroductionBodyError("");
-  }
+    // Step-specific validation
+    if (currentStep === "Introduction" && !introductionContent) {
+      setIntroductionBodyError("Body is required");
+      isValid = false;
+    } else {
+      setIntroductionBodyError("");
+    }
 
-  if (currentStep === "Terms" && !termsContent) {
-    setTermsBodyError("Body is required");
-    isValid = false;
-  } else {
-    setTermsBodyError("");
-  }
+    if (currentStep === "Terms" && !termsContent) {
+      setTermsBodyError("Body is required");
+      isValid = false;
+    } else {
+      setTermsBodyError("");
+    }
 
-  if ((currentStep === "Services & Invoices" || currentStep === "Payments") && !activeOption) {
-    setSelectedOptionError("An option must be selected");
-    isValid = false;
-  } else {
-    setSelectedOptionError("");
-  }
+    if (
+      (currentStep === "Services & Invoices" || currentStep === "Payments") &&
+      !activeOption
+    ) {
+      setSelectedOptionError("An option must be selected");
+      isValid = false;
+    } else {
+      setSelectedOptionError("");
+    }
 
-  return isValid;
-};
+    return isValid;
+  };
   const createsaveProposaltemp = () => {
     if (!validateForm()) {
       return false;
@@ -547,7 +704,7 @@ const [proposalNameError, setProposalNameError] = useState("");
     console.log(invoiceData);
     const currentStep = steps[activeStep];
     // if (activeStep !== 3) {
-      if (["General", "Introduction", "Terms"].includes(currentStep)) {
+    if (["General", "Introduction", "Terms"].includes(currentStep)) {
       const options = {
         method: "POST",
         headers: {
@@ -575,155 +732,182 @@ const [proposalNameError, setProposalNameError] = useState("");
         }),
       };
       console.log(options.body);
-      fetch(`${PROPOSAL_API}/workflow/proposalesandels/proposalesandels`, options)
+      fetch(
+        `${PROPOSAL_API}/workflow/proposalesandels/proposalesandels`,
+        options
+      )
         .then((response) => response.json())
         .then((result) => {
           console.log(result.message);
           // toast.success("Invoice created successfully");
-          if (result && result.message === "ProposalesAndEls Template created successfully") {
+          if (
+            result &&
+            result.message === "ProposalesAndEls Template created successfully"
+          ) {
             fetchPrprosalsAllData();
             toast.success("ProposalesAndEls Template created successfully");
           } else {
-            toast.error(result.message || "Failed to create ProposalesAndEls Template");
+            toast.error(
+              result.message || "Failed to create ProposalesAndEls Template"
+            );
           }
         })
         .catch((error) => {
           console.error("Error:", error);
         });
-    }
-    else if (currentStep === "Services & Invoices" || currentStep === "Payments") {
-    if (activeOption === "invoice") {
-      const options = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          templatename: templatename,
-          teammember: combinedValues,
-          proposalname: proposalName,
-          introduction: stepsVisibility.Introduction,
-          terms: stepsVisibility.Terms,
-          servicesandinvoices: stepsVisibility.ServicesInvoices,
-          introductiontext: introductionContent,
-          // servicesandinvoiceid: "66fa83ffe6e0f4ca11c2204d",
-          custommessageinemail: stepsVisibility.CustomEmailMessage,
-          custommessageinemailtext: description,
-          reminders: stepsVisibility.Reminders,
-          daysuntilnextreminder: daysuntilNextReminder,
-          numberofreminder: noOfReminder,
-          introductiontextname: introductionname,
-          introductiontext: introductionContent,
-          termsandconditionsname: termsandconditionname,
-          termsandconditions: termsContent,
-
-          servicesandinvoicetempid: invoiceData.servicesandinvoicetempid,
-          invoicetemplatename: invoiceData.invoicetemplatename,
-          invoiceteammember: invoiceData.invoiceteammember,
-          issueinvoice: invoiceData.issueinvoice,
-          specificdate: invoiceData.specificdate,
-          specifictime: invoiceData.specifictime,
-          description: invoiceData.description,
-          lineItems: invoiceData.lineItems,
-          summary: invoiceData.summary,
-          notetoclient: invoiceData.notetoclient,
-
-          Addinvoiceoraskfordeposit: addInvoice,
-          Additemizedserviceswithoutcreatinginvoices: addInvoiceitemized,
-          paymentterms: paymentterms,
-          paymentduedate: paymentduedate,
-          paymentamount: paymentamount,
-          active: true,
-        }),
-      };
-      console.log(options.body);
-      fetch(`${PROPOSAL_API}/workflow/proposalesandels/proposalesandels`, options)
-        .then((response) => response.json())
-        .then((result) => {
-          console.log(result.message);
-          // toast.success("Invoice created successfully");
-          if (result && result.message === "ProposalesAndEls Template created successfully") {
-            fetchPrprosalsAllData();
-            toast.success("ProposalesAndEls Template created successfully");
-          } else {
-            toast.error(result.message || "Failed to create ProposalesAndEls Template");
-          }
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-        });
-    }
-
-    if (activeOption === "service") {
-      const lineItems = rows.map((item) => ({
-        productorService: item.productName, // Assuming productName maps to productorService
-        description: item.description,
-        rate: item.rate.replace("$", ""), // Removing '$' sign from rate
-        quantity: item.qty,
-        amount: item.amount.replace("$", ""), // Removing '$' sign from amount
-        tax: item.tax.toString(), // Converting boolean to string
-      }));
-
-      const options = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          templatename: templatename,
-          teammember: combinedValues,
-          proposalname: proposalName,
-          introduction: stepsVisibility.Introduction,
-          terms: stepsVisibility.Terms,
-          servicesandinvoices: stepsVisibility.ServicesInvoices,
-          introductiontext: introductionContent,
-         
-          custommessageinemail: stepsVisibility.CustomEmailMessage,
-          custommessageinemailtext: description,
-          reminders: stepsVisibility.Reminders,
-          daysuntilnextreminder: daysuntilNextReminder,
-          numberofreminder: noOfReminder,
-          introductiontextname: introductionname,
-          introductiontext: introductionContent,
-          termsandconditionsname: termsandconditionname,
-          termsandconditions: termsContent,
-          servicesandinvoicetempid: invoiceData.servicesandinvoicetempid,
-          
-          lineItems: lineItems,
-          summary: {
-            subtotal: subtotal,
-            taxRate: taxRate,
-            taxTotal: taxTotal,
-            total: totalAmount,
+    } else if (
+      currentStep === "Services & Invoices" ||
+      currentStep === "Payments"
+    ) {
+      if (activeOption === "invoice") {
+        const options = {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-          
-          Addinvoiceoraskfordeposit: addInvoice,
-          Additemizedserviceswithoutcreatinginvoices: addInvoiceitemized,
-          
-          active: true,
-        }),
-      };
-      console.log(options.body);
-      fetch(`${PROPOSAL_API}/workflow/proposalesandels/proposalesandels`, options)
-        .then((response) => response.json())
-        .then((result) => {
-          console.log(result.message);
-          // toast.success("Invoice created successfully");
-          if (result && result.message === "ProposalesAndEls Template created successfully") {
-            fetchPrprosalsAllData();
-            toast.success("ProposalesAndEls Template created successfully");
-          } else {
-            toast.error(result.message || "Failed to create ProposalesAndEls Template");
-          }
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-        });
-    }
-  }
+          body: JSON.stringify({
+            templatename: templatename,
+            teammember: combinedValues,
+            proposalname: proposalName,
+            introduction: stepsVisibility.Introduction,
+            terms: stepsVisibility.Terms,
+            servicesandinvoices: stepsVisibility.ServicesInvoices,
+            introductiontext: introductionContent,
+            // servicesandinvoiceid: "66fa83ffe6e0f4ca11c2204d",
+            custommessageinemail: stepsVisibility.CustomEmailMessage,
+            custommessageinemailtext: description,
+            reminders: stepsVisibility.Reminders,
+            daysuntilnextreminder: daysuntilNextReminder,
+            numberofreminder: noOfReminder,
+            introductiontextname: introductionname,
+            introductiontext: introductionContent,
+            termsandconditionsname: termsandconditionname,
+            termsandconditions: termsContent,
 
-   return true;
-    
+            servicesandinvoicetempid: invoiceData.servicesandinvoicetempid,
+            invoicetemplatename: invoiceData.invoicetemplatename,
+            invoiceteammember: invoiceData.invoiceteammember,
+            issueinvoice: invoiceData.issueinvoice,
+            specificdate: invoiceData.specificdate,
+            specifictime: invoiceData.specifictime,
+            description: invoiceData.description,
+            lineItems: invoiceData.lineItems,
+            summary: invoiceData.summary,
+            notetoclient: invoiceData.notetoclient,
+
+            Addinvoiceoraskfordeposit: addInvoice,
+            Additemizedserviceswithoutcreatinginvoices: addInvoiceitemized,
+            paymentterms: paymentterms,
+            paymentduedate: paymentduedate,
+            paymentamount: paymentamount,
+            active: true,
+          }),
+        };
+        console.log(options.body);
+        fetch(
+          `${PROPOSAL_API}/workflow/proposalesandels/proposalesandels`,
+          options
+        )
+          .then((response) => response.json())
+          .then((result) => {
+            console.log(result.message);
+            // toast.success("Invoice created successfully");
+            if (
+              result &&
+              result.message ===
+                "ProposalesAndEls Template created successfully"
+            ) {
+              fetchPrprosalsAllData();
+              toast.success("ProposalesAndEls Template created successfully");
+            } else {
+              toast.error(
+                result.message || "Failed to create ProposalesAndEls Template"
+              );
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      }
+
+      if (activeOption === "service") {
+        const lineItems = rows.map((item) => ({
+          productorService: item.productName, // Assuming productName maps to productorService
+          description: item.description,
+          rate: item.rate.replace("$", ""), // Removing '$' sign from rate
+          quantity: item.qty,
+          amount: item.amount.replace("$", ""), // Removing '$' sign from amount
+          tax: item.tax.toString(), // Converting boolean to string
+        }));
+
+        const options = {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            templatename: templatename,
+            teammember: combinedValues,
+            proposalname: proposalName,
+            introduction: stepsVisibility.Introduction,
+            terms: stepsVisibility.Terms,
+            servicesandinvoices: stepsVisibility.ServicesInvoices,
+            introductiontext: introductionContent,
+
+            custommessageinemail: stepsVisibility.CustomEmailMessage,
+            custommessageinemailtext: description,
+            reminders: stepsVisibility.Reminders,
+            daysuntilnextreminder: daysuntilNextReminder,
+            numberofreminder: noOfReminder,
+            introductiontextname: introductionname,
+            introductiontext: introductionContent,
+            termsandconditionsname: termsandconditionname,
+            termsandconditions: termsContent,
+            servicesandinvoicetempid: invoiceData.servicesandinvoicetempid,
+
+            lineItems: lineItems,
+            summary: {
+              subtotal: subtotal,
+              taxRate: taxRate,
+              taxTotal: taxTotal,
+              total: totalAmount,
+            },
+
+            Addinvoiceoraskfordeposit: addInvoice,
+            Additemizedserviceswithoutcreatinginvoices: addInvoiceitemized,
+
+            active: true,
+          }),
+        };
+        console.log(options.body);
+        fetch(
+          `${PROPOSAL_API}/workflow/proposalesandels/proposalesandels`,
+          options
+        )
+          .then((response) => response.json())
+          .then((result) => {
+            console.log(result.message);
+            // toast.success("Invoice created successfully");
+            if (
+              result &&
+              result.message ===
+                "ProposalesAndEls Template created successfully"
+            ) {
+              fetchPrprosalsAllData();
+              toast.success("ProposalesAndEls Template created successfully");
+            } else {
+              toast.error(
+                result.message || "Failed to create ProposalesAndEls Template"
+              );
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      }
+    }
+
+    return true;
   };
 
   // const handleDuplicateProposal = async (id) => {
@@ -816,7 +1000,9 @@ const [proposalNameError, setProposalNameError] = useState("");
   //delete template
   const handleDelete = (_id) => {
     // Show a confirmation prompt
-    const isConfirmed = window.confirm("Are you sure you want to delete this Job template?");
+    const isConfirmed = window.confirm(
+      "Are you sure you want to delete this Job template?"
+    );
 
     // Proceed with deletion if confirmed
     if (isConfirmed) {
@@ -835,7 +1021,7 @@ const [proposalNameError, setProposalNameError] = useState("");
         .then((result) => {
           console.log(result);
           toast.success("Item deleted successfully");
-          handleCloseOptions()
+          handleCloseOptions();
           setShowForm(false);
           fetchPrprosalsAllData();
           fetchServiceData();
@@ -862,19 +1048,19 @@ const [proposalNameError, setProposalNameError] = useState("");
   //   setOpenMenuId(openMenuId === _id ? null : _id);
   //   setTempIdGet(_id);
   // };
-  
-    const toggleMenu = (event, _id) => {
+
+  const toggleMenu = (event, _id) => {
     setAnchorEl(event.currentTarget);
     setOpenMenuId(_id);
     setTempIdGet(_id);
   };
-    const handleCloseOptions = () => {
+  const handleCloseOptions = () => {
     setAnchorEl(null);
     setOpenMenuId(null);
     setTempIdGet(null);
   };
   // const [anchorEl, setAnchorEl] = useState(null);
-  
+
   // useEffect(() => {
   //   const handleClickOutside = (event) => {
   //     if (!event.target.closest(".menu-container")) {
@@ -886,7 +1072,7 @@ const [proposalNameError, setProposalNameError] = useState("");
   //     document.removeEventListener("mousedown", handleClickOutside);
   //   };
   // }, []);
-  
+
   //*****Payments */
 
   const [paymentterms, setPaymentTerms] = useState("");
@@ -905,7 +1091,6 @@ const [proposalNameError, setProposalNameError] = useState("");
     setPaymentAmount(value);
   };
 
- 
   const [anchorElNew, setAnchorElNew] = useState(null);
   const [selectedRow, setSelectedRow] = useState(null);
 
@@ -950,7 +1135,9 @@ const [proposalNameError, setProposalNameError] = useState("");
       const updatedRows = [...rows];
 
       // Calculate the amount based on rate and qty
-      const rateValue = parseFloat(selectedRowData.rate.replace(/[^0-9.-]+/g, "")); // Removing currency symbol
+      const rateValue = parseFloat(
+        selectedRowData.rate.replace(/[^0-9.-]+/g, "")
+      ); // Removing currency symbol
       const qtyValue = parseInt(selectedRowData.qty) || 0; // Convert to integer
 
       const amount = (rateValue * qtyValue).toFixed(2); // Calculate amount
@@ -977,7 +1164,9 @@ const [proposalNameError, setProposalNameError] = useState("");
     if (selectedRow !== null) {
       const duplicatedRow = {
         ...rows[selectedRow],
-        productName: rows[selectedRow].productName ? `${rows[selectedRow].productName} Copy` : "Copy",
+        productName: rows[selectedRow].productName
+          ? `${rows[selectedRow].productName} Copy`
+          : "Copy",
       };
       const updatedRows = [...rows, duplicatedRow];
       setRows(updatedRows); // Update the state with the duplicated row
@@ -1048,7 +1237,10 @@ const [proposalNameError, setProposalNameError] = useState("");
       .then((result) => {
         console.log(result.message);
 
-        if (result && result.message === "ServiceTemplate created successfully") {
+        if (
+          result &&
+          result.message === "ServiceTemplate created successfully"
+        ) {
           toast.success("ServiceTemplate created successfully");
           handleNewDrawerClose();
           // fetchServicesData();
@@ -1065,7 +1257,10 @@ const [proposalNameError, setProposalNameError] = useState("");
       })
       .catch((error) => {
         console.log(error);
-        const errorMessage = error.response && error.response.message ? error.response.message : "Failed to create invoice";
+        const errorMessage =
+          error.response && error.response.message
+            ? error.response.message
+            : "Failed to create invoice";
         toast.error(errorMessage);
       });
   };
@@ -1159,7 +1354,14 @@ const [proposalNameError, setProposalNameError] = useState("");
     const qty = selectedRowData?.qty || 0;
     const calculatedAmount = rate * qty;
 
-    console.log("Rate: ", rate, "Qty: ", qty, "Total Amount: $", calculatedAmount.toFixed(2));
+    console.log(
+      "Rate: ",
+      rate,
+      "Qty: ",
+      qty,
+      "Total Amount: $",
+      calculatedAmount.toFixed(2)
+    );
     setTotalamount(`$${calculatedAmount.toFixed(2)}`);
   }, [selectedRowData?.rate, selectedRowData?.qty]);
 
@@ -1172,8 +1374,19 @@ const [proposalNameError, setProposalNameError] = useState("");
           <Box>
             <Typography sx={{ fontWeight: "bold" }}>General </Typography>
             <Box mt={2}>
-            <InputLabel sx={{ color: "black" }}>Template name (not visible to clients)</InputLabel>
-              <TextField error={!!errors.templatename} placeholder="Template name (not visible to clients)" value={templatename} onChange={(e) => settemplatename(e.target.value)} size="small" margin="normal" fullWidth sx={{ backgroundColor: "#fff" }} />
+              <InputLabel sx={{ color: "black" }}>
+                Template name (not visible to clients)
+              </InputLabel>
+              <TextField
+                error={!!errors.templatename}
+                placeholder="Template name (not visible to clients)"
+                value={templatename}
+                onChange={(e) => settemplatename(e.target.value)}
+                size="small"
+                margin="normal"
+                fullWidth
+                sx={{ backgroundColor: "#fff" }}
+              />
               {!!errors.templatename && (
                 <Alert
                   sx={{
@@ -1203,60 +1416,74 @@ const [proposalNameError, setProposalNameError] = useState("");
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
                   <Box ml={2}>
-                  <InputLabel sx={{ color: "black" }}>Team Member</InputLabel>
-<MultiSelectDropdown 
-  value={selectedUser}
-  onChange={handleUserChange}
-  placeholder="TeamMember"
-/>
+                    <InputLabel sx={{ color: "black" }}>Team Member</InputLabel>
+                    <MultiSelectDropdown
+                      value={selectedUser}
+                      onChange={handleUserChange}
+                      placeholder="TeamMember"
+                    />
                     {/* <Autocomplete multiple sx={{ mt: 2, backgroundColor: "#fff" }} options={options} size="small" getOptionLabel={(option) => option.label} value={selectedUser} onChange={handleUserChange} renderInput={(params) => <TextField {...params} variant="outlined" placeholder="Assignees" />} isOptionEqualToValue={(option, value) => option.value === value.value} /> */}
                   </Box>
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <Box ml={3}>
-                  <InputLabel sx={{ color: "black" }}>Proposal name (visible to clients)</InputLabel>
-                    <TextField fullWidth 
-                    // value={proposalName + selectedShortcut} 
-                    // onChange={handleProposalName} 
+                    <InputLabel sx={{ color: "black" }}>
+                      Proposal name (visible to clients)
+                    </InputLabel>
+                    <TextField
+                      fullWidth
+                      // value={proposalName + selectedShortcut}
+                      // onChange={handleProposalName}
                       error={!!proposalNameError}
-                    inputRef={textFieldRef}
-                    value={proposalName} 
-                    onChange={handleProposalName} 
-                    onClick={(e) => setCursorPosition(e.target.selectionStart)}
-                    placeholder="Proposal name (visible to clients)" size="small" sx={{ mt: 2, backgroundColor: "#fff" }} />
-                     {!!proposalNameError && (
-                                          <Alert
-                                            sx={{
-                                              width: "96%",
-                                              p: "0", // Adjust padding to control the size
-                                              pl: "4%",
-                                              height: "23px",
-                                              borderRadius: "10px",
-                                              borderTopLeftRadius: "0",
-                                              borderTopRightRadius: "0",
-                                              fontSize: "15px",
-                                              display: "flex",
-                                              alignItems: "center", // Center content vertically
-                                              "& .MuiAlert-icon": {
-                                                fontSize: "16px", // Adjust the size of the icon
-                                                mr: "8px", // Add margin to the right of the icon
-                                              },
-                                            }}
-                                            variant="filled"
-                                            severity="error"
-                                          >
-                                            {proposalNameError}
-                                          </Alert>
-                                        )}
+                      inputRef={textFieldRef}
+                      value={proposalName}
+                      onChange={handleProposalName}
+                      onClick={(e) =>
+                        setCursorPosition(e.target.selectionStart)
+                      }
+                      placeholder="Proposal name (visible to clients)"
+                      size="small"
+                      sx={{ mt: 2, backgroundColor: "#fff" }}
+                    />
+                    {!!proposalNameError && (
+                      <Alert
+                        sx={{
+                          width: "96%",
+                          p: "0", // Adjust padding to control the size
+                          pl: "4%",
+                          height: "23px",
+                          borderRadius: "10px",
+                          borderTopLeftRadius: "0",
+                          borderTopRightRadius: "0",
+                          fontSize: "15px",
+                          display: "flex",
+                          alignItems: "center", // Center content vertically
+                          "& .MuiAlert-icon": {
+                            fontSize: "16px", // Adjust the size of the icon
+                            mr: "8px", // Add margin to the right of the icon
+                          },
+                        }}
+                        variant="filled"
+                        severity="error"
+                      >
+                        {proposalNameError}
+                      </Alert>
+                    )}
                     <Box>
-                      <Button variant="contained" color="primary" onClick={toggleDropdown} sx={{
-                            backgroundColor: 'var(--color-save-btn)',  // Normal background
-                           
-                            '&:hover': {
-                              backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                            },
-                            borderRadius:'15px', mt: 2
-                          }}>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={toggleDropdown}
+                        sx={{
+                          backgroundColor: "var(--color-save-btn)", // Normal background
+
+                          "&:hover": {
+                            backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+                          },
+                          borderRadius: "15px",
+                          mt: 2,
+                        }}
+                      >
                         Add Shortcode
                       </Button>
 
@@ -1274,14 +1501,28 @@ const [proposalNameError, setProposalNameError] = useState("");
                         }}
                       >
                         <Box>
-                          <List className="dropdown-list" sx={{ width: "300px", height: "300px", cursor: "pointer" }}>
+                          <List
+                            className="dropdown-list"
+                            sx={{
+                              width: "300px",
+                              height: "300px",
+                              cursor: "pointer",
+                            }}
+                          >
                             {filteredShortcuts.map((shortcut, index) => (
-                              <ListItem key={index} onClick={() => handleAddShortcut(shortcut.value)}>
+                              <ListItem
+                                key={index}
+                                onClick={() =>
+                                  handleAddShortcut(shortcut.value)
+                                }
+                              >
                                 <ListItemText
                                   primary={shortcut.title}
                                   primaryTypographyProps={{
                                     style: {
-                                      fontWeight: shortcut.isBold ? "bold" : "normal",
+                                      fontWeight: shortcut.isBold
+                                        ? "bold"
+                                        : "normal",
                                     },
                                   }}
                                 />
@@ -1291,8 +1532,6 @@ const [proposalNameError, setProposalNameError] = useState("");
                         </Box>
                       </Popover>
                     </Box>
-
-
                   </Box>
                 </Grid>
               </Grid>
@@ -1300,30 +1539,119 @@ const [proposalNameError, setProposalNameError] = useState("");
 
             <FormControl component="fieldset" sx={{ width: "100%", mt: 3 }}>
               <Typography sx={{ fontWeight: "bold" }}>Steps </Typography>
-              <Box sx={{ border: "1px solid grey", borderRadius: "20px", padding: "15px", mb: 2, mt: 2 }} className="stepsCard">
-                <FormControlLabel control={<Switch checked={stepsVisibility.Introduction} onChange={handleSwitchChange("Introduction")} />} label="Introduction" />
-                <p>Explain to your clients who you are, what services you provide, the value you bring, and any other information you want to share</p>
+              <Box
+                sx={{
+                  border: "1px solid grey",
+                  borderRadius: "20px",
+                  padding: "15px",
+                  mb: 2,
+                  mt: 2,
+                }}
+                className="stepsCard"
+              >
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={stepsVisibility.Introduction}
+                      onChange={handleSwitchChange("Introduction")}
+                    />
+                  }
+                  label="Introduction"
+                />
+                <p>
+                  Explain to your clients who you are, what services you
+                  provide, the value you bring, and any other information you
+                  want to share
+                </p>
               </Box>
-              <Box sx={{ border: "1px solid grey", borderRadius: "20px", padding: "15px", mb: 2 }} className="stepsCard">
-                <FormControlLabel control={<Switch checked={stepsVisibility.Terms} onChange={handleSwitchChange("Terms")} />} label="Terms" />
-                <p>Engagement letter or contractual agreement that outlines the terms of the relationship between your firm and clients. The section title can be renamed.</p>
+              <Box
+                sx={{
+                  border: "1px solid grey",
+                  borderRadius: "20px",
+                  padding: "15px",
+                  mb: 2,
+                }}
+                className="stepsCard"
+              >
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={stepsVisibility.Terms}
+                      onChange={handleSwitchChange("Terms")}
+                    />
+                  }
+                  label="Terms"
+                />
+                <p>
+                  Engagement letter or contractual agreement that outlines the
+                  terms of the relationship between your firm and clients. The
+                  section title can be renamed.
+                </p>
               </Box>
-              <Box sx={{ border: "1px solid grey", borderRadius: "20px", padding: "15px", mb: 2 }} className="stepsCard">
-                <FormControlLabel control={<Switch checked={stepsVisibility.ServicesInvoices} onChange={handleSwitchChange("ServicesInvoices")} />} label="Services & Invoices" />
-                <p>Specify the services your firm will provide. Add one-time or recurring invoices to get paid automatically.</p>
+              <Box
+                sx={{
+                  border: "1px solid grey",
+                  borderRadius: "20px",
+                  padding: "15px",
+                  mb: 2,
+                }}
+                className="stepsCard"
+              >
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={stepsVisibility.ServicesInvoices}
+                      onChange={handleSwitchChange("ServicesInvoices")}
+                    />
+                  }
+                  label="Services & Invoices"
+                />
+                <p>
+                  Specify the services your firm will provide. Add one-time or
+                  recurring invoices to get paid automatically.
+                </p>
               </Box>
 
-              <Box sx={{ border: "1px solid grey", borderRadius: "20px", padding: "15px", mb: 2, mt: 2 }} className="stepsCard">
-                <Box display="flex" alignItems="center" justifyContent="space-between" mb={1}>
-                  <FormControlLabel control={<Switch checked={stepsVisibility.CustomEmailMessage} onChange={handleSwitchChange("CustomEmailMessage")} />} label="Custom message in email" />
-                  <Box sx={{ backgroundColor: "var(--colors-core-blue-600)", padding: "5px 10px", borderRadius: "5px" }}>
+              <Box
+                sx={{
+                  border: "1px solid grey",
+                  borderRadius: "20px",
+                  padding: "15px",
+                  mb: 2,
+                  mt: 2,
+                }}
+                className="stepsCard"
+              >
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="space-between"
+                  mb={1}
+                >
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={stepsVisibility.CustomEmailMessage}
+                        onChange={handleSwitchChange("CustomEmailMessage")}
+                      />
+                    }
+                    label="Custom message in email"
+                  />
+                  <Box
+                    sx={{
+                      backgroundColor: "var(--colors-core-blue-600)",
+                      padding: "5px 10px",
+                      borderRadius: "5px",
+                    }}
+                  >
                     <Typography variant="body2" fontWeight="bold" color="white">
                       Best practice
                     </Typography>
                   </Box>
                 </Box>
                 <Typography variant="body2" color="textSecondary">
-                  Your client will receive a link via email to view and sign this proposal.
+                  Your client will receive a link via email to view and sign
+                  this proposal.
                 </Typography>
 
                 {/* Conditionally render the WYSIWYG editor or static content */}
@@ -1344,14 +1672,28 @@ const [proposalNameError, setProposalNameError] = useState("");
                         }}
                       >
                         <Box>
-                          <List className="dropdown-list" sx={{ width: "300px", height: "300px", cursor: "pointer" }}>
+                          <List
+                            className="dropdown-list"
+                            sx={{
+                              width: "300px",
+                              height: "300px",
+                              cursor: "pointer",
+                            }}
+                          >
                             {filteredShortcuts.map((shortcut, index) => (
-                              <ListItem key={index} onClick={() => handleAddShortcut(shortcut.value)}>
+                              <ListItem
+                                key={index}
+                                onClick={() =>
+                                  handleAddShortcut(shortcut.value)
+                                }
+                              >
                                 <ListItemText
                                   primary={shortcut.title}
                                   primaryTypographyProps={{
                                     style: {
-                                      fontWeight: shortcut.isBold ? "bold" : "normal",
+                                      fontWeight: shortcut.isBold
+                                        ? "bold"
+                                        : "normal",
                                     },
                                   }}
                                 />
@@ -1363,7 +1705,10 @@ const [proposalNameError, setProposalNameError] = useState("");
                     </Box>
 
                     <Box mt={2}>
-                      <EditorShortcodes onChange={handleEditorChange} content={description} />
+                      <EditorShortcodes
+                        onChange={handleEditorChange}
+                        content={description}
+                      />
                     </Box>
                   </Grid>
                 )}
@@ -1372,13 +1717,28 @@ const [proposalNameError, setProposalNameError] = useState("");
               <Box mt={2}>
                 <Box display={"flex"} alignItems={"center"}>
                   <Box>
-                    <FormControlLabel control={<Switch checked={stepsVisibility.Reminders} onChange={handleSwitchChange("Reminders")} />} label="Reminders" />
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={stepsVisibility.Reminders}
+                          onChange={handleSwitchChange("Reminders")}
+                        />
+                      }
+                      label="Reminders"
+                    />
                   </Box>
                   {/* <Typography variant='h6'>Reminders</Typography> */}
                 </Box>
                 {stepsVisibility.Reminders && (
                   <Box mb={3}>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 3, mt: 2 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 3,
+                        mt: 2,
+                      }}
+                    >
                       <Box>
                         {/* <InputLabel sx={{ color: 'black' }}>Days until next reminder</InputLabel> */}
                         <TextField
@@ -1386,7 +1746,9 @@ const [proposalNameError, setProposalNameError] = useState("");
                           fullWidth
                           name="Daysuntilnextreminder"
                           value={daysuntilNextReminder}
-                          onChange={(e) => setDaysuntilNextReminder(e.target.value)}
+                          onChange={(e) =>
+                            setDaysuntilNextReminder(e.target.value)
+                          }
                           placeholder="Days until next reminder"
                           size="small"
                           sx={{ mt: 2 }}
@@ -1396,7 +1758,16 @@ const [proposalNameError, setProposalNameError] = useState("");
 
                       <Box>
                         {/* <InputLabel sx={{ color: 'black' }}>No Of reminders</InputLabel> */}
-                        <TextField fullWidth name="No Of reminders" value={noOfReminder} onChange={(e) => setNoOfReminder(e.target.value)} placeholder="NoOfreminders" size="small" sx={{ mt: 2 }} label="No Of reminders" />
+                        <TextField
+                          fullWidth
+                          name="No Of reminders"
+                          value={noOfReminder}
+                          onChange={(e) => setNoOfReminder(e.target.value)}
+                          placeholder="NoOfreminders"
+                          size="small"
+                          sx={{ mt: 2 }}
+                          label="No Of reminders"
+                        />
                       </Box>
                     </Box>
                   </Box>
@@ -1421,31 +1792,34 @@ const [proposalNameError, setProposalNameError] = useState("");
                 value={introductionname}
               />
             </Box>
-            <Editor onChange={handleIntroductionChange} content={introductionContent} />
-           {!!introductionBodyError && (
-                        <Alert
-                          sx={{
-                            width: "96%",
-                            p: 0,
-                            pl: "4%",
-                            height: "23px",
-                            borderRadius: "10px",
-                            borderTopLeftRadius: 0,
-                            borderTopRightRadius: 0,
-                            fontSize: "15px",
-                            display: "flex",
-                            alignItems: "center",
-                            "& .MuiAlert-icon": {
-                              fontSize: "16px",
-                              mr: "8px",
-                            },
-                          }}
-                          variant="filled"
-                          severity="error"
-                        >
-                          {introductionBodyError}
-                        </Alert>
-                      )}
+            <Editor
+              onChange={handleIntroductionChange}
+              content={introductionContent}
+            />
+            {!!introductionBodyError && (
+              <Alert
+                sx={{
+                  width: "96%",
+                  p: 0,
+                  pl: "4%",
+                  height: "23px",
+                  borderRadius: "10px",
+                  borderTopLeftRadius: 0,
+                  borderTopRightRadius: 0,
+                  fontSize: "15px",
+                  display: "flex",
+                  alignItems: "center",
+                  "& .MuiAlert-icon": {
+                    fontSize: "16px",
+                    mr: "8px",
+                  },
+                }}
+                variant="filled"
+                severity="error"
+              >
+                {introductionBodyError}
+              </Alert>
+            )}
           </Box>
         );
       case steps.indexOf("Terms"):
@@ -1466,71 +1840,95 @@ const [proposalNameError, setProposalNameError] = useState("");
               />
             </Box>
             <TermEditor onChange={handleTermsChange} content={termsContent} />
-         {!!termsBodyError && (
-                       <Alert
-                         sx={{
-                           width: "96%",
-                           p: 0,
-                           pl: "4%",
-                           height: "23px",
-                           borderRadius: "10px",
-                           borderTopLeftRadius: 0,
-                           borderTopRightRadius: 0,
-                           fontSize: "15px",
-                           display: "flex",
-                           alignItems: "center",
-                           "& .MuiAlert-icon": {
-                             fontSize: "16px",
-                             mr: "8px",
-                           },
-                         }}
-                         variant="filled"
-                         severity="error"
-                       >
-                         {termsBodyError}
-                       </Alert>
-                     )}
+            {!!termsBodyError && (
+              <Alert
+                sx={{
+                  width: "96%",
+                  p: 0,
+                  pl: "4%",
+                  height: "23px",
+                  borderRadius: "10px",
+                  borderTopLeftRadius: 0,
+                  borderTopRightRadius: 0,
+                  fontSize: "15px",
+                  display: "flex",
+                  alignItems: "center",
+                  "& .MuiAlert-icon": {
+                    fontSize: "16px",
+                    mr: "8px",
+                  },
+                }}
+                variant="filled"
+                severity="error"
+              >
+                {termsBodyError}
+              </Alert>
+            )}
           </Box>
         );
       case steps.indexOf("Services & Invoices"):
         return (
           <Box>
-            <Typography sx={{ fontWeight: "bold" }}>Choose one of the options</Typography>
+            <Typography sx={{ fontWeight: "bold" }}>
+              Choose one of the options
+            </Typography>
 
             <Typography
               sx={{
-                border: activeOption === "invoice" ? "1px solid blue" : "1px solid grey",
+                border:
+                  activeOption === "invoice"
+                    ? "1px solid blue"
+                    : "1px solid grey",
                 borderRadius: "20px",
                 padding: "15px",
                 cursor: "pointer",
                 marginTop: "15px",
-                backgroundColor: activeOption === "invoice" ? "rgba(90, 165, 230, 0.5)" : "transparent",
-                boxShadow: activeOption === "invoice" ? "0 0 10px rgba(0, 0, 0, 0.1)" : "none",
+                backgroundColor:
+                  activeOption === "invoice"
+                    ? "rgba(90, 165, 230, 0.5)"
+                    : "transparent",
+                boxShadow:
+                  activeOption === "invoice"
+                    ? "0 0 10px rgba(0, 0, 0, 0.1)"
+                    : "none",
                 fontWeight: "bold",
               }}
               onClick={handleShowInvoiceForm}
             >
               Add invoice or ask for deposit
-              <Typography component="p">Create one-time or recurring invoice, or ask for deposit to sign</Typography>
+              <Typography component="p">
+                Create one-time or recurring invoice, or ask for deposit to sign
+              </Typography>
             </Typography>
 
             <Typography
               sx={{
-                border: activeOption === "service" ? "1px solid blue" : "1px solid grey",
+                border:
+                  activeOption === "service"
+                    ? "1px solid blue"
+                    : "1px solid grey",
                 borderRadius: "20px",
                 padding: "15px",
                 cursor: "pointer",
                 marginTop: "15px",
-                backgroundColor: activeOption === "service" ? "rgba(90, 165, 230, 0.5)" : "transparent",
-                boxShadow: activeOption === "service" ? "0 0 10px rgba(0, 0, 0, 0.1)" : "none",
+                backgroundColor:
+                  activeOption === "service"
+                    ? "rgba(90, 165, 230, 0.5)"
+                    : "transparent",
+                boxShadow:
+                  activeOption === "service"
+                    ? "0 0 10px rgba(0, 0, 0, 0.1)"
+                    : "none",
                 fontWeight: "bold",
               }}
               onClick={handleShowServiceForm}
             >
               Add itemized services without creating invoices
-              <Typography component="p">No invoice or deposit request will be created</Typography>
+              <Typography component="p">
+                No invoice or deposit request will be created
+              </Typography>
             </Typography>
- {!!selctedOptionError && (
+            {!!selctedOptionError && (
               <Alert
                 sx={{
                   width: "96%",
@@ -1559,7 +1957,9 @@ const [proposalNameError, setProposalNameError] = useState("");
               {activeOption === "invoice" && (
                 <Box>
                   {/* <Typography>Invoice Form</Typography> */}
-                  <Invoice serviceandinvoiceSettings={serviceandinvoiceSettings} />
+                  <Invoice
+                    serviceandinvoiceSettings={serviceandinvoiceSettings}
+                  />
                 </Box>
               )}
             </Box>
@@ -1570,7 +1970,9 @@ const [proposalNameError, setProposalNameError] = useState("");
 
                 <Box sx={{ margin: "20px 0 10px 0" }}>
                   <Typography variant="h6">Line items</Typography>
-                  <Typography variant="body2">Client-facing itemized list of products and services</Typography>
+                  <Typography variant="body2">
+                    Client-facing itemized list of products and services
+                  </Typography>
                 </Box>
                 <Table sx={{ width: "100%", backgroundColor: "#fff" }}>
                   <TableHead>
@@ -1603,20 +2005,69 @@ const [proposalNameError, setProposalNameError] = useState("");
                             }}
                             menuPortalTarget={document.body}
                           /> */}
-                          <CreatableSelect placeholder="Product or Service" options={serviceoptions} value={serviceoptions.find((option) => option.label === row.productName) || { label: row.productName, value: row.productName }} onChange={(selectedOption) => handleServiceChange(index, selectedOption)} onInputChange={(inputValue, actionMeta) => handleServiceInputChange(inputValue, actionMeta, index)} isClearable />
+                          <CreatableSelect
+                            placeholder="Product or Service"
+                            options={serviceoptions}
+                            value={
+                              serviceoptions.find(
+                                (option) => option.label === row.productName
+                              ) || {
+                                label: row.productName,
+                                value: row.productName,
+                              }
+                            }
+                            onChange={(selectedOption) =>
+                              handleServiceChange(index, selectedOption)
+                            }
+                            onInputChange={(inputValue, actionMeta) =>
+                              handleServiceInputChange(
+                                inputValue,
+                                actionMeta,
+                                index
+                              )
+                            }
+                            isClearable
+                          />
                         </TableCell>
                         <TableCell>
-                          <input type="text" name="description" value={row.description} onChange={(e) => handleInputChange(index, e)} style={{ border: "none" }} placeholder="Description" />
+                          <input
+                            type="text"
+                            name="description"
+                            value={row.description}
+                            onChange={(e) => handleInputChange(index, e)}
+                            style={{ border: "none" }}
+                            placeholder="Description"
+                          />
                         </TableCell>
                         <TableCell>
-                          <input type="text" name="rate" value={row.rate} onChange={(e) => handleInputChange(index, e)} style={{ border: "none" }} />
+                          <input
+                            type="text"
+                            name="rate"
+                            value={row.rate}
+                            onChange={(e) => handleInputChange(index, e)}
+                            style={{ border: "none" }}
+                          />
                         </TableCell>
                         <TableCell>
-                          <input type="text" name="qty" value={row.qty} onChange={(e) => handleInputChange(index, e)} style={{ border: "none" }} />
+                          <input
+                            type="text"
+                            name="qty"
+                            value={row.qty}
+                            onChange={(e) => handleInputChange(index, e)}
+                            style={{ border: "none" }}
+                          />
                         </TableCell>
-                        <TableCell className={row.isDiscount ? "discount-amount" : ""}>{row.amount}</TableCell>
+                        <TableCell
+                          className={row.isDiscount ? "discount-amount" : ""}
+                        >
+                          {row.amount}
+                        </TableCell>
                         <TableCell>
-                          <Checkbox name="tax" checked={row.tax} onChange={(e) => handleInputChange(index, e)} />
+                          <Checkbox
+                            name="tax"
+                            checked={row.tax}
+                            onChange={(e) => handleInputChange(index, e)}
+                          />
                         </TableCell>
                         {/* <TableCell>
                             <IconButton>
@@ -1624,14 +2075,40 @@ const [proposalNameError, setProposalNameError] = useState("");
                             </IconButton>
                           </TableCell> */}
                         <TableCell>
-                          <IconButton onClick={(event) => handleMenuOpen(event, index)}>
+                          <IconButton
+                            onClick={(event) => handleMenuOpen(event, index)}
+                          >
                             <BsThreeDotsVertical />
                           </IconButton>
-                          <Menu anchorEl={anchorElNew} open={Boolean(anchorElNew) && selectedRow === index} onClose={handleMenuClose} anchorOrigin={{ vertical: "top", horizontal: "left" }} transformOrigin={{ vertical: "top", horizontal: "left" }}>
-                            <MenuItem onClick={() => handleEditService(row, index)}>Edit</MenuItem>
-                            <MenuItem onClick={handleDeleteService}>Delete</MenuItem>
-                            <MenuItem onClick={() => handleSaveAsNewService(row)}>Save as new service</MenuItem>
-                            <MenuItem onClick={handleDuplicate}>Duplicate</MenuItem>
+                          <Menu
+                            anchorEl={anchorElNew}
+                            open={Boolean(anchorElNew) && selectedRow === index}
+                            onClose={handleMenuClose}
+                            anchorOrigin={{
+                              vertical: "top",
+                              horizontal: "left",
+                            }}
+                            transformOrigin={{
+                              vertical: "top",
+                              horizontal: "left",
+                            }}
+                          >
+                            <MenuItem
+                              onClick={() => handleEditService(row, index)}
+                            >
+                              Edit
+                            </MenuItem>
+                            <MenuItem onClick={handleDeleteService}>
+                              Delete
+                            </MenuItem>
+                            <MenuItem
+                              onClick={() => handleSaveAsNewService(row)}
+                            >
+                              Save as new service
+                            </MenuItem>
+                            <MenuItem onClick={handleDuplicate}>
+                              Duplicate
+                            </MenuItem>
                           </Menu>
                         </TableCell>
                         <TableCell>
@@ -1644,11 +2121,26 @@ const [proposalNameError, setProposalNameError] = useState("");
                   </TableBody>
                 </Table>
 
-                <Box sx={{ display: "flex", alignItems: "center", gap: "20px", marginTop: "10px" }}>
-                  <Button onClick={() => addRow()} startIcon={<AiOutlinePlusCircle />} sx={{ color: "blue", fontSize: "18px" }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "20px",
+                    marginTop: "10px",
+                  }}
+                >
+                  <Button
+                    onClick={() => addRow()}
+                    startIcon={<AiOutlinePlusCircle />}
+                    sx={{ color: "blue", fontSize: "18px" }}
+                  >
                     Line item
                   </Button>
-                  <Button onClick={() => addRow(true)} startIcon={<CiDiscount1 />} sx={{ color: "blue", fontSize: "18px" }}>
+                  <Button
+                    onClick={() => addRow(true)}
+                    startIcon={<CiDiscount1 />}
+                    sx={{ color: "blue", fontSize: "18px" }}
+                  >
                     Discount
                   </Button>
                 </Box>
@@ -1666,10 +2158,21 @@ const [proposalNameError, setProposalNameError] = useState("");
                   <TableBody>
                     <TableRow>
                       <TableCell>
-                        <input type="number" value={subtotal} onChange={handleSubtotalChange} style={{ border: "none" }} />
+                        <input
+                          type="number"
+                          value={subtotal}
+                          onChange={handleSubtotalChange}
+                          style={{ border: "none" }}
+                        />
                       </TableCell>
                       <TableCell>
-                        <input type="number" value={taxRate} onChange={handleTaxRateChange} style={{ border: "none" }} />%
+                        <input
+                          type="number"
+                          value={taxRate}
+                          onChange={handleTaxRateChange}
+                          style={{ border: "none" }}
+                        />
+                        %
                       </TableCell>
                       <TableCell>${taxTotal.toFixed(2)}</TableCell>
                       <TableCell>${totalAmount}</TableCell>
@@ -1690,17 +2193,33 @@ const [proposalNameError, setProposalNameError] = useState("");
                     },
                   }}
                 >
-                  <Box role="presentation" sx={{ borderRadius: isSmallScreen ? "0" : "15px" }}>
+                  <Box
+                    role="presentation"
+                    sx={{ borderRadius: isSmallScreen ? "0" : "15px" }}
+                  >
                     <Box>
-                      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", p: 2, borderBottom: "1px solid grey" }}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          p: 2,
+                          borderBottom: "1px solid grey",
+                        }}
+                      >
                         <Typography variant="h6">Create Service</Typography>
-                        <RxCross2 onClick={handleNewDrawerClose} style={{ cursor: "pointer" }} />
+                        <RxCross2
+                          onClick={handleNewDrawerClose}
+                          style={{ cursor: "pointer" }}
+                        />
                       </Box>
                     </Box>
                     <form style={{ margin: "15px" }}>
                       <Box>
                         <Box>
-                          <InputLabel sx={{ color: "black" }}>Service Name</InputLabel>
+                          <InputLabel sx={{ color: "black" }}>
+                            Service Name
+                          </InputLabel>
                           <TextField
                             // margin="normal"
                             fullWidth
@@ -1709,11 +2228,18 @@ const [proposalNameError, setProposalNameError] = useState("");
                             size="small"
                             margin="normal"
                             value={selectedRowData?.productName || ""} // Use selected row data
-                            onChange={(e) => setSelectedRowData({ ...selectedRowData, productName: e.target.value })}
+                            onChange={(e) =>
+                              setSelectedRowData({
+                                ...selectedRowData,
+                                productName: e.target.value,
+                              })
+                            }
                           />
                         </Box>
                         <Box sx={{ mt: 1 }}>
-                          <InputLabel sx={{ color: "black" }}>Description</InputLabel>
+                          <InputLabel sx={{ color: "black" }}>
+                            Description
+                          </InputLabel>
                           <TextField
                             fullWidth
                             name="Description"
@@ -1721,27 +2247,42 @@ const [proposalNameError, setProposalNameError] = useState("");
                             size="small"
                             margin="normal"
                             value={selectedRowData?.description || ""} // Use selected row data
-                            onChange={(e) => setSelectedRowData({ ...selectedRowData, description: e.target.value })}
+                            onChange={(e) =>
+                              setSelectedRowData({
+                                ...selectedRowData,
+                                description: e.target.value,
+                              })
+                            }
                           />
                         </Box>
-                       
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+
+                        <Box
+                          sx={{ display: "flex", alignItems: "center", gap: 2 }}
+                        >
                           <Box width="50%">
-                            <Typography sx={{ color: "black" }}>Rate</Typography>
+                            <Typography sx={{ color: "black" }}>
+                              Rate
+                            </Typography>
                             <TextField
                               fullWidth
                               name="Rate"
                               placeholder="Rate"
                               size="small"
                               sx={{ mt: 1 }}
-                             
                               value={selectedRowData?.rate || ""} // Use selected row data
-                              onChange={(e) => setSelectedRowData({ ...selectedRowData, rate: e.target.value })}
+                              onChange={(e) =>
+                                setSelectedRowData({
+                                  ...selectedRowData,
+                                  rate: e.target.value,
+                                })
+                              }
                             />
                           </Box>
 
                           <Box width="50%">
-                            <Typography sx={{ color: "black" }}>Rate Type</Typography>
+                            <Typography sx={{ color: "black" }}>
+                              Rate Type
+                            </Typography>
                             <Autocomplete
                               size="small"
                               fullWidth
@@ -1750,8 +2291,16 @@ const [proposalNameError, setProposalNameError] = useState("");
                               getOptionLabel={(option) => option?.label || ""}
                               value={selectedRateOption}
                               onChange={handleRateTypeChange}
-                              renderInput={(params) => <TextField {...params} variant="outlined" placeholder="Select Rate Type" />}
-                              isOptionEqualToValue={(option, value) => option.value === value.value}
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  variant="outlined"
+                                  placeholder="Select Rate Type"
+                                />
+                              )}
+                              isOptionEqualToValue={(option, value) =>
+                                option.value === value.value
+                              }
                               renderOption={(props, option) => (
                                 <Box
                                   component="li"
@@ -1772,7 +2321,9 @@ const [proposalNameError, setProposalNameError] = useState("");
                             control={
                               <Switch
                                 checked={selectedRowData?.tax || false} // Use the tax value from state
-                                onChange={(event) => handleServiceSwitch(event.target.checked)}
+                                onChange={(event) =>
+                                  handleServiceSwitch(event.target.checked)
+                                }
                                 color="primary"
                               />
                             }
@@ -1781,12 +2332,18 @@ const [proposalNameError, setProposalNameError] = useState("");
                         </Box>
                         <Box>
                           <Box>
-                            <Typography variant="h5" gutterBottom sx={{ fontWeight: "bold", mt: 2 }}>
+                            <Typography
+                              variant="h5"
+                              gutterBottom
+                              sx={{ fontWeight: "bold", mt: 2 }}
+                            >
                               Category
                             </Typography>
                           </Box>
                           <Box>
-                            <InputLabel sx={{ color: "black", mt: 2 }}>Category Name</InputLabel>
+                            <InputLabel sx={{ color: "black", mt: 2 }}>
+                              Category Name
+                            </InputLabel>
                             <Autocomplete
                               size="small"
                               fullWidth
@@ -1795,21 +2352,36 @@ const [proposalNameError, setProposalNameError] = useState("");
                               getOptionLabel={(option) => option.label} // Adjust based on your data structure
                               value={selectedCategory}
                               onChange={handleCategoryChange}
-                              renderInput={(params) => <TextField {...params} placeholder="Category Name" variant="outlined" />}
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  placeholder="Category Name"
+                                  variant="outlined"
+                                />
+                              )}
                               clearOnEscape // Equivalent to isClearable
-                              isOptionEqualToValue={(option, value) => option.value === value.value} // Compare options for equality
+                              isOptionEqualToValue={(option, value) =>
+                                option.value === value.value
+                              } // Compare options for equality
                             />
                           </Box>
                         </Box>
                         <Box>
-                          <Button variant="contained" color="primary" onClick={setCategoryFormOpen}  sx={{
-                      backgroundColor: 'var(--color-save-btn)',  // Normal background
-                     
-                      '&:hover': {
-                        backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                      },
-                      borderRadius:'15px', mt: 4, ml: 1
-                    }}>
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={setCategoryFormOpen}
+                            sx={{
+                              backgroundColor: "var(--color-save-btn)", // Normal background
+
+                              "&:hover": {
+                                backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+                              },
+                              borderRadius: "15px",
+                              mt: 4,
+                              ml: 1,
+                            }}
+                          >
                             Create category
                           </Button>
 
@@ -1820,70 +2392,135 @@ const [proposalNameError, setProposalNameError] = useState("");
                             onClose={handleCategoryFormClose}
                             PaperProps={{
                               sx: {
-                                borderRadius: isSmallScreen ? "0" : "10px 0 0 10px",
+                                borderRadius: isSmallScreen
+                                  ? "0"
+                                  : "10px 0 0 10px",
                                 width: isSmallScreen ? "100%" : "650px",
                                 maxWidth: "100%",
                               },
                             }}
                           >
                             <Box>
-                              <Box style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px" }}>
-                                <ArrowBackRoundedIcon onClick={handleCategoryFormClose} style={{ cursor: "pointer" }} />
+                              <Box
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "space-between",
+                                  padding: "20px",
+                                }}
+                              >
+                                <ArrowBackRoundedIcon
+                                  onClick={handleCategoryFormClose}
+                                  style={{ cursor: "pointer" }}
+                                />
                               </Box>
                               <Divider />
                             </Box>
                             <Box p={3}>
-                              <InputLabel sx={{ color: "black", mt: 2 }}>Category Name</InputLabel>
+                              <InputLabel sx={{ color: "black", mt: 2 }}>
+                                Category Name
+                              </InputLabel>
 
-                              <TextField fullWidth name="Rate" placeholder="Category Name" size="small" margin="normal" value={categorycreate} onChange={(e) => setcategorycreate(e.target.value)} />
+                              <TextField
+                                fullWidth
+                                name="Rate"
+                                placeholder="Category Name"
+                                size="small"
+                                margin="normal"
+                                value={categorycreate}
+                                onChange={(e) =>
+                                  setcategorycreate(e.target.value)
+                                }
+                              />
                             </Box>
-                            <Box sx={{ pt: 2, display: "flex", alignItems: "center", gap: 5, margin: "8px", ml: 3 }}>
-                              <Button variant="contained" color="primary" onClick={createCategory} sx={{
-                      backgroundColor: 'var(--color-save-btn)',  // Normal background
-                     
-                      '&:hover': {
-                        backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                      },
-                      borderRadius:'15px', width:'80px'
-                    }}>
+                            <Box
+                              sx={{
+                                pt: 2,
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 5,
+                                margin: "8px",
+                                ml: 3,
+                              }}
+                            >
+                              <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={createCategory}
+                                sx={{
+                                  backgroundColor: "var(--color-save-btn)", // Normal background
+
+                                  "&:hover": {
+                                    backgroundColor:
+                                      "var(--color-save-hover-btn)", // Hover background color
+                                  },
+                                  borderRadius: "15px",
+                                  width: "80px",
+                                }}
+                              >
                                 Create
                               </Button>
-                              <Button variant="outlined" onClick={handleCategoryFormClose} sx={{
-                  borderColor: 'var(--color-border-cancel-btn)',  // Normal background
-                 color:'var(--color-save-btn)',
-                  '&:hover': {
-                    backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                    color:'#fff',
-                    border:"none"
-                  },
-                  width:'80px',borderRadius:'15px'
-                }}>
+                              <Button
+                                variant="outlined"
+                                onClick={handleCategoryFormClose}
+                                sx={{
+                                  borderColor: "var(--color-border-cancel-btn)", // Normal background
+                                  color: "var(--color-save-btn)",
+                                  "&:hover": {
+                                    backgroundColor:
+                                      "var(--color-save-hover-btn)", // Hover background color
+                                    color: "#fff",
+                                    border: "none",
+                                  },
+                                  width: "80px",
+                                  borderRadius: "15px",
+                                }}
+                              >
                                 Cancel
                               </Button>
                             </Box>
                           </Drawer>
                         </Box>
-                        <Box sx={{ pt: 5, display: "flex", alignItems: "center", gap: 5, ml: 1 }}>
-                          <Button variant="contained" color="primary" onClick={createservicetemp} sx={{
-                      backgroundColor: 'var(--color-save-btn)',  // Normal background
-                     
-                      '&:hover': {
-                        backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                      },
-                      borderRadius:'15px', width:'80px'
-                    }}>
+                        <Box
+                          sx={{
+                            pt: 5,
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 5,
+                            ml: 1,
+                          }}
+                        >
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={createservicetemp}
+                            sx={{
+                              backgroundColor: "var(--color-save-btn)", // Normal background
+
+                              "&:hover": {
+                                backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+                              },
+                              borderRadius: "15px",
+                              width: "80px",
+                            }}
+                          >
                             Save
                           </Button>
-                          <Button variant="outlined" onClick={handleNewDrawerClose} sx={{
-                  borderColor: 'var(--color-border-cancel-btn)',  // Normal background
-                 color:'var(--color-save-btn)',
-                  '&:hover': {
-                    backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                    color:'#fff',
-                    border:"none"
-                  },
-                  width:'80px',borderRadius:'15px'
-                }}>
+                          <Button
+                            variant="outlined"
+                            onClick={handleNewDrawerClose}
+                            sx={{
+                              borderColor: "var(--color-border-cancel-btn)", // Normal background
+                              color: "var(--color-save-btn)",
+                              "&:hover": {
+                                backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+                                color: "#fff",
+                                border: "none",
+                              },
+                              width: "80px",
+                              borderRadius: "15px",
+                            }}
+                          >
                             Cancel
                           </Button>
                         </Box>
@@ -1905,37 +2542,77 @@ const [proposalNameError, setProposalNameError] = useState("");
                   }}
                 >
                   <Box>
-                    <Box style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px" }}>
-                      <ArrowBackRoundedIcon onClick={handleCategoryFormClose} style={{ cursor: "pointer" }} />
+                    <Box
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        padding: "20px",
+                      }}
+                    >
+                      <ArrowBackRoundedIcon
+                        onClick={handleCategoryFormClose}
+                        style={{ cursor: "pointer" }}
+                      />
                     </Box>
                     <Divider />
                   </Box>
                   <Box p={3}>
-                    <InputLabel sx={{ color: "black", mt: 2 }}>Category Name</InputLabel>
+                    <InputLabel sx={{ color: "black", mt: 2 }}>
+                      Category Name
+                    </InputLabel>
 
-                    <TextField fullWidth name="Rate" placeholder="Category Name" size="small" margin="normal" value={categorycreate} onChange={(e) => setcategorycreate(e.target.value)} />
+                    <TextField
+                      fullWidth
+                      name="Rate"
+                      placeholder="Category Name"
+                      size="small"
+                      margin="normal"
+                      value={categorycreate}
+                      onChange={(e) => setcategorycreate(e.target.value)}
+                    />
                   </Box>
-                  <Box sx={{ pt: 2, display: "flex", alignItems: "center", gap: 5, margin: "8px", ml: 3 }}>
-                    <Button variant="contained" color="primary" onClick={createCategory} sx={{
-                      backgroundColor: 'var(--color-save-btn)',  // Normal background
-                     
-                      '&:hover': {
-                        backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                      },
-                      borderRadius:'15px', width:'80px'
-                    }}>
+                  <Box
+                    sx={{
+                      pt: 2,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 5,
+                      margin: "8px",
+                      ml: 3,
+                    }}
+                  >
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={createCategory}
+                      sx={{
+                        backgroundColor: "var(--color-save-btn)", // Normal background
+
+                        "&:hover": {
+                          backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+                        },
+                        borderRadius: "15px",
+                        width: "80px",
+                      }}
+                    >
                       Create
                     </Button>
-                    <Button variant="outlined" onClick={handleCategoryFormClose} sx={{
-                  borderColor: 'var(--color-border-cancel-btn)',  // Normal background
-                 color:'var(--color-save-btn)',
-                  '&:hover': {
-                    backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                    color:'#fff',
-                    border:"none"
-                  },
-                  width:'80px',borderRadius:'15px'
-                }}>
+                    <Button
+                      variant="outlined"
+                      onClick={handleCategoryFormClose}
+                      sx={{
+                        borderColor: "var(--color-border-cancel-btn)", // Normal background
+                        color: "var(--color-save-btn)",
+                        "&:hover": {
+                          backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+                          color: "#fff",
+                          border: "none",
+                        },
+                        width: "80px",
+                        borderRadius: "15px",
+                      }}
+                    >
                       Cancel
                     </Button>
                   </Box>
@@ -1954,59 +2631,159 @@ const [proposalNameError, setProposalNameError] = useState("");
                     },
                   }}
                 >
-                  <Box role="presentation" sx={{ borderRadius: isSmallScreen ? "0" : "15px" }}>
+                  <Box
+                    role="presentation"
+                    sx={{ borderRadius: isSmallScreen ? "0" : "15px" }}
+                  >
                     <Box>
-                      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", p: 2, borderBottom: "1px solid grey" }}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          p: 2,
+                          borderBottom: "1px solid grey",
+                        }}
+                      >
                         <Typography variant="h6">Edit Item</Typography>
-                        <RxCross2 onClick={handleEditDrawerClose} style={{ cursor: "pointer" }} />
+                        <RxCross2
+                          onClick={handleEditDrawerClose}
+                          style={{ cursor: "pointer" }}
+                        />
                       </Box>
                       <Box p={2}>
                         <Typography variant="h6" fontWeight="bold">
                           Product or service
                         </Typography>
-                        <TextField size="small" margin="normal" value={selectedRowData?.productName || ""} fullWidth onChange={(e) => setSelectedRowData({ ...selectedRowData, productName: e.target.value })} />
+                        <TextField
+                          size="small"
+                          margin="normal"
+                          value={selectedRowData?.productName || ""}
+                          fullWidth
+                          onChange={(e) =>
+                            setSelectedRowData({
+                              ...selectedRowData,
+                              productName: e.target.value,
+                            })
+                          }
+                        />
                         <Box>
                           <Typography>Description</Typography>
-                          <TextField size="small" margin="normal" value={selectedRowData?.description || ""} fullWidth multiline onChange={(e) => setSelectedRowData({ ...selectedRowData, description: e.target.value })} />
+                          <TextField
+                            size="small"
+                            margin="normal"
+                            value={selectedRowData?.description || ""}
+                            fullWidth
+                            multiline
+                            onChange={(e) =>
+                              setSelectedRowData({
+                                ...selectedRowData,
+                                description: e.target.value,
+                              })
+                            }
+                          />
                         </Box>
-                        <Box sx={{ display: "flex", alignItems: "center", gap: "10px", mt: 1 }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "10px",
+                            mt: 1,
+                          }}
+                        >
                           <Box>
                             <Typography>Rate</Typography>
-                            <TextField size="small" margin="normal" value={selectedRowData?.rate || ""} fullWidth onChange={(e) => setSelectedRowData({ ...selectedRowData, rate: e.target.value })} />
+                            <TextField
+                              size="small"
+                              margin="normal"
+                              value={selectedRowData?.rate || ""}
+                              fullWidth
+                              onChange={(e) =>
+                                setSelectedRowData({
+                                  ...selectedRowData,
+                                  rate: e.target.value,
+                                })
+                              }
+                            />
                           </Box>
                           <Box>
                             <Typography>QTY</Typography>
-                            <TextField size="small" margin="normal" value={selectedRowData?.qty || ""} fullWidth onChange={(e) => setSelectedRowData({ ...selectedRowData, qty: e.target.value })} />
+                            <TextField
+                              size="small"
+                              margin="normal"
+                              value={selectedRowData?.qty || ""}
+                              fullWidth
+                              onChange={(e) =>
+                                setSelectedRowData({
+                                  ...selectedRowData,
+                                  qty: e.target.value,
+                                })
+                              }
+                            />
                           </Box>
                           <Box>
                             <Typography>Amount</Typography>
-                            <TextField size="small" margin="normal" fullWidth disabled value={totalamount} />
+                            <TextField
+                              size="small"
+                              margin="normal"
+                              fullWidth
+                              disabled
+                              value={totalamount}
+                            />
                           </Box>
                         </Box>
                         <Box mt={2}>
-                          <FormControlLabel control={<Switch checked={selectedRowData?.tax} onChange={(event) => handleServiceWitch(event.target.checked)} color="primary" />} label={"Tax"} />
+                          <FormControlLabel
+                            control={
+                              <Switch
+                                checked={selectedRowData?.tax}
+                                onChange={(event) =>
+                                  handleServiceWitch(event.target.checked)
+                                }
+                                color="primary"
+                              />
+                            }
+                            label={"Tax"}
+                          />
                         </Box>
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 2, mt: 2 }}>
-                          <Button variant="contained" onClick={handleSaveChanges} sx={{
-                      backgroundColor: 'var(--color-save-btn)',  // Normal background
-                     
-                      '&:hover': {
-                        backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                      },
-                      borderRadius:'15px', width:'80px'
-                    }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 2,
+                            mt: 2,
+                          }}
+                        >
+                          <Button
+                            variant="contained"
+                            onClick={handleSaveChanges}
+                            sx={{
+                              backgroundColor: "var(--color-save-btn)", // Normal background
+
+                              "&:hover": {
+                                backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+                              },
+                              borderRadius: "15px",
+                              width: "80px",
+                            }}
+                          >
                             Save
                           </Button>
-                          <Button variant="outlined" onClick={handleEditDrawerClose} sx={{
-                  borderColor: 'var(--color-border-cancel-btn)',  // Normal background
-                 color:'var(--color-save-btn)',
-                  '&:hover': {
-                    backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                    color:'#fff',
-                    border:"none"
-                  },
-                  width:'80px',borderRadius:'15px'
-                }}>
+                          <Button
+                            variant="outlined"
+                            onClick={handleEditDrawerClose}
+                            sx={{
+                              borderColor: "var(--color-border-cancel-btn)", // Normal background
+                              color: "var(--color-save-btn)",
+                              "&:hover": {
+                                backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+                                color: "#fff",
+                                border: "none",
+                              },
+                              width: "80px",
+                              borderRadius: "15px",
+                            }}
+                          >
                             {" "}
                             Cancel
                           </Button>
@@ -2024,13 +2801,37 @@ const [proposalNameError, setProposalNameError] = useState("");
           <Box>
             <Typography variant="h6">Payment Information</Typography>
             <Box mt={1} mb={3}>
-              <TextField size="small" fullWidth margin="normal" placeholder="Payment terms" sx={{ backgroundColor: "#fff" }} onChange={handlePaymentTerms} value={paymentterms} />
+              <TextField
+                size="small"
+                fullWidth
+                margin="normal"
+                placeholder="Payment terms"
+                sx={{ backgroundColor: "#fff" }}
+                onChange={handlePaymentTerms}
+                value={paymentterms}
+              />
             </Box>
             <Box mt={1} mb={3}>
-              <TextField size="small" fullWidth margin="normal" placeholder="Payment due date" sx={{ backgroundColor: "#fff" }} onChange={handlePaymentDueDate} value={paymentduedate} />
+              <TextField
+                size="small"
+                fullWidth
+                margin="normal"
+                placeholder="Payment due date"
+                sx={{ backgroundColor: "#fff" }}
+                onChange={handlePaymentDueDate}
+                value={paymentduedate}
+              />
             </Box>
             <Box mt={1} mb={3}>
-              <TextField size="small" fullWidth margin="normal" placeholder="Payment amount" sx={{ backgroundColor: "#fff" }} onChange={handlePaymentAmount} value={paymentamount} />
+              <TextField
+                size="small"
+                fullWidth
+                margin="normal"
+                placeholder="Payment amount"
+                sx={{ backgroundColor: "#fff" }}
+                onChange={handlePaymentAmount}
+                value={paymentamount}
+              />
             </Box>
             {/* Add more fields for payment details if necessary */}
           </Box>
@@ -2041,19 +2842,21 @@ const [proposalNameError, setProposalNameError] = useState("");
   };
 
   const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(5);
-  
-  
-     const handleChangePage = (_, newPage) => {
-      setPage(newPage);
-    };
-  
-    const handleChangeRowsPerPage = (event) => {
-      setRowsPerPage(parseInt(event.target.value, 10));
-      setPage(0);
-    };
-     // Compute paginated tasks
-     const paginatedTasks = ProposalsTemplates.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const handleChangePage = (_, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+  // Compute paginated tasks
+  const paginatedTasks = ProposalsTemplates.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
   return (
     <Box sx={{ width: "100%" }}>
       {showStepper ? (
@@ -2069,47 +2872,71 @@ const [proposalNameError, setProposalNameError] = useState("");
                   ))}
                 </Stepper> */}
                 <Stepper activeStep={activeStep}>
-                                {steps.map((label, index) => {
-                                  // Check if the step has an error
-                                  const isError =
-                                    (index === 0 && !!proposalNameError) ||
-                                    (index === 1 && !!introductionBodyError) ||
-                                    (index === 2 && !!termsBodyError) ||
-                                    (index === 3 && !!selctedOptionError);
-                
-                                  return (
-                                    <Step key={index} onClick={() => handleStepClick(index)}>
-                                      <StepLabel error={isError} style={{ cursor: "pointer" }}>
-                                        {label}
-                                      </StepLabel>
-                                    </Step>
-                                  );
-                                })}
-                              </Stepper>
+                  {steps.map((label, index) => {
+                    // Check if the step has an error
+                    const isError =
+                      (index === 0 && !!proposalNameError) ||
+                      (index === 1 && !!introductionBodyError) ||
+                      (index === 2 && !!termsBodyError) ||
+                      (index === 3 && !!selctedOptionError);
+
+                    return (
+                      <Step key={index} onClick={() => handleStepClick(index)}>
+                        <StepLabel
+                          error={isError}
+                          style={{ cursor: "pointer" }}
+                        >
+                          {label}
+                        </StepLabel>
+                      </Step>
+                    );
+                  })}
+                </Stepper>
               </Box>
             </Grid>
-            <Grid item xs={4} sx={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+            <Grid
+              item
+              xs={4}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "flex-end",
+              }}
+            >
               <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                <Button variant="contained" onClick={activeStep === steps.length - 1 ? handleReset : handleNext}   sx={{
-                      backgroundColor: 'var(--color-save-btn)',  // Normal background
-                     
-                      '&:hover': {
-                        backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                      },
-                      borderRadius:'15px', width:'200px'
-                    }}>
+                <Button
+                  variant="contained"
+                  onClick={
+                    activeStep === steps.length - 1 ? handleReset : handleNext
+                  }
+                  sx={{
+                    backgroundColor: "var(--color-save-btn)", // Normal background
+
+                    "&:hover": {
+                      backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+                    },
+                    borderRadius: "15px",
+                    width: "200px",
+                  }}
+                >
                   {activeStep === steps.length - 1 ? "Save Template" : "Next"}
                 </Button>
-                <Button disabled={activeStep === 0} onClick={handleBack} variant="outlined" sx={{
-                  borderColor: 'var(--color-border-cancel-btn)',  // Normal background
-                 color:'var(--color-save-btn)',
-                  '&:hover': {
-                    backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                    color:'#fff',
-                    border:"none"
-                  },
-                  width:'200px',borderRadius:'15px'
-                }}>
+                <Button
+                  disabled={activeStep === 0}
+                  onClick={handleBack}
+                  variant="outlined"
+                  sx={{
+                    borderColor: "var(--color-border-cancel-btn)", // Normal background
+                    color: "var(--color-save-btn)",
+                    "&:hover": {
+                      backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+                      color: "#fff",
+                      border: "none",
+                    },
+                    width: "200px",
+                    borderRadius: "15px",
+                  }}
+                >
                   Back
                 </Button>
               </Box>
@@ -2119,155 +2946,166 @@ const [proposalNameError, setProposalNameError] = useState("");
         </Box>
       ) : (
         <Box sx={{ mt: 2 }}>
-          <Button variant="contained" onClick={handleCreateTemplateClick} sx={{
-              backgroundColor: 'var(--color-save-btn)',  // Normal background
-             
-              '&:hover': {
-                backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
+          <Button
+            variant="contained"
+            onClick={handleCreateTemplateClick}
+            sx={{
+              backgroundColor: "var(--color-save-btn)", // Normal background
+
+              "&:hover": {
+                backgroundColor: "var(--color-save-hover-btn)", // Hover background color
               },
-              borderRadius:'15px', 
-            }}>
+              borderRadius: "15px",
+            }}
+          >
             Create Template
           </Button>
           <Box mt={4}>
             {loading ? (
-              <Box sx={{display:'flex',alignItems:'center', justifyContent:'center'}}> <CircularProgress style={{fontSize:'300px', color:'blue'}}/></Box>
-            ):( 
-            
-            // <MaterialReactTable columns={columns} table={table} />
-          
-            <Box>
-<TableContainer component={Paper} sx={{ overflow: "visible" }}>
-            <Table sx={{ width: "100%" }}>
-              <TableHead>
-                <TableRow>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="250"
-                  >
-                    Name
-                  </TableCell>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {" "}
+                <CircularProgress
+                  style={{ fontSize: "300px", color: "blue" }}
+                />
+              </Box>
+            ) : (
+              // <MaterialReactTable columns={columns} table={table} />
 
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="100"
-                  >
-                    Settings
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {paginatedTasks.map((row) => (
-                  <TableRow key={row._id}>
-                    <TableCell>
-                      <Typography
-                        style={{
-                          fontSize: "12px",
-                          padding: "4px 8px",
-                          lineHeight: "1",
-                          cursor: "pointer",
-                          color: "#3f51b5",
-                        }}
-                        onClick={() => handleEdit(row._id)}
-                      >
-                        {row.templatename}
-                      </Typography>
-                    </TableCell>
+              <Box>
+                <TableContainer component={Paper} sx={{ overflow: "visible" }}>
+                  <Table sx={{ width: "100%" }}>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell
+                          style={{
+                            fontSize: "12px",
+                            fontWeight: "bold",
+                            padding: "16px",
+                          }}
+                          width="250"
+                        >
+                          Name
+                        </TableCell>
 
-              
-                     <TableCell
-                                     style={{
-                                       fontSize: "12px",
-                                       padding: "4px 8px",
-                                       lineHeight: "1",
-                                     }}
-                                   >
-                                     <IconButton
-                                       onClick={(event) => toggleMenu(event, row._id)}
-                                       style={{ color: "#2c59fa" }}
-                                       size="small"
-                                     >
-                                       <CiMenuKebab />
-                                     </IconButton>
-                   
-                                     {/* MUI Menu */}
-                                   
-                                   </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
- <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleCloseOptions}
-        anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
-        }}
-        PaperProps={{
-          sx: {
-            mt: 3,
-            ml: 1,
-            boxShadow: 3,
-            borderRadius: 1,
-            minWidth: 120,
-            '& .MuiMenuItem-root': {
-              fontSize: '12px',
-              padding: '8px 16px',
-            }
-          }
-        }}
-      >
-        <MenuItem 
-          onClick={() => handleEdit(tempIdget)}
-          sx={{ 
-            fontWeight: "bold",
-            '&:hover': {
-              backgroundColor: '#f5f5f5'
-            }
-          }}
-        >
-          Edit
-        </MenuItem>
-        <MenuItem 
-          onClick={() => handleDelete(tempIdget)}
-          sx={{ 
-            color: "error.main", 
-            fontWeight: "bold",
-            '&:hover': {
-              backgroundColor: '#ffebee'
-            }
-          }}
-        >
-          Delete
-        </MenuItem>
-      </Menu>
-<TablePagination
-rowsPerPageOptions={[5, 10, 25]}
-component="div"
-count={ProposalsTemplates.length}
-rowsPerPage={rowsPerPage}
-page={page}
-onPageChange={handleChangePage}
-onRowsPerPageChange={handleChangeRowsPerPage}
-/>
-</Box>
-          )
-            }
+                        <TableCell
+                          style={{
+                            fontSize: "12px",
+                            fontWeight: "bold",
+                            padding: "16px",
+                          }}
+                          width="100"
+                        >
+                          Settings
+                        </TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {paginatedTasks.map((row) => (
+                        <TableRow key={row._id}>
+                          <TableCell>
+                            <Typography
+                              style={{
+                                fontSize: "12px",
+                                padding: "4px 8px",
+                                lineHeight: "1",
+                                cursor: "pointer",
+                                color: "#3f51b5",
+                              }}
+                              onClick={() => handleEdit(row._id)}
+                            >
+                              {row.templatename}
+                            </Typography>
+                          </TableCell>
+
+                          <TableCell
+                            style={{
+                              fontSize: "12px",
+                              padding: "4px 8px",
+                              lineHeight: "1",
+                            }}
+                          >
+                            <IconButton
+                              onClick={(event) => toggleMenu(event, row._id)}
+                              style={{ color: "#2c59fa" }}
+                              size="small"
+                            >
+                              <CiMenuKebab />
+                            </IconButton>
+
+                            {/* MUI Menu */}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+                <Menu
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl)}
+                  onClose={handleCloseOptions}
+                  anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                  }}
+                  transformOrigin={{
+                    vertical: "top",
+                    horizontal: "left",
+                  }}
+                  PaperProps={{
+                    sx: {
+                      mt: 3,
+                      ml: 1,
+                      boxShadow: 3,
+                      borderRadius: 1,
+                      minWidth: 120,
+                      "& .MuiMenuItem-root": {
+                        fontSize: "12px",
+                        padding: "8px 16px",
+                      },
+                    },
+                  }}
+                >
+                  <MenuItem
+                    onClick={() => handleEdit(tempIdget)}
+                    sx={{
+                      fontWeight: "bold",
+                      "&:hover": {
+                        backgroundColor: "#f5f5f5",
+                      },
+                    }}
+                  >
+                    Edit
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => handleDelete(tempIdget)}
+                    sx={{
+                      color: "error.main",
+                      fontWeight: "bold",
+                      "&:hover": {
+                        backgroundColor: "#ffebee",
+                      },
+                    }}
+                  >
+                    Delete
+                  </MenuItem>
+                </Menu>
+                <TablePagination
+                  rowsPerPageOptions={[5, 10, 25]}
+                  component="div"
+                  count={ProposalsTemplates.length}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  onPageChange={handleChangePage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                />
+              </Box>
+            )}
             {/* <MaterialReactTable columns={columns} table={table} /> */}
           </Box>
         </Box>
