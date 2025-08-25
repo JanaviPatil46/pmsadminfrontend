@@ -43,10 +43,11 @@ const TeamMemberMultiSelectDropDown = ({
         
         const formattedOptions = data.map(user => ({
           value: user._id,
-          label: user.username || `${user.firstName} ${user.lastName}`.trim()
+          label: user.username 
         }));
         
         setOptions(formattedOptions);
+        console.log("formattedOptions",formattedOptions)
       } catch (err) {
         console.error("Error fetching team members:", err);
         setError("Failed to load team members");
@@ -73,7 +74,7 @@ const TeamMemberMultiSelectDropDown = ({
 
   const handleSelect = (selectedValue) => {
     if (!selectedValue) return;
-    
+    console.log("selectedValue",selectedValue)
     const selectedOption = options.find(option => 
       option && option.value === selectedValue
     );

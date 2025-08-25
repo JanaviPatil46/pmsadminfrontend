@@ -213,11 +213,21 @@ const filteredData = sortedData.filter((row) => {
   
 
 // Team Member filter (matches by ID)
-  const teamMemberMatch = filters.teamMember.length > 0
-    ? row.Team.some(member => 
-        filters.teamMember.includes(member._id) // Match by ID
+  // const teamMemberMatch = filters.teamMember.length > 0
+  //   ? row.Team.some(member => 
+  //       filters.teamMember.includes(member._id) // Match by ID
+  //     )
+  //   : true;
+  // Team Member filter (matches by ID or username)
+const teamMemberMatch = filters.teamMember.length > 0
+  ? row.Team.some(member =>
+      filters.teamMember.some(selected =>
+        selected.value === member._id || 
+        selected.label.toLowerCase() === member.username.toLowerCase()
       )
-    : true;
+    )
+  : true;
+
   // Tags filter
   const tagMatch = filters.tags.length > 0
     ? row.Tags &&
@@ -923,12 +933,22 @@ const clearFilter = (filterField) => {
 {showFilters.teamMember && (
   <div style={{ display: "flex", alignItems: "center" }}>
     <Box sx={{ mr: 3 }}>
-      <TeamMemberMultiSelectDropDown
-        value={filters.teamMember.map(id => ({ 
-          value: id, 
-          label: username
-        }))}
+      {/* <TeamMemberMultiSelectDropDown
+        // value={filters.teamMember.map(id => ({
+           
+        //   value: id, 
+        //   label: username
+        // }))}
+        value={filters.teamMember.map(id => {
+  console.log("id:", id);
+  return {
+    value: id,
+    label: username   // temporary placeholder until you map to real username
+  };
+})}
+
         onChange={(newValue) => {
+            console.log("Selected team members:", newValue);
           setFilters(prev => ({ 
             ...prev, 
             teamMember: newValue.map(item => item.value) // Store just the IDs
@@ -938,7 +958,21 @@ const clearFilter = (filterField) => {
       
         width="250px"
         LOGIN_API={LOGIN_API}
-      />
+      /> */}
+      <TeamMemberMultiSelectDropDown
+  value={filters.teamMember}   // just array of IDs like ["689c4d64...", "6880af58..."]
+  onChange={(newValue) => {
+    console.log("Selected team members:", newValue);
+    setFilters(prev => ({ 
+      ...prev, 
+      teamMember: newValue      // newValue will already be array of IDs
+    }));
+    setPage(0);
+  }}
+  width="250px"
+  LOGIN_API={LOGIN_API}
+/>
+
     </Box>
     <DeleteIcon
       onClick={() => clearFilter("teamMember")}
@@ -957,95 +991,7 @@ const clearFilter = (filterField) => {
                     // marginBottom: "10px",
                   }}
                 >
-                  {/* <FormControl sx={{ width: "100%" }}>
-                    <Select
-                      multiple
-                      multiline
-                      fullWidth
-                      size="small"
-                      input={<OutlinedInput />}
-                      displayEmpty
-                      value={filters.tags || []} // Store selected tag objects
-                      onChange={(e) =>
-                        handleMultiSelectChange("tags", e.target.value)
-                      } // Handle selection
-                      renderValue={(selected) => {
-                        if (selected.length === 0) {
-                          return (
-                            <span style={{ color: "#aaa" }}>
-                              Select tags...
-                            </span>
-                          );
-                        }
-                        return (
-                          <Box
-                            sx={{
-                              display: "flex",
-                              flexWrap: "wrap",
-                              gap: "6px",
-                              padding: "6px",
-                            }}
-                          >
-                            {selected.map((option) => (
-                              <Chip
-                                key={option.tagName}
-                                label={option.tagName}
-                                sx={{
-                                  backgroundColor: option.tagColour,
-                                  color: "#fff",
-                                  fontWeight: 500,
-                                  fontSize: "10px",
-                                  borderRadius: "16px",
-                                  height: "20px",
-                                  cursor: "pointer",
-                                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)",
-                                }}
-                              />
-                            ))}
-                          </Box>
-                        );
-                      }}
-                      MenuProps={{
-                        PaperProps: {
-                          style: { maxHeight: 250 },
-                        },
-                      }}
-                      sx={{
-                        borderRadius: "10px",
-                        "& .MuiOutlinedInput-root": { borderRadius: "10px" },
-                      }}
-                    >
-                      {uniqueTags.map((option) => {
-                        const dynamicWidth = Math.min(
-                          option.tagName.length * 8 + 16,
-                          150
-                        );
-                        return (
-                          <MenuItem
-                            key={option.tagName}
-                            value={option}
-                            sx={{
-                              backgroundColor: option.tagColour,
-                              color: "#fff",
-                              fontSize: "10px",
-                              borderRadius: "10px",
-                              margin: "5px",
-                              textAlign: "center",
-                              padding: "4px 9px",
-                              minWidth: `${dynamicWidth}px`,
-                              maxWidth: `${dynamicWidth}px`,
-                              "&:hover": {
-                                backgroundColor: option.tagColour,
-                                color: "#fff",
-                              },
-                            }}
-                          >
-                            {option.tagName}
-                          </MenuItem>
-                        );
-                      })}
-                    </Select>
-                  </FormControl> */}
+                 
                   <Box mr={3}> <TagsMultiSelectDropDown
   value={filters.tags.map(tag => ({
     value: tag.tagName,
