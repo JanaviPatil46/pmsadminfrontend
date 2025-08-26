@@ -654,7 +654,7 @@ const handleContactPhoneNumberChange = (index, phoneIndex, phoneValue, countryDa
       password: password,
       cpassword: password,
     });
-
+console.log("clientalldata",raw)
     const requestOptions = {
       method: "POST",
       headers: myHeaders,
@@ -701,7 +701,7 @@ const handleContactPhoneNumberChange = (index, phoneIndex, phoneValue, countryDa
       body: raw,
       redirect: "follow",
     };
-
+console.log("rawec",raw)
     const url = `${LOGIN_API}/common/login/signup`;
 
     fetch(url, requestOptions)
@@ -782,14 +782,14 @@ const handleContactPhoneNumberChange = (index, phoneIndex, phoneValue, countryDa
       return; // Prevent form submission if validation fails
     }
 
-    if (!contacts || contacts.length === 0) {
-      toast.error("There is no contact available! Enter atleast one contact");
-      setIsModalVisible(false);
-    } else {
-      console.log(contacts);
-      setIsModalVisible(true);
-    }
-
+    // if (!contacts || contacts.length === 0) {
+    //   toast.error("There is no contact available! Enter atleast one contact");
+    //   setIsModalVisible(false);
+    // } else {
+    //   console.log(contacts);
+    //   setIsModalVisible(true);
+    // }
+ setIsModalVisible(true);
     //
   };
   const [comfirmationOpen, setComfirmationOpen] = useState(false);
@@ -1039,7 +1039,7 @@ const filterOptions = createFilterOptions({
 
   const clientCreatedmail = (email, personalMessage, userid) => {
     const port = window.location.port;
-    const urlportlogin = `${CLIENT_PORT}/client/updatepassword`;
+    const urlportlogin = `${CLIENT_PORT}/client/client/updatepassword`;
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
@@ -1091,7 +1091,39 @@ const filterOptions = createFilterOptions({
         handleDialogClose();
         fetchAccountDataById(accountDatabyid._id);
         toast.success("Contact added successfully");
-      })
+
+        // Create new users for the selected contacts
+      // selectedContacts.forEach(contactId => {
+      //   // Find the contact data by ID
+      //   const contact = filteredContacts.find(c => c.id === contactId);
+      //   if (contact) {
+      //     // Extract contact details (adjust these based on your contact object structure)
+      //     const { email, firstName, middleName, lastName } = contact;
+      //     console.log("contactssss",contact)
+      //     // Call newUser function to create portal access
+      //     newUser(result.updatedAccount._id, email, firstName, middleName, lastName);
+      //   }
+      // });
+      // Fetch details for each selected contact
+     const fetchPromises = selectedContacts.map(contactId => 
+  fetch(`${CONTACT_API}/contacts/${contactId}`)
+    .then(response => response.json())
+    .then(data => {
+      // Access the contact data from the response
+      const contact = data.contact;
+      const { email, firstName, middleName, lastName } = contact;
+      console.log("Creating user for contact:", contact);
+      newUser(accountDatabyid._id, email, firstName, middleName, lastName);
+      console.log("newuserdata",accountDatabyid._id, email, firstName, middleName, lastName)
+    })
+    .catch(error => {
+      console.error(`Failed to fetch contact ${contactId}:`, error);
+    })
+);
+
+return Promise.all(fetchPromises);
+    })
+      
       .catch((error) => console.error(error));
   };
 
@@ -2368,7 +2400,7 @@ const filterOptions = createFilterOptions({
                         onChange={(event, newValue) => {
                           const ids = newValue.map((contact) => contact.id);
                           setSelectedContacts(ids);
-                          console.log(getSelectedIds());
+                          console.log("getSelectedIds",getSelectedIds());
                         }}
                         renderInput={(params) => (
                           <TextField

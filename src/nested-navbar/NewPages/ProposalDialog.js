@@ -170,143 +170,143 @@ useEffect(() => {
     });
   }
 
-  if (
-    proposal.servicesandinvoices &&
-    proposal.Additemizedserviceswithoutcreatinginvoices === "service"
-  ) {
-    const taxRate = proposal.summary?.taxRate || 0;
+  // if (
+  //   proposal.servicesandinvoices &&
+  //   proposal.Additemizedserviceswithoutcreatinginvoices === "service"
+  // ) {
+  //   const taxRate = proposal.summary?.taxRate || 0;
 
-    const serviceHTML = `
-      <div style="font-family: Arial, sans-serif; color: #1e1e1e;">
-        <table style="width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden;">
-          <thead style="background-color: #f9fafb;">
-            <tr>
-              <th style="text-align: left; padding: 8px;">Service</th>
-              <th style="text-align: right; padding: 8px;">Rate</th>
-              <th style="text-align: right; padding: 8px;">Qty</th>
-              <th style="text-align: right; padding: 8px;">Tax</th>
-              <th style="text-align: right; padding: 8px;">Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${proposal.lineItems
-              .map((item) => {
-                const rate = Number(item.rate);
-                const quantity = Number(item.quantity);
-                const baseAmount = rate * quantity;
-                const taxAmount = item.tax ? (baseAmount * taxRate) / 100 : 0;
-                const totalAmount = baseAmount + taxAmount;
+  //   const serviceHTML = `
+  //     <div style="font-family: Arial, sans-serif; color: #1e1e1e;">
+  //       <table style="width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden;">
+  //         <thead style="background-color: #f9fafb;">
+  //           <tr>
+  //             <th style="text-align: left; padding: 8px;">Service</th>
+  //             <th style="text-align: right; padding: 8px;">Rate</th>
+  //             <th style="text-align: right; padding: 8px;">Qty</th>
+  //             <th style="text-align: right; padding: 8px;">Tax</th>
+  //             <th style="text-align: right; padding: 8px;">Amount</th>
+  //           </tr>
+  //         </thead>
+  //         <tbody>
+  //           ${proposal.lineItems
+  //             .map((item) => {
+  //               const rate = Number(item.rate);
+  //               const quantity = Number(item.quantity);
+  //               const baseAmount = rate * quantity;
+  //               const taxAmount = item.tax ? (baseAmount * taxRate) / 100 : 0;
+  //               const totalAmount = baseAmount + taxAmount;
 
-                return `
-                  <tr>
-                    <td style="padding: 8px;">
-                      <div><strong>${item.productorService}</strong></div>
-                      <div style="font-size: 12px; color: #6b7280;">${item.description}</div>
-                    </td>
-                    <td style="text-align: right; padding: 8px;">$ ${rate.toFixed(2)}</td>
-                    <td style="text-align: right; padding: 8px;">${quantity}</td>
-                    <td style="text-align: right; padding: 8px;">$ ${taxAmount.toFixed(2)}</td>
-                    <td style="text-align: right; padding: 8px;">$ ${totalAmount.toFixed(2)}</td>
-                  </tr>`;
-              })
-              .join("")}
-          </tbody>
-          <tfoot>
-            <tr>
-              <td colspan="4" style="text-align: right; padding: 8px;"><strong>Total</strong></td>
-              <td style="text-align: right; padding: 8px;"><strong>$ ${proposal.summary?.total.toFixed(2)}</strong></td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-    `;
+  //               return `
+  //                 <tr>
+  //                   <td style="padding: 8px;">
+  //                     <div><strong>${item.productorService}</strong></div>
+  //                     <div style="font-size: 12px; color: #6b7280;">${item.description}</div>
+  //                   </td>
+  //                   <td style="text-align: right; padding: 8px;">$ ${rate.toFixed(2)}</td>
+  //                   <td style="text-align: right; padding: 8px;">${quantity}</td>
+  //                   <td style="text-align: right; padding: 8px;">$ ${taxAmount.toFixed(2)}</td>
+  //                   <td style="text-align: right; padding: 8px;">$ ${totalAmount.toFixed(2)}</td>
+  //                 </tr>`;
+  //             })
+  //             .join("")}
+  //         </tbody>
+  //         <tfoot>
+  //           <tr>
+  //             <td colspan="4" style="text-align: right; padding: 8px;"><strong>Total</strong></td>
+  //             <td style="text-align: right; padding: 8px;"><strong>$ ${proposal.summary?.total.toFixed(2)}</strong></td>
+  //           </tr>
+  //         </tfoot>
+  //       </table>
+  //     </div>
+  //   `;
 
-    sections.push({
-      key: "services",
-      label: "Services",
-      content: serviceHTML,
-    });
-  }
+  //   sections.push({
+  //     key: "services",
+  //     label: "Services",
+  //     content: serviceHTML,
+  //   });
+  // }
 
-  if (
-    proposal.servicesandinvoices &&
-    proposal.Addinvoiceoraskfordeposit === "invoice"
-  ) {
-    const taxRate = proposal.summary?.taxRate || 0;
+  // if (
+  //   proposal.servicesandinvoices &&
+  //   proposal.Addinvoiceoraskfordeposit === "invoice"
+  // ) {
+  //   const taxRate = proposal.summary?.taxRate || 0;
 
-    const invoiceHTML = `
-      <div style="font-family: Arial, sans-serif; color: #1e1e1e;">
-        <div style="margin-bottom: 20px;">
-          <p><strong>Amount</strong></p>
-          <p style="background-color: #f9fafb; padding: 10px; border-radius: 8px;">$${proposal.summary?.total.toFixed(2)}</p>
+  //   const invoiceHTML = `
+  //     <div style="font-family: Arial, sans-serif; color: #1e1e1e;">
+  //       <div style="margin-bottom: 20px;">
+  //         <p><strong>Amount</strong></p>
+  //         <p style="background-color: #f9fafb; padding: 10px; border-radius: 8px;">$${proposal.summary?.total.toFixed(2)}</p>
 
-          <p><strong>Invoice will be issued</strong></p>
-          <p style="background-color: #f9fafb; padding: 10px; border-radius: 8px;">${proposal.issueinvoice}</p>
+  //         <p><strong>Invoice will be issued</strong></p>
+  //         <p style="background-color: #f9fafb; padding: 10px; border-radius: 8px;">${proposal.issueinvoice}</p>
 
-          <p><strong>Description</strong></p>
-          <p style="background-color: #f9fafb; padding: 10px; border-radius: 8px;">${proposal.description}</p>
-        </div>
+  //         <p><strong>Description</strong></p>
+  //         <p style="background-color: #f9fafb; padding: 10px; border-radius: 8px;">${proposal.description}</p>
+  //       </div>
 
-        <div>
-          <p 
-            style="font-weight: bold; margin-bottom: 10px; cursor: pointer;"
-            onclick="const table = this.nextElementSibling; const arrow = this.querySelector('span'); if (table.style.display === 'none') { table.style.display = 'block'; arrow.innerHTML = '&#x25B2;'; } else { table.style.display = 'none'; arrow.innerHTML = '&#x25BC;'; }"
-          >
-            <span>&#x25BC;</span> Invoice details
-          </p>
+  //       <div>
+  //         <p 
+  //           style="font-weight: bold; margin-bottom: 10px; cursor: pointer;"
+  //           onclick="const table = this.nextElementSibling; const arrow = this.querySelector('span'); if (table.style.display === 'none') { table.style.display = 'block'; arrow.innerHTML = '&#x25B2;'; } else { table.style.display = 'none'; arrow.innerHTML = '&#x25BC;'; }"
+  //         >
+  //           <span>&#x25BC;</span> Invoice details
+  //         </p>
 
-          <div style="display: none;">
-            <table style="width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb;">
-              <thead style="background-color: #f9fafb;">
-                <tr>
-                  <th style="text-align: left; padding: 8px;">Service</th>
-                  <th style="text-align: right; padding: 8px;">Rate</th>
-                  <th style="text-align: right; padding: 8px;">Qty</th>
-                  <th style="text-align: right; padding: 8px;">Tax</th>
-                  <th style="text-align: right; padding: 8px;">Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${proposal.lineItems
-                  .map((item) => {
-                    const rate = Number(item.rate);
-                    const quantity = Number(item.quantity);
-                    const baseAmount = rate * quantity;
-                    const taxAmount = item.tax ? (baseAmount * taxRate) / 100 : 0;
-                    const totalAmount = baseAmount + taxAmount;
+  //         <div style="display: none;">
+  //           <table style="width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb;">
+  //             <thead style="background-color: #f9fafb;">
+  //               <tr>
+  //                 <th style="text-align: left; padding: 8px;">Service</th>
+  //                 <th style="text-align: right; padding: 8px;">Rate</th>
+  //                 <th style="text-align: right; padding: 8px;">Qty</th>
+  //                 <th style="text-align: right; padding: 8px;">Tax</th>
+  //                 <th style="text-align: right; padding: 8px;">Amount</th>
+  //               </tr>
+  //             </thead>
+  //             <tbody>
+  //               ${proposal.lineItems
+  //                 .map((item) => {
+  //                   const rate = Number(item.rate);
+  //                   const quantity = Number(item.quantity);
+  //                   const baseAmount = rate * quantity;
+  //                   const taxAmount = item.tax ? (baseAmount * taxRate) / 100 : 0;
+  //                   const totalAmount = baseAmount + taxAmount;
 
-                    return `
-                      <tr>
-                        <td style="padding: 8px;">
-                          <div><strong>${item.productorService}</strong></div>
-                          <div style="font-size: 12px; color: #6b7280;">${item.description}</div>
-                        </td>
-                        <td style="text-align: right; padding: 8px;">$ ${rate.toFixed(2)}</td>
-                        <td style="text-align: right; padding: 8px;">${quantity}</td>
-                        <td style="text-align: right; padding: 8px;">$ ${taxAmount.toFixed(2)}</td>
-                        <td style="text-align: right; padding: 8px;">$ ${totalAmount.toFixed(2)}</td>
-                      </tr>`;
-                  })
-                  .join("")}
-              </tbody>
-              <tfoot>
-                <tr>
-                  <td colspan="4" style="text-align: right; padding: 8px;"><strong>Total</strong></td>
-                  <td style="text-align: right; padding: 8px;"><strong>$ ${proposal.summary?.total.toFixed(2)}</strong></td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-        </div>
-      </div>
-    `;
+  //                   return `
+  //                     <tr>
+  //                       <td style="padding: 8px;">
+  //                         <div><strong>${item.productorService}</strong></div>
+  //                         <div style="font-size: 12px; color: #6b7280;">${item.description}</div>
+  //                       </td>
+  //                       <td style="text-align: right; padding: 8px;">$ ${rate.toFixed(2)}</td>
+  //                       <td style="text-align: right; padding: 8px;">${quantity}</td>
+  //                       <td style="text-align: right; padding: 8px;">$ ${taxAmount.toFixed(2)}</td>
+  //                       <td style="text-align: right; padding: 8px;">$ ${totalAmount.toFixed(2)}</td>
+  //                     </tr>`;
+  //                 })
+  //                 .join("")}
+  //             </tbody>
+  //             <tfoot>
+  //               <tr>
+  //                 <td colspan="4" style="text-align: right; padding: 8px;"><strong>Total</strong></td>
+  //                 <td style="text-align: right; padding: 8px;"><strong>$ ${proposal.summary?.total.toFixed(2)}</strong></td>
+  //               </tr>
+  //             </tfoot>
+  //           </table>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   `;
 
-    sections.push({
-      key: "invoices",
-      label: "Invoices",
-      content: invoiceHTML,
-    });
-  }
+  //   sections.push({
+  //     key: "invoices",
+  //     label: "Invoices",
+  //     content: invoiceHTML,
+  //   });
+  // }
 
   
  // Add this check at the beginning of your component
