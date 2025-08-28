@@ -463,6 +463,7 @@ const AddJobs = ({
       .request(config)
       .then((response) => {
         console.log("Job created successfully");
+        console.log("")
         toast.success("Job created successfully");
         handleDrawerClose();
         fetchJobData();

@@ -55,6 +55,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import MultiSelectDropdown from "../Templates/MultiSelectDropdown"
 import { LoginContext } from "../Sidebar/Context/Context";
+import EditJobDrawer from "./updateJobCard";
 const Pipeline = ({ charLimit = 4000 }) => {
   const ITEM_HEIGHT = 48;
   const ITEM_PADDING_TOP = 8;
@@ -2082,13 +2083,8 @@ sx={{
         console.error("Error fetching data:", error);
       }
     };
-    //  for tags
-    const calculateWidth = (label) => {
-      const textWidth = label.length * 8;
-      return Math.min(textWidth, 200);
-    };
-    const calculateWidthOptions = (label) =>
-      `${Math.max(label.length * 8, 90)}px`;
+    
+    
     const tagoptions = tags.map((tag) => ({
       value: tag._id,
       label: tag.tagName,
@@ -2112,16 +2108,6 @@ sx={{
     const [selectedTags, setSelectedTags] = useState([]);
     const [dataAccountjob, setDataAccountjob] = useState();
 
-    // const handleTagChange = (event, newValue) => {
-    //   setSelectedTags(newValue); // Keep the full tag objects
-
-    //   // Send only the values to your backend
-    //   const tagValues = newValue.map((option) => option.value);
-    //   console.log("Selected Values:", tagValues);
-
-    //   // Assuming setCombinedTagsValues is a function to send the values to your backend
-    //   setCombinedTagsValues(tagValues);
-    // };
     const handleTagChange = (event) => {
       const { value } = event.target; // Get selected tag objects
       setSelectedTags(value); // Keep full tag objects in state
@@ -2156,12 +2142,6 @@ sx={{
       value: user._id,
       label: user.username,
     }));
-    // for autocomplete
-    // const handleUserChange = (event, selectedOptions) => {
-    //   setSelectedUser(selectedOptions);
-    //   const selectedValues = selectedOptions.map((option) => option.value);
-    //   setCombinedValues(selectedValues);
-    // };
 
     const handleUserChange = (newSelectedUsers) => {
       setSelectedUser(newSelectedUsers);
@@ -2256,120 +2236,112 @@ sx={{
       setClientFacingStatus(checked);
     };
     const [selectedAccount, setSelectedAccount] = useState(null);
-    const handleEditJobCard = async (jobid) => {
-      console.log(jobid);
-      setjobid(jobid);
-      try {
-        const url = `${JOBS_API}/workflow/jobs/job/joblist/listbyid/${jobid}`;
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error("Failed to fetch data");
-        }
-        const data = await response.json();
-        setSelectedJoData(data.jobList);
-        console.log("account name", data);
+    // const handleEditJobCard = async (jobid) => {
+    //   console.log(jobid);
+    //   setjobid(jobid);
+    //   try {
+    //     const url = `${JOBS_API}/workflow/jobs/job/joblist/listbyid/${jobid}`;
+    //     const response = await fetch(url);
+    //     if (!response.ok) {
+    //       throw new Error("Failed to fetch data");
+    //     }
+    //     const data = await response.json();
+    //     console.log("jobasdata",data)
+    //     setSelectedJoData(data.jobList);
 
-        // for autocomplete
-        // if (data.jobList && data.jobList.Account) {
-        //   const accountsData = {
-        //     value: data.jobList.Account._id,
-        //     label: data.jobList.Account.accountName,
-        //   };
-        //   setSelectedAccount(accountsData)
-        //   console.log("accounts",accountsData)
-        // }
+    //     if (data.jobList.Account && data.jobList.Account.length > 0) {
+    //       const { _id, accountName } = data.jobList.Account[0];
+    //       console.log("Account ID:", _id);
+    //       console.log("Account Name:", accountName);
+    //       setSelectedAccount(accountName);
+    //     } 
+    //     if (data.jobList && data.jobList.Pipeline) {
+    //       const pipelineData = {
+    //         value: data.jobList.Pipeline._id,
+    //         label: data.jobList.Pipeline.Name,
+    //       };
+    //       setSelectedPipeline(pipelineData);
+    //       console.log(pipelineData);
+    //       setPipelineId(data.jobList.Pipeline._id);
+    //       console.log(data.jobList.Pipeline._id);
+    //       fetchPipelineDataid(data.jobList.Pipeline._id);
+    //     }
+    //     setDueDate(dayjs(data.jobList.DueDate) || null);
+    //     // (dayjs(tempvalues.startdate) || null)
+    //     setStartDate(dayjs(data.jobList.StartDate) || null);
+    //     if (
+    //       data.jobList &&
+    //       data.jobList.Stage &&
+    //       data.jobList.Stage.length > 0
+    //     ) {
+    //       const stageData = {
+    //         value: data.jobList.Stage[0]._id, // Access first element of array
+    //         label: data.jobList.Stage[0].name,
+    //       };
+    //       setSelectedstage(stageData);
+    //       console.log("stages", stageData);
+    //     }
 
+    //     setPriority(data.jobList.Priority);
+    //     setDescription(data.jobList.Description);
+    //     setClientFacingStatus(data.jobList.ShowinClientPortal);
+    //     setInputText(data.jobList.jobClientName);
+    //     setClientDescription(data.jobList.ClientFacingDecription);
+    //     if (
+    //       data.jobList.ClientFacingStatus &&
+    //       data.jobList.ClientFacingStatus
+    //     ) {
+    //       const clientStatusData = {
+    //         value: data.jobList.ClientFacingStatus._id,
+    //         label: data.jobList.ClientFacingStatus.clientfacingName,
+    //         clientfacingColour:
+    //           data.jobList.ClientFacingStatus.clientfacingColour,
+    //       };
 
-    
+    //       setSelectedjob(clientStatusData);
+    //     }
 
-        if (data.jobList.Account && data.jobList.Account.length > 0) {
-          const { _id, accountName } = data.jobList.Account[0];
-          console.log("Account ID:", _id);
-          console.log("Account Name:", accountName);
-          setSelectedAccount(accountName);
-        } 
-        if (data.jobList && data.jobList.Pipeline) {
-          const pipelineData = {
-            value: data.jobList.Pipeline._id,
-            label: data.jobList.Pipeline.Name,
-          };
-          setSelectedPipeline(pipelineData);
-          console.log(pipelineData);
-          setPipelineId(data.jobList.Pipeline._id);
-          console.log(data.jobList.Pipeline._id);
-          fetchPipelineDataid(data.jobList.Pipeline._id);
-        }
-        setDueDate(dayjs(data.jobList.DueDate) || null);
-        // (dayjs(tempvalues.startdate) || null)
-        setStartDate(dayjs(data.jobList.StartDate) || null);
-        if (
-          data.jobList &&
-          data.jobList.Stage &&
-          data.jobList.Stage.length > 0
-        ) {
-          const stageData = {
-            value: data.jobList.Stage[0]._id, // Access first element of array
-            label: data.jobList.Stage[0].name,
-          };
-          setSelectedstage(stageData);
-          console.log("stages", stageData);
-        }
+    //     if (data.jobList && data.jobList.Account) {
+    //       setDataAccountjob(data.jobList.Account[0].accountName);
+    //     }
 
-        setPriority(data.jobList.Priority);
-        setDescription(data.jobList.Description);
-        setClientFacingStatus(data.jobList.ShowinClientPortal);
-        setInputText(data.jobList.jobClientName);
-        setClientDescription(data.jobList.ClientFacingDecription);
-        if (
-          data.jobList.ClientFacingStatus &&
-          data.jobList.ClientFacingStatus
-        ) {
-          const clientStatusData = {
-            value: data.jobList.ClientFacingStatus._id,
-            label: data.jobList.ClientFacingStatus.clientfacingName,
-            clientfacingColour:
-              data.jobList.ClientFacingStatus.clientfacingColour,
-          };
+    //     if (data.jobList && data.jobList.Account) {
+    //       console.log(data.jobList.Account[0]._id);
+    //       setAccountId(data.jobList.Account[0]._id);
+    //       console.log(data.jobList.Account[0].tags);
+    //       const tagsData = data.jobList.Account[0].tags
+    //         .flatMap((tagArray) => tagArray)
+    //         .map((tag) => ({
+    //           value: tag._id,
+    //           label: tag.tagName,
+    //           colour: tag.tagColour,
+    //         }));
+    //       setSelectedTags(tagsData);
+    //       const selectedValues = tagsData.map((option) => option.value);
+    //       setCombinedTagsValues(selectedValues);
+    //     }
 
-          setSelectedjob(clientStatusData);
-        }
+    //     if (data.jobList && data.jobList.JobAssignee) {
+    //       const assigneesData = data.jobList.JobAssignee.map((assignee) => ({
+    //         value: assignee._id,
+    //         label: assignee.username,
+    //       }));
 
-        if (data.jobList && data.jobList.Account) {
-          setDataAccountjob(data.jobList.Account[0].accountName);
-        }
+    //       setSelectedUser(assigneesData);
+    //       const selectedValues = assigneesData.map((option) => option.value);
+    //       setCombinedValues(selectedValues);
+    //     }
 
-        if (data.jobList && data.jobList.Account) {
-          console.log(data.jobList.Account[0]._id);
-          setAccountId(data.jobList.Account[0]._id);
-          console.log(data.jobList.Account[0].tags);
-          const tagsData = data.jobList.Account[0].tags
-            .flatMap((tagArray) => tagArray)
-            .map((tag) => ({
-              value: tag._id,
-              label: tag.tagName,
-              colour: tag.tagColour,
-            }));
-          setSelectedTags(tagsData);
-          const selectedValues = tagsData.map((option) => option.value);
-          setCombinedTagsValues(selectedValues);
-        }
-
-        if (data.jobList && data.jobList.JobAssignee) {
-          const assigneesData = data.jobList.JobAssignee.map((assignee) => ({
-            value: assignee._id,
-            label: assignee.username,
-          }));
-
-          setSelectedUser(assigneesData);
-          const selectedValues = assigneesData.map((option) => option.value);
-          setCombinedValues(selectedValues);
-        }
-
-        setIsDrawerOpen(true);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
+    //     setIsDrawerOpen(true);
+    //   } catch (error) {
+    //     console.error("Error fetching data:", error);
+    //   }
+    // };
+  const [editJobId, setEditJobId] = useState(null);
+ const handleEditJobCard = (jobId) => {
+    setEditJobId(jobId);
+    setIsDrawerOpen(true);
+  };
     const handleSaveClick = () => {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
@@ -2482,9 +2454,11 @@ sx={{
         })
         .then((result) => {
           // Handle success
+          console.log("hgdvhvf",result)
           toast.success("Job Template updated successfully");
           handleSaveTags();
           setIsDrawerOpen(false);
+          
           fetchJobData();
         })
         .catch((error) => {
@@ -2550,14 +2524,7 @@ sx={{
           {job.Name}
         </Typography>
 
-        {/* Job Assignee */}
-        {/* <Typography
-          variant="body2"
-          color="text.secondary"
-          sx={{ marginBottom: "8px" }}
-        >
-          {job.JobAssignee.join(", ")}
-        </Typography> */}
+     
         <Typography
   variant="body2"
   color="text.secondary"
@@ -2637,9 +2604,22 @@ sx={{
             </Box>
           </Box>
         </Modal>
+      <EditJobDrawer
+        open={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        jobId={editJobId}
+        fetchJobData={fetchJobData}
+        accountOptions={accountOptions}
+        pipelineOptions={optionpipeline}
+        tagOptions={tagoptions}
+        userOptions={useroptions}
+        clientFacingOptions={optionstatus}
+        theme={theme}
+        isSmallScreen={isSmallScreen}
+      />
 
         {/* edit job */}
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
+        {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
           <Drawer
             anchor="right"
             open={isDrawerOpen}
@@ -2689,7 +2669,7 @@ sx={{
                   margin="normal"
                 />
               </Box>
-              {/* selectedAccount */}
+           
               <Box>
                 <InputLabel sx={{ color: "black" }}>Pipeline</InputLabel>
 
@@ -2727,89 +2707,17 @@ sx={{
                 <InputLabel sx={{ color: "black", mb: 1 }}>
                   Account Tags
                 </InputLabel>
-                {/* <Autocomplete
-                  multiple // Enable multi-select
-                  size="small"
-                  sx={{ marginTop: "8px", marginBottom: "8px" }}
-                  options={tagoptions} // The array of options
-                  value={selectedTags} // Selected tags
-                  onChange={handleTagChange}
-                  getOptionLabel={(option) => option.label} // Assuming your tags have a 'label' property
-                  isOptionEqualToValue={(option, value) =>
-                    option.value === value.value
-                  } // Customize equality check
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      variant="outlined"
-                      placeholder="Select tags..."
-                    />
-                  )}
-                  filterSelectedOptions // Prevents duplicates in selection
-                  renderOption={(props, option) => (
-                    <MenuItem
-                      {...props}
-                      key={option.value}
-                      style={{
-                        backgroundColor: option.colour,
-                        color: "#fff",
-                        borderRadius: "15px",
-                        margin: "2px 0",
-                        width: calculateWidthOptions(option.label),
-                      }}
-                    >
-                      {option.label}
-                    </MenuItem>
-                  )}
-                  renderTags={(value, getTagProps) =>
-                    value.map((option, index) => (
-                      <Chip
-                        {...getTagProps({ index })}
-                        key={option.value}
-                        label={option.label}
-                        style={{
-                          backgroundColor: option.colour,
-                          color: "#fff",
-                          borderRadius: "15px",
-                          fontSize: "10px",
-                          margin: "7px",
-                          alignItems: "center",
-                          textAlign: "center",
-                          marginBottom: "5px",
-                          padding: "2px,8px",
-                        }}
-                      />
-                    ))
-                  }
-                /> 
-                 */}
+                
                 <FormControl sx={{ width: "100%" }}>
                   <Select
                     multiple
                     multiline
                     size="small"
-                    // sx={{ marginTop: "8px", marginBottom: "8px", width: "100%" }}
+                   
                     input={<OutlinedInput />}
                     displayEmpty
                     value={combinedTagsValues} // Store selected tag objects
                     onChange={handleTagChange} // Handle selection
-                    // renderValue={(selected) => (
-                    //   <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                    //     {selected.map((option) => (
-                    //       <Chip
-                    //         key={option.value}
-                    //         label={option.label}
-                    //         sx={{
-                    //           backgroundColor: option.colour,
-                    //           color: "#fff",
-                    //           borderRadius: "15px",
-                    //           fontSize: "10px",
-                    //           padding: "2px 8px",
-                    //         }}
-                    //       />
-                    //     ))}
-                    //   </Box>
-                    // )}
                     renderValue={(selected) => {
                       if (selected.length === 0) {
                         return (
@@ -2893,34 +2801,7 @@ sx={{
               </Box>
               <Box mt={2} mr={2.5}>
                 <InputLabel sx={{ color: "black" }}>Job Assignee</InputLabel>
-                {/* <Autocomplete
-                  multiple
-                  sx={{ background: "#fff", mt: 1 }}
-                  options={useroptions}
-                  size="small"
-                  getOptionLabel={(option) => option.label}
-                  value={selecteduser}
-                  onChange={handleUserChange}
-                  renderOption={(props, option) => (
-                    <Box
-                      component="li"
-                      {...props}
-                      sx={{ cursor: "pointer", margin: "5px 10px" }} // Add cursor pointer style
-                    >
-                      {option.label}
-                    </Box>
-                  )}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      variant="outlined"
-                      placeholder="Assignees"
-                    />
-                  )}
-                  isOptionEqualToValue={(option, value) =>
-                    option.value === value.value
-                  }
-                /> */}
+             
                  <MultiSelectDropdown 
                    value={selectedUser}
                    onChange={handleUserChange}
@@ -2970,8 +2851,7 @@ sx={{
                 <DatePicker
                    format="MM/DD/YYYY"
                   sx={{ width: "100%", backgroundColor: "#fff", mt: 2 }}
-                  // value={startDate}
-                  // onChange={handleStartDateChange}
+                 
                   value={startDate}
                   onChange={handleStartDateChange}
                   renderInput={(params) => (
@@ -2984,8 +2864,7 @@ sx={{
                 <DatePicker
                    format="MM/DD/YYYY"
                   sx={{ width: "100%", backgroundColor: "#fff", mt: 2 }}
-                  // value={dueDate}
-                  // onChange={handleDueDateChange}
+                 
                   value={dueDate}
                   onChange={handleDueDateChange}
                   renderInput={(params) => (
@@ -3199,7 +3078,7 @@ sx={{
               </Box>
             </Box>
           </Drawer>
-        </LocalizationProvider>
+        </LocalizationProvider> */}
       </Box>
     );
   };
@@ -3272,43 +3151,6 @@ console.log("jobs for stage",jobs)
   const [accountName, setAccountName] = useState("");
   const [accountId, setAccountId] = useState("");
 
-  // const handleDrop = (jobId, targetStageName) => {
-  //   const sourceStage = stages.find((stage) =>
-  //     jobs.find((job) => job.id === jobId)?.Stage.includes(stage.name)
-  //   );
-
-  //   const targetStage = stages.find((stage) => stage.name === targetStageName);
-  //   const job = jobs.find((job) => job.id === jobId);
-  //   if (job) {
-  //     setAccountName(job.Account.join(", ")); // Store the account name
-  //     setAccountId(job.AccountId); // Store the account ID
-  //   }
-  //   // If the source stage has automations, show the drawer
-  //   if (sourceStage?.automations?.length > 0) {
-  //     setAutomationData(sourceStage.automations); // Set automation data for drawer
-  //     setCurrentJobId(jobId); // Store the current job ID
-  //     setCurrentTargetStage(targetStage); // Store the target stage
-  //     setAutomationDrawerOpen(true); // Open the automation drawer
-  //   } else {
-  //     // If no automations, immediately update the job's stage
-  //     const updatedJobs = jobs.map((job) => {
-  //       if (job.id === jobId) {
-  //         return { ...job, Stage: [targetStageName] };
-  //       }
-  //       return job;
-  //     });
-
-  //     setJobs(updatedJobs); // Update the job in the local state
-
-  //     // Optionally, refresh job data after updating
-  //     setTimeout(() => {
-  //       fetchJobData();
-  //     }, 1000);
-
-  //     updateJobStage(jobId, targetStage);
-  //   }
-  //   setTempJobData({ jobId, targetStageName });
-  // };
 
   const handleDrop = (jobId, targetStageName) => {
     const targetStage = stages.find((stage) => stage.name === targetStageName);
@@ -3346,68 +3188,7 @@ console.log("jobs for stage",jobs)
     setTempJobData({ jobId, targetStageName });
   };
 
-  // const handleMoveJob = (jobId, targetStage) => {
-  //   // Call the API to update the job stage in the backend
-  //   const updateJobStage = async () => {
-  //     let data = JSON.stringify({ stageid: targetStage._id });
-  //     let config = {
-  //       method: "post",
-  //       maxBodyLength: Infinity,
-  //       url: `${JOBS_API}/workflow/jobs/job/jobpipeline/updatestageid/${jobId}`,
-  //       headers: { "Content-Type": "application/json" },
-  //       data: data,
-  //     };
-  //     try {
-  //       const response = await axios.request(config);
-  //       console.log("Job moved successfully:", response.data);
-  //       toast.success("Job moved successfully!");
-  //       fetchJobData(); // Refresh the data
-  //     } catch (error) {
-  //       console.error("Error moving job:", error);
-  //       toast.error("Failed to move job");
-  //     }
-  //   };
-  //   updateJobStage();
-  // };
- 
-//  const handleMoveJob = (jobId, targetStage, automation) => {
-
-//   console.log("while moving job automation", automation)
-//   // Call the API to update the job stage in the backend
-//   const updateJobStage = async () => {
-//     let data = {
-//       stageid: targetStage._id,
-//     };
-
-//     // If there's an automation of type "Update client-facing job status", update those fields
-//     if (automation && automation.type === "Update client-facing job status") {
-//       data = {
-//         ...data,
-//         showinclientportal: automation.visibilityForClient,
-//         clientfacingstatus: automation.selectedClientStatus?.value,
-//         clientfacingDescription: automation.statusDescription,
-//       };
-//     }
-
-//     let config = {
-//       method: "post",
-//       maxBodyLength: Infinity,
-//       url: `${JOBS_API}/workflow/jobs/job/jobpipeline/updatestageid/${jobId}`,
-//       headers: { "Content-Type": "application/json" },
-//       data: JSON.stringify(data),
-//     };
-//     try {
-//       const response = await axios.request(config);
-//       console.log("Job moved successfully:", response.data);
-//       toast.success("Job moved successfully!");
-//       fetchJobData(); // Refresh the data
-//     } catch (error) {
-//       console.error("Error moving job:", error);
-//       toast.error("Failed to move job");
-//     }
-//   };
-//   updateJobStage();
-// };
+  
  
 const handleMoveJob = async (jobId, targetStage, automations = {}) => {
   try {

@@ -1,455 +1,4 @@
 
-// import React, { useEffect, useState } from "react";
-// import { DndProvider, useDrag, useDrop } from "react-dnd";
-// import { HTML5Backend } from "react-dnd-html5-backend";
-// import { Typography,Box ,Dialog, DialogActions, DialogContent, DialogTitle, Button} from "@mui/material";
-// import { useParams } from "react-router-dom";
-// import axios from "axios";
-// import { toast } from "react-toastify";
-// import "./style.css"
-// import { useNavigate } from "react-router-dom";
-// import DeleteIcon from "@mui/icons-material/Delete";
-// import ArchiveIcon from '@mui/icons-material/Archive'; 
-// import { differenceInMinutes, differenceInHours, differenceInDays } from "date-fns";
-// const ItemTypes = {
-//   JOB: "job",
-// };
-
-// const Pipelines = () => {
-//   const PIPELINE_API = process.env.REACT_APP_PIPELINE_TEMP_URL;
-//   const JOBS_API = process.env.REACT_APP_ADD_JOBS_URL;
-
-//   const [jobData, setJobData] = useState([]);
-//   const [pipelineData, setPipelineData] = useState([]);
-//   const [loading, setLoading] = useState(false);
-//   const { data } = useParams();
-  
-//   useEffect(() => {
-//     fetchJobList(data);
-//   }, [data]);
-
-//   const fetchJobList = (data) => {
-//     const url = `${JOBS_API}/workflow/jobs/job/joblist/list/true/${data}`;
-
-//     fetch(url)
-//       .then((response) => response.json())
-//       .then((result) => {
-//         setJobData(result.jobList || []);
-//         console.log("joblist",result.jobList)
-//         const pipelineIds = result.jobList.map((job) => job.PipelineId);
-//         console.log("Pipeline IDs:", pipelineIds);
-//         pipelineIds.forEach((id) => fetchPipelineData(id));
-//       })
-//       .catch((error) => {
-//         console.error("Error fetching job list:", error);
-//       });
-//   };
-
-//   const fetchPipelineData = async (pipelineId) => {
-//     console.log("test",pipelineId)
-//     setLoading(true);
-//     try {
-//       const url = `${PIPELINE_API}/workflow/pipeline/pipeline/${pipelineId}`;
-//       const response = await fetch(url);
-//       const data = await response.json();
-//       console.log("pipeline detils",data)
-//       setPipelineData((prevData) => [
-//         ...prevData,
-//         { ...data.pipeline, stages: data.pipeline.stages || [] },
-//       ]);
-//     } catch (error) {
-//       console.error("Error fetching pipeline data:", error);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
- 
-//   const handleDrop = (jobId, stageName) => {
-//   const updatedJobs = jobData.map((job) => {
-//     if (job.id === jobId) {
-//       // Create a new stages array with just the new stage
-//       const updatedStages = [{ name: stageName }];
-//       return { ...job, Stages: updatedStages };
-//     }
-//     return job;
-//   });
-//   setJobData(updatedJobs);
-
-//   setTimeout(() => {
-//     fetchJobList(data);
-//   }, 1000);
-// };
-
-//   const updateJobStage = async (stage, item) => {
-//     const data = JSON.stringify({ stageid: stage._id });
-//     const config = {
-//       method: "post",
-//       maxBodyLength: Infinity,
-//       url: `${JOBS_API}/workflow/jobs/job/jobpipeline/updatestageid/${item.id}`,
-//       headers: { "Content-Type": "application/json" },
-//       data: data,
-//     };
-
-//     try {
-//       const response = await axios.request(config);
-//       console.log("API Response:", response.data);
-//     } catch (error) {
-//       console.error("API Error:", error);
-//     }
-//   };
-
-//   const moveJob = (jobId, targetStage, stage) => {
-//     console.log("stage details", targetStage)
-//     handleDrop(jobId, targetStage);
-//     updateJobStage(stage, { id: jobId });
-//   };
-//   const uniquePipelines = Array.from(
-//     new Map(pipelineData.map((pipeline) => [pipeline._id, pipeline])).values()
-//   );
-//   return (
-//     <DndProvider backend={HTML5Backend}>
-//       <Box>
-//         {loading && <p>Loading pipeline data...</p>}
-//         {uniquePipelines.map((pipeline, index) => (
-//           <Pipeline
-//             key={index}
-//             pipeline={pipeline}
-//             jobData={jobData}
-//             moveJob={moveJob}
-//             fetchJobList={fetchJobList}
-//             data={data}
-//           />
-//         ))}
-//       </Box>
-//     </DndProvider>
-//   );
-// };
-
-
-
-// const Pipeline = ({ pipeline, jobData, moveJob, fetchJobList, data }) => {
-//   const JOBS_API = process.env.REACT_APP_ADD_JOBS_URL;
-//   const [checkedJobIds, setCheckedJobIds] = useState([]);
-//   const handleJobCheckboxChange = (isChecked, jobId) => {
-//     setCheckedJobIds((prevIds) =>
-//       isChecked ? [...prevIds, jobId] : prevIds.filter((id) => id !== jobId)
-//     );
-//   };
-//   const [openDialog, setOpenDialog] = useState(false);
-//   const [dialogType, setDialogType] = useState("");
-//   const handleDialogOpen = (type) => {
-//     setDialogType(type);
-//     setOpenDialog(true);
-//   };
-
-//   const handleDialogClose = () => {
-//     setOpenDialog(false);
-//   };
-//   const handleDelete = () => {
-//     const requestOptions = {
-//       method: "DELETE",
-//       redirect: "follow",
-//     };
-
-//     Promise.all(
-//       checkedJobIds.map((jobId) =>
-//         fetch(`${JOBS_API}/workflow/jobs/job/${jobId}`, requestOptions)
-//           .then((response) => {
-//             if (!response.ok) {
-//               throw new Error(`Failed to delete job ID: ${jobId}`);
-//             }
-//             return response.json();
-//           })
-//       )
-//     )
-//       .then(() => {
-//         console.log("Jobs deleted successfully:", checkedJobIds);
-//         toast.success("Jobs deleted successfully");
-//         fetchJobList(data); 
-//       })
-//       .catch((error) => {
-//         console.error("Error deleting jobs:", error);
-//         toast.error("Failed to delete some jobs");
-//       });
-//   };
-//   const navigate = useNavigate();
-//   const handleArchive = async () => {
-//     const requestOptions = {
-//       method: "PATCH",
-//       headers: { "Content-Type": "application/json" },
-//       body: JSON.stringify({
-//         active: false,
-//       }),
-//       redirect: "follow",
-//     };
-  
-//     try {
-//       const archivePromises = checkedJobIds.map((jobId) =>
-//         fetch(
-//           `${JOBS_API}/workflow/jobs/job/${jobId}`,
-//           requestOptions
-//         ).then((response) => {
-//           if (!response.ok) {
-//             throw new Error(`Failed to archive job ID: ${jobId}`);
-//           }
-//           return response.json();
-//         })
-//       );
-  
-//       await Promise.all(archivePromises);
-//       toast.success("Jobs archived successfully");
-//       fetchJobList(data);
-//       navigate(`/clients/accounts/accountsdash/workflow/${data}/archivedjobs`);
-//     } catch (error) {
-//       console.error("Error archiving jobs:", error);
-//       toast.error("Failed to archive some jobs");
-//     }
-//   };
-
-//   return (
-//     <Box sx={{ border: "1px solid grey", borderRadius: '10px', marginBottom: '15px' }}>
-//       <h3 style={{ marginLeft: '15px' }}>{pipeline.pipelineName}</h3>
-//       {checkedJobIds.length > 0 && (
-//         <Box>
-//           <Box sx={{display:'flex', alignItems:'center', gap:2}}>
-//             <DeleteIcon
-//               onClick={() => handleDialogOpen("delete")}
-//               sx={{
-//                 marginLeft: "15px",
-//                 color: "red",
-//                 cursor: "pointer",
-//                 transform: "scale(1)",
-//               }}
-//             />
-//             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-//               <ArchiveIcon sx={{ marginRight: 1, cursor:'pointer' }} 
-//                 onClick={() => handleDialogOpen("archive")}
-//               />
-//               <p>Archive</p>
-//             </Box>
-//           </Box>
-//           <Dialog open={openDialog} onClose={handleDialogClose}>
-//             <DialogTitle>
-//               {dialogType === "delete" ? "Confirm Delete" : "Confirm Archive"}
-//             </DialogTitle>
-//             <DialogContent>
-//               Are you sure you want to{" "}
-//               {dialogType === "delete" ? "delete" : "archive"} these jobs?
-//             </DialogContent>
-//             <DialogActions>
-//               <Button onClick={handleDialogClose} color="secondary">
-//                 Cancel
-//               </Button>
-//               <Button
-//                 onClick={dialogType === "delete" ? handleDelete : handleArchive}
-//                 color="primary"
-//               >
-//                 Confirm
-//               </Button>
-//             </DialogActions>
-//           </Dialog>
-//         </Box>
-//       )}
-      
-//       <Box
-//         className="stage-container"
-//         display="flex"
-//         gap={2}
-//         sx={{
-//           padding: 2,
-//           overflowX: "auto",
-//           whiteSpace: "nowrap",
-//         }}
-//       >
-//         {pipeline.stages.map((stage, stageIndex) => (
-//           <Stage
-//             key={stageIndex}
-//             stage={stage}
-//             jobs={jobData.filter(
-//               (job) =>
-//                 job.PipelineId === pipeline._id && 
-//                 job.Stages && 
-//                 job.Stages.some(s => s.name === stage.name)
-//             )}
-//             moveJob={(jobId, targetStage) => moveJob(jobId, targetStage, stage)}
-//             onCheckboxChange={handleJobCheckboxChange}
-            
-//           />
-//         ))}
-//       </Box>
-//     </Box>
-//   );
-// };
-// const Stage = ({ stage, jobs, moveJob ,onCheckboxChange }) => {
-//   const [{ isOver }, drop] = useDrop({
-//     accept: ItemTypes.JOB,
-//     drop: (item) => moveJob(item.id, stage.name),
-//     collect: (monitor) => ({
-//       isOver: monitor.isOver(),
-//     }),
-//   });
-
-//   return (
-//     <Box
-//       ref={drop}
-//       sx={{
-//         minWidth: "180px",
-//         height: 500,
-//         padding: 2,
-//         backgroundColor: isOver ? "white" : "#f2f7f7",
-//         overflowY: "auto",
-//         overflowX: 'hidden',
-//         borderRadius: '10px',
-//         flexShrink: 0,
-//       boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)"
-//       }}
-//       // className="stage"
-//     >
-//       <p>{stage.name}</p>
-//       {jobs.map((job) => (
-//         <Job key={job.id} job={job} onCheckboxChange ={onCheckboxChange }/>
-//       ))}
-//     </Box>
-//   );
-// };
-
-// const Job = ({ job,onCheckboxChange  }) => {
-//   const [{ isDragging }, drag] = useDrag({
-//     type: ItemTypes.JOB,
-//     item: { id: job.id },
-//     collect: (monitor) => ({
-//       isDragging: monitor.isDragging(),
-//     }),
-//   });
-//   const truncateName = (name) => {
-//     const maxLength = 15;
-//     if (name.length > maxLength) {
-//       return name.substring(0, maxLength) + "...";
-//     }
-//     return name;
-//   };
-//   const stripHtmlTags = (html) => {
-//     const doc = new DOMParser().parseFromString(html, "text/html");
-//     return doc.body.textContent || "";
-//   };
-//   const truncateDescription = (description, maxLength = 20) => {
-//     if (description.length > maxLength) {
-//       return description.slice(0, maxLength) + "...";
-//     }
-//     return description;
-//   };
-
-//   const getPriorityStyle = (priority) => {
-//     switch (priority.toLowerCase()) {
-//       case "urgent":
-//         return { color: "white", backgroundColor: "#0E0402", fontSize: "12px", borderRadius: "50px", padding: "3px 7px" };
-//       case "high":
-//         return { color: "white", backgroundColor: "#fe676e", fontSize: "12px", borderRadius: "50px", padding: "3px 7px" }; // light red background
-//       case "medium":
-//         return { color: "white", backgroundColor: "#FFC300", fontSize: "12px", borderRadius: "50px", padding: "3px 7px" }; // light orange background
-//       case "low":
-//         return { color: "white", backgroundColor: "#56c288", fontSize: "12px", borderRadius: "50px", padding: "3px 7px" }; // light green background
-//       default:
-//         return {};
-//     }
-//   };
-//   const formatDate = (date) => {
-//     if (!date) return ""; // Handle null or undefined dates
-//     const options = { month: "short", day: "2-digit", year: "numeric" };
-//     return new Intl.DateTimeFormat("en-US", options).format(new Date(date));
-//   };
-//   const timeAgo = (date) => {
-//     if (!date) return "N/A";
-//     const currentTime = new Date();
-//     const jobTime = new Date(date);
-//     const minutesDiff = differenceInMinutes(currentTime, jobTime);
-//     const hoursDiff = differenceInHours(currentTime, jobTime);
-//     const daysDiff = differenceInDays(currentTime, jobTime);
-//     if (minutesDiff < 1) {
-//       return "just now";
-//     } else if (minutesDiff < 60) {
-//       return `${minutesDiff} minute${minutesDiff === 1 ? "" : "s"} ago`;
-//     } else if (hoursDiff < 24) {
-//       return `${hoursDiff} hour${hoursDiff === 1 ? "" : "s"} ago`;
-//     } else {
-//       return `${daysDiff} day${daysDiff === 1 ? "" : "s"} ago`;
-//     }
-//   };
-//   const [isHovered, setIsHovered] = useState(false);
-//   const [isChecked, setIsChecked] = useState(false);
-//   const handleCheckboxChange = (event) => {
-//     const checked = event.target.checked;
-//     setIsChecked(checked);
-//     onCheckboxChange(checked, job.id); // Notify the pipeline about the checkbox status.
-//     if (checked) {
-//       console.log("Checked Job ID:", job.id);
-//     }
-//   };
-//   return (
-//     <Box
-//       ref={drag}
-//       onMouseEnter={() => setIsHovered(true)}
-//       onMouseLeave={() => setIsHovered(false)}
-//       sx={{
-//         padding: 2,
-//         border: "1px solid #ddd",
-//         marginTop: 2,
-//         width: "160px",
-//         background: isDragging ? "#f0f0f0" : "#f9f9f9",
-//         textAlign: "left",
-//         opacity: isDragging ? 0.5 : 1,
-//         borderRadius: '8px',
-//         cursor: 'pointer',
-//         position: "relative",
-//         transition: "transform 0.2s ease",
-//         boxShadow:"02.s ease"
-//       }}
-     
-//     >
-//       {(isHovered || isChecked) && (
-//         <input
-//           type="checkbox"
-//           checked={isChecked}
-//           onChange={handleCheckboxChange}
-//           style={{
-//             position: "absolute",
-//             top: 10,
-//             right: 10,
-//             cursor: "pointer",
-//             transform: "scale(1.2)",
-//           }}
-//         />
-//       )}
-//       <p>{job.Account.join(", ")}</p>
-//       <p>{truncateName(job.Name)}</p>
-//       {/* <p>{job.JobAssignee.join(", ")}</p>
-//        */}
-//          <Typography
-//   variant="body2"
-//   color="text.secondary"
-//   sx={{ 
-//     marginBottom: "8px",
-//     whiteSpace: "normal",
-//     wordBreak: "break-word",
-//     overflowWrap: "break-word",
-//     lineHeight: "1.5", // Adjust line height for better readability
-//   }}
-// >
-//   {job.JobAssignee.join(", ")}
-// </Typography>
-//       <p>{truncateDescription(stripHtmlTags(job.Description))}</p>
-//       <span style={getPriorityStyle(job.Priority)}>{job.Priority}</span>
-//       <p>Start Date: {formatDate(job.StartDate)}</p>
-//       <p>Due Date: {formatDate(job.DueDate)}</p>
-//       <p>
-//         {timeAgo(job.updatedAt)}
-//       </p>
-
-//     </Box>
-//   );
-// };
-// export default Pipelines;
 
 
 import React, { useEffect, useState ,useContext} from "react";
@@ -461,6 +10,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import "./style.css"
 import { useNavigate } from "react-router-dom";
+import EditJobDrawer from "../../Workflow/updateJobCard"
 import DeleteIcon from "@mui/icons-material/Delete";
 import ArchiveIcon from '@mui/icons-material/Archive'; 
 import { differenceInMinutes, differenceInHours, differenceInDays } from "date-fns";
@@ -548,25 +98,6 @@ const Pipelines = () => {
     }
   };
 
-  // const moveJob = (jobId, targetStage, stage) => {
-  //   console.log("stage details", targetStage)
-  //   updateJobStage(stage, { id: jobId });
-    
-  //   const updatedJobs = jobData.map((job) => {
-  //     if (job.id === jobId) {
-  //       // Create a new stages array with just the new stage
-  //       const updatedStages = [{ name: targetStage }];
-  //       return { ...job, Stages: updatedStages };
-  //     }
-  //     return job;
-  //   });
-  //   setJobData(updatedJobs);
-
-  //   setTimeout(() => {
-  //     fetchJobList(data);
-  //   }, 1000);
-  // };
-
   const moveJob = async (jobId, targetStageName, stage, automations = {}) => {
   try {
     // First, update the job's stage
@@ -618,11 +149,7 @@ const handleJobUpdates = async (jobId, automations) => {
     // Handle assignee updates if automation exists
     if (automations.assignees) {
       const { addAssignees = [], removeAssignees = [] } = automations.assignees;
-      
-      // Create new assignees array:
-      // 1. Start with current assignees
-      // 2. Remove any assignees in removeAssignees
-      // 3. Add any assignees in addAssignees that aren't already present
+  
       const newAssignees = [
         ...currentAssignees.filter(
           assigneeId => !removeAssignees.some(ra => ra._id === assigneeId)
@@ -870,6 +397,8 @@ const Pipeline = ({ pipeline, jobData, moveJob, fetchJobList, data, handleDrop }
             moveJob={(jobId, targetStage) => moveJob(jobId, targetStage, stage)}
             onCheckboxChange={handleJobCheckboxChange}
             handleDrop={handleDrop}
+             fetchJobList={fetchJobList}
+            data={data}
           />
         ))}
       </Box>
@@ -877,7 +406,7 @@ const Pipeline = ({ pipeline, jobData, moveJob, fetchJobList, data, handleDrop }
   );
 };
 
-const Stage = ({ stage, jobs, moveJob, onCheckboxChange, handleDrop }) => {
+const Stage = ({ stage, jobs, moveJob, onCheckboxChange, handleDrop,data,fetchJobList }) => {
   const [{ isOver }, drop] = useDrop({
     accept: ItemTypes.JOB,
     drop: (item) => handleDrop(item.id, stage.name),
@@ -922,7 +451,8 @@ const Stage = ({ stage, jobs, moveJob, onCheckboxChange, handleDrop }) => {
        {/* Only show the visible jobs */}
        <Box sx={{mt:2}}>
           {jobs.slice(0, visibleJobsCount).map((job) => (
-        <Job key={job.id} job={job} onCheckboxChange={onCheckboxChange} />
+        <Job  fetchJobList={fetchJobList}
+            data={data} key={job.id} job={job} onCheckboxChange={onCheckboxChange} />
       ))}
        </Box>
     
@@ -947,7 +477,7 @@ const Stage = ({ stage, jobs, moveJob, onCheckboxChange, handleDrop }) => {
   );
 };
 
-const Job = ({ job, onCheckboxChange }) => {
+const Job = ({ job, onCheckboxChange,data,fetchJobList }) => {
   const [{ isDragging }, drag] = useDrag({
     type: ItemTypes.JOB,
     item: { id: job.id },
@@ -1019,8 +549,113 @@ const Job = ({ job, onCheckboxChange }) => {
       console.log("Checked Job ID:", job.id);
     }
   };
-  return (
-    <Box
+   const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
+
+  // Add these state variables and functions for the edit functionality
+  const [accountOptions, setAccountOptions] = useState([]);
+  const [pipelineOptions, setPipelineOptions] = useState([]);
+  const [tagOptions, setTagOptions] = useState([]);
+  const [userOptions, setUserOptions] = useState([]);
+  const [clientFacingOptions, setClientFacingOptions] = useState([]);
+   const [jobData, setJobData] = useState([]);
+  // API endpoints
+  const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
+  const PIPELINE_API = process.env.REACT_APP_PIPELINE_TEMP_URL;
+  const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
+  const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
+  const CLIENT_FACING_API = process.env.REACT_APP_CLIENT_FACING_URL;
+  const JOBS_API = process.env.REACT_APP_ADD_JOBS_URL;
+
+  // Fetch data for edit drawer
+  useEffect(() => {
+    fetchAccountData();
+    fetchPipelineData();
+    fetchTagData();
+    fetchUserData();
+    fetchClientFacingData();
+  }, []);
+
+  const fetchAccountData = async () => {
+    try {
+      const response = await fetch(`${ACCOUNT_API}/accounts/accountdetails`);
+      const data = await response.json();
+      const options = data.accounts.map(account => ({
+        value: account._id,
+        label: account.accountName,
+      }));
+      setAccountOptions(options);
+    } catch (error) {
+      console.error("Error fetching account data:", error);
+    }
+  };
+
+  const fetchPipelineData = async () => {
+    try {
+      const response = await fetch(`${PIPELINE_API}/workflow/pipeline/pipelines`);
+      const data = await response.json();
+      const options = data.pipeline.map(pipeline => ({
+        value: pipeline._id,
+        label: pipeline.pipelineName,
+      }));
+      setPipelineOptions(options);
+    } catch (error) {
+      console.error("Error fetching pipeline data:", error);
+    }
+  };
+
+  const fetchTagData = async () => {
+    try {
+      const response = await fetch(`${TAGS_API}/tags/`);
+      const data = await response.json();
+      const options = data.tags.map(tag => ({
+        value: tag._id,
+        label: tag.tagName,
+        colour: tag.tagColour,
+      }));
+      setTagOptions(options);
+    } catch (error) {
+      console.error("Error fetching tag data:", error);
+    }
+  };
+
+  const fetchUserData = async () => {
+    try {
+      const response = await fetch(`${LOGIN_API}/common/users/roles?roles=TeamMember,Admin`);
+      const data = await response.json();
+      const options = data.map(user => ({
+        value: user._id,
+        label: user.username,
+      }));
+      setUserOptions(options);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
+
+  const fetchClientFacingData = async () => {
+    try {
+      const response = await fetch(`${CLIENT_FACING_API}/workflow/clientfacingjobstatus/`);
+      const data = await response.json();
+      const options = data.clientFacingJobStatues.map(status => ({
+        value: status._id,
+        label: status.clientfacingName,
+        clientfacingColour: status.clientfacingColour,
+      }));
+      setClientFacingOptions(options);
+    } catch (error) {
+      console.error("Error fetching client facing data:", error);
+    }
+  };
+
+  const handleEditClick = () => {
+    setIsEditDrawerOpen(true);
+  };
+ 
+
+   return (
+
+    <>
+        <Box
     className={`job-card ${isDragging ? "dragging" : ""}`}
       ref={drag}
       onMouseEnter={() => setIsHovered(true)}
@@ -1055,7 +690,7 @@ const Job = ({ job, onCheckboxChange }) => {
         />
       )}
       <p>{job.Account.join(", ")}</p>
-      <p>{truncateName(job.Name)}</p>
+    <strong style={{"color": 'red'}}  onClick={handleEditClick}><p>{truncateName(job.Name)}</p></strong>  
       <Typography
         variant="body2"
         color="text.secondary"
@@ -1077,6 +712,21 @@ const Job = ({ job, onCheckboxChange }) => {
         {timeAgo(job.updatedAt)}
       </p>
     </Box>
+    <EditJobDrawer
+        open={isEditDrawerOpen}
+        onClose={() => setIsEditDrawerOpen(false)}
+        jobId={job.id}
+        // fetchJobData={fetchJobList}
+        fetchJobData={() => fetchJobList(data)}
+        accountOptions={accountOptions}
+        pipelineOptions={pipelineOptions}
+        tagOptions={tagOptions}
+        userOptions={userOptions}
+        clientFacingOptions={clientFacingOptions}
+        theme={{ breakpoints: { down: () => false } }} // Mock theme object
+        isSmallScreen={false}
+      />
+    </>
   );
 };
 

@@ -23,7 +23,9 @@ import {
   Autocomplete,
   Switch,
   FormControlLabel,
-  Alert, Modal,  OutlinedInput,
+  Alert,
+  Modal,
+  OutlinedInput,
 } from "@mui/material";
 import { useContext } from "react";
 import { RxCross2 } from "react-icons/rx";
@@ -42,8 +44,8 @@ import { toast } from "react-toastify";
 import { AiOutlinePlusCircle, AiOutlineDelete } from "react-icons/ai";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import TagsMultiSelectDropDown from "../Templates/TagsMultiSelectDropDown"
-import MultiSelectDropdown from "../Templates/MultiSelectDropdown"
+import TagsMultiSelectDropDown from "../Templates/TagsMultiSelectDropDown";
+import MultiSelectDropdown from "../Templates/MultiSelectDropdown";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { LoginContext } from "../Sidebar/Context/Context";
@@ -55,18 +57,18 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
   const CONTACT_API = process.env.REACT_APP_CONTACTS_URL;
   const API_KEY = process.env.REACT_APP_FOLDER_URL;
-   const { logindata } = useContext(LoginContext);
-  
-    const [loginUserId, setLoginUserId] = useState();
-  
-    useEffect(() => {
-      if (logindata?.user?.id) {
-        setLoginUserId(logindata.user.id);
-      }
-    }, [logindata]);
+  const { logindata } = useContext(LoginContext);
+
+  const [loginUserId, setLoginUserId] = useState();
+
+  useEffect(() => {
+    if (logindata?.user?.id) {
+      setLoginUserId(logindata.user.id);
+    }
+  }, [logindata]);
   const ITEM_HEIGHT = 48;
   const ITEM_PADDING_TOP = 8;
-  
+
   const theme = useTheme();
   const navigate = useNavigate();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
@@ -74,7 +76,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   const [accountType, setAccountType] = useState("Individual");
   const [accountName, setaccountName] = useState("");
   const [companyname, setcompanyname] = useState("");
- 
+
   const [countries, setCountries] = useState([]);
   const [newUserId, setNewUserId] = useState("");
   // const [state, setstate] = useState('')
@@ -119,7 +121,6 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
 
     return isValid;
   };
-
 
   const validateContactForm = () => {
     let isValid = true;
@@ -188,10 +189,10 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
 
   const handleUserChange = (newSelectedUsers) => {
     setSelectedUser(newSelectedUsers);
-    console.log(newSelectedUsers)
+    console.log(newSelectedUsers);
     const selectedValues = newSelectedUsers.map((option) => option.value);
     setCombinedTeamMemberValues(selectedValues);
-    console.log(selectedValues)
+    console.log(selectedValues);
   };
 
   useEffect(() => {
@@ -207,16 +208,15 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
       .catch((error) => console.error("Error fetching country data:", error));
   }, []);
 
-
   const [selectedTags, setSelectedTags] = useState([]);
   const [combinedValues, setCombinedValues] = useState();
 
   const handleTagChange = (newSelectedTags) => {
     setSelectedTags(newSelectedTags);
-    console.log(newSelectedTags)
+    console.log(newSelectedTags);
     const selectedValues = newSelectedTags.map((option) => option.value);
     setCombinedValues(selectedValues);
-    console.log(selectedValues)
+    console.log(selectedValues);
   };
   //Tag FetchData ================
   const [tags, setTags] = useState([]);
@@ -333,7 +333,6 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   const SEVER_PORT = process.env.REACT_APP_SERVER_URI;
   const CLIENT_PORT = process.env.REACT_APP_CLIENT_SERVER_URI;
 
-  
   const updateAcountUserId = (UserId, accountuserid) => {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
@@ -372,7 +371,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
         tags: combinedValues || [], // Default to an empty array if null or undefined
         teamMember: combinedTeamMemberValues || [], // Default to an empty array if null or undefined
         foldertemplate: selectedTemplate?.value || null, // Default to empty string if null or undefined
-        adminUserId:loginUserId
+        adminUserId: loginUserId,
       });
 
       const requestOptions = {
@@ -417,7 +416,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
         city: cCity || "", // Default to empty string if null or undefined
         postalCode: cZipPostalCode || "", // Default to empty string if null or undefined
         foldertemplate: selectedTemplate?.value || null, // Default to empty string if null or undefined
-      adminUserId:loginUserId
+        adminUserId: loginUserId,
       });
       console.log(raw);
       const requestOptions = {
@@ -433,8 +432,12 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
         .then((result) => {
           console.log(result); // Log the result
           console.log(result.newAccount._id);
+          const newAccountId = result.newAccount._id;
           setAccountId(result.newAccount._id);
           addFolderTemplate(result.newAccount._id);
+          assignfoldertemp(newAccountId, result.newAccount.foldertemplate);
+          setAccountData(result.newAccount);
+          fetchAccountDataById(result.newAccount._id);
           // updateContactsAccountId(result.newAccount._id);
           toast.success("Form submitted successfully"); // Display success toast
         })
@@ -504,7 +507,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
 
   const [contacts, setContacts] = useState([]);
 
-   const addNewContact = () => {
+  const addNewContact = () => {
     setContacts([
       ...contacts,
       {
@@ -532,36 +535,37 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
     setContactCount(contactCount + 1);
   };
 
-
-
   const handleContactInputChange = (index, event) => {
     const { name, value } = event.target;
     const trimmedValue = value.trim();
     const updatedContacts = [...contacts];
-    updatedContacts[index] = { ...updatedContacts[index], [name]: trimmedValue };
+    updatedContacts[index] = {
+      ...updatedContacts[index],
+      [name]: trimmedValue,
+    };
 
     // Automatically update the contact name based on first, middle, and last names
     const firstName = updatedContacts[index].firstName || "";
     const middleName = updatedContacts[index].middleName || "";
     const lastName = updatedContacts[index].lastName || "";
     // updatedContacts[index].contactName =
-      // `${firstName} ${middleName} ${lastName}`.trim();
-        updatedContacts[index].contactName = `${firstName} ${middleName} ${lastName}`.trim();
+    // `${firstName} ${middleName} ${lastName}`.trim();
+    updatedContacts[index].contactName =
+      `${firstName} ${middleName} ${lastName}`.trim();
 
     setContacts(updatedContacts);
 
- 
     if (name === "firstName") {
-    setFirstNameError(trimmedValue ? "" : "First name is required.");
-  }
+      setFirstNameError(trimmedValue ? "" : "First name is required.");
+    }
 
-  if (name === "lastName") {
-    setLastNameError(trimmedValue ? "" : "Last name is required.");
-  }
+    if (name === "lastName") {
+      setLastNameError(trimmedValue ? "" : "Last name is required.");
+    }
 
-  if (name === "email") {
-    setEmaileError(trimmedValue ? "" : "Email is required.");
-  }
+    if (name === "email") {
+      setEmaileError(trimmedValue ? "" : "Email is required.");
+    }
   };
 
   const handleContactSwitchChange = (index, fieldName, checked) => {
@@ -572,40 +576,45 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
     };
     setContacts(updatedContacts);
   };
-const handleContactPhoneNumberChange = (index, phoneIndex, phoneValue, countryData) => {
-  setContacts((prevContacts) => {
-    const updatedContacts = [...prevContacts];
-    const contact = { ...updatedContacts[index] }; // clone contact
+  const handleContactPhoneNumberChange = (
+    index,
+    phoneIndex,
+    phoneValue,
+    countryData
+  ) => {
+    setContacts((prevContacts) => {
+      const updatedContacts = [...prevContacts];
+      const contact = { ...updatedContacts[index] }; // clone contact
 
-    let phoneNumbers = [...(contact.phoneNumbers || [])];
+      let phoneNumbers = [...(contact.phoneNumbers || [])];
 
-    // Ensure phoneNumbers array is large enough
-    if (phoneNumbers.length <= phoneIndex) {
-      phoneNumbers = [
-        ...phoneNumbers,
-        ...Array(phoneIndex + 1 - phoneNumbers.length).fill({
-          phone: "",
-          countryCode: "",
-          country: "",
-        }),
-      ];
-    }
+      // Ensure phoneNumbers array is large enough
+      if (phoneNumbers.length <= phoneIndex) {
+        phoneNumbers = [
+          ...phoneNumbers,
+          ...Array(phoneIndex + 1 - phoneNumbers.length).fill({
+            phone: "",
+            countryCode: "",
+            country: "",
+          }),
+        ];
+      }
 
-    // Update the specific phone object
-    phoneNumbers[phoneIndex] = {
-      ...phoneNumbers[phoneIndex],
-      phone: phoneValue,
-      countryCode: countryData.dialCode,
-      country: countryData.countryCode.toLowerCase(),
-    };
+      // Update the specific phone object
+      phoneNumbers[phoneIndex] = {
+        ...phoneNumbers[phoneIndex],
+        phone: phoneValue,
+        countryCode: countryData.dialCode,
+        country: countryData.countryCode.toLowerCase(),
+      };
 
-    // Set back into the contact and then into contacts
-    contact.phoneNumbers = phoneNumbers;
-    updatedContacts[index] = contact;
+      // Set back into the contact and then into contacts
+      contact.phoneNumbers = phoneNumbers;
+      updatedContacts[index] = contact;
 
-    return updatedContacts;
-  });
-};
+      return updatedContacts;
+    });
+  };
   const handleContactAddressChange = (index, field, value) => {
     setContacts((prevContacts) => {
       const updatedContacts = [...prevContacts];
@@ -654,7 +663,7 @@ const handleContactPhoneNumberChange = (index, phoneIndex, phoneValue, countryDa
       password: password,
       cpassword: password,
     });
-console.log("clientalldata",raw)
+    console.log("clientalldata", raw);
     const requestOptions = {
       method: "POST",
       headers: myHeaders,
@@ -674,7 +683,7 @@ console.log("clientalldata",raw)
       .then((result) => {
         console.log(result);
         console.log(result.client._id);
-        
+
         // setClientIdUpdate(result.client._id)
         // newUser(result.client._id);
       })
@@ -692,7 +701,6 @@ console.log("clientalldata",raw)
       email, // Use the provided email
       password: password, // Replace with a dynamic password logic if needed
       role: "Client",
-      
     });
 
     const requestOptions = {
@@ -701,7 +709,7 @@ console.log("clientalldata",raw)
       body: raw,
       redirect: "follow",
     };
-console.log("rawec",raw)
+    console.log("rawec", raw);
     const url = `${LOGIN_API}/common/login/signup`;
 
     fetch(url, requestOptions)
@@ -716,7 +724,6 @@ console.log("rawec",raw)
 
         // clientemail to activate client portal
         clientCreatedmail(email, personalMessage, result._id);
-
       })
       .catch((error) => console.error(error));
   };
@@ -731,7 +738,7 @@ console.log("rawec",raw)
   };
 
   const handlesubmitContact = () => {
-    console.log("nghjg",contacts);
+    console.log("nghjg", contacts);
     //  const url =`${CONTACT_API}/contacts/`
 
     fetch(`${CONTACT_API}/contacts/`, {
@@ -789,45 +796,44 @@ console.log("rawec",raw)
     //   console.log(contacts);
     //   setIsModalVisible(true);
     // }
- setIsModalVisible(true);
+    setIsModalVisible(true);
     //
   };
   const [comfirmationOpen, setComfirmationOpen] = useState(false);
 
-    const handleOpen = () => setComfirmationOpen(true);
-    const handleClose = () => setComfirmationOpen(false);
-    // Open modal and set AccountId properly
-const handleOpenModal = (id) => {
-  setAccountId(id);
-  setComfirmationOpen(true);
-};
+  const handleOpen = () => setComfirmationOpen(true);
+  const handleClose = () => setComfirmationOpen(false);
+  // Open modal and set AccountId properly
+  const handleOpenModal = (id) => {
+    setAccountId(id);
+    setComfirmationOpen(true);
+  };
   // const handleDeleteData =()=>{
-   
+
   // }
-   const handleDeleteData = () => {
-        const requestOptions = {
-          method: "DELETE",
-          redirect: "follow",
-        };
-  
-        fetch(`${ACCOUNT_API}/accounts/accountdetails/${AccountId}`, requestOptions)
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error("Failed to delete item");
-            }
-            return response.json();
-          })
-          .then((result) => {
-            console.log(result);
-            setComfirmationOpen(false);
-            handleNewDrawerClose()
-            
-          })
-          .catch((error) => {
-            console.error(error);
-            toast.error("Failed to delete item");
-          });
-      };
+  const handleDeleteData = () => {
+    const requestOptions = {
+      method: "DELETE",
+      redirect: "follow",
+    };
+
+    fetch(`${ACCOUNT_API}/accounts/accountdetails/${AccountId}`, requestOptions)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to delete item");
+        }
+        return response.json();
+      })
+      .then((result) => {
+        console.log(result);
+        setComfirmationOpen(false);
+        handleNewDrawerClose();
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error("Failed to delete item");
+      });
+  };
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [personalMessage, setPersonalMessage] = useState("");
@@ -924,7 +930,6 @@ const handleOpenModal = (id) => {
 
   const [allContactData, setAllContactData] = useState([]);
 
-
   const fetchContacts = async () => {
     try {
       const response = await axios.get(
@@ -987,37 +992,34 @@ const handleOpenModal = (id) => {
 
   const getSelectedIds = () => selectedContacts.join(", ");
 
-const setFilteredContact = () => {
-  console.log("Search Query:", searchQuery);
-  console.log("All Contacts Data:", allContactData);
+  const setFilteredContact = () => {
+    console.log("Search Query:", searchQuery);
+    console.log("All Contacts Data:", allContactData);
 
-  if (!searchQuery) {
-    console.warn("Search query is empty");
-    setFilteredContacts(allContactData); // Show all contacts if there's no search query
-    return;
-  }
+    if (!searchQuery) {
+      console.warn("Search query is empty");
+      setFilteredContacts(allContactData); // Show all contacts if there's no search query
+      return;
+    }
 
-  const lowerCaseQuery = searchQuery.toLowerCase();
+    const lowerCaseQuery = searchQuery.toLowerCase();
 
-  const filtered = allContactData.filter((contact) => {
+    const filtered = allContactData.filter((contact) => {
+      const emailMatch =
+        contact.email && contact.email.toLowerCase().includes(lowerCaseQuery);
 
+      return emailMatch;
+    });
 
-    const emailMatch =
-      contact.email &&
-      contact.email.toLowerCase().includes(lowerCaseQuery);
+    setFilteredContacts(filtered);
+    console.log("Filtered Contacts news:", filtered);
+  };
 
-    return  emailMatch;
+  const filterOptions = createFilterOptions({
+    matchFrom: "any",
+    stringify: (option) =>
+      `${option.name} ${option.email} ${option.phoneNumbers.join(" ")}`,
   });
-
-  setFilteredContacts(filtered);
-  console.log("Filtered Contacts news:", filtered);
-};
-
-const filterOptions = createFilterOptions({
-  matchFrom: "any",
-  stringify: (option) =>
-    `${option.name} ${option.email} ${option.phoneNumbers.join(" ")}`,
-});
   console.log(allContactData);
   console.log(filteredContacts);
   const handleClickOpen = () => {
@@ -1093,67 +1095,69 @@ const filterOptions = createFilterOptions({
         toast.success("Contact added successfully");
 
         // Create new users for the selected contacts
-      // selectedContacts.forEach(contactId => {
-      //   // Find the contact data by ID
-      //   const contact = filteredContacts.find(c => c.id === contactId);
-      //   if (contact) {
-      //     // Extract contact details (adjust these based on your contact object structure)
-      //     const { email, firstName, middleName, lastName } = contact;
-      //     console.log("contactssss",contact)
-      //     // Call newUser function to create portal access
-      //     newUser(result.updatedAccount._id, email, firstName, middleName, lastName);
-      //   }
-      // });
-      // Fetch details for each selected contact
-     const fetchPromises = selectedContacts.map(contactId => 
-  fetch(`${CONTACT_API}/contacts/${contactId}`)
-    .then(response => response.json())
-    .then(data => {
-      // Access the contact data from the response
-      const contact = data.contact;
-      const { email, firstName, middleName, lastName } = contact;
-      console.log("Creating user for contact:", contact);
-      newUser(accountDatabyid._id, email, firstName, middleName, lastName);
-      console.log("newuserdata",accountDatabyid._id, email, firstName, middleName, lastName)
-    })
-    .catch(error => {
-      console.error(`Failed to fetch contact ${contactId}:`, error);
-    })
-);
 
-return Promise.all(fetchPromises);
-    })
-      
+        // Fetch details for each selected contact
+        // const fetchPromises = selectedContacts.map((contactId) =>
+        //   fetch(`${CONTACT_API}/contacts/${contactId}`)
+        //     .then((response) => response.json())
+        //     .then((data) => {
+        //       // Access the contact data from the response
+        //       const contact = data.contact;
+        //       const { email, firstName, middleName, lastName } = contact;
+        //       console.log("Creating user for contact:", contact);
+        //       newUser(
+        //         accountDatabyid._id,
+        //         email,
+        //         firstName,
+        //         middleName,
+        //         lastName
+        //       );
+        //       console.log(
+        //         "newuserdata",
+        //         accountDatabyid._id,
+        //         email,
+        //         firstName,
+        //         middleName,
+        //         lastName
+        //       );
+        //     })
+        //     .catch((error) => {
+        //       console.error(`Failed to fetch contact ${contactId}:`, error);
+        //     })
+        // );
+
+        // return Promise.all(fetchPromises);
+      })
+
       .catch((error) => console.error(error));
   };
 
-
   // Debounced function to check template name existence
   const checkTemplateName = async (name) => {
-      try {
-        const res = await axios.get(`${ACCOUNT_API}/accounts/check-name`, {
-          params: { name },
-        });
-        if (res.data.exists) {
-          setAccountNameError('Account name taken');
-        } else {
-          setAccountNameError('');
-        }
-      } catch (err) {
-        console.error(err);
-        setAccountNameError('');
+    try {
+      const res = await axios.get(`${ACCOUNT_API}/accounts/check-name`, {
+        params: { name },
+      });
+      if (res.data.exists) {
+        setAccountNameError("Account name taken");
+      } else {
+        setAccountNameError("");
       }
-    };
-  
-   const debouncedCheck = debounce((name) => {
-      if (name.trim()) checkTemplateName(name);
-      else setAccountNameError('');
-    }, 500);
-  
-    useEffect(() => {
-      debouncedCheck(accountName);
-      return debouncedCheck.cancel;
-    }, [accountName]);
+    } catch (err) {
+      console.error(err);
+      setAccountNameError("");
+    }
+  };
+
+  const debouncedCheck = debounce((name) => {
+    if (name.trim()) checkTemplateName(name);
+    else setAccountNameError("");
+  }, 500);
+
+  useEffect(() => {
+    debouncedCheck(accountName);
+    return debouncedCheck.cancel;
+  }, [accountName]);
   return (
     <Box>
       <Box
@@ -1172,7 +1176,7 @@ return Promise.all(fetchPromises);
         />
       </Box>
       <Box className="account-form" sx={{ height: "90vh", overflowY: "auto" }}>
-        <Box >
+        <Box>
           <FormControl
             sx={{ width: "100%", display: "flex", alignItems: "center" }}
           >
@@ -1214,31 +1218,34 @@ return Promise.all(fetchPromises);
                   </>
                 ) : (
                   <>
-                  <Box sx={{display:'flex', alignItems:'center',gap:2}}>
-                    <Box>
-                    <FormControlLabel
-                      value="Account Info"
-                      control={
-                        <Radio checked={selectedOption === "Account Info"} />
-                      }
-                      label="Account Info"
-                      
-                    />
-                    </Box>
-                 <Box>
-                 <ArrowForwardIosRoundedIcon style={{fontSize:'15px'}}/>
-                 </Box>
-                  <Box ml={1}>
-                  <FormControlLabel
-                      value="Contact Info"
-                      control={
-                        <Radio checked={selectedOption === "Contact Info"} />
-                      }
-                      label="Contact Info"
-                     
-                    />
-                  </Box>
-                    
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                      <Box>
+                        <FormControlLabel
+                          value="Account Info"
+                          control={
+                            <Radio
+                              checked={selectedOption === "Account Info"}
+                            />
+                          }
+                          label="Account Info"
+                        />
+                      </Box>
+                      <Box>
+                        <ArrowForwardIosRoundedIcon
+                          style={{ fontSize: "15px" }}
+                        />
+                      </Box>
+                      <Box ml={1}>
+                        <FormControlLabel
+                          value="Contact Info"
+                          control={
+                            <Radio
+                              checked={selectedOption === "Contact Info"}
+                            />
+                          }
+                          label="Contact Info"
+                        />
+                      </Box>
                     </Box>
                   </>
                 )}
@@ -1246,11 +1253,13 @@ return Promise.all(fetchPromises);
             </RadioGroup>
           </FormControl>
         </Box>
-       
-        <Box sx={{p:2,}}>
+
+        <Box sx={{ p: 2 }}>
           {selectedOption === "Account Info" && (
             <Box>
-              <Typography sx={{fontWeight:'bold',fontSize:'20px'}}>Client Type</Typography>
+              <Typography sx={{ fontWeight: "bold", fontSize: "20px" }}>
+                Client Type
+              </Typography>
               {/* <Box>
                 Client Type
               </Box> */}
@@ -1289,7 +1298,9 @@ return Promise.all(fetchPromises);
                       {/* <Box>
                         <h3>Account Info</h3>
                       </Box> */}
- <Typography sx={{fontWeight:'bold',fontSize:'20px'}}>Account Info</Typography>
+                      <Typography sx={{ fontWeight: "bold", fontSize: "20px" }}>
+                        Account Info
+                      </Typography>
                       {/* <Box className='HelpOutlineRoundedIcon'></Box> */}
 
                       <Box className="MoreVertRoundedIcon">
@@ -1313,7 +1324,7 @@ return Promise.all(fetchPromises);
                       </InputLabel>
 
                       <TextField
-                         size="small"
+                        size="small"
                         fullWidth
                         placeholder="Account Name"
                         value={accountName}
@@ -1433,14 +1444,15 @@ return Promise.all(fetchPromises);
                           </Box>
                         )}
                       /> */}
-                      <InputLabel sx={{ color: "black", mb: 1 }}>Tags</InputLabel>
-         
-                      <TagsMultiSelectDropDown 
-  value={selectedTags}
-  onChange={handleTagChange}
-  placeholder="Tags"
-/>
+                      <InputLabel sx={{ color: "black", mb: 1 }}>
+                        Tags
+                      </InputLabel>
 
+                      <TagsMultiSelectDropDown
+                        value={selectedTags}
+                        onChange={handleTagChange}
+                        placeholder="Tags"
+                      />
                     </Box>
 
                     <Box mt={2} mr={2.5}>
@@ -1498,7 +1510,7 @@ return Promise.all(fetchPromises);
                           option.value === value.value
                         }
                       /> */}
-                      <MultiSelectDropdown 
+                      <MultiSelectDropdown
                         value={selectedUser}
                         onChange={handleUserChange}
                         placeholder="Assignees"
@@ -1612,11 +1624,10 @@ return Promise.all(fetchPromises);
                           }}
                           placeholder="Account Name"
                           fullWidth
-                         
                           size="small"
                           error={!!accountNameError}
                           // helperText={pipelineNameError}
-                          sx={{ mt:1.5, backgroundColor: "#fff" }}
+                          sx={{ mt: 1.5, backgroundColor: "#fff" }}
                         />
                         {!!accountNameError && (
                           <Alert
@@ -1666,7 +1677,7 @@ return Promise.all(fetchPromises);
                           //  margin="normal"
                           error={!!companyNameError}
                           // helperText={pipelineNameError}
-                          sx={{mt:1.5, backgroundColor: "#fff" }}
+                          sx={{ mt: 1.5, backgroundColor: "#fff" }}
                           value={companyname}
                           // onChange={(e) => setcompanyname(e.target.value)}
                           onChange={(e) => {
@@ -1707,86 +1718,15 @@ return Promise.all(fetchPromises);
                       </Box>
 
                       <Box mt={2} mr={2}>
-                        {/* <InputLabel sx={{ color: "black" }}>Tags</InputLabel>
+                        <InputLabel sx={{ color: "black", mb: 1 }}>
+                          Tags
+                        </InputLabel>
 
-                        <Autocomplete
-                          multiple
-                          options={tagsOptions}
-                          getOptionLabel={(option) => option.label}
-                          // value={selectedTags}
-                          value={tagsOptions.filter((option) =>
-                            selectedTags.includes(option.value)
-                          )}
+                        <TagsMultiSelectDropDown
+                          value={selectedTags}
                           onChange={handleTagChange}
-                          // renderTags={(value, getTagProps) =>
-                          //   value.map((option, index) => (
-                          //     <Chip
-                          //       key={option.value}
-                          //       label={option.label}
-                          //       style={option.customTagStyle}
-                          //       {...getTagProps({ index })}
-                          //     />
-                          //   ))
-                          // }
-                          renderTags={(selected, getTagProps) =>
-                            selected.map((option, index) => (
-                              <Chip
-                                key={option.value}
-                                label={option.label}
-                                sx={{
-                                  backgroundColor: option.colour,
-                                  color: "#fff",
-                                  fontWeight: 500,
-                                  fontSize: "15px",
-                                  borderRadius: "16px",
-                                  padding: "4px 10px",
-                                  height: "28px",
-                                  margin: "2px",
-                                  cursor:'pointer',
-                                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-                                  "& .MuiChip-label": {
-                                    padding: "0 8px",
-                                  },
-                                  "& .MuiChip-deleteIcon": {
-                                    color: "#fff",
-                                    opacity: 0.7,
-                                    transition: "opacity 0.2s",
-                                    "&:hover": {
-                                      opacity: 1,
-                                    },
-                                  },
-                                }}
-                                {...getTagProps({ index })}
-                              />
-                            ))
-                          }
-                          renderOption={(props, option) => (
-                            <Box
-                              component="li"
-                              {...props}
-                              style={option.customStyle}
-                            >
-                              {option.label}
-                            </Box>
-                          )}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              variant="outlined"
-                              size="small"
-                              placeholder="select tags"
-                            />
-                          )}
-                          sx={{ width: "100%", marginTop: "8px" }}
-                        /> */}
-                         <InputLabel sx={{ color: "black", mb: 1 }}>Tags</InputLabel>
-         
-                         <TagsMultiSelectDropDown 
-  value={selectedTags}
-  onChange={handleTagChange}
-  placeholder="Tags"
-/>
-
+                          placeholder="Tags"
+                        />
                       </Box>
 
                       <Box mt={2} mr={2.5}>
@@ -1794,62 +1734,11 @@ return Promise.all(fetchPromises);
                           Team Member
                         </InputLabel>
 
-                        {/* <Autocomplete
-                          multiple
-                          sx={{ mt: 2 }}
-                          options={options}
-                          size="small"
-                          getOptionLabel={(option) => option.label}
+                        <MultiSelectDropdown
                           value={selectedUser}
                           onChange={handleUserChange}
-                          renderTags={(selected, getTagProps) =>
-                            selected.map((option, index) => (
-                              <Chip
-                                key={option.value}
-                                label={option.label}
-                                sx={{
-                                  
-                                  color: "#000",
-                                  fontWeight: 500,
-                                  fontSize: "15px",
-                                  borderRadius: "16px",
-                                  padding: "4px 10px",
-                                  height: "28px",
-                                  margin: "2px",
-                                  cursor:'pointer',
-                                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-                                  "& .MuiChip-label": {
-                                    padding: "0 8px",
-                                  },
-                                  "& .MuiChip-deleteIcon": {
-                                    color: "#fff",
-                                    opacity: 0.7,
-                                    transition: "opacity 0.2s",
-                                    "&:hover": {
-                                      opacity: 1,
-                                    },
-                                  },
-                                }}
-                                {...getTagProps({ index })}
-                              />
-                            ))
-                          }
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              variant="outlined"
-                              placeholder="Team Member"
-                            />
-                          )}
-                          isOptionEqualToValue={(option, value) =>
-                            option.value === value.value
-                          }
-                        /> */}
-                         <MultiSelectDropdown 
-                        value={selectedUser}
-                        onChange={handleUserChange}
-                        placeholder="Assignees"
-                      />
+                          placeholder="Assignees"
+                        />
                       </Box>
                     </Box>
                     <Box mt={2}>
@@ -1928,7 +1817,10 @@ return Promise.all(fetchPromises);
                       {/* <Typography variant="h6" gutterBottom mt={3}>
                         Address
                       </Typography> */}
-                      <Typography sx={{fontWeight:'bold',fontSize:'20px'}}> Address</Typography>
+                      <Typography sx={{ fontWeight: "bold", fontSize: "20px" }}>
+                        {" "}
+                        Address
+                      </Typography>
                       <Box mt={2}>
                         <InputLabel sx={{ color: "black" }}>Country</InputLabel>
                         <Autocomplete
@@ -2080,7 +1972,7 @@ return Promise.all(fetchPromises);
             </Box>
           )}
         </Box>
-       
+
         <Box>
           {selectedOption === "Contact Info" && (
             <Box className="create_new_contactform-container">
@@ -2090,12 +1982,14 @@ return Promise.all(fetchPromises);
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
-                    p:2
+                    p: 2,
                   }}
                 >
                   {/* <h3 style={{ marginLeft: "20px" }}>Contacts</h3> */}
-                  <Typography sx={{fontWeight:'bold',fontSize:'20px'}}>Contacts</Typography>
-                  
+                  <Typography sx={{ fontWeight: "bold", fontSize: "20px" }}>
+                    Contacts
+                  </Typography>
+
                   <Box
                     onClick={handleClickOpen}
                     sx={{
@@ -2395,12 +2289,12 @@ return Promise.all(fetchPromises);
                         multiple
                         options={filteredContacts}
                         getOptionLabel={(option) => option.name}
-                         filterOptions={filterOptions}
+                        filterOptions={filterOptions}
                         // onInputChange={(event, newValue) => setSearchQuery(newValue)}
                         onChange={(event, newValue) => {
                           const ids = newValue.map((contact) => contact.id);
                           setSelectedContacts(ids);
-                          console.log("getSelectedIds",getSelectedIds());
+                          console.log("getSelectedIds", getSelectedIds());
                         }}
                         renderInput={(params) => (
                           <TextField
@@ -2867,22 +2761,27 @@ return Promise.all(fetchPromises);
                             }}
                           /> */}
                           <PhoneInput
-  country={phone.country || "us"}
-  value={phone.phone}
-  onChange={(value, country) =>
-    handleContactPhoneNumberChange(index, phoneIndex, value, country)
-  }
-  inputStyle={{ width: "100%" }}
-  buttonStyle={{
-    borderTopLeftRadius: "8px",
-    borderBottomLeftRadius: "8px",
-  }}
-  containerStyle={{
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
-  }}
-/>
+                            country={phone.country || "us"}
+                            value={phone.phone}
+                            onChange={(value, country) =>
+                              handleContactPhoneNumberChange(
+                                index,
+                                phoneIndex,
+                                value,
+                                country
+                              )
+                            }
+                            inputStyle={{ width: "100%" }}
+                            buttonStyle={{
+                              borderTopLeftRadius: "8px",
+                              borderBottomLeftRadius: "8px",
+                            }}
+                            containerStyle={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "8px",
+                            }}
+                          />
 
                           <AiOutlineDelete
                             onClick={() => handleDeletePhoneNumber(phoneIndex)}
@@ -3158,39 +3057,39 @@ return Promise.all(fetchPromises);
                 </Button>
               </Box>
               <Modal open={comfirmationOpen} onClose={handleClose}>
-          <Box
-            sx={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              width: 300,
-              bgcolor: "background.paper",
-              p: 4,
-              boxShadow: 24,
-              borderRadius: 2,
-            }}
-          >
-            <Typography variant="h6" component="h2" mb={2}>
-              Confirm Deletion
-            </Typography>
-            <Typography variant="body1" mb={4}>
-              Are you sure you want to delete this data?
-            </Typography>
-            <Box display="flex" gap={3} ml={15}>
-              <Button variant="text" onClick={handleClose}>
-                Cancel
-              </Button>
-              <Button
-                variant="contained"
-                color="error"
-               onClick={handleDeleteData}
-              >
-                Delete
-              </Button>
-            </Box>
-          </Box>
-        </Modal>
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    width: 300,
+                    bgcolor: "background.paper",
+                    p: 4,
+                    boxShadow: 24,
+                    borderRadius: 2,
+                  }}
+                >
+                  <Typography variant="h6" component="h2" mb={2}>
+                    Confirm Deletion
+                  </Typography>
+                  <Typography variant="body1" mb={4}>
+                    Are you sure you want to delete this data?
+                  </Typography>
+                  <Box display="flex" gap={3} ml={15}>
+                    <Button variant="text" onClick={handleClose}>
+                      Cancel
+                    </Button>
+                    <Button
+                      variant="contained"
+                      color="error"
+                      onClick={handleDeleteData}
+                    >
+                      Delete
+                    </Button>
+                  </Box>
+                </Box>
+              </Modal>
               {/* Material-UI Dialog for Modal */}
               <Dialog open={isModalVisible} onClose={handleCloseModal}>
                 <DialogTitle>Add portal access</DialogTitle>
