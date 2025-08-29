@@ -265,6 +265,8 @@ const Info = () => {
     fetch(url + data, requestOptions)
       .then((response) => response.json())
       .then((result) => {
+
+        console.log("accountlist",result)
         setaccountData(result.accountlist);
         setAccName(result.accountlist.Name);
         setUserType(result.accountlist.Type);
@@ -940,7 +942,7 @@ const handleArchive = (accId) => {
                     </Typography>
                   </Box>
                 </Box>
-                <Button
+                {/* <Button
                   variant="outlined"
                   sx={{
                     textTransform: "none",
@@ -952,7 +954,7 @@ const handleArchive = (accId) => {
                   }}
                 >
                   Log in as account (read-only)
-                </Button>
+                </Button> */}
               </Box>
 
               {/* Account Info section */}
@@ -1249,7 +1251,7 @@ const handleArchive = (accId) => {
                       </TableRow>
                     </TableHead>
 
-                    <TableBody>
+                    {/* <TableBody>
                       {contacts.map((contact) => {
                         const {
                           _id,
@@ -1265,7 +1267,7 @@ const handleArchive = (accId) => {
                             <TableRow>
                               <TableCell colSpan={5}>
                                 <Box>
-                                  {/* Contact Name and More Options Button */}
+                               
                                   <Box
                                     sx={{
                                       display: "flex",
@@ -1301,14 +1303,14 @@ const handleArchive = (accId) => {
                                       marginTop: "4px",
                                     }} // Description styling
                                   >
-                                    {/* Display contactdescription if available, else fall back to description */}
+                                    
                                     {description}
                                   </Typography>
                                 </Box>
                               </TableCell>
                             </TableRow>
 
-                            {/* Row for email and switches */}
+                           
                             <TableRow>
                               <TableCell>{email}</TableCell>
                               <TableCell>
@@ -1335,7 +1337,101 @@ const handleArchive = (accId) => {
                           </React.Fragment>
                         );
                       })}
-                    </TableBody>
+                    </TableBody> */}
+                    <TableBody>
+  {contacts.map((contact) => {
+    const {
+      _id,
+      contactName,
+      email,
+      description,
+      userid, // 👈 populated user inside contact
+    } = contact;
+
+    // default to false if userid is missing
+//     const login = userid.login || false;
+//     const notify = userid.notify || false;
+//     const emailSync = userid.emailSync || false;
+console.log("contacts",userid)
+const user = Array.isArray(userid) && userid.length > 0 ? userid[0] : {};
+const login = user.login || false;
+const notify = user.notify || false;
+const emailSync = user.emailSync || false;
+
+    return (
+      <React.Fragment key={_id}>
+        <TableRow>
+          <TableCell colSpan={5}>
+            <Box>
+              {/* Contact Name and More Options Button */}
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontWeight: "bold",
+                    fontSize: "15px",
+                    display: "inline-block",
+                    color: "#1976d2",
+                  }}
+                  onClick={() => handleClick(_id)}
+                >
+                  {contactName}
+                </Typography>
+                <IconButton
+                  aria-label="more options"
+                  size="small"
+                  onClick={(e) =>
+                    handleMenuClick(e, _id, contactName, email)
+                  }
+                >
+                  <MoreVertIcon />
+                </IconButton>
+              </Box>
+              <Typography
+                sx={{
+                  fontSize: "14px",
+                  color: "#757575",
+                  marginTop: "4px",
+                }}
+              >
+                {description}
+              </Typography>
+            </Box>
+          </TableCell>
+        </TableRow>
+
+        {/* Row for email and switches */}
+        <TableRow>
+          <TableCell>{email}</TableCell>
+          <TableCell>
+            <Switch
+              checked={login}
+              onChange={() => handleSwitchChange(contact)}
+            />
+          </TableCell>
+          <TableCell>
+            <Switch
+              checked={notify}
+              onChange={() => handleSimpleSwitchChange("notify", contact)}
+            />
+          </TableCell>
+          <TableCell>
+            <Switch
+              checked={emailSync}
+              onChange={() => handleSimpleSwitchChange("emailSync", contact)}
+            />
+          </TableCell>
+        </TableRow>
+      </React.Fragment>
+    );
+  })}
+</TableBody>
+
 
                     {/* Dropdown Menu */}
                     <Menu

@@ -495,12 +495,12 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   };
   const [phoneNumbers, setPhoneNumbers] = useState([]);
 
-  const handleDeletePhoneNumber = (phoneIndex) => {
-    setPhoneNumbers((prevPhoneNumbers) => {
-      // Create a new array excluding the phone number at the specified index
-      return prevPhoneNumbers.filter((_, index) => index !== phoneIndex);
-    });
-  };
+  // const handleDeletePhoneNumber = (phoneIndex) => {
+  //   setPhoneNumbers((prevPhoneNumbers) => {
+  //     // Create a new array excluding the phone number at the specified index
+  //     return prevPhoneNumbers.filter((_, index) => index !== phoneIndex);
+  //   });
+  // };
 
   //for creating multiple forms when click on Add New Contact
   const [contactCount, setContactCount] = useState(1);
@@ -534,7 +534,10 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
     ]);
     setContactCount(contactCount + 1);
   };
-
+  // ✅ Remove a contact
+  const handleDeleteContact = (index) => {
+    setContacts(contacts.filter((_, i) => i !== index));
+  };
   const handleContactInputChange = (index, event) => {
     const { name, value } = event.target;
     const trimmedValue = value.trim();
@@ -576,45 +579,45 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
     };
     setContacts(updatedContacts);
   };
-  const handleContactPhoneNumberChange = (
-    index,
-    phoneIndex,
-    phoneValue,
-    countryData
-  ) => {
-    setContacts((prevContacts) => {
-      const updatedContacts = [...prevContacts];
-      const contact = { ...updatedContacts[index] }; // clone contact
+  // const handleContactPhoneNumberChange = (
+  //   index,
+  //   phoneIndex,
+  //   phoneValue,
+  //   countryData
+  // ) => {
+  //   setContacts((prevContacts) => {
+  //     const updatedContacts = [...prevContacts];
+  //     const contact = { ...updatedContacts[index] }; // clone contact
 
-      let phoneNumbers = [...(contact.phoneNumbers || [])];
+  //     let phoneNumbers = [...(contact.phoneNumbers || [])];
 
-      // Ensure phoneNumbers array is large enough
-      if (phoneNumbers.length <= phoneIndex) {
-        phoneNumbers = [
-          ...phoneNumbers,
-          ...Array(phoneIndex + 1 - phoneNumbers.length).fill({
-            phone: "",
-            countryCode: "",
-            country: "",
-          }),
-        ];
-      }
+  //     // Ensure phoneNumbers array is large enough
+  //     if (phoneNumbers.length <= phoneIndex) {
+  //       phoneNumbers = [
+  //         ...phoneNumbers,
+  //         ...Array(phoneIndex + 1 - phoneNumbers.length).fill({
+  //           phone: "",
+  //           countryCode: "",
+  //           country: "",
+  //         }),
+  //       ];
+  //     }
 
-      // Update the specific phone object
-      phoneNumbers[phoneIndex] = {
-        ...phoneNumbers[phoneIndex],
-        phone: phoneValue,
-        countryCode: countryData.dialCode,
-        country: countryData.countryCode.toLowerCase(),
-      };
+  //     // Update the specific phone object
+  //     phoneNumbers[phoneIndex] = {
+  //       ...phoneNumbers[phoneIndex],
+  //       phone: phoneValue,
+  //       countryCode: countryData.dialCode,
+  //       country: countryData.countryCode.toLowerCase(),
+  //     };
 
-      // Set back into the contact and then into contacts
-      contact.phoneNumbers = phoneNumbers;
-      updatedContacts[index] = contact;
+  //     // Set back into the contact and then into contacts
+  //     contact.phoneNumbers = phoneNumbers;
+  //     updatedContacts[index] = contact;
 
-      return updatedContacts;
-    });
-  };
+  //     return updatedContacts;
+  //   });
+  // };
   const handleContactAddressChange = (index, field, value) => {
     setContacts((prevContacts) => {
       const updatedContacts = [...prevContacts];
@@ -692,97 +695,356 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
         toast.error("Error signing up. Please try again.");
       });
   };
-  const newUser = (accountid, email, firstName, middleName, lastName) => {
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    const password = `${firstName}@123`;
-    const raw = JSON.stringify({
-      username: firstName, // Use the first name as username
-      email, // Use the provided email
-      password: password, // Replace with a dynamic password logic if needed
-      role: "Client",
-    });
+  // const newUser = (accountid, email, firstName, middleName, lastName) => {
+  //   const myHeaders = new Headers();
+  //   myHeaders.append("Content-Type", "application/json");
+  //   const password = `${firstName}@123`;
+  //   const raw = JSON.stringify({
+  //     username: firstName, // Use the first name as username
+  //     email, // Use the provided email
+  //     password: password, // Replace with a dynamic password logic if needed
+  //     role: "Client",
+  //   });
 
-    const requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-    };
-    console.log("rawec", raw);
-    const url = `${LOGIN_API}/common/login/signup`;
+  //   const requestOptions = {
+  //     method: "POST",
+  //     headers: myHeaders,
+  //     body: raw,
+  //     redirect: "follow",
+  //   };
+  //   console.log("rawec", raw);
+  //   const url = `${LOGIN_API}/common/login/signup`;
 
-    fetch(url, requestOptions)
-      .then((response) => response.json())
-      .then((result) => {
-        console.log(result);
-        console.log(result._id);
+  //   fetch(url, requestOptions)
+  //     .then((response) => response.json())
+  //     .then((result) => {
+  //       console.log(result);
+  //       console.log(result._id);
+  //       setNewUserId(result._id);
+  //       // Update account with the newly created user ID
+  //       updateAcountUserId(result._id, accountid);
+  //       clientalldata(result._id, email, firstName, middleName, lastName);
+
+  //       // clientemail to activate client portal
+  //       clientCreatedmail(email, personalMessage, result._id);
+  //     })
+  //     .catch((error) => console.error(error));
+  // };
+// const newUser = (
+//   accountid,
+//   email,
+//   firstName,
+//   middleName,
+//   lastName,
+//   contactName,
+//   login,
+//   notify,
+//   emailSync,
+  
+// ) => {
+//   if (!login) return; // safety check, only run if login === true
+
+//   const myHeaders = new Headers();
+//   myHeaders.append("Content-Type", "application/json");
+
+//   const password = `${firstName}@123`;
+
+//   const raw = JSON.stringify({
+//     username: contactName, // Full name as username
+//     email,
+//     password,
+//     role: "Client",
+//     login,
+//     notify,
+//     emailSync,
+//   });
+
+//   const requestOptions = {
+//     method: "POST",
+//     headers: myHeaders,
+//     body: raw,
+//     redirect: "follow",
+//   };
+
+//   console.log("New User Payload:", raw);
+
+//   const url = `${LOGIN_API}/common/login/signup`;
+
+//   fetch(url, requestOptions)
+//     .then((response) => response.json())
+//     .then((result) => {
+//       console.log(result);
+//       if (result._id) {
+//         setNewUserId(result._id);
+
+//         // Update account with the newly created user ID
+//         updateAcountUserId(result._id, accountid);
+
+//         // Store client info
+//         clientalldata(result._id, email, firstName, middleName, lastName);
+
+//         // Send activation mail
+//         clientCreatedmail(email, personalMessage, result._id);
+//       }
+//     })
+//     .catch((error) => console.error(error));
+// };
+const newUser = (
+  contactId,    // ✅ added
+  accountid,
+  email,
+  firstName,
+  middleName,
+  lastName,
+  contactName,
+  login,
+  notify,
+  emailSync
+) => {
+  if (!login) return; // safety check
+
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+
+  const password = `${firstName}@123`;
+
+  const raw = JSON.stringify({
+    username: contactName,
+    email,
+    password,
+    role: "Client",
+    login,
+    notify,
+    emailSync,
+  });
+
+  const requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: raw,
+    redirect: "follow",
+  };
+
+  console.log("New User Payload:", raw);
+
+  const url = `${LOGIN_API}/common/login/signup`;
+
+  fetch(url, requestOptions)
+    .then((response) => response.json())
+    .then((result) => {
+      console.log(result);
+      if (result._id) {
         setNewUserId(result._id);
+
+        // ✅ Update contact with created userId
+        fetch(`${CONTACT_API}/contacts/${contactId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userid: result._id ,login:false,notify:false,emailSync:false}),
+        })
+          .then((res) => res.json())
+          .then((updatedContact) => {
+            console.log("Contact updated with userId:", updatedContact);
+          })
+          .catch((err) => console.error("Error updating contact with userId:", err));
+
         // Update account with the newly created user ID
         updateAcountUserId(result._id, accountid);
+
+        // Store client info
         clientalldata(result._id, email, firstName, middleName, lastName);
 
-        // clientemail to activate client portal
+        // Send activation mail
         clientCreatedmail(email, personalMessage, result._id);
-      })
-      .catch((error) => console.error(error));
-  };
+      }
+    })
+    .catch((error) => console.error(error));
+};
 
   console.log(newUserId);
 
-  const handleContactAddPhoneNumber = () => {
-    setPhoneNumbers((prevPhoneNumbers) => [
-      ...prevPhoneNumbers,
-      { id: Date.now(), phone: "", isPrimary: false },
-    ]);
+  // const handleContactAddPhoneNumber = () => {
+  //   setPhoneNumbers((prevPhoneNumbers) => [
+  //     ...prevPhoneNumbers,
+  //     { id: Date.now(), phone: "", isPrimary: false },
+  //   ]);
+  // };
+  // ✅ Add phone number for a specific contact
+  const handleContactAddPhoneNumber = (contactIndex) => {
+    const updatedContacts = [...contacts];
+    updatedContacts[contactIndex].phoneNumbers.push({
+      id: Date.now(),
+      phone: "",
+      country: "us",
+      isPrimary: updatedContacts[contactIndex].phoneNumbers.length === 0, // first one is primary
+    });
+    setContacts(updatedContacts);
+  };
+
+  // ✅ Change phone number for a specific contact
+  const handleContactPhoneNumberChange = (
+    contactIndex,
+    phoneIndex,
+    value,
+    country
+  ) => {
+    const updatedContacts = [...contacts];
+    updatedContacts[contactIndex].phoneNumbers[phoneIndex].phone = value;
+    updatedContacts[contactIndex].phoneNumbers[phoneIndex].country =
+      country?.countryCode || "us";
+    setContacts(updatedContacts);
+  };
+
+  // ✅ Delete phone number for a specific contact
+  const handleDeletePhoneNumber = (contactIndex, phoneIndex) => {
+    const updatedContacts = [...contacts];
+    updatedContacts[contactIndex].phoneNumbers.splice(phoneIndex, 1);
+    setContacts(updatedContacts);
   };
 
   const handlesubmitContact = () => {
-    console.log("nghjg", contacts);
-    //  const url =`${CONTACT_API}/contacts/`
+  console.log("nghjg", contacts);
 
-    fetch(`${CONTACT_API}/contacts/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(contacts),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Success:", data);
-        handleDrawerClose();
-        handleNewDrawerClose();
-        const contactIds = data.newContacts.map((contact) => contact._id);
-        updateContactstoAccount(contactIds);
+  fetch(`${CONTACT_API}/contacts/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(contacts),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log("Success:", data);
+      handleDrawerClose();
+      handleNewDrawerClose();
 
-        const filteredContacts = data.newContacts.filter(
-          (contact) => contact.login
+      const contactIds = data.newContacts.map((contact) => contact._id);
+      updateContactstoAccount(contactIds);
+
+      // 🔑 Now match submitted contacts with created contacts (so we get _id)
+      const loginContacts = data.newContacts.filter((contact) => contact.login);
+
+      console.log("Contacts with login true:", loginContacts);
+
+      loginContacts.forEach((contact) => {
+        const contactName = `${contact.firstName || ""} ${contact.middleName || ""} ${contact.lastName || ""}`.trim();
+
+        // ✅ Pass contact._id also to newUser
+        newUser(
+          contact._id,        // contactId
+          contact.accountid,
+          contact.email,
+          contact.firstName,
+          contact.middleName,
+          contact.lastName,
+          contactName,
+          contact.login,
+          contact.notify,
+          contact.emailSync
         );
-
-        console.log("Filtered Contacts:", filteredContacts);
-
-        filteredContacts.forEach((contact) => {
-          newUser(
-            contact.accountid,
-            contact.email,
-            contact.firstName,
-            contact.middleName,
-            contact.lastName
-          );
-        });
-
-        // toast.success("Contact created successfully!");
-        toast.success("Contact created successfully!");
-
-        navigate("/clients/accounts/activeaccounts");
-        // Handle successful submission (e.g., clear forms, show success message)
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-        // Handle errors (e.g., show error message)
       });
-  };
+
+      toast.success("Contact created successfully!");
+      navigate("/clients/accounts/activeaccounts");
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+};
+
+//   const handlesubmitContact = () => {
+//   console.log("nghjg", contacts);
+
+//   fetch(`${CONTACT_API}/contacts/`, {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//     body: JSON.stringify(contacts),
+//   })
+//     .then((response) => response.json())
+//     .then((data) => {
+//       console.log("Success:", data);
+//       handleDrawerClose();
+//       handleNewDrawerClose();
+
+//       const contactIds = data.newContacts.map((contact) => contact._id);
+//       updateContactstoAccount(contactIds);
+
+//       // 🔑 Use the contacts you submitted, not the response
+//       const loginContacts = contacts.filter((contact) => contact.login);
+
+//       console.log("Contacts with login true:", loginContacts);
+
+//       loginContacts.forEach((contact) => {
+//         const contactName = `${contact.firstName || ""} ${contact.middleName || ""} ${contact.lastName || ""}`.trim();
+
+//         newUser(
+//           contact.accountid,
+//           contact.email,
+//           contact.firstName,
+//           contact.middleName,
+//           contact.lastName,
+//           contactName,
+//           contact.login,
+//           contact.notify,
+//           contact.emailSync
+//         );
+//       });
+
+//       toast.success("Contact created successfully!");
+//       navigate("/clients/accounts/activeaccounts");
+//     })
+//     .catch((error) => {
+//       console.error("Error:", error);
+//     });
+// };
+  // const handlesubmitContact = () => {
+  //   console.log("nghjg", contacts);
+  //   //  const url =`${CONTACT_API}/contacts/`
+
+  //   fetch(`${CONTACT_API}/contacts/`, {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify(contacts),
+  //   })
+  //     .then((response) => response.json())
+  //     .then((data) => {
+  //       console.log("Success:", data);
+  //       handleDrawerClose();
+  //       handleNewDrawerClose();
+  //       const contactIds = data.newContacts.map((contact) => contact._id);
+  //       updateContactstoAccount(contactIds);
+
+  //       const filteredContacts = data.newContacts.filter(
+  //         (contact) => contact.login
+  //       );
+
+  //       console.log("Filtered Contacts:", filteredContacts);
+
+  //       filteredContacts.forEach((contact) => {
+  //         newUser(
+  //           contact.accountid,
+  //           contact.email,
+  //           contact.firstName,
+  //           contact.middleName,
+  //           contact.lastName
+  //         );
+  //       });
+
+  //       // toast.success("Contact created successfully!");
+  //       toast.success("Contact created successfully!");
+
+  //       navigate("/clients/accounts/activeaccounts");
+  //       // Handle successful submission (e.g., clear forms, show success message)
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error:", error);
+  //       // Handle errors (e.g., show error message)
+  //     });
+  // };
   const handleopendialog = () => {
     // validateContactForm()
     if (!validateContactForm()) {
@@ -1034,6 +1296,34 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   const handleLinkAccounts = () => {
     linkContactsToAccount(selectedContacts);
   };
+const handleLoginToggle = (checked, contact) => {
+  // Update UI state for immediate feedback
+  const updatedContacts = contactData.map((c) =>
+    c._id === contact._id ? { ...c, login: checked } : c
+  );
+  setContactData(updatedContacts);
+
+  // If login is toggled ON -> create user
+  if (checked) {
+    const contactName = `${contact.firstName || ""} ${contact.middleName || ""} ${contact.lastName || ""}`.trim();
+
+    newUser(
+      contact._id,
+      accountDatabyid._id,
+      contact.email,
+      contact.firstName,
+      contact.middleName,
+      contact.lastName,
+      contactName,
+      true,                // login
+      contact.notify || false,
+      contact.emailSync || false
+    );
+  } else {
+    console.log("Login disabled for contact:", contact.email);
+    // optional: handle disabling user
+  }
+};
 
   const handleDialogClose = () => {
     setOpen(false);
@@ -1094,7 +1384,29 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
         fetchAccountDataById(accountDatabyid._id);
         toast.success("Contact added successfully");
 
-        // Create new users for the selected contacts
+        
+      })
+
+      .catch((error) => console.error(error));
+  };
+
+  // Debounced function to check template name existence
+  const checkTemplateName = async (name) => {
+    try {
+      const res = await axios.get(`${ACCOUNT_API}/accounts/check-name`, {
+        params: { name },
+      });
+      if (res.data.exists) {
+        setAccountNameError("Account name taken");
+      } else {
+        setAccountNameError("");
+      }
+    } catch (err) {
+      console.error(err);
+      setAccountNameError("");
+    }
+  };
+// Create new users for the selected contacts
 
         // Fetch details for each selected contact
         // const fetchPromises = selectedContacts.map((contactId) =>
@@ -1127,28 +1439,46 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
         // );
 
         // return Promise.all(fetchPromises);
-      })
+        // ✅ Fetch details for each contact in combinedContacts
+      // const fetchPromises = combinedContacts.map((contactId) =>
+      //   fetch(`${CONTACT_API}/contacts/${contactId}`)
+      //     .then((response) => response.json())
+      //     .then((data) => {
+      //       const contact = data.contact;
+      //       console.log("Fetched contact:", contact);
 
-      .catch((error) => console.error(error));
-  };
+      //       // ✅ Only create user if login === true
+      //       if (contact.login) {
+      //         const contactName = `${contact.firstName || ""} ${contact.middleName || ""} ${contact.lastName || ""}`.trim();
 
-  // Debounced function to check template name existence
-  const checkTemplateName = async (name) => {
-    try {
-      const res = await axios.get(`${ACCOUNT_API}/accounts/check-name`, {
-        params: { name },
-      });
-      if (res.data.exists) {
-        setAccountNameError("Account name taken");
-      } else {
-        setAccountNameError("");
-      }
-    } catch (err) {
-      console.error(err);
-      setAccountNameError("");
-    }
-  };
+      //         newUser(
+      //           accountDatabyid._id,
+      //           contact.email,
+      //           contact.firstName,
+      //           contact.middleName,
+      //           contact.lastName,
+      //           contactName,
+      //           contact.login,
+      //           contact.notify,
+      //           contact.emailSync
+      //         );
 
+      //         console.log("New user created for contact:", {
+      //           accountId: accountDatabyid._id,
+      //           email: contact.email,
+      //           username: contactName,
+      //           login: contact.login,
+      //           notify: contact.notify,
+      //           emailSync: contact.emailSync,
+      //         });
+      //       }
+      //     })
+      //     .catch((error) => {
+      //       console.error(`Failed to fetch contact ${contactId}:`, error);
+      //     })
+      // );
+
+      // return Promise.all(fetchPromises);
   const debouncedCheck = debounce((name) => {
     if (name.trim()) checkTemplateName(name);
     else setAccountNameError("");
@@ -2087,12 +2417,22 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
 
                           {/* Toggle Switches */}
                           <Box sx={{ display: "flex", gap: 2, marginTop: 2 }}>
-                            <FormControlLabel
+                            {/* <FormControlLabel
                               control={
                                 <Switch checked={contact.login} readOnly />
                               }
                               label="Login"
-                            />
+                            /> */}
+                            <FormControlLabel
+  control={
+    <Switch
+      checked={contact.login}
+      onChange={(e) => handleLoginToggle(e.target.checked, contact)}
+    />
+  }
+  label="Login"
+/>
+
                             <FormControlLabel
                               control={
                                 <Switch checked={contact.notify} disabled />
@@ -2367,9 +2707,29 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                   }}
                   className="create_new_contactform"
                 >
-                  <Typography variant="h6" gutterBottom sx={{ ml: 1 }}>
-                    Contact {index + 1}
-                  </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    {" "}
+                    <Typography variant="h6" gutterBottom sx={{ ml: 1 }}>
+                      Contact {index + 1}
+                    </Typography>
+                    <AiOutlineDelete
+                      onClick={() => handleDeleteContact(index)}
+                      style={{
+                        // position: "absolute",
+                        top: "10px",
+                        right: "10px",
+                        cursor: "pointer",
+                        color: "red",
+                      }}
+                    />
+                  </Box>
+
                   <Box>
                     <form>
                       <Box
@@ -2714,7 +3074,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                       >
                         Phone Numbers
                       </Typography>
-                      {phoneNumbers.map((phone, phoneIndex) => (
+                      {contact.phoneNumbers.map((phone, phoneIndex) => (
                         <Box
                           key={phone.id}
                           sx={{
@@ -2784,7 +3144,9 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                           />
 
                           <AiOutlineDelete
-                            onClick={() => handleDeletePhoneNumber(phoneIndex)}
+                            onClick={() =>
+                              handleDeletePhoneNumber(index, phoneIndex)
+                            }
                             style={{ cursor: "pointer", color: "red" }}
                           />
                         </Box>

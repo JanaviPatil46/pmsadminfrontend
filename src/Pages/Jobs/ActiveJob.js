@@ -441,7 +441,7 @@ const fetchData = async () => {
 
   useEffect(() => {
     fetchPipelineDataid();
-  }, []);
+  }, [piplineid]);
 
   const fetchPipelineDataid = async (piplineid) => {
     try {

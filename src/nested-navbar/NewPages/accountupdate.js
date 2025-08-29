@@ -421,6 +421,7 @@ const Accountupdate = ({ onClose, selectedAccount,onArchive  }) => {
       setAccountType(selectedAccount.clientType);
       setaccountName(selectedAccount.accountName);
       setAccountcontact(selectedAccount.contacts);
+      console.log("selecteaccpountcontact",selectedAccount.contacts)
       setSelectedCountry({
         name: selectedAccount.country?.name || "", // Use name field or an empty string
         code: selectedAccount.country?.code || "", // Use code field or an empty string
@@ -1312,7 +1313,7 @@ const Accountupdate = ({ onClose, selectedAccount,onArchive  }) => {
                 </Box>
 
                 <Box>
-                  {console.log(accountcontact)}
+                  {console.log("nbfjhgjhdg",accountcontact)}
                   {accountcontact.map((contact) => (
                     <Box key={contact._id} sx={{ padding: 2 }}>
                       {/* Header Section - Always Visible */}
@@ -1391,26 +1392,42 @@ const Accountupdate = ({ onClose, selectedAccount,onArchive  }) => {
                         </Typography>
 
                         {/* Toggle Switches */}
-                        <Box sx={{ display: "flex", gap: 2, marginTop: 2 }}>
+                        {/* <Box sx={{ display: "flex", gap: 2, marginTop: 2 }}>
                           <FormControlLabel
                             control={
-                              <Switch checked={contact.login} readOnly />
+                              <Switch checked={contact.userid.login} readOnly />
                             }
                             label="Login"
                           />
                           <FormControlLabel
                             control={
-                              <Switch checked={contact.notify} disabled />
+                              <Switch checked={contact.userid.notify} disabled />
                             }
                             label="Notify"
                           />
                           <FormControlLabel
                             control={
-                              <Switch checked={contact.emailSync} readOnly />
+                              <Switch checked={contact.userid.emailSync} readOnly />
                             }
                             label="Email Sync"
                           />
-                        </Box>
+                        </Box> */}
+                        {Array.isArray(contact.userid) && contact.userid.map((user) => (
+  <Box key={user._id} sx={{ display: "flex", gap: 2 }}>
+    <FormControlLabel
+      control={<Switch checked={user.login || false} readOnly />}
+      label={`Login`}
+    />
+    <FormControlLabel
+      control={<Switch checked={user.notify || false} readOnly />}
+      label="Notify"
+    />
+    <FormControlLabel
+      control={<Switch checked={user.emailSync || false} readOnly />}
+      label="Email Sync"
+    />
+  </Box>
+))}
                       </Box>
 
                       {/* Conditionally Render Details on Expand */}
