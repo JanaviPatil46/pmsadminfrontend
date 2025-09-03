@@ -64,6 +64,7 @@ import ChatForm from "../Pages/ChatForm";
 import JobDrawer from "../Jobs/JobDrawer";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import InvoiceDrawer from "../Billing/InvoiceDrawer";
+import AccountDrawer from "../components/AccountContactForm/Drawer"
 function Sidebar() {
   const StyledBadge = styled(Badge)(({ theme }) => ({
     "& .MuiBadge-badge": {
@@ -1303,10 +1304,14 @@ const accountNameFromCppkie =Cookies.get("accountName")
             }}
           ></Box>
           {rightDrawerContent === "Account" && (
-            <AccountForm
-              handleNewDrawerClose={handleNewDrawerClose}
+            // <AccountForm
+              // handleNewDrawerClose={handleNewDrawerClose}
+              // handleDrawerClose={handleDrawerClose}
+            // />
+            <AccountDrawer
+               handleNewDrawerClose={handleNewDrawerClose}
               handleDrawerClose={handleDrawerClose}
-            />
+              />
           )}
           {rightDrawerContent === "Contact" && (
             <ContactForm
