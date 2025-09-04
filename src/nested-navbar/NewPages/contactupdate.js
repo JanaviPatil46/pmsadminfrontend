@@ -57,44 +57,20 @@ const ContactUpdateForm = ({ onContactUpdated, selectedContact, handleClose, isS
       setPostalCode(selectedContact.postalCode || "");
       setContactId(selectedContact._id || null); // Set contact ID
       
-    const flatPhoneNumbers = selectedContact.phoneNumbers?.flat() || [];
+   const flatPhoneNumbers = selectedContact.phoneNumbers || [];
 
 setPhoneNumbers(
-  flatPhoneNumbers.map((phoneObj) => ({
+  flatPhoneNumbers.map((phone) => ({
     id: Date.now() + Math.random(),
-    phone: phoneObj.phone.toString().startsWith("+") ? phoneObj.phone.toString() : `+${phoneObj.phone}`,
+    phone: phone.toString().startsWith("+") ? phone.toString() : `+${phone}`,
     isPrimary: false,
-    country: phoneObj.country?.toLowerCase() || "us",
+    country: "us", // default since no country info in DB
   }))
 );
 
-      // const flatTags = selectedContact.tags?.[0] || [];
-      // setTagsNew(
-      //   flatTags.map((tag) => ({
-      //     value: tag._id,
-      //     label: tag.tagName,
-      //     colour: tag.tagColour,
-      //     customTagStyle: {
-      //       backgroundColor: tag.tagColour,
-      //       color: "#fff",
-      //       alignItems: "center",
-      //       textAlign: "center",
-      //       padding: "2px,8px",
-      //       fontSize: "15px",
-      //       cursor: "pointer",
-      //     },
-      //   }))
-      // );
-      const flatTags = selectedContact.tags?.[0] || [];
-    
-    // Store only tag IDs in `tagsNew` as `<Select>` requires values, not objects
-    // setTagsNew(flatTags.map((tag) => tag._id));
-    
-    // setCombinedTagsValues(flatTags.map((tag) => tag._id));
-    //   getaccountbycontactid(selectedContact._id);
-    //   // Set combinedTagsValues to match the tags in the contact
-    //   setCombinedTagsValues(flatTags.map((tag) => tag._id));
-    //   console.log("Tags:", selectedContact.tags);
+      
+   
+
      console.log("Tags:", selectedContact.tags);
       const tags = selectedContact.tags; // Since data is nested inside an array
       // console.log("Tags with IDs:", tags);
@@ -273,11 +249,12 @@ setPhoneNumbers(
 
   const handleSave = async () => {
     
-     const formattedPhoneNumbers = phoneNumbers.map(phone => ({
-    phone: phone.phone,
-    country: phone.country,
+  //    const formattedPhoneNumbers = phoneNumbers.map(phone => ({
+  //   phone: phone.phone,
+  //   country: phone.country,
    
-  }));
+  // }));
+  const formattedPhoneNumbers = phoneNumbers.map(p => p.phone);
     const updatedContact = {
       firstName,
       middleName,
@@ -505,9 +482,9 @@ setPhoneNumbers(
             mb: 2,
           }}
         >
-          {phone.isPrimary && <Chip label="Primary phone" color="primary" size="small" sx={{ position: "absolute", mt: -3 }} />}
+        
                      <PhoneInput
-  country={phone.country || "us"}
+country={"us"}
   value={phone.phone}
   // onChange={(phoneValue) => handlePhoneNumberChange(phone.id, phoneValue)}
      onChange={(value, country) => handlePhoneNumberChange(value, country, phone.id)}

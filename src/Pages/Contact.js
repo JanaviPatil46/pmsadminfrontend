@@ -1103,7 +1103,7 @@ const ContactTable = () => {
                   >
                     {contact.email}
                   </TableCell>
-                  <TableCell
+                  {/* <TableCell
                     style={{
                       fontSize: "12px",
                       padding: "4px 8px",
@@ -1114,7 +1114,7 @@ const ContactTable = () => {
                       <div>
                         {contact.phoneNumbers.map((phoneObj, index) => (
                           <div key={phoneObj._id || index}>
-                            {/* {phoneObj.country === 'in' ? '+91 ' : phoneObj.country === 'us' ? '+1 ' : '+'} */}
+                           
                             +{phoneObj.phone}
                           </div>
                         ))}
@@ -1122,7 +1122,25 @@ const ContactTable = () => {
                     ) : (
                       ""
                     )}
-                  </TableCell>
+                  </TableCell> */}
+                  <TableCell
+  style={{
+    fontSize: "12px",
+    padding: "4px 8px",
+    lineHeight: "1",
+  }}
+>
+  {contact.phoneNumbers && contact.phoneNumbers.length > 0 ? (
+    <div>
+      {contact.phoneNumbers.map((phone, index) => (
+        <div key={index}>{phone}</div>
+      ))}
+    </div>
+  ) : (
+    ""
+  )}
+</TableCell>
+
                   <TableCell
                     style={{
                       fontSize: "12px",

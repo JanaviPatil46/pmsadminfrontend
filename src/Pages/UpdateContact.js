@@ -74,25 +74,29 @@ const ContactForm = ({
       setPostalCode(selectedContact.postalCode || "");
       setContactId(selectedContact._id || null); // Set contact ID
 
-      // const flatPhoneNumbers = selectedContact.phoneNumbers?.flat() || [];
-    
-      // setPhoneNumbers(
-      //   flatPhoneNumbers.map((phoneStr) => ({
-      //     id: Date.now() + Math.random(),
-      //     phone: phoneStr.startsWith("+") ? phoneStr : `+1${phoneStr}`, // add country code if missing
-      //     isPrimary: false,
-      //   }))
-      // );
-const flatPhoneNumbers = selectedContact.phoneNumbers?.flat() || [];
+     
+// const flatPhoneNumbers = selectedContact.phoneNumbers?.flat() || [];
+
+// setPhoneNumbers(
+//   flatPhoneNumbers.map((phoneObj) => ({
+//     id: Date.now() + Math.random(),
+//     phone: phoneObj.phone.toString().startsWith("+") ? phoneObj.phone.toString() : `+${phoneObj.phone}`,
+//     isPrimary: false,
+//     country: phoneObj.country?.toLowerCase() || "us",
+//   }))
+// );
+const flatPhoneNumbers = selectedContact.phoneNumbers || [];
 
 setPhoneNumbers(
-  flatPhoneNumbers.map((phoneObj) => ({
+  flatPhoneNumbers.map((phone) => ({
     id: Date.now() + Math.random(),
-    phone: phoneObj.phone.toString().startsWith("+") ? phoneObj.phone.toString() : `+${phoneObj.phone}`,
+    phone: phone.toString().startsWith("+") ? phone.toString() : `+${phone}`,
     isPrimary: false,
-    country: phoneObj.country?.toLowerCase() || "us",
+    country: "us", // default since no country info in DB
   }))
 );
+
+
 
       console.log("phone numbers", flatPhoneNumbers);
 
@@ -196,12 +200,12 @@ setPhoneNumbers(
   };
   const handleSave = async () => {
 
-     const formattedPhoneNumbers = phoneNumbers.map(phone => ({
-    phone: phone.phone,
-    country: phone.country,
+  //    const formattedPhoneNumbers = phoneNumbers.map(phone => ({
+  //   phone: phone.phone,
+  //   country: phone.country,
    
-  }));
-
+  // }));
+const formattedPhoneNumbers = phoneNumbers.map(p => p.phone);
 console.log("formattedPhoneNumbers",formattedPhoneNumbers)
     const updatedContact = {
       firstName,
@@ -405,8 +409,26 @@ console.log("formattedPhoneNumbers",formattedPhoneNumbers)
             />
           )}
         
-             <PhoneInput
+             {/* <PhoneInput
   country={phone.country || "us"}
+  value={phone.phone}
+  // onChange={(phoneValue) => handlePhoneNumberChange(phone.id, phoneValue)}
+     onChange={(value, country) => handlePhoneNumberChange(value, country, phone.id)}
+  inputStyle={{
+    width: "100%",
+  }}
+  buttonStyle={{
+    borderTopLeftRadius: "8px",
+    borderBottomLeftRadius: "8px",
+  }}
+  containerStyle={{
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+  }}
+/> */}
+<PhoneInput
+country={"us"}
   value={phone.phone}
   // onChange={(phoneValue) => handlePhoneNumberChange(phone.id, phoneValue)}
      onChange={(value, country) => handlePhoneNumberChange(value, country, phone.id)}

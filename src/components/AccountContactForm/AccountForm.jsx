@@ -1,5 +1,3 @@
-
-
 // import React from "react";
 // import { useDispatch, useSelector } from "react-redux";
 // import { setAccountData } from "../../redux/accountContactSlice";
@@ -52,15 +50,12 @@
 //         />
 //       )}
 
-      
-
 //       <Button variant="contained" sx={{ mt: 2 }} onClick={onContinue}>
 //         Continue
 //       </Button>
 //     </Box>
 //   );
 // }
-
 
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -74,14 +69,20 @@ import {
   Autocomplete,
   Chip,
 } from "@mui/material";
-
+import {
+  FormControl,
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+} from "@mui/material";
 export default function AccountForm({ onContinue }) {
   const dispatch = useDispatch();
   const { accountData } = useSelector((state) => state.accountContact);
 
   const [teamMembers, setTeamMembers] = useState([]);
   const [tags, setTags] = useState([]);
-const [folderTemp,setFolderTemp]=useState([])
+  const [folderTemp, setFolderTemp] = useState([]);
   const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
   const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
   const API_KEY = process.env.REACT_APP_FOLDER_URL;
@@ -109,12 +110,10 @@ const [folderTemp,setFolderTemp]=useState([])
     };
     fetchTeamMembers();
   }, [LOGIN_API]);
- useEffect(() => {
+  useEffect(() => {
     const fetchFolderTemps = async () => {
       try {
-        const res = await fetch(
-          `${API_KEY}/foldertemp/folder`
-        );
+        const res = await fetch(`${API_KEY}/foldertemp/folder`);
         const data = await res.json();
         setFolderTemp(
           data.folderTemplates.map((folder) => ({
@@ -150,20 +149,46 @@ const [folderTemp,setFolderTemp]=useState([])
 
   return (
     <Box>
-      <Typography variant="h6" gutterBottom>
+      {/* <Typography variant="h6" gutterBottom>
         Account Form
-      </Typography>
+      </Typography> */}
+      <FormControl component="fieldset" margin="normal" fullWidth>
+        <FormLabel component="legend" sx={{ color: "black", fontSize: "20px" }}>
+          Client Type
+        </FormLabel>
+        <RadioGroup
+          row // remove this if you want them vertically stacked
+          name="clientType"
+          value={accountData.clientType || ""}
+          onChange={handleChange}
+        >
+          <FormControlLabel
+            value="Individual"
+            control={<Radio />}
+            label="Individual"
+          />
+          <FormControlLabel
+            value="Company"
+            control={<Radio />}
+            label="Company"
+          />
+        </RadioGroup>
+      </FormControl>
 
+      <FormLabel component="legend" sx={{ color: "black", fontSize: "20px" }}>
+        Account Info
+      </FormLabel>
       <TextField
         fullWidth
         margin="normal"
         label="Account Name"
         name="accountName"
+        size="small"
         value={accountData.accountName || ""}
         onChange={handleChange}
       />
 
-      <TextField
+      {/* <TextField
         select
         fullWidth
         margin="normal"
@@ -174,12 +199,13 @@ const [folderTemp,setFolderTemp]=useState([])
       >
         <MenuItem value="Individual">Individual</MenuItem>
         <MenuItem value="Company">Company</MenuItem>
-      </TextField>
+      </TextField> */}
 
       {accountData.clientType === "Company" && (
         <TextField
           fullWidth
           margin="normal"
+          size="small"
           label="Company Name"
           name="companyName"
           value={accountData.companyName || ""}
@@ -198,73 +224,106 @@ const [folderTemp,setFolderTemp]=useState([])
         }
         filterSelectedOptions
         renderInput={(params) => (
-          <TextField {...params} margin="normal" label="Select Team Members" />
+          <TextField
+            {...params}
+            margin="normal"
+            label="Select Team Members"
+            size="small"
+          />
         )}
       />
 
       {/* Tags with colored chips */}
-    {/* Tags with colored chips + colored dropdown options */}
-<Autocomplete
-  multiple
-  options={tags}
-  getOptionLabel={(option) => option.label}
-  value={accountData.tags || []}
-  onChange={(e, newValue) => dispatch(setAccountData({ tags: newValue }))}
-  filterSelectedOptions
-  renderTags={(selected, getTagProps) =>
-    selected.map((option, index) => (
-      <Chip
-        {...getTagProps({ index })}
-        key={option.value}
-        label={option.label}
-        sx={{
-          backgroundColor: option.colour,
-          color: "#fff",
-          fontWeight: 500,
-          cursor:'pointer',
-          fontSize:'12px'
-        }}
+      {/* Tags with colored chips + colored dropdown options */}
+      <Autocomplete
+        multiple
+        options={tags}
+        getOptionLabel={(option) => option.label}
+        value={accountData.tags || []}
+        onChange={(e, newValue) => dispatch(setAccountData({ tags: newValue }))}
+        filterSelectedOptions
+        renderTags={(selected, getTagProps) =>
+          selected.map((option, index) => (
+            <Chip
+              {...getTagProps({ index })}
+              key={option.value}
+              label={option.label}
+              sx={{
+                backgroundColor: option.colour,
+                color: "#fff",
+                fontWeight: 500,
+                cursor: "pointer",
+                fontSize: "12px",
+              }}
+            />
+          ))
+        }
+        renderOption={(props, option) => (
+          <Box
+            component="li"
+            {...props}
+            sx={{
+              backgroundColor: option.colour,
+              color: "#fff",
+              borderRadius: "15px",
+              px: 1,
+              py: 0.5,
+              my: 0.5,
+              width: "fit-content",
+              fontSize: "10px",
+              cursor: "pointer",
+            }}
+          >
+            {option.label}
+          </Box>
+        )}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            margin="normal"
+            label="Select Tags"
+            size="small"
+          />
+        )}
       />
-    ))
-  }
-  renderOption={(props, option) => (
-    <Box
-      component="li"
-      {...props}
-      sx={{
-        backgroundColor: option.colour,
-        color: "#fff",
-        borderRadius: "15px",
-        px: 1,
-        py: 0.5,
-        my: 0.5,
-        width: "fit-content",
-        fontSize:'10px',
-        cursor:'pointer'
-        
-      }}
-    >
-      {option.label}
-    </Box>
-  )}
-  renderInput={(params) => (
-    <TextField {...params} margin="normal" label="Select Tags" />
-  )}
-/>
 
-{/* Folder Template */}
-<Autocomplete
-  options={folderTemp}
-  getOptionLabel={(option) => option.label}
-  value={accountData.folderTemp || null} // full object, like tags
-  onChange={(e, newValue) =>
-    dispatch(setAccountData({ folderTemp: newValue || null }))
-  }
-  renderInput={(params) => (
-    <TextField {...params} margin="normal" label="Select Folder Template" />
-  )}
-/>
+      {/* Folder Template */}
+      <Autocomplete
+        options={folderTemp}
+        getOptionLabel={(option) => option.label}
+        value={accountData.folderTemp || null} // full object, like tags
+        onChange={(e, newValue) =>
+          dispatch(setAccountData({ folderTemp: newValue || null }))
+        }
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            margin="normal"
+            label="Select Folder Template"
+            size="small"
+          />
+        )}
+      />
 
+      {accountData.clientType === "Company" && (
+        <Box>
+          <FormLabel
+            component="legend"
+            sx={{ color: "black", fontSize: "20px" }}
+          >
+            Address
+          </FormLabel>
+          <TextField
+            fullWidth
+            margin="normal"
+            size="small"
+            label="Company Name"
+            name="companyName"
+            value={accountData.companyName || ""}
+            onChange={handleChange}
+          />
+        </Box>
+      )}
 
       <Button variant="contained" sx={{ mt: 2 }} onClick={onContinue}>
         Continue
