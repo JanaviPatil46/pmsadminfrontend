@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useMemo } from "react";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 
@@ -26,6 +26,7 @@ import "./contact.css";
 import TagsMultiSelectDropDown from "../Templates/TagsMultiSelectDropDown"
 import { toast } from "react-toastify";
 import { RxCross2 } from "react-icons/rx";
+import countryList from "react-select-country-list";
 const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   const CONTACT_API = process.env.REACT_APP_CONTACTS_URL;
 
@@ -55,28 +56,35 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   const [combinedValues, setCombinedValues] = useState();
 
   console.log(selectedCountry);
-  useEffect(() => {
-    axios
-      .get("https://restcountries.com/v3.1/all?fields=name,cca2")
-      .then((response) => {
-        const countryData = response.data.map((country) => ({
-          name: country.name.common,
-          code: country.cca2,
-        }));
-        setCountries(countryData);
-      })
-      .catch((error) => console.error("Error fetching country data:", error));
-  }, []);
-
-  // const handlePhoneNumberChange = (id, phone) => {
-  //   console.log(id)
-  //   setPhoneNumbers((prevPhoneNumbers) =>
-  //     prevPhoneNumbers.map((item) =>
-  //       item.id === id ? { ...item, phone } : item
-  //     )
-  //   );
-  // };
- const handlePhoneNumberChange = (phoneValue, countryData, id) => {
+  // useEffect(() => {
+  //   axios
+  //     .get("https://restcountries.com/v3.1/all?fields=name,cca2")
+  //     .then((response) => {
+  //       const countryData = response.data.map((country) => ({
+  //         name: country.name.common,
+  //         code: country.cca2,
+  //       }));
+  //       setCountries(countryData);
+  //     })
+  //     .catch((error) => console.error("Error fetching country data:", error));
+  // }, []);
+  const options = useMemo(() => countryList().getData(), []);
+ 
+//  const handlePhoneNumberChange = (phoneValue, countryData, id) => {
+//   setPhoneNumbers(prevPhoneNumbers =>
+//     prevPhoneNumbers.map(item =>
+//       item.id === id
+//         ? {
+//             ...item,
+//             phone: phoneValue,
+//             countryCode: countryData.dialCode, // Store country dial code
+//             country: countryData.countryCode.toLowerCase() // Store country code (e.g., 'us')
+//           }
+//         : item
+//     )
+//   );
+// };
+   const handlePhoneNumberChange = (phoneValue, countryData, id) => {
   setPhoneNumbers(prevPhoneNumbers =>
     prevPhoneNumbers.map(item =>
       item.id === id
@@ -90,7 +98,6 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
     )
   );
 };
-
   // Update contactName when firstName, middleName, or lastName changes
   useEffect(() => {
     setContactName(`${firstName} ${middleName} ${lastName}`.trim());
@@ -558,8 +565,26 @@ console.log("formattedPhoneNumbers",formattedPhoneNumbers)
                 gap: "8px",
               }}
             /> */}
-            <PhoneInput
+            {/* <PhoneInput
   country={phone.country || "us"}
+  value={phone.phone}
+  // onChange={(phoneValue) => handlePhoneNumberChange(phone.id, phoneValue)}
+     onChange={(value, country) => handlePhoneNumberChange(value, country, phone.id)}
+  inputStyle={{
+    width: "100%",
+  }}
+  buttonStyle={{
+    borderTopLeftRadius: "8px",
+    borderBottomLeftRadius: "8px",
+  }}
+  containerStyle={{
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+  }}
+/> */}
+<PhoneInput
+country={"us"}
   value={phone.phone}
   // onChange={(phoneValue) => handlePhoneNumberChange(phone.id, phoneValue)}
      onChange={(value, country) => handlePhoneNumberChange(value, country, phone.id)}
@@ -607,7 +632,7 @@ console.log("formattedPhoneNumbers",formattedPhoneNumbers)
         <Box>
           <InputLabel sx={{ color: "black" }}>Country</InputLabel>
 
-          <Autocomplete
+          {/* <Autocomplete
             size="small"
             options={countries}
             getOptionLabel={(option) => option.name}
@@ -638,7 +663,18 @@ console.log("formattedPhoneNumbers",formattedPhoneNumbers)
                 sx={{ marginTop: "8px", width: "100%" }}
               />
             )}
-          />
+          /> */}
+          <Autocomplete
+      options={options}
+      size="small"
+      getOptionLabel={(option) => option.label} // show country name
+      value={selectedCountry}
+      onChange={(event, newValue) => setSelectedCountry(newValue)}
+      renderInput={(params) => (
+        <TextField {...params} placeholder="Select Country" variant="outlined" />
+      )}
+      
+    />
         </Box>
         <Box>
           <InputLabel sx={{ color: "black", mt: 2 }}>Street address</InputLabel>

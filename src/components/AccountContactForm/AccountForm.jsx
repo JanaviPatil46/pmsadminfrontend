@@ -57,7 +57,7 @@
 //   );
 // }
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState ,useMemo} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setAccountData } from "../../redux/accountContactSlice";
 import {
@@ -76,6 +76,7 @@ import {
   FormControlLabel,
   Radio,
 } from "@mui/material";
+import countryList from "react-select-country-list";
 export default function AccountForm({ onContinue }) {
   const dispatch = useDispatch();
   const { accountData } = useSelector((state) => state.accountContact);
@@ -147,15 +148,16 @@ export default function AccountForm({ onContinue }) {
     fetchTags();
   }, [TAGS_API]);
 
+
+  // Get country list once (memoized)
+  const options = useMemo(() => countryList().getData(), []);
   return (
     <Box>
-      {/* <Typography variant="h6" gutterBottom>
-        Account Form
-      </Typography> */}
+    
       <FormControl component="fieldset" margin="normal" fullWidth>
-        <FormLabel component="legend" sx={{ color: "black", fontSize: "20px" }}>
+        <Typography sx={{ color: "black", fontSize: "20px" }}>
           Client Type
-        </FormLabel>
+        </Typography>
         <RadioGroup
           row // remove this if you want them vertically stacked
           name="clientType"
@@ -251,6 +253,7 @@ export default function AccountForm({ onContinue }) {
               sx={{
                 backgroundColor: option.colour,
                 color: "#fff",
+                // m:1.5,
                 fontWeight: 500,
                 cursor: "pointer",
                 fontSize: "12px",
@@ -305,25 +308,81 @@ export default function AccountForm({ onContinue }) {
         )}
       />
 
-      {accountData.clientType === "Company" && (
-        <Box>
-          <FormLabel
-            component="legend"
-            sx={{ color: "black", fontSize: "20px" }}
-          >
-            Address
-          </FormLabel>
-          <TextField
-            fullWidth
-            margin="normal"
-            size="small"
-            label="Company Name"
-            name="companyName"
-            value={accountData.companyName || ""}
-            onChange={handleChange}
-          />
-        </Box>
+     {accountData.clientType === "Company" && (
+  <Box>
+    <FormLabel
+      component="legend"
+      sx={{ color: "black", fontSize: "20px" }}
+    >
+      Address
+    </FormLabel>
+
+    {/* Country */}
+    <Autocomplete
+    fullWidth
+      options={options}
+      getOptionLabel={(option) => option.label}
+      value={accountData.country || null}
+      onChange={(event, newValue) =>
+        dispatch(setAccountData({ country: newValue }))
+      }
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          margin="normal"
+          label="Select Country"
+          size="small"
+        />
       )}
+      sx={{  mt: 1 }}
+    />
+
+    {/* Street Address */}
+    <TextField
+      fullWidth
+      margin="normal"
+      size="small"
+      label="Street Address"
+      name="streetAdd"
+      value={accountData.streetAdd || ""}
+      onChange={handleChange}
+    />
+
+    {/* City */}
+    <TextField
+      fullWidth
+      margin="normal"
+      size="small"
+      label="City"
+      name="city"
+      value={accountData.city || ""}
+      onChange={handleChange}
+    />
+
+    {/* State */}
+    <TextField
+      fullWidth
+      margin="normal"
+      size="small"
+      label="State"
+      name="state"
+      value={accountData.state || ""}
+      onChange={handleChange}
+    />
+
+    {/* Zip Code */}
+    <TextField
+      fullWidth
+      margin="normal"
+      size="small"
+      label="Zip Code"
+      name="zipCode"
+      value={accountData.zipCode || ""}
+      onChange={handleChange}
+    />
+  </Box>
+)}
+
 
       <Button variant="contained" sx={{ mt: 2 }} onClick={onContinue}>
         Continue

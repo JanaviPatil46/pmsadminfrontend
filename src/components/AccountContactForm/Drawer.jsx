@@ -2,7 +2,8 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 import { RxCross2 } from "react-icons/rx";
 import AccountContactForm from "./AccountContactForm"
-const Drawer = ({ handleNewDrawerClose, handleDrawerClose }) => {
+// const Drawer = ({ handleNewDrawerClose, handleDrawerClose }) => {
+  const Drawer = ({ handleNewDrawerClose, handleDrawerClose, editingAccountId }) => {
   return (
     <>
       <Box
@@ -14,14 +15,17 @@ const Drawer = ({ handleNewDrawerClose, handleDrawerClose }) => {
           borderBottom: "1px solid grey",
         }}
       >
-        <Typography variant="h6">New Account</Typography>
+        {/* <Typography variant="h6">New Account</Typography> */}
+         <Typography variant="h6">
+          {editingAccountId ? "Edit Account" : "New Account"}
+        </Typography>
         <RxCross2
           style={{ cursor: "pointer" }}
           onClick={handleNewDrawerClose}
         />
       </Box>
       <Box>
-       <AccountContactForm />
+       <AccountContactForm handleDrawerClose={handleDrawerClose} handleNewDrawerClose={handleNewDrawerClose}  editingAccountId={editingAccountId}/>
       </Box>
     </>
   );

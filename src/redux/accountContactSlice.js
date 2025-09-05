@@ -1,5 +1,3 @@
-
-
 // import { createSlice } from "@reduxjs/toolkit";
 
 // const initialContact = {
@@ -86,6 +84,15 @@ const initialContact = {
   middleName: "",
   lastName: "",
   contactName: "",
+  companyName: "",
+  note: "",
+  ssn: "",
+  tags: [],
+  country: "",
+  streetAdd: "",
+  city: "",
+  state: "",
+  zipCode: "",
   email: "",
   phoneNumbers: [""],
   login: false,
@@ -98,9 +105,14 @@ const initialState = {
     accountName: "",
     clientType: "Individual",
     companyName: "",
-    tags:[],
-    teamMembers:[],
-    folderTemp:""
+    tags: [],
+    teamMembers: [],
+    folderTemp: "",
+    country: "",
+    streetAdd: "",
+    city: "",
+    state: "",
+    zipCode: "",
   },
   contacts: [initialContact], // ✅ manually added contacts
   selectedContacts: [], // ✅ existing contacts selected from backend
@@ -130,17 +142,17 @@ const accountContactSlice = createSlice({
     addPhoneNumber: (state, action) => {
       state.contacts[action.payload].phoneNumbers.push("");
     },
-    
+
     updatePhoneNumber: (state, action) => {
       const { contactIndex, phoneIndex, value } = action.payload;
       state.contacts[contactIndex].phoneNumbers[phoneIndex] = value;
     },
-    
+
     removePhoneNumber: (state, action) => {
       const { contactIndex, phoneIndex } = action.payload;
       state.contacts[contactIndex].phoneNumbers.splice(phoneIndex, 1);
     },
-    
+
     updateContactField: (state, action) => {
       const { index, field, value } = action.payload;
       state.contacts[index][field] = value;
@@ -150,16 +162,16 @@ const accountContactSlice = createSlice({
     addSelectedContacts: (state, action) => {
       state.selectedContacts = [...state.selectedContacts, ...action.payload];
     },
-    
+
     removeSelectedContact: (state, action) => {
       state.selectedContacts.splice(action.payload, 1);
     },
-    
+
     updateSelectedContactField: (state, action) => {
       const { index, field, value } = action.payload;
       state.selectedContacts[index][field] = value;
     },
-// 🔹 reducers for tags, team members, and folder template
+    // 🔹 reducers for tags, team members, and folder template
     setTags: (state, action) => {
       state.accountData.tags = action.payload;
     },
@@ -169,6 +181,16 @@ const accountContactSlice = createSlice({
     setFolderTemplate: (state, action) => {
       state.accountData.folderTemp = action.payload;
     },
+    setContactCountry: (state, action) => {
+  const { index, country } = action.payload;
+  state.contacts[index].country = country;
+},
+
+
+    setContactTags: (state, action) => {
+  const { index, tags } = action.payload;
+  state.contacts[index].tags = tags;
+},
     resetForm: () => initialState,
   },
 });
@@ -186,9 +208,9 @@ export const {
   addSelectedContacts,
   removeSelectedContact,
   updateSelectedContactField,
-   setTags,
+  setTags,
   setTeamMembers,
-  setFolderTemplate,
+  setFolderTemplate,setContactTags,setContactCountry
 } = accountContactSlice.actions;
 
 export default accountContactSlice.reducer;

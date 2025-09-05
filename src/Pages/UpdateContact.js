@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect ,useMemo} from "react";
 import {
   OutlinedInput,
   FormControl,
@@ -15,6 +15,7 @@ import {
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import axios from "axios";
+import countryList from "react-select-country-list";
 import { AiOutlinePlusCircle, AiOutlineDelete } from "react-icons/ai";
 import { toast } from "react-toastify";
 import TagsMultiSelectDropDown from "../Templates/TagsMultiSelectDropDown.js";
@@ -38,11 +39,8 @@ const ContactForm = ({
   const [email, setEmail] = useState("");
   const [phoneNumbers, setPhoneNumbers] = useState([]);
   // const [selectedCountry, setSelectedCountry] = useState('');
-  const [selectedCountry, setSelectedCountry] = useState({
-    name: "",
-    code: "",
-  });
-
+  const [selectedCountry, setSelectedCountry] = useState(null);
+console.log("selectedcountry",selectedCountry)
   const [streetAddress, setStreetAddress] = useState("");
   const [city, setCity] = useState("");
 
@@ -64,10 +62,14 @@ const ContactForm = ({
       setSsn(selectedContact.ssn || "");
       setEmail(selectedContact.email || "");
       // setSelectedCountry(selectedContact.country || '');
+      // setSelectedCountry({
+      //   name: selectedContact.country?.name || "", // Use name field or an empty string
+      //   code: selectedContact.country?.code || "", // Use code field or an empty string
+      // });
       setSelectedCountry({
-        name: selectedContact.country?.name || "", // Use name field or an empty string
-        code: selectedContact.country?.code || "", // Use code field or an empty string
-      });
+      value: selectedContact.country?.code,
+      label: selectedContact.country?.name,
+    });
       setStreetAddress(selectedContact.streetAddress || "");
       setCity(selectedContact.city || "");
       setState(selectedContact.state || "");
@@ -117,19 +119,19 @@ setPhoneNumbers(
   }, [selectedContact]);
 
   const [countries, setCountries] = useState([]);
-  useEffect(() => {
-    axios
-      .get("https://restcountries.com/v3.1/all?fields=name,cca2")
-      .then((response) => {
-        const countryData = response.data.map((country) => ({
-          name: country.name.common,
-          code: country.cca2,
-        }));
-        setCountries(countryData);
-      })
-      .catch((error) => console.error("Error fetching country data:", error));
-  }, []);
-
+  // useEffect(() => {
+  //   axios
+  //     .get("https://restcountries.com/v3.1/all?fields=name,cca2")
+  //     .then((response) => {
+  //       const countryData = response.data.map((country) => ({
+  //         name: country.name.common,
+  //         code: country.cca2,
+  //       }));
+  //       setCountries(countryData);
+  //     })
+  //     .catch((error) => console.error("Error fetching country data:", error));
+  // }, []);
+  const options = useMemo(() => countryList().getData(), []);
 
   const handleCountryChange = (event) => {
     const selectedCode = event.target.value;
@@ -218,7 +220,10 @@ console.log("formattedPhoneNumbers",formattedPhoneNumbers)
       email,
       // phoneNumbers,
       phoneNumbers: formattedPhoneNumbers,
-      country: selectedCountry,
+      // country: selectedCountry,
+      country: selectedCountry
+    ? { name: selectedCountry.label, code: selectedCountry.value }
+    : null,
       streetAddress,
       city,
       state,
@@ -475,7 +480,7 @@ country={"us"}
       </Typography>
       <Box mt={1}>
         <InputLabel sx={{ color: "black" }}>Country</InputLabel>
-        <Select
+        {/* <Select
           size="small"
           value={selectedCountry.code}
           onChange={handleCountryChange}
@@ -489,7 +494,18 @@ country={"us"}
               {country.name}
             </MenuItem>
           ))}
-        </Select>
+        </Select> */}
+        <Autocomplete
+              options={options}
+              size="small"
+              getOptionLabel={(option) => option.label} // show country name
+              value={selectedCountry}
+              onChange={(event, newValue) => setSelectedCountry(newValue)}
+              renderInput={(params) => (
+                <TextField {...params} placeholder="Select Country" variant="outlined" />
+              )}
+              
+            />
       </Box>
       <Box mt={2}>
         <InputLabel sx={{ color: "black" }}>Street Address</InputLabel>

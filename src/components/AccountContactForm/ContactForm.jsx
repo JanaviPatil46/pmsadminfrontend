@@ -1,5 +1,3 @@
-
-
 // import React from "react";
 // import { useDispatch, useSelector } from "react-redux";
 // import {
@@ -126,10 +124,6 @@
 //     </Box>
 //   );
 // }
-
-
-
-
 
 // working code withput exsiting contacts
 // import React from "react";
@@ -412,11 +406,6 @@
 //   );
 // }
 
-
-
-
-
-
 // import React, { useState } from "react";
 // import { useDispatch, useSelector } from "react-redux";
 // import {
@@ -450,7 +439,6 @@
 // import { AddCircle, RemoveCircle, Close } from "@mui/icons-material";
 // import PhoneInput from "react-phone-input-2";
 // import "react-phone-input-2/lib/style.css";
-
 
 // // Contact selection dialog component
 // const ContactSelectionDialog = ({ open, onClose, onSelectContacts }) => {
@@ -553,7 +541,7 @@
 //             }}
 //           />
 //         </Box>
-        
+
 //         <Box sx={{ mt: 2, height: 300, overflow: 'auto' }}>
 //           {loading ? (
 //             <Typography>Loading contacts...</Typography>
@@ -574,9 +562,9 @@
 //                         tabIndex={-1}
 //                         disableRipple
 //                       />
-//                       <ListItemText 
-//                         primary={contact.contactName || `${contact.firstName} ${contact.lastName}`} 
-//                         secondary={contact.email} 
+//                       <ListItemText
+//                         primary={contact.contactName || `${contact.firstName} ${contact.lastName}`}
+//                         secondary={contact.email}
 //                       />
 //                     </ListItemButton>
 //                   </ListItem>
@@ -588,8 +576,8 @@
 //       </DialogContent>
 //       <DialogActions>
 //         <Button onClick={handleCancel}>Cancel</Button>
-//         <Button 
-//           onClick={handleSubmit} 
+//         <Button
+//           onClick={handleSubmit}
 //           variant="contained"
 //           disabled={selectedContacts.length === 0}
 //         >
@@ -608,7 +596,7 @@
 //       <Typography variant="h6" gutterBottom>
 //         Selected Existing Contacts
 //       </Typography>
-      
+
 //       {contacts.map((contact, index) => (
 //         <Card key={index} sx={{ mb: 2 }}>
 //           <CardContent>
@@ -618,7 +606,7 @@
 //                   {contact.contactName || `${contact.firstName} ${contact.lastName}`}
 //                 </Typography>
 //                 <Typography color="textSecondary">{contact.email}</Typography>
-                
+
 //                 <FormGroup row sx={{ mt: 1 }}>
 //                   <FormControlLabel
 //                     control={
@@ -629,7 +617,7 @@
 //                     }
 //                     label="Login"
 //                   />
-                  
+
 //                   <FormControlLabel
 //                     control={
 //                       <Checkbox
@@ -639,7 +627,7 @@
 //                     }
 //                     label="Notify"
 //                   />
-                  
+
 //                   <FormControlLabel
 //                     control={
 //                       <Checkbox
@@ -651,8 +639,8 @@
 //                   />
 //                 </FormGroup>
 //               </Box>
-              
-//               <IconButton 
+
+//               <IconButton
 //                 onClick={() => onRemove(index)}
 //                 color="error"
 //               >
@@ -700,13 +688,12 @@
 //    // Handle adding a new contact form
 //   const handleAddContact = () => {
 //     // Only add a new contact if we don't have any or if the last one has some data
-//     if (contacts.length === 0 || contacts[contacts.length - 1].firstName || 
+//     if (contacts.length === 0 || contacts[contacts.length - 1].firstName ||
 //         contacts[contacts.length - 1].lastName || contacts[contacts.length - 1].email) {
 //       dispatch(addContact());
 //     }
 //     setShowContactForm(true);
 //   };
-
 
 //   return (
 //     <Box>
@@ -809,7 +796,7 @@
 //           <Typography variant="subtitle1" sx={{ mt: 2 }}>
 //             Phone Numbers
 //           </Typography>
-          
+
 //           {contact.phoneNumbers.map((phone, phoneIndex) => (
 //             <Box
 //               key={phoneIndex}
@@ -848,7 +835,7 @@
 //               )}
 //             </Box>
 //           ))}
-          
+
 //           <FormGroup row sx={{ mt: 2 }}>
 //             <FormControlLabel
 //               control={
@@ -942,8 +929,7 @@
 //   );
 // }
 
-
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setContactData,
@@ -956,6 +942,8 @@ import {
   addSelectedContacts,
   removeSelectedContact,
   updateSelectedContactField,
+  setContactTags,
+  setContactCountry,
   // resetContacts,
 } from "../../redux/accountContactSlice";
 
@@ -970,13 +958,24 @@ import {
   FormControlLabel,
   Checkbox,
   FormGroup,
+  Autocomplete,
+  FormLabel,
   Chip,
   Card,
-  CardContent,List,ListItemText,ListItem,DialogActions,Dialog,DialogTitle,ListItemButton,DialogContent
+  CardContent,
+  List,
+  ListItemText,
+  ListItem,
+  DialogActions,
+  Dialog,
+  DialogTitle,
+  ListItemButton,
+  DialogContent,
 } from "@mui/material";
 import { AddCircle, RemoveCircle, Close } from "@mui/icons-material";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
+import countryList from "react-select-country-list";
 import axios from "axios";
 
 // Contact selection dialog component
@@ -985,7 +984,7 @@ const ContactSelectionDialog = ({ open, onClose, onSelectContacts }) => {
   const [availableContacts, setAvailableContacts] = useState([]);
   const [selectedContacts, setSelectedContacts] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
   // Fetch contacts from backend API
   React.useEffect(() => {
     if (open) {
@@ -997,9 +996,10 @@ const ContactSelectionDialog = ({ open, onClose, onSelectContacts }) => {
     setLoading(true);
     try {
       // Replace with your actual API endpoint
-      const response = await fetch("http://localhost:5000/api/contacts");
+      const response = await fetch(`${ACCOUNT_API}/contacts/`);
       const data = await response.json();
-      setAvailableContacts(data);
+      console.log("contactlist", data.contacts);
+      setAvailableContacts(data.contacts);
     } catch (error) {
       console.error("Error fetching contacts:", error);
     } finally {
@@ -1012,7 +1012,9 @@ const ContactSelectionDialog = ({ open, onClose, onSelectContacts }) => {
   };
 
   const handleToggleContact = (contact) => {
-    const currentIndex = selectedContacts.findIndex(c => c._id === contact._id);
+    const currentIndex = selectedContacts.findIndex(
+      (c) => c._id === contact._id
+    );
     const newSelected = [...selectedContacts];
 
     if (currentIndex === -1) {
@@ -1025,7 +1027,7 @@ const ContactSelectionDialog = ({ open, onClose, onSelectContacts }) => {
   };
 
   const handleRemoveChip = (contactId) => {
-    const newSelected = selectedContacts.filter(c => c._id !== contactId);
+    const newSelected = selectedContacts.filter((c) => c._id !== contactId);
     setSelectedContacts(newSelected);
   };
 
@@ -1042,13 +1044,17 @@ const ContactSelectionDialog = ({ open, onClose, onSelectContacts }) => {
     onClose();
   };
 
-  // Filter contacts based on search term
-  const filteredContacts = availableContacts.filter(contact =>
-    contact.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (contact.contactName && contact.contactName.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (contact.firstName && contact.firstName.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (contact.lastName && contact.lastName.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  // Only filter when searchTerm has value
+  const filteredContacts = searchTerm
+    ? availableContacts.filter((contact) => {
+        const fullName =
+          `${contact.firstName || ""} ${contact.lastName || ""} ${contact.contactName || ""}`.toLowerCase();
+        const email = (contact.email || "").toLowerCase();
+        const term = searchTerm.toLowerCase();
+
+        return fullName.includes(term) || email.includes(term);
+      })
+    : [];
 
   return (
     <Dialog open={open} onClose={handleCancel} maxWidth="md" fullWidth>
@@ -1066,12 +1072,17 @@ const ContactSelectionDialog = ({ open, onClose, onSelectContacts }) => {
             onChange={handleSearchChange}
             InputProps={{
               startAdornment: (
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mr: 1 }}>
-                  {selectedContacts.map(contact => (
+                <Box
+                  sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mr: 1 }}
+                >
+                  {selectedContacts.map((contact) => (
                     <Chip
                       key={contact._id}
                       size="small"
-                      label={contact.contactName || `${contact.firstName} ${contact.lastName}`}
+                      label={
+                        contact.contactName ||
+                        `${contact.firstName} ${contact.lastName}`
+                      }
                       onDelete={() => handleRemoveChip(contact._id)}
                     />
                   ))}
@@ -1080,30 +1091,39 @@ const ContactSelectionDialog = ({ open, onClose, onSelectContacts }) => {
             }}
           />
         </Box>
-        
-        <Box sx={{ mt: 2, height: 300, overflow: 'auto' }}>
+
+        <Box sx={{ mt: 2, height: 300, overflow: "auto" }}>
           {loading ? (
             <Typography>Loading contacts...</Typography>
           ) : filteredContacts.length === 0 ? (
-            <Typography sx={{ p: 2, textAlign: 'center', color: 'text.secondary' }}>
-              {searchTerm ? 'No contacts found' : 'No contacts available'}
+            <Typography
+              sx={{ p: 2, textAlign: "center", color: "text.secondary" }}
+            >
+              {searchTerm ? "No contacts found" : "No contacts available"}
             </Typography>
           ) : (
             <List>
               {filteredContacts.map((contact) => {
-                const isSelected = selectedContacts.some(c => c._id === contact._id);
+                const isSelected = selectedContacts.some(
+                  (c) => c._id === contact._id
+                );
                 return (
                   <ListItem key={contact._id} disablePadding>
-                    <ListItemButton onClick={() => handleToggleContact(contact)}>
+                    <ListItemButton
+                      onClick={() => handleToggleContact(contact)}
+                    >
                       <Checkbox
                         edge="start"
                         checked={isSelected}
                         tabIndex={-1}
                         disableRipple
                       />
-                      <ListItemText 
-                        primary={contact.contactName || `${contact.firstName} ${contact.lastName}`} 
-                        secondary={contact.email} 
+                      <ListItemText
+                        primary={
+                          contact.contactName ||
+                          `${contact.firstName} ${contact.lastName}`
+                        }
+                        secondary={contact.email}
                       />
                     </ListItemButton>
                   </ListItem>
@@ -1115,8 +1135,8 @@ const ContactSelectionDialog = ({ open, onClose, onSelectContacts }) => {
       </DialogContent>
       <DialogActions>
         <Button onClick={handleCancel}>Cancel</Button>
-        <Button 
-          onClick={handleSubmit} 
+        <Button
+          onClick={handleSubmit}
           variant="contained"
           disabled={selectedContacts.length === 0}
         >
@@ -1136,54 +1156,62 @@ const SelectedContactsDisplay = ({ contacts, onRemove, onUpdateField }) => {
       <Typography variant="h6" gutterBottom>
         Selected Existing Contacts
       </Typography>
-      
+
       {contacts.map((contact, index) => (
         <Card key={index} sx={{ mb: 2 }}>
           <CardContent>
-            <Box display="flex" justifyContent="space-between" alignItems="flex-start">
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="flex-start"
+            >
               <Box flexGrow={1}>
                 <Typography variant="h6">
-                  {contact.contactName || `${contact.firstName} ${contact.lastName}`}
+                  {contact.contactName ||
+                    `${contact.firstName} ${contact.lastName}`}
                 </Typography>
                 <Typography color="textSecondary">{contact.email}</Typography>
-                
+
                 <FormGroup row sx={{ mt: 1 }}>
                   <FormControlLabel
                     control={
                       <Checkbox
                         checked={contact.login || false}
-                        onChange={(e) => onUpdateField(index, "login", e.target.checked)}
+                        onChange={(e) =>
+                          onUpdateField(index, "login", e.target.checked)
+                        }
                       />
                     }
                     label="Login"
                   />
-                  
+
                   <FormControlLabel
                     control={
                       <Checkbox
                         checked={contact.notify || false}
-                        onChange={(e) => onUpdateField(index, "notify", e.target.checked)}
+                        onChange={(e) =>
+                          onUpdateField(index, "notify", e.target.checked)
+                        }
                       />
                     }
                     label="Notify"
                   />
-                  
+
                   <FormControlLabel
                     control={
                       <Checkbox
                         checked={contact.emailSync || false}
-                        onChange={(e) => onUpdateField(index, "emailSync", e.target.checked)}
+                        onChange={(e) =>
+                          onUpdateField(index, "emailSync", e.target.checked)
+                        }
                       />
                     }
                     label="Email Sync"
                   />
                 </FormGroup>
               </Box>
-              
-              <IconButton 
-                onClick={() => onRemove(index)}
-                color="error"
-              >
+
+              <IconButton onClick={() => onRemove(index)} color="error">
                 <Close />
               </IconButton>
             </Box>
@@ -1196,7 +1224,9 @@ const SelectedContactsDisplay = ({ contacts, onRemove, onUpdateField }) => {
 
 export default function ContactForm({ onBack, onSubmit }) {
   const dispatch = useDispatch();
-  const { contacts, selectedContacts, accountData } = useSelector((state) => state.accountContact);
+  const { contacts, selectedContacts, accountData } = useSelector(
+    (state) => state.accountContact
+  );
   const [dialogOpen, setDialogOpen] = useState(false);
   const [showContactForm, setShowContactForm] = useState(false);
 
@@ -1206,7 +1236,8 @@ export default function ContactForm({ onBack, onSubmit }) {
 
     if (["firstName", "middleName", "lastName"].includes(name)) {
       const c = { ...contacts[index], [name]: value };
-      updated.contactName = `${c.firstName} ${c.middleName} ${c.lastName}`.trim();
+      updated.contactName =
+        `${c.firstName} ${c.middleName} ${c.lastName}`.trim();
     }
 
     dispatch(setContactData({ index, data: updated }));
@@ -1227,18 +1258,28 @@ export default function ContactForm({ onBack, onSubmit }) {
     dispatch(updateSelectedContactField({ index, field, value }));
   };
 
-  // Handle adding a new contact form
-  const handleAddContact = () => {
-    // Only add a new contact if we don't have any or if the last one has some data
-    if (contacts.length === 0 || contacts[contacts.length - 1].firstName || 
-        contacts[contacts.length - 1].lastName || contacts[contacts.length - 1].email) {
-      dispatch(addContact());
-    }
-    setShowContactForm(true);
-  };
-
- 
-
+  const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
+  const [tags, setTags] = useState([]);
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const res = await fetch(`${TAGS_API}/tags/`);
+        const data = await res.json();
+        setTags(
+          data.tags.map((tag) => ({
+            value: tag._id,
+            label: tag.tagName,
+            colour: tag.tagColour,
+          }))
+        );
+      } catch (err) {
+        console.error("Error fetching tags:", err);
+      }
+    };
+    fetchTags();
+  }, [TAGS_API]);
+  // Get country list once (memoized)
+  const options = useMemo(() => countryList().getData(), []);
   return (
     <Box>
       <Typography variant="h6" gutterBottom>
@@ -1273,76 +1314,216 @@ export default function ContactForm({ onBack, onSubmit }) {
       <Typography variant="h6" gutterBottom>
         Add New Contacts
       </Typography>
-      
-      {showContactForm && (
-        <>
-          {contacts.map((contact, contactIndex) => (
-            <Box
-              key={contactIndex}
-              sx={{
-                border: "1px solid #ccc",
-                borderRadius: 2,
-                p: 2,
-                mb: 3,
-                background: "#fafafa",
-              }}
-            >
-              <Typography variant="subtitle1" gutterBottom>
-                Contact #{contactIndex + 1}
-              </Typography>
 
-              <Grid container spacing={2}>
-                <Grid item xs={4}>
-                  <TextField
-                    fullWidth
-                    label="First Name"
-                    name="firstName"
-                    value={contact.firstName || ""}
-                    onChange={(e) => handleChange(contactIndex, e)}
-                  />
-                </Grid>
-                <Grid item xs={4}>
-                  <TextField
-                    fullWidth
-                    label="Middle Name"
-                    name="middleName"
-                    value={contact.middleName || ""}
-                    onChange={(e) => handleChange(contactIndex, e)}
-                  />
-                </Grid>
-                <Grid item xs={4}>
-                  <TextField
-                    fullWidth
-                    label="Last Name"
-                    name="lastName"
-                    value={contact.lastName || ""}
-                    onChange={(e) => handleChange(contactIndex, e)}
-                  />
-                </Grid>
+      {/* {showContactForm && ( */}
+      <>
+        {contacts.map((contact, contactIndex) => (
+          <Box
+            key={contactIndex}
+            sx={{
+              border: "1px solid #ccc",
+              borderRadius: 2,
+              p: 2,
+              mb: 3,
+              background: "#fafafa",
+            }}
+          >
+            <Typography variant="subtitle1" gutterBottom>
+              Contact #{contactIndex + 1}
+            </Typography>
+
+            <Grid container spacing={2} mt={2}>
+              <Grid item xs={3.7} ml={2}>
+                <TextField
+                  fullWidth
+                  label="First Name"
+                  name="firstName"
+                  value={contact.firstName || ""}
+                  onChange={(e) => handleChange(contactIndex, e)}
+                />
               </Grid>
+              <Grid item xs={3.7} ml={1}>
+                <TextField
+                  fullWidth
+                  label="Middle Name"
+                  name="middleName"
+                  value={contact.middleName || ""}
+                  onChange={(e) => handleChange(contactIndex, e)}
+                />
+              </Grid>
+              <Grid item xs={3.9} ml={1}>
+                <TextField
+                  fullWidth
+                  label="Last Name"
+                  name="lastName"
+                  value={contact.lastName || ""}
+                  onChange={(e) => handleChange(contactIndex, e)}
+                />
+              </Grid>
+            </Grid>
 
-              <TextField
-                fullWidth
-                margin="normal"
-                label="Contact Name"
-                value={contact.contactName || ""}
-                disabled
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Contact Name"
+              value={contact.contactName || ""}
+              disabled
+            />
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Company Name"
+              name="companyName"
+              value={contact.companyName || ""}
+              onChange={(e) => handleChange(contactIndex, e)}
+            />
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Note"
+              name="note"
+                multiline
+//  maxRows={20}
+              value={contact.note || ""}
+              onChange={(e) => handleChange(contactIndex, e)}
+            />
+            <TextField
+  fullWidth
+  margin="normal"
+  label="SSN"
+  name="ssn"
+  value={contact.ssn || ""}
+  onChange={(e) => handleChange(contactIndex, e)}
+  type="number"
+  inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+  />
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Email"
+              name="email"
+              value={contact.email || ""}
+              onChange={(e) => handleChange(contactIndex, e)}
+            />
+            <FormGroup row sx={{ mt: 2 }}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={contact.login || false}
+                    onChange={(e) =>
+                      dispatch(
+                        updateContactField({
+                          index: contactIndex,
+                          field: "login",
+                          value: e.target.checked,
+                        })
+                      )
+                    }
+                  />
+                }
+                label="Login"
               />
 
-              <TextField
-                fullWidth
-                margin="normal"
-                label="Email"
-                name="email"
-                value={contact.email || ""}
-                onChange={(e) => handleChange(contactIndex, e)}
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={contact.notify || false}
+                    onChange={(e) =>
+                      dispatch(
+                        updateContactField({
+                          index: contactIndex,
+                          field: "notify",
+                          value: e.target.checked,
+                        })
+                      )
+                    }
+                  />
+                }
+                label="Notify"
               />
 
-              <Typography variant="subtitle1" sx={{ mt: 2 }}>
-                Phone Numbers
-              </Typography>
-              
-              {contact.phoneNumbers && contact.phoneNumbers.map((phone, phoneIndex) => (
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={contact.emailSync || false}
+                    onChange={(e) =>
+                      dispatch(
+                        updateContactField({
+                          index: contactIndex,
+                          field: "emailSync",
+                          value: e.target.checked,
+                        })
+                      )
+                    }
+                  />
+                }
+                label="Email Sync"
+              />
+            </FormGroup>
+
+            <Autocomplete
+              multiple
+              options={tags}
+              getOptionLabel={(option) => option.label}
+              value={contact.tags || []}
+              onChange={(e, newValue) =>
+                dispatch(
+                  setContactTags({ index: contactIndex, tags: newValue })
+                )
+              }
+              filterSelectedOptions
+              renderTags={(selected, getTagProps) =>
+                selected.map((option, index) => (
+                  <Chip
+                    {...getTagProps({ index })}
+                    key={option.value}
+                    label={option.label}
+                    sx={{
+                      backgroundColor: option.colour,
+                      color: "#fff",
+                      // m:1.5,
+                      fontWeight: 500,
+                      cursor: "pointer",
+                      fontSize: "12px",
+                    }}
+                  />
+                ))
+              }
+              renderOption={(props, option) => (
+                <Box
+                  component="li"
+                  {...props}
+                  sx={{
+                    backgroundColor: option.colour,
+                    color: "#fff",
+                    borderRadius: "15px",
+                    px: 1,
+                    py: 0.5,
+                    my: 0.5,
+                    width: "fit-content",
+                    fontSize: "10px",
+                    cursor: "pointer",
+                  }}
+                >
+                  {option.label}
+                </Box>
+              )}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  margin="normal"
+                  label="Select Tags"
+                  size="small"
+                />
+              )}
+            />
+
+            <Typography variant="subtitle1" sx={{ mt: 2 }}>
+              Phone Numbers
+            </Typography>
+
+            {contact.phoneNumbers &&
+              contact.phoneNumbers.map((phone, phoneIndex) => (
                 <Box
                   key={phoneIndex}
                   sx={{ display: "flex", alignItems: "center", mt: 1 }}
@@ -1380,81 +1561,105 @@ export default function ContactForm({ onBack, onSubmit }) {
                   )}
                 </Box>
               ))}
-              
-              <FormGroup row sx={{ mt: 2 }}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={contact.login || false}
-                      onChange={(e) =>
-                        dispatch(
-                          updateContactField({
-                            index: contactIndex,
-                            field: "login",
-                            value: e.target.checked,
-                          })
-                        )
-                      }
-                    />
-                  }
-                  label="Login"
-                />
 
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={contact.notify || false}
-                      onChange={(e) =>
-                        dispatch(
-                          updateContactField({
-                            index: contactIndex,
-                            field: "notify",
-                            value: e.target.checked,
-                          })
-                        )
-                      }
-                    />
-                  }
-                  label="Notify"
-                />
+            <Box>
+              <FormLabel
+                component="legend"
+                sx={{ color: "black", fontSize: "20px" }}
+              >
+                Address
+              </FormLabel>
 
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={contact.emailSync || false}
-                      onChange={(e) =>
-                        dispatch(
-                          updateContactField({
-                            index: contactIndex,
-                            field: "emailSync",
-                            value: e.target.checked,
-                          })
-                        )
-                      }
-                    />
-                  }
-                  label="Email Sync"
-                />
-              </FormGroup>
+              {/* Country */}
+              <Autocomplete
+                options={options}
+                getOptionLabel={(option) => option.label}
+                value={contact.country || null}
+                onChange={(e, newValue) =>
+                  dispatch(
+                    setContactCountry({
+                      index: contactIndex,
+                      country: newValue,
+                    })
+                  )
+                }
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    margin="normal"
+                    label="Select Country"
+                  />
+                )}
+              />
 
-              {contacts.length > 1 && (
-                <Button
-                  color="error"
-                  sx={{ mt: 2 }}
-                  onClick={() => dispatch(removeContact(contactIndex))}
-                >
-                  Remove Contact
-                </Button>
-              )}
+              {/* Street Address */}
+              <TextField
+                fullWidth
+                margin="normal"
+                size="small"
+                label="Street Address"
+                name="streetAdd"
+                value={contact.streetAdd || ""}
+                // onChange={handleChange}
+                onChange={(e) => handleChange(contactIndex, e)}
+              />
+
+              {/* City */}
+              <TextField
+                fullWidth
+                margin="normal"
+                size="small"
+                label="City"
+                name="city"
+                value={contact.city || ""}
+                // onChange={handleChange}
+                onChange={(e) => handleChange(contactIndex, e)}
+              />
+
+              {/* State */}
+              <TextField
+                fullWidth
+                margin="normal"
+                size="small"
+                label="State"
+                name="state"
+                value={contact.state || ""}
+                // onChange={handleChange}
+                onChange={(e) => handleChange(contactIndex, e)}
+              />
+
+              {/* Zip Code */}
+              <TextField
+                fullWidth
+                margin="normal"
+                size="small"
+                label="Zip Code"
+                name="zipCode"
+                value={contact.zipCode || ""}
+                // onChange={handleChange}
+                onChange={(e) => handleChange(contactIndex, e)}
+              />
             </Box>
-          ))}
-        </>
-      )}
-      
+
+            {contacts.length > 1 && (
+              <Button
+                color="error"
+                sx={{ mt: 2 }}
+                onClick={() => dispatch(removeContact(contactIndex))}
+              >
+                Remove Contact
+              </Button>
+            )}
+          </Box>
+        ))}
+      </>
+      {/* )} */}
+
       <Button
         variant="outlined"
         startIcon={<AddCircle />}
-        onClick={handleAddContact}
+        // onClick={handleAddContact}
+        onClick={() => dispatch(addContact())}
         sx={{ mb: 3 }}
       >
         Add Another Contact

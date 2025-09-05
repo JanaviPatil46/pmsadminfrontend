@@ -53,6 +53,7 @@ import Accountupdate from "./accountupdate";
 import ChevronDownIcon from "@mui/icons-material/ExpandMore";
 import { toast } from "react-toastify";
 import Cookies from "js-cookie";
+import AccountDrawer from "../../components/AccountContactForm/Drawer";
 const Info = () => {
   const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
   const theme = useTheme();
@@ -74,6 +75,7 @@ const Info = () => {
   const [contact, setContact] = useState(null);
   const [personalMessage, setPersonalMessage] = useState("");
   const [openRemoveDialog, setOpenRemoveDialog] = useState(false);
+  const [editingAccountId, setEditingAccountId] = useState(null);
   const handleSwitchChange = (contactData) => {
     setContact(contactData);
     console.log("contscts", contactData);
@@ -279,6 +281,7 @@ const Info = () => {
           setDescription(result.accountlist.Contacts.description);
         }
         fetchaccountdatabyid(result.accountlist.id);
+       
       })
       .catch((error) => console.error(error));
   };
@@ -783,6 +786,9 @@ const handleArchive = (accId) => {
       toast.error("An error occurred while archiving the account");
     });
 };
+const handleDrawerClose=()=>{
+  setIsNewDrawerOpen((false))
+}
 
   return (
     <Box sx={{ width: "100%", padding: 2, mt: 4 }}>
@@ -874,7 +880,12 @@ const handleArchive = (accId) => {
           transform: "scale(1.1)",
         },
       }}
-      onClick={() => setIsNewDrawerOpen(true)}
+      // onClick={() => setIsNewDrawerOpen(true)}
+       onClick={() => {
+    setIsNewDrawerOpen(true);
+    // Pass the account ID to the drawer for editing
+    setEditingAccountId(data); // You'll need state for this
+  }}
       disabled={storedData?.teammember?.manageAccounts === false}
     >
       <MdEdit size={22} />
@@ -892,15 +903,23 @@ const handleArchive = (accId) => {
       },
     }}
   >
-    <Accountupdate
+    {/* <Accountupdate
       selectedAccount={accountDatabyid}
       onClose={() => {
         setIsNewDrawerOpen(false);
         fetchAccount();
       }}
       onArchive={handleArchive}
-    />
+    /> */}
+     {isNewDrawerOpen && (
+        <AccountDrawer
+          handleNewDrawerClose={handleDrawerClose}
+          // handleDrawerClose={handleDrawerClose}
+          editingAccountId={editingAccountId}
+        />
+      )}
   </Drawer>
+  
 </Box>
 
               <Divider sx={{ mb: 3 }} />
