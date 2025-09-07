@@ -915,7 +915,7 @@ const handleDrawerClose=()=>{
         <AccountDrawer
           handleNewDrawerClose={handleDrawerClose}
           // handleDrawerClose={handleDrawerClose}
-          editingAccountId={editingAccountId}
+          editingAccountId={data}
         />
       )}
   </Drawer>

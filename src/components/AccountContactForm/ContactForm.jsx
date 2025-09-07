@@ -979,7 +979,7 @@ import countryList from "react-select-country-list";
 import axios from "axios";
 
 // Contact selection dialog component
-const ContactSelectionDialog = ({ open, onClose, onSelectContacts }) => {
+const ContactSelectionDialog = ({ open, onClose, onSelectContacts , existingContactIds = [] , accountUserIds = []}) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [availableContacts, setAvailableContacts] = useState([]);
   const [selectedContacts, setSelectedContacts] = useState([]);
@@ -1011,21 +1011,65 @@ const ContactSelectionDialog = ({ open, onClose, onSelectContacts }) => {
     setSearchTerm(e.target.value);
   };
 
-  const handleToggleContact = (contact) => {
+  // const handleToggleContact = (contact) => {
+  //   const currentIndex = selectedContacts.findIndex(
+  //     (c) => c._id === contact._id
+  //   );
+  //   const newSelected = [...selectedContacts];
+
+  //   if (currentIndex === -1) {
+  //     newSelected.push(contact);
+  //   } else {
+  //     newSelected.splice(currentIndex, 1);
+  //   }
+
+  //   setSelectedContacts(newSelected);
+  // };
+//  const handleToggleContact = (contact) => {
+//     const currentIndex = selectedContacts.findIndex(
+//       (c) => c._id === contact._id
+//     );
+//     const newSelected = [...selectedContacts];
+
+//     if (currentIndex === -1) {
+//       // Mark as newly added if not already in the account
+//       const isExistingContact = existingContactIds.includes(contact._id);
+//       newSelected.push({
+//         ...contact, 
+//         existingUser: contact.userid && contact.userid.length > 0, // Mark if this contact already has a user
+//         existingContact: isExistingContact // Mark if this contact is already associated with the account
+//       });
+//     } else {
+//       newSelected.splice(currentIndex, 1);
+//     }
+
+//     setSelectedContacts(newSelected);
+//   };
+const handleToggleContact = (contact) => {
     const currentIndex = selectedContacts.findIndex(
       (c) => c._id === contact._id
     );
     const newSelected = [...selectedContacts];
 
     if (currentIndex === -1) {
-      newSelected.push(contact);
+      // Mark as newly added if not already in the account
+      const isExistingContact = existingContactIds.includes(contact._id);
+      // Check if this contact has a user account associated with THIS account
+      const hasUserForThisAccount = accountUserIds.some(userId => 
+        contact.userid && contact.userid.includes(userId)
+      );
+      
+      newSelected.push({
+        ...contact, 
+        existingUser: hasUserForThisAccount, // Mark if this contact has a user for THIS account
+        existingContact: isExistingContact // Mark if this contact is already associated with the account
+      });
     } else {
       newSelected.splice(currentIndex, 1);
     }
 
     setSelectedContacts(newSelected);
   };
-
   const handleRemoveChip = (contactId) => {
     const newSelected = selectedContacts.filter((c) => c._id !== contactId);
     setSelectedContacts(newSelected);
@@ -1148,7 +1192,7 @@ const ContactSelectionDialog = ({ open, onClose, onSelectContacts }) => {
 };
 
 // Selected contacts display component
-const SelectedContactsDisplay = ({ contacts, onRemove, onUpdateField }) => {
+const SelectedContactsDisplay = ({ contacts, onRemove, onUpdateField, isEditing = false }) => {
   if (contacts.length === 0) return null;
 
   return (
@@ -1170,7 +1214,16 @@ const SelectedContactsDisplay = ({ contacts, onRemove, onUpdateField }) => {
                   {contact.contactName ||
                     `${contact.firstName} ${contact.lastName}`}
                 </Typography>
+                <Typography color="textSecondary">{contact.companyName}</Typography>
                 <Typography color="textSecondary">{contact.email}</Typography>
+{contact.existingUser && (
+                  <Chip 
+                    label="Has User Account" 
+                    size="small" 
+                    color="success" 
+                    sx={{ mt: 1 }}
+                  />
+                )}
 
                 <FormGroup row sx={{ mt: 1 }}>
                   <FormControlLabel
@@ -1180,6 +1233,7 @@ const SelectedContactsDisplay = ({ contacts, onRemove, onUpdateField }) => {
                         onChange={(e) =>
                           onUpdateField(index, "login", e.target.checked)
                         }
+                        disabled={contact.existingUser}
                       />
                     }
                     label="Login"
@@ -1222,7 +1276,7 @@ const SelectedContactsDisplay = ({ contacts, onRemove, onUpdateField }) => {
   );
 };
 
-export default function ContactForm({ onBack, onSubmit }) {
+export default function ContactForm({ onBack, onSubmit,isEditing = false  }) {
   const dispatch = useDispatch();
   const { contacts, selectedContacts, accountData } = useSelector(
     (state) => state.accountContact
@@ -1242,7 +1296,10 @@ export default function ContactForm({ onBack, onSubmit }) {
 
     dispatch(setContactData({ index, data: updated }));
   };
-
+useEffect(() => {
+    console.log("Selected Contacts:", selectedContacts);
+    console.log("Contacts:", contacts);
+  }, [selectedContacts, contacts]);
   // Handle adding existing contacts from the dialog
   const handleAddExistingContacts = (newContacts) => {
     dispatch(addSelectedContacts(newContacts));
@@ -1308,6 +1365,7 @@ export default function ContactForm({ onBack, onSubmit }) {
         contacts={selectedContacts}
         onRemove={handleRemoveSelectedContact}
         onUpdateField={handleUpdateSelectedContactField}
+        isEditing={isEditing}
       />
 
       {/* Manual contact form */}

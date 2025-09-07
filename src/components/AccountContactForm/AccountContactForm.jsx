@@ -60,7 +60,7 @@
 //   );
 // }
 
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import {
   Box,
@@ -77,7 +77,12 @@ import ContactForm from "./ContactForm";
 import { useDispatch } from "react-redux";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { resetForm ,setAccountData,addSelectedContacts,removeSelectedContact} from "../../redux/accountContactSlice";
+import {
+  resetForm,
+  setAccountData,
+  setSelectedContacts,
+  removeSelectedContact,
+} from "../../redux/accountContactSlice";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import RadioButtonCheckedIcon from "@mui/icons-material/RadioButtonChecked";
@@ -87,12 +92,12 @@ const steps = ["Account Info", "Contact Info"];
 export default function AccountContactForm({
   handleNewDrawerClose,
   handleDrawerClose,
-   editingAccountId = null,
+  editingAccountId = null,
 }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
-   const [isEditing, setIsEditing] = useState(!!editingAccountId);
+  const [isEditing, setIsEditing] = useState(!!editingAccountId);
   const [isLoading, setIsLoading] = useState(false);
   const { accountData, contacts, selectedContacts } = useSelector(
     (state) => state.accountContact
@@ -102,162 +107,65 @@ export default function AccountContactForm({
     setActiveStep(index); // ✅ allow clicking on steps
   };
 
-  
   // ======================= Helper Functions =======================
   const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
   const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
   const CLIENT_PORT = process.env.REACT_APP_CLIENT_SERVER_URI;
   const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
   const API_KEY = process.env.REACT_APP_FOLDER_URL;
-  useEffect(() => {
-    if (editingAccountId) {
-      fetchAccountData(editingAccountId);
+
+  // Helper function to fetch tag details
+  const fetchTagsDetails = async (tagIds) => {
+    try {
+      const responses = await Promise.all(
+        tagIds.map((tagId) => axios.get(`${TAGS_API}/tags/${tagId}`))
+      );
+
+      return responses.map((response) => ({
+        value: response.data.tag._id,
+        label: response.data.tag.tagName,
+        colour: response.data.tag.tagColour,
+      }));
+    } catch (error) {
+      console.error("Error fetching tag details:", error);
+      return [];
     }
-  }, [editingAccountId]);
-const fetchAccountData = async (accountId) => {
-  setIsLoading(true);
-  try {
-    const response = await axios.get(
-      `${ACCOUNT_API}/accounts/accountdetails/${accountId}`
-    );
-    const accountData = response.data.account;
-    console.log("accountData",accountData)
-    // Transform the data to match your form structure
-    const formattedData = {
-      accountName: accountData.accountName,
-      clientType: accountData.clientType,
-      companyName: accountData.companyName || "",
-      tags: accountData.tags ? await fetchTagsDetails(accountData.tags) : [],
-      teamMembers: accountData.teamMember ? await fetchTeamMembersDetails(accountData.teamMember) : [],
-      folderTemp: accountData.foldertemplate ? await fetchFolderTemplateDetails(accountData.foldertemplate) : null,
-      country: accountData.country && accountData.country.code ? {
-        value: accountData.country.code,
-        label: accountData.country.name
-      } : null,
-      streetAdd: accountData.streetAddress || "",
-      city: accountData.city || "",
-      state: accountData.state || "",
-      zipCode: accountData.postalCode || ""
-    };
-      console.log("formattedData",formattedData)
-    dispatch(setAccountData(formattedData));
-    
-    // Fetch contacts for this account
-    // await fetchAccountContacts(accountId);
-  await setAccountContactsToSelected(accountData.contacts);
-  } catch (error) {
-    console.error("Error fetching account data:", error);
-    toast.error("Failed to load account data");
-  } finally {
-    setIsLoading(false);
-  }
-};
-const setAccountContactsToSelected = async (contactsData) => {
-  try {
-    if (!contactsData || contactsData.length === 0) {
-      return;
+  };
+
+  // Helper function to fetch team member details
+  const fetchTeamMembersDetails = async (teamMemberIds) => {
+    try {
+      const responses = await Promise.all(
+        teamMemberIds.map((memberId) =>
+          axios.get(`${LOGIN_API}/common/users/${memberId}`)
+        )
+      );
+
+      return responses.map((response) => ({
+        value: response.data.user._id,
+        label: response.data.user.username,
+      }));
+    } catch (error) {
+      console.error("Error fetching team member details:", error);
+      return [];
     }
+  };
 
-    // Format each contact for selectedContacts
-    const formattedContacts = await Promise.all(
-      contactsData.map(async (contact) => {
-        // Fetch tag details for this contact
-       
-
-        return {
-          _id: contact._id,
-          firstName: contact.firstName || "",
-          middleName: contact.middleName || "",
-          lastName: contact.lastName || "",
-          contactName: contact.contactName || "",
-          companyName: contact.companyName || "",
-          // note: contact.note || "",
-          // ssn: contact.ssn || "",
-          email: contact.email || "",
-          // phoneNumbers: contact.phoneNumbers || [""],
-          // login: contact.login || false,
-          // notify: contact.notify || false,
-          // emailSync: contact.emailSync || false,
-          // tags: contactTags,
-          // country: contact.country && contact.country.code 
-            // ? { value: contact.country.code, label: contact.country.name }
-            // : null,
-          // streetAdd: contact.streetAddress || "",
-          // city: contact.city || "",
-          // state: contact.state || "",
-          // zipCode: contact.postalCode || ""
-        };
-      })
-    );
-
-    // Set all formatted contacts to selectedContacts
-    dispatch(addSelectedContacts(formattedContacts));
-    // Clear any existing data first
-    // dispatch(removeSelectedContact());
-    // dispatch(clearSelectedContacts());
-    
-    // Set account data
-    // dispatch(setAccountData(formattedData));
-    
-    // Set contacts from the account data into selectedContacts
-    await setAccountContactsToSelected(accountData.contacts);
-
-  } catch (error) {
-    console.error("Error setting contacts to selected:", error);
-  }
-};
-// Helper function to fetch tag details
-const fetchTagsDetails = async (tagIds) => {
-  try {
-    const responses = await Promise.all(
-      tagIds.map(tagId => 
-        axios.get(`${TAGS_API}/tags/${tagId}`)
-      )
-    );
-    
-    return responses.map(response => ({
-      value: response.data.tag._id,
-      label: response.data.tag.tagName,
-      colour: response.data.tag.tagColour
-    }));
-  } catch (error) {
-    console.error("Error fetching tag details:", error);
-    return [];
-  }
-};
-
-// Helper function to fetch team member details
-const fetchTeamMembersDetails = async (teamMemberIds) => {
-  try {
-    const responses = await Promise.all(
-      teamMemberIds.map(memberId => 
-        axios.get(`${LOGIN_API}/common/users/${memberId}`)
-      )
-    );
-    
-    return responses.map(response => ({
-      value: response.data.user._id,
-      label: response.data.user.username
-    }));
-  } catch (error) {
-    console.error("Error fetching team member details:", error);
-    return [];
-  }
-};
-
-// Helper function to fetch folder template details
-const fetchFolderTemplateDetails = async (folderTemplateId) => {
-  try {
-    const response = await axios.get(`${API_KEY}/foldertemp/folder/${folderTemplateId}`);
-    return {
-      value: response.data.folderTemplate._id,
-      label: response.data.folderTemplate.templatename
-    };
-  } catch (error) {
-    console.error("Error fetching folder template details:", error);
-    return null;
-  }
-};
+  // Helper function to fetch folder template details
+  const fetchFolderTemplateDetails = async (folderTemplateId) => {
+    try {
+      const response = await axios.get(
+        `${API_KEY}/foldertemp/folder/${folderTemplateId}`
+      );
+      return {
+        value: response.data.folderTemplate._id,
+        label: response.data.folderTemplate.templatename,
+      };
+    } catch (error) {
+      console.error("Error fetching folder template details:", error);
+      return null;
+    }
+  };
   // const fetchAccountData = async (accountId) => {
   //   setIsLoading(true);
   //   try {
@@ -295,10 +203,10 @@ const fetchFolderTemplateDetails = async (folderTemplateId) => {
   //     };
   //     console.log("formattedData",formattedData)
   //     dispatch(setAccountData(formattedData));
-      
+
   //     // Fetch contacts for this account
   //     // await fetchAccountContacts(accountId);
-      
+
   //   } catch (error) {
   //     console.error("Error fetching account data:", error);
   //     toast.error("Failed to load account data");
@@ -416,6 +324,121 @@ const fetchFolderTemplateDetails = async (folderTemplateId) => {
       .catch((error) => console.error("clientCreatedmail Error:", error));
   };
 
+  useEffect(() => {
+    if (editingAccountId) {
+      fetchAccountData(editingAccountId);
+    }
+  }, [editingAccountId]);
+
+  // Function to fetch account data for editing
+  const fetchAccountData = async (accountId) => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get(
+        `${ACCOUNT_API}/accounts/accountdetails/${accountId}`
+      );
+      const accountData = response.data.account;
+
+      // Transform the data to match your form structure
+      const formattedData = {
+        accountName: accountData.accountName,
+        clientType: accountData.clientType,
+        companyName: accountData.companyName || "",
+        tags: accountData.tags ? await fetchTagsDetails(accountData.tags) : [],
+        teamMembers: accountData.teamMember
+          ? await fetchTeamMembersDetails(accountData.teamMember)
+          : [],
+        folderTemp: accountData.foldertemplate
+          ? {
+              value: accountData.foldertemplate,
+              label: "Template Name", // We'll fetch the actual name in the next step
+            }
+          : null,
+        country: accountData.country
+          ? {
+              value: accountData.country.code,
+              label: accountData.country.name,
+            }
+          : null,
+        streetAdd: accountData.streetAddress || "",
+        city: accountData.city || "",
+        state: accountData.state || "",
+        zipCode: accountData.postalCode || "",
+      };
+
+      dispatch(setAccountData(formattedData));
+
+      // Fetch folder template name
+      if (accountData.foldertemplate) {
+        const folderDetails = await fetchFolderTemplateDetails(
+          accountData.foldertemplate
+        );
+        if (folderDetails) {
+          dispatch(
+            setAccountData({
+              folderTemp: folderDetails,
+            })
+          );
+        }
+      }
+
+      // Fetch contacts for this account
+      await fetchAccountContacts(accountId, accountData.contacts);
+    } catch (error) {
+      console.error("Error fetching account data:", error);
+      toast.error("Failed to load account data");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Function to fetch contacts for the account being edited
+  const fetchAccountContacts = async (accountId, accountContacts) => {
+    try {
+      // For each contact, check if they have a user and set login status
+      const contactsWithLoginStatus = await Promise.all(
+        accountContacts.map(async (contact) => {
+          // Check if this contact has a user account
+          const hasUser = contact.userid && contact.userid.length > 0;
+
+          return {
+            _id: contact._id,
+            firstName: contact.firstName || "",
+            middleName: contact.middleName || "",
+            lastName: contact.lastName || "",
+            contactName: contact.contactName || "",
+            companyName: contact.companyName || "",
+            note: contact.note || "",
+            ssn: contact.ssn || "",
+            email: contact.email || "",
+            phoneNumbers: contact.phoneNumbers || [""],
+            tags: contact.tags ? await fetchTagsDetails(contact.tags) : [],
+            country: contact.country
+              ? {
+                  value: contact.country.code,
+                  label: contact.country.name,
+                }
+              : null,
+            streetAdd: contact.streetAddress || "",
+            city: contact.city || "",
+            state: contact.state || "",
+            zipCode: contact.postalCode || "",
+            login: hasUser,
+            notify: contact.notify || false,
+            emailSync: contact.emailSync || false,
+            existingUser: hasUser, // Mark if this contact already has a user
+            existingContact: true, // Mark as existing contact
+          };
+        })
+      );
+
+      dispatch(setSelectedContacts(contactsWithLoginStatus));
+    } catch (error) {
+      console.error("Error processing account contacts:", error);
+    }
+  };
+
+  // Update handleSubmit to handle both create and edit
   const handleSubmit = async () => {
     try {
       const finalData = {
@@ -428,12 +451,11 @@ const fetchFolderTemplateDetails = async (folderTemplateId) => {
         ),
         foldertemplate: accountData.folderTemp
           ? accountData.folderTemp.value
-          : null, // 👈 only ID,
-        // ✅ Country object (matches backend schema)
+          : null,
         country: accountData.country
           ? {
-              code: accountData.country.value, // e.g., "IN"
-              name: accountData.country.label, // e.g., "India"
+              code: accountData.country.value,
+              name: accountData.country.label,
             }
           : { code: "", name: "" },
         streetAddress: accountData.streetAdd || "",
@@ -443,20 +465,36 @@ const fetchFolderTemplateDetails = async (folderTemplateId) => {
         active: true,
       };
 
-      console.log("Final data:", finalData);
+      let accountId;
 
-      const { data: account } = await axios.post(
-        `${ACCOUNT_API}/accounts/accountdetails`,
-        finalData
-      );
-      const newAccountId = account._id;
+      if (isEditing) {
+        // Update existing account
+        await axios.patch(
+          `${ACCOUNT_API}/accounts/accountdetails/${editingAccountId}`,
+          finalData
+        );
+        accountId = editingAccountId;
 
-      // 1.1 Create root folder structure for this account
-      await addFolderTemplate(newAccountId);
+        // Update folder template if changed
+        if (finalData.foldertemplate) {
+          await assignfoldertemp(accountId, finalData.foldertemplate);
+        }
+      } else {
+        // Create new account
+        const { data: account } = await axios.post(
+          `${ACCOUNT_API}/accounts/accountdetails`,
+          finalData
+        );
+        accountId = account._id;
 
-      // 1.2 Assign selected folder template (if any)
-      await assignfoldertemp(newAccountId, finalData.foldertemplate);
-      // 2. Create NEW Contacts (manually added)
+        // Create root folder structure for this account
+        await addFolderTemplate(accountId);
+
+        // Assign selected folder template (if any)
+        await assignfoldertemp(accountId, finalData.foldertemplate);
+      }
+
+      // Process NEW contacts (manually added)
       for (let contact of contacts) {
         if (
           (contact.firstName || contact.lastName || contact.email) &&
@@ -466,58 +504,153 @@ const fetchFolderTemplateDetails = async (folderTemplateId) => {
             `${ACCOUNT_API}/contacts/new-contact`,
             {
               ...contact,
-               tags: (contact.tags || []).map((t) => t.value),
-               country: contact.country
-    ? {
-        code: contact.country.value,
-        name: contact.country.label,
-      }
-    : { code: "", name: "" },
-              accountId: account._id,
+              tags: (contact.tags || []).map((t) => t.value),
+              country: contact.country
+                ? {
+                    code: contact.country.value,
+                    name: contact.country.label,
+                  }
+                : { code: "", name: "" },
+              accountId: accountId,
             }
           );
 
-          // 3. If contact has login enabled → also create user
+          // If contact has login enabled → also create user (only for new contacts)
           if (contact.login) {
-            const { data: newUser } = await axios.post(
-              `${LOGIN_API}/common/from-contact`,
-              {
-                contactId: newContact._id,
-                email: contact.email,
-                password: "defaultPass123",
-              }
-            );
-            console.log("newUser", newUser);
+            try {
+              const { data: newUser } = await axios.post(
+                `${LOGIN_API}/common/from-contact`,
+                {
+                  contactId: newContact._id,
+                  email: contact.email,
+                  password: "defaultPass123",
+                }
+              );
 
-            // 🔗 Link User ↔ Account, Save Client Info, Send Mail
-            updateAcountUserId(newUser.user._id, account._id);
-            clientalldata(
-              newUser._id,
-              contact.email,
-              contact.firstName,
-              contact.middleName,
-              contact.lastName,
-              account.accountName
-            );
-            clientCreatedmail(
-              contact.email,
-              "Welcome to our platform!",
-              newUser.user._id
-            );
+              // Link User ↔ Account, Save Client Info, Send Mail
+              updateAcountUserId(newUser.user._id, accountId);
+              clientalldata(
+                newUser.user._id,
+                contact.email,
+                contact.firstName,
+                contact.middleName,
+                contact.lastName,
+                accountData.accountName
+              );
+              clientCreatedmail(
+                contact.email,
+                "Welcome to our platform!",
+                newUser.user._id
+              );
+            } catch (error) {
+              console.error("Error creating user for contact:", error);
+              // Continue even if user creation fails
+            }
           }
         }
       }
 
-      // 4. Update EXISTING contacts
-      for (let contact of selectedContacts) {
+      // Process EXISTING contacts (both previously existing and newly selected)
+      // for (let contact of selectedContacts) {
+      //   // Update contact details
+      //   await axios.patch(`${ACCOUNT_API}/contacts/${contact._id}`, {
+      //     ...contact,
+      //     tags: (contact.tags || []).map((t) => t.value),
+      //     country: contact.country
+      //       ? {
+      //           code: contact.country.value,
+      //           name: contact.country.label,
+      //         }
+      //       : { code: "", name: "" },
+      //     accountId: accountId,
+      //     login: contact.login,
+      //     notify: contact.notify,
+      //     emailSync: contact.emailSync,
+      //   });
+
+      //   // For edit mode, only create users for contacts that are newly added
+      //   // and have login enabled but don't have a user yet
+      //   if (
+      //     contact.login &&
+      //     !contact.existingUser &&
+      //     !contact.existingContact
+      //   ) {
+      //     try {
+      //       const { data: newUser } = await axios.post(
+      //         `${LOGIN_API}/common/from-contact`,
+      //         {
+      //           contactId: contact._id,
+      //           email: contact.email,
+      //           password: "defaultPass123",
+      //         }
+      //       );
+
+      //       await axios.patch(`${ACCOUNT_API}/contacts/${contact._id}`, {
+      //         // accountId: accountId,
+      //         login: false,
+      //         notify: false,
+      //         emailSync: false,
+      //       });
+      //       // Link User ↔ Account, Save Client Info, Send Mail
+      //       updateAcountUserId(newUser.user._id, accountId);
+      //       clientalldata(
+      //         newUser.user._id,
+      //         contact.email,
+      //         contact.firstName,
+      //         contact.middleName,
+      //         contact.lastName,
+      //         accountData.accountName
+      //       );
+      //       clientCreatedmail(
+      //         contact.email,
+      //         "Welcome to our platform!",
+      //         newUser.user._id
+      //       );
+      //     } catch (error) {
+      //       console.error("Error creating user for selected contact:", error);
+      //       // Continue even if user creation fails
+      //     }
+      //   }
+      // }
+for (let contact of selectedContacts) {
+      // For existing contacts of the account, set login, notify, emailSync to false
+      if (contact.existingContact) {
         await axios.patch(`${ACCOUNT_API}/contacts/${contact._id}`, {
           ...contact,
-          accountId: account._id,
+          tags: (contact.tags || []).map((t) => t.value),
+          country: contact.country
+            ? {
+                code: contact.country.value,
+                name: contact.country.label,
+              }
+            : { code: "", name: "" },
+          accountId: accountId,
+          login: false, // Set to false for existing contacts
+          notify: false, // Set to false for existing contacts
+          emailSync: false, // Set to false for existing contacts
+        });
+      } else {
+        // For newly added contacts, preserve their settings
+        await axios.patch(`${ACCOUNT_API}/contacts/${contact._id}`, {
+          ...contact,
+          tags: (contact.tags || []).map((t) => t.value),
+          country: contact.country
+            ? {
+                code: contact.country.value,
+                name: contact.country.label,
+              }
+            : { code: "", name: "" },
+          accountId: accountId,
+          login: contact.login,
+          notify: contact.notify,
+          emailSync: contact.emailSync,
         });
 
-        if (contact.login) {
+        // For edit mode, only create users for contacts that are newly added
+        // and have login enabled but don't have a user yet
+        if (contact.login && !contact.existingUser && !contact.existingContact) {
           try {
-            const { data: existingUser } = await axios.post(
+            const { data: newUser } = await axios.post(
               `${LOGIN_API}/common/from-contact`,
               {
                 contactId: contact._id,
@@ -526,34 +659,29 @@ const fetchFolderTemplateDetails = async (folderTemplateId) => {
               }
             );
 
-            // 🔗 Link User ↔ Account, Save Client Info, Send Mail
-            updateAcountUserId(existingUser.user._id, account._id);
+            // Link User ↔ Account, Save Client Info, Send Mail
+            updateAcountUserId(newUser.user._id, accountId);
             clientalldata(
-              existingUser._id,
+              newUser.user._id,
               contact.email,
               contact.firstName,
               contact.middleName,
               contact.lastName,
-              account.accountName
+              accountData.accountName
             );
             clientCreatedmail(
               contact.email,
               "Welcome to our platform!",
-              existingUser.user._id
+              newUser.user._id
             );
           } catch (error) {
-            if (error.response?.status === 409) {
-              await axios.patch(`${ACCOUNT_API}/contact/${contact._id}`, {
-                email: contact.email,
-              });
-            } else {
-              throw error;
-            }
+            console.error("Error creating user for selected contact:", error);
+            // Continue even if user creation fails
           }
         }
       }
-
-      // 5. Update Account with all contact references
+    }
+      // Update Account with all contact references
       const allContactIds = [
         ...contacts
           .filter((c) => (c.firstName || c.lastName || c.email) && c._id)
@@ -563,16 +691,24 @@ const fetchFolderTemplateDetails = async (folderTemplateId) => {
 
       if (allContactIds.length > 0) {
         await axios.patch(
-          `${ACCOUNT_API}/accounts/accountdetails/${account._id}`,
+          `${ACCOUNT_API}/accounts/accountdetails/${accountId}`,
           { contacts: allContactIds }
         );
       }
 
-      toast.success("✅ Account, contacts & users saved!");
+      toast.success(
+        isEditing
+          ? "✅ Account updated successfully!"
+          : "✅ Account, contacts & users saved!"
+      );
       dispatch(resetForm());
-      handleDrawerClose();
+      // handleDrawerClose();
       handleNewDrawerClose();
-      navigate("/clients/accounts/activeaccounts");
+      if (!isEditing) {
+       handleDrawerClose();
+        navigate("/clients/accounts/activeaccounts");
+      }
+      // navigate("/clients/accounts/activeaccounts");
     } catch (err) {
       console.error(err);
       if (err.response?.data?.error === "Account name is taken") {
@@ -582,6 +718,172 @@ const fetchFolderTemplateDetails = async (folderTemplateId) => {
       }
     }
   };
+  // const handleSubmit = async () => {
+  //   try {
+  //     const finalData = {
+  //       clientType: accountData.clientType,
+  //       accountName: accountData.accountName,
+  //       companyName: accountData.companyName,
+  //       tags: (accountData.tags || []).map((tag) => tag.value),
+  //       teamMember: (accountData.teamMembers || []).map(
+  //         (member) => member.value
+  //       ),
+  //       foldertemplate: accountData.folderTemp
+  //         ? accountData.folderTemp.value
+  //         : null, // 👈 only ID,
+  //       // ✅ Country object (matches backend schema)
+  //       country: accountData.country
+  //         ? {
+  //             code: accountData.country.value, // e.g., "IN"
+  //             name: accountData.country.label, // e.g., "India"
+  //           }
+  //         : { code: "", name: "" },
+  //       streetAddress: accountData.streetAdd || "",
+  //       city: accountData.city || "",
+  //       state: accountData.state || "",
+  //       postalCode: accountData.zipCode || "",
+  //       active: true,
+  //     };
+
+  //     console.log("Final data:", finalData);
+
+  //     const { data: account } = await axios.post(
+  //       `${ACCOUNT_API}/accounts/accountdetails`,
+  //       finalData
+  //     );
+  //     const newAccountId = account._id;
+
+  //     // 1.1 Create root folder structure for this account
+  //     await addFolderTemplate(newAccountId);
+
+  //     // 1.2 Assign selected folder template (if any)
+  //     await assignfoldertemp(newAccountId, finalData.foldertemplate);
+  //     // 2. Create NEW Contacts (manually added)
+  //     for (let contact of contacts) {
+  //       if (
+  //         (contact.firstName || contact.lastName || contact.email) &&
+  //         !contact._id
+  //       ) {
+  //         const { data: newContact } = await axios.post(
+  //           `${ACCOUNT_API}/contacts/new-contact`,
+  //           {
+  //             ...contact,
+  //              tags: (contact.tags || []).map((t) => t.value),
+  //              country: contact.country
+  //   ? {
+  //       code: contact.country.value,
+  //       name: contact.country.label,
+  //     }
+  //   : { code: "", name: "" },
+  //             accountId: account._id,
+  //           }
+  //         );
+
+  //         // 3. If contact has login enabled → also create user
+  //         if (contact.login) {
+  //           const { data: newUser } = await axios.post(
+  //             `${LOGIN_API}/common/from-contact`,
+  //             {
+  //               contactId: newContact._id,
+  //               email: contact.email,
+  //               password: "defaultPass123",
+  //             }
+  //           );
+  //           console.log("newUser", newUser);
+
+  //           // 🔗 Link User ↔ Account, Save Client Info, Send Mail
+  //           updateAcountUserId(newUser.user._id, account._id);
+  //           clientalldata(
+  //             newUser._id,
+  //             contact.email,
+  //             contact.firstName,
+  //             contact.middleName,
+  //             contact.lastName,
+  //             account.accountName
+  //           );
+  //           clientCreatedmail(
+  //             contact.email,
+  //             "Welcome to our platform!",
+  //             newUser.user._id
+  //           );
+  //         }
+  //       }
+  //     }
+
+  //     // 4. Update EXISTING contacts
+  //     for (let contact of selectedContacts) {
+  //       await axios.patch(`${ACCOUNT_API}/contacts/${contact._id}`, {
+  //         ...contact,
+  //         accountId: account._id,
+  //       });
+
+  //       if (contact.login) {
+  //         try {
+  //           const { data: existingUser } = await axios.post(
+  //             `${LOGIN_API}/common/from-contact`,
+  //             {
+  //               contactId: contact._id,
+  //               email: contact.email,
+  //               password: "defaultPass123",
+  //             }
+  //           );
+
+  //           // 🔗 Link User ↔ Account, Save Client Info, Send Mail
+  //           updateAcountUserId(existingUser.user._id, account._id);
+  //           clientalldata(
+  //             existingUser._id,
+  //             contact.email,
+  //             contact.firstName,
+  //             contact.middleName,
+  //             contact.lastName,
+  //             account.accountName
+  //           );
+  //           clientCreatedmail(
+  //             contact.email,
+  //             "Welcome to our platform!",
+  //             existingUser.user._id
+  //           );
+  //         } catch (error) {
+  //           if (error.response?.status === 409) {
+  //             await axios.patch(`${ACCOUNT_API}/contact/${contact._id}`, {
+  //               email: contact.email,
+  //             });
+  //           } else {
+  //             throw error;
+  //           }
+  //         }
+  //       }
+  //     }
+
+  //     // 5. Update Account with all contact references
+  //     const allContactIds = [
+  //       ...contacts
+  //         .filter((c) => (c.firstName || c.lastName || c.email) && c._id)
+  //         .map((c) => c._id),
+  //       ...selectedContacts.map((c) => c._id),
+  //     ];
+
+  //     if (allContactIds.length > 0) {
+  //       await axios.patch(
+  //         `${ACCOUNT_API}/accounts/accountdetails/${account._id}`,
+  //         { contacts: allContactIds }
+  //       );
+  //     }
+
+  //     toast.success("✅ Account, contacts & users saved!");
+  //     dispatch(resetForm());
+  //     handleDrawerClose();
+  //     handleNewDrawerClose();
+  //     navigate("/clients/accounts/activeaccounts");
+  //   } catch (err) {
+  //     console.error(err);
+  //     if (err.response?.data?.error === "Account name is taken") {
+  //       alert("❌ Account name is already taken. Please choose another.");
+  //     } else {
+  //       alert("❌ Failed to save. Check console.");
+  //     }
+  //   }
+  // };
 
   const CLIENT_DOCS_API = process.env.REACT_APP_CLIENT_DOCS_MANAGE;
   const addFolderTemplate = (accountId) => {
@@ -631,9 +933,7 @@ const fetchFolderTemplateDetails = async (folderTemplateId) => {
 
   return (
     <Box sx={{ maxWidth: 700, margin: "auto", mt: 1 }}>
-     
       <Box sx={{ display: "flex", justifyContent: "center" }}>
-      
         {steps.map((label, index) => (
           <Box key={label} sx={{ display: "flex", alignItems: "center" }}>
             <Radio
@@ -654,13 +954,13 @@ const fetchFolderTemplateDetails = async (folderTemplateId) => {
       </Box>
       <Box sx={{ p: 3 }}>
         {activeStep === 0 && (
-          <AccountForm onContinue={() => setActiveStep(1)}  isEditing={isEditing}/>
+          <AccountForm onContinue={() => setActiveStep(1)} />
         )}
         {activeStep === 1 && (
           <ContactForm
             onBack={() => setActiveStep(0)}
             onSubmit={handleSubmit}
-              isEditing={isEditing}
+            isEditing={isEditing}
           />
         )}
       </Box>
@@ -673,10 +973,6 @@ const fetchFolderTemplateDetails = async (folderTemplateId) => {
     </Box>
   );
 }
-
-
-
-
 
 // const handleSubmit = () => {
 //   const finalData = {
@@ -765,142 +1061,142 @@ const fetchFolderTemplateDetails = async (folderTemplateId) => {
 // };
 
 //   const handleSubmit = async () => {
-  //   const finalData = {
-  //     ...accountData,
-  //     // contacts,
-  //     contacts: [...contacts, ...selectedContacts],
-  //   };
+//   const finalData = {
+//     ...accountData,
+//     // contacts,
+//     contacts: [...contacts, ...selectedContacts],
+//   };
 
-  //   try {
-  //     // 1. Create Account
-  //     const { data: account } = await axios.post(
-  //       "http://localhost:5000/api/accounts",
-  //       {
-  //         clientType: finalData.clientType,
-  //         accountName: finalData.accountName,
-  //         companyName: finalData.companyName,
-  //       }
-  //     );
+//   try {
+//     // 1. Create Account
+//     const { data: account } = await axios.post(
+//       "http://localhost:5000/api/accounts",
+//       {
+//         clientType: finalData.clientType,
+//         accountName: finalData.accountName,
+//         companyName: finalData.companyName,
+//       }
+//     );
 
-  //     // 2. Create Contacts for this account
-  //     for (let c of finalData.contacts) {
-  //       const { data: contact } = await axios.post(
-  //         "http://localhost:5000/api/contacts",
-  //         {
-  //           ...c,
-  //           accountId: account._id, // link to account
-  //         }
-  //       );
+//     // 2. Create Contacts for this account
+//     for (let c of finalData.contacts) {
+//       const { data: contact } = await axios.post(
+//         "http://localhost:5000/api/contacts",
+//         {
+//           ...c,
+//           accountId: account._id, // link to account
+//         }
+//       );
 
-  //       // 3. If contact has login enabled → also create user
-  //       if (c.login) {
-  //         await axios.post("http://localhost:5000/api/users/from-contact", {
-  //           contactId: contact._id,
-  //           email: c.email,
-  //           password: "defaultPass123", // can generate random or prompt
-  //         });
-  //       }
-  //     }
+//       // 3. If contact has login enabled → also create user
+//       if (c.login) {
+//         await axios.post("http://localhost:5000/api/users/from-contact", {
+//           contactId: contact._id,
+//           email: c.email,
+//           password: "defaultPass123", // can generate random or prompt
+//         });
+//       }
+//     }
 
-  //     alert("✅ Account, contacts & users saved!");
-  //     console.log("Saved Data:", finalData);
-  //   } catch (err) {
-  //     console.error(err);
+//     alert("✅ Account, contacts & users saved!");
+//     console.log("Saved Data:", finalData);
+//   } catch (err) {
+//     console.error(err);
 
-  //     // ✅ Handle duplicate accountName
-  //     if (err.response?.data?.error === "Account name is taken") {
-  //       alert("❌ Account name is already taken. Please choose another.");
-  //     } else {
-  //       alert("❌ Failed to save. Check console.");
-  //     }
-  //   }
-  // };
+//     // ✅ Handle duplicate accountName
+//     if (err.response?.data?.error === "Account name is taken") {
+//       alert("❌ Account name is already taken. Please choose another.");
+//     } else {
+//       alert("❌ Failed to save. Check console.");
+//     }
+//   }
+// };
 
-  // Modify the handleSubmit function to properly handle existing and new contacts
-  // const handleSubmit = async () => {
-  //   const finalData = {
-  //     ...accountData,
-  //     contacts: [...contacts], // Only include manually added contacts
-  //     selectedContacts: [...selectedContacts], // Keep selected contacts separate
-  //   };
+// Modify the handleSubmit function to properly handle existing and new contacts
+// const handleSubmit = async () => {
+//   const finalData = {
+//     ...accountData,
+//     contacts: [...contacts], // Only include manually added contacts
+//     selectedContacts: [...selectedContacts], // Keep selected contacts separate
+//   };
 
-  //   try {
-  //     // 1. Create Account
-  //     const { data: account } = await axios.post(
-  //       "http://localhost:5000/api/accounts",
-  //       {
-  //         clientType: finalData.clientType,
-  //         accountName: finalData.accountName,
-  //         companyName: finalData.companyName,
-  //       }
-  //     );
+//   try {
+//     // 1. Create Account
+//     const { data: account } = await axios.post(
+//       "http://localhost:5000/api/accounts",
+//       {
+//         clientType: finalData.clientType,
+//         accountName: finalData.accountName,
+//         companyName: finalData.companyName,
+//       }
+//     );
 
-  //     // 2. Create NEW Contacts (manually added)
-  //     for (let c of finalData.contacts) {
-  //       // Only create if it's a new contact (doesn't have _id)
-  //       if (!c._id) {
-  //         const { data: contact } = await axios.post(
-  //           "http://localhost:5000/api/contacts",
-  //           {
-  //             ...c,
-  //             accountId: account._id, // link to account
-  //           }
-  //         );
+//     // 2. Create NEW Contacts (manually added)
+//     for (let c of finalData.contacts) {
+//       // Only create if it's a new contact (doesn't have _id)
+//       if (!c._id) {
+//         const { data: contact } = await axios.post(
+//           "http://localhost:5000/api/contacts",
+//           {
+//             ...c,
+//             accountId: account._id, // link to account
+//           }
+//         );
 
-  //         // 3. If contact has login enabled → also create user
-  //         if (c.login) {
-  //           await axios.post("http://localhost:5000/api/users/from-contact", {
-  //             contactId: contact._id,
-  //             email: c.email,
-  //             password: "defaultPass123",
-  //           });
-  //         }
-  //       }
-  //     }
+//         // 3. If contact has login enabled → also create user
+//         if (c.login) {
+//           await axios.post("http://localhost:5000/api/users/from-contact", {
+//             contactId: contact._id,
+//             email: c.email,
+//             password: "defaultPass123",
+//           });
+//         }
+//       }
+//     }
 
-  //     // 4. Update EXISTING contacts (selected from backend)
-  //     for (let c of finalData.selectedContacts) {
-  //       // Update the existing contact with the account ID
-  //       await axios.put(
-  //         `http://localhost:5000/api/contacts/${c._id}`,
-  //         {
-  //           ...c,
-  //           accountId: account._id, // link to account
-  //         }
-  //       );
+//     // 4. Update EXISTING contacts (selected from backend)
+//     for (let c of finalData.selectedContacts) {
+//       // Update the existing contact with the account ID
+//       await axios.put(
+//         `http://localhost:5000/api/contacts/${c._id}`,
+//         {
+//           ...c,
+//           accountId: account._id, // link to account
+//         }
+//       );
 
-  //       // 5. If contact has login enabled → also create/update user
-  //       if (c.login) {
-  //         try {
-  //           // Try to create user (might already exist)
-  //           await axios.post("http://localhost:5000/api/users/from-contact", {
-  //             contactId: c._id,
-  //             email: c.email,
-  //             password: "defaultPass123",
-  //           });
-  //         } catch (error) {
-  //           // If user already exists, update it instead
-  //           if (error.response?.status === 409) {
-  //             await axios.put(`http://localhost:5000/api/users/contact/${c._id}`, {
-  //               email: c.email,
-  //             });
-  //           } else {
-  //             throw error;
-  //           }
-  //         }
-  //       }
-  //     }
+//       // 5. If contact has login enabled → also create/update user
+//       if (c.login) {
+//         try {
+//           // Try to create user (might already exist)
+//           await axios.post("http://localhost:5000/api/users/from-contact", {
+//             contactId: c._id,
+//             email: c.email,
+//             password: "defaultPass123",
+//           });
+//         } catch (error) {
+//           // If user already exists, update it instead
+//           if (error.response?.status === 409) {
+//             await axios.put(`http://localhost:5000/api/users/contact/${c._id}`, {
+//               email: c.email,
+//             });
+//           } else {
+//             throw error;
+//           }
+//         }
+//       }
+//     }
 
-  //     alert("✅ Account, contacts & users saved!");
-  //     console.log("Saved Data:", finalData);
-  //   } catch (err) {
-  //     console.error(err);
+//     alert("✅ Account, contacts & users saved!");
+//     console.log("Saved Data:", finalData);
+//   } catch (err) {
+//     console.error(err);
 
-  //     // ✅ Handle duplicate accountName
-  //     if (err.response?.data?.error === "Account name is taken") {
-  //       alert("❌ Account name is already taken. Please choose another.");
-  //     } else {
-  //       alert("❌ Failed to save. Check console.");
-  //     }
-  //   }
-  // };
+//     // ✅ Handle duplicate accountName
+//     if (err.response?.data?.error === "Account name is taken") {
+//       alert("❌ Account name is already taken. Please choose another.");
+//     } else {
+//       alert("❌ Failed to save. Check console.");
+//     }
+//   }
+// };

@@ -2,8 +2,8 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 import { RxCross2 } from "react-icons/rx";
 import AccountContactForm from "./AccountContactForm"
-// const Drawer = ({ handleNewDrawerClose, handleDrawerClose }) => {
-  const Drawer = ({ handleNewDrawerClose, handleDrawerClose, editingAccountId }) => {
+const Drawer = ({ handleNewDrawerClose, handleDrawerClose ,editingAccountId}) => {
+
   return (
     <>
       <Box
@@ -16,7 +16,8 @@ import AccountContactForm from "./AccountContactForm"
         }}
       >
         {/* <Typography variant="h6">New Account</Typography> */}
-         <Typography variant="h6">
+        
+        <Typography variant="h6">
           {editingAccountId ? "Edit Account" : "New Account"}
         </Typography>
         <RxCross2
@@ -25,7 +26,7 @@ import AccountContactForm from "./AccountContactForm"
         />
       </Box>
       <Box>
-       <AccountContactForm handleDrawerClose={handleDrawerClose} handleNewDrawerClose={handleNewDrawerClose}  editingAccountId={editingAccountId}/>
+       <AccountContactForm handleDrawerClose={handleDrawerClose} handleNewDrawerClose={handleNewDrawerClose} editingAccountId={editingAccountId} />
       </Box>
     </>
   );

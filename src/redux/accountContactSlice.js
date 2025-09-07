@@ -166,11 +166,15 @@ const accountContactSlice = createSlice({
     removeSelectedContact: (state, action) => {
       state.selectedContacts.splice(action.payload, 1);
     },
-
-    updateSelectedContactField: (state, action) => {
+  updateSelectedContactField: (state, action) => {
       const { index, field, value } = action.payload;
-      state.selectedContacts[index][field] = value;
-    },
+      if (state.selectedContacts[index]) {
+        state.selectedContacts[index][field] = value;
+      }},
+    // updateSelectedContactField: (state, action) => {
+    //   const { index, field, value } = action.payload;
+    //   state.selectedContacts[index][field] = value;
+    // },
     // 🔹 reducers for tags, team members, and folder template
     setTags: (state, action) => {
       state.accountData.tags = action.payload;
@@ -186,7 +190,15 @@ const accountContactSlice = createSlice({
   state.contacts[index].country = country;
 },
 
-
+ // Add this new reducer:
+    setSelectedContacts: (state, action) => {
+      state.selectedContacts = action.payload.map(contact => ({
+        ...contact,
+        existingUser: contact.existingUser || false,
+        existingContact: contact.existingContact || false
+      }));
+    },
+   
     setContactTags: (state, action) => {
   const { index, tags } = action.payload;
   state.contacts[index].tags = tags;
@@ -210,7 +222,7 @@ export const {
   updateSelectedContactField,
   setTags,
   setTeamMembers,
-  setFolderTemplate,setContactTags,setContactCountry
+  setFolderTemplate,setContactTags,setContactCountry,setSelectedContacts
 } = accountContactSlice.actions;
 
 export default accountContactSlice.reducer;

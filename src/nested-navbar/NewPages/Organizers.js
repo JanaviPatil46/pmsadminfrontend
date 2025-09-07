@@ -13,7 +13,7 @@ import {
   TableRow,
   Paper,
   Chip,
-  TableContainer,
+  TableContainer,Menu
 } from "@mui/material";
 import { CiMenuKebab } from "react-icons/ci";
 import { useNavigate, useParams, useRouteLoaderData } from "react-router-dom";
@@ -180,12 +180,21 @@ const handleArchive = (_id, isActive) => {
       })
       .catch((error) => console.error(error));
   };
-
-  const toggleMenu = (_id) => {
-    setOpenMenuId(openMenuId === _id ? null : _id);
+ const [anchorEl, setAnchorEl] = useState(null);
+  // const toggleMenu = (_id) => {
+  //   setOpenMenuId(openMenuId === _id ? null : _id);
+  //   setTempIdGet(_id);
+  // };
+const toggleMenu = (event, _id) => {
+    setAnchorEl(event.currentTarget);
+    setOpenMenuId(_id);
     setTempIdGet(_id);
   };
-
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setOpenMenuId(null);
+    setTempIdGet(null);
+  };
   const handleCreateInvoiceClick = () => {
     setShowOrganizerTemplateForm(true);
     navigate(
@@ -428,6 +437,7 @@ const handleOpenDialog = (organizer) => {
       </Box>
       {!showForm ? (
         // <Paper>
+        <>
         <TableContainer component={Paper} sx={{ overflow: "visible" }}>
           <Table sx={{ width: "100%" }}>
             <TableHead>
@@ -578,7 +588,7 @@ const handleOpenDialog = (organizer) => {
                       />
                     ) : null}
                   </TableCell>
-                  <TableCell
+                  {/* <TableCell
                     style={{
                       fontSize: "12px",
                       padding: "4px 8px",
@@ -629,17 +639,12 @@ const handleOpenDialog = (organizer) => {
                           </Typography>
                           <Typography
                             sx={{ fontSize: "12px", fontWeight: "bold" }}
-                            // onClick={() => handleEdit(row._id)}
+                            
                             onClick={() => handleOpenDialog(row)}
                           >
                             Change Answers    
                           </Typography>
-                          {/* <Typography
-                            onClick={() => handleArchive(row._id)}
-                            sx={{ fontSize: "12px", fontWeight: "bold" }}
-                          >
-                            Archived    
-                          </Typography> */}
+                         
                   
 <Typography
   onClick={() => handleArchive(row._id, row.active)}
@@ -657,12 +662,113 @@ const handleOpenDialog = (organizer) => {
                         </Box>
                       )}
                     </IconButton>
-                  </TableCell>
+                  </TableCell> */}
+                  <TableCell
+                                                                      style={{
+                                                                        fontSize: "12px",
+                                                                        padding: "4px 8px",
+                                                                        lineHeight: "1",
+                                                                      }}
+                                                                    >
+                                                                      <IconButton
+                                                                        onClick={(event) => toggleMenu(event, row._id)}
+                                                                        style={{ color: "#2c59fa" }}
+                                                                        size="small"
+                                                                      >
+                                                                        <CiMenuKebab />
+                                                                      </IconButton>
+                                                    
+                                                                      {/* MUI Menu */}
+                                                                       <Menu
+    anchorEl={anchorEl}
+    open={openMenuId === row._id}
+    onClose={handleMenuClose}
+    anchorOrigin={{
+      vertical: "top",
+      horizontal: "right",
+    }}
+    transformOrigin={{
+      vertical: "top",
+      horizontal: "left",
+    }}
+    PaperProps={{
+      sx: {
+        mt: 1,
+        ml: 1,
+        boxShadow: 3,
+        borderRadius: 1,
+        minWidth: 140,
+        p: 1,
+      },
+    }}
+  >
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+      <Typography
+        sx={{ fontSize: "12px", fontWeight: "bold", cursor: "pointer" }}
+        onClick={() => {
+          handleSealed(row._id, !row.issealed);
+          handleMenuClose();
+        }}
+      >
+        {row.issealed ? "Unseal" : "Seal"}
+      </Typography>
+
+      <Typography
+        sx={{
+          fontSize: "12px",
+          fontWeight: "bold",
+          color: "red",
+          cursor: "pointer",
+        }}
+        onClick={() => {
+          handleDelete(row._id);
+          handleMenuClose();
+        }}
+      >
+        Delete
+      </Typography>
+
+      <Typography
+        sx={{ fontSize: "12px", fontWeight: "bold", cursor: "pointer" }}
+        onClick={() => {
+          handleOpenDialog(row);
+          handleMenuClose();
+        }}
+      >
+        Change Answers
+      </Typography>
+
+      <Typography
+        sx={{ fontSize: "12px", fontWeight: "bold", cursor: "pointer" }}
+        onClick={() => {
+          handleArchive(row._id, row.active);
+          handleMenuClose();
+        }}
+      >
+        {row.active ? "Archive" : "Restore"}
+      </Typography>
+
+      <Typography
+        sx={{ fontSize: "12px", fontWeight: "bold", cursor: "pointer" }}
+        onClick={() => {
+          printOrganizerData(row._id);
+          handleMenuClose();
+        }}
+      >
+        Print
+      </Typography>
+    </Box>
+  </Menu>
+                                                                    
+                                                                    </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
+      
+</>
+        
       ) : (
         <Box>
           {" "}
