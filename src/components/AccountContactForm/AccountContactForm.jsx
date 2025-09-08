@@ -466,6 +466,7 @@ export default function AccountContactForm({
       };
 
       let accountId;
+      let newContactIds = [];
 
       if (isEditing) {
         // Update existing account
@@ -514,7 +515,7 @@ export default function AccountContactForm({
               accountId: accountId,
             }
           );
-
+  newContactIds.push(newContact._id);
           // If contact has login enabled → also create user (only for new contacts)
           if (contact.login) {
             try {
@@ -682,12 +683,17 @@ for (let contact of selectedContacts) {
       }
     }
       // Update Account with all contact references
-      const allContactIds = [
-        ...contacts
-          .filter((c) => (c.firstName || c.lastName || c.email) && c._id)
-          .map((c) => c._id),
-        ...selectedContacts.map((c) => c._id),
-      ];
+      // const allContactIds = [
+      //   ...contacts
+      //     .filter((c) => (c.firstName || c.lastName || c.email) && c._id)
+      //     .map((c) => c._id),
+      //   ...selectedContacts.map((c) => c._id),
+      // ];
+       // Update Account with all contact references
+    const allContactIds = [
+      ...newContactIds, // Include IDs of newly created contacts
+      ...selectedContacts.map((c) => c._id), // Include IDs of selected contacts
+    ];
 
       if (allContactIds.length > 0) {
         await axios.patch(

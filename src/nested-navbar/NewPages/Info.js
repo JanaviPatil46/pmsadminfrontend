@@ -448,7 +448,33 @@ const Info = () => {
     handleMenuClose();
     setDescription(""); // Clear the description if cancelled
   };
-
+const deleteUserByContactId = (contactId) => {
+  const requestOptions = {
+    method: "DELETE",
+    redirect: "follow",
+  };
+  
+  fetch(
+    `${LOGIN_API}/common/user/deletecontact/${contactId}`, // Changed endpoint to match user deletion
+    requestOptions
+  )
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Failed to delete user');
+      }
+      return response.json();
+    })
+    .then((result) => {
+      console.log("User deleted successfully", result);
+      handleContactUpdated();
+      toast.success("User deleted successfully");
+      fetchAccount(); // Refresh your data
+    })
+    .catch((error) => {
+      console.error(error);
+      toast.error("Failed to delete user");
+    });
+};
   const removecontactidfromaccount = (contactId) => {
     const requestOptions = {
       method: "DELETE",
@@ -460,6 +486,9 @@ const Info = () => {
     )
       .then((response) => response.json())
       .then((result) => {
+        console.log("unlinked contact",result)
+
+          deleteUserByContactId(contactId);
         handleContactUpdated();
         toast.success("contact is unlinked");
         fetchAccount();
@@ -468,6 +497,7 @@ const Info = () => {
   };
   const handleUnlink = () => {
     removecontactidfromaccount(selectedContact);
+   
     handleMenuClose();
   };
 
@@ -1270,93 +1300,7 @@ const handleDrawerClose=()=>{
                       </TableRow>
                     </TableHead>
 
-                    {/* <TableBody>
-                      {contacts.map((contact) => {
-                        const {
-                          _id,
-                          contactName,
-                          email,
-                          login,
-                          notify,
-                          emailSync,
-                          description,
-                        } = contact;
-                        return (
-                          <React.Fragment key={_id}>
-                            <TableRow>
-                              <TableCell colSpan={5}>
-                                <Box>
-                               
-                                  <Box
-                                    sx={{
-                                      display: "flex",
-                                      justifyContent: "space-between",
-                                      alignItems: "center",
-                                    }}
-                                  >
-                                    <Typography
-                                      sx={{
-                                        fontWeight: "bold",
-                                        fontSize: "15px",
-                                        display: "inline-block",
-                                        color: "#1976d2",
-                                      }}
-                                      onClick={() => handleClick(_id)}
-                                    >
-                                      {contactName}
-                                    </Typography>
-                                    <IconButton
-                                      aria-label="more options"
-                                      size="small"
-                                      onClick={(e) =>
-                                        handleMenuClick(e, _id, contactName,email)
-                                      }
-                                    >
-                                      <MoreVertIcon />
-                                    </IconButton>
-                                  </Box>
-                                  <Typography
-                                    sx={{
-                                      fontSize: "14px",
-                                      color: "#757575",
-                                      marginTop: "4px",
-                                    }} // Description styling
-                                  >
-                                    
-                                    {description}
-                                  </Typography>
-                                </Box>
-                              </TableCell>
-                            </TableRow>
-
-                           
-                            <TableRow>
-                              <TableCell>{email}</TableCell>
-                              <TableCell>
-                                <Switch
-                                  checked={login}
-                                  onChange={() => handleSwitchChange(contact)}
-                                />
-                              </TableCell>
-                           
-                              <TableCell>
-  <Switch
-    checked={notify}
-    onChange={() => handleSimpleSwitchChange('notify', contact)}
-  />
-</TableCell>
-<TableCell>
-  <Switch
-    checked={emailSync}
-    onChange={() => handleSimpleSwitchChange('emailSync', contact)}
-  />
-</TableCell>
-
-                            </TableRow>
-                          </React.Fragment>
-                        );
-                      })}
-                    </TableBody> */}
+                   
                     <TableBody>
   {contacts.map((contact) => {
     const {
@@ -1376,7 +1320,7 @@ const user = Array.isArray(userid) && userid.length > 0 ? userid[0] : {};
 const login = user.login || false;
 const notify = user.notify || false;
 const emailSync = user.emailSync || false;
-
+console.log("login",login)
     return (
       <React.Fragment key={_id}>
         <TableRow>
