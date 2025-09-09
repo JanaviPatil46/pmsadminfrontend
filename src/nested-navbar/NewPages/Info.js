@@ -467,12 +467,12 @@ const deleteUserByContactId = (contactId) => {
     .then((result) => {
       console.log("User deleted successfully", result);
       handleContactUpdated();
-      toast.success("User deleted successfully");
+      
       fetchAccount(); // Refresh your data
     })
     .catch((error) => {
       console.error(error);
-      toast.error("Failed to delete user");
+      // toast.error("Failed to delete user");
     });
 };
   const removecontactidfromaccount = (contactId) => {
