@@ -696,27 +696,42 @@ const CreateBulkJob = ({ selectedAccounts, onClose, charLimit = 4000 }) => {
   const [automations, setAutomations] = useState([]);
   const createjob = () => {
     // Check if the first stage of the selected pipeline contains automations
-    if (
-      selectedPipelineDetails?.pipeline?.stages?.[0]?.automations?.length > 0
-    ) {
-      // Get automations data from the first stage
-      const automationsData =
-        selectedPipelineDetails?.pipeline?.stages?.[0]?.automations || [];
-      console.log("janavi", automationsData);
-      setAutomations(automationsData);
+    // if (
+    //   selectedPipelineDetails?.pipeline?.stages?.[0]?.automations?.length > 0
+    // ) {
+    //   // Get automations data from the first stage
+    //   const automationsData =
+    //     selectedPipelineDetails?.pipeline?.stages?.[0]?.automations || [];
+    //   console.log("janavi", automationsData);
+    //   setAutomations(automationsData);
 
-      // Open the drawer with the automations data
-      // openDrawer(automationsData);
-      setDrawerOpen(true);
-      return; // Stop further execution of createjob
-    }
+    //   // Open the drawer with the automations data
+    //   // openDrawer(automationsData);
+    //   setDrawerOpen(true);
+    //   return; // Stop further execution of createjob
+    // }
+  // Find the details of the selected stage
+  const selectedStageDetails = selectedPipelineDetails?.pipeline?.stages?.find(
+    (stage) => stage._id === selectedStage?.value
+  );
 
+  // Check if the selected stage contains automations
+  if (selectedStageDetails?.automations?.length > 0) {
+    const automationsData = selectedStageDetails.automations || [];
+    console.log("janavi", automationsData);
+    setAutomations(automationsData);
+
+    // Open the drawer with automations data
+    setDrawerOpen(true);
+    return; // Stop further execution of createjob
+  }
     const myHeaders = {
       "Content-Type": "application/json",
     };
 
     const data = {
       accounts: combinedaccountValues,
+        stageid: selectedStage.value,
       pipeline: selectedPipeline.value,
       templatename: selectedtemp.value,
       jobname: jobName,
@@ -2330,6 +2345,7 @@ console.log("org temp url", url)
           const jobData = {
             accounts: [accountId],
             pipeline: selectedPipeline.value,
+              stageid: selectedStage.value,
             templatename: selectedtemp.value,
             jobname: jobName,
             jobassignees: finalAssignees, // Use the modified assignees list
@@ -2986,7 +3002,7 @@ console.log("org temp url", url)
                 <Box mt={2}>
                   <label className="job-input-label">Stage</label>
                   <Autocomplete
-                    disabled // Disable the Autocomplete input
+                    // disabled // Disable the Autocomplete input
                     size="small"
                     options={stagesoptions}
                     getOptionLabel={(option) => option.label}

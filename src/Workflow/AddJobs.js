@@ -1944,6 +1944,7 @@ const AddJobs = ({
 
       const jobData = {
         accounts: [accountId],
+           stageid: selectedStage.value,
         pipeline: pipelineId,
         templatename: selectedtemp.value,
         jobname: jobName,

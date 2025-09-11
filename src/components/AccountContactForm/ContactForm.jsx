@@ -1277,6 +1277,54 @@ const SelectedContactsDisplay = ({ contacts, onRemove, onUpdateField, isEditing 
 };
 
 export default function ContactForm({ onBack, onSubmit,isEditing = false  }) {
+  const [contactErrors, setContactErrors] = useState([]);
+ 
+
+  // Validation function
+  const validateContactForm = () => {
+    const newContactErrors = [];
+    let hasErrors = false;
+
+    // Validate each contact
+    contacts.forEach((contact, index) => {
+      const contactError = {};
+
+      // First Name validation
+      if (!contact.firstName?.trim()) {
+        contactError.firstName = 'First Name is required';
+        hasErrors = true;
+      }
+
+      // Last Name validation
+      if (!contact.lastName?.trim()) {
+        contactError.lastName = 'Last Name is required';
+        hasErrors = true;
+      }
+
+      // Email validation
+      if (!contact.email?.trim()) {
+        contactError.email = 'Email is required';
+        hasErrors = true;
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact.email)) {
+        contactError.email = 'Please enter a valid email address';
+        hasErrors = true;
+      }
+
+      newContactErrors[index] = contactError;
+    });
+
+   
+
+    setContactErrors(newContactErrors);
+    return !hasErrors;
+  };
+
+  const handleSubmitWithValidation = () => {
+    if (validateContactForm()) {
+      onSubmit();
+    }
+  };
+  
   const dispatch = useDispatch();
   const { contacts, selectedContacts, accountData } = useSelector(
     (state) => state.accountContact
@@ -1284,16 +1332,35 @@ export default function ContactForm({ onBack, onSubmit,isEditing = false  }) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [showContactForm, setShowContactForm] = useState(false);
 
-  const handleChange = (index, e) => {
-    const { name, value } = e.target;
-    let updated = { [name]: value };
+  // const handleChange = (index, e) => {
+  //   const { name, value } = e.target;
+  //   let updated = { [name]: value };
 
+  //   if (["firstName", "middleName", "lastName"].includes(name)) {
+  //     const c = { ...contacts[index], [name]: value };
+  //     updated.contactName =
+  //       `${c.firstName} ${c.middleName} ${c.lastName}`.trim();
+  //   }
+
+  //   dispatch(setContactData({ index, data: updated }));
+  // };
+   const handleChange = (index, e) => {
+    const { name, value } = e.target;
+    
+    // Clear error for this field when user types
+    if (contactErrors[index]?.[name]) {
+      setContactErrors(prev => {
+        const newErrors = [...prev];
+        newErrors[index] = { ...newErrors[index], [name]: '' };
+        return newErrors;
+      });
+    }
+    
+    let updated = { [name]: value };
     if (["firstName", "middleName", "lastName"].includes(name)) {
       const c = { ...contacts[index], [name]: value };
-      updated.contactName =
-        `${c.firstName} ${c.middleName} ${c.lastName}`.trim();
+      updated.contactName = `${c.firstName} ${c.middleName} ${c.lastName}`.trim();
     }
-
     dispatch(setContactData({ index, data: updated }));
   };
 useEffect(() => {
@@ -1398,6 +1465,9 @@ useEffect(() => {
                   name="firstName"
                   value={contact.firstName || ""}
                   onChange={(e) => handleChange(contactIndex, e)}
+                  error={!!contactErrors[contactIndex]?.firstName}
+                helperText={contactErrors[contactIndex]?.firstName}
+                required
                 />
               </Grid>
               <Grid item xs={3.7} ml={1}>
@@ -1415,7 +1485,10 @@ useEffect(() => {
                   label="Last Name"
                   name="lastName"
                   value={contact.lastName || ""}
-                  onChange={(e) => handleChange(contactIndex, e)}
+                   onChange={(e) => handleChange(contactIndex, e)}
+                error={!!contactErrors[contactIndex]?.lastName}
+                helperText={contactErrors[contactIndex]?.lastName}
+                required
                 />
               </Grid>
             </Grid>
@@ -1462,6 +1535,9 @@ useEffect(() => {
               name="email"
               value={contact.email || ""}
               onChange={(e) => handleChange(contactIndex, e)}
+              error={!!contactErrors[contactIndex]?.email}
+            helperText={contactErrors[contactIndex]?.email}
+            required
             />
             <FormGroup row sx={{ mt: 2 }}>
               <FormControlLabel
@@ -1729,7 +1805,7 @@ useEffect(() => {
         <Button variant="outlined" onClick={onBack}>
           Back
         </Button>
-        <Button variant="contained" onClick={onSubmit}>
+        <Button variant="contained" onClick={handleSubmitWithValidation}>
           Submit
         </Button>
       </Box>

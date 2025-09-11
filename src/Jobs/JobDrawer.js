@@ -287,10 +287,38 @@ const [username, setUsername] = useState("");
         console.error("Error fetching pipeline details:", error);
       }
     }
+     fetchPipelineDataByID(selectedOptions.value);
   };
   useEffect(() => {
     fetchPipelineData();
   }, []);
+   const [selectedStage, setSelectedStage] = useState(null);
+  const [stagesoptions, setStagesOptions] = useState([]);
+  const handleStageChange = (event, newValue) => {
+    setSelectedStage(newValue);
+  };
+
+    const fetchPipelineDataByID = async (pipelineid) => {
+    try {
+      const url = `${PIPELINE_API}/workflow/pipeline/pipeline/${pipelineid}`;
+      const response = await fetch(url);
+      const data = await response.json();
+      console.log(data.pipeline);
+
+      // Map stages for Autocomplete
+      const stageOptions = data.pipeline.stages.map((stage) => ({
+        label: stage.name,
+        value: stage._id,
+      }));
+
+      setStagesOptions(stageOptions);
+      setSelectedStage(stageOptions[0]);
+
+      // setPipelineData(data.pipeline);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
   const fetchPipelineData = async () => {
     try {
       const url = `${PIPELINE_API}/workflow/pipeline/pipelines`;
@@ -309,27 +337,42 @@ const [username, setUsername] = useState("");
   const [automations, setAutomations] = useState([]);
   const createjob = () => {
     // Check if the first stage of the selected pipeline contains automations
-    if (
-      selectedPipelineDetails?.pipeline?.stages?.[0]?.automations?.length > 0
-    ) {
-      // Get automations data from the first stage
-      const automationsData =
-        selectedPipelineDetails?.pipeline?.stages?.[0]?.automations || [];
-      console.log("janavi", automationsData);
-      setAutomations(automationsData);
+    // if (
+    //   selectedPipelineDetails?.pipeline?.stages?.[0]?.automations?.length > 0
+    // ) {
+    //   // Get automations data from the first stage
+    //   const automationsData =
+    //     selectedPipelineDetails?.pipeline?.stages?.[0]?.automations || [];
+    //   console.log("janavi", automationsData);
+    //   setAutomations(automationsData);
 
-      // Open the drawer with the automations data
-      // openDrawer(automationsData);
-      setDrawerOpen(true);
-      return; // Stop further execution of createjob
-    }
+    //   // Open the drawer with the automations data
+    //   // openDrawer(automationsData);
+    //   setDrawerOpen(true);
+    //   return; // Stop further execution of createjob
+    // }
+  // Find the details of the selected stage
+  const selectedStageDetails = selectedPipelineDetails?.pipeline?.stages?.find(
+    (stage) => stage._id === selectedStage?.value
+  );
 
+  // Check if the selected stage contains automations
+  if (selectedStageDetails?.automations?.length > 0) {
+    const automationsData = selectedStageDetails.automations || [];
+    console.log("janavi", automationsData);
+    setAutomations(automationsData);
+
+    // Open the drawer with automations data
+    setDrawerOpen(true);
+    return; // Stop further execution of createjob
+  }
     const myHeaders = {
       "Content-Type": "application/json",
     };
 
     const data = {
       accounts: combinedaccountValues,
+        stageid: selectedStage.value,
       pipeline: selectedPipeline.value,
       templatename: selectedtemp.value,
       jobname: jobName,
@@ -1803,6 +1846,7 @@ const createJob = async () => {
 
       const jobData = {
         accounts: [accountId],
+           stageid: selectedStage.value,
         pipeline: selectedPipeline.value,
         templatename: selectedtemp.value,
         jobname: jobName,
@@ -2368,6 +2412,26 @@ const createJob = async () => {
                 clearOnEscape // Enable clearable functionality
               />
             </Box>
+            <Box mt={2}>
+                  <label className="job-input-label">Stage</label>
+                  <Autocomplete
+                    // disabled // Disable the Autocomplete input
+                    size="small"
+                    options={stagesoptions}
+                    getOptionLabel={(option) => option.label}
+                    value={selectedStage}
+                    onChange={handleStageChange}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        placeholder="Stages"
+                        variant="outlined"
+                        className="add-jobs-select-dropdown"
+                      />
+                    )}
+                    sx={{ width: "100%", marginTop: "8px" }}
+                  />
+                </Box>
             <Box mt={2}>
               <label className="job-input-label">Template</label>
               <Autocomplete

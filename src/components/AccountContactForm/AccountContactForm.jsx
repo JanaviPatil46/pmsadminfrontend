@@ -107,6 +107,7 @@ export default function AccountContactForm({
     setActiveStep(index); // ✅ allow clicking on steps
   };
 
+
   // ======================= Helper Functions =======================
   const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
   const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
@@ -724,7 +725,105 @@ for (let contact of selectedContacts) {
       }
     }
   };
-  // const handleSubmit = async () => {
+
+
+
+  
+  
+
+  const CLIENT_DOCS_API = process.env.REACT_APP_CLIENT_DOCS_MANAGE;
+  const addFolderTemplate = (accountId) => {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    const raw = JSON.stringify({
+      accountId: accountId,
+    });
+
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+    console.log(raw);
+    console.log("Creating folder for account:", accountId);
+    fetch(`${CLIENT_DOCS_API}/clientdocs/clients`, requestOptions)
+      .then((response) => response.json())
+      .then((result) => console.log(result))
+      .catch((error) => console.error(error));
+  };
+
+  const assignfoldertemp = (accountId, foldertempId) => {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    const raw = JSON.stringify({
+      accountId: accountId,
+      foldertempId: foldertempId || null,
+    });
+
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+
+    console.log(raw);
+    fetch(`${CLIENT_DOCS_API}/clientdocs/accountfoldertemp`, requestOptions)
+      .then((response) => response.json())
+      .then((result) => console.log(result))
+      .catch((error) => console.error(error));
+  };
+
+  return (
+    <Box sx={{ maxWidth: 700, margin: "auto", mt: 1 }}>
+      <Box sx={{ display: "flex", justifyContent: "center" }}>
+        {steps.map((label, index) => (
+          <Box key={label} sx={{ display: "flex", alignItems: "center" }}>
+            <Radio
+              checked={activeStep === index}
+              value={index}
+              readOnly
+              size="small"
+            />
+            <Typography>{label}</Typography>
+
+            {index < steps.length - 1 && (
+              <Typography sx={{ mx: 1, ml: 3, mt: 1 }}>
+                <ChevronRightIcon />
+              </Typography>
+            )}
+          </Box>
+        ))}
+      </Box>
+      <Box sx={{ p: 3 }}>
+        {activeStep === 0 && (
+          <AccountForm onContinue={() => setActiveStep(1)} />
+        )}
+        {activeStep === 1 && (
+          <ContactForm
+            onBack={() => setActiveStep(0)}
+            onSubmit={handleSubmit}
+            isEditing={isEditing}
+          />
+        )}
+      </Box>
+
+      {activeStep === steps.length && (
+        <Typography sx={{ mt: 2 }} align="center">
+          🎉 All steps completed – your account and contacts are saved!
+        </Typography>
+      )}
+    </Box>
+  );
+}
+
+
+
+
+// const handleSubmit = async () => {
   //   try {
   //     const finalData = {
   //       clientType: accountData.clientType,
@@ -890,96 +989,6 @@ for (let contact of selectedContacts) {
   //     }
   //   }
   // };
-
-  const CLIENT_DOCS_API = process.env.REACT_APP_CLIENT_DOCS_MANAGE;
-  const addFolderTemplate = (accountId) => {
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-
-    const raw = JSON.stringify({
-      accountId: accountId,
-    });
-
-    const requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-    };
-    console.log(raw);
-    console.log("Creating folder for account:", accountId);
-    fetch(`${CLIENT_DOCS_API}/clientdocs/clients`, requestOptions)
-      .then((response) => response.json())
-      .then((result) => console.log(result))
-      .catch((error) => console.error(error));
-  };
-
-  const assignfoldertemp = (accountId, foldertempId) => {
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-
-    const raw = JSON.stringify({
-      accountId: accountId,
-      foldertempId: foldertempId || null,
-    });
-
-    const requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-    };
-
-    console.log(raw);
-    fetch(`${CLIENT_DOCS_API}/clientdocs/accountfoldertemp`, requestOptions)
-      .then((response) => response.json())
-      .then((result) => console.log(result))
-      .catch((error) => console.error(error));
-  };
-
-  return (
-    <Box sx={{ maxWidth: 700, margin: "auto", mt: 1 }}>
-      <Box sx={{ display: "flex", justifyContent: "center" }}>
-        {steps.map((label, index) => (
-          <Box key={label} sx={{ display: "flex", alignItems: "center" }}>
-            <Radio
-              checked={activeStep === index}
-              value={index}
-              readOnly
-              size="small"
-            />
-            <Typography>{label}</Typography>
-
-            {index < steps.length - 1 && (
-              <Typography sx={{ mx: 1, ml: 3, mt: 1 }}>
-                <ChevronRightIcon />
-              </Typography>
-            )}
-          </Box>
-        ))}
-      </Box>
-      <Box sx={{ p: 3 }}>
-        {activeStep === 0 && (
-          <AccountForm onContinue={() => setActiveStep(1)} />
-        )}
-        {activeStep === 1 && (
-          <ContactForm
-            onBack={() => setActiveStep(0)}
-            onSubmit={handleSubmit}
-            isEditing={isEditing}
-          />
-        )}
-      </Box>
-
-      {activeStep === steps.length && (
-        <Typography sx={{ mt: 2 }} align="center">
-          🎉 All steps completed – your account and contacts are saved!
-        </Typography>
-      )}
-    </Box>
-  );
-}
-
 // const handleSubmit = () => {
 //   const finalData = {
 //     ...accountData,

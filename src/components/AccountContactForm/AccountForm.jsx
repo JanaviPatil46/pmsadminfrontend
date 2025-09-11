@@ -87,10 +87,19 @@ export default function AccountForm({ onContinue }) {
   const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
   const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
   const API_KEY = process.env.REACT_APP_FOLDER_URL;
-  const handleChange = (e) => {
-    dispatch(setAccountData({ [e.target.name]: e.target.value }));
+  // const handleChange = (e) => {
+  //   dispatch(setAccountData({ [e.target.name]: e.target.value }));
+  // };
+ const handleChange = (e) => {
+    const { name, value } = e.target;
+    
+    // Clear error for this field when user types
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+    
+    dispatch(setAccountData({ [name]: value }));
   };
-
   // Fetch Team Members
   useEffect(() => {
     const fetchTeamMembers = async () => {
@@ -148,9 +157,51 @@ export default function AccountForm({ onContinue }) {
     fetchTags();
   }, [TAGS_API]);
 
-
+// Clear error for Autocomplete fields
+  const handleAutocompleteChange = (field, newValue) => {
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
+    }
+    dispatch(setAccountData({ [field]: newValue }));
+  };
   // Get country list once (memoized)
   const options = useMemo(() => countryList().getData(), []);
+   const [errors, setErrors] = useState({});
+
+  // Validation function
+  const validateAccountForm = () => {
+    const newErrors = {};
+
+    // Account Name validation
+    if (!accountData.accountName?.trim()) {
+      newErrors.accountName = 'Account Name is required';
+    }
+
+    // Client Type validation
+    if (!accountData.clientType) {
+      newErrors.clientType = 'Client Type is required';
+    }
+
+    // Company Name validation (if client type is Company)
+    if (accountData.clientType === 'Company' && !accountData.companyName?.trim()) {
+      newErrors.companyName = 'Company Name is required for Company clients';
+    }
+
+    // Folder Template validation
+    if (!accountData.folderTemp) {
+      newErrors.folderTemp = 'Folder Template is required';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleContinue = () => {
+    if (validateAccountForm()) {
+      onContinue();
+    }
+  };
+
   return (
     <Box>
     
@@ -188,20 +239,12 @@ export default function AccountForm({ onContinue }) {
         size="small"
         value={accountData.accountName || ""}
         onChange={handleChange}
+         error={!!errors.accountName}
+        helperText={errors.accountName}
+        required
       />
 
-      {/* <TextField
-        select
-        fullWidth
-        margin="normal"
-        label="Client Type"
-        name="clientType"
-        value={accountData.clientType || ""}
-        onChange={handleChange}
-      >
-        <MenuItem value="Individual">Individual</MenuItem>
-        <MenuItem value="Company">Company</MenuItem>
-      </TextField> */}
+   
 
       {accountData.clientType === "Company" && (
         <TextField
@@ -212,6 +255,9 @@ export default function AccountForm({ onContinue }) {
           name="companyName"
           value={accountData.companyName || ""}
           onChange={handleChange}
+           error={!!errors.companyName}
+          helperText={errors.companyName}
+          required
         />
       )}
 
@@ -295,15 +341,19 @@ export default function AccountForm({ onContinue }) {
         options={folderTemp}
         getOptionLabel={(option) => option.label}
         value={accountData.folderTemp || null} // full object, like tags
-        onChange={(e, newValue) =>
-          dispatch(setAccountData({ folderTemp: newValue || null }))
-        }
+        // onChange={(e, newValue) =>
+        //   dispatch(setAccountData({ folderTemp: newValue || null }))
+        // }
+         onChange={(e, newValue) => handleAutocompleteChange('folderTemp', newValue)}
         renderInput={(params) => (
           <TextField
             {...params}
             margin="normal"
             label="Select Folder Template"
             size="small"
+             error={!!errors.folderTemp}
+            helperText={errors.folderTemp}
+            required
           />
         )}
       />
@@ -384,7 +434,7 @@ export default function AccountForm({ onContinue }) {
 )}
 
 
-      <Button variant="contained" sx={{ mt: 2 }} onClick={onContinue}>
+      <Button variant="contained" sx={{ mt: 2 }} onClick={handleContinue}>
         Continue
       </Button>
     </Box>
