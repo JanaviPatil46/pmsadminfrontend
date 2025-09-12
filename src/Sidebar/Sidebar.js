@@ -55,6 +55,7 @@ import CloseIcon from "@mui/icons-material/Close";
 // import Avatar from "@mui/material/Avatar";
 import Stack from "@mui/material/Stack";
 import SearchComponent from "./Search";
+import { useDispatch } from "react-redux";
 // import Badge from "@mui/material/Badge";
 import Avatar from "@mui/material/Avatar";
 import ClientSelectionDialog from "../Billing/ClientSelectionDialog";
@@ -64,6 +65,12 @@ import ChatForm from "../Pages/ChatForm";
 import JobDrawer from "../Jobs/JobDrawer";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import InvoiceDrawer from "../Billing/InvoiceDrawer";
+import {
+  resetForm,
+  setAccountData,
+  setSelectedContacts,
+  removeSelectedContact,
+} from "../redux/accountContactSlice";
 import AccountDrawer from "../components/AccountContactForm/Drawer"
 function Sidebar() {
   const StyledBadge = styled(Badge)(({ theme }) => ({
@@ -96,6 +103,7 @@ function Sidebar() {
   }));
   const location = useLocation();
   const navigate = useNavigate();
+   const dispatch = useDispatch();
   const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
   const SIDEBAR_API = process.env.REACT_APP_SIDEBAR_URL;
   const NEW_SIDEBAR_API = process.env.REACT_APP_SIDEBAR_URL;
@@ -328,6 +336,8 @@ function Sidebar() {
 
   const handleNewDrawerClose = () => {
     setIsRightDrawerOpen(false);
+
+     dispatch(resetForm());
   };
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);

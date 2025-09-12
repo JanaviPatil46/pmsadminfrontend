@@ -514,6 +514,7 @@ export default function AccountContactForm({
                   }
                 : { code: "", name: "" },
               accountId: accountId,
+              // accountName: accountData.accountName,
             }
           );
   newContactIds.push(newContact._id);
@@ -526,6 +527,7 @@ export default function AccountContactForm({
                   contactId: newContact._id,
                   email: contact.email,
                   password: "defaultPass123",
+                  username: accountData.accountName,
                 }
               );
 
@@ -757,7 +759,8 @@ for (let contact of selectedContacts) {
   const assignfoldertemp = (accountId, foldertempId) => {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
-
+console.log("assignfoldertemp",accountId)
+console.log("assignfoldertemp",foldertempId)
     const raw = JSON.stringify({
       accountId: accountId,
       foldertempId: foldertempId || null,
