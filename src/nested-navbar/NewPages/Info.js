@@ -76,41 +76,58 @@ const Info = () => {
   const [personalMessage, setPersonalMessage] = useState("");
   const [openRemoveDialog, setOpenRemoveDialog] = useState(false);
   const [editingAccountId, setEditingAccountId] = useState(null);
+  // const handleSwitchChange = (contactData) => {
+  //   setContact(contactData);
+  //   console.log("contsctsdata", contactData);
+  //   // setOpenDialog(true);      // Open the dialog
+  //   if (contactData.login) {
+  //     // If login is true, show the REMOVE confirmation dialog
+  //     setOpenRemoveDialog(true);
+  //   } else {
+  //     // If login is false, show the ADD portal access dialog
+  //     setOpenDialog(true);
+  //   }
+  // };
   const handleSwitchChange = (contactData) => {
     setContact(contactData);
-    console.log("contscts", contactData);
-    // setOpenDialog(true);      // Open the dialog
-    if (contactData.login) {
-      // If login is true, show the REMOVE confirmation dialog
+    console.log("contsctsdata", contactData);
+
+    const user =
+      Array.isArray(contactData.userid) && contactData.userid.length > 0
+        ? contactData.userid[0]
+        : {};
+
+    if (user.login) {
       setOpenRemoveDialog(true);
     } else {
-      // If login is false, show the ADD portal access dialog
       setOpenDialog(true);
     }
   };
- const handleSimpleSwitchChange = async (field, contactData) => {
-  const updatedValue = !contactData[field];
 
-  try {
-    await axios.patch(`${CONTACT_API}/contacts/${contactData._id}`, {
-      [field]: updatedValue,
-    });
+  const handleSimpleSwitchChange = async (field, contactData) => {
+    const updatedValue = !contactData[field];
 
-    // ✅ Update the local UI by setting new state
-    setContacts(prev =>
-      prev.map(contact =>
-        contact._id === contactData._id
-          ? { ...contact, [field]: updatedValue }
-          : contact
-      )
-    );
+    try {
+      await axios.patch(`${CONTACT_API}/contacts/${contactData._id}`, {
+        [field]: updatedValue,
+      });
 
-    console.log(`Updated ${field} for ${contactData.contactName} to ${updatedValue}`);
-  } catch (error) {
-    console.error(`Failed to update ${field}:`, error);
-  }
-};
+      // ✅ Update the local UI by setting new state
+      setContacts((prev) =>
+        prev.map((contact) =>
+          contact._id === contactData._id
+            ? { ...contact, [field]: updatedValue }
+            : contact
+        )
+      );
 
+      console.log(
+        `Updated ${field} for ${contactData.contactName} to ${updatedValue}`
+      );
+    } catch (error) {
+      console.error(`Failed to update ${field}:`, error);
+    }
+  };
 
   const handleCloseDialog = () => {
     setOpenDialog(false); // Close dialog
@@ -170,9 +187,9 @@ const Info = () => {
       const existingUser = userRes.data?.user?.[0];
 
       if (existingUser && existingUser._id) {
-        console.log("nbhjb")
+        console.log("nbhjb");
         // Step 2A: User exists -> update active = true
-         await axios.patch(`${LOGIN_API}/common/user/${existingUser._id}`, {
+        await axios.patch(`${LOGIN_API}/common/user/${existingUser._id}`, {
           active: true,
         });
         clientCreatedmail(email, "", existingUser._id);
@@ -267,8 +284,7 @@ const Info = () => {
     fetch(url + data, requestOptions)
       .then((response) => response.json())
       .then((result) => {
-
-        console.log("accountlist",result)
+        console.log("accountlist", result);
         setaccountData(result.accountlist);
         setAccName(result.accountlist.Name);
         setUserType(result.accountlist.Type);
@@ -281,7 +297,6 @@ const Info = () => {
           setDescription(result.accountlist.Contacts.description);
         }
         fetchaccountdatabyid(result.accountlist.id);
-       
       })
       .catch((error) => console.error(error));
   };
@@ -361,12 +376,12 @@ const Info = () => {
   // Derived state for menu open/close
   const menuOpen = Boolean(anchorEl);
 
-  const handleMenuClick = (event, id, contactName,email) => {
-    console.log("contactemail",email)
+  const handleMenuClick = (event, id, contactName, email) => {
+    console.log("contactemail", email);
     setAnchorEl(event.currentTarget);
     setSelectedContact(id); // Set the selected contact ID here
     setContactName(contactName);
-    setContactEmail(email)
+    setContactEmail(email);
   };
 
   const handleMenuClose = () => {
@@ -448,33 +463,33 @@ const Info = () => {
     handleMenuClose();
     setDescription(""); // Clear the description if cancelled
   };
-const deleteUserByContactId = (contactId) => {
-  const requestOptions = {
-    method: "DELETE",
-    redirect: "follow",
+  const deleteUserByContactId = (contactId) => {
+    const requestOptions = {
+      method: "DELETE",
+      redirect: "follow",
+    };
+
+    fetch(
+      `${LOGIN_API}/common/user/deletecontact/${contactId}`, // Changed endpoint to match user deletion
+      requestOptions
+    )
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to delete user");
+        }
+        return response.json();
+      })
+      .then((result) => {
+        console.log("User deleted successfully", result);
+        handleContactUpdated();
+
+        fetchAccount(); // Refresh your data
+      })
+      .catch((error) => {
+        console.error(error);
+        // toast.error("Failed to delete user");
+      });
   };
-  
-  fetch(
-    `${LOGIN_API}/common/user/deletecontact/${contactId}`, // Changed endpoint to match user deletion
-    requestOptions
-  )
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error('Failed to delete user');
-      }
-      return response.json();
-    })
-    .then((result) => {
-      console.log("User deleted successfully", result);
-      handleContactUpdated();
-      
-      fetchAccount(); // Refresh your data
-    })
-    .catch((error) => {
-      console.error(error);
-      // toast.error("Failed to delete user");
-    });
-};
   const removecontactidfromaccount = (contactId) => {
     const requestOptions = {
       method: "DELETE",
@@ -486,9 +501,9 @@ const deleteUserByContactId = (contactId) => {
     )
       .then((response) => response.json())
       .then((result) => {
-        console.log("unlinked contact",result)
+        console.log("unlinked contact", result);
 
-          deleteUserByContactId(contactId);
+        deleteUserByContactId(contactId);
         handleContactUpdated();
         toast.success("contact is unlinked");
         fetchAccount();
@@ -497,7 +512,7 @@ const deleteUserByContactId = (contactId) => {
   };
   const handleUnlink = () => {
     removecontactidfromaccount(selectedContact);
-   
+
     handleMenuClose();
   };
 
@@ -517,64 +532,64 @@ const deleteUserByContactId = (contactId) => {
   const getSelectedIds = () => {
     return selectedContacts.join(", "); // Just join the IDs array into a string
   };
-// Handler for the reset password menu item
-const handleResetPassword = () => {
-  setResetPasswordDialogOpen(true);
-  handleMenuClose();
-};
+  // Handler for the reset password menu item
+  const handleResetPassword = () => {
+    setResetPasswordDialogOpen(true);
+    handleMenuClose();
+  };
   const SEVER_PORT = process.env.REACT_APP_CLIENT_SERVER_URI;
-    const [emailError, setEmailError] = useState(false);
+  const [emailError, setEmailError] = useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = useState("");
-// Handler for confirming password reset
-const confirmResetPassword = async (e) => {
-  if (e) e.preventDefault();
+  // Handler for confirming password reset
+  const confirmResetPassword = async (e) => {
+    if (e) e.preventDefault();
 
-  // Validation
-  if (!contactEmail) {
-    setEmailError(true);
-    setEmailErrorMessage("Email is required");
-    return;
-  } else if (!contactEmail.includes("@")) {
-    setEmailError(true);
-    setEmailErrorMessage("Email must include @");
-    return;
-  } else {
-    setEmailError(false);
-    setEmailErrorMessage("");
-  }
-
-  try {
-    const clientResetURL = `${SEVER_PORT}/client/client/resetpassword`;
-    const apiURL = `${LOGIN_API}/resetpass/forgotpassword/`;
-
-    const response = await fetch(apiURL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: contactEmail,  // Fixed syntax here
-        url: clientResetURL,
-      }),
-    });
-
-    const res = await response.json();
-
-    if (response.status === 200) {
-      localStorage.setItem("resetpasstoken", res.result.token);
-      Cookies.set("resetpasstoken", res.result.token);
-      toast.success("Check your email for the reset link.");
-      setResetPasswordDialogOpen(false); // Close the dialog on success
-    } else if (response.status === 400) {
-      toast.error("Invalid user!");
+    // Validation
+    if (!contactEmail) {
+      setEmailError(true);
+      setEmailErrorMessage("Email is required");
+      return;
+    } else if (!contactEmail.includes("@")) {
+      setEmailError(true);
+      setEmailErrorMessage("Email must include @");
+      return;
     } else {
-      toast.error("An error occurred. Please try again.");
+      setEmailError(false);
+      setEmailErrorMessage("");
     }
-  } catch (error) {
-    console.error("Password reset error:", error);
-    toast.error("Network error. Please try again.");
-  }
-};
+
+    try {
+      const clientResetURL = `${SEVER_PORT}/client/client/resetpassword`;
+      const apiURL = `${LOGIN_API}/resetpass/forgotpassword/`;
+
+      const response = await fetch(apiURL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: contactEmail, // Fixed syntax here
+          url: clientResetURL,
+        }),
+      });
+
+      const res = await response.json();
+
+      if (response.status === 200) {
+        localStorage.setItem("resetpasstoken", res.result.token);
+        Cookies.set("resetpasstoken", res.result.token);
+        toast.success("Check your email for the reset link.");
+        setResetPasswordDialogOpen(false); // Close the dialog on success
+      } else if (response.status === 400) {
+        toast.error("Invalid user!");
+      } else {
+        toast.error("An error occurred. Please try again.");
+      }
+    } catch (error) {
+      console.error("Password reset error:", error);
+      toast.error("Network error. Please try again.");
+    }
+  };
   useEffect(() => {
     setFilteredContacts(
       contactData.filter((contact) =>
@@ -781,51 +796,52 @@ const confirmResetPassword = async (e) => {
       })
       .catch((error) => console.error(error));
   };
-  const navigate =useNavigate()
-const handleArchive = (accId) => {
-  if (!accId) return;
+  const navigate = useNavigate();
+  const handleArchive = (accId) => {
+    if (!accId) return;
 
-  const confirmArchive = window.confirm("Are you sure you want to archive this account?");
-  if (!confirmArchive) return;
+    const confirmArchive = window.confirm(
+      "Are you sure you want to archive this account?"
+    );
+    if (!confirmArchive) return;
 
-  const myHeaders = new Headers();
-  myHeaders.append("Content-Type", "application/json");
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
 
-  const raw = JSON.stringify({
-    active: false, // archiving → set active to false
-  });
-
-  const requestOptions = {
-    method: "PATCH",
-    headers: myHeaders,
-    body: raw,
-    redirect: "follow",
-  };
-
-  const url = `${ACCOUNT_API}/accounts/accountdetails/${accId}`;
-  fetch(url, requestOptions)
-    .then((response) => response.json())
-    .then((result) => {
-      console.log(result);
-      toast.success("Account archived successfully");
-      navigate('/clients/accounts/archivedaccounts')
-      fetchAccount(); // Refresh account details after archive
-    })
-    .catch((error) => {
-      console.error(error);
-      toast.error("An error occurred while archiving the account");
+    const raw = JSON.stringify({
+      active: false, // archiving → set active to false
     });
-};
-const handleDrawerClose=()=>{
-  setIsNewDrawerOpen((false))
-}
+
+    const requestOptions = {
+      method: "PATCH",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+
+    const url = `${ACCOUNT_API}/accounts/accountdetails/${accId}`;
+    fetch(url, requestOptions)
+      .then((response) => response.json())
+      .then((result) => {
+        console.log(result);
+        toast.success("Account archived successfully");
+        navigate("/clients/accounts/archivedaccounts");
+        fetchAccount(); // Refresh account details after archive
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error("An error occurred while archiving the account");
+      });
+  };
+  const handleDrawerClose = () => {
+    setIsNewDrawerOpen(false);
+  };
 
   return (
     <Box sx={{ width: "100%", padding: 2, mt: 4 }}>
       <Grid container rowSpacing={2} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
         <Grid item xs={12} sm={6}>
           <Card sx={{ boxShadow: 3, borderRadius: 2, mr: 5 }}>
-            
             <CardContent>
               {/* Header section */}
               {/* <Box
@@ -872,68 +888,71 @@ const handleDrawerClose=()=>{
                   />
                 </Drawer>
               </Box> */}
-<Box
-  sx={{
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    mb: 2,
-    p: 2,
-    borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
-    backgroundColor: "background.paper",
-    borderRadius: 2,
-    boxShadow: (theme) => theme.shadows[1],
-  }}
->
-  <Typography variant="h5" fontWeight={600} color="text.primary">
-    Account Details
-  </Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  mb: 2,
+                  p: 2,
+                  borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
+                  backgroundColor: "background.paper",
+                  borderRadius: 2,
+                  boxShadow: (theme) => theme.shadows[1],
+                }}
+              >
+                <Typography variant="h5" fontWeight={600} color="text.primary">
+                  Account Details
+                </Typography>
 
-  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-    <IconButton
-      sx={{
-        color: "text.secondary",
-        transition: "all 0.2s",
-        "&:hover": { color: "primary.main", transform: "scale(1.1)" },
-      }}
-    onClick={() => handleArchive(data)}
-    >
-      <BiArchiveOut size={22} />
-    </IconButton>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <IconButton
+                    sx={{
+                      color: "text.secondary",
+                      transition: "all 0.2s",
+                      "&:hover": {
+                        color: "primary.main",
+                        transform: "scale(1.1)",
+                      },
+                    }}
+                    onClick={() => handleArchive(data)}
+                  >
+                    <BiArchiveOut size={22} />
+                  </IconButton>
 
-    <IconButton
-      sx={{
-        color: "text.secondary",
-        transition: "all 0.2s",
-        "&:hover": {
-          color: "primary.main",
-          transform: "scale(1.1)",
-        },
-      }}
-      // onClick={() => setIsNewDrawerOpen(true)}
-       onClick={() => {
-    setIsNewDrawerOpen(true);
-    // Pass the account ID to the drawer for editing
-    setEditingAccountId(data); // You'll need state for this
-  }}
-      disabled={storedData?.teammember?.manageAccounts === false}
-    >
-      <MdEdit size={22} />
-    </IconButton>
-  </Box>
+                  <IconButton
+                    sx={{
+                      color: "text.secondary",
+                      transition: "all 0.2s",
+                      "&:hover": {
+                        color: "primary.main",
+                        transform: "scale(1.1)",
+                      },
+                    }}
+                    // onClick={() => setIsNewDrawerOpen(true)}
+                    onClick={() => {
+                      setIsNewDrawerOpen(true);
+                      // Pass the account ID to the drawer for editing
+                      setEditingAccountId(data); // You'll need state for this
+                    }}
+                    disabled={storedData?.teammember?.manageAccounts === false}
+                  >
+                    <MdEdit size={22} />
+                  </IconButton>
+                </Box>
 
-  <Drawer
-    anchor="right"
-    open={isNewDrawerOpen}
-    onClose={() => setIsNewDrawerOpen(false)}
-    PaperProps={{
-      sx: {
-        borderRadius: isSmallScreen ? 0 : "10px 0 0 10px",
-        width: isSmallScreen ? "100%" : 650,
-      },
-    }}
-  >
-    {/* <Accountupdate
+                <Drawer
+                  anchor="right"
+                  open={isNewDrawerOpen}
+                  onClose={() => setIsNewDrawerOpen(false)}
+                  PaperProps={{
+                    sx: {
+                      borderRadius: isSmallScreen ? 0 : "10px 0 0 10px",
+                      width: isSmallScreen ? "100%" : 650,
+                    },
+                  }}
+                >
+                  {/* <Accountupdate
       selectedAccount={accountDatabyid}
       onClose={() => {
         setIsNewDrawerOpen(false);
@@ -941,16 +960,15 @@ const handleDrawerClose=()=>{
       }}
       onArchive={handleArchive}
     /> */}
-     {isNewDrawerOpen && (
-        <AccountDrawer
-          handleNewDrawerClose={handleDrawerClose}
-          // handleDrawerClose={handleDrawerClose}
-          editingAccountId={data}
-        />
-      )}
-  </Drawer>
-  
-</Box>
+                  {isNewDrawerOpen && (
+                    <AccountDrawer
+                      handleNewDrawerClose={handleDrawerClose}
+                      // handleDrawerClose={handleDrawerClose}
+                      editingAccountId={data}
+                    />
+                  )}
+                </Drawer>
+              </Box>
 
               <Divider sx={{ mb: 3 }} />
 
@@ -1300,101 +1318,109 @@ const handleDrawerClose=()=>{
                       </TableRow>
                     </TableHead>
 
-                   
                     <TableBody>
-  {contacts.map((contact) => {
-    const {
-      _id,
-      contactName,
-      email,
-      description,
-      userid, // 👈 populated user inside contact
-    } = contact;
+                      {contacts.map((contact) => {
+                        const {
+                          _id,
+                          contactName,
+                          email,
+                          description,
+                          userid, // 👈 populated user inside contact
+                        } = contact;
 
-    // default to false if userid is missing
-//     const login = userid.login || false;
-//     const notify = userid.notify || false;
-//     const emailSync = userid.emailSync || false;
-console.log("contacts",userid)
-const user = Array.isArray(userid) && userid.length > 0 ? userid[0] : {};
-const login = user.login || false;
-const notify = user.notify || false;
-const emailSync = user.emailSync || false;
-console.log("login",login)
-    return (
-      <React.Fragment key={_id}>
-        <TableRow>
-          <TableCell colSpan={5}>
-            <Box>
-              {/* Contact Name and More Options Button */}
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Typography
-                  sx={{
-                    fontWeight: "bold",
-                    fontSize: "15px",
-                    display: "inline-block",
-                    color: "#1976d2",
-                  }}
-                  onClick={() => handleClick(_id)}
-                >
-                  {contactName}
-                </Typography>
-                <IconButton
-                  aria-label="more options"
-                  size="small"
-                  onClick={(e) =>
-                    handleMenuClick(e, _id, contactName, email)
-                  }
-                >
-                  <MoreVertIcon />
-                </IconButton>
-              </Box>
-              <Typography
-                sx={{
-                  fontSize: "14px",
-                  color: "#757575",
-                  marginTop: "4px",
-                }}
-              >
-                {description}
-              </Typography>
-            </Box>
-          </TableCell>
-        </TableRow>
+                        const user =
+                          Array.isArray(userid) && userid.length > 0
+                            ? userid[0]
+                            : {};
+                        const login = user.login || false;
+                        const notify = user.notify || false;
+                        const emailSync = user.emailSync || false;
+                        // console.log("login",login)
+                        return (
+                          <React.Fragment key={_id}>
+                            <TableRow>
+                              <TableCell colSpan={5}>
+                                <Box>
+                                  {/* Contact Name and More Options Button */}
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      justifyContent: "space-between",
+                                      alignItems: "center",
+                                    }}
+                                  >
+                                    <Typography
+                                      sx={{
+                                        fontWeight: "bold",
+                                        fontSize: "15px",
+                                        display: "inline-block",
+                                        color: "#1976d2",
+                                      }}
+                                      onClick={() => handleClick(_id)}
+                                    >
+                                      {contactName}
+                                    </Typography>
+                                    <IconButton
+                                      aria-label="more options"
+                                      size="small"
+                                      onClick={(e) =>
+                                        handleMenuClick(
+                                          e,
+                                          _id,
+                                          contactName,
+                                          email
+                                        )
+                                      }
+                                    >
+                                      <MoreVertIcon />
+                                    </IconButton>
+                                  </Box>
+                                  <Typography
+                                    sx={{
+                                      fontSize: "14px",
+                                      color: "#757575",
+                                      marginTop: "4px",
+                                    }}
+                                  >
+                                    {description}
+                                  </Typography>
+                                </Box>
+                              </TableCell>
+                            </TableRow>
 
-        {/* Row for email and switches */}
-        <TableRow>
-          <TableCell>{email}</TableCell>
-          <TableCell>
-            <Switch
-              checked={login}
-              onChange={() => handleSwitchChange(contact)}
-            />
-          </TableCell>
-          <TableCell>
-            <Switch
-              checked={notify}
-              onChange={() => handleSimpleSwitchChange("notify", contact)}
-            />
-          </TableCell>
-          <TableCell>
-            <Switch
-              checked={emailSync}
-              onChange={() => handleSimpleSwitchChange("emailSync", contact)}
-            />
-          </TableCell>
-        </TableRow>
-      </React.Fragment>
-    );
-  })}
-</TableBody>
-
+                            {/* Row for email and switches */}
+                            <TableRow>
+                              <TableCell>{email}</TableCell>
+                              <TableCell>
+                                <Switch
+                                  checked={login}
+                                  onChange={() => handleSwitchChange(contact)}
+                                />
+                              </TableCell>
+                              <TableCell>
+                                <Switch
+                                  checked={notify}
+                                  onChange={() =>
+                                    handleSimpleSwitchChange("notify", contact)
+                                  }
+                                />
+                              </TableCell>
+                              <TableCell>
+                                <Switch
+                                  checked={emailSync}
+                                  onChange={() =>
+                                    handleSimpleSwitchChange(
+                                      "emailSync",
+                                      contact
+                                    )
+                                  }
+                                />
+                              </TableCell>
+                            </TableRow>
+                          </React.Fragment>
+                        );
+                      })}
+                    </TableBody>
 
                     {/* Dropdown Menu */}
                     <Menu
@@ -1406,38 +1432,52 @@ console.log("login",login)
                         Edit Description
                       </MenuItem>
                       <MenuItem onClick={handleUnlink}>Unlink</MenuItem>
-                       <MenuItem onClick={handleResetPassword}>  {/* New option */}
-    Reset Password
-  </MenuItem>
+                      <MenuItem onClick={handleResetPassword}>
+                        {" "}
+                        {/* New option */}
+                        Reset Password
+                      </MenuItem>
                     </Menu>
-<Dialog
-  open={resetPasswordDialogOpen}
-  onClose={() => setResetPasswordDialogOpen(false)}
-  aria-labelledby="reset-password-dialog-title"
->
-  <DialogTitle id="reset-password-dialog-title">
-    Reset Password
-    <Button onClick={() => setResetPasswordDialogOpen(false)} color="secondary">
-      X
-    </Button>
-  </DialogTitle>
-  <DialogContent>
-    <Typography>
-      Are you sure you want to reset the password for <strong>{contactEmail}</strong>?
-    </Typography>
-    <Typography sx={{ mt: 2 }}>
-      The user will receive an email with instructions to set a new password.
-    </Typography>
-  </DialogContent>
-  <DialogActions>
-    <Button onClick={() => setResetPasswordDialogOpen(false)} color="primary">
-      Cancel
-    </Button>
-    <Button onClick={confirmResetPassword} color="primary" variant="contained">
-      Reset Password
-    </Button>
-  </DialogActions>
-</Dialog>
+                    <Dialog
+                      open={resetPasswordDialogOpen}
+                      onClose={() => setResetPasswordDialogOpen(false)}
+                      aria-labelledby="reset-password-dialog-title"
+                    >
+                      <DialogTitle id="reset-password-dialog-title">
+                        Reset Password
+                        <Button
+                          onClick={() => setResetPasswordDialogOpen(false)}
+                          color="secondary"
+                        >
+                          X
+                        </Button>
+                      </DialogTitle>
+                      <DialogContent>
+                        <Typography>
+                          Are you sure you want to reset the password for{" "}
+                          <strong>{contactEmail}</strong>?
+                        </Typography>
+                        <Typography sx={{ mt: 2 }}>
+                          The user will receive an email with instructions to
+                          set a new password.
+                        </Typography>
+                      </DialogContent>
+                      <DialogActions>
+                        <Button
+                          onClick={() => setResetPasswordDialogOpen(false)}
+                          color="primary"
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={confirmResetPassword}
+                          color="primary"
+                          variant="contained"
+                        >
+                          Reset Password
+                        </Button>
+                      </DialogActions>
+                    </Dialog>
                     {/* Description Modal */}
                     <Dialog
                       open={descriptionModalOpen}
@@ -1541,7 +1581,13 @@ console.log("login",login)
                         style: { width: "600px" },
                       }}
                     >
-                      <DialogTitle id="remove-access-dialog-title">
+                      <DialogTitle
+                        id="remove-access-dialog-title"
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
                         <Typography variant="h6">
                           Remove Portal Access
                         </Typography>

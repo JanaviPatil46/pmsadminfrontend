@@ -114,7 +114,7 @@ const initialState = {
     state: "",
     zipCode: "",
   },
-  contacts: [initialContact], // ✅ manually added contacts
+  contacts: [], // ✅ manually added contacts
   selectedContacts: [], // ✅ existing contacts selected from backend
 };
 
