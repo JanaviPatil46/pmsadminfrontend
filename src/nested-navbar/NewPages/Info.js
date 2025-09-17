@@ -67,6 +67,7 @@ const Info = () => {
   const [tags, setTags] = useState([]);
   const [teams, setTeams] = useState([]);
   const [contacts, setContacts] = useState([]);
+  const [userDetails, setUserDetails] = useState([]);
   const [accountDatabyid, setAccountDatabyid] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [open, setOpen] = useState(false);
@@ -101,33 +102,75 @@ const Info = () => {
       setOpenRemoveDialog(true);
     } else {
       setOpenDialog(true);
+      setSelectedContact(contactData._id);
     }
   };
+  const [selectedUser, setSelectedUser] = useState(null);
 
-  const handleSimpleSwitchChange = async (field, contactData) => {
-    const updatedValue = !contactData[field];
-
+  const handleSimpleSwitchChange = async (field, user) => {
     try {
-      await axios.patch(`${CONTACT_API}/contacts/${contactData._id}`, {
-        [field]: updatedValue,
-      });
+      // If the switch is "login", we show dialogs instead of direct toggle
+      if (field === "login") {
+        if (user.login) {
+          // Currently true → turning OFF login (remove access)
+          setSelectedUser(user); // store user for dialog reference
+          setOpenRemoveDialog(true);
+        } else {
+          // Currently false → turning ON login (add access)
+          setSelectedUser(user);
+          setOpenDialog(true);
+        }
+      } else {
+        // For other fields (notify, emailSync) → direct update
+        const updatedUser = { ...user, [field]: !user[field] };
 
-      // ✅ Update the local UI by setting new state
-      setContacts((prev) =>
-        prev.map((contact) =>
-          contact._id === contactData._id
-            ? { ...contact, [field]: updatedValue }
-            : contact
-        )
-      );
+        const response = await fetch(
+          `${LOGIN_API}/common/users/${user._id}`, // ✅ your API endpoint
+          {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ [field]: updatedUser[field] }),
+          }
+        );
 
-      console.log(
-        `Updated ${field} for ${contactData.contactName} to ${updatedValue}`
-      );
+        if (!response.ok) {
+          throw new Error("Failed to update user");
+        }
+
+        // Update local state so switch reflects change instantly
+        setUserDetails((prev) =>
+          prev.map((u) => (u._id === user._id ? updatedUser : u))
+        );
+      }
     } catch (error) {
-      console.error(`Failed to update ${field}:`, error);
+      console.error("Error updating user:", error);
     }
   };
+
+  // const handleSimpleSwitchChange = async (field, contactData) => {
+  //   const updatedValue = !contactData[field];
+
+  //   try {
+  //     await axios.patch(`${CONTACT_API}/contacts/${contactData._id}`, {
+  //       [field]: updatedValue,
+  //     });
+
+  //     // ✅ Update the local UI by setting new state
+  //     setContacts((prev) =>
+  //       prev.map((contact) =>
+  //         contact._id === contactData._id
+  //           ? { ...contact, [field]: updatedValue }
+  //           : contact
+  //       )
+  //     );
+
+  //     console.log(
+  //       `Updated ${field} for ${contactData.contactName} to ${updatedValue}`
+  //     );
+  //   } catch (error) {
+  //     console.error(`Failed to update ${field}:`, error);
+  //   }
+  // };
 
   const handleCloseDialog = () => {
     setOpenDialog(false); // Close dialog
@@ -163,49 +206,54 @@ const Info = () => {
   //     .catch((error) => console.error(error));
   // };
 
-  // const handleSave = () => {
-  //   if (contact) {
-  //     console.log("contact", contact);
-  //     const { _id, email, firstName, middleName, lastName } = contact;
-  //     newUser(data, email, firstName, middleName, lastName);
-  //     updateContacts(_id);
+const handleSave = () => {
+  if (!selectedUser) return;
 
-  //     setOpenDialog(false); // Close the dialog after saving
-  //   }
-  // };
+  console.log("Saving portal access for:", selectedUser);
 
-  const handleSave = async () => {
-    if (!contact) return;
+  const { contactId, email, firstName, middleName, lastName } = selectedUser;
 
-    const { _id, email, firstName, middleName, lastName } = contact;
+  // Call your newUser function
+  newUser(data, contactId, email, firstName, middleName, lastName);
 
-    try {
-      // Step 1: Check if user exists
-      const userRes = await axios.get(
-        `${LOGIN_API}/common/user/email/getuserbyemail/${email}`
-      );
-      const existingUser = userRes.data?.user?.[0];
+  // Close dialog
+  setOpenDialog(false);
+  setPersonalMessage("");
+  setSelectedUser(null);
+};
 
-      if (existingUser && existingUser._id) {
-        console.log("nbhjb");
-        // Step 2A: User exists -> update active = true
-        await axios.patch(`${LOGIN_API}/common/user/${existingUser._id}`, {
-          active: true,
-        });
-        clientCreatedmail(email, "", existingUser._id);
-      } else {
-        // Step 2B: User doesn't exist -> create new user
-        newUser(data, email, firstName, middleName, lastName);
-      }
 
-      // Step 3: Update contact login = true
-      updateContacts(_id);
-    } catch (error) {
-      console.error("Error saving portal access:", error);
-    }
+//   const handleSave = async () => {
+//     if (!contact) return;
+// console.log("hgjfd")
+//     const { _id, email, firstName, middleName, lastName } = contact;
+//     console.log("contct for axctivtwe", contact);
+//     try {
+//       // Step 1: Check if user exists
+//       const userRes = await axios.get(
+//         `${LOGIN_API}/common/user/email/getuserbyemail/${email}`
+//       );
+//       const existingUser = userRes.data?.user?.[0];
 
-    setOpenDialog(false); // Close dialog
-  };
+//       if (existingUser && existingUser._id) {
+//         console.log("nbhjb");
+//         // Step 2A: User exists -> update active = true
+//         await axios.patch(`${LOGIN_API}/common/user/${existingUser._id}`, {
+//           active: true,
+//         });
+//         clientCreatedmail(email, "", existingUser._id);
+//       } else {
+//         // Step 2B: User doesn't exist -> create new user
+//         newUser(data, selectedContact, email, firstName, middleName, lastName);
+//       }
+
+//       // Step 3: Update contact login = true
+//     } catch (error) {
+//       console.error("Error saving portal access:", error);
+//     }
+
+//     setOpenDialog(false); // Close dialog
+//   };
 
   //  clientCreatedmail(email, "", result._id);
 
@@ -243,12 +291,13 @@ const Info = () => {
     setSelectedContact(null);
   };
 
-  const updateContacts = (_id) => {
+  const updateContacts = (_id, userid) => {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
     const raw = JSON.stringify({
-      login: true,
+      login: false,
+      userid: userid,
     });
 
     const requestOptions = {
@@ -295,6 +344,7 @@ const Info = () => {
         if (result && result.accountlist) {
           setContacts(result.accountlist.Contacts);
           setDescription(result.accountlist.Contacts.description);
+          setUserDetails(result.accountlist.Users);
         }
         fetchaccountdatabyid(result.accountlist.id);
       })
@@ -376,39 +426,149 @@ const Info = () => {
   // Derived state for menu open/close
   const menuOpen = Boolean(anchorEl);
 
-  const handleMenuClick = (event, id, contactName, email) => {
-    console.log("contactemail", email);
+  // const handleMenuClick = (event, id, contactName, email) => {
+  //   console.log("contactemail", email);
+  //   setAnchorEl(event.currentTarget);
+  //   setSelectedContact(id); // Set the selected contact ID here
+  //   setContactName(contactName);
+  //   setContactEmail(email);
+
+  // };
+
+  const handleMenuClick = (
+    event,
+    contactId,
+    contactName,
+    contactEmail,
+    user
+  ) => {
+    console.log("Selected contact:", { contactId, contactName, contactEmail });
+    console.log("Selected user:", { userId: user?._id, email: user?.email });
+
     setAnchorEl(event.currentTarget);
-    setSelectedContact(id); // Set the selected contact ID here
+    setSelectedContact(contactId);
     setContactName(contactName);
-    setContactEmail(email);
+    setContactEmail(contactEmail);
+    setSelectedUser(user); // Save selected user for Unlink or Reset Password
   };
+  console.log("seraccountcontact", selectedContact);
 
   const handleMenuClose = () => {
     setAnchorEl(null);
     setSelectedContact(null); // Reset selected contact when menu closes
   };
 
+  // const handleEditDescription = (contact) => {
+  //   console.log("Editing description for contact ID:", selectedContact);
+  //   // setDescriptionModalOpen(true); // Open the description modal
+  //   // fetchAccount();
+  //   // setSelectedContact(contact);
+  //   setSelectedContact({
+  //   _id: contact._id,
+  //   contactName: contact.contactName,
+  //   description: contact.description || "",
+  // });
+  //   setDescription(contact.description || "");
+  //   setDescriptionModalOpen(true);
+  //    handleMenuClose();
+  // };
+  const [contactId, setContactId] = useState();
   const handleEditDescription = () => {
-    console.log("Editing description for contact ID:", selectedContact);
-    setDescriptionModalOpen(true); // Open the description modal
-    fetchAccount();
+    const contact = contacts.find((c) => c._id === selectedContact);
+    console.log("selecteconatct", contact);
+    if (!contact) return;
+    setContactId(contact._id);
+    setContactName(contact.contactName);
+    setDescription(contact.description || "");
+    setDescriptionModalOpen(true);
+    handleMenuClose();
   };
 
-  const handleDescriptionSave = () => {
-    console.log(
-      "Description saved for contact ID:",
-      selectedContact,
-      "Description:",
-      description
-    );
-    setContactDescription(description);
-    updateDescriptiontoAccount(description);
-    updateDescriptiontoContact(selectedContact, description);
-    // Add logic to save the description for the selected contact
-    setDescriptionModalOpen(false);
-    fetchAccount();
-    // setDescription(""); // Clear the description
+  // const handleDescriptionSave = async () => {
+  //   if (!selectedContact) return;
+
+  //   try {
+  //     const response = await fetch(
+  //       `${ACCOUNT_API}/contacts/${selectedContact._id}`,
+  //       {
+  //         method: "PATCH",
+  //         headers: { "Content-Type": "application/json" },
+  //         body: JSON.stringify({ description }),
+  //       }
+  //     );
+
+  //     if (!response.ok) throw new Error("Failed to update description");
+
+  //     // Update local state (optimistic UI)
+  //     setContacts((prev) =>
+  //       prev.map((c) =>
+  //         c._id === selectedContact._id ? { ...c, description } : c
+  //       )
+  //     );
+
+  //     setDescriptionModalOpen(false);
+  //     setSelectedContact(null);
+  //     setDescription("");
+  //   } catch (error) {
+  //     console.error("Error updating contact description:", error);
+  //   }
+  // };
+
+  // const handleDescriptionSave = () => {
+  //   console.log(
+  //     "Description saved for contact ID:",
+  //     selectedContact,
+  //     "Description:",
+  //     description
+  //   );
+  //   setContactDescription(description);
+  //   // updateDescriptiontoAccount(description);
+  //   updateDescriptiontoContact(selectedContact, description);
+  //   // Add logic to save the description for the selected contact
+  //   setDescriptionModalOpen(false);
+  //   fetchAccount();
+  //   // setDescription(""); // Clear the description
+  // };
+
+  const handleDescriptionSave = async () => {
+    console.log("Save clicked", contactId);
+    if (!contactId) return;
+
+    // Log selected contact ID
+    console.log("selectedContact ID:", contactId);
+
+    // Build URL and body
+    const url = `${ACCOUNT_API}/contacts/${contactId}`;
+    const bodyData = { description: description };
+
+    // Log URL and data
+    console.log("PATCH URL:", url);
+    console.log("PATCH body:", bodyData);
+
+    try {
+      const response = await fetch(url, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(bodyData),
+      });
+
+      if (!response.ok) throw new Error("Failed to update description");
+
+      // Optional: log response data
+      const responseData = await response.json();
+      console.log("PATCH response:", responseData);
+
+      // Update local state
+      setContacts((prev) =>
+        prev.map((c) => (c._id === contactId ? { ...c, description } : c))
+      );
+
+      setDescriptionModalOpen(false);
+      setSelectedContact(null);
+      setDescription("");
+    } catch (error) {
+      console.error("Error updating contact description:", error);
+    }
   };
 
   const updateDescriptiontoAccount = (description) => {
@@ -490,28 +650,39 @@ const Info = () => {
         // toast.error("Failed to delete user");
       });
   };
-  const removecontactidfromaccount = (contactId) => {
+  const removeUserFromContactAndAccount = (contactId, userId) => {
     const requestOptions = {
       method: "DELETE",
       redirect: "follow",
     };
     fetch(
-      `${ACCOUNT_API}/accounts/accountdetails/removecontactfromaccount/${data}/${contactId}`,
+      `${ACCOUNT_API}/accounts/accountdetails/removecontactfromaccount/${data}/${contactId}/${userId}`,
       requestOptions
     )
       .then((response) => response.json())
       .then((result) => {
         console.log("unlinked contact", result);
 
-        deleteUserByContactId(contactId);
+        // deleteUserByContactId(contactId);
         handleContactUpdated();
         toast.success("contact is unlinked");
         fetchAccount();
       })
       .catch((error) => console.error(error));
   };
+  // const handleUnlink = () => {
+  //   removecontactidfromaccount(selectedContact);
+
+  //   handleMenuClose();
+  // };
   const handleUnlink = () => {
-    removecontactidfromaccount(selectedContact);
+    if (!selectedContact || !selectedUser) return;
+    console.log(
+      "selectedContact, selectedUser._id",
+      selectedContact,
+      selectedUser._id
+    );
+    removeUserFromContactAndAccount(selectedContact, selectedUser._id);
 
     handleMenuClose();
   };
@@ -680,16 +851,27 @@ const Info = () => {
 
       .catch((error) => console.error(error));
   };
-  const newUser = (data, email, firstName, middleName, lastName) => {
-    console.log("acc", data);
+  const newUser = (
+    data,
+    selectedContact,
+    email,
+    firstName,
+    middleName,
+    lastName
+  ) => {
+    console.log("acc", data, email, firstName, middleName, lastName);
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
     const raw = JSON.stringify({
-      username: firstName, // Use the first name as username
+      username: accName, // Use the first name as username
       email, // Use the provided email
-      password: firstName, // Replace with a dynamic password logic if needed
+      password: "defaultPass123", // Replace with a dynamic password logic if needed
       role: "Client",
+      contactId: selectedContact,
+      login: true,
+      notify: false,
+      emailSync: false,
     });
 
     const requestOptions = {
@@ -707,10 +889,12 @@ const Info = () => {
         console.log(result);
         console.log(result._id);
         setNewUserId(result._id);
+    
         // Update account with the newly created user ID
         updateAcountUserId(result._id, data);
         clientalldata(result._id, email, firstName, middleName, lastName);
         clientCreatedmail(email, "", result._id);
+        // update
         // Optional: Trigger user created email notification
         // userCreatedmail();
       })
@@ -746,21 +930,21 @@ const Info = () => {
 
   const handleLinkAccounts = () => {
     updateContactstoAccount(selectedContacts);
-    const filteredContacts = selectedContacts.filter(
-      (contact) => contact.login
-    );
+    // const filteredContacts = selectedContacts.filter(
+    //   (contact) => contact.login
+    // );
 
-    console.log("Filtered Contacts:", filteredContacts);
+    // console.log("Filtered Contacts:", selectedContacts);
 
-    filteredContacts.forEach((contact) => {
-      newUser(
-        contact.accountid,
-        contact.email,
-        contact.firstName,
-        contact.middleName,
-        contact.lastName
-      );
-    });
+    // filteredContacts.forEach((contact) => {
+    //   newUser(
+    //     contact.accountid,
+    //     contact.email,
+    //     contact.firstName,
+    //     contact.middleName,
+    //     contact.lastName
+    //   );
+    // });
   };
   console.log(selectedContacts);
 
@@ -1229,32 +1413,6 @@ const Info = () => {
                       selectedContacts.includes(contact.id)
                     )} // Control the selected value
                   />
-                  {/* <Autocomplete
-                    multiple
-                    sx={{ background: "#fff", mt: 1 }}
-                    options={contactOptions}
-                    size="small"
-                    getOptionLabel={(option) => option.label}
-                    value={selectedContacts}
-                    // onChange={handleUserChange}
-                    onChange={(event, newValue) => {
-                      // Update selected contacts with only IDs
-                      const ids = contactOptions.map((contact) => contact.id); // Extract IDs from selected contacts
-                      setSelectedContacts(ids); // Update selectedContacts with IDs
-                      console.log(getSelectedIds()); // Log the comma-separated IDs
-                    }}
-                    renderOption={(props, option) => (
-                      <Box
-                        component="li"
-                        {...props}
-                        sx={{ cursor: "pointer", margin: "5px 10px" }} // Add cursor pointer style
-                      >
-                        {option.label}
-                      </Box>
-                    )}
-                    renderInput={(params) => <TextField {...params} variant="outlined" placeholder="Assignees" />}
-                    isOptionEqualToValue={(option, value) => option.value === value.value}
-                  /> */}
                 </Box>
 
                 {/* Footer */}
@@ -1307,7 +1465,7 @@ const Info = () => {
               </Box>
 
               <Box mt={2}>
-                <TableContainer component={Paper}>
+                {/* <TableContainer component={Paper}>
                   <Table>
                     <TableHead>
                       <TableRow>
@@ -1341,7 +1499,7 @@ const Info = () => {
                             <TableRow>
                               <TableCell colSpan={5}>
                                 <Box>
-                                  {/* Contact Name and More Options Button */}
+                                 
                                   <Box
                                     sx={{
                                       display: "flex",
@@ -1388,7 +1546,7 @@ const Info = () => {
                               </TableCell>
                             </TableRow>
 
-                            {/* Row for email and switches */}
+                          
                             <TableRow>
                               <TableCell>{email}</TableCell>
                               <TableCell>
@@ -1422,23 +1580,476 @@ const Info = () => {
                       })}
                     </TableBody>
 
-                    {/* Dropdown Menu */}
-                    <Menu
-                      anchorEl={anchorEl}
-                      open={menuOpen} // Use derived state here
-                      onClose={handleMenuClose}
-                    >
-                      <MenuItem onClick={handleEditDescription}>
-                        Edit Description
-                      </MenuItem>
-                      <MenuItem onClick={handleUnlink}>Unlink</MenuItem>
-                      <MenuItem onClick={handleResetPassword}>
-                        {" "}
-                        {/* New option */}
-                        Reset Password
-                      </MenuItem>
-                    </Menu>
-                    <Dialog
+                    
+                  
+                  </Table>
+                </TableContainer> */}
+                {/* <TableContainer component={Paper}>
+  <Table>
+    <TableHead>
+      <TableRow>
+        <TableCell>Contact Info</TableCell>
+        <TableCell>Login</TableCell>
+        <TableCell>Notify</TableCell>
+        <TableCell>Email Sync</TableCell>
+      </TableRow>
+    </TableHead>
+
+    <TableBody>
+      {contacts.map((contact) => {
+        const {
+          _id,
+          contactName,
+          email,
+          description,
+          userid, // Populated user inside contact
+        } = contact;
+
+        // Safely extract user data
+        const user = Array.isArray(userid) && userid.length > 0 ? userid[0] : null;
+        
+        // Default to false if user doesn't exist or values are undefined
+        const login = user?.login || false;
+        const notify = user?.notify || false;
+        const emailSync = user?.emailSync || false;
+
+        return (
+          <React.Fragment key={_id}>
+         
+            <TableRow>
+              <TableCell colSpan={4}>
+                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <Typography
+                    sx={{
+                      fontWeight: "bold",
+                      fontSize: "15px",
+                      color: "#1976d2",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => handleClick(_id)}
+                  >
+                    {contactName}
+                  </Typography>
+                  <IconButton
+                    aria-label="more options"
+                    size="small"
+                    onClick={(e) => handleMenuClick(e, _id, contactName, email)}
+                  >
+                    <MoreVertIcon />
+                  </IconButton>
+                </Box>
+                {description && (
+                  <Typography
+                    sx={{
+                      fontSize: "14px",
+                      color: "#757575",
+                      marginTop: "4px",
+                    }}
+                  >
+                    {description}
+                  </Typography>
+                )}
+              </TableCell>
+            </TableRow>
+
+           
+            <TableRow>
+              <TableCell>
+                {email}
+                {!user && (
+                  <Typography variant="caption" display="block" color="error">
+                    No user account
+                  </Typography>
+                )}
+              </TableCell>
+              <TableCell>
+                <Switch
+                  checked={login}
+                  onChange={() => handleSwitchChange(contact)}
+                  // disabled={!user} // Disable if no user exists
+                />
+              </TableCell>
+              <TableCell>
+                <Switch
+                  checked={notify}
+                  onChange={() => handleSimpleSwitchChange("notify", contact)}
+                  disabled={!user}
+                />
+              </TableCell>
+              <TableCell>
+                <Switch
+                  checked={emailSync}
+                  onChange={() => handleSimpleSwitchChange("emailSync", contact)}
+                  disabled={!user}
+                />
+              </TableCell>
+            </TableRow>
+          </React.Fragment>
+        );
+      })}
+    </TableBody>
+  </Table>
+</TableContainer> */}
+              </Box>
+              {/* <Menu
+                anchorEl={anchorEl}
+                open={menuOpen} // Use derived state here
+                onClose={handleMenuClose}
+              >
+                <MenuItem onClick={handleEditDescription}>
+                  Edit Description
+                </MenuItem>
+                <MenuItem onClick={handleUnlink}>Unlink</MenuItem>
+                <MenuItem onClick={handleResetPassword}>
+                  {" "}
+                  Reset Password
+                </MenuItem>
+              </Menu>
+              <Dialog
+                open={resetPasswordDialogOpen}
+                onClose={() => setResetPasswordDialogOpen(false)}
+                aria-labelledby="reset-password-dialog-title"
+              >
+                <DialogTitle id="reset-password-dialog-title">
+                  Reset Password
+                  <Button
+                    onClick={() => setResetPasswordDialogOpen(false)}
+                    color="secondary"
+                  >
+                    X
+                  </Button>
+                </DialogTitle>
+                <DialogContent>
+                  <Typography>
+                    Are you sure you want to reset the password for{" "}
+                    <strong>{contactEmail}</strong>?
+                  </Typography>
+                  <Typography sx={{ mt: 2 }}>
+                    The user will receive an email with instructions to set a
+                    new password.
+                  </Typography>
+                </DialogContent>
+                <DialogActions>
+                  <Button
+                    onClick={() => setResetPasswordDialogOpen(false)}
+                    color="primary"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={confirmResetPassword}
+                    color="primary"
+                    variant="contained"
+                  >
+                    Reset Password
+                  </Button>
+                </DialogActions>
+              </Dialog>
+
+              <Dialog
+                open={descriptionModalOpen}
+                onClose={handleDescriptionCancel}
+                aria-labelledby="form-dialog-title"
+                PaperProps={{
+                  style: { width: "800px" }, // Adjust the width as needed
+                }}
+              >
+                <DialogTitle id="form-dialog-title">
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography variant="h6">{`Description for: ${contactName}`}</Typography>
+                    <Button onClick={handleDescriptionCancel} color="secondary">
+                      X
+                    </Button>
+                  </Box>
+                </DialogTitle>
+                <DialogContent>
+                  <Typography variant="h5" fontWeight="bold">
+                    Description
+                  </Typography>
+                  <TextField
+                    autoFocus
+                    margin="dense"
+                    type="text"
+                    fullWidth
+                    variant="outlined"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Enter description"
+                    data-test="contact-notes-input"
+                  />
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={handleDescriptionSave} color="primary">
+                    Save
+                  </Button>
+                  <Button onClick={handleDescriptionCancel} color="primary">
+                    Cancel
+                  </Button>
+                </DialogActions>
+              </Dialog>
+
+              <Dialog
+                open={openDialog}
+                onClose={handleCloseDialog}
+                aria-labelledby="form-dialog-title"
+                PaperProps={{
+                  style: { width: "800px" },
+                }}
+              >
+                <DialogTitle>
+                  <Typography variant="h6">Add portal access</Typography>
+                  <Button onClick={handleCloseDialog} color="secondary">
+                    X
+                  </Button>
+                </DialogTitle>
+                <DialogContent>
+                  <p>You are adding portal access for the following users:</p>
+                  <div>{contact?.email}</div>
+                  <TextField
+                    label="Personal message"
+                    variant="outlined"
+                    fullWidth
+                    value={personalMessage}
+                    onChange={handleMessageChange}
+                    sx={{ mt: 2 }}
+                  />
+                </DialogContent>
+                <DialogActions>
+                  <Button color="primary" onClick={handleSave}>
+                    Save
+                  </Button>
+                  <Button onClick={handleCloseDialog} color="primary">
+                    Cancel
+                  </Button>
+                </DialogActions>
+              </Dialog>
+
+              <Dialog
+                open={openRemoveDialog}
+                onClose={() => setOpenRemoveDialog(false)}
+                aria-labelledby="remove-access-dialog-title"
+                PaperProps={{
+                  style: { width: "600px" },
+                }}
+              >
+                <DialogTitle
+                  id="remove-access-dialog-title"
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Typography variant="h6">Remove Portal Access</Typography>
+                  <Button
+                    onClick={() => setOpenRemoveDialog(false)}
+                    color="secondary"
+                  >
+                    X
+                  </Button>
+                </DialogTitle>
+                <DialogContent>
+                  <Typography>
+                    You are removing portal access for{" "}
+                    <strong>{contact?.email}</strong> to{" "}
+                    <strong>{contact?.contactName}</strong>.
+                  </Typography>
+                  <Typography sx={{ mt: 2 }}>
+                    If you decide to enable login for this email in the future,
+                    they will be sent a new invite.
+                  </Typography>
+                  <Typography sx={{ mt: 2 }}>
+                    Are you sure you want to remove portal access for{" "}
+                    <strong>{contact?.email}</strong>?
+                  </Typography>
+                </DialogContent>
+                <DialogActions>
+                  <Button
+                    onClick={() => setOpenRemoveDialog(false)}
+                    color="primary"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleConfirmRemoveAccess}
+                    color="error"
+                    variant="contained"
+                  >
+                    Remove Access
+                  </Button>
+                </DialogActions>
+              </Dialog> */}
+
+              <Box mt={2}>
+                <TableContainer component={Paper}>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell></TableCell>
+                        <TableCell>Login</TableCell>
+                        <TableCell>Notify</TableCell>
+                        <TableCell>Email Sync</TableCell>
+                      </TableRow>
+                    </TableHead>
+
+                    <TableBody>
+                      {contacts.map((contact) => {
+                        // filter users belonging to this contact
+                        const contactUsers = userDetails.filter(
+                          (user) => user.contactId === contact._id
+                        );
+
+                        return (
+                          <React.Fragment key={contact._id}>
+                            <TableRow>
+                              <TableCell colSpan={4}>
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                  }}
+                                >
+                                  <Typography
+                                    sx={{
+                                      fontWeight: "bold",
+                                      fontSize: "15px",
+                                      display: "inline-block",
+                                      color: "#1976d2",
+                                    }}
+                                    onClick={() => handleClick(contact._id)}
+                                  >
+                                    {contact.contactName}
+                                  </Typography>
+                                </Box>
+
+                                <Typography
+                                  sx={{
+                                    fontSize: "14px",
+                                    color: "#757575",
+                                    marginTop: "4px",
+                                  }}
+                                >
+                                  {contact.description || "-"}
+                                </Typography>
+                              </TableCell>
+                            </TableRow>
+
+                            {contactUsers.length > 0 ? (
+                              contactUsers.map((user) => (
+                                <TableRow key={user._id}>
+                                  <TableCell>{user.email}</TableCell>
+                                  <TableCell>
+                                    <Switch
+                                      checked={user.login}
+                                      onChange={() =>
+                                        handleSimpleSwitchChange("login", user)
+                                      }
+                                    />
+                                  </TableCell>
+                                  <TableCell>
+                                    <Switch
+                                      checked={user.notify}
+                                      onChange={() =>
+                                        handleSimpleSwitchChange("notify", user)
+                                      }
+                                    />
+                                  </TableCell>
+                                  <TableCell>
+                                    <Switch
+                                      checked={user.emailSync}
+                                      onChange={() =>
+                                        handleSimpleSwitchChange(
+                                          "emailSync",
+                                          user
+                                        )
+                                      }
+                                    />
+                                  </TableCell>
+                                  <TableCell>
+                                    <IconButton
+                                      size="small"
+                                      onClick={(e) =>
+                                        handleMenuClick(
+                                          e,
+                                          contact._id, // contactId
+                                          contact.contactName, // contactName
+                                          user.email, // contactEmail
+                                          user // user object
+                                        )
+                                      }
+                                    >
+                                      <MoreVertIcon />
+                                    </IconButton>
+                                  </TableCell>
+                                </TableRow>
+                              ))
+                            ) : (
+                             <TableRow>
+    <TableCell>{contact.email}</TableCell>
+    <TableCell>
+      <Switch
+        checked={false} // default since no user is linked
+        onChange={() =>
+          handleSimpleSwitchChange("login", { contactId: contact._id, email: contact.email })
+        }
+      />
+    </TableCell>
+    <TableCell>
+      
+      <Switch checked={false} disabled /> 
+    </TableCell>
+    <TableCell>
+    
+      <Switch checked={false} disabled /> 
+    </TableCell>
+    <TableCell>
+      <IconButton
+        size="small"
+        onClick={(e) =>
+          handleMenuClick(
+            e,
+            contact._id,
+            contact.contactName,
+            contact.email,
+            null // no user object
+          )
+        }
+      >
+        <MoreVertIcon />
+      </IconButton>
+    </TableCell>
+  </TableRow>
+                            )}
+                          </React.Fragment>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+
+                <Menu
+                  anchorEl={anchorEl}
+                  open={menuOpen} // Use derived state here
+                  onClose={handleMenuClose}
+                >
+                  <MenuItem onClick={handleEditDescription}>
+    Edit Description
+  </MenuItem>
+
+                  <MenuItem onClick={handleUnlink}>Unlink</MenuItem>
+                  <MenuItem onClick={handleResetPassword}>
+                    {" "}
+                    Reset Password
+                  </MenuItem>
+                </Menu>
+
+                <Dialog
                       open={resetPasswordDialogOpen}
                       onClose={() => setResetPasswordDialogOpen(false)}
                       aria-labelledby="reset-password-dialog-title"
@@ -1478,159 +2089,150 @@ const Info = () => {
                         </Button>
                       </DialogActions>
                     </Dialog>
-                    {/* Description Modal */}
-                    <Dialog
-                      open={descriptionModalOpen}
-                      onClose={handleDescriptionCancel}
-                      aria-labelledby="form-dialog-title"
-                      PaperProps={{
-                        style: { width: "800px" }, // Adjust the width as needed
+                <Dialog
+                  open={descriptionModalOpen}
+                  onClose={handleDescriptionCancel}
+                  aria-labelledby="form-dialog-title"
+                  PaperProps={{
+                    style: { width: "800px" }, // Adjust the width as needed
+                  }}
+                >
+                  <DialogTitle id="form-dialog-title">
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
                       }}
                     >
-                      <DialogTitle id="form-dialog-title">
-                        <Box
-                          sx={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                          }}
-                        >
-                          <Typography variant="h6">{`Description for: ${contactName}`}</Typography>
-                          <Button
-                            onClick={handleDescriptionCancel}
-                            color="secondary"
-                          >
-                            X
-                          </Button>
-                        </Box>
-                      </DialogTitle>
-                      <DialogContent>
-                        <Typography variant="h5" fontWeight="bold">
-                          Description
-                        </Typography>
-                        <TextField
-                          autoFocus
-                          margin="dense"
-                          type="text"
-                          fullWidth
-                          variant="outlined"
-                          value={description}
-                          onChange={(e) => setDescription(e.target.value)}
-                          placeholder="Enter description"
-                          data-test="contact-notes-input"
-                        />
-                      </DialogContent>
-                      <DialogActions>
-                        <Button onClick={handleDescriptionSave} color="primary">
-                          Save
-                        </Button>
-                        <Button
-                          onClick={handleDescriptionCancel}
-                          color="primary"
-                        >
-                          Cancel
-                        </Button>
-                      </DialogActions>
-                    </Dialog>
-
-                    {/*add client Poratl Modal */}
-                    <Dialog
-                      open={openDialog}
-                      onClose={handleCloseDialog}
-                      aria-labelledby="form-dialog-title"
-                      PaperProps={{
-                        style: { width: "800px" },
-                      }}
-                    >
-                      <DialogTitle>
-                        <Typography variant="h6">Add portal access</Typography>
-                        <Button onClick={handleCloseDialog} color="secondary">
-                          X
-                        </Button>
-                      </DialogTitle>
-                      <DialogContent>
-                        <p>
-                          You are adding portal access for the following users:
-                        </p>
-                        <div>{contact?.email}</div>
-                        <TextField
-                          label="Personal message"
-                          variant="outlined"
-                          fullWidth
-                          value={personalMessage}
-                          onChange={handleMessageChange}
-                          // onChange={(e) => handleContactInputChange(index, e)}
-                          sx={{ mt: 2 }}
-                        />
-                      </DialogContent>
-                      <DialogActions>
-                        <Button color="primary" onClick={handleSave}>
-                          Save
-                        </Button>
-                        <Button onClick={handleCloseDialog} color="primary">
-                          Cancel
-                        </Button>
-                      </DialogActions>
-                    </Dialog>
-                    {/* remove client access */}
-                    <Dialog
-                      open={openRemoveDialog}
-                      onClose={() => setOpenRemoveDialog(false)}
-                      aria-labelledby="remove-access-dialog-title"
-                      PaperProps={{
-                        style: { width: "600px" },
-                      }}
-                    >
-                      <DialogTitle
-                        id="remove-access-dialog-title"
-                        sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                        }}
+                      <Typography variant="h6">  {`Description for: ${contactName}`}</Typography>
+                      <Button
+                        onClick={handleDescriptionCancel}
+                        color="secondary"
                       >
-                        <Typography variant="h6">
-                          Remove Portal Access
-                        </Typography>
-                        <Button
-                          onClick={() => setOpenRemoveDialog(false)}
-                          color="secondary"
-                        >
-                          X
-                        </Button>
-                      </DialogTitle>
-                      <DialogContent>
-                        <Typography>
-                          You are removing portal access for{" "}
-                          <strong>{contact?.email}</strong> to{" "}
-                          <strong>{contact?.contactName}</strong>.
-                        </Typography>
-                        <Typography sx={{ mt: 2 }}>
-                          If you decide to enable login for this email in the
-                          future, they will be sent a new invite.
-                        </Typography>
-                        <Typography sx={{ mt: 2 }}>
-                          Are you sure you want to remove portal access for{" "}
-                          <strong>{contact?.email}</strong>?
-                        </Typography>
-                      </DialogContent>
-                      <DialogActions>
-                        <Button
-                          onClick={() => setOpenRemoveDialog(false)}
-                          color="primary"
-                        >
-                          Cancel
-                        </Button>
-                        <Button
-                          onClick={handleConfirmRemoveAccess}
-                          color="error"
-                          variant="contained"
-                        >
-                          Remove Access
-                        </Button>
-                      </DialogActions>
-                    </Dialog>
-                  </Table>
-                </TableContainer>
+                        X
+                      </Button>
+                    </Box>
+                  </DialogTitle>
+                  <DialogContent>
+                    <Typography variant="h5" fontWeight="bold">
+                      Description
+                    </Typography>
+                    <TextField
+                      autoFocus
+                      margin="dense"
+                      type="text"
+                      fullWidth
+                      variant="outlined"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      placeholder="Enter description"
+                      data-test="contact-notes-input"
+                    />
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={handleDescriptionSave} color="primary">
+                      Save
+                    </Button>
+                    
+
+                    <Button onClick={handleDescriptionCancel} color="primary">
+                      Cancel
+                    </Button>
+                  </DialogActions>
+                </Dialog>
+
+                <Dialog
+                  open={openDialog}
+                  onClose={handleCloseDialog}
+                  aria-labelledby="form-dialog-title"
+                  PaperProps={{
+                    style: { width: "800px" },
+                  }}
+                >
+                  <DialogTitle>
+                    <Typography variant="h6">Add portal access</Typography>
+                    <Button onClick={handleCloseDialog} color="secondary">
+                      X
+                    </Button>
+                  </DialogTitle>
+                  <DialogContent>
+                    <p>You are adding portal access for the following users:</p>
+                    <div>{selectedUser?.email}</div>
+                    <TextField
+                      label="Personal message"
+                      variant="outlined"
+                      fullWidth
+                      value={personalMessage}
+                      onChange={handleMessageChange}
+                      // onChange={(e) => handleContactInputChange(index, e)}
+                      sx={{ mt: 2 }}
+                    />
+                  </DialogContent>
+                  <DialogActions>
+                    <Button color="primary" onClick={handleSave}>
+                      Save
+                    </Button>
+                    <Button onClick={handleCloseDialog} color="primary">
+                      Cancel
+                    </Button>
+                  </DialogActions>
+                </Dialog>
+
+                <Dialog
+                  open={openRemoveDialog}
+                  onClose={() => setOpenRemoveDialog(false)}
+                  aria-labelledby="remove-access-dialog-title"
+                  PaperProps={{
+                    style: { width: "600px" },
+                  }}
+                >
+                  <DialogTitle
+                    id="remove-access-dialog-title"
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Typography variant="h6">Remove Portal Access</Typography>
+                    <Button
+                      onClick={() => setOpenRemoveDialog(false)}
+                      color="secondary"
+                    >
+                      X
+                    </Button>
+                  </DialogTitle>
+                  <DialogContent>
+                    <Typography>
+                      You are removing portal access for{" "}
+                      <strong>{selectedUser?.email}</strong> to{" "}
+                      <strong>{selectedUser?.contactName}</strong>.
+                    </Typography>
+                    <Typography sx={{ mt: 2 }}>
+                      If you decide to enable login for this email in the
+                      future, they will be sent a new invite.
+                    </Typography>
+                    <Typography sx={{ mt: 2 }}>
+                      Are you sure you want to remove portal access for{" "}
+                      <strong>{selectedUser?.email}</strong>?
+                    </Typography>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button
+                      onClick={() => setOpenRemoveDialog(false)}
+                      color="primary"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handleConfirmRemoveAccess}
+                      color="error"
+                      variant="contained"
+                    >
+                      Remove Access
+                    </Button>
+                  </DialogActions>
+                </Dialog>
               </Box>
             </CardContent>
           </Card>

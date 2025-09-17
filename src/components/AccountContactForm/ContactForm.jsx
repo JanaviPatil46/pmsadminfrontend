@@ -1069,6 +1069,7 @@ const handleToggleContact = (contact) => {
     }
 
     setSelectedContacts(newSelected);
+     setSearchTerm("");
   };
   const handleRemoveChip = (contactId) => {
     const newSelected = selectedContacts.filter((c) => c._id !== contactId);
@@ -1275,11 +1276,69 @@ const SelectedContactsDisplay = ({ contacts, onRemove, onUpdateField, isEditing 
     </Box>
   );
 };
-
+// Personalization Dialog Component
+const PersonalizationDialog = ({ 
+  open, 
+  onClose, 
+ contactEmails,
+ 
+  message, 
+  onMessageChange, 
+  onConfirm 
+}) => {
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+      <DialogTitle>Add portal access</DialogTitle>
+       <DialogContent>
+        <Typography variant="body2" gutterBottom sx={{ fontWeight: 'bold' }}>
+          This message will be sent to:
+        </Typography>
+        
+        <Box sx={{ 
+          maxHeight: 150, 
+          overflow: 'auto', 
+          border: '1px solid #eee', 
+          borderRadius: 1, 
+          p: 1, 
+          mb: 2,
+          backgroundColor: '#f9f9f9'
+        }}>
+          {contactEmails.map((email, index) => (
+            <Typography key={index} variant="body2" sx={{ mb: 0.5 }}>
+              • {email}
+            </Typography>
+          ))}
+        </Box>
+        
+        <TextField
+          autoFocus
+          margin="dense"
+          // label="Message for Contacts"
+          type="text"
+          fullWidth
+          multiline
+          // rows={4}
+          variant="outlined"
+          value={message}
+          onChange={onMessageChange}
+          placeholder="Enter a message that will be sent to all contacts"
+        />
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onConfirm} variant="contained">
+         Send
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
 export default function ContactForm({ onBack, onSubmit,isEditing = false  }) {
   const [contactErrors, setContactErrors] = useState([]);
  
-
+// Add this near your other state declarations
+const [personalizeDialogOpen, setPersonalizeDialogOpen] = useState(false);
+const [personalMessage, setPersonalMessage] = useState("");
   // Validation function
   const validateContactForm = () => {
     const newContactErrors = [];
@@ -1319,31 +1378,51 @@ export default function ContactForm({ onBack, onSubmit,isEditing = false  }) {
     return !hasErrors;
   };
 
+  // const handleSubmitWithValidation = () => {
+  //   if (validateContactForm()) {
+  //     onSubmit();
+  //   }
+  // };
+//   const handleSubmitWithValidation = () => {
+//   if (validateContactForm()) {
+//     // Check if there are any contacts with login enabled
+//     const contactsWithLogin = [
+//       ...contacts.filter(contact => contact.login),
+//       ...selectedContacts.filter(contact => contact.login && !contact.existingUser)
+//     ];
+    
+//     if (contactsWithLogin.length > 0) {
+//       // Show personalization dialog
+//       setPersonalizeDialogOpen(true);
+//     } else {
+//       // No contacts with login enabled, proceed directly
+//       onSubmit();
+//     }
+//   }
+// };
   const handleSubmitWithValidation = () => {
-    if (validateContactForm()) {
+  if (validateContactForm()) {
+    // Check if there are any contacts with emails to send to
+    const allContactEmails = [
+      ...contacts.map(contact => contact.email).filter(email => email),
+      ...selectedContacts.map(contact => contact.email).filter(email => email)
+    ];
+    
+    if (allContactEmails.length > 0) {
+      // Show personalization dialog for all contacts with emails
+      setPersonalizeDialogOpen(true);
+    } else {
+      // No contacts with emails, proceed directly
       onSubmit();
     }
-  };
-  
+  }
+};
   const dispatch = useDispatch();
   const { contacts, selectedContacts, accountData } = useSelector(
     (state) => state.accountContact
   );
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [showContactForm, setShowContactForm] = useState(false);
-
-  // const handleChange = (index, e) => {
-  //   const { name, value } = e.target;
-  //   let updated = { [name]: value };
-
-  //   if (["firstName", "middleName", "lastName"].includes(name)) {
-  //     const c = { ...contacts[index], [name]: value };
-  //     updated.contactName =
-  //       `${c.firstName} ${c.middleName} ${c.lastName}`.trim();
-  //   }
-
-  //   dispatch(setContactData({ index, data: updated }));
-  // };
+ 
    const handleChange = (index, e) => {
     const { name, value } = e.target;
     
@@ -1434,13 +1513,30 @@ useEffect(() => {
         onUpdateField={handleUpdateSelectedContactField}
         isEditing={isEditing}
       />
-
+<PersonalizationDialog
+  open={personalizeDialogOpen}
+  onClose={() => setPersonalizeDialogOpen(false)}
+  // contactCount={[
+  //   ...contacts.filter(contact => contact.login),
+  //   ...selectedContacts.filter(contact => contact.login && !contact.existingUser)
+  // ].length}
+   contactEmails={[
+    ...contacts.map(contact => contact.email).filter(email => email),
+    ...selectedContacts.map(contact => contact.email).filter(email => email)
+  ]}
+  message={personalMessage}
+  onMessageChange={(e) => setPersonalMessage(e.target.value)}
+  onConfirm={() => {
+    setPersonalizeDialogOpen(false);
+    onSubmit(personalMessage);
+  }}
+/>
       {/* Manual contact form */}
       <Typography variant="h6" gutterBottom>
         Add New Contacts
       </Typography>
 
-      {/* {showContactForm && ( */}
+    
       <>
         {contacts.map((contact, contactIndex) => (
           <Box
@@ -1787,7 +1883,7 @@ useEffect(() => {
           </Box>
         ))}
       </>
-      {/* )} */}
+     
 
       <Button
         variant="outlined"

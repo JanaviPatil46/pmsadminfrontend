@@ -439,235 +439,9 @@ export default function AccountContactForm({
     }
   };
 
-  // Update handleSubmit to handle both create and edit
-//   const handleSubmit = async () => {
-//     try {
-//       const finalData = {
-//         clientType: accountData.clientType,
-//         accountName: accountData.accountName,
-//         companyName: accountData.companyName,
-//         tags: (accountData.tags || []).map((tag) => tag.value),
-//         teamMember: (accountData.teamMembers || []).map(
-//           (member) => member.value
-//         ),
-//         foldertemplate: accountData.folderTemp
-//           ? accountData.folderTemp.value
-//           : null,
-//         country: accountData.country
-//           ? {
-//               code: accountData.country.value,
-//               name: accountData.country.label,
-//             }
-//           : { code: "", name: "" },
-//         streetAddress: accountData.streetAdd || "",
-//         city: accountData.city || "",
-//         state: accountData.state || "",
-//         postalCode: accountData.zipCode || "",
-//         active: true,
-//       };
+ 
 
-//       let accountId;
-//       let newContactIds = [];
-
-//       if (isEditing) {
-//         // Update existing account
-//         await axios.patch(
-//           `${ACCOUNT_API}/accounts/accountdetails/${editingAccountId}`,
-//           finalData
-//         );
-//         accountId = editingAccountId;
-
-//         // Update folder template if changed
-//         if (finalData.foldertemplate) {
-//           await assignfoldertemp(accountId, finalData.foldertemplate);
-//         }
-//       } else {
-//         // Create new account
-//         const { data: account } = await axios.post(
-//           `${ACCOUNT_API}/accounts/accountdetails`,
-//           finalData
-//         );
-//         accountId = account._id;
-
-//         // Create root folder structure for this account
-//         await addFolderTemplate(accountId);
-
-//         // Assign selected folder template (if any)
-//         await assignfoldertemp(accountId, finalData.foldertemplate);
-//       }
-
-//       // Process NEW contacts (manually added)
-//       for (let contact of contacts) {
-//         if (
-//           (contact.firstName || contact.lastName || contact.email) &&
-//           !contact._id
-//         ) {
-//           const { data: newContact } = await axios.post(
-//             `${ACCOUNT_API}/contacts/new-contact`,
-//             {
-//               ...contact,
-//               tags: (contact.tags || []).map((t) => t.value),
-//               country: contact.country
-//                 ? {
-//                     code: contact.country.value,
-//                     name: contact.country.label,
-//                   }
-//                 : { code: "", name: "" },
-//               accountId: accountId,
-//               // accountName: accountData.accountName,
-//             }
-//           );
-//   newContactIds.push(newContact._id);
-//           // If contact has login enabled → also create user (only for new contacts)
-//           if (contact.login) {
-//             try {
-//               const { data: newUser } = await axios.post(
-//                 `${LOGIN_API}/common/from-contact`,
-//                 {
-//                   contactId: newContact._id,
-//                   email: contact.email,
-//                   password: "defaultPass123",
-//                   username: accountData.accountName,
-//                 }
-//               );
-
-//               // Link User ↔ Account, Save Client Info, Send Mail
-//               updateAcountUserId(newUser.user._id, accountId);
-//               clientalldata(
-//                 newUser.user._id,
-//                 contact.email,
-//                 contact.firstName,
-//                 contact.middleName,
-//                 contact.lastName,
-//                 accountData.accountName
-//               );
-//               clientCreatedmail(
-//                 contact.email,
-//                 "Welcome to our platform!",
-//                 newUser.user._id
-//               );
-//             } catch (error) {
-//               console.error("Error creating user for contact:", error);
-//               // Continue even if user creation fails
-//             }
-//           }
-//         }
-//       }
-
-
-// for (let contact of selectedContacts) {
-//       // For existing contacts of the account, set login, notify, emailSync to false
-//       if (contact.existingContact) {
-//         await axios.patch(`${ACCOUNT_API}/contacts/${contact._id}`, {
-//           ...contact,
-//           tags: (contact.tags || []).map((t) => t.value),
-//           country: contact.country
-//             ? {
-//                 code: contact.country.value,
-//                 name: contact.country.label,
-//               }
-//             : { code: "", name: "" },
-//           accountId: accountId,
-//           login: false, // Set to false for existing contacts
-//           notify: false, // Set to false for existing contacts
-//           emailSync: false, // Set to false for existing contacts
-//         });
-//       } else {
-//         // For newly added contacts, preserve their settings
-//         await axios.patch(`${ACCOUNT_API}/contacts/${contact._id}`, {
-//           ...contact,
-//           tags: (contact.tags || []).map((t) => t.value),
-//           country: contact.country
-//             ? {
-//                 code: contact.country.value,
-//                 name: contact.country.label,
-//               }
-//             : { code: "", name: "" },
-//           accountId: accountId,
-//           login: contact.login,
-//           notify: contact.notify,
-//           emailSync: contact.emailSync,
-//         });
-
-//         // For edit mode, only create users for contacts that are newly added
-//         // and have login enabled but don't have a user yet
-//         if (contact.login && !contact.existingUser && !contact.existingContact) {
-//           try {
-//             const { data: newUser } = await axios.post(
-//               `${LOGIN_API}/common/from-contact`,
-//               {
-//                 contactId: contact._id,
-//                 email: contact.email,
-//                 password: "defaultPass123",
-//               }
-//             );
-
-//             // Link User ↔ Account, Save Client Info, Send Mail
-//             updateAcountUserId(newUser.user._id, accountId);
-//             clientalldata(
-//               newUser.user._id,
-//               contact.email,
-//               contact.firstName,
-//               contact.middleName,
-//               contact.lastName,
-//               accountData.accountName
-//             );
-//             clientCreatedmail(
-//               contact.email,
-//               "Welcome to our platform!",
-//               newUser.user._id
-//             );
-//           } catch (error) {
-//             console.error("Error creating user for selected contact:", error);
-//             // Continue even if user creation fails
-//           }
-//         }
-//       }
-//     }
-//       // Update Account with all contact references
-//       // const allContactIds = [
-//       //   ...contacts
-//       //     .filter((c) => (c.firstName || c.lastName || c.email) && c._id)
-//       //     .map((c) => c._id),
-//       //   ...selectedContacts.map((c) => c._id),
-//       // ];
-//        // Update Account with all contact references
-//     const allContactIds = [
-//       ...newContactIds, // Include IDs of newly created contacts
-//       ...selectedContacts.map((c) => c._id), // Include IDs of selected contacts
-//     ];
-
-//       if (allContactIds.length > 0) {
-//         await axios.patch(
-//           `${ACCOUNT_API}/accounts/accountdetails/${accountId}`,
-//           { contacts: allContactIds }
-//         );
-//       }
-
-//       toast.success(
-//         isEditing
-//           ? "✅ Account updated successfully!"
-//           : "✅ Account, contacts & users saved!"
-//       );
-//       dispatch(resetForm());
-//       // handleDrawerClose();
-//       handleNewDrawerClose();
-//       if (!isEditing) {
-//        handleDrawerClose();
-//         navigate("/clients/accounts/activeaccounts");
-//       }
-//       // navigate("/clients/accounts/activeaccounts");
-//     } catch (err) {
-//       console.error(err);
-//       if (err.response?.data?.error === "Account name is taken") {
-//         alert("❌ Account name is already taken. Please choose another.");
-//       } else {
-//         alert("❌ Failed to save. Check console.");
-//       }
-//     }
-//   };
-
-const handleSubmit = async () => {
+const handleSubmit = async (personalMessage = "") => {
   try {
     const finalData = {
       clientType: accountData.clientType,
@@ -768,9 +542,10 @@ const handleSubmit = async () => {
               contact.lastName,
               accountData.accountName
             );
+             const message = personalMessage || "Welcome to our platform!";
             clientCreatedmail(
               contact.email,
-              "Welcome to our platform!",
+              message,
               newUser.user._id
             );
           } catch (error) {
@@ -834,12 +609,17 @@ const handleSubmit = async () => {
               }
             );
 console.log("newuser",newUser)
+  // Add the new user ID to existing user IDs (if any)
+            // const existingUserIds = contact.userid ? contact.userid : [];
+            // const updatedUserIds = Array.isArray(existingUserIds) 
+            //   ? [...existingUserIds, newUser._id] 
+            //   : [newUser._id];
             // After creating user, update the contact to set login, notify, emailSync to false
             await axios.patch(`${ACCOUNT_API}/contacts/${contact._id}`, {
               login: false,
               notify: false,
               emailSync: false,
-              userid: newUser._id
+              // userid: updatedUserIds
             });
 
             // Link User ↔ Account, Save Client Info, Send Mail
@@ -852,9 +632,10 @@ console.log("newuser",newUser)
               contact.lastName,
               accountData.accountName
             );
+              const message = personalMessage || "Welcome to our platform!";
             clientCreatedmail(
               contact.email,
-              "Welcome to our platform!",
+            message,
               newUser._id
             );
           } catch (error) {
