@@ -478,6 +478,7 @@ import CreateFolderInFirm from "./Firm Docs Shared With Client/CreateFolder";
 import { Folder, FolderOpen, InsertDriveFile } from "@mui/icons-material";
 import FileExplorer from "./FileExplorer";
 import EditNameDrawer from "./EditNameDrawer";
+import MoveFile from "./MoveFile";
 const Documents = () => {
   const DOCS_MANAGMENTS = process.env.REACT_APP_CLIENT_DOCS_MANAGE;
   const { data } = useParams();
@@ -492,6 +493,9 @@ const Documents = () => {
   const folderInputRef = useRef(null);
   const [uploadDocOpen, setUplaodDocOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [isMoveDocument, setIsMoveDocument] = useState(false);
+    const [sourceFile, setSourceFile] = useState(null);
+
   console.log(refreshKey);
   const handleFileChange = (e) => setFile(e.target.files[0]);
   const handleNewFileChange = (e) => setFile(e.target.files[0]);
@@ -499,7 +503,15 @@ const Documents = () => {
   const handleOpenDrawer = () => setUplaodDocOpen(true);
   const handleCreateFolderClick = () => setIsFolderFormOpen((prev) => !prev);
   const handleNewFolderClick = () => setIsFolderCreate((prev) => !prev);
+  const handleFileMove = () => setIsMoveDocument(true);
+
   const [combinedFolderStructure, setCombinedFolderStructure] = useState(null);
+
+  const handleMove = (item) => {
+    console.log("Move Hi jan v kujaki", item.path);
+    setSourceFile(item.path);
+
+  };
 
   // const [contextItem, setContextItem] = useState(null);
   const [structFolder, setStructFolder] = useState(null);
@@ -1547,6 +1559,11 @@ const Documents = () => {
             >
               {selectedItem?.sealed ? "Unseal" : "Seal"}
             </MenuItem>
+
+               <MenuItem  onClick={handleFileMove}>Move11</MenuItem>
+
+
+
           </>
         )}
       </Menu>
@@ -1585,6 +1602,24 @@ const Documents = () => {
         onClose={() => setDrawerOpen(false)}
         item={selectedItem}
         onRename={handleRename}
+      />
+      {/* <MoveFile
+        open={isMoveDocument}
+        onClose={() => setIsMoveDocument(false)}
+        file={file}
+        fetchUnSealedFolders={fetchUnSealedFolders}
+        fetchAdminPrivateFolders={fetchPrivateFolders}
+        accountId={data}
+        fetchBothFolders={fetchBothFolders}
+        sourceFile={sourceFile}
+      /> */}
+ <MoveFile
+       open={isMoveDocument}
+        onClose={() => setIsMoveDocument(false)}
+        fetchUnSealedFolders={fetchUnSealedFolders}
+        fetchAdminPrivateFolders={fetchPrivateFolders}
+        fetchBothFolders={fetchBothFolders}
+        accountId={data}
       />
       <CreateFolder
         open={isFolderFormOpen}

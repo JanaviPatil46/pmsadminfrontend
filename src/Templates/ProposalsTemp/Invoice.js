@@ -988,52 +988,7 @@ const Invoice = ({ charLimit = 4000, serviceandinvoiceSettings, serviceandinvoic
                   onChange={(e) => setSelectedRowData({ ...selectedRowData, description: e.target.value })}
                 />
               </Box>
-              {/* <Box sx={{ width: "100%", mt: 2 }}>
-                <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
-                    <Box>
-                      <InputLabel sx={{ color: "black" }}>Rate</InputLabel>
-                      <TextField
-                        fullWidth
-                        name="Rate"
-                        placeholder="Rate"
-                        size="small"
-                        margin="normal"
-                        value={selectedRowData?.rate || ""} // Use selected row data
-                        onChange={(e) => setSelectedRowData({ ...selectedRowData, rate: e.target.value })}
-                      />
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Box sx={{ mr: "15px" }}>
-                      <InputLabel sx={{ color: "black" }}>Rate Type</InputLabel>
-                      <Autocomplete
-                        size="small"
-                        fullWidth
-                        sx={{ mt: 2 }}
-                        options={options}
-                        getOptionLabel={(option) => option?.label || ""}
-                        value={selectedRateOption}
-                        onChange={handleRateTypeChange}
-                        renderInput={(params) => <TextField {...params} variant="outlined" placeholder="Select Rate Type" />}
-                        isOptionEqualToValue={(option, value) => option.value === value.value}
-                        renderOption={(props, option) => (
-                          <Box
-                            component="li"
-                            {...props}
-                            sx={{
-                              margin: "4px",
-                              cursor: "pointer",
-                            }}
-                          >
-                            <Typography>{option.label}</Typography>
-                          </Box>
-                        )}
-                      />
-                    </Box>
-                  </Grid>
-                </Grid>
-              </Box> */}
+             
               <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                 <Box width="50%">
                   <Typography sx={{ color: "black" }}>Rate</Typography>

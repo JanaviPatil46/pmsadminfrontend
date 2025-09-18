@@ -49,34 +49,7 @@ export default function UploadDocument ({
     }
   };
 
-//   const handleSubmitfile = async (e) => {
-//     let data = new FormData();
-//     data.append("destinationPath", );
-//     data.append("file", file);
 
-//     let config = {
-//       method: "post",
-//       maxBodyLength: Infinity,
-//       url: `${DOCS_MANAGMENTS}/uploaddocuments/`,
-//       data: data,
-      
-//     };
-//     axios
-//     .request(config)
-//     .then((response) => {
-//       console.log(JSON.stringify(response.data));
-//       alert("File uploaded successfully!");
-     
-//     })
-//     .catch((error) => {
-//       console.error(error);
-//       alert("Failed to upload the file.");
-//     });
-
-//   setIsDocumentForm(false);
-//   setFile(null);
-// };
- 
 
 const handleSubmitfile = async () => {
     if (!selectedFolder) {
@@ -278,52 +251,6 @@ const FolderContents = ({ contents, setSelectedFolder, selectedFolder, parentPat
       })}
     </List>
   );
-  // return (
-  //   <ul style={{ listStyle: "none", marginLeft: "1em", paddingLeft: "0.5em" }}>
-  //     {contents.map((item, index) => {
-  //       // Construct the full path dynamically
-  //       const fullPath = parentPath ? `${parentPath}/${item.name}` : `uploads/${templateId}/${item.name}`;
-
-  //       // return (
-  //       //   <li key={index} style={{ marginBottom: "0.8em" }}>
-  //       //     {item.type === "folder" ? (
-  //       //       <div>
-  //       //         <div
-  //       //           onClick={() => {
-  //       //             toggleFolder(fullPath);
-  //       //             setSelectedFolder(fullPath);
-  //       //             console.log("Selected Folder Path:", fullPath);
-  //       //           }}
-  //       //           style={{
-  //       //             fontWeight: selectedFolder === fullPath ? "bold" : "normal",
-  //       //             cursor: "pointer",
-  //       //             color:  "#007BFF",
-  //       //           }}
-  //       //         >
-  //       //           {openFolders[fullPath] ? "📂" : "📁"} {item.name}
-  //       //         </div>
-
-  //       //         {openFolders[fullPath] && item.contents.length > 0 && (
-  //       //           <FolderContents
-  //       //             contents={item.contents}
-  //       //             setSelectedFolder={setSelectedFolder}
-  //       //             selectedFolder={selectedFolder}
-  //       //             parentPath={fullPath} // Pass the updated path down to maintain hierarchy
-  //       //             templateId={templateId}
-  //       //           />
-  //       //         )}
-  //       //       </div>
-  //       //     ) : (
-  //       //       <span style={{ color: "#333" }}>📄 {item.name}</span>
-  //       //     )}
-  //       //   </li>
-  //       // );
-      
-      
-       
-      
-  //     })}
-  //   </ul>
-  // );
+  
 };
 
