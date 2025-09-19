@@ -2042,7 +2042,8 @@ const handleSave = () => {
     Edit Description
   </MenuItem>
 
-                  <MenuItem onClick={handleUnlink}>Unlink</MenuItem>
+                  <MenuItem  onClick={handleUnlink} 
+  disabled={!selectedUser} >Unlink</MenuItem>
                   <MenuItem onClick={handleResetPassword}>
                     {" "}
                     Reset Password

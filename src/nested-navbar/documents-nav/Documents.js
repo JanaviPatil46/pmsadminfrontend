@@ -1536,6 +1536,7 @@ const Documents = () => {
             <MenuItem disabled onClick={() => handleMenuAction("edit")}>
               Edit
             </MenuItem>
+           
           </>
         ) : (
           <>
@@ -1560,9 +1561,15 @@ const Documents = () => {
               {selectedItem?.sealed ? "Unseal" : "Seal"}
             </MenuItem>
 
-               <MenuItem  onClick={handleFileMove}>Move11</MenuItem>
+               {/* <MenuItem  onClick={handleFileMove}>Move11</MenuItem> */}
 
-
+<MenuItem onClick={() => {
+           
+              handleFileMove();
+              handleMenuClose();
+              handleMove(selectedItem);
+           
+          }}>Move</MenuItem>
 
           </>
         )}
@@ -1595,6 +1602,13 @@ const Documents = () => {
         >
           Delete
         </MenuItem>
+         <MenuItem onClick={() => {
+           
+              handleFileMove();
+              handleMenuClose();
+              handleMove(selectedItem);
+           
+          }}>Move</MenuItem>
       </Menu>
 
       <EditNameDrawer
@@ -1620,6 +1634,8 @@ const Documents = () => {
         fetchAdminPrivateFolders={fetchPrivateFolders}
         fetchBothFolders={fetchBothFolders}
         accountId={data}
+         sourceFile={sourceFile}
+         isMoveDocument={isMoveDocument}
       />
       <CreateFolder
         open={isFolderFormOpen}

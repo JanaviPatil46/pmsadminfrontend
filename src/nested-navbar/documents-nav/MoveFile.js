@@ -1,31 +1,20 @@
-
-import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Typography,
-  Drawer,
-  IconButton,
-  CircularProgress,
-  TextField,
-  Button,
-} from "@mui/material";
-import { MdClose } from "react-icons/md";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Button, Box, Typography, Drawer } from "@mui/material";
+import { FaTimes } from "react-icons/fa";
 
-const CreateFolder = ({
+const MoveFile = ({
   open,
   onClose,
+  file,
   fetchUnSealedFolders,
   fetchAdminPrivateFolders,
-  accountId,  fetchBothFolders
+  accountId,
+  fetchBothFolders,
+  sourceFile,
 }) => {
-  const templateId = "67ea43c004956fca8db1d445";
-
-  useEffect(() => {
-    console.log("account id selected",accountId);
-  }, [accountId]);
-
-  const [newFolderName, setNewFolderName] = useState("");
+  const DOCS_MANAGMENTS = process.env.REACT_APP_CLIENT_DOCS_MANAGE;
+  //console.log("hi janavi kujaki kurkur", sourceFile);
 
   const [structFolder, setStructFolder] = useState(null);
   const [privateStructFolder, setPrivateStructFolder] = useState(null);
@@ -34,10 +23,10 @@ const CreateFolder = ({
   const [selectedFolderId, setSelectedFolderId] = useState(null);
   const [newFolderPath, setNewFolderPath] = useState("");
   const [destinationPath, setDestinationPath] = useState("");
-  const DOCS_MANAGMENTS = process.env.REACT_APP_CLIENT_DOCS_MANAGE;
+ 
   const fetchFolders = async () => {
     try {
-      const url = `${DOCS_MANAGMENTS}/admindocs/clientDocs/${accountId}`;
+      const url =  `${DOCS_MANAGMENTS}/admindocs/clientDocs/${accountId}`;
       const response = await axios.get(url);
       const addIsOpenProperty = (folders, parentId = null) =>
         folders.map((folder, index) => ({
@@ -88,15 +77,14 @@ const CreateFolder = ({
   };
   useEffect(() => {
     if (open) {
+      // Only fetch when the drawer is open
       fetchFolders();
       fetchPrivateFolders();
-      // fetchBothFolders()
     }
   }, [open]);
 
   useEffect(() => {
     if (selectedFolderId) {
-      console.log("The selected folder ID has been updated:", selectedFolderId);
       handleSelectFolderPath(); // Call your function that depends on the updated state
     }
   }, [selectedFolderId]);
@@ -290,32 +278,33 @@ const CreateFolder = ({
     });
   };
 
-  const createFolderAPI = () => {
-    if (!destinationPath || !newFolderName) {
-      console.log("Missing path or folder name.");
-      return;
-    }
-  
-    return axios
-      .get(
-        `${DOCS_MANAGMENTS}/createnewFolder/?path=${destinationPath}&foldername=${newFolderName}`
-      )
-      .then((response) => {
-        console.log("API Response:", response.data);
-        setNewFolderName(""); // Clear input
-        fetchBothFolders()
-        onClose()
-        fetchUnSealedFolders()
-        fetchAdminPrivateFolders()
+  const handleSubmitfile = async (e) => {
+    e?.preventDefault?.(); // prevent form reload if used in <form>
 
-        return response.data;
-      })
-      .catch((error) => {
-        console.log("API Error:", error);
-        throw error;
+    try {
+      const response = await axios.post(`${DOCS_MANAGMENTS}/movefile`, {
+        sourcePath: sourceFile,
+        destinationPath: destinationPath,
       });
+
+      console.log(response.data);
+      alert("File moved successfully!");
+
+      // Reset and refresh
+      setSelectedFolderId(null);
+      onClose();
+      fetchFolders();
+      fetchBothFolders();
+      fetchUnSealedFolders();
+      fetchPrivateFolders();
+      fetchUnSealedFolders();
+      fetchAdminPrivateFolders();
+      setSelectedFolderId(null);
+    } catch (error) {
+      console.error(error);
+      alert("Failed to move the file.");
+    }
   };
-  
 
   const handleSelectFolderPath = () => {
     const getFolderPath = (folders, parentPath = "") => {
@@ -341,19 +330,9 @@ const CreateFolder = ({
       return;
     }
 
-    // if (selectedType === "public" && structFolder?.folders) {
-    //   const selectedPath = getFolderPath(structFolder.folders);
-    //   setNewFolderPath(selectedPath);
-    //   console.log("Selected public path:", selectedPath);
-    // }
-
     if (selectedType === "public" && structFolder?.folders) {
       let selectedPath = getFolderPath(structFolder.folders);
 
-      // Append /unsealed if the selected folder is "Client Uploaded Documents"
-      // if (selectedPath === "/Client Uploaded Documents") {
-      //   selectedPath += "/unsealed";
-      // }
       // Inject "unsealed" if path starts with "/Client Uploaded Documents"
       if (selectedPath?.startsWith("/Client Uploaded Documents")) {
         selectedPath = selectedPath.replace(
@@ -363,6 +342,7 @@ const CreateFolder = ({
       }
 
       setNewFolderPath(selectedPath);
+      // setDestinationPath(selectedPath);
       console.log("Selected public path:", selectedPath);
     }
 
@@ -370,6 +350,7 @@ const CreateFolder = ({
       const selectedPath = getFolderPath(privateStructFolder.folders);
       setPrivateFolderPath(selectedPath);
       console.log("Selected private path:", selectedPath);
+      // setDestinationPath(selectedPath);
     }
   };
 
@@ -390,74 +371,71 @@ const CreateFolder = ({
   }, [privateFolderPath, selectedType]);
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return <Box>Error: {error}</Box>;
   }
 
   if (!structFolder || !privateStructFolder) {
-    return <div></div>;
+    return <Box></Box>;
   }
 
   return (
-    <Box>
-      <Drawer anchor="right" open={open} onClose={onClose}>
-        
+    <Drawer
+      anchor="right"
+      open={open}
+      onClose={onClose}
+      PaperProps={{
+        sx: {
+          width: 600,
+        },
+      }}
+    >
+      <Box>
         <Box
           sx={{
-            backgroundColor: "#fff",
-            borderRadius: "8px",
-
-            padding: 2,
-            width: 600,
-            fontFamily:
-              "'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            p: 2,
+            // padding:'5px 0 5px 0',
+            borderBottom: "1px solid grey",
           }}
         >
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Typography variant="h6">Create folder new </Typography>
-            <IconButton onClick={onClose}>
-              <MdClose />
-            </IconButton>
-          </Box>
-          <TextField
-            fullWidth
-            size="small"
-            variant="outlined"
-            placeholder="Folder Name"
-            value={newFolderName}
-            onChange={(e) => setNewFolderName(e.target.value)}
-          />
-          <Button
-            variant="contained"
-            sx={{ mt: 2 }}
-            onClick={createFolderAPI}
-          >
-            Create Folder
-          </Button>
-
-          <Box sx={{ maxHeight: "500px", overflowY: "auto" }}>
-            {renderContents(structFolder.folders, (newFolders) =>
-              setStructFolder({ ...structFolder, folders: newFolders })
-            )}
-
-            {renderPrivateContents(privateStructFolder.folders, (newFolders) =>
-              setPrivateStructFolder({
-                ...privateStructFolder,
-                folders: newFolders,
-              })
-            )}
-          </Box>
+          <Typography variant="h6">Select Folder To Move File</Typography>
+          <FaTimes style={{ cursor: "pointer" }} onClick={onClose} />
         </Box>
-      </Drawer>
-    </Box>
+        <Box sx={{ maxHeight: "500px", overflowY: "auto" }}>
+          {renderContents(structFolder.folders, (newFolders) =>
+            setStructFolder({ ...structFolder, folders: newFolders })
+          )}
+
+          {renderPrivateContents(privateStructFolder.folders, (newFolders) =>
+            setPrivateStructFolder({
+              ...privateStructFolder,
+              folders: newFolders,
+            })
+          )}
+        </Box>
+      </Box>
+
+      {/* Buttons */}
+      <Box sx={{ display: "flex", gap: 2, mt: 3, ml: 4 }}>
+        <Button
+          variant="contained"
+          color="primary"
+          //disabled={!file}
+          onClick={() => {
+            handleSelectFolderPath();
+            handleSubmitfile();
+          }}
+        >
+          Upload
+        </Button>
+        <Button variant="outlined" onClick={onClose}>
+          Cancel
+        </Button>
+      </Box>
+    </Drawer>
   );
 };
 
-export default CreateFolder;
-
-
+export default MoveFile;

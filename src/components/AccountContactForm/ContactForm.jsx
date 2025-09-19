@@ -1011,40 +1011,7 @@ const ContactSelectionDialog = ({ open, onClose, onSelectContacts , existingCont
     setSearchTerm(e.target.value);
   };
 
-  // const handleToggleContact = (contact) => {
-  //   const currentIndex = selectedContacts.findIndex(
-  //     (c) => c._id === contact._id
-  //   );
-  //   const newSelected = [...selectedContacts];
 
-  //   if (currentIndex === -1) {
-  //     newSelected.push(contact);
-  //   } else {
-  //     newSelected.splice(currentIndex, 1);
-  //   }
-
-  //   setSelectedContacts(newSelected);
-  // };
-//  const handleToggleContact = (contact) => {
-//     const currentIndex = selectedContacts.findIndex(
-//       (c) => c._id === contact._id
-//     );
-//     const newSelected = [...selectedContacts];
-
-//     if (currentIndex === -1) {
-//       // Mark as newly added if not already in the account
-//       const isExistingContact = existingContactIds.includes(contact._id);
-//       newSelected.push({
-//         ...contact, 
-//         existingUser: contact.userid && contact.userid.length > 0, // Mark if this contact already has a user
-//         existingContact: isExistingContact // Mark if this contact is already associated with the account
-//       });
-//     } else {
-//       newSelected.splice(currentIndex, 1);
-//     }
-
-//     setSelectedContacts(newSelected);
-//   };
 const handleToggleContact = (contact) => {
     const currentIndex = selectedContacts.findIndex(
       (c) => c._id === contact._id
@@ -1378,28 +1345,7 @@ const [personalMessage, setPersonalMessage] = useState("");
     return !hasErrors;
   };
 
-  // const handleSubmitWithValidation = () => {
-  //   if (validateContactForm()) {
-  //     onSubmit();
-  //   }
-  // };
-//   const handleSubmitWithValidation = () => {
-//   if (validateContactForm()) {
-//     // Check if there are any contacts with login enabled
-//     const contactsWithLogin = [
-//       ...contacts.filter(contact => contact.login),
-//       ...selectedContacts.filter(contact => contact.login && !contact.existingUser)
-//     ];
-    
-//     if (contactsWithLogin.length > 0) {
-//       // Show personalization dialog
-//       setPersonalizeDialogOpen(true);
-//     } else {
-//       // No contacts with login enabled, proceed directly
-//       onSubmit();
-//     }
-//   }
-// };
+
   const handleSubmitWithValidation = () => {
   if (validateContactForm()) {
     // Check if there are any contacts with emails to send to

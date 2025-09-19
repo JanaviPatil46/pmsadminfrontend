@@ -330,7 +330,7 @@ export default function AccountContactForm({
       fetchAccountData(editingAccountId);
     }
   }, [editingAccountId]);
-
+ const [userDetails, setUserDetails] = useState([]);
   // Function to fetch account data for editing
   const fetchAccountData = async (accountId) => {
     setIsLoading(true);
@@ -382,9 +382,10 @@ export default function AccountContactForm({
           );
         }
       }
-
+// Set user details from the account data
+    setUserDetails(accountData.userid || []);
       // Fetch contacts for this account
-      await fetchAccountContacts(accountId, accountData.contacts);
+      await fetchAccountContacts(accountId, accountData.contacts,accountData.userid || []);
     } catch (error) {
       console.error("Error fetching account data:", error);
       toast.error("Failed to load account data");
@@ -394,50 +395,99 @@ export default function AccountContactForm({
   };
 
   // Function to fetch contacts for the account being edited
-  const fetchAccountContacts = async (accountId, accountContacts) => {
-    try {
-      // For each contact, check if they have a user and set login status
-      const contactsWithLoginStatus = await Promise.all(
-        accountContacts.map(async (contact) => {
-          // Check if this contact has a user account
-          const hasUser = contact.userid && contact.userid.length > 0;
+  // const fetchAccountContacts = async (accountId, accountContacts) => {
+  //   try {
+  //     // For each contact, check if they have a user and set login status
+  //     const contactsWithLoginStatus = await Promise.all(
+  //       accountContacts.map(async (contact) => {
+  //         // Check if this contact has a user account
+  //         const hasUser = contact.userid && contact.userid.length > 0;
 
-          return {
-            _id: contact._id,
-            firstName: contact.firstName || "",
-            middleName: contact.middleName || "",
-            lastName: contact.lastName || "",
-            contactName: contact.contactName || "",
-            companyName: contact.companyName || "",
-            note: contact.note || "",
-            ssn: contact.ssn || "",
-            email: contact.email || "",
-            phoneNumbers: contact.phoneNumbers || [""],
-            tags: contact.tags ? await fetchTagsDetails(contact.tags) : [],
-            country: contact.country
-              ? {
-                  value: contact.country.code,
-                  label: contact.country.name,
-                }
-              : null,
-            streetAdd: contact.streetAddress || "",
-            city: contact.city || "",
-            state: contact.state || "",
-            zipCode: contact.postalCode || "",
-            login: hasUser,
-            notify: contact.notify || false,
-            emailSync: contact.emailSync || false,
-            existingUser: hasUser, // Mark if this contact already has a user
-            existingContact: true, // Mark as existing contact
-          };
-        })
-      );
+  //         return {
+  //           _id: contact._id,
+  //           firstName: contact.firstName || "",
+  //           middleName: contact.middleName || "",
+  //           lastName: contact.lastName || "",
+  //           contactName: contact.contactName || "",
+  //           companyName: contact.companyName || "",
+  //           note: contact.note || "",
+  //           ssn: contact.ssn || "",
+  //           email: contact.email || "",
+  //           phoneNumbers: contact.phoneNumbers || [""],
+  //           tags: contact.tags ? await fetchTagsDetails(contact.tags) : [],
+  //           country: contact.country
+  //             ? {
+  //                 value: contact.country.code,
+  //                 label: contact.country.name,
+  //               }
+  //             : null,
+  //           streetAdd: contact.streetAddress || "",
+  //           city: contact.city || "",
+  //           state: contact.state || "",
+  //           zipCode: contact.postalCode || "",
+  //           login: hasUser,
+  //           notify: contact.notify || false,
+  //           emailSync: contact.emailSync || false,
+  //           existingUser: hasUser, // Mark if this contact already has a user
+  //           existingContact: true, // Mark as existing contact
+  //         };
+  //       })
+  //     );
 
-      dispatch(setSelectedContacts(contactsWithLoginStatus));
-    } catch (error) {
-      console.error("Error processing account contacts:", error);
-    }
-  };
+  //     dispatch(setSelectedContacts(contactsWithLoginStatus));
+  //   } catch (error) {
+  //     console.error("Error processing account contacts:", error);
+  //   }
+  // };
+  // Function to fetch contacts for the account being edited
+const fetchAccountContacts = async (accountId, accountContacts, accountUsers) => {
+  try {
+    // For each contact, check if they have a user and set login status
+    const contactsWithLoginStatus = await Promise.all(
+      accountContacts.map(async (contact) => {
+        // Find users associated with this contact
+        const contactUsers = accountUsers.filter(user => user.contactId === contact._id);
+        const hasUser = contactUsers.length > 0;
+
+        // Get user settings if user exists
+        const userSettings = hasUser ? contactUsers[0] : {};
+
+        return {
+          _id: contact._id,
+          firstName: contact.firstName || "",
+          middleName: contact.middleName || "",
+          lastName: contact.lastName || "",
+          contactName: contact.contactName || "",
+          companyName: contact.companyName || "",
+          note: contact.note || "",
+          ssn: contact.ssn || "",
+          email: contact.email || "",
+          phoneNumbers: contact.phoneNumbers || [""],
+          tags: contact.tags ? await fetchTagsDetails(contact.tags) : [],
+          country: contact.country
+            ? {
+                value: contact.country.code,
+                label: contact.country.name,
+              }
+            : null,
+          streetAdd: contact.streetAddress || "",
+          city: contact.city || "",
+          state: contact.state || "",
+          zipCode: contact.postalCode || "",
+          login: userSettings.login || false,
+          notify: userSettings.notify || false,
+          emailSync: userSettings.emailSync || false,
+          existingUser: hasUser, // Mark if this contact already has a user
+          existingContact: true, // Mark as existing contact
+        };
+      })
+    );
+
+    dispatch(setSelectedContacts(contactsWithLoginStatus));
+  } catch (error) {
+    console.error("Error processing account contacts:", error);
+  }
+};
 
  
 
