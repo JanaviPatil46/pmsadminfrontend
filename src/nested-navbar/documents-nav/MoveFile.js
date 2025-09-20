@@ -293,12 +293,9 @@ const MoveFile = ({
       // Reset and refresh
       setSelectedFolderId(null);
       onClose();
-      fetchFolders();
-      fetchBothFolders();
-      fetchUnSealedFolders();
-      fetchPrivateFolders();
-      fetchUnSealedFolders();
-      fetchAdminPrivateFolders();
+       fetchUnSealedFolders();
+        fetchBothFolders()
+        fetchAdminPrivateFolders();
       setSelectedFolderId(null);
     } catch (error) {
       console.error(error);
