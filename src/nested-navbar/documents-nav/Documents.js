@@ -615,6 +615,7 @@ const Documents = () => {
       const data = await response.json();
       if (response.ok) {
         console.log("Renamed:", data);
+         toast.success("Renamed successfully")
         fetchBothFolders();
         fetchPrivateFolders();
         // Refresh your data list here
@@ -1069,9 +1070,9 @@ const Documents = () => {
     ) : selectedItem?.folder ? (
       // Folder menu options (for non-parent folders)
       <>
-        <MenuItem onClick={() => handleMenuAction("new-folder")}>
+        {/* <MenuItem onClick={() => handleMenuAction("new-folder")}>
           New Folder
-        </MenuItem>
+        </MenuItem> */}
         <MenuItem onClick={() => {
           handleEdit(selectedItem);
           handleMenuClose();
