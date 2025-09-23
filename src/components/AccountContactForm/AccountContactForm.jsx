@@ -345,10 +345,24 @@ export default function AccountContactForm({
         accountName: accountData.accountName,
         clientType: accountData.clientType,
         companyName: accountData.companyName || "",
-        tags: accountData.tags ? await fetchTagsDetails(accountData.tags) : [],
-        teamMembers: accountData.teamMember
-          ? await fetchTeamMembersDetails(accountData.teamMember)
-          : [],
+        // tags: accountData.tags ? await fetchTagsDetails(accountData.tags) : [],
+        // teamMembers: accountData.teamMember
+        //   ? await fetchTeamMembersDetails(accountData.teamMember)
+        //   : [],
+        tags: Array.isArray(accountData.tags)
+    ? accountData.tags.map(tag => ({
+        value: tag._id,
+        label: tag.tagName,
+        colour: tag.tagColour,
+      }))
+    : [],
+
+  teamMembers: Array.isArray(accountData.teamMember)
+    ? accountData.teamMember.map(member => ({
+        value: member._id,
+        label: member.username,
+      }))
+    : [],
         folderTemp: accountData.foldertemplate
           ? {
               value: accountData.foldertemplate,

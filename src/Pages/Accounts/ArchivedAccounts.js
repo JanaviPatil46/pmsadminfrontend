@@ -697,82 +697,114 @@ const FixedColumnTable = () => {
       .catch((error) => console.error(error));
   };
   // const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
-  const handleDeleteSelected = async () => {
-    const isConfirmed = window.confirm(
-      "Are you sure you want to delete the selected accounts?"
+  // const handleDeleteSelected = async () => {
+  //   const isConfirmed = window.confirm(
+  //     "Are you sure you want to delete the selected accounts?"
+  //   );
+
+  //   if (isConfirmed) {
+  //     try {
+  //       // Delete selected accounts and extract their data
+  //       const deletedAccounts = await Promise.all(
+  //         selected.map(async (id) => {
+  //           const response = await axios.delete(
+  //             `${ACCOUNT_API}/accounts/accountdetails/${id}`
+  //           );
+  //           return response.data.deletedAccount; // Extract deleted account data
+  //         })
+  //       );
+
+  //       // Extract user IDs from deleted accounts
+  //       const userIds = deletedAccounts.map((acc) => acc.userid);
+
+  //       // Get user data and client data before deletion
+  //       const usersData = await Promise.all(
+  //         userIds.map(async (userid) => {
+  //           const response = await axios.get(
+  //             `${LOGIN_API}/common/user/${userid}`
+  //           );
+  //           return response.data; // Get user data
+  //         })
+  //       );
+
+  //       const clientsData = await Promise.all(
+  //         userIds.map(async (userid) => {
+  //           console.log("clientid", userid);
+  //           const response = await axios.get(
+  //             `${LOGIN_API}/admin/client/${userid}`
+  //           );
+  //           return response.data; // Get client data
+  //         })
+  //       );
+
+  //       // Extract client IDs from retrieved client data
+  //       // const clientIds = clientsData.map(client => client._id);
+  //       const clientIds = clientsData
+  //         .map((clientObj) => clientObj.client?._id)
+  //         .filter((id) => id);
+
+  //       console.log("clients", clientsData);
+  //       // Delete users
+  //       await Promise.all(
+  //         userIds.map((userid) =>
+  //           axios.delete(`${LOGIN_API}/common/user/${userid}`)
+  //         )
+  //       );
+
+  //       // Delete clients
+  //       await Promise.all(
+  //         clientIds.map((clientId) =>
+  //           axios.delete(`${LOGIN_API}/admin/clientsignup/${clientId}`)
+  //         )
+  //       );
+
+  //       // Update UI to remove deleted accounts
+  //       setAccountData((prevContacts) =>
+  //         prevContacts.filter((account) => !selected.includes(account.id))
+  //       );
+
+  //       toast.success(
+  //         "Selected account deleted successfully!"
+  //       );
+  //       setSelected([]); // Clear selected contacts
+  //     } catch (error) {
+  //       console.error("Delete API Error:", error);
+  //       toast.error("Failed to delete selected accounts, users, or clients.");
+  //     }
+  //   }
+  // };
+const handleDeleteSelected = async () => {
+  const isConfirmed = window.confirm(
+    "Are you sure you want to delete the selected accounts?"
+  );
+
+  if (!isConfirmed) return;
+
+  try {
+    // Call backend delete API for all selected accounts
+    const deletedResults = await Promise.all(
+      selected.map(async (id) => {
+        const response = await axios.delete(
+          `${ACCOUNT_API}/accounts/accountdetails/${id}`
+        );
+        return response.data; // backend already deletes account, users, clients
+      })
     );
 
-    if (isConfirmed) {
-      try {
-        // Delete selected accounts and extract their data
-        const deletedAccounts = await Promise.all(
-          selected.map(async (id) => {
-            const response = await axios.delete(
-              `${ACCOUNT_API}/accounts/accountdetails/${id}`
-            );
-            return response.data.deletedAccount; // Extract deleted account data
-          })
-        );
+    console.log("Deleted results:", deletedResults);
 
-        // Extract user IDs from deleted accounts
-        const userIds = deletedAccounts.map((acc) => acc.userid);
+    // Update UI to remove deleted accounts
+    setAccountData((prevAccounts) =>
+      prevAccounts.filter((account) => !selected.includes(account.id))
+    );
 
-        // Get user data and client data before deletion
-        const usersData = await Promise.all(
-          userIds.map(async (userid) => {
-            const response = await axios.get(
-              `${LOGIN_API}/common/user/${userid}`
-            );
-            return response.data; // Get user data
-          })
-        );
-
-        const clientsData = await Promise.all(
-          userIds.map(async (userid) => {
-            console.log("clientid", userid);
-            const response = await axios.get(
-              `${LOGIN_API}/admin/client/${userid}`
-            );
-            return response.data; // Get client data
-          })
-        );
-
-        // Extract client IDs from retrieved client data
-        // const clientIds = clientsData.map(client => client._id);
-        const clientIds = clientsData
-          .map((clientObj) => clientObj.client?._id)
-          .filter((id) => id);
-
-        console.log("clients", clientsData);
-        // Delete users
-        await Promise.all(
-          userIds.map((userid) =>
-            axios.delete(`${LOGIN_API}/common/user/${userid}`)
-          )
-        );
-
-        // Delete clients
-        await Promise.all(
-          clientIds.map((clientId) =>
-            axios.delete(`${LOGIN_API}/admin/clientsignup/${clientId}`)
-          )
-        );
-
-        // Update UI to remove deleted accounts
-        setAccountData((prevContacts) =>
-          prevContacts.filter((account) => !selected.includes(account.id))
-        );
-
-        toast.success(
-          "Selected account deleted successfully!"
-        );
-        setSelected([]); // Clear selected contacts
-      } catch (error) {
-        console.error("Delete API Error:", error);
-        toast.error("Failed to delete selected accounts, users, or clients.");
-      }
-    }
-  };
+    toast.success("Selected accounts (with users & clients) deleted successfully!");
+    setSelected([]); // Clear selected
+  } catch (error) {
+    console.error("Delete API Error:", error);
+    toast.error("Failed to delete selected accounts.");
+  }
+};
 
   const [openDialog, setOpenDialog] = useState(false);
   const [confirmText, setConfirmText] = useState("");

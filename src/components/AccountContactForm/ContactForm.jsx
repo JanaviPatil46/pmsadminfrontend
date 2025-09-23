@@ -1349,12 +1349,16 @@ const [personalMessage, setPersonalMessage] = useState("");
   const handleSubmitWithValidation = () => {
   if (validateContactForm()) {
     // Check if there are any contacts with emails to send to
-    const allContactEmails = [
-      ...contacts.map(contact => contact.email).filter(email => email),
-      ...selectedContacts.map(contact => contact.email).filter(email => email)
+    // const allContactEmails = [
+    //   ...contacts.map(contact => contact.email).filter(email => email),
+    //   ...selectedContacts.map(contact => contact.email).filter(email => email)
+    // ];
+     const contactsToPersonalize = [
+      ...contacts.filter(contact => contact.login), // New contacts with login enabled
+      ...selectedContacts.filter(contact => contact.login && !contact.existingUser) // Existing contacts with login enabled but no user account
     ];
     
-    if (allContactEmails.length > 0) {
+    if (contactsToPersonalize.length > 0) {
       // Show personalization dialog for all contacts with emails
       setPersonalizeDialogOpen(true);
     } else {
@@ -1459,6 +1463,24 @@ useEffect(() => {
         onUpdateField={handleUpdateSelectedContactField}
         isEditing={isEditing}
       />
+{/* <PersonalizationDialog
+  open={personalizeDialogOpen}
+  onClose={() => setPersonalizeDialogOpen(false)}
+  // contactCount={[
+  //   ...contacts.filter(contact => contact.login),
+  //   ...selectedContacts.filter(contact => contact.login && !contact.existingUser)
+  // ].length}
+   contactEmails={[
+    ...contacts.map(contact => contact.email).filter(email => email),
+    ...selectedContacts.map(contact => contact.email).filter(email => email)
+  ]}
+  message={personalMessage}
+  onMessageChange={(e) => setPersonalMessage(e.target.value)}
+  onConfirm={() => {
+    setPersonalizeDialogOpen(false);
+    onSubmit(personalMessage);
+  }}
+/> */}
 <PersonalizationDialog
   open={personalizeDialogOpen}
   onClose={() => setPersonalizeDialogOpen(false)}
