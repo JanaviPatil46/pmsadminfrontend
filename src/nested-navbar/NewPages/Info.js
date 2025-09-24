@@ -622,7 +622,7 @@ const Info = () => {
   };
   const clientCreatedmail = (email, personalMessage, userid) => {
     const port = window.location.port;
-    const urlportlogin = `${CLIENT_PORT}/updatepassword`;
+    const urlportlogin = `${CLIENT_PORT}/client/client/updatepassword`;
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
