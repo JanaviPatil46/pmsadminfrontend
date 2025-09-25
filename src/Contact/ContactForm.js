@@ -164,11 +164,13 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
 
     handleNewDrawerClose();
     handleDrawerClose();
-  const formattedPhoneNumbers = phoneNumbers.map(phone => ({
-    phone: phone.phone,
-    country: phone.country,
+  // const formattedPhoneNumbers = phoneNumbers.map(phone => ({
+  //   phone: phone.phone,
+  //   country: phone.country,
    
-  }));
+  // }));
+  const formattedPhoneNumbers = phoneNumbers.map(phone => phone.phone);
+
 
 console.log("formattedPhoneNumbers",formattedPhoneNumbers)
     const raw = JSON.stringify([

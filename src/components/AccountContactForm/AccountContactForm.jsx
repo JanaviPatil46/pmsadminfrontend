@@ -60,7 +60,7 @@
 //   );
 // }
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useContext } from "react";
 import { useSelector } from "react-redux";
 import {
   Box,
@@ -83,6 +83,7 @@ import {
   setSelectedContacts,
   removeSelectedContact,
 } from "../../redux/accountContactSlice";
+import { LoginContext } from "../../Sidebar/Context/Context";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import RadioButtonCheckedIcon from "@mui/icons-material/RadioButtonChecked";
@@ -106,8 +107,13 @@ export default function AccountContactForm({
   const handleStepClick = (index) => {
     setActiveStep(index); // ✅ allow clicking on steps
   };
-
-
+const { logindata } = useContext(LoginContext);
+  const [loginUserId, setLoginUserId] = useState();
+    useEffect(() => {
+    if (logindata?.user?.id) {
+      setLoginUserId(logindata.user.id);
+    }
+  }, [logindata]);
   // ======================= Helper Functions =======================
   const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
   const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
@@ -528,6 +534,7 @@ const handleSubmit = async (personalMessage = "") => {
       city: accountData.city || "",
       state: accountData.state || "",
       postalCode: accountData.zipCode || "",
+      adminUserId: loginUserId,
       active: true,
     };
 

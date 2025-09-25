@@ -1273,7 +1273,7 @@ const Inboxplus = () => {
      
            setuserdata(data);
            setEmailSyncEmail(data.emailSyncEmail)
-           console.log("dta", data.emailSyncEmail);
+       console.log("Updated emailSyncEmail", data.emailSyncEmail);
           
          } catch (error) {
            console.error("Error fetching data:", error);
@@ -1319,35 +1319,61 @@ const Inboxplus = () => {
     }
   }, []);
 
-  useEffect(() => {
-    const fetchEmails = async () => {
-      // const savedEmail = localStorage.getItem("gmail_user_email");
-      // if (!savedEmail) return;
-console.log("emailSyncEmail",emailSyncEmail)
-      try {
-        if (userRole === "Admin") {
-          const res = await axios.get(
-            `${EMAIL_SYNC}/emailsync/user/login-with-token/${emailSyncEmail}`
-          );
-          setEmailList(res.data.emails || []);
-        } else if (userRole === "TeamMember" && accountIds.length > 0) {
-          const res = await axios.get(
-            `${EMAIL_SYNC}/emailsync/user/login-with-token/${emailSyncEmail}`
-          );
-          const filteredEmails = (res.data.emails || []).filter((email) => {
-            return accountIds.some((accountId) =>
-              email.subject?.includes(accountId)
-            );
-          });
-          setEmailList(filteredEmails);
-        }
-      } catch (err) {
-        console.error("Error fetching emails", err);
-      }
-    };
+//   useEffect(() => {
+//     const fetchEmails = async () => {
+//       // const savedEmail = localStorage.getItem("gmail_user_email");
+//       // if (!savedEmail) return;
+// console.log("emailSyncEmail",emailSyncEmail)
+//       try {
+//         if (userRole === "Admin") {
+//           const res = await axios.get(
+//             `${EMAIL_SYNC}/emailsync/user/login-with-token/${emailSyncEmail}`
+//           );
+//           setEmailList(res.data.emails || []);
+//         } else if (userRole === "TeamMember" && accountIds.length > 0) {
+//           const res = await axios.get(
+//             `${EMAIL_SYNC}/emailsync/user/login-with-token/${emailSyncEmail}`
+//           );
+//           const filteredEmails = (res.data.emails || []).filter((email) => {
+//             return accountIds.some((accountId) =>
+//               email.subject?.includes(accountId)
+//             );
+//           });
+//           setEmailList(filteredEmails);
+//         }
+//       } catch (err) {
+//         console.error("Error fetching emails", err);
+//       }
+//     };
 
-    fetchEmails();
-  }, [userRole, accountIds,emailSyncEmail]);
+//     fetchEmails();
+//   }, [userRole, accountIds,emailSyncEmail]);
+useEffect(() => {
+  const fetchEmails = async () => {
+    if (!emailSyncEmail) return; // ⛔ stop until we actually have the email
+    try {
+      if (userRole === "Admin") {
+        const res = await axios.get(
+          `${EMAIL_SYNC}/emailsync/user/login-with-token/${emailSyncEmail}`
+        );
+        setEmailList(res.data.emails || []);
+      } else if (userRole === "TeamMember" && accountIds.length > 0) {
+        const res = await axios.get(
+          `${EMAIL_SYNC}/emailsync/user/login-with-token/${emailSyncEmail}`
+        );
+        const filteredEmails = (res.data.emails || []).filter((email) =>
+          accountIds.some((accountId) => email.subject?.includes(accountId))
+        );
+        setEmailList(filteredEmails);
+        console.log("setEmailList",filteredEmails)
+      }
+    } catch (err) {
+      console.error("Error fetching emails", err);
+    }
+  };
+
+  fetchEmails();
+}, [userRole, accountIds, emailSyncEmail]);
 
   const fetchTeamMemberAccounts = async (userId) => {
     try {
