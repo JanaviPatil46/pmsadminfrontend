@@ -69,7 +69,7 @@ const EditJobDrawer = ({
   const [charCount, setCharCount] = useState(0);
   const charLimit = 500;
   const [dataAccountjob, setDataAccountjob] = useState("");
-
+const [jobName,setJobName]=useState("")
   // Fetch job data when component mounts or jobId changes
   useEffect(() => {
     if (jobId) {
@@ -88,14 +88,14 @@ const EditJobDrawer = ({
       console.log("jobasdata", data);
       
       const jobData = data.jobList;
-      
+      console.log("joblist",jobData)
       // Set account data
       if (jobData.Account && jobData.Account.length > 0) {
         const { _id, accountName } = jobData.Account[0];
         setSelectedAccount(accountName);
         setAccountId(_id);
       }
-      
+      setJobName(jobData.Name)
       // Set pipeline data
       if (jobData.Pipeline) {
         const pipelineData = {
@@ -254,6 +254,7 @@ const EditJobDrawer = ({
     const raw = JSON.stringify({
       pipeline: selectedPipeline?.value,
       stageid: selectedStage?.value,
+      jobname: jobName,
       jobassignees: combinedValues,
       priority: priority,
       description: description,
@@ -293,6 +294,7 @@ const EditJobDrawer = ({
     const raw = JSON.stringify({
       pipeline: selectedPipeline?.value,
       stageid: selectedStage?.value,
+      jobname: jobName,
       jobassignees: combinedValues,
       priority: priority,
       description: description,
@@ -401,6 +403,16 @@ const EditJobDrawer = ({
             <InputLabel sx={{ color: "black" }}>Account</InputLabel>
             <TextField
               value={selectedAccount}
+              size="small"
+              fullWidth
+              margin="normal"
+            />
+          </Box>
+          <Box>
+            <InputLabel sx={{ color: "black" }}>Job Name</InputLabel>
+            <TextField
+              value={jobName}
+               onChange={(e) => setJobName(e.target.value)}
               size="small"
               fullWidth
               margin="normal"

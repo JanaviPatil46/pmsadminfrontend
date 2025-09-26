@@ -438,7 +438,7 @@ const fetchData = async () => {
   const [piplineid, setPipelineId] = useState();
   const [pipelineIdData, setPipelineIdData] = useState();
   const [stages, setstages] = useState();
-
+const [jobName,setJobName]=useState("")
   useEffect(() => {
     fetchPipelineDataid();
   }, [piplineid]);
@@ -588,6 +588,7 @@ const fetchData = async () => {
       }
       const data = await response.json();
       setSelectedJob(data.jobList);
+      setJobName(data.jobList.Name)
       console.log(data.jobList);
       if (data.jobList.Account && data.jobList.Account.length > 0) {
         const { _id, accountName } = data.jobList.Account[0];
@@ -809,6 +810,7 @@ const fetchData = async () => {
     const raw = JSON.stringify({
       pipeline: selectedPipeline.value,
       stageid: selectedstage.value,
+      jobname:jobName,
       jobassignees: combinedValues,
       priority: priority,
       description: description,
@@ -884,7 +886,7 @@ const fetchData = async () => {
       pipeline: selectedPipeline.value,
       stageid: selectedstage.value,
       jobassignees: combinedValues,
-
+jobname:jobName,
       priority: priority,
       description: description,
       startdate: startDate,
@@ -1236,6 +1238,17 @@ const getPriorityStyle = (priority) => {
                 margin="normal"
               />
             </Box>
+
+            <Box>
+                        <InputLabel sx={{ color: "black" }}>Job Name</InputLabel>
+                        <TextField
+                          value={jobName}
+                           onChange={(e) => setJobName(e.target.value)}
+                          size="small"
+                          fullWidth
+                          margin="normal"
+                        />
+                      </Box>
             <Box>
               <InputLabel sx={{ color: "black" }}>Pipeline</InputLabel>
 

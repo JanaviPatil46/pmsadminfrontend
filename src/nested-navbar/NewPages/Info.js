@@ -42,7 +42,7 @@ import {
   TextField,
   Select,
   Checkbox,
-  ListItemText,
+  ListItemText,FormGroup
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import ContactUpdateForm from "./contactupdate";
@@ -115,6 +115,7 @@ const Info = () => {
         setUserDetails((prev) =>
           prev.map((u) => (u._id === user._id ? updatedUser : u))
         );
+        fetchAccount()
       }
     } catch (error) {
       console.error("Error updating user:", error);
@@ -144,6 +145,7 @@ const Info = () => {
     setOpenDialog(false);
     setPersonalMessage("");
     setSelectedUser(null);
+    fetchAccount()
   
   };
 
@@ -558,13 +560,21 @@ const Info = () => {
       toast.error("Network error. Please try again.");
     }
   };
-  useEffect(() => {
-    setFilteredContacts(
-      contactData.filter((contact) =>
-        contact.name.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    );
-  }, [searchQuery, contactData]);
+  // useEffect(() => {
+  //   setFilteredContacts(
+  //     contactData.filter((contact) =>
+  //       contact.name.toLowerCase().includes(searchQuery.toLowerCase())
+  //     )
+  //   );
+  // }, [searchQuery, contactData]);
+useEffect(() => {
+  setFilteredContacts(
+    contactData.filter((contact) => {
+      const fullName = `${contact.firstName || ""} ${contact.middleName || ""} ${contact.lastName || ""}`.toLowerCase();
+      return fullName.includes(searchQuery.toLowerCase());
+    })
+  );
+}, [searchQuery, contactData]);
 
   const handleAddContactDrawer = () => {
     setIsDrawerOpenForAddContact(true);
@@ -644,7 +654,10 @@ const Info = () => {
     const urlusersavedmail = `${LOGIN_API}/clientmail/clientsavedemail/`;
     console.log(urlusersavedmail);
     fetch(urlusersavedmail, requestOptions)
-      .then((response) => response.json())
+      .then((response) => {response.json()
+        fetchAccount()
+      
+      })
 
       .catch((error) => console.error(error));
   };
@@ -721,44 +734,142 @@ const Info = () => {
       .catch((error) => console.error(error));
   };
 
-  const handleLinkAccounts = () => {
-    updateContactstoAccount(selectedContacts);
+  
+  // const handleLinkAccounts = () => {
+  //   updateContactstoAccount(selectedContacts);
    
-  };
-  console.log(selectedContacts);
+  // };
+  // console.log(selectedContacts);
 
-  const updateContactstoAccount = (selectedContacts) => {
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    const existingContactIds = accountDatabyid.contacts.map(
-      (contact) => contact._id
-    );
-    // Combine existing contact IDs with the new ones
-    const combinedContacts = [...existingContactIds, ...selectedContacts];
-    console.log(combinedContacts);
-    const raw = JSON.stringify({
-      contacts: combinedContacts,
-    });
-    console.log(raw);
-    const requestOptions = {
-      method: "PATCH",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
+  // const updateContactstoAccount = (selectedContacts) => {
+  //   const myHeaders = new Headers();
+  //   myHeaders.append("Content-Type", "application/json");
+  //   const existingContactIds = accountDatabyid.contacts.map(
+  //     (contact) => contact._id
+  //   );
+  //   // Combine existing contact IDs with the new ones
+  //   const combinedContacts = [...existingContactIds, ...selectedContacts];
+  //   console.log(combinedContacts);
+  //   const raw = JSON.stringify({
+  //     contacts: combinedContacts,
+  //   });
+  //   console.log(raw);
+  //   const requestOptions = {
+  //     method: "PATCH",
+  //     headers: myHeaders,
+  //     body: raw,
+  //     redirect: "follow",
+  //   };
+  //   fetch(
+  //     `${ACCOUNT_API}/accounts/accountdetails/${accountDatabyid._id}`,
+  //     requestOptions
+  //   )
+  //     .then((response) => response.json())
+  //     .then((result) => {
+  //       console.log(result);
+  //       handleCloseDrawerofAddContact();
+  //       toast.success("contact added successfully");
+  //       fetchAccount();
+  //       setSelectedContacts([])
+  //     })
+  //     .catch((error) => console.error(error));
+  // };
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+const [contactDetails, setContactDetails] = useState([]);
+
+const handleLinkAccounts = () => {
+  // First, get detailed information about selected contacts
+  const selectedContactDetails = filteredContacts.filter(contact => 
+    selectedContacts.includes(contact.id)
+  );
+  
+  // Map to the format needed for the confirmation dialog
+  const contactData = selectedContactDetails.map(contact => ({
+    id: contact.id,
+    contactName: contact.name,
+    firstName: contact.firstName || '',
+    lastName: contact.lastName || '',
+    middleName: contact.middleName || '',
+    email: contact.email || '',
+    companyName: contact.companyName || '',
+    
+    login:  false, // Default to true if existing user
+    notify: false, // Default values
+    emailSync: false
+  }));
+  
+  setContactDetails(contactData);
+  console.log("contactData",contactData)
+  setIsConfirmDialogOpen(true);
+};
+
+const handleConfirmLink = () => {
+  // First, create users for contacts where login is true
+  contactDetails.forEach(contact => {
+    if (contact.login ) {
+      newUser({
+        // Your user data structure
+        data,
+  contactId:contact.id,
+        email: contact.email,
+        firstName: contact.firstName,
+        middleName: contact.middleName,
+        lastName: contact.lastName,
+        // ... other user fields
+      });
+    }
+  });
+  
+  // Then update the contacts to account
+  updateContactstoAccount(selectedContacts);
+  setIsConfirmDialogOpen(false);
+};
+
+const handleUpdateField = (index, field, value) => {
+  setContactDetails(prev => {
+    const updated = [...prev];
+    updated[index] = {
+      ...updated[index],
+      [field]: value
     };
-    fetch(
-      `${ACCOUNT_API}/accounts/accountdetails/${accountDatabyid._id}`,
-      requestOptions
-    )
-      .then((response) => response.json())
-      .then((result) => {
-        console.log(result);
-        handleCloseDrawerofAddContact();
-        toast.success("contact added successfully");
-        fetchAccount();
-      })
-      .catch((error) => console.error(error));
+    return updated;
+  });
+};
+
+const updateContactstoAccount = (selectedContacts) => {
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+  const existingContactIds = accountDatabyid.contacts.map(
+    (contact) => contact._id
+  );
+  
+  const combinedContacts = [...existingContactIds, ...selectedContacts];
+  
+  const raw = JSON.stringify({
+    contacts: combinedContacts,
+  });
+  
+  const requestOptions = {
+    method: "PATCH",
+    headers: myHeaders,
+    body: raw,
+    redirect: "follow",
   };
+  
+  fetch(
+    `${ACCOUNT_API}/accounts/accountdetails/${accountDatabyid._id}`,
+    requestOptions
+  )
+    .then((response) => response.json())
+    .then((result) => {
+      console.log(result);
+      handleCloseDrawerofAddContact();
+      toast.success("contact added successfully");
+      fetchAccount();
+      setSelectedContacts([]);
+    })
+    .catch((error) => console.error(error));
+};
   const navigate = useNavigate();
   const handleArchive = (accId) => {
     if (!accId) return;
@@ -1176,7 +1287,128 @@ const Info = () => {
                   </Button>
                 </Box>
               </Drawer>
+<Dialog
+    open={isConfirmDialogOpen}
+    onClose={() => setIsConfirmDialogOpen(false)}
+    maxWidth="md"
+    fullWidth
+  >
+    <DialogTitle>
+      <Typography variant="h6" fontWeight="bold">
+        Confirm Contact Linking
+      </Typography>
+      <Typography variant="body2" color="textSecondary">
+        Review and configure settings for the selected contacts
+      </Typography>
+    </DialogTitle>
+    
+    <DialogContent>
+      <Box sx={{ mt: 2 }}>
+        {contactDetails.map((contact, index) => (
+          <Card key={contact.id} sx={{ mb: 2 }}>
+            <CardContent>
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="flex-start"
+              >
+                <Box flexGrow={1}>
+                  <Typography variant="h6">
+                    {contact.contactName }
+                  </Typography>
+                  <Typography color="textSecondary">
+                    {contact.companyName}
+                  </Typography>
+                  <Typography color="textSecondary">{contact.email}</Typography>
+                  {contact.existingUser && (
+                    <Chip
+                      label="Has User Account"
+                      size="small"
+                      color="success"
+                      sx={{ mt: 1 }}
+                    />
+                  )}
 
+                  <FormGroup row sx={{ mt: 1 }}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={contact.login || false}
+                          onChange={(e) =>
+                            handleUpdateField(index, "login", e.target.checked)
+                          }
+                          disabled={contact.existingUser}
+                        />
+                      }
+                      label="Login"
+                    />
+
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={contact.notify || false}
+                          onChange={(e) =>
+                            handleUpdateField(index, "notify", e.target.checked)
+                          }
+                        />
+                      }
+                      label="Notify"
+                    />
+
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={contact.emailSync || false}
+                          onChange={(e) =>
+                            handleUpdateField(index, "emailSync", e.target.checked)
+                          }
+                        />
+                      }
+                      label="Email Sync"
+                    />
+                  </FormGroup>
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
+        ))}
+      </Box>
+    </DialogContent>
+    
+    <DialogActions sx={{ p: 3, gap: 2 }}>
+      <Button
+        variant="outlined"
+        onClick={() => setIsConfirmDialogOpen(false)}
+        sx={{
+          borderColor: "var(--color-border-cancel-btn)",
+          color: "var(--color-save-btn)",
+          "&:hover": {
+            backgroundColor: "var(--color-save-hover-btn)",
+            color: "#fff",
+            border: "none",
+          },
+          width: "100px",
+          borderRadius: "15px",
+        }}
+      >
+        Cancel
+      </Button>
+      <Button
+        variant="contained"
+        onClick={handleConfirmLink}
+        sx={{
+          backgroundColor: "var(--color-save-btn)",
+          "&:hover": {
+            backgroundColor: "var(--color-save-hover-btn)",
+          },
+          width: "100px",
+          borderRadius: "15px",
+        }}
+      >
+        Confirm
+      </Button>
+    </DialogActions>
+  </Dialog>
               <Box sx={{ mt: 1 }}>
                 <Divider />
               </Box>

@@ -322,25 +322,7 @@ const fetchJobData = async () => {
       // const data = await response.json();
       console.log("joblistss",jobListResponse.data.jobList)
       setJobs(jobListResponse.data.jobList);
-    // const formattedData = jobListResponse.data.jobList.map((job) => ({
-    //   ...job,
-    //   StartDate: job.StartDate
-    //     ? format(new Date(job.StartDate), "MMMM dd, yyyy")
-    //     : "",
-    //   DueDate: job.DueDate
-    //     ? format(new Date(job.DueDate), "MMMM dd, yyyy")
-    //     : "",
-    //   updatedAt: formatDistanceToNow(new Date(job.updatedAt), { addSuffix: true }),
-    //   JobAssignee: Array.isArray(job.JobAssignee)
-    //     ? job.JobAssignee.join(", ")
-    //     : job.JobAssignee,
-    //   clientfacingstatus: {
-    //     statusName: job.ClientFacingStatus?.statusName || "",
-    //     statusColor: job.ClientFacingStatus?.statusColor || "",
-    //   },
-    // }));
-
-    // setJobs(formattedData);
+   
     console.log("Formatted Job Data:", jobListResponse.data.jobList);
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -357,7 +339,15 @@ const fetchJobData = async () => {
         throw new Error("Failed to fetch stages");
       }
       const data = await response.json();
-      return data.pipeline.stages;
+     
+      // return data.pipeline.stages;
+        // Ensure each stage has both _id and name
+    return data.pipeline.stages.map(stage => ({
+      _id: stage._id,
+      name: stage.name,
+      automations: stage.automations || []
+    }));
+
     } catch (error) {
       console.error("Error fetching stages:", error);
       return [];
@@ -387,6 +377,7 @@ const fetchJobData = async () => {
 
     const fetchedStages = await fetchStages(pipeline._id);
     setStages(fetchedStages);
+   console.log("fetchStages",fetchedStages)
   };
 
   const handleBackToPipelineList = () => {
@@ -395,60 +386,7 @@ const fetchJobData = async () => {
     setStages([]);
   };
   console.log("janavi", stages);
-  // const updateJobStage = async (stage, item) => {
-  //   let data = JSON.stringify({ stageid: stage._id });
-  //   let config = {
-  //     method: "post",
-  //     maxBodyLength: Infinity,
-  //     url: `${JOBS_API}/workflow/jobs/job/jobpipeline/updatestageid/${item.id}`,
-  //     headers: { "Content-Type": "application/json" },
-  //     data: data,
-  //   };
-  //   axios
-  //     .request(config)
-  //     .then((response) => {
-  //       console.log(JSON.stringify(response.data));
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //     });
-  // };
-  // const AutomationDrawer = ({ open, automations, onClose }) => (
-  //   <Drawer anchor="right" open={open} onClose={onClose}>
-  //     <Box sx={{ width: 300, padding: 2 }}>
-  //       <Typography variant="h6">Automations</Typography>
-  //       {automations.length > 0 ? (
-  //         automations.map((automation, index) => (
-  //           <Box key={index} sx={{ marginBottom: 2 }}>
-  //             <Typography variant="body1"><strong>Type:</strong> {automation.type}</Typography>
-  //             <Typography variant="body1"><strong>Template:</strong> {automation.template.label}</Typography>
-  //             <Typography variant="body1"><strong>Tags:</strong></Typography>
-  //             {automation.tags.map((tag) => (
-  //               <Box
-  //                 key={tag._id}
-  //                 sx={{
-  //                   display: "inline-block",
-  //                   backgroundColor: tag.tagColour,
-  //                   color: "white",
-  //                   borderRadius: "4px",
-  //                   padding: "2px 6px",
-  //                   marginRight: "4px",
-  //                 }}
-  //               >
-  //                 {tag.tagName}
-  //               </Box>
-  //             ))}
-  //           </Box>
-  //         ))
-  //       ) : (
-  //         <Typography>No automations available</Typography>
-  //       )}
-  //       <Button onClick={onClose} variant="contained" sx={{ marginTop: 2 }}>
-  //         Close
-  //       </Button>
-  //     </Box>
-  //   </Drawer>
-  // );
+
 
   const updateJobStage = async (jobId, targetStage) => {
     // Create the payload with the stage ID for updating the job's stage
@@ -3084,10 +3022,12 @@ sx={{
   };
 
   const Stage = ({ stage, selectedPipeline, handleDrop }) => {
+    console.log("pipeline stage list",stage)
     const [{ isOver }, drop] = useDrop({
       accept: "JOB_CARD",
       drop: (item, monitor) => {
-        handleDrop(item.id, stage.name);
+        // handleDrop(item.id, stage.name);
+         handleDrop(item.id, stage._id, stage.name);
         console.log(stage.automations);
         // updateJobStage(stage, item);
       },
@@ -3096,13 +3036,19 @@ sx={{
       }),
     });
 console.log("jobs for stage",jobs)
-    const stageJobs = jobs.filter(
-      (job) =>
+    // const stageJobs = jobs.filter(
+    //   (job) =>
          
-        job.Pipeline  &&
-        // job.Stages.includes(stage.name)
-         job.Stages.some((s) => s.name === stage.name)
-    );
+    //     job.Pipeline  &&
+    //     // job.Stages.includes(stage.name)
+    //      job.Stages.some((s) => s.name === stage.name)
+    // );
+  // Filter jobs by stage ID
+  const stageJobs = jobs.filter(
+    (job) => 
+      job.Pipeline &&
+      job.Stages.some((s) => s._id === stage._id)
+  );
     // console.log("jobs for stage", stageJobs);
     const [displayCount, setDisplayCount] = useState(3);
     const displayedJobs = stageJobs.slice(0, displayCount);
@@ -3152,43 +3098,88 @@ console.log("jobs for stage",jobs)
   const [accountId, setAccountId] = useState("");
 
 
-  const handleDrop = (jobId, targetStageName) => {
-    const targetStage = stages.find((stage) => stage.name === targetStageName);
-    const job = jobs.find((job) => job.id === jobId);
+  // const handleDrop = (jobId, targetStageName) => {
+  //   const targetStage = stages.find((stage) => stage.name === targetStageName);
+  //   const job = jobs.find((job) => job.id === jobId);
 
-    if (job) {
-      setAccountName(job.Account.join(", ")); // Store the account name
-      setAccountId(job.AccountId); // Store the account ID
-    }
+  //   if (job) {
+  //     setAccountName(job.Account.join(", ")); // Store the account name
+  //     setAccountId(job.AccountId); // Store the account ID
+  //   }
 
-    // If the target stage has automations, show the drawer
-    if (targetStage?.automations?.length > 0) {
-      setAutomationData(targetStage.automations); // Set automation data for drawer
-      setCurrentJobId(jobId); // Store the current job ID
-      setCurrentTargetStage(targetStage); // Store the target stage
-      setAutomationDrawerOpen(true); // Open the automation drawer
-    } else {
-      // If no automations, immediately update the job's stage
-      const updatedJobs = jobs.map((job) => {
-        if (job.id === jobId) {
-          return { ...job, Stage: [targetStageName] };
-        }
-        return job;
-      });
+  //   // If the target stage has automations, show the drawer
+  //   if (targetStage?.automations?.length > 0) {
+  //     setAutomationData(targetStage.automations); // Set automation data for drawer
+  //     setCurrentJobId(jobId); // Store the current job ID
+  //     setCurrentTargetStage(targetStage); // Store the target stage
+  //     setAutomationDrawerOpen(true); // Open the automation drawer
+  //   } else {
+  //     // If no automations, immediately update the job's stage
+  //     const updatedJobs = jobs.map((job) => {
+  //       if (job.id === jobId) {
+  //         return { ...job, Stage: [targetStageName] };
+  //       }
+  //       return job;
+  //     });
 
-      setJobs(updatedJobs); // Update the job in the local state
+  //     setJobs(updatedJobs); // Update the job in the local state
 
-      // Optionally, refresh job data after updating
-      setTimeout(() => {
-        fetchJobData();
-      }, 1000);
+  //     // Optionally, refresh job data after updating
+  //     setTimeout(() => {
+  //       fetchJobData();
+  //     }, 1000);
 
-      updateJobStage(jobId, targetStage);
-    }
-    setTempJobData({ jobId, targetStageName });
-  };
+  //     updateJobStage(jobId, targetStage);
+  //   }
+  //   setTempJobData({ jobId, targetStageName });
+  // };
 
+  const handleDrop = (jobId, targetStageId, targetStageName) => {
+  const targetStage = stages.find((stage) => 
+    stage._id === targetStageId || stage.name === targetStageName
+  );
   
+  const job = jobs.find((job) => job.id === jobId);
+
+  if (job) {
+    setAccountName(job.Account.join(", "));
+    setAccountId(job.AccountId);
+  }
+
+  // If the target stage has automations, show the drawer
+  if (targetStage?.automations?.length > 0) {
+    setAutomationData(targetStage.automations);
+    setCurrentJobId(jobId);
+    setCurrentTargetStage(targetStage);
+    setAutomationDrawerOpen(true);
+  } else {
+    // If no automations, immediately update the job's stage
+    const updatedJobs = jobs.map((job) => {
+      if (job.id === jobId) {
+        // Update both stage ID and name in the job
+        return { 
+          ...job, 
+          Stage: [targetStageName],
+          // Also update the Stages array to include the new stage
+          Stages: [...(job.Stages || []), { 
+            _id: targetStageId, 
+            name: targetStageName 
+          }]
+        };
+      }
+      return job;
+    });
+
+    setJobs(updatedJobs);
+
+    setTimeout(() => {
+      fetchJobData();
+    }, 1000);
+
+    updateJobStage(jobId, targetStage);
+  }
+  setTempJobData({ jobId, targetStageId, targetStageName });
+};
  
 const handleMoveJob = async (jobId, targetStage, automations = {}) => {
   try {
@@ -3501,7 +3492,7 @@ const handleMoveJob = async (jobId, targetStage, automations = {}) => {
               <Box className="stage-container" display="flex" gap={2}>
                 {stages.map((stage, index) => (
                   <Stage
-                    key={index}
+                    key={stage._id || index} 
                     stage={stage}
                     selectedPipeline={selectedPipeline}
                     handleDrop={handleDrop}
