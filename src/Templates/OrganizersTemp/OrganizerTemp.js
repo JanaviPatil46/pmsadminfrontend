@@ -429,6 +429,7 @@ useEffect(() => {
         console.log(result)
         if (result && result.message === "Organizer Template created successfully") {
           toast.success("Organizer Template created successfully");
+          handleMenuClose()
           setShowOrganizerTemplateForm(false);
           setTemplateName('');
           setOrganizerName('');

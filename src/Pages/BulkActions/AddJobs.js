@@ -1373,6 +1373,7 @@ console.log("org temp url", url)
       const raw = JSON.stringify({
         accountid: accountId,
         organizertemplateid: automationTemp,
+          organizerName: organizerData.organizerName,
         reminders: organizerData.reminders,
         noofreminders: organizerData.noOfReminder,
         daysuntilnextreminder: organizerData.daysuntilNextReminder,

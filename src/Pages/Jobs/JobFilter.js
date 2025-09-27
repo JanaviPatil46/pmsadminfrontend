@@ -108,19 +108,6 @@ const FilterDropdown = ({ onFilterChange }) => {
     setStageAnchorEl(event.currentTarget);
   };
 
-  // const handlePipelineCheckboxToggle = (pipeline) => {
-  //   const stageNames = pipeline.stages.map((stage) => stage.name);
-  //   const currentSelected = selectedStages[pipeline.pipelineName] || [];
-
-  //   const allSelected = stageNames.every((name) =>
-  //     currentSelected.includes(name)
-  //   );
-
-  //   setSelectedStages((prev) => ({
-  //     ...prev,
-  //     [pipeline.pipelineName]: allSelected ? [] : stageNames,
-  //   }));
-  // };
 
   const handlePipelineCheckboxToggle = (pipeline) => {
   const stageNames = pipeline.stages.map((stage) => stage.name);
@@ -139,16 +126,7 @@ const FilterDropdown = ({ onFilterChange }) => {
     }));
   }
 };
-  // const handleStageToggle = (pipelineName, stageName) => {
-  //   setSelectedStages((prev) => {
-  //     const current = prev[pipelineName] || [];
-  //     const updated = current.includes(stageName)
-  //       ? current.filter((name) => name !== stageName)
-  //       : [...current, stageName];
-
-  //     return { ...prev, [pipelineName]: updated };
-  //   });
-  // };
+ 
   const handleStageToggle = (pipelineName, stageName) => {
   setSelectedStages((prev) => {
     const current = prev[pipelineName] || [];

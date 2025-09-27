@@ -362,30 +362,56 @@ const fetchData = async () => {
 
       // Pipeline and stage filter - updated to match your data structure
     
-      if (Object.keys(filters.pipelineStages).length > 0) {
-        console.log(filters.pipelineStages);
-        const pipelineMatch = Object.entries(filters.pipelineStages).some(
-          ([pipelineName, stageNames]) => {
-            const jobPipeline = job.Pipeline || "";
-            if (jobPipeline.toLowerCase() !== pipelineName.toLowerCase()) {
-              return false;
-            }
+      // if (Object.keys(filters.pipelineStages).length > 0) {
+      //   console.log("job filter by pipeline and stage",filters.pipelineStages);
+      //   const pipelineMatch = Object.entries(filters.pipelineStages).some(
+      //     ([pipelineName, stageNames]) => {
+      //       const jobPipeline = job.Pipeline || "";
+      //       if (jobPipeline.toLowerCase() !== pipelineName.toLowerCase()) {
+      //         return false;
+      //       }
 
-            const jobStages = Array.isArray(job.Stage)
-              ? job.Stage
-              : [job.Stage || ""];
+      //       const jobStages = Array.isArray(job.Stage)
+      //         ? job.Stage
+      //         : [job.Stage || ""];
 
-            return stageNames.some((stage) =>
-              jobStages.some(
-                (jobStage) => jobStage.toLowerCase() === stage.toLowerCase()
-              )
-            );
-          }
-        );
-        console.log("jkhdfds", pipelineMatch);
-        if (!pipelineMatch) return false;
+      //       return stageNames.some((stage) =>
+      //         jobStages.some(
+      //           (jobStage) => jobStage.toLowerCase() === stage.toLowerCase()
+      //         )
+      //       );
+      //     }
+      //   );
+      //   console.log("jkhdfds", pipelineMatch);
+      //   if (!pipelineMatch) return false;
         
-      }
+      // }
+      if (Object.keys(filters.pipelineStages).length > 0) {
+  console.log('Filtering by pipeline/stages:', filters.pipelineStages);
+  console.log('Job pipeline:', job.Pipeline);
+  console.log('Job stages:', job.Stages?.map(stage => stage.name));
+  
+  const pipelineMatch = Object.entries(filters.pipelineStages).some(
+    ([pipelineName, stageNames]) => {
+      const jobPipeline = job.Pipeline || "";
+      const pipelineMatches = jobPipeline.toLowerCase() === pipelineName.toLowerCase();
+      
+      if (!pipelineMatches) return false;
+
+      const jobStageNames = job.Stages?.map(stage => stage.name) || [];
+      const stageMatches = stageNames.some((selectedStage) =>
+        jobStageNames.some(
+          (jobStage) => jobStage.toLowerCase() === selectedStage.toLowerCase()
+        )
+      );
+      
+      console.log(`Pipeline "${pipelineName}" matches: ${pipelineMatches}, Stages match: ${stageMatches}`);
+      return stageMatches;
+    }
+  );
+
+  if (!pipelineMatch) return false;
+}
       // Account name filter - with null/undefined check
       if (filters.accountName) {
         const accountName = job.Account

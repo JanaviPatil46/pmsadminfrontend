@@ -683,7 +683,7 @@ useEffect(() => {
       notify: false,
       emailSync: false,
     });
-
+console.log("newuser raw",raw)
     const requestOptions = {
       method: "POST",
       headers: myHeaders,
@@ -699,7 +699,7 @@ useEffect(() => {
         console.log(result);
         console.log(result._id);
         setNewUserId(result._id);
-
+console.log("accoint id to the contact", data)
         updateAcountUserId(result._id, data);
         clientalldata(result._id, email, firstName, middleName, lastName);
         clientCreatedmail(email, "", result._id);
@@ -787,9 +787,9 @@ const handleLinkAccounts = () => {
   const contactData = selectedContactDetails.map(contact => ({
     id: contact.id,
     contactName: contact.name,
-    firstName: contact.firstName || '',
-    lastName: contact.lastName || '',
-    middleName: contact.middleName || '',
+    firstName: contact.firstname || '',
+    lastName: contact.lastname || '',
+    middleName: contact.middlename || '',
     email: contact.email || '',
     companyName: contact.companyName || '',
     
@@ -805,21 +805,32 @@ const handleLinkAccounts = () => {
 
 const handleConfirmLink = () => {
   // First, create users for contacts where login is true
-  contactDetails.forEach(contact => {
-    if (contact.login ) {
-      newUser({
-        // Your user data structure
-        data,
-  contactId:contact.id,
-        email: contact.email,
-        firstName: contact.firstName,
-        middleName: contact.middleName,
-        lastName: contact.lastName,
-        // ... other user fields
-      });
+  // contactDetails.forEach(contact => {
+  //   if (contact.login ) {
+  //     newUser({
+  //       // Your user data structure
+  //       data,
+  // contactId:contact.id,
+  //       email: contact.email,
+  //       firstName: contact.firstName,
+  //       middleName: contact.middleName,
+  //       lastName: contact.lastName,
+  //       // ... other user fields
+  //     });
+  //   }
+  // });
+   if (!contactDetails || contactDetails.length === 0) return;
+
+  console.log("Confirming portal access for contacts:", contactDetails);
+
+  contactDetails.forEach((contact) => {
+    if (contact.login) {
+      const { id: contactId, email, firstName, middleName, lastName } = contact;
+
+      // Call your newUser function
+      newUser(data, contactId, email, firstName, middleName, lastName);
     }
   });
-  
   // Then update the contacts to account
   updateContactstoAccount(selectedContacts);
   setIsConfirmDialogOpen(false);

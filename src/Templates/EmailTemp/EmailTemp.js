@@ -614,6 +614,8 @@ const EmailTemp = () => {
         })
         .then((result) => {
           toast.success("Data deleted successfully");
+          
+          handleMenuClose();
           fetchEmailTemplates();
         })
         .catch((error) => {
