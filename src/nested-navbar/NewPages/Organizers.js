@@ -13,8 +13,9 @@ import {
   TableRow,
   Paper,
   Chip,
-  TableContainer,Menu
+  TableContainer,Menu,DialogActions,TextField,DialogTitle
 } from "@mui/material";
+import axios from "axios";
 import { CiMenuKebab } from "react-icons/ci";
 import { useNavigate, useParams, useRouteLoaderData } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -239,7 +240,39 @@ const toggleMenu = (event, _id) => {
   }, []);
 
   const [selectedOrganizer, SetSelectedOrganizer] = useState({});
-  
+  const [renameDialogOpen, setRenameDialogOpen] = React.useState(false);
+const [renameRowId, setRenameRowId] = React.useState(null);
+const [renameValue, setRenameValue] = React.useState("");
+const handleRenameConfirm = async (id, newName) => {
+  if (!newName || newName.trim() === "") return;
+
+  try {
+    const response = await axios.patch(
+      `${ORGANIZER_TEMP_API}/workflow/orgaccwise/rename/${id}`, // use the rename endpoint
+      { organizerName: newName }, // send only organizerName
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (response.status === 200) {
+      toast.success("Organizer Renamed successfully")
+      // Update frontend table immediately
+      setOrganizerTemplatesData((prev) =>
+        prev.map((row) =>
+          row._id === id ? { ...row, organizerName: newName } : row
+        )
+      );
+    } else {
+      console.error("Failed to update organizer name in DB");
+    }
+  } catch (error) {
+    console.error("Error updating organizer name:", error);
+  }
+};
+
   const [showForm, setShowForm] = useState(false);
   const handleEdit = (_id) => {
     SetSelectedOrganizer(_id);
@@ -521,6 +554,7 @@ const handleOpenDialog = (organizer) => {
                       {row.organizerName}
                     </Typography>
                   </TableCell>
+                  
                   <TableCell
                     style={{
                       fontSize: "12px",
@@ -588,81 +622,7 @@ const handleOpenDialog = (organizer) => {
                       />
                     ) : null}
                   </TableCell>
-                  {/* <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <IconButton
-                      onClick={() => toggleMenu(row._id)}
-                      style={{ color: "#2c59fa" }}
-                    >
-                      <CiMenuKebab style={{ fontSize: "25px" }} />
-                      {openMenuId === row._id && (
-                        <Box
-                          sx={{
-                            position: "absolute",
-                            zIndex: 1,
-                            backgroundColor: "#fff",
-                            boxShadow: 1,
-                            borderRadius: 1,
-                            p: 1,
-                            // left:0,
-                            right: "30px",
-                            m: 2,
-                            top: "10px",
-                            width: "150px",
-                            textAlign: "start",
-                          }}
-                        >
-                       
-                          <Typography
-                            sx={{ fontSize: "12px", fontWeight: "bold" }}
-                            // onClick={() => handleSealed(row._id)}
-                            onClick={() => handleSealed(row._id, !row.issealed)}
-                          >
-                            {row.issealed ? "Unseal" : "Seal"}
-                          </Typography>
-
-                          <Typography
-                            sx={{
-                              fontSize: "12px",
-                              color: "red",
-                              fontWeight: "bold",
-                            }}
-                            onClick={() => handleDelete(row._id)}
-                          >
-                            Delete
-                          </Typography>
-                          <Typography
-                            sx={{ fontSize: "12px", fontWeight: "bold" }}
-                            
-                            onClick={() => handleOpenDialog(row)}
-                          >
-                            Change Answers    
-                          </Typography>
-                         
-                  
-<Typography
-  onClick={() => handleArchive(row._id, row.active)}
-  sx={{ fontSize: "12px", fontWeight: "bold", cursor: "pointer" }}
->
-  {row.active ? "Archive" : "Restore"}
-</Typography>
-
-                          <Typography
-                            sx={{ fontSize: "12px", fontWeight: "bold" }}
-                            onClick={() => printOrganizerData(row._id)}
-                          >
-                            Print
-                          </Typography>
-                        </Box>
-                      )}
-                    </IconButton>
-                  </TableCell> */}
+                 
                   <TableCell
                                                                       style={{
                                                                         fontSize: "12px",
@@ -757,6 +717,18 @@ const handleOpenDialog = (organizer) => {
       >
         Print
       </Typography>
+      <Typography
+  sx={{ fontSize: "12px", fontWeight: "bold", cursor: "pointer" }}
+  onClick={() => {
+    setRenameRowId(row._id);
+    setRenameValue(row.organizerName); // Pre-fill current name
+    setRenameDialogOpen(true);
+    handleMenuClose();
+  }}
+>
+  Rename
+</Typography>
+
     </Box>
   </Menu>
                                                                     
@@ -766,7 +738,42 @@ const handleOpenDialog = (organizer) => {
             </TableBody>
           </Table>
         </TableContainer>
-      
+        
+      <Dialog
+  open={renameDialogOpen}
+  onClose={() => setRenameDialogOpen(false)}
+  maxWidth="xs"
+  fullWidth
+>
+  <DialogTitle>Rename Organizer</DialogTitle>
+  <DialogContent>
+    <TextField
+      autoFocus
+      margin="dense"
+      label="New Name"
+      type="text"
+      fullWidth
+      variant="outlined"
+      value={renameValue}
+      onChange={(e) => setRenameValue(e.target.value)}
+    />
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={() => setRenameDialogOpen(false)} color="secondary">
+      Cancel
+    </Button>
+    <Button
+      onClick={() => {
+        handleRenameConfirm(renameRowId, renameValue);
+        setRenameDialogOpen(false);
+      }}
+      color="primary"
+    >
+      Save
+    </Button>
+  </DialogActions>
+</Dialog>
+
 </>
         
       ) : (
