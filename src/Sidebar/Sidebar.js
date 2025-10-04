@@ -15,6 +15,7 @@ import {
   DialogContent,
   DialogActions,
   TextField,
+  CircularProgress
 } from "@mui/material";
 import {
   ChevronLeft,
@@ -519,6 +520,7 @@ const accountNameFromCppkie =Cookies.get("accountName")
       setPreview(`${LOGIN_API}/${transformedUrl}`);
     }
   }, [currentImage]);
+    const [emailSyncEmail,setEmailSyncEmail]= useState("")
   const fetchUserData = async (id) => {
     const maxLength = 15;
     const myHeaders = new Headers();
@@ -542,6 +544,7 @@ const accountNameFromCppkie =Cookies.get("accountName")
         }
 
         // console.log(userData)
+        setEmailSyncEmail(result.emailSyncEmail)
         setUserid(result._id);
         setCurrentImage(result.profilePicture);
       });
@@ -634,6 +637,115 @@ const accountNameFromCppkie =Cookies.get("accountName")
   const unreadHashEmailCount = Cookies.get("unreadHashEmailCount");
   console.log("Stored unread count:", unreadHashEmailCount);
 
+
+  //chek inbox email working 
+   const EMAIL_SYNC = process.env.REACT_APP_EMAILSYNC_API;
+ // redirect to google login
+  const [emails, setEmails] = useState([]);
+  const [loading, setLoading] = useState(false);
+const [fetchError, setFetchError] = useState("");
+// useEffect(() => {
+//   const fetchEmails = async () => {
+//     if (!emailSyncEmail) return;
+
+//     try {
+//       setLoading(true);
+//       setFetchError("");
+//       console.log("📩 Fetching emails for:", emailSyncEmail);
+
+//       const res = await axios.get(
+//         `${EMAIL_SYNC}/emailsync/user/login-with-token/${emailSyncEmail}`
+//       );
+
+//       console.log("✅ Response:", res.data);
+
+//       let emails = res.data?.emails || [];
+
+     
+
+//       setEmails(emails);
+
+//       // If backend indicates re-login needed
+//       if (res.data?.redirectUrl) {
+//         window.location.href = `${EMAIL_SYNC}/emailsync/auth/google`;
+//       }
+//     } catch (err) {
+//       console.error("❌ Error fetching emails:", err.response?.data || err.message);
+
+//       if (err.response?.data?.error?.includes("Refresh token missing")) {
+//         setFetchError("Your Gmail session expired. Please log in again.");
+//       } else {
+//         setFetchError("Failed to fetch emails. Please try again.");
+//       }
+
+//       // If refresh failed → redirect to login
+//       if (err.response?.data?.redirectUrl) {
+//         window.location.href = `${EMAIL_SYNC}/emailsync/auth/google`;
+//       }
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   fetchEmails();
+// }, [ emailSyncEmail]);
+
+  //start 
+  useEffect(() => {
+    const fetchEmails = async () => {
+      if (!emailSyncEmail) return;
+
+      setLoading(true);
+      setFetchError("");
+      setEmails([]);
+
+      try {
+        const res = await axios.get(
+          `${EMAIL_SYNC}/emailsync/user/login-with-token/${emailSyncEmail}`,
+          { withCredentials: true }
+        );
+
+        setEmails(res.data?.emails || []);
+
+        if (res.data?.redirectUrl) {
+          window.location.href = `${EMAIL_SYNC}/emailsync/auth/google`;
+        }
+      } catch (err) {
+        console.error("Error fetching emails:", err.response?.data || err.message);
+
+        if (err.response?.data?.error?.includes("Refresh token missing")) {
+          setFetchError("Your Gmail session expired. Please log in again.");
+        } else {
+          setFetchError("Failed to fetch emails. Please try again.");
+        }
+
+        if (err.response?.data?.redirectUrl) {
+          window.location.href = `${EMAIL_SYNC}/emailsync/auth/google`;
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEmails();
+  }, [emailSyncEmail]);
+
+  // Show animated loader while fetching
+
+  
+  const Loader = () => {
+  return (
+    <Box
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      height="200px"
+    >
+      <CircularProgress /> {/* This is the animated spinner */}
+    </Box>
+  );
+};
+  if (loading) return <Loader />;
   return (
     <div className="grid-container">
       <header className="header">
