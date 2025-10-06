@@ -117,15 +117,7 @@ function Sidebar() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isRightDrawerOpen, setIsRightDrawerOpen] = useState(false);
   const [rightDrawerContent, setRightDrawerContent] = useState(null);
-  // const [isDarkMode, setIsDarkMode] = useState(false);
-
-  // useEffect(() => {
-  //   // Apply dark mode based on the state
-  //   document.documentElement.setAttribute(
-  //     "data-theme",
-  //     isDarkMode ? "dark" : "light"
-  //   );
-  // }, [isDarkMode]);
+  
   useEffect(() => {
     const handleResize = () => {
       setIsSmallScreen(window.innerWidth <= 768);
@@ -138,21 +130,7 @@ function Sidebar() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  //   useEffect(() => {
-  //     const fetchSidebarData = async () => {
-  //       try {
-  //         const response = await axios.get(`${SIDEBAR_API}/api/`);
-  //         const sidebarData = response.data;
-  //         setSidebarItems(sidebarData);
-  // console.log("sidebar data",sidebarData)
-  //       } catch (error) {
-  //         console.error("Error fetching sidebar data:", error);
-  //       }
-  //     };
-  //     fetchSidebarData();
-  //   }, []);
-
-  // useEffect(() => {
+  
   const fetchSidebarData = async () => {
     try {
       const response = await axios.get(`${SIDEBAR_API}/api/`);
@@ -255,12 +233,7 @@ function Sidebar() {
             localStorage.getItem("teamMemberData")
           );
           if (teamMemberData) {
-            // Add a flag to indicate restricted access
-            // NewSidebarData = NewSidebarData.map(item =>
-            //   item.label === "Account" && !teamMemberData.manageAccounts
-            //     ? { ...item, restricted: true }
-            //     : item
-            // );teammember
+           
 
             NewSidebarData = NewSidebarData.map((item) => {
               if (
@@ -316,16 +289,11 @@ function Sidebar() {
       setIsCollapsed(!isCollapsed);
     }
   };
-  // const [activeSubmenu, setActiveSubmenu] = useState(null);
-  // const handleToggleSubmenu = (path, label) => {
-  //   setOpenMenu(openMenu === path ? null : path);
-  // };
+  
   const handleToggleSubmenu = (menuId, label) => {
     setOpenMenu((prevMenu) => (prevMenu === menuId ? null : menuId)); // Toggle submenu
   };
-  // const handleSubmenuClick = (submenuPath) => {
-  //   setActiveSubmenu(submenuPath);
-  // };
+  
   const handleDrawerOpen = () => {
     setIsDrawerOpen(true);
   };
@@ -377,25 +345,7 @@ const accountNameFromCppkie =Cookies.get("accountName")
     setIsOrganizerDialogOpen(true);
   }
 };
-  // const handleNewItemClick = (label) => {
-  //   console.log("menu", label);
-  //   if (
-  //     label === "Account" ||
-  //     label === "Contact" ||
-  //     label === "Task" ||
-  //     label === "Chat" ||
-  //     label === "Jobs"
-  //   ) {
-  //     setRightDrawerContent(label);
-  //     setIsRightDrawerOpen(true);
-  //   }
-  
-  //   else if (label === "Invoice") {
-  //     setIsDialogOpen(true);
-  //   } else if (label === "Organizer") {
-  //     setIsOrganizerDialogOpen(true);
-  //   }
-  // };
+
   const [theme, setTheme] = useState("light-theme");
   const toggleTheme = () => {
     if (theme === "dark-theme") {
@@ -444,63 +394,188 @@ const accountNameFromCppkie =Cookies.get("accountName")
   };
   const [data, setData] = useState(false);
   const [loginsData, setloginsData] = useState("");
+  const [emailSyncEmail,setEmailSyncEmail]= useState("")
+  const [loading, setLoading] = useState(true);
+  // const DashboardValid = async () => {
+  //   let token = localStorage.getItem("usersdatatoken");
+  //   // Cookies.set("userToken", res.result.token); // Set cookie with duration provided
+  //   console.log("userToken",token);
+  //   const url = `${LOGIN_API}/common/login/verifytoken/`;
+  //   const res = await fetch(url, {
+  //     method: "GET",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //       Authorization: token,
+  //     },
+  //   });
 
-  const DashboardValid = async () => {
-    let token = localStorage.getItem("usersdatatoken");
-    // Cookies.set("userToken", res.result.token); // Set cookie with duration provided
-    console.log("userToken",token);
-    const url = `${LOGIN_API}/common/login/verifytoken/`;
-    const res = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: token,
-      },
-    });
+  //   //console.log(token);
 
-    //console.log(token);
+  //   const data = await res.json();
+  //   //console.log(data);
+  //   if (data.message === "Invalid token") {
+  //     // console.log("error page");
+  //     navigate("/login");
+  //   } else {
+  //     // console.log("user verify");
+  //     setLoginData(data);
+  //     setloginsData(data.user.id);
 
-    const data = await res.json();
-    //console.log(data);
-    if (data.message === "Invalid token") {
-      // console.log("error page");
-      navigate("/login");
-    } else {
-      // console.log("user verify");
+  //     console.log("User role:", data.user.role);
+
+  //     if (data.user.role === "Admin") {
+  //       localStorage.setItem("userRole", data.user.role);
+  //       fetchUserData(data.user.id);
+  //       // getadminsignup(data.user.id)
+  //       fetchSidebarData();
+  //       navigate("/");
+  //     }
+
+     
+  //     else if (data.user.role === "TeamMember") {
+  //       localStorage.setItem("userRole", data.user.role);
+  //       fetchUserData(data.user.id);
+  //       fectUsersDatabyUserid(data.user.id);
+  //       navigate("/");
+  //     } else {
+  //       toast.error("You are not valid user.");
+  //       setTimeout(() => {
+  //         navigate("/login");
+  //       }, 1000);
+  //     }
+  //   }
+  // };
+  // useEffect(() => {
+  //   DashboardValid();
+  //   setData(true);
+  // }, []);
+// const validateAndFetch = async () => {
+//   try {
+//     // 1️⃣ Validate user token
+//     let token = localStorage.getItem("usersdatatoken");
+//     const res = await fetch(`${LOGIN_API}/common/login/verifytoken/`, {
+//       method: "GET",
+//       headers: {
+//         "Content-Type": "application/json",
+//         Authorization: token,
+//       },
+//     });
+
+//     const data = await res.json();
+
+//     if (data.message === "Invalid token") {
+//       navigate("/login");
+//       return;
+//     }
+
+//     // Save user info
+//     setLoginData(data);
+//     setloginsData(data.user.id);
+//     localStorage.setItem("userRole", data.user.role);
+
+//     // Fetch user & sidebar data
+//     fetchUserData(data.user.id);
+//     if (data.user.role === "Admin") fetchSidebarData();
+//     else if (data.user.role === "TeamMember") fectUsersDatabyUserid(data.user.id);
+
+//     console.log("User role:", data.user.role);
+
+//     // 2️⃣ Fetch emails after dashboard validation
+//     if (emailSyncEmail) {
+//       setLoading(true);
+//       setFetchError("");
+
+//       try {
+//         const emailRes = await axios.get(
+//           `${EMAIL_SYNC}/emailsync/user/login-with-token/${emailSyncEmail}`
+//         );
+
+//         const emails = emailRes.data?.emails || [];
+//         setEmails(emails);
+
+//         // Redirect to Google login if required
+//         if (emailRes.data?.redirectUrl) {
+//           window.location.href = `${EMAIL_SYNC}/emailsync/auth/google`;
+//           return; // stop further execution
+//         }
+//       } catch (err) {
+//         console.error("❌ Error fetching emails:", err.response?.data || err.message);
+//         setFetchError(
+//           err.response?.data?.error?.includes("Refresh token missing")
+//             ? "Your Gmail session expired. Please log in again."
+//             : "Failed to fetch emails. Please try again."
+//         );
+
+//         if (err.response?.data?.redirectUrl) {
+//           window.location.href = `${EMAIL_SYNC}/emailsync/auth/google`;
+//           return;
+//         }
+//       } finally {
+//         setLoading(false);
+//       }
+//     }
+
+//     // 3️⃣ Finally navigate to dashboard/main page
+//     navigate("/");
+//   } catch (err) {
+//     console.error("Dashboard validation failed:", err);
+//     navigate("/login");
+//   }
+// };
+useEffect(() => {
+  const validateAndFetch = async () => {
+    try {
+      const token = localStorage.getItem("usersdatatoken");
+      if (!token) {
+        window.location.href = `${EMAIL_SYNC}/emailsync/auth/google`;
+        return;
+      }
+
+      const res = await fetch(`${LOGIN_API}/common/login/verifytoken/`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json", Authorization: token },
+      });
+
+      const data = await res.json();
+
+      if (data.message === "Invalid token") {
+        window.location.href = `${EMAIL_SYNC}/emailsync/auth/google`;
+        return;
+      }
+
+      // token valid → fetch user data
       setLoginData(data);
       setloginsData(data.user.id);
+      localStorage.setItem("userRole", data.user.role);
+      fetchUserData(data.user.id);
+fectUsersDatabyUserid(data.user.id)
+      // fetch emails
+      if (emailSyncEmail) {
+        const emailRes = await axios.get(
+          `${EMAIL_SYNC}/emailsync/user/login-with-token/${emailSyncEmail}`
+        );
 
-      console.log("User role:", data.user.role);
-
-      if (data.user.role === "Admin") {
-        localStorage.setItem("userRole", data.user.role);
-        fetchUserData(data.user.id);
-        // getadminsignup(data.user.id)
-        fetchSidebarData();
-        navigate("/");
+        if (emailRes.data?.redirectUrl) {
+          window.location.href = `${EMAIL_SYNC}/emailsync/auth/google`;
+          return;
+        }
+        setEmails(emailRes.data?.emails || []);
       }
 
-      // else if (data.user.role === "Client") {
-      //   navigate("/clientDash/home");
-      // }
-      else if (data.user.role === "TeamMember") {
-        localStorage.setItem("userRole", data.user.role);
-        fetchUserData(data.user.id);
-        fectUsersDatabyUserid(data.user.id);
-        navigate("/");
-      } else {
-        toast.error("You are not valid user.");
-        setTimeout(() => {
-          navigate("/login");
-        }, 1000);
-      }
+      setLoading(false); // finished validation
+    } catch (err) {
+      console.error("Validation failed", err);
+      window.location.href = `${EMAIL_SYNC}/emailsync/auth/google`;
     }
   };
-  useEffect(() => {
-    DashboardValid();
-    setData(true);
-  }, []);
 
+  validateAndFetch();
+}, [emailSyncEmail]);
+// Call this on component mount
+useEffect(() => {
+  // validateAndFetch();
+  setData(true)
+}, []);
   const [userData, setUserData] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [username, setUsername] = useState("");
@@ -520,7 +595,7 @@ const accountNameFromCppkie =Cookies.get("accountName")
       setPreview(`${LOGIN_API}/${transformedUrl}`);
     }
   }, [currentImage]);
-    const [emailSyncEmail,setEmailSyncEmail]= useState("")
+  
   const fetchUserData = async (id) => {
     const maxLength = 15;
     const myHeaders = new Headers();
@@ -531,7 +606,7 @@ const accountNameFromCppkie =Cookies.get("accountName")
       redirect: "follow",
     };
     const url = `${LOGIN_API}/common/user/${id}`;
-    fetch(url + loginsData, requestOptions)
+    fetch(url , requestOptions)
       .then((response) => response.json())
       .then((result) => {
         console.log("id", result);
@@ -563,9 +638,7 @@ const accountNameFromCppkie =Cookies.get("accountName")
         // Store result in local storage
         localStorage.setItem("teamMemberData", JSON.stringify(result));
 
-        // Immediately retrieve the stored data
-        //  const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
-        //  console.log("Stored Team Member Data:", storedData);
+        
         fetchSidebarData();
       })
       .catch((error) => console.error(error));
@@ -578,26 +651,7 @@ const accountNameFromCppkie =Cookies.get("accountName")
       return str;
     }
   };
-  // const getadminsignup = async (id) => {
-  //   console.log("tset", id)
-  //   const requestOptions = {
-  //     method: "GET",
-  //     redirect: "follow",
-  //   };
 
-  //   const url = `${LOGIN_API}/admin/adminsignup/${id}`;
-  //   console.log(id)
-  //   fetch(url + loginsData, requestOptions)
-  //     .then((response) => response.json())
-  //     .then((result) => {
-  //       console.log("id", result);
-  //       const profilePicFilename = result.admin.profilePicture.split("\\").pop(); // Extract filename
-
-  //       setProfilePicture(`${LOGIN_API}/uploads/${profilePicFilename}`);
-  //       console.log(profilePicture)
-
-  //     });
-  // };
 
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const toggleDropdown = () => setDropdownOpen(!isDropdownOpen);
@@ -642,8 +696,49 @@ const accountNameFromCppkie =Cookies.get("accountName")
    const EMAIL_SYNC = process.env.REACT_APP_EMAILSYNC_API;
  // redirect to google login
   const [emails, setEmails] = useState([]);
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
 const [fetchError, setFetchError] = useState("");
+
+
+  //start 
+//   useEffect(() => {
+//     const fetchEmails = async () => {
+//       if (!emailSyncEmail) return;
+// console.log("bvds",emailSyncEmail)
+//       // setLoading(true);
+//       setFetchError("");
+//       setEmails([]);
+
+//       try {
+//         const res = await axios.get(
+//           `${EMAIL_SYNC}/emailsync/user/login-with-token/${emailSyncEmail}`,
+         
+//         );
+
+//         setEmails(res.data.emails || []);
+// console.log("email list",res.data.emails)
+//         if (res.data?.redirectUrl) {
+//           window.location.href = `${EMAIL_SYNC}/emailsync/auth/google`;
+//         }
+//       } catch (err) {
+//         console.error("Error fetching emails:", err.response?.data || err.message);
+
+//         if (err.response?.data?.error?.includes("Refresh token missing")) {
+//           setFetchError("Your Gmail session expired. Please log in again.");
+//         } else {
+//           setFetchError("Failed to fetch emails. Please try again.");
+//         }
+
+//         if (err.response?.data?.redirectUrl) {
+//           window.location.href = `${EMAIL_SYNC}/emailsync/auth/google`;
+//         }
+//       } finally {
+//         // setLoading(false);
+//       }
+//     };
+
+//     fetchEmails();
+//   }, [emailSyncEmail]);
 // useEffect(() => {
 //   const fetchEmails = async () => {
 //     if (!emailSyncEmail) return;
@@ -689,63 +784,22 @@ const [fetchError, setFetchError] = useState("");
 
 //   fetchEmails();
 // }, [ emailSyncEmail]);
-
-  //start 
-  useEffect(() => {
-    const fetchEmails = async () => {
-      if (!emailSyncEmail) return;
-
-      setLoading(true);
-      setFetchError("");
-      setEmails([]);
-
-      try {
-        const res = await axios.get(
-          `${EMAIL_SYNC}/emailsync/user/login-with-token/${emailSyncEmail}`,
-          { withCredentials: true }
-        );
-
-        setEmails(res.data?.emails || []);
-
-        if (res.data?.redirectUrl) {
-          window.location.href = `${EMAIL_SYNC}/emailsync/auth/google`;
-        }
-      } catch (err) {
-        console.error("Error fetching emails:", err.response?.data || err.message);
-
-        if (err.response?.data?.error?.includes("Refresh token missing")) {
-          setFetchError("Your Gmail session expired. Please log in again.");
-        } else {
-          setFetchError("Failed to fetch emails. Please try again.");
-        }
-
-        if (err.response?.data?.redirectUrl) {
-          window.location.href = `${EMAIL_SYNC}/emailsync/auth/google`;
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchEmails();
-  }, [emailSyncEmail]);
-
   // Show animated loader while fetching
 
   
-  const Loader = () => {
-  return (
-    <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      height="200px"
-    >
-      <CircularProgress /> {/* This is the animated spinner */}
-    </Box>
-  );
-};
-  if (loading) return <Loader />;
+//   const Loader = () => {
+//   return (
+//     <Box
+//       display="flex"
+//       justifyContent="center"
+//       alignItems="center"
+//       height="200px"
+//     >
+//       <CircularProgress /> {/* This is the animated spinner */}
+//     </Box>
+//   );
+// };
+//   if (loading) return <Loader />;
   return (
     <div className="grid-container">
       <header className="header">
@@ -777,36 +831,19 @@ const [fetchError, setFetchError] = useState("");
               <FaPlusCircle className="add-icon" onClick={handleDrawerOpen} />
             </Box>
 
-            {/* <Box
-              onClick={toggleTheme}
-              style={{
-                // display: "inline-block",
-                cursor: "pointer",
-                transition: "transform 0.3s ease",
-                transform: isDarkMode ? "scaleX(-1)" : "scaleX(1)",
-              }}
-            >
-              <VscColorMode fontSize="1.5rem" />
-            </Box> */}
+          
           </Box>
 
           <Box>
             <SearchComponent />
           </Box>
-          {/* <Box ml={"auto"} mr={3}><NotificationsIcon/></Box> */}
+         
           <Box
             ml={"auto"}
             mr={3}
             sx={{ display: "flex", alignItems: "center", gap: 3 }}
           >
-            {/* <Box>
-              {" "}
-              <Badge badgeContent={unreadHashEmailCount} color="primary">
-                {" "}
-               
-                <NotificationsIcon />
-              </Badge>
-            </Box> */}
+            
 
             <Link to="#" className="logout-link">
               <Box className="info">
@@ -819,20 +856,7 @@ const [fetchError, setFetchError] = useState("");
                     anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                     variant="dot"
                   >
-                    {/* <Avatar
-                      alt={username}
-                      src={croppedImage || ""}
-                      sx={{
-                        width: 40,
-                        height: 40,
-                        backgroundColor: "#f5f5f5",
-                        fontSize: "16px",
-                        fontWeight: "bold",
-                        color: "#555",
-                      }}
-                    >
-                      {!croppedImage && getInitials(username)}
-                    </Avatar> */}
+                    
                     <Avatar
                       src={preview || currentImage}
                       sx={{
@@ -857,65 +881,7 @@ const [fetchError, setFetchError] = useState("");
             </Link>
           </Box>
           {isDropdownOpen && (
-            // <Box
-            //   sx={{
-            //     position: "absolute",
-            //     top: "100px",
-            //     right: "0",
-            //     width: "230px",
-            //     backgroundColor: "#fff",
-            //     border: "1px solid #ddd",
-            //     mr:'20px',
-            //     borderRadius: "8px",
-            //     boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-            //     zIndex: 10,
-            //   }}
-            // >
-            //   <Box
-            //     sx={{
-            //       padding: "15px",
-            //       display: "flex",
-            //       alignItems: "center",
-            //       gap: "15px",
-            //     }}
-            //   >
-            //      <StyledBadge
-            //       overlap="circular"
-            //       anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-            //       variant="dot"
-            //     >
-            //       <Avatar
-            //         alt="User Name"
-            //         src={croppedImage  || "default_image_url"}
-            //         sx={{ width: 40, height: 40 }}
-            //       />
-            //     </StyledBadge>
-            //     <Box>
-            //     <Typography style={{ fontWeight: "bold",fontSize: "12px", }}>
-            //         {username}
-            //       </Typography>
-            //       <Typography sx={{ fontSize: "10px", color: "#666" }}>
-            //         {userEmail}
-            //       </Typography>
-            //     </Box>
-            //   </Box>
-            //   <hr sx={{ margin: "0" }} />
-            //   <Box sx={{ padding: "15px" }}>
-            //     <Box
-            //       sx={{
-            //         marginTop: "5px",
-            //         color: "red",
-            //         display: "flex",
-            //         alignItems: "center",
-            //         cursor: "pointer",
-            //       }}
-            //       onClick={logoutuser}
-            //     >
-            //       <AiOutlineLogout style={{ marginRight: "10px" }} />
-            //       <Typography>Log out</Typography>
-            //     </Box>
-            //   </Box>
-            // </Box>
+            
             <Box
               sx={{
                 position: "absolute",
@@ -1031,107 +997,7 @@ const [fetchError, setFetchError] = useState("");
               </Typography>
             )}
           </Box>
-          {/* <Box className='sidebar-contents' sx={{ mt: 2, height: '78vh', overflowY: 'auto' }}>
-            <List sx={{ cursor: 'pointer' }}>
-              {sidebarItems.map(item => (
-                <Box key={item._id}>
-                  <ListItem onClick={() => handleToggleSubmenu(item._id, item.label)} component={Link} to={item.path} className="menu-item" sx={{
-                    mt: 1, // margin-top: 8px
-                    borderRadius: '10px',
-                    // color: 'black',
-
-                    transition: 'background-color 0.3s, color 0.3s',
-                    '&:hover': {
-                      color: '#fff',
-                      backgroundColor: '#0000ff',
-
-                      '.menu-icon': {
-                        color: '#fff',
-                      },
-                      '.menu-text': {
-                        color: '#fff',
-                      }
-                    },
-                  }}>
-                    <ListItemIcon sx={{ fontSize: '1.5rem', }} className="menu-icon">
-                      {iconMapping[item.icon] ? React.createElement(iconMapping[item.icon]) : null}
-                    </ListItemIcon>
-                    {!isCollapsed && <ListItemText primary={item.label} sx={{ ml: -2 }} className="menu-text" />}
-                    {!isCollapsed && item.submenu.length > 0 && (
-                      <ListItemIcon sx={{ justifyContent: 'end' }}>
-                        {openMenu === item._id ? <ExpandLess className="menu-icon" /> : <ExpandMore className="menu-icon" />}
-                      </ListItemIcon>
-                    )}
-                  </ListItem>
-                  {item.submenu.length > 0 && (
-                    <Collapse in={openMenu === item._id}>
-                      <List component="div" disablePadding>
-                        {item.submenu.map(subItem => (
-                          <ListItem key={subItem.path} component={Link} to={subItem.path} className="menu-item" sx={{
-                            mt: 1, // margin-top: 8px
-                            borderRadius: '10px',
-                            color: 'black',
-                            pl: 4,
-                            transition: 'background-color 0.3s, color 0.3s',
-                            '&:hover': {
-                              color: '#fff',
-                              backgroundColor: '#0000ff',
-                              '.menu-icon': {
-                                color: '#fff',
-                              },
-                              '.menu-text': {
-                                color: '#fff',
-                              }
-
-                            },
-                          }}>
-                            <ListItemIcon sx={{ fontSize: '1.2rem', }} className="menu-icon" >
-                              {iconMapping[subItem.icon] ? React.createElement(iconMapping[subItem.icon]) : null}
-                            </ListItemIcon>
-                            {!isCollapsed && <ListItemText primary={subItem.label} sx={{ ml: -2 }} className="menu-text" />}
-                          </ListItem>
-                        ))}
-                      </List>
-                    </Collapse>
-                  )}
-                </Box>
-              ))}
-            </List>
-            <div className="bottom-content">
-              <ul>
-                <li>
-                  <Link to="#" className="logout-link">
-                    <div className="info" >
-                      <div>
-                      <img
-                          src={ user}
-                          alt="user"
-                          className="user-icon"
-                          style={{ height: "55px", width: "55px",borderRadius: "50%" }}
-                        />
-                      </div>
-                      <span className="hidden-text" >
-                        <b>{username}</b>
-                        <h6>{userData}</h6>
-                      </span>
-
-                      <div>
-                        <AiOutlineLogout
-                          className="logout-icon"
-                          onClick={() => {
-                            logoutuser();
-                          }}
-                        />
-                      </div>
-                    </div>
-
-
-                  </Link>
-                </li>
-
-              </ul>
-            </div>
-          </Box> */}
+         
 
           <Box
             className="sidebar-contents"
@@ -1265,11 +1131,7 @@ const [fetchError, setFetchError] = useState("");
               })}
             </List>
 
-            {/* <div className="bottom-content">
-              <ul>
-                <li></li>
-              </ul>
-            </div> */}
+          
           </Box>
         </Box>
       </aside>
@@ -1354,61 +1216,7 @@ const [fetchError, setFetchError] = useState("");
               </ListItem>
             ))}
           </List>
-          {/* <List>
-            {newSidebarItems.map((item) => (
-              <ListItem
-                key={item._id}
-                component={Link}
-                to={item.path}
-                className="menu-item"
-                onClick={(e) => {
-                  if (item.restricted) {
-                    e.preventDefault(); // Prevent navigation
-                    toast.error("Access to this feature is restricted.");
-                  } else {
-                    handleNewItemClick(item.label);
-                  }
-                }}
-                sx={{
-                  mt: 1, // margin-top: 8px
-                  borderRadius: "10px",
-                  color: "black",
-                  transition: "background-color 0.3s, color 0.3s",
-                  "&:hover": {
-                    color: item.restricted ? "grey" : "#fff",
-                    backgroundColor: item.restricted ? "" : "#0000ff",
-                    ".menu-icon": {
-                      color: item.restricted ? "grey" : "#fff",
-                    },
-                    ".menu-text": {
-                      color: item.restricted ? "grey" : "#fff",
-                    },
-                  },
-                }}
-              >
-                <ListItemIcon
-                  sx={{
-                    fontSize: "1.2rem",
-                    color: item.restricted ? "grey" : "#2c85de",
-                  }}
-                  className="menu-icon"
-                >
-                  {iconMapping[item.icon]
-                    ? React.createElement(iconMapping[item.icon])
-                    : null}
-                </ListItemIcon>
-                <ListItemText
-                  primary={item.label}
-                  className="menu-text"
-                  primaryTypographyProps={{
-                    fontSize: "0.9rem", // Adjust size for submenu text
-                    fontWeight: 400, // Optional: control weight
-                  }}
-                  sx={{ color: item.restricted ? "grey" : "inherit" }}
-                />
-              </ListItem>
-            ))}
-          </List> */}
+          
         </Box>
       </Drawer>
       <Drawer
@@ -1426,10 +1234,7 @@ const [fetchError, setFetchError] = useState("");
             }}
           ></Box>
           {rightDrawerContent === "Account" && (
-            // <AccountForm
-              // handleNewDrawerClose={handleNewDrawerClose}
-              // handleDrawerClose={handleDrawerClose}
-            // />
+           
             <AccountDrawer
                handleNewDrawerClose={handleNewDrawerClose}
               handleDrawerClose={handleDrawerClose}
@@ -1468,15 +1273,7 @@ const [fetchError, setFetchError] = useState("");
         onClose={() => setIsDialogOpen(false)}
         handleDrawerClose={handleDrawerClose}
       />
-{/* {
-  !accountIdFromCookie && (
-    <ClientSelectionDialog
-      open={isDialogOpen}
-      onClose={() => setIsDialogOpen(false)}
-      handleDrawerClose={handleDrawerClose}
-    />
-  )
-} */}
+
 <InvoiceDrawer
   isDrawerOpen={isInvoiceDrawerOpen}
   setDrawerOpen={setIsInvoiceDrawerOpen}
