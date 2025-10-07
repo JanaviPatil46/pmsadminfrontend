@@ -539,8 +539,7 @@ useEffect(() => {
       const data = await res.json();
 
       if (data.message === "Invalid token") {
-        window.location.href = `${EMAIL_SYNC}/emailsync/auth/google`;
-        return;
+        navigate("/login");
       }
 
       // token valid → fetch user data

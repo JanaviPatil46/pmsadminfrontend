@@ -645,7 +645,7 @@ const Inboxplus = () => {
                         From: {email.from || "Unknown"}
                       </Typography>
                       
-                      {emailType && (
+                      {/* {emailType && (
                         <Typography
                           variant="caption"
                           sx={{
@@ -659,7 +659,7 @@ const Inboxplus = () => {
                         >
                           {emailType.toUpperCase()}
                         </Typography>
-                      )}
+                      )} */}
                     </CardContent>
                   </Card>
                 );
