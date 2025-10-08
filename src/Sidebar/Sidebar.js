@@ -221,66 +221,126 @@ function Sidebar() {
 
   // }, []);
 
-  useEffect(() => {
-    if (isDrawerOpen) {
-      const fetchNewSidebarData = async () => {
-        try {
-          const response = await axios.get(`${NEW_SIDEBAR_API}/newsidebar/`);
-          let NewSidebarData = response.data;
-
-          // Retrieve team member data if the user is a team member
-          const teamMemberData = JSON.parse(
-            localStorage.getItem("teamMemberData")
-          );
-          if (teamMemberData) {
+//   useEffect(() => {
+//     if (isDrawerOpen) {
+//       const fetchNewSidebarData = async () => {
+//         try {
+//           const response = await axios.get(`${NEW_SIDEBAR_API}/newsidebar/`);
+//           let NewSidebarData = response.data;
+// console.log("newsidebardata", NewSidebarData)
+//           // Retrieve team member data if the user is a team member
+//           const teamMemberData = JSON.parse(
+//             localStorage.getItem("teamMemberData")
+//           );
+//           if (teamMemberData) {
            
 
-            NewSidebarData = NewSidebarData.map((item) => {
-              if (
-                item.label === "Account" &&
-                !teamMemberData.teammember.manageAccounts
-              ) {
-                return { ...item, restricted: true };
-              }
-              if (
-                item.label === "Contact" &&
-                !teamMemberData.teammember.manageContacts
-              ) {
-                return { ...item, restricted: true };
-              }
-              if (
-                item.label === "Jobs" &&
-                !teamMemberData.teammember.managePipelines
-              ) {
-                return { ...item, restricted: true };
-              }
-              if (
-                item.label === "Organizer" &&
-                !teamMemberData.teammember.manageOrganizers
-              ) {
-                return { ...item, restricted: true };
-              }
-              if (
-                item.label === "Invoice" &&
-                !teamMemberData.teammember.manageInvoices
-              ) {
-                return { ...item, restricted: true };
-              }
-              return item;
-            });
-          }
+//             NewSidebarData = NewSidebarData.map((item) => {
+//               if (
+//                 item.label === "Account" &&
+//                 !teamMemberData.teammember.manageAccounts
+//               ) {
+//                 return { ...item, restricted: true };
+//               }
+//               if (
+//                 item.label === "Contact" &&
+//                 !teamMemberData.teammember.manageContacts
+//               ) {
+//                 return { ...item, restricted: true };
+//               }
+//               if (
+//                 item.label === "Jobs" &&
+//                 !teamMemberData.teammember.managePipelines
+//               ) {
+//                 return { ...item, restricted: true };
+//               }
+//               if (
+//                 item.label === "Organizer" &&
+//                 !teamMemberData.teammember.manageOrganizers
+//               ) {
+//                 return { ...item, restricted: true };
+//               }
+//               if (
+//                 item.label === "Invoice" &&
+//                 !teamMemberData.teammember.manageInvoices
+//               ) {
+//                 return { ...item, restricted: true };
+//               }
+//               return item;
+//             });
+//           }
 
-          setNewSidebarItems(NewSidebarData);
-        } catch (error) {
-          console.error("Error fetching new sidebar data:", error);
+//           setNewSidebarItems(NewSidebarData);
+//         } catch (error) {
+//           console.error("Error fetching new sidebar data:", error);
+//         }
+//       };
+
+//       fetchNewSidebarData();
+//     }
+//   }, [isDrawerOpen]);
+
+   useEffect(() => {
+  if (isDrawerOpen) {
+    const fetchNewSidebarData = async () => {
+      try {
+        const response = await axios.get(`${NEW_SIDEBAR_API}/newsidebar/`);
+        let NewSidebarData = response.data;
+        console.log("newsidebardata", NewSidebarData);
+
+        // Get team member permissions from localStorage
+        const teamMemberData = JSON.parse(
+          localStorage.getItem("teamMemberData")
+        );
+
+        if (teamMemberData && teamMemberData.teammember) {
+          // Apply restrictions only if team member exists
+          NewSidebarData = NewSidebarData.map((item) => {
+            if (
+              item.label === "Account" &&
+              !teamMemberData.teammember.manageAccounts
+            ) {
+              return { ...item, restricted: true };
+            }
+            if (
+              item.label === "Contact" &&
+              !teamMemberData.teammember.manageContacts
+            ) {
+              return { ...item, restricted: true };
+            }
+            if (
+              item.label === "Jobs" &&
+              !teamMemberData.teammember.managePipelines
+            ) {
+              return { ...item, restricted: true };
+            }
+            if (
+              item.label === "Organizer" &&
+              !teamMemberData.teammember.manageOrganizers
+            ) {
+              return { ...item, restricted: true };
+            }
+            if (
+              item.label === "Invoice" &&
+              !teamMemberData.teammember.manageInvoices
+            ) {
+              return { ...item, restricted: true };
+            }
+            return item;
+          });
+        } else {
+          console.log("No team member data found — showing all items");
         }
-      };
 
-      fetchNewSidebarData();
-    }
-  }, [isDrawerOpen]);
+        setNewSidebarItems(NewSidebarData);
+      } catch (error) {
+        console.error("Error fetching new sidebar data:", error);
+      }
+    };
 
-  
+    fetchNewSidebarData();
+  }
+}, [isDrawerOpen]);
 
   const handleToggleSidebar = () => {
     if (isSmallScreen) {
@@ -546,8 +606,22 @@ useEffect(() => {
       setLoginData(data);
       setloginsData(data.user.id);
       localStorage.setItem("userRole", data.user.role);
-      fetchUserData(data.user.id);
-fectUsersDatabyUserid(data.user.id)
+//       fetchUserData(data.user.id);
+// fectUsersDatabyUserid(data.user.id)
+ // ✅ Role-based logic
+      if (data.user.role === "Admin") {
+        fetchUserData(data.user.id);
+        fetchSidebarData();
+        // navigate("/");
+      } else if (data.user.role === "TeamMember") {
+        fetchUserData(data.user.id);
+        fectUsersDatabyUserid(data.user.id);
+        // navigate("/");
+      } else {
+        toast.error("You are not a valid user.");
+        setTimeout(() => navigate("/login"), 1000);
+        return;
+      }
       // fetch emails
       if (emailSyncEmail) {
         const emailRes = await axios.get(
@@ -639,6 +713,7 @@ useEffect(() => {
 
         
         fetchSidebarData();
+       
       })
       .catch((error) => console.error(error));
   };
@@ -699,106 +774,7 @@ useEffect(() => {
 const [fetchError, setFetchError] = useState("");
 
 
-  //start 
-//   useEffect(() => {
-//     const fetchEmails = async () => {
-//       if (!emailSyncEmail) return;
-// console.log("bvds",emailSyncEmail)
-//       // setLoading(true);
-//       setFetchError("");
-//       setEmails([]);
-
-//       try {
-//         const res = await axios.get(
-//           `${EMAIL_SYNC}/emailsync/user/login-with-token/${emailSyncEmail}`,
-         
-//         );
-
-//         setEmails(res.data.emails || []);
-// console.log("email list",res.data.emails)
-//         if (res.data?.redirectUrl) {
-//           window.location.href = `${EMAIL_SYNC}/emailsync/auth/google`;
-//         }
-//       } catch (err) {
-//         console.error("Error fetching emails:", err.response?.data || err.message);
-
-//         if (err.response?.data?.error?.includes("Refresh token missing")) {
-//           setFetchError("Your Gmail session expired. Please log in again.");
-//         } else {
-//           setFetchError("Failed to fetch emails. Please try again.");
-//         }
-
-//         if (err.response?.data?.redirectUrl) {
-//           window.location.href = `${EMAIL_SYNC}/emailsync/auth/google`;
-//         }
-//       } finally {
-//         // setLoading(false);
-//       }
-//     };
-
-//     fetchEmails();
-//   }, [emailSyncEmail]);
-// useEffect(() => {
-//   const fetchEmails = async () => {
-//     if (!emailSyncEmail) return;
-
-//     try {
-//       setLoading(true);
-//       setFetchError("");
-//       console.log("📩 Fetching emails for:", emailSyncEmail);
-
-//       const res = await axios.get(
-//         `${EMAIL_SYNC}/emailsync/user/login-with-token/${emailSyncEmail}`
-//       );
-
-//       console.log("✅ Response:", res.data);
-
-//       let emails = res.data?.emails || [];
-
-     
-
-//       setEmails(emails);
-
-//       // If backend indicates re-login needed
-//       if (res.data?.redirectUrl) {
-//         window.location.href = `${EMAIL_SYNC}/emailsync/auth/google`;
-//       }
-//     } catch (err) {
-//       console.error("❌ Error fetching emails:", err.response?.data || err.message);
-
-//       if (err.response?.data?.error?.includes("Refresh token missing")) {
-//         setFetchError("Your Gmail session expired. Please log in again.");
-//       } else {
-//         setFetchError("Failed to fetch emails. Please try again.");
-//       }
-
-//       // If refresh failed → redirect to login
-//       if (err.response?.data?.redirectUrl) {
-//         window.location.href = `${EMAIL_SYNC}/emailsync/auth/google`;
-//       }
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   fetchEmails();
-// }, [ emailSyncEmail]);
-  // Show animated loader while fetching
-
-  
-//   const Loader = () => {
-//   return (
-//     <Box
-//       display="flex"
-//       justifyContent="center"
-//       alignItems="center"
-//       height="200px"
-//     >
-//       <CircularProgress /> {/* This is the animated spinner */}
-//     </Box>
-//   );
-// };
-//   if (loading) return <Loader />;
+ 
   return (
     <div className="grid-container">
       <header className="header">
