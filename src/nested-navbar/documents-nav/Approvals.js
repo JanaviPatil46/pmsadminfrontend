@@ -33,6 +33,7 @@ const Approvals = () => {
               <TableCell><strong>Document Name</strong></TableCell>
             
               <TableCell><strong>Status</strong></TableCell>
+              <TableCell><strong>Description</strong></TableCell>
               <TableCell><strong>Created At</strong></TableCell>
             </TableRow>
           </TableHead>
@@ -43,6 +44,7 @@ const Approvals = () => {
                   <TableCell>{approval.filename || "—"}</TableCell>
                
                   <TableCell>{approval.status}</TableCell>
+                  <TableCell>{approval.description}</TableCell>
                 <TableCell>
   {approval.updatedAt
     ? new Date(approval.updatedAt).toLocaleString("en-US", {

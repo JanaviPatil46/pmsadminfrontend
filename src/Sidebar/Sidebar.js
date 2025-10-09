@@ -509,87 +509,16 @@ const accountNameFromCppkie =Cookies.get("accountName")
   //   DashboardValid();
   //   setData(true);
   // }, []);
-// const validateAndFetch = async () => {
-//   try {
-//     // 1️⃣ Validate user token
-//     let token = localStorage.getItem("usersdatatoken");
-//     const res = await fetch(`${LOGIN_API}/common/login/verifytoken/`, {
-//       method: "GET",
-//       headers: {
-//         "Content-Type": "application/json",
-//         Authorization: token,
-//       },
-//     });
 
-//     const data = await res.json();
-
-//     if (data.message === "Invalid token") {
-//       navigate("/login");
-//       return;
-//     }
-
-//     // Save user info
-//     setLoginData(data);
-//     setloginsData(data.user.id);
-//     localStorage.setItem("userRole", data.user.role);
-
-//     // Fetch user & sidebar data
-//     fetchUserData(data.user.id);
-//     if (data.user.role === "Admin") fetchSidebarData();
-//     else if (data.user.role === "TeamMember") fectUsersDatabyUserid(data.user.id);
-
-//     console.log("User role:", data.user.role);
-
-//     // 2️⃣ Fetch emails after dashboard validation
-//     if (emailSyncEmail) {
-//       setLoading(true);
-//       setFetchError("");
-
-//       try {
-//         const emailRes = await axios.get(
-//           `${EMAIL_SYNC}/emailsync/user/login-with-token/${emailSyncEmail}`
-//         );
-
-//         const emails = emailRes.data?.emails || [];
-//         setEmails(emails);
-
-//         // Redirect to Google login if required
-//         if (emailRes.data?.redirectUrl) {
-//           window.location.href = `${EMAIL_SYNC}/emailsync/auth/google`;
-//           return; // stop further execution
-//         }
-//       } catch (err) {
-//         console.error("❌ Error fetching emails:", err.response?.data || err.message);
-//         setFetchError(
-//           err.response?.data?.error?.includes("Refresh token missing")
-//             ? "Your Gmail session expired. Please log in again."
-//             : "Failed to fetch emails. Please try again."
-//         );
-
-//         if (err.response?.data?.redirectUrl) {
-//           window.location.href = `${EMAIL_SYNC}/emailsync/auth/google`;
-//           return;
-//         }
-//       } finally {
-//         setLoading(false);
-//       }
-//     }
-
-//     // 3️⃣ Finally navigate to dashboard/main page
-//     navigate("/");
-//   } catch (err) {
-//     console.error("Dashboard validation failed:", err);
-//     navigate("/login");
-//   }
-// };
 useEffect(() => {
   const validateAndFetch = async () => {
     try {
       const token = localStorage.getItem("usersdatatoken");
-      if (!token) {
-        window.location.href = `${EMAIL_SYNC}/emailsync/auth/google`;
-        return;
-      }
+      console.log("fghfhf",token)
+      // if (!token) {
+      //   window.location.href = `${EMAIL_SYNC}/emailsync/auth/google`;
+      //   return;
+      // }
 
       const res = await fetch(`${LOGIN_API}/common/login/verifytoken/`, {
         method: "GET",
@@ -638,7 +567,7 @@ useEffect(() => {
       setLoading(false); // finished validation
     } catch (err) {
       console.error("Validation failed", err);
-      window.location.href = `${EMAIL_SYNC}/emailsync/auth/google`;
+      // window.location.href = `${EMAIL_SYNC}/emailsync/auth/google`;
     }
   };
 

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { Menu, MenuItem } from "@mui/material";
 import { DocusealBuilder } from "@docuseal/react";
-import { Dialog, DialogTitle, DialogContent, IconButton } from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, IconButton,DialogActions,Button,TextField } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import customCss from "./docuseal-dark-theme.css";
 const DOCS_MANAGMENTS = process.env.REACT_APP_CLIENT_DOCS_MANAGE;
@@ -26,6 +26,8 @@ const Folder = ({
   const [polling, setPolling] = useState(false);
   const [openDialog, setOpenDialog] = useState(false); // dialog state
   const [anchorEl, setAnchorEl] = useState(null);
+   const [openApprovalDialog, setOpenApprovalDialog] = useState(false);
+  const [description, setDescription] = useState("");
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -116,9 +118,19 @@ const Folder = ({
       console.error("Failed to request signature:", err);
     }
   };
-
-  const handleRequestApproval = async () => {
+// 🔹 Open dialog instead of directly sending request
+  const handleOpenDialog = () => {
     handleMenuClose();
+    setOpenApprovalDialog(true);
+  };
+
+  // 🔹 Close dialog
+  const handleCloseDialog = () => {
+    setOpenApprovalDialog(false);
+    setDescription("");
+  };
+  const handleRequestApproval = async () => {
+    // handleMenuClose();
 
     try {
       // Build file URL
@@ -130,6 +142,7 @@ const Folder = ({
         filename: content.filename,
         fileUrl: fileUrl,
         clientEmail: clientEmail, // assuming this comes from backend data
+        description:description
       };
       console.log("payload", payload);
       const res = await fetch(`${DOCS_MANAGMENTS}/approvals/request-approval`, {
@@ -143,6 +156,7 @@ const Folder = ({
       alert(`Approval request sent to ${payload.clientEmail}`);
       // ✅ Mark file as approved
       setApprovedFiles((prev) => new Set(prev).add(content._id));
+      setOpenApprovalDialog(false)
         // ✅ Immediately disable further e-sign requests
     await handlePermissionChange("canEsign", false);
     } catch (err) {
@@ -236,7 +250,8 @@ const Folder = ({
 
   {content.filename.toLowerCase().endsWith(".pdf") && (
     <MenuItem
-      onClick={handleRequestApproval}
+      // onClick={handleRequestApproval}
+       onClick={handleOpenDialog}
       disabled={!permissions.canApprove} // depends on canApprove
     >
       Approval
@@ -266,7 +281,31 @@ const Folder = ({
 </Menu>
 
         </div>
-
+<Dialog open={openApprovalDialog} onClose={handleCloseDialog} fullWidth maxWidth="sm">
+        <DialogTitle>Request Approval</DialogTitle>
+        <DialogContent>
+          <TextField
+            // label="Description"
+            multiline
+            rows={4}
+            fullWidth
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Type a short description or note for this approval..."
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog}>Cancel</Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleRequestApproval}
+            disabled={!description.trim()}
+          >
+            Send
+          </Button>
+        </DialogActions>
+      </Dialog>
         {/* Dialog remains unchanged */}
         <Dialog
           open={openDialog && showBuilderFor === content._id}
