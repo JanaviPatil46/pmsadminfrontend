@@ -77,6 +77,7 @@ import {
   Radio,
 } from "@mui/material";
 import countryList from "react-select-country-list";
+import TagsMultiSelectDropDown from "../../Templates/TagsMultiSelectDropDown"
 export default function AccountForm({ onContinue }) {
   const dispatch = useDispatch();
   const { accountData } = useSelector((state) => state.accountContact);
@@ -283,7 +284,7 @@ export default function AccountForm({ onContinue }) {
 
       {/* Tags with colored chips */}
       {/* Tags with colored chips + colored dropdown options */}
-      <Autocomplete
+      {/* <Autocomplete
         multiple
         options={tags}
         getOptionLabel={(option) => option.label}
@@ -334,9 +335,17 @@ export default function AccountForm({ onContinue }) {
             size="small"
           />
         )}
-      />
+      /> */}
+      <TagsMultiSelectDropDown
+  value={accountData.tags || []}
+  onChange={(newValue) => dispatch(setAccountData({ tags: newValue }))}
+  options={tags} // Pass if tags are already loaded; else remove to fetch internally
+  placeholder="Select tags"
+  // width="100%"
+/>
 
-      {/* Folder Template */}
+<Box mt={1}>
+{/* Folder Template */}
       <Autocomplete
         options={folderTemp}
         getOptionLabel={(option) => option.label}
@@ -357,6 +366,8 @@ export default function AccountForm({ onContinue }) {
           />
         )}
       />
+</Box>
+      
 
      {accountData.clientType === "Company" && (
   <Box>

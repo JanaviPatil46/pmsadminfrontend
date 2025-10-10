@@ -15,7 +15,7 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  CircularProgress
+  CircularProgress,Popover
 } from "@mui/material";
 import {
   ChevronLeft,
@@ -655,10 +655,17 @@ useEffect(() => {
     }
   };
 
-
+const [anchorEl, setAnchorEl] = useState(null);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
-  const toggleDropdown = () => setDropdownOpen(!isDropdownOpen);
-
+  // const toggleDropdown = () => setDropdownOpen(!isDropdownOpen);
+   const toggleDropdown = (event) => {
+    setAnchorEl(event.currentTarget);
+    setDropdownOpen(!isDropdownOpen);
+  };
+ const handleCloseDropdown = () => {
+    setAnchorEl(null);
+    setDropdownOpen(false);
+  };
   const [croppedImage, setCroppedImage] = useState(""); // The cropped image
 
   // Fetch the last uploaded image when the page loads
@@ -784,7 +791,7 @@ const [fetchError, setFetchError] = useState("");
               </Box>
             </Link>
           </Box>
-          {isDropdownOpen && (
+          {/* {isDropdownOpen && (
             
             <Box
               sx={{
@@ -859,7 +866,80 @@ const [fetchError, setFetchError] = useState("");
                 </Box>
               </Box>
             </Box>
-          )}
+          )} */}
+           <Popover
+                                open={isDropdownOpen}
+                                anchorEl={anchorEl}
+                                onClose={handleCloseDropdown}
+                                anchorOrigin={{
+                                  vertical: "bottom",
+                                  horizontal: "left",
+                                }}
+                                transformOrigin={{
+                                  vertical: "top",
+                                  horizontal: "left",
+                                }}
+                                sx={{mt:2}}
+                              >
+                               <Box
+                sx={{
+                  padding: "16px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                }}
+              >
+                <StyledBadge
+                  overlap="circular"
+                  anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                  variant="dot"
+                >
+                  <Avatar
+                    src={preview || currentImage}
+                    sx={{
+                      width: 40,
+                      height: 40,
+                      border: "2px solid #eee",
+                    }}
+                  />
+                </StyledBadge>
+                <Box>
+                  <Typography
+                    sx={{ fontWeight: "600", fontSize: "13px", color: "#333" }}
+                  >
+                    {username}
+                  </Typography>
+                  <Typography sx={{ fontSize: "11px", color: "#777" }}>
+                    {userEmail}
+                  </Typography>
+                </Box>
+              </Box>
+
+              <Box sx={{ borderTop: "1px solid #eee" }} />
+
+              <Box sx={{ padding: "14px" }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    cursor: "pointer",
+                    color: "red",
+                    fontWeight: "500",
+                    padding: "8px",
+                    borderRadius: "6px",
+                    transition: "background 0.3s",
+                    "&:hover": {
+                      backgroundColor: "#f8d7da",
+                    },
+                  }}
+                  onClick={logoutuser}
+                >
+                  <AiOutlineLogout size={18} />
+                  <Typography sx={{ fontSize: "13px" }}>Log out</Typography>
+                </Box>
+              </Box>
+                              </Popover>
         </Box>
       </header>
 

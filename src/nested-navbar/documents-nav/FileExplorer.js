@@ -158,7 +158,7 @@ const Folder = ({
       setApprovedFiles((prev) => new Set(prev).add(content._id));
       setOpenApprovalDialog(false)
         // ✅ Immediately disable further e-sign requests
-    await handlePermissionChange("canEsign", false);
+    await handlePermissionChange("canApprove", false);
     } catch (err) {
       console.error("Approval request failed:", err);
       alert("Failed to send approval request.");

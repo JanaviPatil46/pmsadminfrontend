@@ -19,6 +19,8 @@ import axios from "axios";
 import { CiMenuKebab } from "react-icons/ci";
 import { useNavigate, useParams, useRouteLoaderData } from "react-router-dom";
 import { toast } from "react-toastify";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 import OrganizerUpdate from "../NewPages/OrganizerUpdate";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -282,7 +284,68 @@ const handleRenameConfirm = async (id, newName) => {
   const handleClosePreview = () => {
        setShowForm(false);
   };
+const handleDownload = async (organizer) => {
+  if (!organizer) return;
 
+  // Construct sections HTML (only answered questions)
+  const sectionsHtml = (organizer.sections || [])
+    .map((section) => {
+      const answeredElements = (section.formElements || []).filter(
+        (el) => el.textvalue && el.textvalue.trim() !== ""
+      );
+
+      if (answeredElements.length === 0) return "";
+
+      const formElementsHtml = answeredElements
+        .map(
+          (element) => `
+        <div style="margin-bottom: 10px;">
+          <strong>${element.text}</strong>
+          <div style="margin-left: 10px; margin-top: 5px;">
+            <strong>Answer:</strong> ${element.textvalue}
+          </div>
+        </div>
+      `
+        )
+        .join("");
+
+      return `
+        <div style="margin-bottom: 15px;">
+          <h3 style="margin-bottom: 5px;">${section.name}</h3>
+          ${formElementsHtml}
+        </div>
+      `;
+    })
+    .join("");
+
+  // Wrap in a container
+  const containerHtml = `
+    <div style="font-family: Arial, sans-serif; font-size: 12px; padding: 20px;">
+      <h2>${organizer.organizerName}</h2>
+      ${sectionsHtml || "<p>No answered questions available.</p>"}
+    </div>
+  `;
+
+  // Create a temporary container in DOM
+  const tempDiv = document.createElement("div");
+  tempDiv.innerHTML = containerHtml;
+  document.body.appendChild(tempDiv);
+
+  // Render HTML to canvas
+  const canvas = await html2canvas(tempDiv, { scale: 2 });
+  const imgData = canvas.toDataURL("image/png");
+
+  // Remove temporary container
+  document.body.removeChild(tempDiv);
+
+  // Generate PDF
+  const pdf = new jsPDF("p", "pt", "a4");
+  const pdfWidth = pdf.internal.pageSize.getWidth();
+  const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+  pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+  pdf.save(`${organizer.organizerName}_answered.pdf`);
+};
   
   const printOrganizerData = (id) => {
     const organizer = organizerTemplatesData.find((org) => org._id === id);
@@ -672,6 +735,15 @@ const handleOpenDialog = (organizer) => {
       >
         {row.issealed ? "Unseal" : "Seal"}
       </Typography>
+<Typography
+  sx={{ fontSize: "12px", fontWeight: "bold", cursor: "pointer" }}
+  onClick={() => {
+    handleDownload(row); // Pass current organizer
+    handleMenuClose();
+  }}
+>
+  Download
+</Typography>
 
       <Typography
         sx={{

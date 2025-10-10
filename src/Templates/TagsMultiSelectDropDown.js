@@ -14,7 +14,7 @@ const TagsMultiSelectDropDown = ({
   onChange,
   options: propOptions,
   placeholder = "Select tags",
-  width = "100%"
+  // width = "100%"
 }) => {
   const containerRef = useRef(null);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -90,7 +90,7 @@ const filteredOptions = options
     !value.some(selected => selected.value === option.value)
   );
   return (
-    <Box sx={{ width }}>
+    <Box >
     
       
       <Box
@@ -100,11 +100,12 @@ const filteredOptions = options
           alignItems: "center",
           justifyContent: "space-between",
           border: "1px solid #ccc",
-          borderRadius: "8px",
+          // borderRadius: "8px",
           padding: "4px",
           cursor: "pointer",
           bgcolor: "background.paper",
-          width: "100%"
+          // width: "100%",
+          mt:2
         }}
         onClick={handleClick}
       >
