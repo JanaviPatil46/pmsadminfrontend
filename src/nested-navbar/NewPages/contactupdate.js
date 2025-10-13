@@ -291,7 +291,8 @@ setPhoneNumbers(
           onContactUpdated(); // Call the callback function
         }
         handleClose(); // Close the form on success
-      } else {
+      } 
+      else {
         console.error("Failed to update contact:", response.statusText);
       }
     } catch (error) {

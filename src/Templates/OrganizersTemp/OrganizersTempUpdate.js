@@ -708,6 +708,7 @@ useEffect(() => {
     );
   };
   const handleSectionSaveData = (settings) => {
+    console.log("gfg selected section org",settings)
     // Update the specific section with the new settings
     setSections((prevSections) =>
       prevSections.map((section) =>

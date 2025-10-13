@@ -77,6 +77,7 @@ import {
   Radio,
 } from "@mui/material";
 import countryList from "react-select-country-list";
+import MultiSelectDropdown from "../../Templates/MultiSelectDropdown"
 import TagsMultiSelectDropDown from "../../Templates/TagsMultiSelectDropDown"
 export default function AccountForm({ onContinue }) {
   const dispatch = useDispatch();
@@ -263,7 +264,7 @@ export default function AccountForm({ onContinue }) {
       )}
 
       {/* Team Members */}
-      <Autocomplete
+      {/* <Autocomplete
         multiple
         options={teamMembers}
         getOptionLabel={(option) => option.label}
@@ -280,7 +281,14 @@ export default function AccountForm({ onContinue }) {
             size="small"
           />
         )}
-      />
+      /> */}
+<MultiSelectDropdown
+  value={accountData.teamMembers || []}
+  onChange={(newValue) => dispatch(setAccountData({ teamMembers: newValue }))}
+  options={teamMembers} // You can omit this prop to let it fetch internally
+  placeholder="Select Team Members"
+  width="100%"
+/>
 
       {/* Tags with colored chips */}
       {/* Tags with colored chips + colored dropdown options */}

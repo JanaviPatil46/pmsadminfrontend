@@ -287,6 +287,7 @@ const Pipeline = ({ pipeline, jobData, moveJob, fetchJobList, data, handleDrop }
       .then(() => {
         console.log("Jobs deleted successfully:", checkedJobIds);
         toast.success("Jobs deleted successfully");
+        setOpenDialog(false)
         fetchJobList(data); 
       })
       .catch((error) => {
@@ -320,7 +321,9 @@ const Pipeline = ({ pipeline, jobData, moveJob, fetchJobList, data, handleDrop }
   
       await Promise.all(archivePromises);
       toast.success("Jobs archived successfully");
+       setOpenDialog(false)
       fetchJobList(data);
+     
       navigate(`/clients/accounts/accountsdash/workflow/${data}/archivedjobs`);
     } catch (error) {
       console.error("Error archiving jobs:", error);

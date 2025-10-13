@@ -219,7 +219,7 @@ const Section = ({
       sectionRepeatingMode: repeateButton,
       buttonName: repeateButton ? repeatButtonName : "", // You can store the text input value instead of hardcoding it
       conditional: conditionButton,
-      sectionMode: sectionMode,
+      mode: sectionMode,
       
       conditions: conditionButton
         ? sectionQuestionAnswers.map((qa, index) => ({
@@ -234,12 +234,13 @@ const Section = ({
         
       // conditions: conditionButton ? questionAnswers : [], // assuming questionAnswers is an array of {question, answer} objects
     };
+    console.log("bnvfhgdsfhds section settings",sectionsettings)
 
     if (onSaveSectionData) {
       onSaveSectionData(sectionsettings);
       console.log("updated Section Settings:", sectionsettings);
       setSectionConditionBadge(sectionsettings.conditional);
-      // console.log(sectionsettings.conditional)
+      console.log(sectionsettings.conditional)
       toggleDrawer(false);
       setRepeateButton(false);
       setRepeatButtonName("");
@@ -406,8 +407,8 @@ const Section = ({
       );
       setConditionButton(updatedSection.sectionsettings.conditional || false);
       // setSectionConditionBadge(updatedSection.sectionsettings.conditional)
-      setSectionMode(updatedSection.sectionsettings.sectionMode || "Any");
-      
+      setSectionMode(updatedSection.sectionsettings.mode || "Any");
+      console.log("updatedSection.sectionsettings",updatedSection.sectionsettings)
         const conditions = updatedSection.sectionsettings.conditions || [];
       setSectionQuestionAnswers(conditions);
 

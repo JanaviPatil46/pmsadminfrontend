@@ -229,7 +229,7 @@ const MultiSelectDropdown = ({
   onChange,
   options: propOptions,
   placeholder = "Select from list",
-  width = "100%"
+  // width = "100%"
 }) => {
   const containerRef = useRef(null);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -299,7 +299,7 @@ const MultiSelectDropdown = ({
   );
 
   return (
-    <Box sx={{ width }}>
+    <Box >
       <Box
         ref={containerRef}
         sx={{
@@ -307,12 +307,12 @@ const MultiSelectDropdown = ({
           alignItems: "center",
           justifyContent: "space-between",
           border: "1px solid #ccc",
-          borderRadius: "8px",
+          // borderRadius: "8px",
           padding: "8px",
           cursor: "pointer",
           bgcolor: "background.paper",
-          width: "100%",
-          // mt: 2,
+          // width: "100%",
+          mt: 2,
           minHeight: "20px", 
         }}
         onClick={handleClick}
