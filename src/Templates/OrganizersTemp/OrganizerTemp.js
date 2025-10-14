@@ -641,51 +641,6 @@ useEffect(() => {
     return isValid;
   };
 
-  // const handleDuplicateTemplate = async (templateId) => {
-  //   // Find the template by its ID
-  //   const templateToDuplicate = organizerTemplatesData.find(template => template._id === templateId);
-  //   if (!templateToDuplicate) {
-  //     toast.error('Template not found');
-  //     return;
-  //   }
-  //   // Create a new template object (with new ID and modified template name)
-  //   const duplicatedTemplate = {
-  //     ...templateToDuplicate,
-  //     templatename: `${templateToDuplicate.templatename} (Copy)`, // Indicate it's a duplicate
-  //     // _id: undefined, // Remove the ID since we want to create a new one
-  //     sections: templateToDuplicate.sections.map(section => ({
-  //       ...section,
-  //       id: Date.now().toString() + section.id, // Generate a new unique ID for the section
-  //     })),
-  //   };
-  //   try {
-  //     // Prepare request options
-  //     const myHeaders = new Headers();
-  //     myHeaders.append("Content-Type", "application/json");
-
-  //     const raw = JSON.stringify(duplicatedTemplate);
-  //     const requestOptions = {
-  //       method: "POST",
-  //       headers: myHeaders,
-  //       body: raw,
-  //       redirect: "follow"
-  //     };
-
-  //     // Send the duplicated template to the server
-  //     const response = await fetch(`${ORGANIZER_TEMP_API}/workflow/organizers/organizertemplate`, requestOptions);
-  //     const result = await response.json();
-
-  //     if (result.message === "Organizer Template created successfully") {
-  //       toast.success("Template duplicated successfully");
-  //       fetchOrganizerTemplates(); // Refresh the list after duplication
-  //     } else {
-  //       toast.error(result.error || "Failed to duplicate template");
-  //     }
-  //   } catch (error) {
-  //     console.error(error);
-  //     toast.error("Error duplicating template");
-  //   }
-  // };
 
   const handleDuplicateTemplate = async (templateId) => {
   try {

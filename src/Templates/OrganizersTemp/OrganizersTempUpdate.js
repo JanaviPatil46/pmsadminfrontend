@@ -97,31 +97,12 @@ const OrganizersTempUpdate = () => {
     newSections.splice(toIndex, 0, movedSection);
     setSections(newSections);
   };
-// const truncateText = (text, maxWords) => {
-//     const words = text.split(' ');
-//     if (words.length > maxWords) {
-//       return words.slice(0, maxWords).join(' ') + ' ..';
-//     }
-//     return text;
-//   };
+
   const ORGANIZER_TEMP_API = process.env.REACT_APP_ORGANIZER_TEMP_URL;
 
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // const handlePreview = () => {
-  //   // Gather all the necessary data for the preview
-  //   const data = {
-  //     organizerName,
-  //     sections, // This contains all your sections and their elements
-  //   };
-
-  //   // You can also use any other required data from your state here
-  //   console.log("Data for preview:", data);
-
-  //   // Navigate to the desired path with data if necessary (you might want to pass it through state)
-  //   navigate('/organizerpreview', { state: { data } });
-  // };
 
   const [shortcuts, setShortcuts] = useState([]);
   const [filteredShortcuts, setFilteredShortcuts] = useState([]);
@@ -171,171 +152,12 @@ useEffect(() => {
   }
 }, [selectedOption]);
 
-  // useEffect(() => {
-  //   // Set shortcuts based on selected option
-  //   if (selectedOption === "contacts") {
-  //     const contactShortcuts = [
-  //       { title: "Account Shortcodes", isBold: true },
-  //       { title: "Account Name", isBold: false, value: "ACCOUNT_NAME" },
-  //       {
-  //         title: "Custom field:Website",
-  //         isBold: false,
-  //         value: "ACCOUNT_CUSTOM_FIELD:Website",
-  //       },
-  //       { title: "Contact Shortcodes", isBold: true },
-  //       { title: "Contact Name", isBold: false, value: "CONTACT_NAME" },
-  //       { title: "First Name", isBold: false, value: "FIRST_NAME" },
-  //       { title: "Middle Name", isBold: false, value: "MIDDLE_NAME" },
-  //       { title: "Last Name", isBold: false, value: "LAST_NAME" },
-  //       { title: "Phone number", isBold: false, value: "PHONE_NUMBER" },
-  //       { title: "Country", isBold: false, value: "COUNTRY" },
-  //       { title: "Company name", isBold: false, value: "COMPANY_NAME " },
-  //       { title: "Street address", isBold: false, value: "STREET_ADDRESS" },
-  //       { title: "City", isBold: false, value: "CITY" },
-  //       { title: "State/Province", isBold: false, value: "STATE / PROVINCE" },
-  //       { title: "Zip/Postal code", isBold: false, value: "ZIP / POSTAL CODE" },
-  //       {
-  //         title: "Custom field:Email",
-  //         isBold: false,
-  //         value: "CONTACT_CUSTOM_FIELD:Email",
-  //       },
-  //       { title: "Date Shortcodes", isBold: true },
-  //       {
-  //         title: "Current day full date",
-  //         isBold: false,
-  //         value: "CURRENT_DAY_FULL_DATE",
-  //       },
-  //       {
-  //         title: "Current day number",
-  //         isBold: false,
-  //         value: "CURRENT_DAY_NUMBER",
-  //       },
-  //       { title: "Current day name", isBold: false, value: "CURRENT_DAY_NAME" },
-  //       { title: "Current week", isBold: false, value: "CURRENT_WEEK" },
-  //       {
-  //         title: "Current month number",
-  //         isBold: false,
-  //         value: "CURRENT_MONTH_NUMBER",
-  //       },
-  //       {
-  //         title: "Current month name",
-  //         isBold: false,
-  //         value: "CURRENT_MONTH_NAME",
-  //       },
-  //       { title: "Current quarter", isBold: false, value: "CURRENT_QUARTER" },
-  //       { title: "Current year", isBold: false, value: "CURRENT_YEAR" },
-  //       {
-  //         title: "Last day full date",
-  //         isBold: false,
-  //         value: "LAST_DAY_FULL_DATE",
-  //       },
-  //       { title: "Last day number", isBold: false, value: "LAST_DAY_NUMBER" },
-  //       { title: "Last day name", isBold: false, value: "LAST_DAY_NAME" },
-  //       { title: "Last week", isBold: false, value: "LAST_WEEK" },
-  //       {
-  //         title: "Last month number",
-  //         isBold: false,
-  //         value: "LAST_MONTH_NUMBER",
-  //       },
-  //       { title: "Last month name", isBold: false, value: "LAST_MONTH_NAME" },
-  //       { title: "Last quarter", isBold: false, value: "LAST_QUARTER" },
-  //       { title: "Last_year", isBold: false, value: "LAST_YEAR" },
-  //       {
-  //         title: "Next day full date",
-  //         isBold: false,
-  //         value: "NEXT_DAY_FULL_DATE",
-  //       },
-  //       { title: "Next day number", isBold: false, value: "NEXT_DAY_NUMBER" },
-  //       { title: "Next day name", isBold: false, value: "NEXT_DAY_NAME" },
-  //       { title: "Next week", isBold: false, value: "NEXT_WEEK" },
-  //       {
-  //         title: "Next month number",
-  //         isBold: false,
-  //         value: "NEXT_MONTH_NUMBER",
-  //       },
-  //       { title: "Next month name", isBold: false, value: "NEXT_MONTH_NAME" },
-  //       { title: "Next quarter", isBold: false, value: "NEXT_QUARTER" },
-  //       { title: "Next year", isBold: false, value: "NEXT_YEAR" },
-  //     ];
-  //     setShortcuts(contactShortcuts);
-  //   } else if (selectedOption === "account") {
-  //     const accountShortcuts = [
-  //       { title: "Account Shortcodes", isBold: true },
-  //       { title: "Account Name", isBold: false, value: "ACCOUNT_NAME" },
-  //       {
-  //         title: "Custom field:Website",
-  //         isBold: false,
-  //         value: "ACCOUNT_CUSTOM_FIELD:Website",
-  //       },
-  //       { title: "Date Shortcodes", isBold: true },
-  //       {
-  //         title: "Current day full date",
-  //         isBold: false,
-  //         value: "CURRENT_DAY_FULL_DATE",
-  //       },
-  //       {
-  //         title: "Current day number",
-  //         isBold: false,
-  //         value: "CURRENT_DAY_NUMBER",
-  //       },
-  //       { title: "Current day name", isBold: false, value: "CURRENT_DAY_NAME" },
-  //       { title: "Current week", isBold: false, value: "CURRENT_WEEK" },
-  //       {
-  //         title: "Current month number",
-  //         isBold: false,
-  //         value: "CURRENT_MONTH_NUMBER",
-  //       },
-  //       {
-  //         title: "Current month name",
-  //         isBold: false,
-  //         value: "CURRENT_MONTH_NAME",
-  //       },
-  //       { title: "Current quarter", isBold: false, value: "CURRENT_QUARTER" },
-  //       { title: "Current year", isBold: false, value: "CURRENT_YEAR" },
-  //       {
-  //         title: "Last day full date",
-  //         isBold: false,
-  //         value: "LAST_DAY_FULL_DATE",
-  //       },
-  //       { title: "Last day number", isBold: false, value: "LAST_DAY_NUMBER" },
-  //       { title: "Last day name", isBold: false, value: "LAST_DAY_NAME" },
-  //       { title: "Last week", isBold: false, value: "LAST_WEEK" },
-  //       {
-  //         title: "Last month number",
-  //         isBold: false,
-  //         value: "LAST_MONTH_NUMBER",
-  //       },
-  //       { title: "Last month name", isBold: false, value: "LAST_MONTH_NAME" },
-  //       { title: "Last quarter", isBold: false, value: "LAST_QUARTER" },
-  //       { title: "Last_year", isBold: false, value: "LAST_YEAR" },
-  //       {
-  //         title: "Next day full date",
-  //         isBold: false,
-  //         value: "NEXT_DAY_FULL_DATE",
-  //       },
-  //       { title: "Next day number", isBold: false, value: "NEXT_DAY_NUMBER" },
-  //       { title: "Next day name", isBold: false, value: "NEXT_DAY_NAME" },
-  //       { title: "Next week", isBold: false, value: "NEXT_WEEK" },
-  //       {
-  //         title: "Next month number",
-  //         isBold: false,
-  //         value: "NEXT_MONTH_NUMBER",
-  //       },
-  //       { title: "Next month name", isBold: false, value: "NEXT_MONTH_NAME" },
-  //       { title: "Next quarter", isBold: false, value: "NEXT_QUARTER" },
-  //       { title: "Next year", isBold: false, value: "NEXT_YEAR" },
-  //     ];
-  //     setShortcuts(accountShortcuts);
-  //   }
-  // }, [selectedOption]);
+ 
   const handleCloseDropdown = () => {
     setShowDropdown(false);
     setAnchorEl(null);
   };
-  // const handlejobName = (e) => {
-  //   const { value } = e.target;
-  //   setOrganizerName(value);
-  // };
+ 
 
   const [cursorPosition, setCursorPosition] = useState(0);
   const textFieldRef = useRef(null);
@@ -349,10 +171,6 @@ useEffect(() => {
     setShowDropdown(!showDropdown);
   };
 
-  // const handleAddShortcut = (shortcut) => {
-  //   setOrganizerName((prevText) => prevText + `[${shortcut}]`);
-  //   setShowDropdown(false);
-  // };
 
   const handleAddShortcut = (shortcut) => {
     setOrganizerName((prevText) => {
@@ -503,17 +321,6 @@ useEffect(() => {
     );
   };
 
-  // const handleDuplicateSection = (sectionId) => {
-  //   const sectionToDuplicate = sections.find(section => section.id === sectionId);
-  //   if (sectionToDuplicate) {
-  //     const duplicatedSection = {
-  //       ...sectionToDuplicate,
-  //       text: `${sectionToDuplicate.text} (Copy)`,
-  //       id: Date.now(), // Assign a new ID for the duplicated section
-  //     };
-  //     setSections([...sections, duplicatedSection]);
-  //   }
-  // };
   const handleDuplicateSection = (sectionId) => {
     const sectionToDuplicate = sections.find(
       (section) => section.id === sectionId
@@ -666,9 +473,7 @@ useEffect(() => {
       })
       .catch((error) => console.error(error));
   };
-  // const handleBackButton = ()=>{
-  //   navigate('/firmtemp/templates/organizers');
-  // }
+
   const [isFormFilled, setIsFormFilled] = useState(false);
   const handleBackButton = () => {
     if (isFormFilled) {
@@ -762,16 +567,7 @@ useEffect(() => {
   const [checkboxValues, setCheckboxValues] = useState({});
   const [answeredElements, setAnsweredElements] = useState({});
 
-  // const handleRadioChange = (value, elementText) => {
-  //   setRadioValues((prevValues) => ({
-  //     ...prevValues,
-  //     [elementText]: value,
-  //   }));
-  //   setAnsweredElements((prevAnswered) => ({
-  //     ...prevAnswered,
-  //     [elementText]: true,
-  //   }));
-  // };
+  
   const handleRadioChange = (value, elementText, sectionId) => {
     const key = `${sectionId}_${elementText}`;
     setRadioValues((prevValues) => ({
@@ -798,28 +594,10 @@ useEffect(() => {
     }));
   };
 
-  // const handleCheckboxChange = (value, elementText) => {
-  //   setCheckboxValues((prevValues) => ({
-  //     ...prevValues,
-  //     [elementText]: {
-  //       ...prevValues[elementText],
-  //       [value]: !prevValues[elementText]?.[value],
-  //     },
-  //   }));
-  //   setAnsweredElements((prevAnswered) => ({
-  //     ...prevAnswered,
-  //     [elementText]: true,
-  //   }));
-  // };
+ 
 
   const [selectedValue, setSelectedValue] = useState(null);
-  // const handleChange = (event, elementText) => {
-  //   setSelectedValue(event.target.value);
-  //   setAnsweredElements((prevAnswered) => ({
-  //     ...prevAnswered,
-  //     [elementText]: true,
-  //   }));
-  // };
+ 
   const [selectedYesNoValues, setSelectedYesNoValues] = useState({});
   const handleYesNoChange = (value, elementText, sectionId) => {
     const key = `${sectionId}_${elementText}`;
@@ -834,17 +612,7 @@ useEffect(() => {
   };
 
   const [inputValues, setInputValues] = useState({});
-  // const handleInputChange = (event, elementText) => {
-  //   const { value } = event.target;
-  //   setInputValues((prevValues) => ({
-  //     ...prevValues,
-  //     [elementText]: value,
-  //   }));
-  //   setAnsweredElements((prevAnswered) => ({
-  //     ...prevAnswered,
-  //     [elementText]: true,
-  //   }));
-  // };
+
   const handleInputChange = (event, elementText, sectionId) => {
     const key = `${sectionId}_${elementText}`;
     const { value } = event.target;
@@ -858,13 +626,7 @@ useEffect(() => {
     }));
   };
   const [selectedDropdownValues, setSelectedDropdownValues] = useState({});
-  // const handleDropdownValueChange = (event, elementText) => {
-  //   setSelectedDropdownValue(event.target.value);
-  //   setAnsweredElements((prevAnswered) => ({
-  //     ...prevAnswered,
-  //     [elementText]: true,
-  //   }));
-  // };
+  
   const handleDropdownValueChange = (event, elementText, sectionId) => {
     const key = `${sectionId}_${elementText}`;
     setSelectedDropdownValues((prevValues) => ({
@@ -883,47 +645,7 @@ useEffect(() => {
     return tempDiv.innerText || tempDiv.textContent || "";
   };
 
-  //   const shouldShowElement = (element) => {
-  //     const settings = element.questionsectionsettings;
-
-  //     // If the element isn't conditional, show it by default
-  //     if (!settings?.conditional) return true;
-
-  //     const conditions = settings?.conditions || [];
-
-  //     // Check if all conditions are satisfied
-  //     for (const condition of conditions) {
-  //         const { question, answer } = condition;
-
-  //         if (question && answer) {
-  //             const radioAnswer = radioValues[question];
-  //             const checkboxAnswer = checkboxValues[question];
-  //             const dropdownAnswer = selectedDropdownValue;
-
-  //             // For radio buttons
-  //             if (radioAnswer !== undefined && radioAnswer === answer) {
-  //                 continue;
-  //             }
-
-  //             // For checkboxes: check if the condition answer is in the selected checkbox values
-  //             if (checkboxAnswer && checkboxAnswer[answer]) {
-  //                 continue;
-  //             }
-
-  //             // For dropdowns: check if the condition answer matches the selected dropdown value
-  //             if (dropdownAnswer !== undefined && dropdownAnswer === answer) {
-  //                 continue;
-  //             }
-
-  //             // If any condition is not satisfied, hide the element
-  //             return false;
-  //         }
-  //     }
-
-  //     // All conditions are satisfied, show the element
-  //     return true;
-  // };
-
+  
   const shouldShowElement = (element, sectionId) => {
     const settings = element.questionsectionsettings;
     if (!settings?.conditional) return true;
@@ -989,37 +711,7 @@ useEffect(() => {
       (element) => answeredElements[element.text]
     ).length || 0;
 
-  // const shouldShowSection = (section) => {
-  //   if (!section.sectionsettings?.conditional) return true;
-
-  //   const conditions = section.sectionsettings.conditions || [];
-
-  //   // Ensure all conditions are true
-  //   return conditions.every((condition) => {
-  //       if (!condition.question || !condition.answer) return false;
-
-  //       // Check for radio button conditions
-  //       const radioAnswer = radioValues[condition.question];
-  //       if (radioAnswer !== undefined && condition.answer === radioAnswer) {
-  //           return true;
-  //       }
-
-  //       // Check for checkbox conditions
-  //       const checkboxAnswer = checkboxValues[condition.question];
-  //       if (checkboxAnswer && checkboxAnswer[condition.answer]) {
-  //           return true;
-  //       }
-
-  //       // Check for dropdown conditions
-  //       const dropdownAnswer = selectedDropdownValue[condition.question];
-  //       if (dropdownAnswer !== undefined && condition.answer === dropdownAnswer) {
-  //           return true;
-  //       }
-
-  //       // If no condition is satisfied, return false
-  //       return false;
-  //   });
-  // };
+  
 
   const shouldShowSection = (section) => {
     if (!section.sectionsettings?.conditional) return true;
@@ -1479,31 +1171,7 @@ useEffect(() => {
                   fullWidth
                   sx={{ marginBottom: "10px", marginTop: "10px" }}
                 >
-                  {/* <Select
-                    value={activeStep}
-                    onChange={handleDropdownChange}
-                    size="small"
-                  >
-                    
-                    {visibleSections.map((section, index) => {
-                      // Calculate answered elements count for this specific section
-                      const answeredCount = section.formElements.reduce(
-                        (count, element) => {
-                          const key = `${section.id}_${element.text}`;
-                          return count + (answeredElements[key] ? 1 : 0);
-                        },
-                        0
-                      );
-
-                      const totalElements = section.formElements.length;
-
-                      return (
-                        <MenuItem key={section.id} value={index}>
-                          {section.text} ({answeredCount}/{totalElements})
-                        </MenuItem>
-                      );
-                    })}
-                  </Select> */}
+                  
                   <Select
   value={activeStep}
   onChange={handleDropdownChange}
@@ -1540,246 +1208,9 @@ useEffect(() => {
                   />
                 </Box>
 
-                {/* {sections
-                    .filter(shouldShowSection) // Filter sections based on conditions
-                    .map((section, sectionIndex) => (
-                        sectionIndex === activeStep && ( */}
+                
                 <Box sx={{ pl: 20, pr: 20 }}>
-                  {/* {visibleSections.map((section, sectionIndex) => (
-                    sectionIndex === activeStep && (
-                      <Box key={section.text}>
-                        {section.formElements.map((element) => (
-                          shouldShowElement(element) && (
-                            <Box key={element.text} >
-                              {(element.type === 'Free Entry'  || element.type === 'Email') && (
-                                <Box>
-                                  <Typography fontSize='18px' mb={1} mt={1}>{element.text}</Typography>
-                                  <TextField
-                                    variant="outlined"
-                                    size='small'
-                                    multiline
-                                    fullWidth
-                                    // margin='normal'
-                                    placeholder={`${element.type} Answer`}
-                                    inputProps={{
-                                      type: element.type === 'Free Entry' ? 'text' : element.type.toLowerCase(),
-                                    }}
-                                    maxRows={8}
-                                    style={{ display: 'block', }}
-                                    value={inputValues[element.text] || ''}
-                                    onChange={(e) => handleInputChange(e, element.text)}
-                                  />
-                                </Box>
-                              )}
-{(  element.type === 'Number') && (
-                                    <Box>
-                                      <Typography fontSize='18px' mb={1} mt={1}>{element.text}</Typography>
-                                      
-                                      <TextField
-  variant="outlined"
-  size="small"
-  multiline
-  fullWidth
-  placeholder={`${element.type} Answer`}
-  inputProps={{
-    type: "text", // Keep as text to prevent default number input styling
-    inputMode: "numeric", // Mobile keyboard optimization
-    pattern: "[0-9]*", // Ensures only numbers
-  }}
-  maxRows={8}
-  style={{ display: "block", marginTop: "15px" }}
-  value={inputValues[element.text] || ""}
-  onChange={(e) => {
-    const numericValue = e.target.value.replace(/\D/g, ""); // Remove non-numeric characters
-    handleInputChange({ target: { value: numericValue } }, element.text);
-  }}
-/>
-
-                                    </Box>
-                                  )}
-                              {element.type === 'Radio Buttons' && (
-                                <Box>
-                                  <Typography fontSize='18px' mb={1} mt={1} >{element.text}</Typography>
-                                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                                    {element.options.map((option) => (
-                                      <Button
-                                        key={option.text}
-                                        variant={radioValues[element.text] === option.text ? 'contained' : 'outlined'}
-                                        onClick={() => handleRadioChange(option.text, element.text)}
-                                        sx={{
-                                          // width: '80px',
-                                          borderRadius: '15px',
-                                          ...(radioValues[element.text] === option.text
-                                            ? {
-                                                backgroundColor: 'var(--color-save-btn)',  // Normal background
-                                                '&:hover': {
-                                                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                                                },
-                                              }
-                                            : {
-                                                borderColor: 'var(--color-border-cancel-btn)',  // Normal border color
-                                                color: 'var(--color-save-btn)',
-                                                '&:hover': {
-                                                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                                                  color: '#fff',
-                                                  border: 'none',
-                                                },
-                                              }),
-                                        }}
-                                     >
-                                        {option.text}
-                                      </Button>
-                                    ))}
-                                  </Box>
-                                </Box>
-                              )}
-
-                              {element.type === 'Checkboxes' && (
-                                <Box>
-                                  <Typography fontSize='18px' >{element.text}</Typography>
-                                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                                    {element.options.map((option) => (
-                                      <Button
-                                        key={option.text}
-                                        variant={checkboxValues[element.text]?.[option.text] ? 'contained' : 'outlined'}
-                                        onClick={() => handleCheckboxChange(option.text, element.text)}
-                                        sx={{
-                                          // width: '80px',
-                                          borderRadius: '15px',
-                                          ...(checkboxValues[element.text]?.[option.text]
-                                            ? {
-                                                backgroundColor: 'var(--color-save-btn)',  // Normal background
-                                                '&:hover': {
-                                                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                                                },
-                                              }
-                                            : {
-                                                borderColor: 'var(--color-border-cancel-btn)',  // Normal border color
-                                                color: 'var(--color-save-btn)',
-                                                '&:hover': {
-                                                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                                                  color: '#fff',
-                                                  border: 'none',
-                                                },
-                                              }),
-                                        }}
-                                     >
-                                        {option.text}
-                                      </Button>
-                                    ))}
-                                  </Box>
-                                </Box>
-                              )}
-
-                              {element.type === 'Yes/No' && (
-                                <Box>
-                                  <Typography fontSize='18px' >{element.text}</Typography>
-                                  <Box sx={{ display: 'flex', gap: 1 }}>
-                                    {element.options.map((option) => (
-                                      <Button
-                                        key={option.text}
-                                        variant={selectedValue === option.text ? 'contained' : 'outlined'}
-                                        onClick={(event) => handleChange(event, element.text)}
-                                        sx={{
-                                          // width: '80px',
-                                          borderRadius: '15px',
-                                          ...(selectedValue === option.text
-                                            ? {
-                                                backgroundColor: 'var(--color-save-btn)',  // Normal background
-                                                '&:hover': {
-                                                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                                                },
-                                              }
-                                            : {
-                                                borderColor: 'var(--color-border-cancel-btn)',  // Normal border color
-                                                color: 'var(--color-save-btn)',
-                                                '&:hover': {
-                                                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                                                  color: '#fff',
-                                                  border: 'none',
-                                                },
-                                              }),
-                                        }}
-                                     >
-                                        {option.text}
-                                      </Button>
-                                    ))}
-                                  </Box>
-                                </Box>
-                              )}
-
-                              {element.type === 'Dropdown' && (
-                                <Box>
-                                  <Typography fontSize='18px' >{element.text}</Typography>
-                                  <FormControl fullWidth>
-                                    <Select
-                                      value={selectedDropdownValue}
-                                      onChange={(event) => handleDropdownValueChange(event, element.text)}
-                                      size='small'
-                                    >
-                                      {element.options.map((option) => (
-                                        <MenuItem key={option.text} value={option.text}>
-                                          {option.text}
-                                        </MenuItem>
-                                      ))}
-                                    </Select>
-                                  </FormControl>
-                                </Box>
-                              )}
-
-                              {element.type === 'Date' && (
-                                <Box>
-                                  <Typography fontSize='18px' >{element.text}</Typography>
-                                  <DatePicker
-                                     format="MM/DD/YYYY"
-                                    sx={{ width: '100%', backgroundColor: '#fff' }}
-                                    selected={startDate}
-                                    onChange={handleStartDateChange}
-                                    renderInput={(params) => <TextField {...params} size="small" />}
-                                    onOpen={() => setAnsweredElements((prevAnswered) => ({
-                                      ...prevAnswered,
-                                      [element.text]: true,
-                                    }))}
-                                  />
-                                </Box>
-                              )}
-                            
-                              {element.type === "File Upload" && (
-                                <Box>
-                                  <Typography fontSize='18px' mb={1} mt={2} >{element.text}</Typography>
-                                  
-                                  <Tooltip title="Unavailable in preview mode" placement="top">
-                                    <Box sx={{ position: 'relative', width: '100%' }}>
-                                      <TextField
-                                        variant="outlined"
-                                        size="small"
-                                        fullWidth
-                                        // margin="normal"
-                                        disabled
-                                        placeholder="Add Document"
-                                        sx={{
-                                          cursor: 'not-allowed',
-                                          '& .MuiInputBase-input': {
-                                            pointerEvents: 'none',
-                                            cursor: 'not-allowed',
-                                          },
-                                        }}
-                                      />
-                                    </Box>
-                                  </Tooltip>
-                                </Box>
-                              )}
-                              {element.type === "Text Editor" && (
-                                <Box mt={2} mb={2}>
-                                  <Typography>{stripHtmlTags(element.text)}</Typography>
-                                </Box>
-                              )}
-                            </Box>
-                          )
-                        ))}
-                      </Box>
-                    )
-                  ))} */}
+                 
                   {visibleSections.map(
                     (section, sectionIndex) =>
                       sectionIndex === activeStep && (

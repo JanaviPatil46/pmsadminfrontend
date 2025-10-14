@@ -490,8 +490,11 @@ const handleCheckboxChange = (value, elementText, sectionId) => {
           id: section?.id?.toString() || "",
           text: section?.text || "",
           sectionsettings: {
+            sectionRepeatingMode: section?.sectionsettings?.sectionRepeatingMode || false,
+            buttonName: section?.sectionsettings?.buttonName || "Repeat Section",
             conditional: section?.sectionsettings?.conditional || false,
             conditions: section?.sectionsettings?.conditions || [],
+             mode: section?.sectionsettings?.mode || "Any"  
           },
           formElements:
             section?.formElements?.map((question) => ({
