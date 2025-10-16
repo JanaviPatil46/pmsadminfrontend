@@ -691,13 +691,15 @@ const handleAccountChange = (newSelectedAcc) => {
 
   // console.log(serviceandinvoiceSettings);
   const { logindata, setLoginData } = useContext(LoginContext);
-
+console.log("logged user detilas",logindata)
   const [loginsData, setloginsData] = useState("");
 
   const [username, setUsername] = useState("");
  
   const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
   const fetchUserLoginData = async (id) => {
+
+    console.log("fetchuserdata",id)
     const maxLength = 15;
     const myHeaders = new Headers();
 
@@ -707,17 +709,22 @@ const handleAccountChange = (newSelectedAcc) => {
       redirect: "follow",
     };
     const url = `${LOGIN_API}/common/user/${id}`;
-    fetch(url + loginsData, requestOptions)
+    fetch(url , requestOptions)
       .then((response) => response.json())
       .then((result) => {
        
         setUsername(result.username);
       });
   };
-  useEffect(() => {
+  // useEffect(() => {
     
+  //   fetchUserLoginData(logindata.user.id);
+  // }, []);
+useEffect(() => {
+  if (logindata && logindata.user && logindata.user.id) {
     fetchUserLoginData(logindata.user.id);
-  }, []);
+  }
+}, [logindata]);
 
   const proposalSendMail = () => {
     const myHeaders = new Headers();

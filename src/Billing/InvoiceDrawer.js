@@ -28,7 +28,7 @@ import {
   MenuItem,
   Divider,
   Button,
-  Checkbox,
+  Checkbox,Alert
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -690,8 +690,33 @@ const InvoiceDrawer = ({
     amount: item.amount.replace("$", ""),
     tax: item.tax.toString(),
   }));
+ const [templateNameError, setTemplateNameError] = useState("");
+const [lineItemsError, setLineItemsError]= useState("")
+  const validateForm = () => {
+    let isValid = true;
+    if (!selectInvoiceTemp) {
+      setTemplateNameError("Name can't be blank");
+    
+      isValid = false;
+    } else {
+      setTemplateNameError("");
+    }
+    if (!selectedservice){
+      setLineItemsError("selecte the Line Items");
+      isValid = false;
+    }
+    else{
+      setLineItemsError("")
+    }
 
+    return isValid;
+  };
   const createinvoice = () => {
+
+     if (!validateForm()) {
+      return; // Prevent form submission if validation fails
+    }
+
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
@@ -1244,7 +1269,7 @@ const InvoiceDrawer = ({
                   </InputLabel>
                   <Autocomplete
                     options={invoiceoptions}
-                    sx={{ mt: 1, mb: 2, backgroundColor: "#fff" }}
+                    sx={{ mt: 1,  backgroundColor: "#fff" }}
                     size="small"
                     value={selectInvoiceTemp}
                     onChange={handleInvoiceTempChange}
@@ -1256,12 +1281,37 @@ const InvoiceDrawer = ({
                       <TextField {...params} placeholder="Invoice Template" />
                     )}
                     isClearable={true}
+                     error={!!templateNameError}
                   />
+                  {!!templateNameError && (
+                                <Alert
+                                  sx={{
+                                    width: "96%",
+                                    p: "0", // Adjust padding to control the size
+                                    pl: "4%",
+                                    height: "23px",
+                                    borderRadius: "10px",
+                                    borderTopLeftRadius: "0",
+                                    borderTopRightRadius: "0",
+                                    fontSize: "15px",
+                                    display: "flex",
+                                    alignItems: "center", // Center content vertically
+                                    "& .MuiAlert-icon": {
+                                      fontSize: "16px", // Adjust the size of the icon
+                                      mr: "8px", // Add margin to the right of the icon
+                                    },
+                                  }}
+                                  variant="filled"
+                                  severity="error"
+                                >
+                                  {templateNameError}
+                                </Alert>
+                              )}
                 </Box>
               </Grid>
             </Grid>
-            <Grid container rowSpacing={1}>
-              <Grid xs={6}>
+            <Box sx={{mt:2}}> <Grid container rowSpacing={1} >
+              <Grid xs={6} >
                 <Box pr={2}>
                   <InputLabel sx={{ color: "black" }}>
                     Invoice Number
@@ -1302,7 +1352,8 @@ const InvoiceDrawer = ({
                   />
                 </Box>
               </Grid>
-            </Grid>
+            </Grid></Box>
+           
             <Grid container rowSpacing={1} mt={2}>
               <Grid xs={6}>
                 <Box pr={2}>
@@ -1560,6 +1611,7 @@ const InvoiceDrawer = ({
                               )
                             }
                             isClearable
+                             error={!selectedservice}
                             styles={{
                               container: (provided) => ({
                                 ...provided,
@@ -1576,6 +1628,30 @@ const InvoiceDrawer = ({
                             }}
                             menuPortalTarget={document.body}
                           />
+                           {!!selectedservice && (
+                                <Alert
+                                  sx={{
+                                    width: "96%",
+                                    p: "0", // Adjust padding to control the size
+                                    pl: "4%",
+                                    height: "23px",
+                                    borderRadius: "10px",
+                                    borderTopLeftRadius: "0",
+                                    borderTopRightRadius: "0",
+                                    fontSize: "15px",
+                                    display: "flex",
+                                    alignItems: "center", // Center content vertically
+                                    "& .MuiAlert-icon": {
+                                      fontSize: "16px", // Adjust the size of the icon
+                                      mr: "8px", // Add margin to the right of the icon
+                                    },
+                                  }}
+                                  variant="filled"
+                                  severity="error"
+                                >
+                                  {selectedservice}
+                                </Alert>
+                              )}
                         </TableCell>
 
                         <TableCell>

@@ -15,7 +15,8 @@ import Templates from "./Pages/Templates";
 import JobTemp from "./Templates/JobsTemp/JobTemp";
 import JobTemplateUpdate from "./Templates/JobsTemp/JobTemplateUpdate";
 import PipelineTemp from "./Templates/PipelineTemp/PipelineTemp";
-import FolderTemp from "./Templates/FoldersTemp/FolderTemp";
+// import FolderTemp from "./Templates/FoldersTemp/FolderTemp";
+import FolderTemp from "./Templates/documentManagement/FolderTemp.js"
 import ChatTemp from "./Templates/ChatsTemp/ChatTemp";
 
 import InvoiceTemp from "./Templates/InvoicesTemp/InvoiceTemp";
@@ -106,6 +107,9 @@ import ActiveOrganizers from "./Pages/Organizers/ActiveOrganizers.js";
 import ArchivedOrganizers from "./Pages/Organizers/ArchivedOrganizers.js";
 import InternalCommunication from  "./Pages/internalChat/internalCommunication.js"
 import Bulkaccount from "./Pages/Bulkaccount.js";
+import TemplateCreator from "./Templates/documentManagement/TemplateCreator.js";
+import FolderTreeView from "./Templates/documentManagement/FolderTreeView.js";
+import DocsFolderTree from "./nested-navbar/documents-nav/DocsFolderTree.js";
 const App = () => {
   return (
     <BrowserRouter>
@@ -169,7 +173,10 @@ const App = () => {
             <Route path="clientfacing" element={<ClientfacingJob />} />
             {/* <Route path="pipelines" element={<PipelineTemp />} /> */}
             {/* <Route path="pipelines/PipelineTemplateUpdate/:id" element={<PipelineTempUpdate />} /> */}
-            <Route path="folders" element={<FolderTemp />} />
+            {/* <Route path="folders" element={<FolderTemp />} /> */}
+                  <Route path="folders" element={<FolderTemp />} />
+                  <Route path="createfolder" element={<TemplateCreator/>}/>
+                  <Route path="tree/:templateId" element={<FolderTreeView/>}/>
             <Route path="chats" element={<ChatTemp />} />
             <Route path="chats/chatTemplateUpdate/:id" element={<ChatTempUpdate />} />
 
@@ -203,7 +210,8 @@ const App = () => {
             <Route path="overview/:data" element={<Overview />} />
             <Route path="info/:data" element={<Info />} />
             <Route path="docs/:data" element={<DashDocs />}>
-              <Route path="documents" element={<Documents />} />
+              {/* <Route path="documents" element={<Documents />} /> */}
+               <Route path="documents" element={<DocsFolderTree />} />
               <Route path="approvals" element={<Approvals />} />
               <Route path="signatures" element={<Signatures />} />
               <Route path="filerequests" element={<FileRequest />} />
