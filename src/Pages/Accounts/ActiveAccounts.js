@@ -58,6 +58,7 @@ import { useNavigate } from "react-router-dom";
 import TagsMultiSelectDropDown from "./TagsMultiSelectDropDown.js"
 import TeamMemberMultiSelectDropDown from "./TeamMemberMultiSelectDropDown.js"
 import { LoginContext } from "../../Sidebar/Context/Context.js";
+import Cookies from 'js-cookie';
 const FixedColumnTable = () => {
   const WINDOWS_PORT = process.env.REACT_APP_SERVER_URI;
   const { logindata } = useContext(LoginContext);
@@ -78,6 +79,32 @@ const FixedColumnTable = () => {
   const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
   const [accountData, setAccountData] = useState([]);
   const [selected, setSelected] = useState([]);
+
+//      console.log("Selecting all:", selected);
+//      useEffect(() => {
+//   if (selected && selected.length > 0) {
+//     // Store selected data in cookies (convert to JSON)
+//     Cookies.set("accountId", selected);
+//   } else {
+//     // Optional: remove cookie if selection is cleared
+//     Cookies.remove('accountId');
+//   }
+// }, [selected]);
+
+
+useEffect(() => {
+  if (selected && selected.length > 0) {
+    // ✅ Always store only the latest (most recent) ID
+    const latestId = selected[selected.length - 1];
+    Cookies.set("accountId", latestId, { path: "/" });
+    console.log("✅ Stored latest accountId:", latestId);
+  } else {
+    // ❌ Remove cookie if nothing is selected
+    Cookies.remove("accountId", { path: "/" });
+    console.log("❌ accountId cookie removed");
+  }
+}, [selected]);
+
   const [anchorEl, setAnchorEl] = useState(null);
 
   // Update your state initialization to ensure arrays are always used for multi-select filters
@@ -1048,6 +1075,7 @@ const clearFilter = (filterField) => {
                             const allSelected = accountData.map(
                               (item) => item.id
                             );
+                          
                             setSelected(allSelected);
                           }
                         }}

@@ -249,6 +249,7 @@ import FolderOpenIcon from "@mui/icons-material/FolderOpen";
 import axios from "axios";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
+import { toast } from "react-toastify";
 const MoveDrawer = ({
   isOpen,
   onClose,
@@ -285,10 +286,14 @@ const MoveDrawer = ({
       );
 
       setMessage(res.data.message);
+      toast.success(res.data.message)
       fetchFolderTree?.();
     } catch (err) {
-      if (err.response) setMessage(err.response.data.error || "Move failed");
-      else setMessage("Server not reachable");
+     if (err.response) {
+  toast.error(err.response.data.error || "Move failed");
+} else {
+  toast.error("Server not reachable");
+}
     }
   };
 

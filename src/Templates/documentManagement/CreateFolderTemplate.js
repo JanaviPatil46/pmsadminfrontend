@@ -24,6 +24,7 @@ import CreteFolderDrawer from "../CreteFolderDrawer";
 import MoveDrawer from "../MoveDrawer";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import DriveFolderUploadIcon from "@mui/icons-material/DriveFolderUpload";
+import { toast } from 'react-toastify';
 
 const CreateFolderTemplate = () => {
   const [expandedFolders, setExpandedFolders] = useState({});
@@ -55,14 +56,17 @@ const [templateId, setTemplateId] = useState("");
       if (response.ok) {
         setMessage(`Success! Folder template created: ${data.templatePath}`);
         setTemplateName('');
+
         // Fetch folder tree for the created template ID (extracted from templatePath)
         const templateId = data.templatePath.split('/')[0];
         console.log("te,plateid",templateId)
         setTemplateId(templateId)
+        toast.success("Folder Template created successfuuly")
         await fetchFolderTree(templateId);
       } 
       else {
         setError(data.error || 'Failed to create folder template');
+        toast.error("Failed to create folder template")
       }
     } catch (err) {
       setError('Network error or server not reachable');
@@ -172,7 +176,8 @@ const [templateId, setTemplateId] = useState("");
       const data = await response.json();
 
       if (response.ok && data.success) {
-        alert(data.message);
+        // alert(data.message);
+        toast.success(data.message)
         await fetchFolderTree(); // refresh view
       } else {
         alert(data.message || "Failed to delete");

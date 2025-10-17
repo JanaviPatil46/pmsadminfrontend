@@ -153,6 +153,7 @@
 import React, { useState, useEffect } from "react";
 import { Drawer, Box, Typography, TextField, Button } from "@mui/material";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const RenameDrawer = ({
   isOpen,
@@ -194,11 +195,13 @@ const RenameDrawer = ({
       );
 
       setMessage(`✅ ${res.data.message}`);
+      toast.success(res.data.message)
          onClose();
       fetchFolderTree(); // refresh folder structure
      
     } catch (err) {
       console.error("Rename error:", err);
+      toast.error(err.response?.data?.error)
       setMessage(`❌ Error: ${err.response?.data?.error || "Server Error"}`);
     }
   };

@@ -242,6 +242,7 @@ import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const FileUploadDrawer = ({
   isOpen,
@@ -286,11 +287,13 @@ const FileUploadDrawer = ({
       );
 
       setMessage(`✅ File uploaded: ${res.data.fileMeta.name}`);
+      toast.success(`✅ File uploaded: ${res.data.fileMeta.name}`)
       setFile(null);
       onClose();
       fetchFolderTree();
     } catch (err) {
       console.error(err);
+      toast.error(err)
       setMessage("❌ Error uploading file");
     }
   };

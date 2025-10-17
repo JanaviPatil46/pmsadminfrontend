@@ -252,6 +252,7 @@ import FolderIcon from "@mui/icons-material/Folder";
 import FolderOpenIcon from "@mui/icons-material/FolderOpen";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
+import { toast } from "react-toastify";
 const CreateFolderDrawer = ({
   isOpen,
   onClose,
@@ -292,6 +293,7 @@ console.log("selected path", selectedFolder)
       );
 console.log("res",res)
       setMessage(`✅ Folder created: ${res.data.metaData.name}`);
+      toast.success(`✅ Folder created: ${res.data.metaData.name}`)
       setFolderName("");
      
       // fetchFolderTree();
@@ -300,6 +302,7 @@ console.log("res",res)
        onClose();
     } catch (err) {
       console.error(err);
+      toast.error(err)
       setMessage(
         `❌ Error creating folder: ${err.response?.data?.error || "Server Error"}`
       );

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, TextField, Button, Typography, Alert } from "@mui/material";
+import { toast } from "react-toastify";
 const TemplateCreator = () => {
   const [templatename, setTemplateName] = useState("");
   const [message, setMessage] = useState("");
@@ -27,6 +28,7 @@ const TemplateCreator = () => {
         setMessage(`Success! Folder template created: ${data.templatePath}`);
         const templateId = data.templatePath.split("/")[0];
         console.log("templateId",templateId)
+        toast.success(`Success! Folder template created`)
         // Redirect to tree structure component and pass templateId as URL param
         // navigate(`/tree/${templateId}`);
           const encodedPath = encodeURIComponent(data.templatePath); // encode slashes etc.
@@ -34,6 +36,7 @@ const TemplateCreator = () => {
    navigate(`/firmtemp/templates/tree/${encodedPath}`, { state: { templateName: templatename } });
       } else {
         setError(data.error || "Failed to create folder template");
+        toast.error("Failed to create folder template")
       }
     } catch (err) {
       setError("Network error or server not reachable");

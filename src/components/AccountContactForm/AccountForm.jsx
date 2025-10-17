@@ -189,10 +189,10 @@ export default function AccountForm({ onContinue }) {
       newErrors.companyName = 'Company Name is required for Company clients';
     }
 
-    // Folder Template validation
-    if (!accountData.folderTemp) {
-      newErrors.folderTemp = 'Folder Template is required';
-    }
+    // // Folder Template validation
+    // if (!accountData.folderTemp) {
+    //   newErrors.folderTemp = 'Folder Template is required';
+    // }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -368,8 +368,8 @@ export default function AccountForm({ onContinue }) {
             margin="normal"
             label="Select Folder Template"
             size="small"
-             error={!!errors.folderTemp}
-            helperText={errors.folderTemp}
+            //  error={!!errors.folderTemp}
+            // helperText={errors.folderTemp}
             required
           />
         )}

@@ -242,13 +242,15 @@ import {
   ListItemButton,
   ListItemText,
   Collapse,
-  Alert,ListItemIcon
+  Alert,
+  ListItemIcon,
 } from "@mui/material";
 import FolderIcon from "@mui/icons-material/Folder";
 import FolderOpenIcon from "@mui/icons-material/FolderOpen";
 import axios from "axios";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
+import { toast } from "react-toastify";
 
 const MoveDrawer = ({
   isOpen,
@@ -286,10 +288,17 @@ const MoveDrawer = ({
       );
 
       setMessage(res.data.message);
+      toast.success(res.data.message);
+      onClose();
       fetchFolderTree?.();
     } catch (err) {
-      if (err.response) setMessage(err.response.data.error || "Move failed");
-      else setMessage("Server not reachable");
+      // if (err.response) setMessage(err.response.data.error || "Move failed");
+      // else setMessage("Server not reachable");
+      if (err.response) {
+        toast.error(err.response.data.error || "Move failed");
+      } else {
+        toast.error("Server not reachable");
+      }
     }
   };
 
@@ -479,7 +488,12 @@ const FolderTreeSelector = ({ items, onSelect, selectedFolder, level = 0 }) => {
                 if (!item.meta?.readOnly) onSelect(item.path);
               }}
             >
-              <ListItemIcon onClick={(e) => { e.stopPropagation(); toggleExpand(item.path); }}>
+              <ListItemIcon
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleExpand(item.path);
+                }}
+              >
                 {isExpanded ? <FolderOpenIcon /> : <FolderIcon />}
               </ListItemIcon>
               <ListItemText
@@ -490,7 +504,21 @@ const FolderTreeSelector = ({ items, onSelect, selectedFolder, level = 0 }) => {
                 }}
               />
               {item.children?.length > 0 &&
-                (isExpanded ? <ExpandLess onClick={(e) => { e.stopPropagation(); toggleExpand(item.path); }} /> : <ExpandMore onClick={(e) => { e.stopPropagation(); toggleExpand(item.path); }} />)}
+                (isExpanded ? (
+                  <ExpandLess
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleExpand(item.path);
+                    }}
+                  />
+                ) : (
+                  <ExpandMore
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleExpand(item.path);
+                    }}
+                  />
+                ))}
             </ListItem>
 
             {item.children?.length > 0 && (

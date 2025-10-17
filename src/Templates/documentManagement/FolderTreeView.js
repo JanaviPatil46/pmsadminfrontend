@@ -7,6 +7,7 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  Stack,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -17,7 +18,7 @@ import {
   Lock as LockIcon,
   LockOpen as LockOpenIcon,
 } from "@mui/icons-material";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation,useNavigate } from "react-router-dom";
 import FileUploadDrawer from "./FileUploadDrawer";
 import FolderUploadDrawer from "./FolderUploadDrawer";
 import CreteFolderDrawer from "./CreteFolderDrawer";
@@ -26,6 +27,7 @@ import MoveDrawer from "./MoveDrawer";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import DriveFolderUploadIcon from "@mui/icons-material/DriveFolderUpload";
 import { Eye, PenTool, Stamp, Lock } from "lucide-react";
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import {
   Folder as FolderClosedIcon,
   FolderOpen as FolderOpenIcon,
@@ -34,7 +36,7 @@ const FolderTreeView = () => {
 const { templateId } = useParams();
 const location = useLocation();
 const templateName = location.state?.templateName || "Unknown Template";
-
+ const navigate = useNavigate();
   const decodedTemplateId = decodeURIComponent(templateId);
  const [expandedFolders, setExpandedFolders] = useState({});
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
@@ -885,12 +887,24 @@ console.log("hgjhg",templateId)
 //     </div>
 <Box sx={{ margin: "auto", p: 3 }}>
       {/* Template Name */}
-      <Typography variant="h5" sx={{ mb: 3, textAlign: "center" }}>
+
+      <Box sx={{display:'flex', alignItems:'center',gap:"35%"}}> 
+ <KeyboardBackspaceIcon
+          sx={{
+            cursor: "pointer",
+            fontSize: 28,
+            mr: 1,
+            "&:hover": { color: "#1976d2" },
+          }}
+          onClick={() => navigate("/firmtemp/templates/folders")}
+        />  <Typography variant="h5" sx={{  textAlign: "center" }}>
         Template: {templateName}
       </Typography>
+      </Box>
+    
 
       {/* Action Buttons */}
-      <Box sx={{ p: 3, maxWidth: "1000px", mx: "auto" }}>
+      <Box sx={{  maxWidth: "1000px", mx: "auto" }}>
         <Box
           sx={{
             display: "flex",
@@ -1084,7 +1098,7 @@ console.log("hgjhg",templateId)
                 Edit
               </MenuItem>
 
-              <MenuItem
+              {/* <MenuItem
                 disabled={isLocked}
                 onClick={() => {
                   toggleSignStatus(selectedFolderForMenu);
@@ -1102,9 +1116,9 @@ console.log("hgjhg",templateId)
                   style={{ marginRight: 6 }}
                 />
                 {statusTextMap[currentStatus]}
-              </MenuItem>
+              </MenuItem> */}
 
-              <MenuItem
+              {/* <MenuItem
                 disabled={isLocked}
                 onClick={() => {
                   toggleReadStatus(selectedFolderForMenu);
@@ -1124,9 +1138,9 @@ console.log("hgjhg",templateId)
                   style={{ marginRight: 6 }}
                 />
                 {isRead ? "Mark Unread" : "Mark Read"}
-              </MenuItem>
+              </MenuItem> */}
 
-              <MenuItem
+              {/* <MenuItem
                 disabled={isLocked}
                 onClick={() => {
                   toggleApprovalStatus(selectedFolderForMenu);
@@ -1147,7 +1161,7 @@ console.log("hgjhg",templateId)
                       "sendForApproval"
                   ]
                 }
-              </MenuItem>
+              </MenuItem> */}
 
               <MenuItem
                 onClick={() => {

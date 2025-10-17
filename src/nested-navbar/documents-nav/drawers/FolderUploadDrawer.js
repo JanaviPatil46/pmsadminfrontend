@@ -83,7 +83,7 @@
 
 //     try {
 //       const res = await fetch(
-//         `http://localhost:5000/api/accountsdoc/folder/upload?folderPath=${encodeURIComponent(
+//         `https://www.snptaxes.com/api/accountsdoc/folder/upload?folderPath=${encodeURIComponent(
 //           targetFolderPath
 //         )}`,
 //         { method: "POST", body: formData }
@@ -282,6 +282,7 @@ import FolderOpenIcon from "@mui/icons-material/FolderOpen";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
+import { toast } from "react-toastify";
 
 const FolderUploadDrawer = ({
   isOpen,
@@ -339,7 +340,7 @@ const FolderUploadDrawer = ({
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/accountsdoc/folder/upload?folderPath=${encodeURIComponent(
+        `https://www.snptaxes.com/api/accountsdoc/folder/upload?folderPath=${encodeURIComponent(
           targetFolderPath
         )}`,
         { method: "POST", body: formData }
@@ -347,6 +348,7 @@ const FolderUploadDrawer = ({
       const data = await res.json();
       if (res.ok) {
         setMessage(`✅ Folder uploaded successfully: ${data.files.length} files`);
+        toast.success(`✅ Folder uploaded successfully: ${data.files.length} files`)
         fetchFolderTree();
         onClose()
         setFiles([]);

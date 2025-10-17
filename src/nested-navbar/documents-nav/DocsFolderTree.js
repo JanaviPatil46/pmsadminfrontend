@@ -35,6 +35,7 @@ import {
   FolderOpen as FolderOpenIcon,
 } from "lucide-react";
 import DownloadIcon from '@mui/icons-material/Download';
+import { toast } from 'react-toastify';
 const DOCS_MANAGMENTS = process.env.REACT_APP_CLIENT_DOCS_MANAGE;
 const DocsFolderTree = () => {
 const { data } = useParams();
@@ -85,11 +86,13 @@ console.log("acount id for the documentation",data)
       .then((result) => {
         console.log(result);
        
-        alert("Folder Template Assign Successfully");
+        // alert("Folder Template Assign Successfully");
+        toast.success("Folder Template Assign Successfully")
         
       })
       .catch((error) => {
         console.error(error);
+        toast.error(error)
         alert("Failed to Assign Folder Template");
       });
   };
@@ -345,10 +348,12 @@ const handleRequestApproval = async () => {
         const data = await res.json();
   
         if (res.ok) {
-          alert(data.message || "Status updated successfully");
+          // alert(data.message || "Status updated successfully");
+          toast.success(data.message)
           fetchFolderTree(accountId); // refresh folder tree to reflect change
         } else {
           alert(data.error || "Failed to update status");
+          toast.error(data.error)
         }
       } catch (err) {
         console.error("Error updating status:", err);
@@ -392,12 +397,14 @@ const handleRequestApproval = async () => {
           }
   
           handleMenuClose();
-          alert(data.message || "Updated successfully");
+          // alert(data.message || "Updated successfully");
+          toast.success(data.message)
         } else {
           alert("Error: " + data.error);
         }
       } catch (err) {
         console.error(err);
+        toast.error(err)
         alert("Failed to update read-only status");
       }
     };
@@ -424,14 +431,17 @@ const handleRequestApproval = async () => {
         const data = await response.json();
   
         if (response.ok && data.success) {
-          alert(data.message);
+          // alert(data.message);
+          toast.success(data.message)
            fetchFolderTree(accountId);
         } else {
           alert(data.message || "Failed to delete");
+                toast.error(data.message)
         }
       } catch (err) {
         console.error("Error deleting item:", err);
         alert("Error deleting file or folder");
+              toast.error(err)
       }
   
       handleMenuClose();
