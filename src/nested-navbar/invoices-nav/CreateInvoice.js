@@ -177,10 +177,48 @@ const CreateInvoice = ({ charLimit = 4000, onClose }) => {
     value: service._id,
     label: service.serviceName,
   }));
+    const [selectedservice, setselectedService] = useState();
+      const fetchservicebyid = async (id, rowIndex) => {
+    const requestOptions = {
+      method: "GET",
+      redirect: "follow",
+    };
+    const url = `${SERVICE_API}/workflow/services/servicetemplate/${id}`;
+    fetch(url, requestOptions)
+      .then((response) => response.json())
+      .then((result) => {
+        const service = Array.isArray(result.serviceTemplate)
+          ? result.serviceTemplate[0]
+          : result.serviceTemplate;
+        const rate = service.rate
+          ? parseFloat(service.rate.replace("$", ""))
+          : 0;
+        const updatedRow = {
+          productName: service.serviceName || "",
+          description: service.description || "",
+          rate: `$${rate.toFixed(2)}`,
+          qty: "1",
+          amount: `$${rate.toFixed(2)}`,
+          tax: service.tax || false,
+          isDiscount: false,
+        };
+
+        const updatedRows = [...rows];
+        updatedRows[rowIndex] = { ...updatedRows[rowIndex], ...updatedRow };
+        setRows(updatedRows);
+      })
+      .catch((error) => console.error(error));
+  };
   const handleServiceChange = (index, selectedOptions) => {
     const newRows = [...rows];
     newRows[index].productName = selectedOptions ? selectedOptions.label : "";
     setRows(newRows);
+     setselectedService(selectedOptions);
+    // fetchservicebyid(selectedOptions.value, index);
+     // Call fetch only if an option is actually selected
+  if (selectedOptions && selectedOptions.value) {
+    fetchservicebyid(selectedOptions.value, index);
+  }
   };
 
   const handleServiceInputChange = (inputValue, actionMeta, index) => {
@@ -914,7 +952,7 @@ const validateInvoice = () => {
     <Box>
       <Box sx={{display:'flex', alignItems:'center',justifyContent:'space-between',mr:2}}>
       <Typography p={2} variant="h6">
-        Create Invoice
+        Create Invoice 
       </Typography>
       <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
     <Box
@@ -1251,9 +1289,7 @@ const validateInvoice = () => {
               </Typography>
               <p style={{ color: "grey" }}>Client-facing itemized list of products and services</p>
             </Box>
-            {/* <Box >
-                        <MaterialReactTable columns={columns} table={table} />
-                    </Box> */}
+            
             <Box sx={{ overflowX: "auto", width: "100%" }}>
               <Table>
                 <TableHead>
@@ -1272,24 +1308,7 @@ const validateInvoice = () => {
                   {rows.map((row, index) => (
                     <TableRow key={index}>
                       <TableCell>
-                        {/* <CreatableSelect
-                          placeholder="Product or Service"
-                          options={serviceoptions}
-                          value={serviceoptions.find((option) => option.label === row.productName) || { label: row.productName, value: row.productName }}
-                          onChange={(selectedOption) => handleServiceChange(index, selectedOption)}
-                          onInputChange={(inputValue, actionMeta) => handleServiceInputChange(inputValue, actionMeta, index)}
-                          isClearable
-                          styles={{
-                            container: (provided) => ({
-                              ...provided,
-                              width: "180px",
-                            }),
-                            control: (provided) => ({
-                              ...provided,
-                              width: "180px",
-                            }),
-                          }}
-                        /> */}
+                       
                         <CreatableSelect
                           // placeholder='Product or Service'
                           placeholder={row.isDiscount ? "Reason for discount" : "Product or Service"}
@@ -1321,11 +1340,7 @@ const validateInvoice = () => {
                       <TableCell>
                         <Checkbox name="tax" checked={row.tax} onChange={(e) => handleInputChange(index, e)} />
                       </TableCell>
-                      {/* <TableCell>
-                        <IconButton>
-                          <BsThreeDotsVertical />
-                        </IconButton>
-                      </TableCell> */}
+                      
                       <TableCell>
                         <IconButton onClick={(event) => handleMenuOpen(event, index)}>
                           <BsThreeDotsVertical />

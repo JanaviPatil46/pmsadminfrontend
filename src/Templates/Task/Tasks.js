@@ -1096,14 +1096,14 @@ const handleUserChange = (newSelectedUsers) => {
                                           >
                                             <Checkbox
                                               style={{ cursor: "pointer" }}
-                                              // checked={subtask.checked}
-                                              checked={checkedSubtasks.includes(
-                                                subtask.id
-                                              )}
+                                              checked={subtask.checked}
+                                              // checked={checkedSubtasks.includes(
+                                              //   subtask.id
+                                              // )}
                                               onChange={() =>
                                                 handleCheckboxChange(
                                                   subtask.id,
-                                                  subtask.checked
+                                                  // subtask.checked
                                                 )
                                               }
                                             />

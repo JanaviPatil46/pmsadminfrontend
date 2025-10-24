@@ -139,49 +139,81 @@ const NewTaskDrawer = ({ open, onClose, isEditMode, taskData }) => {
 
   const [subtasks, setSubtasks] = useState([]);
   const [checkedSubtasks, setCheckedSubtasks] = useState([]);
+  // const handleCheckboxChange = (subtaskId) => {
+  //   setSubtasks((prevSubtasks) =>
+  //     prevSubtasks.map((subtask) =>
+  //       subtask.id === subtaskId
+  //         ? { ...subtask, checked: true } // Always set checked to true
+  //         : subtask
+  //     )
+  //   );
+  
+  //   setCheckedSubtasks((prevCheckedSubtasks) =>
+  //     prevCheckedSubtasks.includes(subtaskId)
+  //       ? prevCheckedSubtasks // Keep already checked items
+  //       : [...prevCheckedSubtasks, subtaskId] // Add new checked item
+  //   );
+  // };
+
+// Fixed checkbox handler - properly toggles checked state
   const handleCheckboxChange = (subtaskId) => {
-    setSubtasks((prevSubtasks) =>
-      prevSubtasks.map((subtask) =>
+    setSubtasks(prevSubtasks =>
+      prevSubtasks.map(subtask =>
         subtask.id === subtaskId
-          ? { ...subtask, checked: true } // Always set checked to true
+          ? { ...subtask, checked: !subtask.checked } // Toggle checked state
           : subtask
       )
     );
-  
-    setCheckedSubtasks((prevCheckedSubtasks) =>
-      prevCheckedSubtasks.includes(subtaskId)
-        ? prevCheckedSubtasks // Keep already checked items
-        : [...prevCheckedSubtasks, subtaskId] // Add new checked item
-    );
   };
-
-
+    // Fixed add subtask function
   const handleAddSubtask = () => {
-    const newId = String(subtasks.length + 1);
-    setSubtasks([...subtasks, { id: newId, text: "" }]);
+    const newId = String(subtasks.length + 1);// Use timestamp for unique ID
+    setSubtasks([...subtasks, { 
+      id: newId, 
+      text: "", 
+      checked: false // Initialize with unchecked state
+    }]);
   };
+  // const handleAddSubtask = () => {
+  //   const newId = String(subtasks.length + 1);
+  //   setSubtasks([...subtasks, { id: newId, text: "" }]);
+  // };
 
+  // const handleDragEnd = (result) => {
+  //   // Ensure a valid drop location
+  //   if (!result.destination) return;
+
+  //   // Reorder subtasks based on the drag-and-drop result
+  //   const newSubtasks = Array.from(subtasks);
+  //   const [reorderedItem] = newSubtasks.splice(result.source.index, 1);
+  //   newSubtasks.splice(result.destination.index, 0, reorderedItem);
+
+  //   // Update the state with the new order of subtasks
+  //   setSubtasks(newSubtasks);
+  // };
+ // Fixed drag end handler
   const handleDragEnd = (result) => {
-    // Ensure a valid drop location
     if (!result.destination) return;
 
-    // Reorder subtasks based on the drag-and-drop result
     const newSubtasks = Array.from(subtasks);
     const [reorderedItem] = newSubtasks.splice(result.source.index, 1);
     newSubtasks.splice(result.destination.index, 0, reorderedItem);
 
-    // Update the state with the new order of subtasks
     setSubtasks(newSubtasks);
-  };
-
+  }
+  // const handleInputChange = (id, value) => {
+  //   setSubtasks(
+  //     subtasks.map((subtask) =>
+  //       subtask.id === id ? { ...subtask, text: value } : subtask
+  //     )
+  //   );
+  // };
+ // Fixed input change handler
   const handleInputChange = (id, value) => {
-    setSubtasks(
-      subtasks.map((subtask) =>
-        subtask.id === id ? { ...subtask, text: value } : subtask
-      )
-    );
+    setSubtasks(subtasks.map(subtask =>
+      subtask.id === id ? { ...subtask, text: value } : subtask
+    ));
   };
-
   const handleDeleteSubtask = (id) => {
     setSubtasks(subtasks.filter((subtask) => subtask.id !== id));
   };
@@ -254,13 +286,7 @@ const NewTaskDrawer = ({ open, onClose, isEditMode, taskData }) => {
       console.error("Error fetching data:", error);
     }
   };
-  //  for tags
-  const calculateWidth = (tagName) => {
-    const baseWidth = 10; // base width for each tag
-    const charWidth = 8; // approximate width of each character
-    const padding = 10; // padding on either side
-    return baseWidth + charWidth * tagName.length + padding;
-  };
+  
  
   const handleTagChange = (newSelectedTags) => {
     setTagsNew(newSelectedTags);
@@ -338,18 +364,18 @@ const NewTaskDrawer = ({ open, onClose, isEditMode, taskData }) => {
         tempallvalue();
 
         // Extract and process subtasks
-        if (
-          data.taskTemplate.subtasks &&
-          Array.isArray(data.taskTemplate.subtasks)
-        ) {
-          const subtasksText = data.taskTemplate.subtasks.map(
-            (subtask) => subtask.text
-          );
-          console.log("Subtasks Text:", subtasksText); // Log the extracted subtasks text
-
-          setSubtasks(subtasksText); // Assuming you have a state setter for this
+         // FIXED: Process subtasks with proper structure
+        if (data.taskTemplate && Array.isArray(data.taskTemplate.subtasks)) {
+          const formattedSubtasks = data.taskTemplate.subtasks.map((subtask, index) => ({
+            id: subtask.id || `subtask-${index}-${Date.now()}`, // Ensure unique ID
+            text: subtask.text || "",
+            checked: subtask.checked || false // Ensure checked property exists
+          }));
+          console.log("Formatted Subtasks:", formattedSubtasks);
+          setSubtasks(formattedSubtasks);
         } else {
           console.log("subtasks is not defined or not an array.");
+          setSubtasks([]); // Reset to empty array if no subtasks
         }
       } catch (error) {
         console.error("Error fetching template data:", error);
@@ -416,11 +442,15 @@ const NewTaskDrawer = ({ open, onClose, isEditMode, taskData }) => {
         setCombinedTagsValues(tagsData.map((option) => option.value));
       }
 
-      // Pre-fill subtasks
-      if (taskData.taskList.SubtaskList
-        && Array.isArray(taskData.taskList.SubtaskList
-        )) {
-        setSubtasks(taskData.taskList.SubtaskList);
+     if (taskData.taskList.SubtaskList && Array.isArray(taskData.taskList.SubtaskList)) {
+        const formattedSubtasks = taskData.taskList.SubtaskList.map((subtask, index) => ({
+          id: subtask.id || `edit-subtask-${index}-${Date.now()}`,
+          text: subtask.text || "",
+          checked: subtask.checked || false // Ensure checked property exists
+        }));
+        setSubtasks(formattedSubtasks);
+      } else {
+        setSubtasks([]);
       }
 
       if (taskData.taskList && taskData.taskList.Accounts) {
@@ -483,12 +513,17 @@ let hasError = false;
   const myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
 
-  const subtaskData = subtasks.map(({ id, text }) => ({
+  // const subtaskData = subtasks.map(({ id, text }) => ({
+  //   id,
+  //   text,
+  //   checked: checkedSubtasks.includes(id),
+  // }));
+    const subtaskData = subtasks.map(({ id, text, checked }) => ({
     id,
     text,
-    checked: checkedSubtasks.includes(id),
+    checked: checked || false, // Use the checked property from subtask, default to false if undefined
   }));
-console.log(subtaskData)
+  console.log("Subtask data being saved:", subtaskData);
   const raw = JSON.stringify({
     accounts: selectedaccount?.value,
     job: selectedJob?.value,
@@ -773,7 +808,7 @@ console.log("rew",raw)
                 </Box>
               </Box>
               <Box mt={2}>
-                <DragDropContext onDragEnd={handleDragEnd}>
+                {/* <DragDropContext onDragEnd={handleDragEnd}>
                   <Box
                     sx={{
                       display: "flex",
@@ -874,7 +909,104 @@ console.log("rew",raw)
                       )}
                     </Droppable>
                   )}
-                </DragDropContext>
+                </DragDropContext> */}
+                 <DragDropContext onDragEnd={handleDragEnd}>
+            <Box sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}>
+              <Typography variant="h6">Subtasks</Typography>
+              <FormControlLabel
+                control={
+                  <Switch
+                    onChange={(event) => handleSubtaskSwitch(event.target.checked)}
+                    checked={SubtaskSwitch}
+                    color="primary"
+                  />
+                }
+              />
+            </Box>
+
+            {SubtaskSwitch && (
+              <Droppable droppableId="subtaskList">
+                {(provided) => (
+                  <div
+                    className="subtask-input"
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                  >
+                    {subtasks.map((subtask, index) => (
+                      <Draggable
+                        key={subtask.id} // Use the actual ID from state
+                        draggableId={subtask.id}
+                        index={index}
+                      >
+                        {(provided) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                          >
+                            <Box
+                              display="flex"
+                              gap="30px"
+                              alignItems="center"
+                              sx={{
+                                textDecoration: subtask.checked ? 'line-through' : 'none',
+                                opacity: subtask.checked ? 0.7 : 1
+                              }}
+                            >
+                              <Checkbox
+                                style={{ cursor: "pointer" }}
+                                checked={subtask.checked || false}
+                                onChange={() => handleCheckboxChange(subtask.id)}
+                              />
+                              <TextField
+                                placeholder="Things To do"
+                                value={subtask.text}
+                                size="small"
+                                margin="normal"
+                                fullWidth
+                                onChange={(e) => handleInputChange(subtask.id, e.target.value)}
+                                variant="outlined"
+                                sx={{
+                                  '& .MuiInputBase-input': {
+                                    textDecoration: subtask.checked ? 'line-through' : 'none',
+                                  }
+                                }}
+                                disabled={subtask.checked} // Optional: disable input when checked
+                              />
+                              <IconButton
+                                onClick={() => handleDeleteSubtask(subtask.id)}
+                                style={{ cursor: "pointer" }}
+                              >
+                                <RiDeleteBin6Line />
+                              </IconButton>
+                              <IconButton 
+                                style={{ cursor: "move" }}
+                                {...provided.dragHandleProps}
+                              >
+                                <PiDotsSixVerticalBold />
+                              </IconButton>
+                            </Box>
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                    <Box
+                      sx={{ cursor: "pointer" }}
+                      onClick={handleAddSubtask}
+                      style={{ margin: "10px", color: "#1976d3" }}
+                    >
+                      <FiPlusCircle /> Add Subtasks
+                    </Box>
+                  </div>
+                )}
+              </Droppable>
+            )}
+          </DragDropContext>
               </Box>
             </Box>
           </LocalizationProvider>

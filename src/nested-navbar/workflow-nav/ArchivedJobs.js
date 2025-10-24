@@ -39,6 +39,7 @@ const ArchivedJobs = () => {
       .then((response) => response.json())
       .then((result) => {
         setJobData(result.jobList || []);
+        console.log("joblist",result)
       })
       .catch((error) => {
         console.error("Error fetching job list:", error);
@@ -276,7 +277,7 @@ const ArchivedJobs = () => {
                           fontSize: "12px",
                           padding: "4px 8px",
                           lineHeight: "1",
-                        }}>{job.Stage.join(", ")}</TableCell>
+                        }}>{job.Stages.join(", ")}</TableCell>
                
                 <TableCell style={{
                           fontSize: "12px",

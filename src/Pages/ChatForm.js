@@ -95,7 +95,7 @@ const ChatForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   const [chatTemplates, setChatTemplates] = useState([]);
   const fetchChatTemplates = async () => {
     try {
-      const url = `${CHAT_API}/Workflow/chats/chattemplate`;
+      const url = `${CHAT_API}/workflow/chats/chattemplate`;
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error("Failed to fetch ChatTemplate");
@@ -146,164 +146,198 @@ const ChatForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
       shortcuts.filter((shortcut) => shortcut.title.toLowerCase().includes(""))
     );
   }, [shortcuts]);
-
-  useEffect(() => {
-    // Set shortcuts based on selected option
-    if (selectedOption === "contacts") {
-      const contactShortcuts = [
-        { title: "Account Shortcodes", isBold: true },
-        { title: "Account Name", isBold: false, value: "ACCOUNT_NAME" },
-        {
-          title: "Custom field:Website",
-          isBold: false,
-          value: "ACCOUNT_CUSTOM_FIELD:Website",
-        },
-        { title: "Contact Shortcodes", isBold: true },
-        { title: "Contact Name", isBold: false, value: "CONTACT_NAME" },
-        { title: "First Name", isBold: false, value: "FIRST_NAME" },
-        { title: "Middle Name", isBold: false, value: "MIDDLE_NAME" },
-        { title: "Last Name", isBold: false, value: "LAST_NAME" },
-        { title: "Phone number", isBold: false, value: "PHONE_NUMBER" },
-        { title: "Country", isBold: false, value: "COUNTRY" },
-        { title: "Company name", isBold: false, value: "COMPANY_NAME " },
-        { title: "Street address", isBold: false, value: "STREET_ADDRESS" },
-        { title: "City", isBold: false, value: "CITY" },
-        { title: "State/Province", isBold: false, value: "STATE / PROVINCE" },
-        { title: "Zip/Postal code", isBold: false, value: "ZIP / POSTAL CODE" },
-        {
-          title: "Custom field:Email",
-          isBold: false,
-          value: "CONTACT_CUSTOM_FIELD:Email",
-        },
-        { title: "Date Shortcodes", isBold: true },
-        {
-          title: "Current day full date",
-          isBold: false,
-          value: "CURRENT_DAY_FULL_DATE",
-        },
-        {
-          title: "Current day number",
-          isBold: false,
-          value: "CURRENT_DAY_NUMBER",
-        },
-        { title: "Current day name", isBold: false, value: "CURRENT_DAY_NAME" },
-        { title: "Current week", isBold: false, value: "CURRENT_WEEK" },
-        {
-          title: "Current month number",
-          isBold: false,
-          value: "CURRENT_MONTH_NUMBER",
-        },
-        {
-          title: "Current month name",
-          isBold: false,
-          value: "CURRENT_MONTH_NAME",
-        },
-        { title: "Current quarter", isBold: false, value: "CURRENT_QUARTER" },
-        { title: "Current year", isBold: false, value: "CURRENT_YEAR" },
-        {
-          title: "Last day full date",
-          isBold: false,
-          value: "LAST_DAY_FULL_DATE",
-        },
-        { title: "Last day number", isBold: false, value: "LAST_DAY_NUMBER" },
-        { title: "Last day name", isBold: false, value: "LAST_DAY_NAME" },
-        { title: "Last week", isBold: false, value: "LAST_WEEK" },
-        {
-          title: "Last month number",
-          isBold: false,
-          value: "LAST_MONTH_NUMBER",
-        },
-        { title: "Last month name", isBold: false, value: "LAST_MONTH_NAME" },
-        { title: "Last quarter", isBold: false, value: "LAST_QUARTER" },
-        { title: "Last_year", isBold: false, value: "LAST_YEAR" },
-        {
-          title: "Next day full date",
-          isBold: false,
-          value: "NEXT_DAY_FULL_DATE",
-        },
-        { title: "Next day number", isBold: false, value: "NEXT_DAY_NUMBER" },
-        { title: "Next day name", isBold: false, value: "NEXT_DAY_NAME" },
-        { title: "Next week", isBold: false, value: "NEXT_WEEK" },
-        {
-          title: "Next month number",
-          isBold: false,
-          value: "NEXT_MONTH_NUMBER",
-        },
-        { title: "Next month name", isBold: false, value: "NEXT_MONTH_NAME" },
-        { title: "Next quarter", isBold: false, value: "NEXT_QUARTER" },
-        { title: "Next year", isBold: false, value: "NEXT_YEAR" },
-      ];
-      setShortcuts(contactShortcuts);
-    } else if (selectedOption === "account") {
-      const accountShortcuts = [
-        { title: "Account Shortcodes", isBold: true },
-        { title: "Account Name", isBold: false, value: "ACCOUNT_NAME" },
-        {
-          title: "Custom field:Website",
-          isBold: false,
-          value: "ACCOUNT_CUSTOM_FIELD:Website",
-        },
-        { title: "Date Shortcodes", isBold: true },
-        {
-          title: "Current day full date",
-          isBold: false,
-          value: "CURRENT_DAY_FULL_DATE",
-        },
-        {
-          title: "Current day number",
-          isBold: false,
-          value: "CURRENT_DAY_NUMBER",
-        },
-        { title: "Current day name", isBold: false, value: "CURRENT_DAY_NAME" },
-        { title: "Current week", isBold: false, value: "CURRENT_WEEK" },
-        {
-          title: "Current month number",
-          isBold: false,
-          value: "CURRENT_MONTH_NUMBER",
-        },
-        {
-          title: "Current month name",
-          isBold: false,
-          value: "CURRENT_MONTH_NAME",
-        },
-        { title: "Current quarter", isBold: false, value: "CURRENT_QUARTER" },
-        { title: "Current year", isBold: false, value: "CURRENT_YEAR" },
-        {
-          title: "Last day full date",
-          isBold: false,
-          value: "LAST_DAY_FULL_DATE",
-        },
-        { title: "Last day number", isBold: false, value: "LAST_DAY_NUMBER" },
-        { title: "Last day name", isBold: false, value: "LAST_DAY_NAME" },
-        { title: "Last week", isBold: false, value: "LAST_WEEK" },
-        {
-          title: "Last month number",
-          isBold: false,
-          value: "LAST_MONTH_NUMBER",
-        },
-        { title: "Last month name", isBold: false, value: "LAST_MONTH_NAME" },
-        { title: "Last quarter", isBold: false, value: "LAST_QUARTER" },
-        { title: "Last_year", isBold: false, value: "LAST_YEAR" },
-        {
-          title: "Next day full date",
-          isBold: false,
-          value: "NEXT_DAY_FULL_DATE",
-        },
-        { title: "Next day number", isBold: false, value: "NEXT_DAY_NUMBER" },
-        { title: "Next day name", isBold: false, value: "NEXT_DAY_NAME" },
-        { title: "Next week", isBold: false, value: "NEXT_WEEK" },
-        {
-          title: "Next month number",
-          isBold: false,
-          value: "NEXT_MONTH_NUMBER",
-        },
-        { title: "Next month name", isBold: false, value: "NEXT_MONTH_NAME" },
-        { title: "Next quarter", isBold: false, value: "NEXT_QUARTER" },
-        { title: "Next year", isBold: false, value: "NEXT_YEAR" },
-      ];
-      setShortcuts(accountShortcuts);
-    }
-  }, [selectedOption]);
+useEffect(() => {
+  if (selectedOption === "contacts" || selectedOption === "account") {
+    const accountShortcuts = [
+      { title: "Account Shortcodes", isBold: true },
+      { title: "Account Name", isBold: false, value: "ACCOUNT_NAME" },
+      // { title: "Custom field:Website", isBold: false, value: "ACCOUNT_CUSTOM_FIELD:Website" },
+      { title: "Date Shortcodes", isBold: true },
+      { title: "Current day full date", isBold: false, value: "CURRENT_DAY_FULL_DATE" },
+      { title: "Current day number", isBold: false, value: "CURRENT_DAY_NUMBER" },
+      { title: "Current day name", isBold: false, value: "CURRENT_DAY_NAME" },
+      { title: "Current week", isBold: false, value: "CURRENT_WEEK" },
+      { title: "Current month number", isBold: false, value: "CURRENT_MONTH_NUMBER" },
+      { title: "Current month name", isBold: false, value: "CURRENT_MONTH_NAME" },
+      { title: "Current quarter", isBold: false, value: "CURRENT_QUARTER" },
+      { title: "Current year", isBold: false, value: "CURRENT_YEAR" },
+      { title: "Last day full date", isBold: false, value: "LAST_DAY_FULL_DATE" },
+      { title: "Last day number", isBold: false, value: "LAST_DAY_NUMBER" },
+      { title: "Last day name", isBold: false, value: "LAST_DAY_NAME" },
+      { title: "Last week", isBold: false, value: "LAST_WEEK" },
+      { title: "Last month number", isBold: false, value: "LAST_MONTH_NUMBER" },
+      { title: "Last month name", isBold: false, value: "LAST_MONTH_NAME" },
+      { title: "Last quarter", isBold: false, value: "LAST_QUARTER" },
+      { title: "Last_year", isBold: false, value: "LAST_YEAR" },
+      { title: "Next day full date", isBold: false, value: "NEXT_DAY_FULL_DATE" },
+      { title: "Next day number", isBold: false, value: "NEXT_DAY_NUMBER" },
+      { title: "Next day name", isBold: false, value: "NEXT_DAY_NAME" },
+      { title: "Next week", isBold: false, value: "NEXT_WEEK" },
+      { title: "Next month number", isBold: false, value: "NEXT_MONTH_NUMBER" },
+      { title: "Next month name", isBold: false, value: "NEXT_MONTH_NAME" },
+      { title: "Next quarter", isBold: false, value: "NEXT_QUARTER" },
+      { title: "Next year", isBold: false, value: "NEXT_YEAR" },
+    ];
+    setShortcuts(accountShortcuts);
+  }
+}, [selectedOption]);
+  // useEffect(() => {
+  //   // Set shortcuts based on selected option
+  //   if (selectedOption === "contacts") {
+  //     const contactShortcuts = [
+  //       { title: "Account Shortcodes", isBold: true },
+  //       { title: "Account Name", isBold: false, value: "ACCOUNT_NAME" },
+  //       {
+  //         title: "Custom field:Website",
+  //         isBold: false,
+  //         value: "ACCOUNT_CUSTOM_FIELD:Website",
+  //       },
+  //       { title: "Contact Shortcodes", isBold: true },
+  //       { title: "Contact Name", isBold: false, value: "CONTACT_NAME" },
+  //       { title: "First Name", isBold: false, value: "FIRST_NAME" },
+  //       { title: "Middle Name", isBold: false, value: "MIDDLE_NAME" },
+  //       { title: "Last Name", isBold: false, value: "LAST_NAME" },
+  //       { title: "Phone number", isBold: false, value: "PHONE_NUMBER" },
+  //       { title: "Country", isBold: false, value: "COUNTRY" },
+  //       { title: "Company name", isBold: false, value: "COMPANY_NAME " },
+  //       { title: "Street address", isBold: false, value: "STREET_ADDRESS" },
+  //       { title: "City", isBold: false, value: "CITY" },
+  //       { title: "State/Province", isBold: false, value: "STATE / PROVINCE" },
+  //       { title: "Zip/Postal code", isBold: false, value: "ZIP / POSTAL CODE" },
+  //       {
+  //         title: "Custom field:Email",
+  //         isBold: false,
+  //         value: "CONTACT_CUSTOM_FIELD:Email",
+  //       },
+  //       { title: "Date Shortcodes", isBold: true },
+  //       {
+  //         title: "Current day full date",
+  //         isBold: false,
+  //         value: "CURRENT_DAY_FULL_DATE",
+  //       },
+  //       {
+  //         title: "Current day number",
+  //         isBold: false,
+  //         value: "CURRENT_DAY_NUMBER",
+  //       },
+  //       { title: "Current day name", isBold: false, value: "CURRENT_DAY_NAME" },
+  //       { title: "Current week", isBold: false, value: "CURRENT_WEEK" },
+  //       {
+  //         title: "Current month number",
+  //         isBold: false,
+  //         value: "CURRENT_MONTH_NUMBER",
+  //       },
+  //       {
+  //         title: "Current month name",
+  //         isBold: false,
+  //         value: "CURRENT_MONTH_NAME",
+  //       },
+  //       { title: "Current quarter", isBold: false, value: "CURRENT_QUARTER" },
+  //       { title: "Current year", isBold: false, value: "CURRENT_YEAR" },
+  //       {
+  //         title: "Last day full date",
+  //         isBold: false,
+  //         value: "LAST_DAY_FULL_DATE",
+  //       },
+  //       { title: "Last day number", isBold: false, value: "LAST_DAY_NUMBER" },
+  //       { title: "Last day name", isBold: false, value: "LAST_DAY_NAME" },
+  //       { title: "Last week", isBold: false, value: "LAST_WEEK" },
+  //       {
+  //         title: "Last month number",
+  //         isBold: false,
+  //         value: "LAST_MONTH_NUMBER",
+  //       },
+  //       { title: "Last month name", isBold: false, value: "LAST_MONTH_NAME" },
+  //       { title: "Last quarter", isBold: false, value: "LAST_QUARTER" },
+  //       { title: "Last_year", isBold: false, value: "LAST_YEAR" },
+  //       {
+  //         title: "Next day full date",
+  //         isBold: false,
+  //         value: "NEXT_DAY_FULL_DATE",
+  //       },
+  //       { title: "Next day number", isBold: false, value: "NEXT_DAY_NUMBER" },
+  //       { title: "Next day name", isBold: false, value: "NEXT_DAY_NAME" },
+  //       { title: "Next week", isBold: false, value: "NEXT_WEEK" },
+  //       {
+  //         title: "Next month number",
+  //         isBold: false,
+  //         value: "NEXT_MONTH_NUMBER",
+  //       },
+  //       { title: "Next month name", isBold: false, value: "NEXT_MONTH_NAME" },
+  //       { title: "Next quarter", isBold: false, value: "NEXT_QUARTER" },
+  //       { title: "Next year", isBold: false, value: "NEXT_YEAR" },
+  //     ];
+  //     setShortcuts(contactShortcuts);
+  //   } else if (selectedOption === "account") {
+  //     const accountShortcuts = [
+  //       { title: "Account Shortcodes", isBold: true },
+  //       { title: "Account Name", isBold: false, value: "ACCOUNT_NAME" },
+  //       {
+  //         title: "Custom field:Website",
+  //         isBold: false,
+  //         value: "ACCOUNT_CUSTOM_FIELD:Website",
+  //       },
+  //       { title: "Date Shortcodes", isBold: true },
+  //       {
+  //         title: "Current day full date",
+  //         isBold: false,
+  //         value: "CURRENT_DAY_FULL_DATE",
+  //       },
+  //       {
+  //         title: "Current day number",
+  //         isBold: false,
+  //         value: "CURRENT_DAY_NUMBER",
+  //       },
+  //       { title: "Current day name", isBold: false, value: "CURRENT_DAY_NAME" },
+  //       { title: "Current week", isBold: false, value: "CURRENT_WEEK" },
+  //       {
+  //         title: "Current month number",
+  //         isBold: false,
+  //         value: "CURRENT_MONTH_NUMBER",
+  //       },
+  //       {
+  //         title: "Current month name",
+  //         isBold: false,
+  //         value: "CURRENT_MONTH_NAME",
+  //       },
+  //       { title: "Current quarter", isBold: false, value: "CURRENT_QUARTER" },
+  //       { title: "Current year", isBold: false, value: "CURRENT_YEAR" },
+  //       {
+  //         title: "Last day full date",
+  //         isBold: false,
+  //         value: "LAST_DAY_FULL_DATE",
+  //       },
+  //       { title: "Last day number", isBold: false, value: "LAST_DAY_NUMBER" },
+  //       { title: "Last day name", isBold: false, value: "LAST_DAY_NAME" },
+  //       { title: "Last week", isBold: false, value: "LAST_WEEK" },
+  //       {
+  //         title: "Last month number",
+  //         isBold: false,
+  //         value: "LAST_MONTH_NUMBER",
+  //       },
+  //       { title: "Last month name", isBold: false, value: "LAST_MONTH_NAME" },
+  //       { title: "Last quarter", isBold: false, value: "LAST_QUARTER" },
+  //       { title: "Last_year", isBold: false, value: "LAST_YEAR" },
+  //       {
+  //         title: "Next day full date",
+  //         isBold: false,
+  //         value: "NEXT_DAY_FULL_DATE",
+  //       },
+  //       { title: "Next day number", isBold: false, value: "NEXT_DAY_NUMBER" },
+  //       { title: "Next day name", isBold: false, value: "NEXT_DAY_NAME" },
+  //       { title: "Next week", isBold: false, value: "NEXT_WEEK" },
+  //       {
+  //         title: "Next month number",
+  //         isBold: false,
+  //         value: "NEXT_MONTH_NUMBER",
+  //       },
+  //       { title: "Next month name", isBold: false, value: "NEXT_MONTH_NAME" },
+  //       { title: "Next quarter", isBold: false, value: "NEXT_QUARTER" },
+  //       { title: "Next year", isBold: false, value: "NEXT_YEAR" },
+  //     ];
+  //     setShortcuts(accountShortcuts);
+  //   }
+  // }, [selectedOption]);
   const handleCloseDropdown = () => {
     setAnchorEl(null);
   };
@@ -322,7 +356,7 @@ const ChatForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   ///clienttask
 
   const [subtasks, setSubtasks] = useState([
-    { id: "1", text: "", checked: "" },
+   
   ]);
   const handleDragEnd = (result) => {
     if (!result.destination) return;
@@ -398,6 +432,16 @@ const ChatForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
 
   ///for drawer save btn
   const saveChat = () => {
+     // Validation checks
+  if (!selectInvoiceTemp || !selectInvoiceTemp.value) {
+    toast.error("Please select a template before saving the chat.");
+    return;
+  }
+
+  if (!inputText.trim() && !selectedShortcut.trim()) {
+    toast.error("Please enter a subject before saving the chat.");
+    return;
+  }
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     const selectedAccountIds = selectedaccount.map((account) => account.value);
@@ -447,12 +491,8 @@ const ChatForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
         // console.log("chat id",result.newChats._id)
         // setChatId(result.newChats._id)
         toast.success("New Chat created successfully");
-        // handleDrawerClose()
-        // sendSaveChatMail(result.newChats._id)
-        // setIsSubmitted(true);
-        // accountwiseChatlist(data, isActiveTrue);
-        // handleClose()
-        handleDrawerClose();
+        
+        handleClose();
         setSelectedInvoiceTemp("")
         setSelectedaccount()
         setDescription("")
@@ -522,7 +562,7 @@ const ChatForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
               <InputLabel sx={{ color: "black" }}> Template</InputLabel>
               <Autocomplete
                 options={invoiceoptions}
-                getOptionLabel={(option) => option.label}
+             getOptionLabel={(option) => option.label || ""}
                 value={selectInvoiceTemp}
                 onChange={handleInvoiceTempChange}
                 isOptionEqualToValue={(option, value) =>
@@ -694,7 +734,7 @@ const ChatForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
               )}
             </Box>
 
-            <DragDropContext onDragEnd={handleDragEnd}>
+            {/* <DragDropContext onDragEnd={handleDragEnd}>
               <Box
                 sx={{
                   display: "flex",
@@ -781,7 +821,95 @@ const ChatForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                   </div>
                 )}
               </Droppable>
-            </DragDropContext>
+            </DragDropContext> */}
+             <DragDropContext onDragEnd={handleDragEnd}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            m: 2,
+                          }}
+                        >
+                          <Typography variant="h6">Client tasks</Typography>
+                          <Box
+                            sx={{ cursor: "pointer" }}
+                            onClick={handleAddSubtask}
+                            style={{ margin: "10px", color: "#1976d3" }}
+                          >
+                            <FiPlusCircle /> Add Subtasks
+                          </Box>
+                        </Box>
+            
+                        <Droppable droppableId="subtaskList">
+                          {(provided) => (
+                            <div
+                              className="subtask-input"
+                              {...provided.droppableProps}
+                              ref={provided.innerRef}
+                            >
+                              {(subtasks.length > 0
+                                ? subtasks
+                                : []
+                              ).map((subtask, index) => (
+                                <Draggable
+                                  key={subtask.id}
+                                  draggableId={subtask.id}
+                                  index={index}
+                                >
+                                  {(provided) => (
+                                    <div
+                                      ref={provided.innerRef}
+                                      {...provided.draggableProps}
+                                      {...provided.dragHandleProps}
+                                    >
+                                      <Box
+                                        display="flex"
+                                        gap="30px"
+                                        alignItems="center"
+                                        m={1}
+                                      >
+                                        <Checkbox
+                                          style={{ cursor: "pointer" }}
+                                          checked={checkedSubtasks.includes(subtask.id)}
+                                          onChange={() =>
+                                            handleCheckboxChange(
+                                              subtask.id,
+                                              subtask.checked
+                                            )
+                                          }
+                                        />
+                                        <TextField
+                                          placeholder="Things To do"
+                                          value={subtask.text}
+                                          size="small"
+                                          margin="normal"
+                                          fullWidth
+                                          onChange={(e) =>
+                                            handleInputChange(subtask.id, e.target.value)
+                                          }
+                                          variant="outlined"
+                                        />
+                                        <IconButton
+                                          onClick={() => handleDeleteSubtask(subtask.id)}
+                                          style={{ cursor: "pointer" }}
+                                        >
+                                          <RiDeleteBin6Line />
+                                        </IconButton>
+                                        <IconButton style={{ cursor: "move" }}>
+                                          <PiDotsSixVerticalBold />
+                                        </IconButton>
+                                      </Box>
+                                    </div>
+                                  )}
+                                </Draggable>
+                              ))}
+            
+                              {provided.placeholder}
+                            </div>
+                          )}
+                        </Droppable>
+                      </DragDropContext>
           </Box>
         </Box>
         <Box mt={2} sx={{ display: "flex", alignItems: "center", gap: 2,ml:2 }}>
@@ -800,7 +928,7 @@ const ChatForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
               Create Chat
             </Button>
             <Button
-              onClick={handleDrawerClose}
+              onClick={handleClose}
               variant="outlined"
               sx={{
                 borderColor: "var(--color-border-cancel-btn)", // Normal background

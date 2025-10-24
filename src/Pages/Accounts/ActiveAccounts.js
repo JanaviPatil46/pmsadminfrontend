@@ -92,18 +92,18 @@ const FixedColumnTable = () => {
 // }, [selected]);
 
 
-useEffect(() => {
-  if (selected && selected.length > 0) {
-    // ✅ Always store only the latest (most recent) ID
-    const latestId = selected[selected.length - 1];
-    Cookies.set("accountId", latestId, { path: "/" });
-    console.log("✅ Stored latest accountId:", latestId);
-  } else {
-    // ❌ Remove cookie if nothing is selected
-    Cookies.remove("accountId", { path: "/" });
-    console.log("❌ accountId cookie removed");
-  }
-}, [selected]);
+// useEffect(() => {
+//   if (selected && selected.length > 0) {
+//     // ✅ Always store only the latest (most recent) ID
+//     const latestId = selected[selected.length - 1];
+//     Cookies.set("accountId", latestId, { path: "/" });
+//     console.log("✅ Stored latest accountId:", latestId);
+//   } else {
+//     // ❌ Remove cookie if nothing is selected
+//     Cookies.remove("accountId", { path: "/" });
+//     console.log("❌ accountId cookie removed");
+//   }
+// }, [selected]);
 
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -183,8 +183,7 @@ const [filters, setFilters] = useState({
         ? [...selected, id]
         : selected.filter((item) => item !== id);
     setSelected(newSelected);
-    // Log all selected row IDs
-    // console.log("Selected IDs:", newSelected); // Log all selected IDs
+    
   };
 
   // Update the handleFilterChange function to properly handle both single and multi-select filters
@@ -352,6 +351,22 @@ const clearFilter = (filterField) => {
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
   );
+useEffect(() => {
+  if (selected && selected.length > 0 && paginatedData.length > 0) {
+    const latestId = selected[selected.length - 1];
+    const selectedRow = paginatedData.find((row) => row.id === latestId);
+
+    if (selectedRow) {
+      Cookies.set("accountId", latestId, { path: "/" });
+      Cookies.set("accountName", selectedRow.Name, { path: "/" });
+      console.log("✅ Stored accountId:", latestId, "accountName:", selectedRow.Name);
+    }
+  } else {
+    Cookies.remove("accountId", { path: "/" });
+    Cookies.remove("accountName", { path: "/" });
+    console.log("❌ accountId and accountName cookies removed");
+  }
+}, [selected, paginatedData]);
 
   const handleAssignOrganizer = () => {
     setIsCreateOrganizerOpen(!isCreateOrganizerOpen);

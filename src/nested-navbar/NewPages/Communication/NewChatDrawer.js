@@ -58,6 +58,7 @@ const NewChatDrawer = ({ open, handleClose, accountwiseChatlist, data,isActiveTr
       const response = await fetch(url);
       const data = await response.json();
       setChatTemplates(data.chatTemplate);
+      console.log("chat template list",data.chatTemplate)
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -406,6 +407,17 @@ useEffect(() => {
   }, [logindata]);
   ///for drawer save btn
   const saveChat = () => {
+
+       // Validation checks
+      if (!selectedOption || !selectedOption.value) {
+        toast.error("Please select a template before saving the chat.");
+        return;
+      }
+    
+      if (!inputText.trim() && !selectedShortcut.trim()) {
+        toast.error("Please enter a subject before saving the chat.");
+        return;
+      }
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     const selectedAccountIds = selectedaccount.map((account) => account.value);

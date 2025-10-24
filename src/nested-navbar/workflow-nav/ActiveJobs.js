@@ -19,13 +19,17 @@ import {
   DialogTitle,
   Button,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { GoDotFill } from "react-icons/go";
+import EditJobDrawer from "../../Workflow/updateJobCard";
 const ActiveJobs = () => {
   const JOBS_API = process.env.REACT_APP_ADD_JOBS_URL;
   const [jobData, setJobData] = useState([]);
   const { data } = useParams();
-
+ const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
   useEffect(() => {
     fetchJobList(data);
   }, [data]);
@@ -132,6 +136,144 @@ const ActiveJobs = () => {
         console.error("Error deleting job:", error);
       });
   };
+
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+     const [editJobId, setEditJobId] = useState(null);
+     const handleEditJobCard = (jobId) => {
+        setEditJobId(jobId);
+        setIsDrawerOpen(true);
+      };
+         const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
+          const [accountData, setAccountData] = useState([]);
+      
+          useEffect(() => {
+            fetchAccountData();
+          }, []);
+      
+          const fetchAccountData = async () => {
+            try {
+              const response = await fetch(`${ACCOUNT_API}/accounts/accountdetails`);
+              const data = await response.json();
+              setAccountData(data.accounts);
+            } catch (error) {
+              console.error("Error fetching data:", error);
+            }
+          };
+      
+          // Create account options
+          const accountOptions = accountData.map((account) => ({
+            value: account._id,
+            label: account.accountName,
+          }));
+
+            const PIPELINE_API = process.env.REACT_APP_PIPELINE_TEMP_URL;
+              const [pipelineData, setPipelineData] = useState([]);
+            useEffect(() => {
+                fetchPipelineData();
+              }, []);
+          
+              const fetchPipelineData = async () => {
+                try {
+                  const url = `${PIPELINE_API}/workflow/pipeline/pipelines`;
+                  const response = await fetch(url);
+                  if (!response.ok) {
+                    throw new Error("Failed to fetch pipeline data");
+                  }
+                  const data = await response.json();
+                  console.log(data);
+                  setPipelineData(data.pipeline || []);
+                } catch (error) {
+                  console.error("Error fetching data:", error);
+                }
+              };
+          
+              const optionpipeline = pipelineData.map((pipeline) => ({
+                value: pipeline._id,
+                label: pipeline.pipelineName,
+              }));
+              const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
+                 const [tags, setTags] = useState([]);
+                
+                  useEffect(() => {
+                    fetchTagData();
+                  }, []);
+              
+                  const fetchTagData = async () => {
+                    try {
+                      const response = await fetch(`${TAGS_API}/tags/`);
+                      const data = await response.json();
+                      setTags(data.tags);
+                    } catch (error) {
+                      console.error("Error fetching data:", error);
+                    }
+                  };
+                  
+                  
+                  const tagoptions = tags.map((tag) => ({
+                    value: tag._id,
+                    label: tag.tagName,
+                    colour: tag.tagColour,
+              
+                    customTagStyle: {
+                      backgroundColor: tag.tagColour,
+                      color: "#fff",
+                      borderRadius: "8px",
+                      alignItems: "center",
+                      textAlign: "center",
+                      marginBottom: "5px",
+                      padding: "2px,8px",
+              
+                      fontSize: "10px",
+                      // width: `${calculateWidth(tag.tagName)}px`,
+                      margin: "7px",
+                    },
+                  }));
+                   useEffect(() => {
+                        fetchUserData();
+                      }, []);
+                      const [userData, setUserData] = useState([]);
+                     
+                      const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
+                      const fetchUserData = async () => {
+                        try {
+                          const url = `${LOGIN_API}/common/users/roles?roles=TeamMember,Admin`;
+                          const response = await fetch(url);
+                          const data = await response.json();
+                          setUserData(data);
+                        } catch (error) {
+                          console.error("Error fetching data:", error);
+                        }
+                      };
+                      const useroptions = userData.map((user) => ({
+                        value: user._id,
+                        label: user.username,
+                      }));
+                      const CLIENT_FACING_API = process.env.REACT_APP_CLIENT_FACING_URL;
+                       const [clientFacingJobs, setClientFacingJobs] = useState([]);
+                          const fetchClientFacingJobsData = async () => {
+      try {
+        const response = await fetch(
+          `${CLIENT_FACING_API}/workflow/clientfacingjobstatus/`
+        );
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const data = await response.json();
+        setClientFacingJobs(data.clientFacingJobStatues); // Ensure data is set correctly
+        console.log(data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    const optionstatus = clientFacingJobs.map((status) => ({
+      value: status._id,
+      label: status.clientfacingName,
+      clientfacingColour: status.clientfacingColour,
+    }));
+     // useEffect to fetch jobs when the component mounts
+        useEffect(() => {
+          fetchClientFacingJobsData();
+        }, []);
   return (
     <Box sx={{ padding: 2 }}>
       <TableContainer component={Paper}>
@@ -194,8 +336,8 @@ const ActiveJobs = () => {
                 <TableCell style={{
                           fontSize: "12px",
                           padding: "4px 8px",
-                          lineHeight: "1",
-                        }}>{job.Name}</TableCell>
+                          lineHeight: "1",cursor:"pointer"
+                        }}  onClick={() => handleEditJobCard(job.id)}>{job.Name}</TableCell>
                 <TableCell style={{
                           fontSize: "12px",
                           padding: "4px 8px",
@@ -289,6 +431,20 @@ const ActiveJobs = () => {
           <Button onClick={handleCloseDialog}>Cancel</Button>
         </DialogActions>
       </Dialog>
+      <EditJobDrawer
+        open={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        jobId={editJobId}
+        // fetchJobData={fetchJobList}
+        fetchJobData={()=> fetchJobList(data)}
+        accountOptions={accountOptions}
+        pipelineOptions={optionpipeline}
+        tagOptions={tagoptions}
+        userOptions={useroptions}
+        clientFacingOptions={optionstatus}
+        theme={theme}
+        isSmallScreen={isSmallScreen}
+      />
     </Box>
   );
 };
