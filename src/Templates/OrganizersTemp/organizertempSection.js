@@ -1241,6 +1241,12 @@ const renderOptions = (element, type = "text") => {
       </Box>
     );
 
+   const requiredQuestion = element.questionsectionsettings?.required && (
+  <Box component="span" sx={{ color: "red", ml: 0.5 }}>
+    *
+  </Box>
+);
+
     const settingsButton = (
       <IconButton onClick={() => handleSettingsClick(element.id)}>
         <IoSettingsOutline />
@@ -1265,6 +1271,7 @@ const renderOptions = (element, type = "text") => {
                 placeholder="Free Entry"
               />
               {conditionalBadge}
+              {requiredQuestion}
               {settingsButton}
               {deleteButton}
             </Box>
@@ -1283,6 +1290,7 @@ const renderOptions = (element, type = "text") => {
                 placeholder="Email"
               />
               {conditionalBadge}
+               {requiredQuestion}
               {settingsButton}
               {deleteButton}
             </Box>
@@ -1301,6 +1309,7 @@ const renderOptions = (element, type = "text") => {
                 placeholder="Number"
               />
               {conditionalBadge}
+               {requiredQuestion}
               {settingsButton}
               {deleteButton}
             </Box>
@@ -1319,6 +1328,7 @@ const renderOptions = (element, type = "text") => {
                 placeholder="Date"
               />
               {conditionalBadge}
+               {requiredQuestion}
               {settingsButton}
               {deleteButton}
             </Box>
@@ -1336,6 +1346,7 @@ const renderOptions = (element, type = "text") => {
                 placeholder="Radio Buttons"
               />
               {conditionalBadge}
+               {requiredQuestion}
               {settingsButton}
               {deleteButton}
             </Box>
@@ -1355,6 +1366,7 @@ const renderOptions = (element, type = "text") => {
                 onChange={(e) => handleCheckboxTextChange(element.id, e.target.value)}
               />
               {conditionalBadge}
+               {requiredQuestion}
               {settingsButton}
               {deleteButton}
             </Box>
@@ -1373,6 +1385,7 @@ const renderOptions = (element, type = "text") => {
                 onChange={(e) => handleCheckboxTextChange(element.id, e.target.value)}
               />
               {conditionalBadge}
+               {requiredQuestion}
               {settingsButton}
               {deleteButton}
             </Box>
@@ -1390,6 +1403,7 @@ const renderOptions = (element, type = "text") => {
                 placeholder="Yes/No"
               />
               {conditionalBadge}
+               {requiredQuestion}
               {settingsButton}
               {deleteButton}
             </Box>
@@ -1408,6 +1422,7 @@ const renderOptions = (element, type = "text") => {
                 placeholder="File Upload"
               />
               {conditionalBadge}
+               {requiredQuestion}
               {settingsButton}
               {deleteButton}
             </Box>
