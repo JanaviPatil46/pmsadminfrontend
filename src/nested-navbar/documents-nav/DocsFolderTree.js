@@ -1007,7 +1007,7 @@ const handleRequestApproval = async () => {
       label: approvalStatusTextMap[currentApprovalStatus],
       action: () => toggleApprovalStatus(item),
       type: "approval",
-      isApproved,
+      currentApprovalStatus,
     },
           // { icon: <Stamp size={16} />, label: "Send Approval", action: () => toggleApprovalStatus(item) },
           { icon: <DeleteIcon />, label: "Delete", action: () => deleteItem(item) },

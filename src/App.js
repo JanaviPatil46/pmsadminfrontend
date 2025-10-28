@@ -4,8 +4,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import SidebarComponent from "./Sidebar/Sidebar";
 import Insights from "./Pages/Insights";
 import Account from "./Pages/Accounts/Accounts.js";
-import ActiveAccount from "./Pages/Accounts/ActiveAccounts.js"
-import ArchivedAccount from "./Pages/Accounts/ArchivedAccounts.js"
+import ActiveAccount from "./Pages/Accounts/ActiveAccounts.js";
+import ArchivedAccount from "./Pages/Accounts/ArchivedAccounts.js";
 import Contact from "./Pages/Contact";
 import ErrorPage from "./Pages/ErrorPage";
 import Tasks from "./Templates/Task/Tasks";
@@ -16,7 +16,7 @@ import JobTemp from "./Templates/JobsTemp/JobTemp";
 import JobTemplateUpdate from "./Templates/JobsTemp/JobTemplateUpdate";
 import PipelineTemp from "./Templates/PipelineTemp/PipelineTemp";
 // import FolderTemp from "./Templates/FoldersTemp/FolderTemp";
-import FolderTemp from "./Templates/documentManagement/FolderTemp.js"
+import FolderTemp from "./Templates/documentManagement/FolderTemp.js";
 import ChatTemp from "./Templates/ChatsTemp/ChatTemp";
 
 import InvoiceTemp from "./Templates/InvoicesTemp/InvoiceTemp";
@@ -46,8 +46,8 @@ import Workflow from "./nested-navbar/NewPages/Workflow";
 import Pipelines from "./nested-navbar/workflow-nav/Pipelines";
 import ActiveJobs from "./nested-navbar/workflow-nav/ActiveJobs";
 import ArchivedJobs from "./nested-navbar/workflow-nav/ArchivedJobs";
-import AccountPendingTasks from "./nested-navbar/workflow-nav/PendingTasks.js"
-import AccountCompletedTasks from "./nested-navbar/workflow-nav/CompletedTasks.js"
+import AccountPendingTasks from "./nested-navbar/workflow-nav/PendingTasks.js";
+import AccountCompletedTasks from "./nested-navbar/workflow-nav/CompletedTasks.js";
 import Info from "./nested-navbar/NewPages/Info";
 import Proposals from "./nested-navbar/NewPages/Proposals";
 import DashDocs from "./nested-navbar/NewPages/Docs";
@@ -85,27 +85,27 @@ import FirmSettings from "./Settings/FirmSetting";
 import InvoiceUpdate from "./Billing/invoiceUpdate.js";
 import AccountOrganizer from "./nested-navbar/NewPages/AccountOrganizer";
 
-import Inboxplus from './Inboxplus/Inboxplus.js';
+import Inboxplus from "./Inboxplus/Inboxplus.js";
 
-import AccountWiseProposal from "./nested-navbar/Proposals/PrposalTempUpdate.js"
-import AccountWiseProposalUpdate from "./nested-navbar/Proposals/ProposalAccWiseUpdate.js"
-import ProposalsELS from './Billing/Proposals&ELS/ProposalsEls.js'
-import CreateProposals from "./Billing/Proposals&ELS/CreateProposals.js"
+import AccountWiseProposal from "./nested-navbar/Proposals/PrposalTempUpdate.js";
+import AccountWiseProposalUpdate from "./nested-navbar/Proposals/ProposalAccWiseUpdate.js";
+import ProposalsELS from "./Billing/Proposals&ELS/ProposalsEls.js";
+import CreateProposals from "./Billing/Proposals&ELS/CreateProposals.js";
 import NewTag from "./Templates/Tags/Tags";
 import MarketPlaces from "./Pages/MarketPlaces.js";
 import TimeEntry from "./Pages/TimeEntry.js";
 import AccountImport from "./Import/AccountImport.js";
 import ContactImport from "./Import/ContactImport.js";
 import TagsImport from "./Import/TagsImport.js";
-import SetPassword from "./nested-navbar/NewPages/setPassword.js"
-import ActiveJob from "./Pages/Jobs/ActiveJob.js"
+import SetPassword from "./nested-navbar/NewPages/setPassword.js";
+import ActiveJob from "./Pages/Jobs/ActiveJob.js";
 import ArchivedJob from "./Pages/Jobs/ArchiveJob.js";
 import PendingTasks from "./Tasks/PendingTasks.js";
 import CompletedTasks from "./Tasks/CompletedTasks.js";
-import AccountOrganizers from "./Pages/Organizers/AccountOrganizers.js"
+import AccountOrganizers from "./Pages/Organizers/AccountOrganizers.js";
 import ActiveOrganizers from "./Pages/Organizers/ActiveOrganizers.js";
 import ArchivedOrganizers from "./Pages/Organizers/ArchivedOrganizers.js";
-import InternalCommunication from  "./Pages/internalChat/internalCommunication.js"
+import InternalCommunication from "./Pages/internalChat/internalCommunication.js";
 import Bulkaccount from "./Pages/Bulkaccount.js";
 import TemplateCreator from "./Templates/documentManagement/TemplateCreator.js";
 import FolderTreeView from "./Templates/documentManagement/FolderTreeView.js";
@@ -123,71 +123,101 @@ const App = () => {
         <Route path="/" element={<SidebarComponent />}>
           <Route index element={<Insights />} />
           <Route path="/docs" element={<Docs />} />
-          <Route path="/clients/accounts" element={<Account />} >
-          <Route path="activeaccounts" element={<ActiveAccount/>}/>
-          <Route path="archivedaccounts" element={<ArchivedAccount/>}/>
+          <Route path="/clients/accounts" element={<Account />}>
+            <Route path="activeaccounts" element={<ActiveAccount />} />
+            <Route path="archivedaccounts" element={<ArchivedAccount />} />
           </Route>
-          <Route path="/organizers" element={<AccountOrganizers/>}>
-          <Route path="active" element={<ActiveOrganizers/>}/>
-          <Route path="archived" element={<ArchivedOrganizers/>}/>
+          <Route path="/organizers" element={<AccountOrganizers />}>
+            <Route path="active" element={<ActiveOrganizers />} />
+            <Route path="archived" element={<ArchivedOrganizers />} />
           </Route>
           <Route path="clients/contacts" element={<Contact />} />
           <Route path="stages" element={<Stages />} />
-          <Route path="firmtemp/tags" element={<NewTag/>}/>
-          <Route path="firmtemp/pipelines" element={<PipelineTemp/>}/>
-          <Route path="/firmtemp/marketplace" element={<MarketPlaces/>}/>
-          <Route path="/PipelineTemplateUpdate/:id" element={<PipelineTempUpdate />} />
+          <Route path="firmtemp/tags" element={<NewTag />} />
+          <Route path="firmtemp/pipelines" element={<PipelineTemp />} />
+          <Route path="/firmtemp/marketplace" element={<MarketPlaces />} />
+          <Route
+            path="/PipelineTemplateUpdate/:id"
+            element={<PipelineTempUpdate />}
+          />
           {/* <Route path="addJobs" element={<CreateJob />} /> */}
           <Route path="billing/time" element={<TimeEntry />} />
-        
+
           <Route path="billing/Invoices" element={<Invoices />} />
-          <Route path="billing/Invoices/Updateinvoice/:_id" element={<InvoiceUpdate />} />
-          <Route path='billing/proposalsandels' element={<ProposalsELS/>}/>
-          <Route path='billing/proposalsandels/new' element={<CreateProposals/>}/>
+          <Route
+            path="billing/Invoices/Updateinvoice/:_id"
+            element={<InvoiceUpdate />}
+          />
+          <Route path="billing/proposalsandels" element={<ProposalsELS />} />
+          <Route
+            path="billing/proposalsandels/new"
+            element={<CreateProposals />}
+          />
           {/* <Route path="workflow/tasks" element={<WorkflowTask />} /> */}
-          <Route path="tasks" element={<WorkflowTask />} >
-          <Route path="pending" element={<PendingTasks/>}/>
-          <Route path="completed" element={<CompletedTasks/>}/>
+          <Route path="tasks" element={<WorkflowTask />}>
+            <Route path="pending" element={<PendingTasks />} />
+            <Route path="completed" element={<CompletedTasks />} />
           </Route>
-          <Route path="jobs" element={<Jobs />} >
-          <Route path="activejob" element={<ActiveJob/>}/>
-          <Route path="archivedjob" element={<ArchivedJob/>}/>
+          <Route path="jobs" element={<Jobs />}>
+            <Route path="activejob" element={<ActiveJob />} />
+            <Route path="archivedjob" element={<ArchivedJob />} />
           </Route>
           <Route path="pipelines" element={<Pipeline />} />
-          <Route path="/bulkaccount" element={<Bulkaccount/>}/>
+          <Route path="/bulkaccount" element={<Bulkaccount />} />
           <Route path="/organizerpreview" element={<PreviewOrganizer />} />
-          <Route path="/import/accounts" element={<AccountImport/>}/>
-          <Route path="/import/contacts" element={<ContactImport/>}/>
-          <Route path="/import/tags" element={<TagsImport/>}/>
+          <Route path="/import/accounts" element={<AccountImport />} />
+          <Route path="/import/contacts" element={<ContactImport />} />
+          <Route path="/import/tags" element={<TagsImport />} />
           <Route path="firmtemp/templates" element={<Templates />}>
-          {/* <Route path="tags" element={<Tags />} /> */}
-       
+            {/* <Route path="tags" element={<Tags />} /> */}
+
             <Route path="tasks" element={<Tasks />} />
-          
+
             <Route path="tasks/taskTempUpdate/:_id" element={<TasksUpdate />} />
-           
+
             <Route path="emails" element={<EmailTemp />} />
-            <Route path="emails/emailTempUpdate/:_id" element={<EmailTempUpdate />} />
+            <Route
+              path="emails/emailTempUpdate/:_id"
+              element={<EmailTempUpdate />}
+            />
             <Route path="jobs" element={<JobTemp />} />
-            <Route path="jobs/JobTemplateUpdate/:_id" element={<JobTemplateUpdate />} />
+            <Route
+              path="jobs/JobTemplateUpdate/:_id"
+              element={<JobTemplateUpdate />}
+            />
             <Route path="clientfacing" element={<ClientfacingJob />} />
             {/* <Route path="pipelines" element={<PipelineTemp />} /> */}
             {/* <Route path="pipelines/PipelineTemplateUpdate/:id" element={<PipelineTempUpdate />} /> */}
             {/* <Route path="folders" element={<FolderTemp />} /> */}
-                  <Route path="folders" element={<FolderTemp />} />
-                  <Route path="createfolder" element={<TemplateCreator/>}/>
-                  <Route path="tree/:templateId" element={<FolderTreeView/>}/>
+            <Route path="folders" element={<FolderTemp />} />
+            <Route path="createfolder" element={<TemplateCreator />} />
+            <Route path="tree/:templateId" element={<FolderTreeView />} />
             <Route path="chats" element={<ChatTemp />} />
-            <Route path="chats/chatTemplateUpdate/:id" element={<ChatTempUpdate />} />
+            <Route
+              path="chats/chatTemplateUpdate/:id"
+              element={<ChatTempUpdate />}
+            />
 
             <Route path="invoices" element={<InvoiceTemp />} />
-            <Route path="invoices/invoiceTempUpdate/:id" element={<InvoiceTempUpdate />} />
+            <Route
+              path="invoices/invoiceTempUpdate/:id"
+              element={<InvoiceTempUpdate />}
+            />
             <Route path="organizers" element={<OrganizerTemp />} />
-            <Route path="organizers/OrganizerTempUpdate/:id" element={<OrganizersTempUpdate />} />
-            <Route path="recurring-invoices" element={<RecurringInvoiceTemp />} />
+            <Route
+              path="organizers/OrganizerTempUpdate/:id"
+              element={<OrganizersTempUpdate />}
+            />
+            <Route
+              path="recurring-invoices"
+              element={<RecurringInvoiceTemp />}
+            />
             <Route path="signatures" element={<SignatureTemp />} />
             <Route path="proposals" element={<ProposalTemp />} />
-            <Route path="proposals/ProposalTempUpdate/:_id" element={<ProposalTempUpdate />} />
+            <Route
+              path="proposals/ProposalTempUpdate/:_id"
+              element={<ProposalTempUpdate />}
+            />
           </Route>
           <Route path="/firmtemp/teammember" element={<TeamMember />}>
             <Route path="activemember" element={<ActiveMember />} />
@@ -200,18 +230,23 @@ const App = () => {
           {/* <Route path='/firmtemp/services/ServicesUpdate/:id' element={ServicesUpdate}/> */}
           <Route path="/servicesUpdate/:id" element={<ServicesUpdate />} />
           <Route path="/settings/myaccount" element={<MyAccount />} />
-          <Route path='/inbox+' element={<Inboxplus/>}/>
+          <Route path="/inbox+" element={<Inboxplus />} />
 
-
-          <Route path='/internal-communation' element={<InternalCommunication/>}/>
+          <Route
+            path="/internal-communation"
+            element={<InternalCommunication />}
+          />
 
           <Route path="/settings/firmsettings" element={<FirmSettings />} />
-          <Route path="/clients/accounts/accountsdash" element={<AccountDash />}>
+          <Route
+            path="/clients/accounts/accountsdash"
+            element={<AccountDash />}
+          >
             <Route path="overview/:data" element={<Overview />} />
             <Route path="info/:data" element={<Info />} />
             <Route path="docs/:data" element={<DashDocs />}>
               {/* <Route path="documents" element={<Documents />} /> */}
-               <Route path="documents" element={<DocsFolderTree />} />
+              <Route path="documents" element={<DocsFolderTree />} />
               <Route path="approvals" element={<Approvals />} />
               <Route path="signatures" element={<Signatures />} />
               <Route path="filerequests" element={<FileRequest />} />
@@ -220,7 +255,10 @@ const App = () => {
             </Route>
             <Route path="communication/:data" element={<Communication />} />
             <Route path="organizers/:data" element={<Organizers />} />
-            <Route path="organizers/:data/accountorganizer" element={<AccountOrganizer />} />
+            <Route
+              path="organizers/:data/accountorganizer"
+              element={<AccountOrganizer />}
+            />
             {/* <Route path="/organizerpreview" element={<PreviewOrganizer />} /> */}
             <Route path="invoices/:data" element={<AccountInvoice />}>
               <Route path="invoice" element={<Invoice />} />
@@ -231,8 +269,14 @@ const App = () => {
               <Route path="sent" element={<Sent />} />
             </Route>
             <Route path="proposals/:data" element={<Proposals />} />
-            <Route path="proposals/:data/new" element={<AccountWiseProposal/>}/>
-          <Route path="proposals/:data/update/:_id" element={<AccountWiseProposalUpdate/>}/>
+            <Route
+              path="proposals/:data/new"
+              element={<AccountWiseProposal />}
+            />
+            <Route
+              path="proposals/:data/update/:_id"
+              element={<AccountWiseProposalUpdate />}
+            />
             <Route path="notes/:data" element={<Notes />} />
 
             <Route path="workflow/:data" element={<Workflow />}>
