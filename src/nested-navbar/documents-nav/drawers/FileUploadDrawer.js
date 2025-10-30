@@ -1,227 +1,4 @@
-// import React, { useState, useEffect } from "react";
-// import axios from "axios";
 
-// const drawerStyle = {
-//   position: "fixed",
-//   top: 0,
-//   right: 0,
-//   height: "100%",
-//   width: "350px",
-//   backgroundColor: "#8de066ff",
-//   boxShadow: "-2px 0 5px rgba(0,0,0,0.3)",
-//   padding: "20px",
-//   transition: "transform 0.3s ease-in-out",
-//   zIndex: 1000,
-// };
-
-// const overlayStyle = {
-//   position: "fixed",
-//   top: 0,
-//   left: 0,
-//   width: "100%",
-//   height: "100%",
-//   backgroundColor: "rgba(0,0,0,0.3)",
-//   zIndex: 999,
-// };
-
-// const FileUploadDrawer = ({
-//   isOpen,
-//   onClose,
-//   folderTree,
-//   fetchFolderTree,
-//   selectedFolderForMenu,
-// }) => {
-//   const [file, setFile] = useState(null);
-//   const [selectedFolder, setSelectedFolder] = useState("");
-//   const [message, setMessage] = useState("");
-
-//   const handleFileChange = (e) => setFile(e.target.files[0]);
-
-//   const handleFolderSelect = (path) => setSelectedFolder(path);
-
-//   useEffect(() => {
-//     // Set selected folder only when drawer opens
-//     if (isOpen && selectedFolderForMenu) {
-//       setSelectedFolder(selectedFolderForMenu.path);
-//     } else if (!isOpen) {
-//       setSelectedFolder(""); // reset internal selection when drawer closes
-//     }
-//   }, [isOpen, selectedFolderForMenu]);
-
-//   const handleUpload = async () => {
-//     if (!file || !selectedFolder) {
-//       setMessage("Please select a file and folder.");
-//       return;
-//     }
-
-//     try {
-//       const formData = new FormData();
-//       formData.append("file", file);
-
-//       const res = await axios.post(
-//         `https://www.snptaxes.com/api/accountsdoc/file/upload?folderPath=${encodeURIComponent(
-//           selectedFolder
-//         )}`,
-//         formData,
-//         { headers: { "Content-Type": "multipart/form-data" } }
-//       );
-
-//       setMessage(`✅ File uploaded: ${res.data.fileMeta.name}`);
-//       setFile(null);
-//       fetchFolderTree(); // refresh folder explorer
-//     } catch (err) {
-//       console.error(err);
-//       setMessage("❌ Error uploading file");
-//     }
-//   };
-
-//   if (!isOpen) return null;
-
-//   return (
-//     <>
-//       <div style={overlayStyle} onClick={onClose}></div>
-//       <div
-//         style={{
-//           ...drawerStyle,
-//           transform: isOpen ? "translateX(0)" : "translateX(100%)",
-//         }}
-//       >
-//         <h3>📄 Upload File </h3>
-
-//         <label>Selected Folder:</label>
-//         <input
-//           type="text"
-//           value={selectedFolder}
-//           onChange={(e) => setSelectedFolder(e.target.value)}
-//           placeholder="Enter folder path or select from tree"
-//           style={{ width: "100%", marginBottom: "10px", padding: "5px" }}
-//         />
-
-//         <input
-//           type="file"
-//           onChange={handleFileChange}
-//           style={{ width: "100%", marginBottom: "10px" }}
-//         />
-
-//         <button
-//           onClick={handleUpload}
-//           style={{
-//             width: "100%",
-//             padding: "10px",
-//             backgroundColor: "#0b5ed7",
-//             color: "#fff",
-//             border: "none",
-//             cursor: "pointer",
-//           }}
-//         >
-//           Upload
-//         </button>
-
-//         {message && <p style={{ marginTop: "10px" }}>{message}</p>}
-
-//         <button
-//           onClick={onClose}
-//           style={{
-//             marginTop: "20px",
-//             padding: "6px 10px",
-//             backgroundColor: "#ccc",
-//             border: "none",
-//             cursor: "pointer",
-//           }}
-//         >
-//           Close
-//         </button>
-
-//         <div style={{ marginTop: "20px" }}>
-//           {!selectedFolder && ( // ✅ Show tree only if no folder is pre-selected
-//             <>
-//               <h4>Select Parent Folder from Tree</h4>
-//               <FolderTreeSelector
-//                 items={folderTree}
-//                 onSelect={handleFolderSelect}
-//                 selectedFolder={selectedFolder}
-//               />
-//             </>
-//           )}
-//         </div>
-//       </div>
-//     </>
-//   );
-// };
-
-// // 🔹 Recursive Folder Selector inside Drawer with Expand/Collapse
-// const FolderTreeSelector = ({ items, onSelect, level = 0 }) => {
-//   const [expanded, setExpanded] = useState({});
-
-//   const toggleExpand = (path) => {
-//     setExpanded((prev) => ({ ...prev, [path]: !prev[path] }));
-//   };
-
-//   return (
-//     <ul style={{ paddingLeft: `${level * 15}px`, listStyleType: "none" }}>
-//       {items?.map((item) => (
-//         <li key={item.path} style={{ marginBottom: "4px" }}>
-//           {item.type === "folder" ? (
-//             <>
-//               {/* Folder name with expand/collapse */}
-//               <span
-//                 style={{ cursor: "pointer", color: "#0b5ed7" }}
-//                 onClick={() => toggleExpand(item.path)}
-//               >
-//                 {expanded[item.path] ? "📂" : "📁"} {item.name}{" "}
-//                 {item.meta?.readOnly}
-//               </span>
-
-//               {/* Select Folder Button (disabled if read-only) */}
-//               <button
-//                 onClick={() => onSelect(item.path)}
-//                 disabled={item.meta?.readOnly}
-//                 style={{
-//                   marginLeft: "10px",
-//                   padding: "2px 6px",
-//                   cursor: item.meta?.readOnly ? "not-allowed" : "pointer",
-//                   opacity: item.meta?.readOnly ? 0.5 : 1,
-//                 }}
-//               >
-//                 Select
-//               </button>
-
-//               {/* Expand children recursively */}
-//               {expanded[item.path] &&
-//                 item.children &&
-//                 item.children.length > 0 && (
-//                   <FolderTreeSelector
-//                     items={item.children}
-//                     onSelect={onSelect}
-//                     level={level + 1}
-//                   />
-//                 )}
-
-//               {/* Show files inside folder */}
-//               {expanded[item.path] &&
-//                 item.meta?.files &&
-//                 item.meta.files.length > 0 && (
-//                   <ul style={{ paddingLeft: "15px" }}>
-//                     {item.meta.files.map((file) => (
-//                       <li key={file.name}>
-//                         📄 {file.name} {file.readOnly ? "(Read Only)" : ""}
-//                       </li>
-//                     ))}
-//                   </ul>
-//                 )}
-//             </>
-//           ) : (
-//             <span>
-//               📄 {item.name} {item.meta?.readOnly ? "(Read Only)" : ""}
-//             </span>
-//           )}
-//         </li>
-//       ))}
-//     </ul>
-//   );
-// };
-
-// export default FileUploadDrawer;
 
 import React, { useState, useEffect } from "react";
 import {
@@ -252,6 +29,7 @@ const FileUploadDrawer = ({
   selectedFolderForMenu,
 }) => {
   const [file, setFile] = useState(null);
+   const [files, setFiles] = useState([]);
   const [selectedFolder, setSelectedFolder] = useState("");
   const [message, setMessage] = useState("");
 
@@ -265,39 +43,85 @@ const FileUploadDrawer = ({
     }
   }, [isOpen, selectedFolderForMenu]);
 
-  const handleFileChange = (e) => setFile(e.target.files[0]);
+  // const handleFileChange = (e) => setFile(e.target.files[0]);
+  const handleFileChange = (e) => {
+    const selectedFiles = Array.from(e.target.files);
+    const maxSize = 50 * 1024 * 1024; // 50 MB
+    const forbiddenTypes = ["video/", "audio/"];
+
+    const validFiles = selectedFiles.filter((file) => {
+      if (file.size > maxSize) {
+        alert(`❌ ${file.name} exceeds 50 MB limit.`);
+        return false;
+      }
+      if (forbiddenTypes.some((type) => file.type.startsWith(type))) {
+        alert(`❌ ${file.name} is an audio or video file — not allowed.`);
+        return false;
+      }
+      return true;
+    });
+
+    setFiles(validFiles);
+  };
   const handleFolderSelect = (path) => setSelectedFolder(path);
 
+  // const handleUpload = async () => {
+  //  if (files.length === 0 || !selectedFolder) {
+  //     setMessage("Please select files and a folder.");
+  //     return;
+  //   }
+
+  //   try {
+  //     const formData = new FormData();
+  //     files.forEach((file) => formData.append("files", file));
+
+  //     const res = await axios.post(
+        // `https://www.snptaxes.com/api/accountsdoc/file/upload?folderPath=${encodeURIComponent(
+        //   selectedFolder
+        // )}`,
+  //       formData,
+  //       { headers: { "Content-Type": "multipart/form-data" } }
+  //     );
+
+  //     // setMessage(`✅ File uploaded: ${res.data.fileMeta.name}`);
+  //     toast.success(`✅ File uploaded: ${res.data.message}`)
+  //    setFiles([]);
+  //     onClose();
+  //     fetchFolderTree();
+  //   } catch (err) {
+  //     console.error(err);
+  //     toast.error(err)
+  //     setMessage("❌ Error uploading file");
+  //   }
+  // };
   const handleUpload = async () => {
-    if (!file || !selectedFolder) {
-      setMessage("Please select a file and folder.");
+    if (files.length === 0 || !selectedFolder) {
+      setMessage("Please select files and a folder.");
       return;
     }
 
     try {
       const formData = new FormData();
-      formData.append("file", file);
+      files.forEach((file) => formData.append("files", file));
 
       const res = await axios.post(
-        `https://www.snptaxes.com/api/accountsdoc/file/upload?folderPath=${encodeURIComponent(
+              `https://www.snptaxes.com/api/accountsdoc/file/upload?folderPath=${encodeURIComponent(
           selectedFolder
         )}`,
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
 
-      setMessage(`✅ File uploaded: ${res.data.fileMeta.name}`);
-      toast.success(`✅ File uploaded: ${res.data.fileMeta.name}`)
-      setFile(null);
+      setMessage(`✅ ${res.data.message || "Files uploaded successfully"}`);
+      toast.success(`✅ ${res.data.message || "Files uploaded successfully"}`)
+      setFiles([]);
       onClose();
-      fetchFolderTree();
+     fetchFolderTree();
     } catch (err) {
       console.error(err);
-      toast.error(err)
-      setMessage("❌ Error uploading file");
+      setMessage("❌ Error uploading files");
     }
   };
-
   return (
     <Drawer anchor="right" open={isOpen} onClose={onClose}>
       <Box sx={{ width: 400, p: 3, bgcolor: "#f0f8ff", height: "100%" }}>
@@ -314,7 +138,7 @@ const FileUploadDrawer = ({
           margin="dense"
         /> */}
 
-        <Button
+        {/* <Button
           variant="outlined"
           component="label"
           fullWidth
@@ -322,7 +146,19 @@ const FileUploadDrawer = ({
         >
           {file ? file.name : "Select File"}
           <input type="file" hidden onChange={handleFileChange} />
-        </Button>
+        </Button> */}
+         <Button
+                  variant="outlined"
+                  component="label"
+                  fullWidth
+                  sx={{ mt: 1, mb: 2 }}
+                >
+                  {files.length > 0
+                    ? `${files.length} file(s) selected`
+                    : "Select Files"}
+                  <input type="file" hidden multiple onChange={handleFileChange} />
+                </Button>
+        
 
         <Button
           variant="contained"

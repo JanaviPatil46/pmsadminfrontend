@@ -873,12 +873,12 @@ const MyStepperUpdate = () => {
   }, []); // Empty dependency array to run only once on mount
 
   // console.log(serviceandinvoiceSettings);
-  const { logindata, setLoginData } = useContext(LoginContext);
+  const { logindata} = useContext(LoginContext);
 
   const [loginsData, setloginsData] = useState("");
 
   const [username, setUsername] = useState("");
-
+ const [loginuserid, setLoginUserId] = useState("");
   const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
   const fetchUserLoginData = async (id) => {
     const maxLength = 15;
@@ -896,9 +896,18 @@ const MyStepperUpdate = () => {
         setUsername(result.username);
       });
   };
+  // useEffect(() => {
+  //   fetchUserLoginData(logindata.user.id);
+  // }, []);
   useEffect(() => {
-    fetchUserLoginData(logindata.user.id);
-  }, []);
+      if (logindata?.user?.id) {
+        // Check if logindata and user.id exist
+        setLoginUserId(logindata.user.id);
+      }
+    }, [logindata]);
+    useEffect(() => {
+      fetchUserLoginData(loginuserid);
+    }, []);
 
   const proposalSendMail = () => {
     const myHeaders = new Headers();

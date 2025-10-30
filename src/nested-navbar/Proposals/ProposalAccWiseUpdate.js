@@ -1267,7 +1267,7 @@ const MyStepperUpdateAcc = () => {
 
   const fetchProposalTemplateData = async () => {
     try {
-      const url = `${PROPOSAL_API}/Workflow/proposalesandels/proposalesandels`;
+      const url = `${PROPOSAL_API}/workflow/proposalesandels/proposalesandels`;
       const response = await fetch(url);
       const data = await response.json();
       console.log(data);
