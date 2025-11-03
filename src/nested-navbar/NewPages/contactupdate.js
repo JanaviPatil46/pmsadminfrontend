@@ -140,33 +140,12 @@ setPhoneNumbers(
     },
   ]);
 };
-  // const handleAddPhoneNumber = () => {
-  //   setPhoneNumbers((prevPhoneNumbers) => [...prevPhoneNumbers, { id: Date.now(), phone: "", isPrimary: false }]);
-  // };
-
+ 
   const handleDeletePhoneNumber = (id) => {
     setPhoneNumbers((prevPhoneNumbers) => prevPhoneNumbers.filter((item) => item.id !== id));
   };
 
-  // const handleTagChange = (event, newValue) => {
-  //   setTagsNew(newValue);
-  //   const selectedTagsValues = newValue.map((option) => option.value);
-  //   setCombinedTagsValues(selectedTagsValues);
-  // };
-  // const handleTagChange = (event) => {
-  //   const { value } = event.target;
-    
-  //   // Ensure the selected value is stored correctly
-  //   setTagsNew(value);
-  
-  //   // Extract selected tag values
-  //   const selectedTagsValues = value.map((val) => {
-  //     const option = tagsOptions.find((opt) => opt.value === val);
-  //     return option?.value;
-  //   });
-  
-  //   setCombinedTagsValues(selectedTagsValues);
-  // };
+ 
   const handleTagChange = (newSelectedTags) => {
     setTagsNew(newSelectedTags);
     console.log(newSelectedTags)

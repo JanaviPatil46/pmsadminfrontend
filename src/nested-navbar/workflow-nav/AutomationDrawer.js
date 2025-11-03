@@ -1162,7 +1162,7 @@ const AutomationDrawer = ({
 
     const raw = JSON.stringify({
       accountId: accountId,
-      foldertempId: templateId,
+      templateId: templateId,
     });
 
     const requestOptions = {
@@ -1172,8 +1172,9 @@ const AutomationDrawer = ({
       redirect: "follow",
     };
 
-    fetch(`${CLIENT_DOCS_API}/clientdocs/accountfoldertemp`, requestOptions)
-      .then((response) => response.json())
+    // fetch(`${CLIENT_DOCS_API}/clientdocs/accountfoldertemp`, requestOptions)
+     fetch(`https://www.snptaxes.com/api/docManagement/apply-template`, requestOptions) .then((response) => response.json())
+
       .then((result) => console.log(result))
       .catch((error) => console.error(error));
   };

@@ -146,12 +146,24 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
     } else {
       setLastNameError("");
     }
-    if (!email) {
-      setEmaileError("Email is required.");
-      isValid = false;
-    } else {
-      setEmaileError("");
-    }
+    // if (!email) {
+    //   setEmaileError("Email is required.");
+    //   isValid = false;
+    // } else {
+    //   setEmaileError("");
+    // }
+    // Email
+  if (!email?.trim()) {
+    setEmaileError("Email is required.");
+    isValid = false;
+  } else if (
+    !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)
+  ) {
+    setEmaileError("Please enter a valid email address.");
+    isValid = false;
+  } else {
+    setEmaileError("");
+  }
     return isValid;
   };
   const sendingData = async (e) => {
@@ -164,11 +176,7 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
 
     handleNewDrawerClose();
     handleDrawerClose();
-  // const formattedPhoneNumbers = phoneNumbers.map(phone => ({
-  //   phone: phone.phone,
-  //   country: phone.country,
-   
-  // }));
+ 
   const formattedPhoneNumbers = phoneNumbers.map(phone => phone.phone);
 
 
@@ -255,7 +263,7 @@ console.log("formattedPhoneNumbers",formattedPhoneNumbers)
         }}
       >
         <Typography sx={{ fontWeight: "550", fontSize: "20px" }}>
-          New Contact
+          New Contact 
         </Typography>
         <RxCross2
           onClick={handleNewDrawerClose}
@@ -446,15 +454,28 @@ console.log("formattedPhoneNumbers",formattedPhoneNumbers)
             size="small"
             sx={{ mt: 1.5, backgroundColor: "#fff" }}
             // onChange={(e) => setFirstName(e.target.value)}
-            onChange={(e) => {
-              const value = e.target.value;
-              setEmail(value);
+            // onChange={(e) => {
+            //   const value = e.target.value;
+            //   setEmail(value);
 
-              // Clear the error message when input is not empty
-              if (value.trim() !== "") {
-                setEmaileError("");
-              }
-            }}
+            //   // Clear the error message when input is not empty
+            //   if (value.trim() !== "") {
+            //     setEmaileError("");
+            //   }
+            // }}
+            onChange={(e) => {
+  const value = e.target.value;
+  setEmail(value);
+
+  if (!value.trim()) {
+    setEmaileError("Email is required.");
+  } else if (!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(value)) {
+    setEmaileError("Please enter a valid email address.");
+  } else {
+    setEmaileError(""); // Clear error when valid
+  }
+}}
+
             error={!!emailError}
           />
           {!!emailError && (

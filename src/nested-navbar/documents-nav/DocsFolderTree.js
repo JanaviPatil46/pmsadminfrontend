@@ -451,7 +451,39 @@ const handleRequestApproval = async () => {
       alert(`Move folder: ${folder.path}`); // implement backend
       handleMenuClose();
     };
-    
+        const handleFileClick = (fullPath, fileName, meta = {}) => {
+    try {
+      // 🔒 Prevent opening locked files
+      if (meta.readOnly) {
+        alert("This file is locked and cannot be opened.");
+        return;
+      }
+
+      // ✅ Construct full file URL
+      const fileUrl = `https://www.snptaxes.com/uploads/accounts/${data}/${fullPath}`;
+
+      // ✅ Detect file extension (case-insensitive)
+      const fileExt = fileName.split(".").pop().toLowerCase();
+
+      // ✅ Extensions that can open in browser
+      const viewableExtensions = ["pdf", "jpg", "jpeg", "png", "gif", "txt"];
+
+      if (viewableExtensions.includes(fileExt)) {
+        // Open supported file types in a new tab
+        window.open(fileUrl, "_blank", "noopener,noreferrer");
+      } else {
+        // Force download for unsupported types (e.g., docx, xlsx, zip, etc.)
+        const link = document.createElement("a");
+        link.href = fileUrl;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    } catch (error) {
+      console.error("Error opening/downloading file:", error);
+    }
+  };
   
    const renderTree = (items, level = 0, parentPath = "") => {
       return (
@@ -474,7 +506,13 @@ const handleRequestApproval = async () => {
                 <Lock size={16} color={meta.readOnly ? "#e53935" : "#9e9e9e"} />
               </Box>
             );
-  
+  const handleSafeFileClick = () => {
+            if (meta.readOnly) {
+              alert("This file is locked and cannot be opened.");
+              return;
+            }
+            handleFileClick(fullPath, item.name);
+          };
             return (
               <li key={fullPath} style={{ marginBottom: 8 }}>
                 {item.type === "folder" ? (
@@ -540,7 +578,9 @@ const handleRequestApproval = async () => {
                     />
                     <Typography
                       variant="body2"
-                      sx={{ flex: 1, wordBreak: "break-word" }}
+                      sx={{ flex: 1, wordBreak: "break-word", color: meta.readOnly ? "#999" : "#1976d2", textDecoration: meta.readOnly ? "none" : "underline",
+                      cursor: meta.readOnly ? "not-allowed" : "pointer", }}
+                      onClick={handleSafeFileClick}
                     >
                       {item.name}
                     </Typography>

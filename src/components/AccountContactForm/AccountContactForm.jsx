@@ -784,7 +784,7 @@ console.log("assignfoldertemp",accountId)
 console.log("assignfoldertemp",foldertempId)
     const raw = JSON.stringify({
       accountId: accountId,
-      foldertempId: foldertempId || null,
+      templateId: foldertempId || null,
     });
 
     const requestOptions = {
@@ -795,7 +795,8 @@ console.log("assignfoldertemp",foldertempId)
     };
 
     console.log(raw);
-    fetch(`${CLIENT_DOCS_API}/clientdocs/accountfoldertemp`, requestOptions)
+      fetch(`https://www.snptaxes.com/api/docManagement/apply-template`, requestOptions)
+    // fetch(`${CLIENT_DOCS_API}/clientdocs/accountfoldertemp`, requestOptions)
       .then((response) => response.json())
       .then((result) => console.log(result))
       .catch((error) => console.error(error));

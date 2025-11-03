@@ -673,7 +673,8 @@ const PipelineTemp = () => {
 
   const fetchFolderData = async () => {
     try {
-      const url = `${API_KEY}/foldertemp/folder`;
+      // const url = `${API_KEY}/foldertemp/folder`;
+       const url = `https://www.snptaxes.com/api/foldertemp/templatelist`;
       const response = await fetch(url);
       const data = await response.json();
       setFolderTemplates(data.folderTemplates);
@@ -5056,7 +5057,7 @@ case "Update job assignees":
                                       )
                                     }
                                   >
-                                   Update job assignees
+                                   Update job assignees 
                                   </MenuItem>
                                   <MenuItem
                                     onClick={() =>

@@ -18,14 +18,19 @@ const AddAutomationDrawer = ({
       anchor="right"
       open={isDrawerOpen}
       onClose={handleDrawerClose}
-      BackdropProps={{ invisible: true }}
-      PaperProps={{
-        sx: {
-          borderRadius: "10px 0 0 10px",
-          width: 500,
-          maxWidth: "100%",
-        },
-      }}
+     PaperProps={{
+          sx: {
+            width: 500,
+          },
+        }}
+      // BackdropProps={{ invisible: true }}
+      // PaperProps={{
+      //   sx: {
+      //     borderRadius: "10px 0 0 10px",
+      //     width: 500,
+      //     maxWidth: "100%",
+      //   },
+      // }}
     >
       {/* Header Section */}
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", p: 2 }}>

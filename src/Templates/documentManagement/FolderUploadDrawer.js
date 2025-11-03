@@ -275,7 +275,7 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  Collapse,
+  Collapse,LinearProgress
 } from "@mui/material";
 import FolderIcon from "@mui/icons-material/Folder";
 import FolderOpenIcon from "@mui/icons-material/FolderOpen";
@@ -321,20 +321,70 @@ const FolderUploadDrawer = ({
     }
   };
 
-  const handleUpload = async () => {
-    if (files.length === 0) {
-      setMessage("Please select a folder first");
-      return;
-    }
+  // const handleUpload = async () => {
+  //   if (files.length === 0) {
+  //     setMessage("Please select a folder first");
+  //     return;
+  //   }
 
-    let targetFolderPath = selectedFolder
-      ? `${selectedFolder}/${folderName}`
-      : folderName;
+  //   let targetFolderPath = selectedFolder
+  //     ? `${selectedFolder}/${folderName}`
+  //     : folderName;
 
-    targetFolderPath = targetFolderPath.replace(/\/+/g, "/");
+  //   targetFolderPath = targetFolderPath.replace(/\/+/g, "/");
 
+  //   const formData = new FormData();
+  //   files.forEach((file) => {
+  //     formData.append("files", file, file.webkitRelativePath);
+  //   });
+
+  //   try {
+  //     const res = await fetch(
+  //       `https://www.snptaxes.com/api/docManagement/folder/upload?folderPath=${encodeURIComponent(
+  //         targetFolderPath
+  //       )}`,
+  //       { method: "POST", body: formData }
+  //     );
+  //     const data = await res.json();
+  //     if (res.ok) {
+  //       // setMessage(`✅ Folder uploaded successfully: ${data.files.length} files`);
+  //       toast.success(`Folder uploaded successfully: ${data.files.length} files`)
+  //       fetchFolderTree();
+  //       onClose()
+  //       setFiles([]);
+  //     } else {
+  //       setMessage(`❌ Error: ${data.error}`);
+  //     }
+  //   } catch (err) {
+  //     console.error(err);
+  //     setMessage("Upload failed");
+  //   }
+  // };
+  const [progress, setProgress] = useState(0);
+
+const handleUpload = async () => {
+  if (files.length === 0) {
+    setMessage("Please select a folder first");
+    return;
+  }
+
+  let targetFolderPath = selectedFolder
+    ? `${selectedFolder}/${folderName}`
+    : folderName;
+
+  targetFolderPath = targetFolderPath.replace(/\/+/g, "/");
+
+  const CHUNK_SIZE = 30; // upload 30 files per request
+  const totalChunks = Math.ceil(files.length / CHUNK_SIZE);
+
+  setMessage("Uploading...");
+  let uploadedChunks = 0;
+
+  for (let i = 0; i < files.length; i += CHUNK_SIZE) {
     const formData = new FormData();
-    files.forEach((file) => {
+    const chunk = files.slice(i, i + CHUNK_SIZE);
+
+    chunk.forEach((file) => {
       formData.append("files", file, file.webkitRelativePath);
     });
 
@@ -345,22 +395,34 @@ const FolderUploadDrawer = ({
         )}`,
         { method: "POST", body: formData }
       );
-      const data = await res.json();
-      if (res.ok) {
-        // setMessage(`✅ Folder uploaded successfully: ${data.files.length} files`);
-        toast.success(`Folder uploaded successfully: ${data.files.length} files`)
-        fetchFolderTree();
-        onClose()
-        setFiles([]);
-      } else {
-        setMessage(`❌ Error: ${data.error}`);
+
+      if (!res.ok) {
+        const err = await res.json();
+        toast.error(`❌ Upload failed: ${err.error || "Unknown error"}`);
+        setMessage(`❌ Upload failed at chunk ${uploadedChunks + 1}`);
+        return;
       }
+
+      uploadedChunks++;
+      const percent = Math.round((uploadedChunks / totalChunks) * 100);
+        setProgress(percent);
+      setMessage(`✅ Uploading... ${percent}% completed`);
     } catch (err) {
       console.error(err);
-      setMessage("Upload failed");
+      setMessage("❌ Upload failed due to network error");
+      return;
     }
-  };
+  }
 
+  // All chunks uploaded
+  toast.success("✅ Folder uploaded successfully!");
+  setMessage(`✅ Folder uploaded (${files.length} files)`);
+
+  fetchFolderTree();
+  setFiles([]);
+  onClose();
+};
+ 
   return (
     <Drawer anchor="right" open={isOpen} onClose={onClose}>
       <Box sx={{ width: 400, p: 3, bgcolor: "#f0f8ff", height: "100%" }}>
@@ -411,6 +473,14 @@ const FolderUploadDrawer = ({
         >
           🚀 Upload
         </Button>
+{progress > 0 && progress < 100 && (
+  <Box sx={{ width: "100%", mt: 2 }}>
+    <LinearProgress variant="determinate" value={progress} />
+    <Typography align="center" sx={{ mt: 1 }}>
+      {progress}%
+    </Typography>
+  </Box>
+)}
 
         {message && (
           <Typography sx={{ mt: 2, fontWeight: "bold" }}>{message}</Typography>

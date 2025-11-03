@@ -978,7 +978,8 @@ const fetchJobData = async () => {
 
       const raw = JSON.stringify({
         accountId: automationAccountId,
-        foldertempId: automationTemp,
+        // foldertempId: automationTemp,
+         templateId: automationTemp,
       });
 
       const requestOptions = {
@@ -989,7 +990,8 @@ const fetchJobData = async () => {
       };
 
       console.log(raw);
-      fetch(`${CLIENT_DOCS_API}/clientdocs/accountfoldertemp`, requestOptions)
+      // fetch(`${CLIENT_DOCS_API}/clientdocs/accountfoldertemp`, requestOptions)
+        fetch(`https://www.snptaxes.com/api/docManagement/apply-template`, requestOptions)
         .then((response) => response.json())
         .then((result) => console.log(result))
         .catch((error) => console.error(error));

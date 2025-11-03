@@ -273,7 +273,8 @@ const Info = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState(null);
 
-  const handleClick = async (_id) => {
+  const handleClick = async (_id,userId) => {
+     console.log("Users for this contact:", userId);
     try {
       const url = `${CONTACT_API}/contacts/${_id}`;
       const response = await fetch(url);
@@ -281,7 +282,7 @@ const Info = () => {
         throw new Error("Failed to fetch data");
       }
       const data = await response.json();
-      console.log(data);
+      console.log("edit the selected contact",data);
       setSelectedContact(data.contact);
       setIsDrawerOpen(true);
     } catch (error) {
@@ -1464,8 +1465,11 @@ const updateContactstoAccount = (selectedContacts) => {
                                       fontSize: "15px",
                                       display: "inline-block",
                                       color: "#1976d2",
+                                      cursor:'pointer'
                                     }}
-                                    onClick={() => handleClick(contact._id)}
+                                    // onClick={() => handleClick(contact._id)}
+                                    onClick={() => handleClick(contact._id, contactUsers)}
+
                                   >
                                     {contact.contactName}
                                   </Typography>

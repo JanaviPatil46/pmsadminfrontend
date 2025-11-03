@@ -310,16 +310,7 @@ const FolderUploadDrawer = ({
 
   const handleFolderSelect = (path) => setSelectedFolder(path);
 
-  // const handleUploadFolderSelect = (e) => {
-  //   const selectedFiles = Array.from(e.target.files);
-  //   setFiles(selectedFiles);
-
-  //   if (selectedFiles.length > 0) {
-  //     const firstPath = selectedFiles[0].webkitRelativePath;
-  //     const topLevelFolder = firstPath.split("/")[0];
-  //     setFolderName(topLevelFolder);
-  //   }
-  // };
+ 
   const handleUploadFolderSelect = (e) => {
     const selectedFiles = Array.from(e.target.files);
     if (selectedFiles.length === 0) return;
@@ -396,23 +387,7 @@ const FolderUploadDrawer = ({
           📁 Upload Folder
         </Typography>
 
-        {/* <TextField
-          label="Folder Name"
-          placeholder="Enter folder name"
-          value={folderName}
-          onChange={(e) => setFolderName(e.target.value)}
-          fullWidth
-          margin="dense"
-        />
-
-        <TextField
-          label="Selected Path"
-          placeholder="Select parent folder"
-          value={selectedFolder}
-          InputProps={{ readOnly: true }}
-          fullWidth
-          margin="dense"
-        /> */}
+       
 
         <Button
           variant="outlined"

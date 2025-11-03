@@ -125,7 +125,8 @@ export default function AccountForm({ onContinue }) {
   useEffect(() => {
     const fetchFolderTemps = async () => {
       try {
-        const res = await fetch(`${API_KEY}/foldertemp/folder`);
+        // const res = await fetch(`${API_KEY}/foldertemp/folder`);
+        const res = await fetch(`https://www.snptaxes.com/api/foldertemp/templatelist`);
         const data = await res.json();
         setFolderTemp(
           data.folderTemplates.map((folder) => ({
