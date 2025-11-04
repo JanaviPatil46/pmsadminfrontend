@@ -233,6 +233,8 @@ setPhoneNumbers(
   //   country: phone.country,
    
   // }));
+   const oldEmail = selectedContact.email;
+    const emailChanged = oldEmail !== email;
   const formattedPhoneNumbers = phoneNumbers.map(p => p.phone);
     const updatedContact = {
       firstName,
@@ -265,6 +267,12 @@ setPhoneNumbers(
       if (response.ok) {
         const result = await response.json();
         console.log("Contact updated:", result);
+
+         // If email has changed, update all users with this contactId
+      if (emailChanged) {
+  await updateUsersEmail(contactId, email);
+}
+
         toast.success("Contact updated successfully!");
         if (onContactUpdated) {
           onContactUpdated(); // Call the callback function
@@ -279,6 +287,32 @@ setPhoneNumbers(
       toast.error("Failed to update contact");
     }
   };
+   const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
+  // Function to update users' email based on contactId
+const updateUsersEmail = async (contactId, newEmail) => {
+  try {
+    const response = await fetch(
+      `${LOGIN_API}/common/user/update-email-by-contact/${contactId}`,
+      {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: newEmail }),
+      }
+    );
+
+    if (response.ok) {
+      const result = await response.json();
+      console.log("Users email updated:", result);
+      // toast.success("Users email updated!");
+    } else {
+      toast.warning("Contact updated but failed to update users");
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    toast.warning("Contact updated but failed to update users");
+  }
+};
+
 
   const [accountdata, SetAccountData] = useState([]);
   const getaccountbycontactid = (contactId) => {

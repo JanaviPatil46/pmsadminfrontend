@@ -295,6 +295,7 @@ const Info = () => {
 
   const handleContactUpdated = () => {
     fetchContacts(); // Refetch contacts when updated
+    fetchAccount()
   };
   const fetchContacts = async () => {
     try {
