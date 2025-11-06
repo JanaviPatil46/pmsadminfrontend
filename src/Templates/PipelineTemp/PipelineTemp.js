@@ -55,6 +55,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import TagAutomationComponent from "../TagAutomationComponent";
 import TagsMultiSelectDropDown from "../TagsMultiSelectDropDown";
 import { GoDotFill } from "react-icons/go";
+import debounce from "lodash.debounce";
 const PipelineTemp = () => {
   const ITEM_HEIGHT = 48;
   const ITEM_PADDING_TOP = 8;
@@ -4192,6 +4193,33 @@ case "Update job assignees":
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+
+    // Debounced function to check template name existence
+    const checkTemplateName = async (name) => {
+        try {
+          const res = await axios.get(`${PIPELINE_API}/workflow/pipeline/check-name`, {
+            params: { name },
+          });
+          if (res.data.exists) {
+            setPipelineNameError('Template name already exists');
+          } else {
+            setPipelineNameError('');
+          }
+        } catch (err) {
+          console.error(err);
+          setPipelineNameError('');
+        }
+      };
+    
+     const debouncedCheck = debounce((name) => {
+        if (name.trim()) checkTemplateName(name);
+        else setPipelineNameError('');
+      }, 500);
+    
+      useEffect(() => {
+        debouncedCheck(pipelineName);
+        return debouncedCheck.cancel;
+      }, [pipelineName]);
   return (
     <Box>
       {!showForm ? (

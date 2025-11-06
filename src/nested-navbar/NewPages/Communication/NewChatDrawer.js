@@ -409,7 +409,7 @@ useEffect(() => {
   const saveChat = () => {
 
        // Validation checks
-      if (!selectedOption || !selectedOption.value) {
+      if (!selectedOption ) {
         toast.error("Please select a template before saving the chat.");
         return;
       }

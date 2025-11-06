@@ -669,7 +669,7 @@ useEffect(() => {
     email,
     firstName,
     middleName,
-    lastName
+    lastName,emailSync,notify
   ) => {
     console.log("acc", data, email, firstName, middleName, lastName);
     const myHeaders = new Headers();
@@ -682,8 +682,8 @@ useEffect(() => {
       role: "Client",
       contactId: selectedContact,
       login: true,
-      notify: false,
-      emailSync: false,
+      notify: notify,
+      emailSync: emailSync,
     });
 console.log("newuser raw",raw)
     const requestOptions = {
@@ -830,7 +830,7 @@ const handleConfirmLink = () => {
       const { id: contactId, email, firstName, middleName, lastName } = contact;
 
       // Call your newUser function
-      newUser(data, contactId, email, firstName, middleName, lastName);
+      newUser(data, contactId, email, firstName, middleName, lastName,contact.emailSync,contact.notify);
     }
   });
   // Then update the contacts to account

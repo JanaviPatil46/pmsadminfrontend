@@ -740,38 +740,7 @@ useEffect(() => {
                                                         {(provided) => (
                                                             <div className="subtask-input" {...provided.droppableProps} ref={provided.innerRef}>
 
-                                                                {/* {(subtasks.length > 0 ? subtasks : [{ id: 'default', text: '' }]).map((subtask, index) => (
-                                                                    <Draggable key={subtask.id} draggableId={subtask.id} index={index}>
-                                                                        {(provided) => (
-                                                                            <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-
-                                                                                <Box display="flex" gap="30px" alignItems="center">
-                                                                                    <Checkbox
-                                                                                        style={{ cursor: 'pointer' }}
-                                                                                        // checked={checkedSubtasks.includes(subtask.id)}
-                                                                                        checked={subtask.checked}
-                                                                                        onChange={() => handleCheckboxChange(subtask.id)}
-                                                                                    />
-                                                                                    <TextField
-                                                                                        placeholder="Things To do"
-                                                                                        value={subtask.text}
-                                                                                        size="small"
-                                                                                        margin='normal'
-                                                                                        fullWidth
-                                                                                        onChange={(e) => handleInputChange(subtask.id, e.target.value)}
-                                                                                        variant="outlined"
-                                                                                    />
-                                                                                    <IconButton onClick={() => handleDeleteSubtask(subtask.id)} style={{ cursor: 'pointer' }}>
-                                                                                        <RiDeleteBin6Line />
-                                                                                    </IconButton>
-                                                                                    <IconButton style={{ cursor: 'move' }}>
-                                                                                        <PiDotsSixVerticalBold />
-                                                                                    </IconButton>
-                                                                                </Box>
-                                                                            </div>
-                                                                        )}
-                                                                    </Draggable>
-                                                                ))} */}
+                                                               
 {subtasks.map((subtask, index) => (
   <Draggable key={subtask.id} draggableId={subtask.id} index={index}>
     {(provided) => (

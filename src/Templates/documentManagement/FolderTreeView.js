@@ -444,6 +444,7 @@ console.log("hgjhg",templateId)
               <Lock size={16} color={meta.readOnly ? "#e53935" : "#9e9e9e"} />
             </Box>
           );
+          
 
           return (
             <li key={fullPath} style={{ marginBottom: 8 }}>
@@ -557,334 +558,7 @@ console.log("hgjhg",templateId)
     );
   };
   return (
-//     <div style={{ margin: 'auto', padding: 20 }}>
-     
-//   <h2>Template: {templateName}</h2>
-    
-     
-//         <Box sx={{ p: 3, maxWidth: "1000px", mx: "auto" }}>
-     
-//       <Box
-//         sx={{
-//           display: "flex",
-//           gap: 2,
-//           justifyContent: "center",
-//           flexWrap: "wrap",
-//           mb: 4,
-//         }}
-//       >
-//         <Box
-//           sx={{
-//             display: "flex",
-//             flexDirection: { xs: "column", sm: "row" }, // vertical on mobile, horizontal on desktop
-//             gap: 1,
-//             maxWidth: "600px",
-//             width: "100%",
-//             mx: "auto",
-//             my: 3,
-//           }}
-//         >
-//           <Button
-//             variant="contained"
-//             fullWidth
-//             onClick={() => {
-//               setNewFolderDrawerOpen(true);
-//               handleMenuClose();
-//             }}
-//             startIcon={<FolderIcon />}
-//           >
-//             Create Folder
-//           </Button>
 
-//           <Button
-//             variant="contained"
-//             fullWidth
-//             onClick={() => setFileUploadDrawerOpen(true)}
-//             startIcon={<UploadFileIcon />}
-//           >
-//             Upload File
-//           </Button>
-
-//           <Button
-//             variant="contained"
-//             fullWidth
-//             onClick={() => setFolderUploaDrawerOpen(true)}
-//             startIcon={<DriveFolderUploadIcon />}
-//           >
-//             Upload Folder
-//           </Button>
-//         </Box>
-
-//         <FileUploadDrawer
-//           isOpen={fileUploadDrawerOpen}
-//           onClose={() => setFileUploadDrawerOpen(false)}
-//           folderTree={folderTree}
-       
-//         fetchFolderTree={()=>{fetchFolderTree(templateId)}}
-//           selectedFolderForMenu={selectedFolderForMenu}
-//         />
-
-//         <CreteFolderDrawer
-//           isOpen={newFolderDrawerOpen}
-//           onClose={() => {
-//             setNewFolderDrawerOpen(false); // close drawer
-//             setSelectedFolderForMenu(null); // reset selection when drawer closes
-//           }}
-//           folderTree={folderTree}
-//           fetchFolderTree={()=>{fetchFolderTree(templateId)}}
-//           selectedFolderForMenu={selectedFolderForMenu}
-//         />
-
-//         <FolderUploadDrawer
-//           isOpen={folderUploaDrawerOpen}
-//           onClose={() => setFolderUploaDrawerOpen(false)}
-//           folderTree={folderTree}
-     
-//         fetchFolderTree={()=>{fetchFolderTree(templateId)}}
-//           selectedFolderForMenu={selectedFolderForMenu}
-//         />
-
-//         <MoveDrawer
-//           isOpen={moveDrawerOpen}
-//           onClose={() => {
-//             setMoveDrawerOpen(false); // close drawer
-//             setSelectedFolderForMenu(null); // reset selection when drawer closes
-//           }}
-//           folderTree={folderTree}
-      
-//         fetchFolderTree={()=>{fetchFolderTree(templateId)}}
-//           selectedFolderForMenu={selectedFolderForMenu}
-//         />
-
-//         <RenameDrawer
-//           isOpen={renameDrawer}
-//           onClose={() => {
-//             SetRenameDrawer(false); // close drawer
-//             setSelectedFolderForMenu(null); // reset selection when drawer closes
-//           }}
-//           folderTree={folderTree}
-//           // fetchFolderTree={fetchFolderTree}
-//                  fetchFolderTree={()=>{fetchFolderTree(templateId)}}
-//           selectedFolderForMenu={selectedFolderForMenu}
-//         />
-//       </Box>
-
-//       {/* Folder Explorer */}
-//       <Paper elevation={3} sx={{ p: 2 }}>
-//         <Typography variant="h6" gutterBottom>
-//           📜 Folder Explorer
-//         </Typography>
-//         {folderTree ? (
-//           renderTree(folderTree)
-//         ) : (
-//           <Typography>Loading folder data...</Typography>
-//         )}
-//       </Paper>
-//       <Menu
-//         anchorEl={menuAnchorEl}
-//         open={Boolean(menuAnchorEl)}
-//         onClose={handleMenuClose}
-//         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-//         transformOrigin={{ vertical: "top", horizontal: "right" }}
-//       >
-//         {(() => {
-//           const isLocked = selectedFolderForMenu?.meta?.readOnly === true;
-//   const isRead = selectedFolderForMenu?.meta?.readStatus === true;
-//           const isSigned = selectedFolderForMenu?.meta?.signStatus === true;
-//           const currentStatus =
-//             selectedFolderForMenu?.meta?.signStatus || "sendForSignature";
-
-//           const isApproved = selectedFolderForMenu?.meta?.authStatus === true;
-//           return (
-//             <>
-//               {/* Move */}
-//               <MenuItem
-//                 disabled={isLocked}
-//                 onClick={() => {
-//                  setMoveDrawerOpen(true);
-//                   handleMenuClose();
-//                 }}
-//                 sx={{ fontSize: "0.8rem", py: 0.5 }}
-//               >
-//                 <DriveFileMoveIcon
-//                   fontSize="small"
-//                   sx={{ mr: 0.5, fontSize: "16px" }}
-//                 />
-//                 Move
-//               </MenuItem>
-
-//               {/* Delete */}
-//               <MenuItem
-//                 disabled={isLocked}
-//                 onClick={() => {
-//                   deleteItem(selectedFolderForMenu);
-//                   handleMenuClose();
-//                 }}
-//                 sx={{ fontSize: "0.8rem", py: 0.5 }}
-//               >
-//                 <DeleteIcon
-//                   fontSize="small"
-//                   sx={{ mr: 0.5, fontSize: "16px" }}
-//                 />
-//                 Delete
-//               </MenuItem>
-
-//               {/* New Folder */}
-//               <MenuItem
-//                 disabled={isLocked}
-//                 onClick={() => {
-//                   setNewFolderDrawerOpen(true);
-//                   handleMenuClose();
-//                 }}
-//                 sx={{ fontSize: "0.8rem", py: 0.5 }}
-//               >
-//                 <DriveFileMoveIcon
-//                   fontSize="small"
-//                   sx={{ mr: 0.5, fontSize: "16px" }}
-//                 />
-//                 New Folder
-//               </MenuItem>
-
-//               {/* New File */}
-//               <MenuItem
-//                 disabled={isLocked}
-//                 onClick={() => {
-//                   setFileUploadDrawerOpen(true);
-//                   handleMenuClose();
-//                 }}
-//                 sx={{ fontSize: "0.8rem", py: 0.5 }}
-//               >
-//                 <DriveFileMoveIcon
-//                   fontSize="small"
-//                   sx={{ mr: 0.5, fontSize: "16px" }}
-//                 />
-//                 New File
-//               </MenuItem>
-
-//               {/* Upload Folder */}
-//               <MenuItem
-//                 disabled={isLocked}
-//                 onClick={() => {
-//                   setFolderUploaDrawerOpen(true);
-//                   handleMenuClose();
-//                 }}
-//                 sx={{ fontSize: "0.8rem", py: 0.5 }}
-//               >
-//                 <DriveFileMoveIcon
-//                   fontSize="small"
-//                   sx={{ mr: 0.5, fontSize: "16px" }}
-//                 />
-//                 Upload Folder
-//               </MenuItem>
-
-//               {/* Edit */}
-//               <MenuItem
-//                 disabled={isLocked}
-//                 onClick={() => {
-//                   SetRenameDrawer(true);
-//                   handleMenuClose();
-//                 }}
-//                 sx={{ fontSize: "0.8rem", py: 0.5 }}
-//               >
-//                 <DriveFileMoveIcon
-//                   fontSize="small"
-//                   sx={{ mr: 0.5, fontSize: "16px" }}
-//                 />
-//                 Edit
-//               </MenuItem>
-
-//           <MenuItem
-//                          disabled={isLocked}
-//                          onClick={() => {
-//                            toggleSignStatus(selectedFolderForMenu);
-//                            handleMenuClose();
-//                          }}
-//                          sx={{ fontSize: "0.8rem", py: 0.5 }}
-//                        >
-//                          <PenTool
-//                            size={16}
-//                            color={
-//                              currentStatus === "signatureCompleted"
-//                                ? "#1976d2"
-//                                : "#807878ff"
-//                            }
-//                            style={{ marginRight: 6 }}
-//                          />
-//                          {statusTextMap[currentStatus]}
-//                        </MenuItem>
-//  <MenuItem
-//                 disabled={isLocked} // Disabled when locked
-//                 onClick={() => {
-//                   toggleReadStatus(selectedFolderForMenu); // pass item
-//                   handleMenuClose();
-//                 }}
-//                 sx={{ fontSize: "0.8rem", py: 0.5 }}
-//               >
-//                 <Eye
-//                   size={16}
-//                   color={
-//                     isLocked
-//                       ? "#f5ececff" // gray when locked
-//                       : isRead
-//                       ? "#1976d2" // blue when active/read
-//                       : "#807878ff" // gray when inactive/unread
-//                   }
-//                   style={{ marginRight: 6 }}
-//                 />
-//                 {isRead ? "Mark Unread" : "Mark Read"}
-//               </MenuItem>
-
-//               <MenuItem
-//                 disabled={isLocked}
-//                 onClick={() => {
-//                   toggleApprovalStatus(selectedFolderForMenu);
-//                   handleMenuClose();
-//                 }}
-//                 sx={{ fontSize: "0.8rem", py: 0.5 }}
-//               >
-//                 <Stamp
-//                   size={16}
-//                   color={
-//                     selectedFolderForMenu?.meta?.authStatus ===
-//                     "approvalCompleted"
-//                       ? "#1976d2" // Blue when approval completed
-//                       : "#807878ff" // Gray for other statuses
-//                   }
-//                   style={{ marginRight: 6 }}
-//                 />
-//                 {
-//                   approvalStatusTextMap[
-//                     selectedFolderForMenu?.meta?.authStatus || "sendForApproval"
-//                   ]
-//                 }
-//               </MenuItem>
-//               {/* Lock / Unlock */}
-//               <MenuItem
-//                 onClick={() => {
-//                   toggleReadOnly(selectedFolderForMenu);
-//                   handleMenuClose();
-//                 }}
-//                 sx={{ fontSize: "0.8rem", py: 0.5 }}
-//               >
-//                 {isLocked ? (
-//                   <LockOpenIcon
-//                     fontSize="small"
-//                     sx={{ mr: 0.5, fontSize: "16px" }}
-//                   />
-//                 ) : (
-//                   <LockIcon
-//                     fontSize="small"
-//                     sx={{ mr: 0.5, fontSize: "16px" }}
-//                   />
-//                 )}
-//                 {isLocked ? "Unlock" : "Lock"}
-//               </MenuItem>
-//             </>
-//           );
-//         })()}
-//       </Menu>
-//     </Box>
-//     </div>
 <Box sx={{ margin: "auto", p: 3 }}>
       {/* Template Name */}
 
@@ -1023,11 +697,19 @@ console.log("hgjhg",templateId)
           const currentStatus =
             selectedFolderForMenu?.meta?.signStatus || "sendForSignature";
           const isApproved = selectedFolderForMenu?.meta?.authStatus === true;
+const restrictedNames = [
+  "Client Uploaded Documents",
+  "Firm Documents Shared with Client",
+  "Private",
+];
+
+const isRestricted =
+  restrictedNames.includes(selectedFolderForMenu?.name);
 
           return (
             <>
               <MenuItem
-                disabled={isLocked}
+               disabled={isLocked || isRestricted}
                 onClick={() => {
                   setMoveDrawerOpen(true);
                   handleMenuClose();
@@ -1039,7 +721,7 @@ console.log("hgjhg",templateId)
               </MenuItem>
 
               <MenuItem
-                disabled={isLocked}
+                disabled={isLocked || isRestricted}
                 onClick={() => {
                   deleteItem(selectedFolderForMenu);
                   handleMenuClose();

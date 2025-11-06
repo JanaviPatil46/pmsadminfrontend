@@ -744,6 +744,7 @@ const handleRequestApproval = async () => {
             }}
             folderTree={folderTree}
             fetchFolderTree={() => fetchFolderTree(data)}
+            accountId={data}
             selectedFolderForMenu={selectedFolderForMenu}
           />
   

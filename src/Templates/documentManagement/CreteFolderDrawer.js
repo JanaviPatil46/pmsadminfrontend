@@ -258,7 +258,7 @@ const CreateFolderDrawer = ({
   onClose,
   folderTree,
   fetchFolderTree,
-  selectedFolderForMenu,
+  selectedFolderForMenu,templateId
 }) => {
   const [folderName, setFolderName] = useState("");
   const [selectedFolder, setSelectedFolder] = useState("");
@@ -288,6 +288,7 @@ const CreateFolderDrawer = ({
         {
           name: folderName,
           parentPath: selectedFolder || "",
+          templateId: templateId
         }
       );
 
@@ -295,9 +296,9 @@ const CreateFolderDrawer = ({
       toast.success(`✅ Folder created: ${res.data.metaData.name}`)
       setFolderName("");
      
-      // fetchFolderTree();
+      fetchFolderTree();
       // ✅ Wait for folder tree refresh
-    await fetchFolderTree();
+    // await fetchFolderTree();
        onClose();
     } catch (err) {
       console.error(err);
