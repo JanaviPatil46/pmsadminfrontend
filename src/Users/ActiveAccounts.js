@@ -1,5 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { Container, Button, Box, Typography, Divider, Paper, TextField, IconButton, FilledInput, OutlinedInput, Input, InputLabel, InputAdornment, FormHelperText, FormControl } from "@mui/material";
+import {
+  Container,
+  Button,
+  Box,
+  Typography,
+  Divider,
+  Paper,
+  TextField,
+  IconButton,
+  FilledInput,
+  OutlinedInput,
+  Input,
+  InputLabel,
+  InputAdornment,
+  FormHelperText,
+  FormControl,
+} from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useParams, useNavigate } from "react-router-dom";
@@ -24,7 +40,8 @@ const ActiveAccounts = () => {
   //for confiem password
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
 
-  const handleClickConfirmShowPassword = () => setShowConfirmPassword((show) => !show);
+  const handleClickConfirmShowPassword = () =>
+    setShowConfirmPassword((show) => !show);
 
   const handleMouseDownConfirmPassword = (event) => {
     event.preventDefault();
@@ -51,6 +68,7 @@ const ActiveAccounts = () => {
   const [middleName, setMiddleName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
+  const [passwordMatchValidation, setPasswordMatchValidation] = useState("");
 
   useEffect(() => {
     fetchidwiseData();
@@ -104,7 +122,8 @@ const ActiveAccounts = () => {
   const [firstNameValidation, setFirstNameValidation] = useState("");
   const [lastNameValidation, setLastNameValidation] = useState("");
   const [passwordValidation, setPasswordValidation] = useState("");
-  const [confirmPasswordValidation, setConfirmPasswordValidation] = useState("");
+  const [confirmPasswordValidation, setConfirmPasswordValidation] =
+    useState("");
 
   const submitvalidation = async (e) => {
     e.preventDefault();
@@ -135,11 +154,16 @@ const ActiveAccounts = () => {
     } else {
       setConfirmPasswordValidation("");
     }
-
+// if passwords don't match → stop
+    if (password !== confirmPassword) {
+      setPasswordMatchValidation("Passwords do not match");
+      return;
+    }
     // If all validations pass, proceed to next step
     if (firstName && lastName && password && confirmPassword) {
       UserValidToken();
     }
+  
   };
 
   const UserValidToken = async () => {
@@ -212,7 +236,10 @@ const ActiveAccounts = () => {
         redirect: "follow",
       };
 
-      const response = await fetch(`${LOGIN_API}/common/user/email/getuserbyemail/${email}`, requestOptions);
+      const response = await fetch(
+        `${LOGIN_API}/common/user/email/getuserbyemail/${email}`,
+        requestOptions
+      );
       if (!response.ok) {
         throw new Error("Failed to fetch user data");
       }
@@ -220,7 +247,10 @@ const ActiveAccounts = () => {
       const data = await response.json();
       console.log(data);
 
-      if (data.message === "User retrieved successfully" && data.user.length > 0) {
+      if (
+        data.message === "User retrieved successfully" &&
+        data.user.length > 0
+      ) {
         const userId = data.user[0]._id; // Access the _id field of the first user
         console.log(userId);
         updatePassword(userId);
@@ -292,19 +322,52 @@ const ActiveAccounts = () => {
             To activate your account, please fill in the requested information.
           </Typography>
           <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
-            <TextField value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="First Name" fullWidth margin="normal" size="small" variant="outlined" sx={{ backgroundColor: "#fff" }} />
-            <Box style={{ color: "red", fontSize: "9px" }}>{firstNameValidation}</Box>
+            <TextField
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              placeholder="First Name"
+              fullWidth
+              margin="normal"
+              size="small"
+              variant="outlined"
+              sx={{ backgroundColor: "#fff" }}
+            />
+            <Box style={{ color: "red", fontSize: "9px" }}>
+              {firstNameValidation}
+            </Box>
 
-            <TextField placeholder="Middle Name" value={middleName} onChange={(e) => setMiddleName(e.target.value)} fullWidth margin="normal" size="small" variant="outlined" sx={{ backgroundColor: "#fff" }} />
+            <TextField
+              placeholder="Middle Name"
+              value={middleName}
+              onChange={(e) => setMiddleName(e.target.value)}
+              fullWidth
+              margin="normal"
+              size="small"
+              variant="outlined"
+              sx={{ backgroundColor: "#fff" }}
+            />
 
-            <TextField value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Last Name" fullWidth margin="normal" size="small" variant="outlined" sx={{ backgroundColor: "#fff" }} />
-            <Box style={{ color: "red", fontSize: "9px" }}>{lastNameValidation}</Box>
+            <TextField
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              placeholder="Last Name"
+              fullWidth
+              margin="normal"
+              size="small"
+              variant="outlined"
+              sx={{ backgroundColor: "#fff" }}
+            />
+            <Box style={{ color: "red", fontSize: "9px" }}>
+              {lastNameValidation}
+            </Box>
           </Box>
 
           <Box display={"flex"} alignItems={"center"} gap={1} mt={3}>
             <Box>
               <FormControl variant="outlined">
-                <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
+                <InputLabel htmlFor="outlined-adornment-password">
+                  Password
+                </InputLabel>
                 <OutlinedInput
                   size="small"
                   id="outlined-adornment-password"
@@ -313,7 +376,13 @@ const ActiveAccounts = () => {
                   onChange={handlePasswordChange} // onChange should be on the input, not IconButton
                   endAdornment={
                     <InputAdornment position="end">
-                      <IconButton aria-label="toggle password visibility" onClick={handleClickShowPassword} onMouseDown={handleMouseDownPassword} onMouseUp={handleMouseUpPassword} edge="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={handleClickShowPassword}
+                        onMouseDown={handleMouseDownPassword}
+                        onMouseUp={handleMouseUpPassword}
+                        edge="end"
+                      >
                         {showPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
                     </InputAdornment>
@@ -321,12 +390,17 @@ const ActiveAccounts = () => {
                   label="Password"
                 />
               </FormControl>
-              <div style={{ color: "red", fontSize: "9px" }}>{passwordValidation}</div>
+              <div style={{ color: "red", fontSize: "9px" }}>
+                {passwordValidation}
+              </div>
             </Box>
 
             <Box>
               <FormControl variant="outlined">
-                <InputLabel htmlFor="outlined-adornment-password"> Confirm Password</InputLabel>
+                <InputLabel htmlFor="outlined-adornment-password">
+                  {" "}
+                  Confirm Password
+                </InputLabel>
                 <OutlinedInput
                   size="small"
                   id="outlined-adornment-password"
@@ -335,7 +409,13 @@ const ActiveAccounts = () => {
                   onChange={handleConfirmPasswordChange}
                   endAdornment={
                     <InputAdornment position="end">
-                      <IconButton aria-label="toggle password visibility" onClick={handleClickConfirmShowPassword} onMouseDown={handleMouseDownConfirmPassword} onMouseUp={handleMouseUpConfirmPassword} edge="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={handleClickConfirmShowPassword}
+                        onMouseDown={handleMouseDownConfirmPassword}
+                        onMouseUp={handleMouseUpConfirmPassword}
+                        edge="end"
+                      >
                         {showPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
                     </InputAdornment>
@@ -343,20 +423,25 @@ const ActiveAccounts = () => {
                   label="Password"
                 />
               </FormControl>
-              <div style={{ color: "red", fontSize: "9px" }}>{confirmPasswordValidation}</div>
+              <div style={{ color: "red", fontSize: "9px" }}>
+                {confirmPasswordValidation || passwordMatchValidation}
+              </div>
             </Box>
           </Box>
           <div className="password-validation-checklist">
             <p>Your password must contain:</p>
             <ul>
               <li className={password.length >= 8 ? "valid" : ""}>
-                <IoIosCheckmarkCircleOutline className="check-icon" /> Minimum 8 characters
+                <IoIosCheckmarkCircleOutline className="check-icon" /> Minimum 8
+                characters
               </li>
               <li className={/\d/.test(password) ? "valid" : ""}>
-                <IoIosCheckmarkCircleOutline className="check-icon" /> At least one number
+                <IoIosCheckmarkCircleOutline className="check-icon" /> At least
+                one number
               </li>
               <li className={/[a-zA-Z]/.test(password) ? "valid" : ""}>
-                <IoIosCheckmarkCircleOutline className="check-icon" /> At least one letter
+                <IoIosCheckmarkCircleOutline className="check-icon" /> At least
+                one letter
               </li>
             </ul>
           </div>

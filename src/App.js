@@ -110,6 +110,8 @@ import Bulkaccount from "./Pages/Bulkaccount.js";
 import TemplateCreator from "./Templates/documentManagement/TemplateCreator.js";
 import FolderTreeView from "./Templates/documentManagement/FolderTreeView.js";
 import DocsFolderTree from "./nested-navbar/documents-nav/DocsFolderTree.js";
+import AccountTable from "./AccountContactForm/AccountTable.js"
+import AccountDetails from "./AccountContactForm/AccountDetails.js"
 const App = () => {
   return (
     <BrowserRouter>
@@ -124,7 +126,9 @@ const App = () => {
           <Route index element={<Insights />} />
           <Route path="/docs" element={<Docs />} />
           <Route path="/clients/accounts" element={<Account />}>
-            <Route path="activeaccounts" element={<ActiveAccount />} />
+            {/* <Route path="activeaccounts" element={<ActiveAccount />} /> */}
+             <Route path="activeaccounts" element={<AccountTable />}/>
+              <Route path="account/:id" element={<AccountDetails/>}/>
             <Route path="archivedaccounts" element={<ArchivedAccount />} />
           </Route>
           <Route path="/organizers" element={<AccountOrganizers />}>
