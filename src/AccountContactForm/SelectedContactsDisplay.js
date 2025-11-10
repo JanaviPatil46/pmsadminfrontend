@@ -7,6 +7,7 @@ import CloseIcon from "@mui/icons-material/Close";
 
 export default function SelectedContactsDisplay({ contacts, onRemove, onUpdateField, isEditing = false }) {
   if (!contacts.length) return null;
+  console.log("contacts",contacts)
   return (
     <Box sx={{ mb: 3 }}>
       <Typography variant="h6" gutterBottom>Selected Existing Contacts</Typography>

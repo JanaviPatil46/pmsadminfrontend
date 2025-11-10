@@ -39,21 +39,22 @@ const AccountOrganizer = () => {
   const [accountData, setAccountData] = useState([]);
   const fetchAccountsData = async () => {
     try {
-      const url = `${ACCOUNT_API}/accounts/account/accountdetailslist/`;
-      const response = await fetch(url);
+      // const url = `${ACCOUNT_API}/accounts/account/accountdetailslist/`;
+       const response = await fetch("https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true")
+      // const response = await fetch(url);
       const result = await response.json();
-
-      if (Array.isArray(result.accountlist)) {
-        setAccountData(result.accountlist);
-        console.log(result.accountlist);
+console.log("accounts result",result)
+      if (Array.isArray(result.accounts)) {
+        setAccountData(result.accounts);
+        // console.log(result.accounts);
 
         // Assuming `data` contains the selected account ID(s) as a string or array of IDs
 
-        const selectedAccounts = result.accountlist
-          .filter((account) => (Array.isArray(data) ? data.includes(account.id) : account.id === data))
+        const selectedAccounts = result.accounts
+          .filter((account) => (Array.isArray(data) ? data.includes(account._id) : account._id === data))
           .map((selectedAccount) => ({
-            label: selectedAccount.Name,
-            value: selectedAccount.id,
+            label: selectedAccount.accountName,
+            value: selectedAccount._id,
           }));
 
         if (selectedAccounts.length > 0) {
@@ -68,7 +69,10 @@ const AccountOrganizer = () => {
       console.log("Error:", error);
     }
   };
-
+ const AccountsOptions = (accountData || []).map((account) => ({
+    value: account.id,
+    label: account.Name,
+  }));
   const handleOrganizerTemplateChange = (event) => {
     const selectedValue = event.target.value;
     setSelectedOrganizerTemplate(selectedValue);
@@ -114,10 +118,7 @@ const handleOrganizerNameChange = (e) => {
   console.log(selectedAccount);
   console.log(selectedOrganizerTemplate);
 
-  const AccountsOptions = (accountData || []).map((account) => ({
-    value: account.id,
-    label: account.Name,
-  }));
+ 
 
   const OrganizerTemplateOptions = organizerTemplate.map((organizertemp) => ({
     value: organizertemp._id,
@@ -138,37 +139,7 @@ const handleOrganizerNameChange = (e) => {
   const [inputValues, setInputValues] = useState({});
   const [selectedValue, setSelectedValue] = useState(null);
   const [selectedYesNoValues, setSelectedYesNoValues] = useState({});
-// const shouldShowSection = (section) => {
-//     if (!section.sectionsettings?.conditional) return true;
-  
-//     const conditions = section.sectionsettings.conditions || [];
-  
-//     // Ensure all conditions are true
-//     return conditions.every((condition) => {
-//         if (!condition.question || !condition.answer) return false;
-  
-//         // Check for radio button conditions
-//         const radioAnswer = radioValues[condition.question];
-//         if (radioAnswer !== undefined && condition.answer === radioAnswer) {
-//             return true;
-//         }
-  
-//         // Check for checkbox conditions
-//         const checkboxAnswer = checkboxValues[condition.question];
-//         if (checkboxAnswer && checkboxAnswer[condition.answer]) {
-//             return true;
-//         }
-  
-//         // Check for dropdown conditions
-//         const dropdownAnswer = selectedDropdownValue[condition.question];
-//         if (dropdownAnswer !== undefined && condition.answer === dropdownAnswer) {
-//             return true;
-//         }
-  
-//         // If no condition is satisfied, return false
-//         return false;
-//     });
-//   };
+
   
   const shouldShowSection = (section) => {
     if (!section.sectionsettings?.conditional) return true;
@@ -221,17 +192,6 @@ const handleOrganizerNameChange = (e) => {
   const getVisibleSections = () => sections.filter(shouldShowSection);
   const visibleSections = getVisibleSections();
 
-  // const handleInputChange = (event, elementText) => {
-  //   const { value } = event.target;
-  //   setInputValues((prevValues) => ({
-  //     ...prevValues,
-  //     [elementText]: value,
-  //   }));
-  //   setAnsweredElements((prevAnswered) => ({
-  //     ...prevAnswered,
-  //     [elementText]: true,
-  //   }));
-  // };
   const handleInputChange = (event, elementText, sectionId) => {
     const key = `${sectionId}_${elementText}`;
     const { value } = event.target;
@@ -331,46 +291,7 @@ const shouldShowElement = (element, sectionId) => {
 
     return true;
   };
-  // const shouldShowElement = (element) => {
-  //   const settings = element.questionsectionsettings;
   
-  //   // If the element isn't conditional, show it by default
-  //   if (!settings?.conditional) return true;
-  
-  //   const conditions = settings?.conditions || [];
-  
-  //   // Check if all conditions are satisfied
-  //   for (const condition of conditions) {
-  //       const { question, answer } = condition;
-  
-  //       if (question && answer) {
-  //           const radioAnswer = radioValues[question];
-  //           const checkboxAnswer = checkboxValues[question];
-  //           const dropdownAnswer = selectedDropdownValue;
-  
-  //           // For radio buttons
-  //           if (radioAnswer !== undefined && radioAnswer === answer) {
-  //               continue;
-  //           }
-  
-  //           // For checkboxes: check if the condition answer is in the selected checkbox values
-  //           if (checkboxAnswer && checkboxAnswer[answer]) {
-  //               continue;
-  //           }
-  
-  //           // For dropdowns: check if the condition answer matches the selected dropdown value
-  //           if (dropdownAnswer !== undefined && dropdownAnswer === answer) {
-  //               continue;
-  //           }
-  
-  //           // If any condition is not satisfied, hide the element
-  //           return false;
-  //       }
-  //   }
-  
-  //   // All conditions are satisfied, show the element
-  //   return true;
-  // };
 
   const handleRadioChange = (value, elementText, sectionId) => {
     const key = `${sectionId}_${elementText}`;
@@ -383,16 +304,7 @@ const shouldShowElement = (element, sectionId) => {
       [key]: true,
     }));
   };
-  // const handleRadioChange = (value, elementText) => {
-  //   setRadioValues((prevValues) => ({
-  //     ...prevValues,
-  //     [elementText]: value,
-  //   }));
-  //   setAnsweredElements((prevAnswered) => ({
-  //     ...prevAnswered,
-  //     [elementText]: true,
-  //   }));
-  // };
+  
 const handleCheckboxChange = (value, elementText, sectionId) => {
     const key = `${sectionId}_${elementText}`;
     setCheckboxValues((prevValues) => ({
@@ -407,27 +319,7 @@ const handleCheckboxChange = (value, elementText, sectionId) => {
       [key]: true,
     }));
   };
-  // const handleCheckboxChange = (value, elementText) => {
-  //   setCheckboxValues((prevValues) => ({
-  //     ...prevValues,
-  //     [elementText]: {
-  //       ...prevValues[elementText],
-  //       [value]: !prevValues[elementText]?.[value],
-  //     },
-  //   }));
-  //   setAnsweredElements((prevAnswered) => ({
-  //     ...prevAnswered,
-  //     [elementText]: true,
-  //   }));
-  // };
-
-  // const handleChange = (event, elementText) => {
-  //   setSelectedValue(event.target.value);
-  //   setAnsweredElements((prevAnswered) => ({
-  //     ...prevAnswered,
-  //     [elementText]: true,
-  //   }));
-  // };
+  
 
   const handleYesNoChange = (value, elementText, sectionId) => {
     const key = `${sectionId}_${elementText}`;
@@ -440,13 +332,7 @@ const handleCheckboxChange = (value, elementText, sectionId) => {
       [key]: true,
     }));
   };
-  // const handleDropdownValueChange = (event, elementText) => {
-  //   setSelectedDropdownValue(event.target.value);
-  //   setAnsweredElements((prevAnswered) => ({
-  //     ...prevAnswered,
-  //     [elementText]: true,
-  //   }));
-  // };
+  
   const handleDropdownValueChange = (event, elementText, sectionId) => {
     const key = `${sectionId}_${elementText}`;
     setSelectedDropdownValues((prevValues) => ({
@@ -542,9 +428,9 @@ const handleCheckboxChange = (value, elementText, sectionId) => {
       .then((result) => {
         console.log(result);
         console.log(result.newOrganizerAccountWise);
-        const { _id } = result.newOrganizerAccountWise;
+        // const { _id } = result.newOrganizerAccountWise;
 
-        console.log(_id); // "66f7e5d97114d8ad832c2d3e"
+        // console.log(_id); // "66f7e5d97114d8ad832c2d3e"
         setorganizeraccountwise(result.newOrganizerAccountWise);
         setShowOrganizerForm(true);
         setSelectedOrganizerTemplate(selectedOrganizerTemplate);

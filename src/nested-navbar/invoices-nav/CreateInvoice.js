@@ -54,8 +54,10 @@ const CreateInvoice = ({ charLimit = 4000, onClose }) => {
   console.log(selectedaccount);
   const fetchAccountData = async () => {
     try {
-      const response = await fetch(`${ACCOUNT_API}/accounts/accountdetails`);
-      const result = await response.json();
+      // const response = await fetch(`${ACCOUNT_API}/accounts/accountdetails`);
+            const response = await fetch("https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true")
+
+            const result = await response.json();
       setaccountdata(result.accounts);
       console.log(result.accounts);
       console.log(data);

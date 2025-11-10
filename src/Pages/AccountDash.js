@@ -5,7 +5,7 @@ import { FaRegEye } from "react-icons/fa";
 import Cookies from 'js-cookie';
 import { useParams } from "react-router-dom";
 import { Box, Typography } from "@mui/material";
-
+import axios from "axios";
 const AccountsDash = () => {
   const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
   const { data } = useParams();
@@ -29,26 +29,40 @@ const AccountsDash = () => {
   const [accName, setAccName] = useState();
 
   // eslint-disable-next-line
+  // useEffect(() => {
+  //   const requestOptions = {
+  //     method: "GET",
+  //     redirect: "follow",
+  //   };
+
+  //   // Fetch URL with environment variable
+
+  //   const url = `${ACCOUNT_API}/accounts/accountdetails/accountdetailslist/listbyid/`;
+  //   fetch(url + data, requestOptions)
+  //     .then((response) => response.json())
+  //     .then((result) => {
+  //       console.log(result);
+
+  //       setAccName(result.accountlist.Name);
+  //        Cookies.set('accountName', result.accountlist.Name);
+  //     })
+  //     .catch((error) => console.error(error));
+  // }, [data]);
+ const fetchAccountDetails = async () => {
+    try {
+      const res = await axios.get(
+        `https://www.snptaxes.com/api/accounts/${data}`
+      );
+      setAccName(res.data.accountName);
+      console.log("result", res.data);
+    } catch (error) {
+      console.error("Error fetching account details:", error);
+    }
+  };
+// console.log("selected contact list",selectedContact)
   useEffect(() => {
-    const requestOptions = {
-      method: "GET",
-      redirect: "follow",
-    };
-
-    // Fetch URL with environment variable
-
-    const url = `${ACCOUNT_API}/accounts/accountdetails/accountdetailslist/listbyid/`;
-    fetch(url + data, requestOptions)
-      .then((response) => response.json())
-      .then((result) => {
-        console.log(result);
-
-        setAccName(result.accountlist.Name);
-         Cookies.set('accountName', result.accountlist.Name);
-      })
-      .catch((error) => console.error(error));
+    fetchAccountDetails();
   }, [data]);
-
   return (
     <Box>
       <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>

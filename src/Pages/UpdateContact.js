@@ -61,11 +61,7 @@ console.log("selectedcountry",selectedCountry)
       setNote(selectedContact.note || "");
       setSsn(selectedContact.ssn || "");
       setEmail(selectedContact.email || "");
-      // setSelectedCountry(selectedContact.country || '');
-      // setSelectedCountry({
-      //   name: selectedContact.country?.name || "", // Use name field or an empty string
-      //   code: selectedContact.country?.code || "", // Use code field or an empty string
-      // });
+      
       setSelectedCountry({
       value: selectedContact.country?.code,
       label: selectedContact.country?.name,
@@ -77,16 +73,7 @@ console.log("selectedcountry",selectedCountry)
       setContactId(selectedContact._id || null); // Set contact ID
 
      
-// const flatPhoneNumbers = selectedContact.phoneNumbers?.flat() || [];
 
-// setPhoneNumbers(
-//   flatPhoneNumbers.map((phoneObj) => ({
-//     id: Date.now() + Math.random(),
-//     phone: phoneObj.phone.toString().startsWith("+") ? phoneObj.phone.toString() : `+${phoneObj.phone}`,
-//     isPrimary: false,
-//     country: phoneObj.country?.toLowerCase() || "us",
-//   }))
-// );
 const flatPhoneNumbers = selectedContact.phoneNumbers || [];
 
 setPhoneNumbers(
@@ -119,18 +106,7 @@ setPhoneNumbers(
   }, [selectedContact]);
 
   const [countries, setCountries] = useState([]);
-  // useEffect(() => {
-  //   axios
-  //     .get("https://restcountries.com/v3.1/all?fields=name,cca2")
-  //     .then((response) => {
-  //       const countryData = response.data.map((country) => ({
-  //         name: country.name.common,
-  //         code: country.cca2,
-  //       }));
-  //       setCountries(countryData);
-  //     })
-  //     .catch((error) => console.error("Error fetching country data:", error));
-  // }, []);
+  
   const options = useMemo(() => countryList().getData(), []);
 
   const handleCountryChange = (event) => {
@@ -146,14 +122,7 @@ setPhoneNumbers(
     });
   };
 
-  // const handlePhoneNumberChange = (id, phone) => {
-  //   console.log("phone",phone)
-  //   setPhoneNumbers((prevPhoneNumbers) =>
-  //     prevPhoneNumbers.map((item) =>
-  //       item.id === id ? { ...item, phone } : item
-  //     )
-  //   );
-  // };
+ 
 
    const handlePhoneNumberChange = (phoneValue, countryData, id) => {
   setPhoneNumbers(prevPhoneNumbers =>
@@ -169,12 +138,7 @@ setPhoneNumbers(
     )
   );
 };
-  // const handleAddPhoneNumber = () => {
-  //   setPhoneNumbers((prevPhoneNumbers) => [
-  //     ...prevPhoneNumbers,
-  //     { id: Date.now(), phone: "", isPrimary: false },
-  //   ]);
-  // };
+ 
     const handleAddPhoneNumber = () => {
   setPhoneNumbers(prevPhoneNumbers => [
     ...prevPhoneNumbers,
@@ -200,62 +164,62 @@ setPhoneNumbers(
     setCombinedTagsValues(selectedValues);
     console.log(selectedValues);
   };
-  const handleSave = async () => {
 
-  //    const formattedPhoneNumbers = phoneNumbers.map(phone => ({
-  //   phone: phone.phone,
-  //   country: phone.country,
-   
-  // }));
-const formattedPhoneNumbers = phoneNumbers.map(p => p.phone);
-console.log("formattedPhoneNumbers",formattedPhoneNumbers)
-    const updatedContact = {
-      firstName,
-      middleName,
-      lastName,
-      contactName,
-      companyName,
-      note,
-      ssn,
-      email,
-      // phoneNumbers,
-      phoneNumbers: formattedPhoneNumbers,
-      // country: selectedCountry,
-      country: selectedCountry
+const handleSave = async (e) => {
+  e.preventDefault();
+
+  // if (!validateForm()) return;
+
+  // handleNewDrawerClose();
+  // handleDrawerClose();
+
+  const formattedPhoneNumbers = phoneNumbers.map((item) => item.phone);
+
+  const countryPayload = selectedCountry
     ? { name: selectedCountry.label, code: selectedCountry.value }
-    : null,
-      streetAddress,
-      city,
-      state,
-      postalCode,
-      tags: combinedTagsValues,
-    };
-    console.log(updatedContact);
-    try {
-      const response = await fetch(`${CONTACT_API}/contacts/${contactId}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedContact),
-      });
+    : null;
 
-      if (response.ok) {
-        const result = await response.json();
-        console.log("Contact updated:", result);
-        toast.success("Contact updated successfully!");
-        if (onContactUpdated) {
-          onContactUpdated(); // Call the callback function
-        }
-        handleClose(); // Close the form on success
-      } else {
-        console.error("Failed to update contact:", response.statusText);
-      }
-    } catch (error) {
-      console.error("Error updating contact:", error);
-      toast.error("Failed to update contact");
-    }
+  const payload = JSON.stringify({
+    firstName,
+    middleName,
+    lastName,
+    contactName,
+    companyName,
+    note,
+    ssn,
+    email,
+    tags: combinedTagsValues,
+    country: countryPayload,
+    streetAddress,
+    city,
+    state,
+    postalCode,
+    phoneNumbers: formattedPhoneNumbers,
+  });
+
+  const requestOptions = {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: payload,
   };
+console.log("payload",requestOptions)
+  const url = `https://www.snptaxes.com/api/contacts/contact/${contactId}`; // <-- Update existing contact ID
+
+  fetch(url, requestOptions)
+    .then((res) => {
+      if (!res.ok) throw new Error("Request failed");
+      return res.json();
+    })
+    .then(() => {
+      toast.success("Contact updated successfully!");
+      handleClose()
+      onContactUpdated()
+      // navigate("/clients/contacts");
+    })
+    .catch(() => {
+      toast.error("Failed to update contact");
+    });
+};
 
   return (
     <form
@@ -267,9 +231,7 @@ console.log("formattedPhoneNumbers",formattedPhoneNumbers)
       }}
       className="contact-form"
     >
-      {/* <Typography variant="h6" gutterBottom sx={{ ml: 1, fontWeight: "bold", mt: 2 }}>
-        Contact info
-      </Typography> */}
+      
       <Box
         sx={{
           display: "flex",

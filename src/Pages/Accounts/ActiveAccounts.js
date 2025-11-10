@@ -975,32 +975,7 @@ useEffect(() => {
 {showFilters.teamMember && (
   <div style={{ display: "flex", alignItems: "center" }}>
     <Box sx={{ mr: 3 }}>
-      {/* <TeamMemberMultiSelectDropDown
-        // value={filters.teamMember.map(id => ({
-           
-        //   value: id, 
-        //   label: username
-        // }))}
-        value={filters.teamMember.map(id => {
-  console.log("id:", id);
-  return {
-    value: id,
-    label: username   // temporary placeholder until you map to real username
-  };
-})}
-
-        onChange={(newValue) => {
-            console.log("Selected team members:", newValue);
-          setFilters(prev => ({ 
-            ...prev, 
-            teamMember: newValue.map(item => item.value) // Store just the IDs
-          }));
-          setPage(0);
-        }}
-      
-        width="250px"
-        LOGIN_API={LOGIN_API}
-      /> */}
+     
       <TeamMemberMultiSelectDropDown
   value={filters.teamMember}   // just array of IDs like ["689c4d64...", "6880af58..."]
   onChange={(newValue) => {

@@ -89,7 +89,7 @@ const Accounts = () => {
         <Typography variant="h4" gutterBottom={"10px"}>Accounts</Typography>
       </Box>
 
-      <Box
+      {/* <Box
         sx={{
           display: "flex",
           alignItems: "center",
@@ -131,7 +131,7 @@ const Accounts = () => {
         >
           Archived
         </NavLink>
-      </Box>
+      </Box> */}
 
       <Box mt={2}>
         <Outlet context={{ refreshAccountsData, refreshCount }} />

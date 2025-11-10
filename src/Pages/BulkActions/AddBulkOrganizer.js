@@ -8,6 +8,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { toast } from "react-toastify";
 
 const AddBulkOrganizer = ({ selectedAccounts, onClose }) => {
+  console.log("selectedAccounts",selectedAccounts)
   const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
   const ORGANIZER_TEMP_API = process.env.REACT_APP_ORGANIZER_TEMP_URL;
   const { data } = useParams();
@@ -42,29 +43,36 @@ const AddBulkOrganizer = ({ selectedAccounts, onClose }) => {
 
   const fetchAccountsData = async () => {
     try {
-      const url = `${ACCOUNT_API}/accounts/account/accountdetailslist/`;
+      // const url = `${ACCOUNT_API}/accounts/account/accountdetailslist/`;
+      const url = "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true";
       const response = await fetch(url);
       const result = await response.json();
-
-      if (Array.isArray(result.accountlist)) {
-        setAccountData(result.accountlist);
-        console.log(result.accountlist);
-
-        // Map accounts to options
-        const options = result.accountlist.map((account) => ({
-          value: account.id,
-          label: account.Name,
+console.log("result",result.accounts)
+setAccountData(result.accounts)
+    const options = result.accounts.map((account) => ({
+          value: account._id,
+          label: account.accountName,
         }));
         setAccountOptions(options);
+      // if (Array.isArray(result.accountlist)) {
+      //   setAccountData(result.accountlist);
+      //   console.log(result.accountlist);
 
-        // Filter options based on selectedAccounts
+      //   // Map accounts to options
+        // const options = result.accountlist.map((account) => ({
+        //   value: account.id,
+        //   label: account.Name,
+        // }));
+        // setAccountOptions(options);
+
+      //   // Filter options based on selectedAccounts
         const selectedOptions = options.filter((option) => selectedAccounts.includes(option.value));
-        console.log("Selected Options:", selectedOptions);
+      //   console.log("Selected Options:", selectedOptions);
         setSelectedAccount(selectedOptions);
         setCombinedaccountValues(selectedOptions.map((option) => option.value));
-      } else {
-        console.error("Account list is not an array", result.accountlist);
-      }
+      // } else {
+      //   console.error("Account list is not an array", result.accountlist);
+      // }
     } catch (error) {
       console.log("Error:", error);
     }

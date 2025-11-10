@@ -2196,11 +2196,14 @@ const ClientSelectionDialog = ({ open, onClose, handleDrawerClose }) => {
 
   const fetchAccountData = async () => {
     try {
-      const response = await fetch(
-        `${ACCOUNT_API}/accounts/account/accountdetailslist/true`
-      );
-      const data = await response.json();
-      setAccountData(data.accountlist);
+      // const response = await fetch(
+      //   `${ACCOUNT_API}/accounts/account/accountdetailslist/true`
+      // );
+      // const data = await response.json();
+         const url = "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true"
+          const response = await fetch(url);
+          const data = await response.json();
+      setAccountData(data.accounts);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -2211,8 +2214,8 @@ const ClientSelectionDialog = ({ open, onClose, handleDrawerClose }) => {
   }, []);
 
   const accountOptions = accountData.map((account) => ({
-    value: account.id,
-    label: account.Name,
+    value: account._id,
+    label: account.accountName,
   }));
 
   const filteredAccounts = accountOptions.filter((account) =>

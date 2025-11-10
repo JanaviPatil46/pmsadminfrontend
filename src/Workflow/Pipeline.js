@@ -229,6 +229,8 @@ const Pipeline = ({ charLimit = 4000 }) => {
   //     console.error("Error fetching data:", error);
   //   }
   // };
+  const [filterStatus, setFilterStatus] = useState("active"); 
+  
 const fetchJobData = async () => {
   setLoading(true);
   const loaderDelay = new Promise((resolve) => setTimeout(resolve, 1000));
@@ -248,7 +250,7 @@ const fetchJobData = async () => {
     if (userRole === "Admin") {
       // ✅ Fetch active accounts first
       const accountsResponse = await axios.get(
-        `${ACCOUNT_API}/accounts/account/accountdetailslist/${isActiveTrue}`
+         `https://www.snptaxes.com/api/accounts/list?active=${filterStatus === "active"}`
       );
 
       const accountsData = accountsResponse.data.accountlist;
@@ -262,7 +264,7 @@ const fetchJobData = async () => {
         return;
       }
 
-      const accountIds = accountsData.map((account) => account.id).join(",");
+      const accountIds = accountsData.map((account) => account._id).join(",");
       url = `${JOBS_API}/workflow/jobs/job/joblist/list/true/${accountIds}`;
     } 
     

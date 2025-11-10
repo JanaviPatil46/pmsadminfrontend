@@ -154,6 +154,7 @@ const Example = ({ charLimit = 4000 }) => {
  
  
  
+ const [filterStatus, setFilterStatus] = useState("active"); 
  
   const fetchData = async () => {
     try {
@@ -181,7 +182,7 @@ const Example = ({ charLimit = 4000 }) => {
         }
   
         // Fetch accounts linked to the user
-        const accountsResponse = await axios.get(`${ACCOUNT_API}/accounts/getaccounts/${loginuserid}/true`);
+        const accountsResponse = await axios.get(`https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=${filterStatus === "active"}`);
         const accountsData = accountsResponse.data.accountlist;
         console.log(accountsData);
   
@@ -192,7 +193,7 @@ const Example = ({ charLimit = 4000 }) => {
         }
   
         // Extract account IDs and form a query string
-        const accountIds = accountsData.map(account => account.id).join(",");
+        const accountIds = accountsData.map(account => account._id).join(",");
   
         // Fetch jobs based on retrieved account IDs
         url = `${JOBS_API}/workflow/jobs/job/joblist/list/true/${accountIds}`;

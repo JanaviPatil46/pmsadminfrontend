@@ -31,14 +31,44 @@ const NewChatDrawer = ({ open, handleClose, accountwiseChatlist, data,isActiveTr
   const CHATTOCLIENT_API = process.env.REACT_APP_CHAT_API;
   const [isSubmitted, setIsSubmitted] = useState(false);
   const { logindata } = useContext(LoginContext);
-
+ const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
   const [loginUserId, setLoginUserId] = useState();
-
+const [username,setUsername]=useState("")
   useEffect(() => {
     if (logindata?.user?.id) {
       setLoginUserId(logindata.user.id);
+      fetchUserData(logindata.user.id)
     }
   }, [logindata]);
+
+    const fetchUserData = async (id) => {
+    const maxLength = 15;
+    const myHeaders = new Headers();
+
+    const requestOptions = {
+      method: "GET",
+      headers: myHeaders,
+      redirect: "follow",
+    };
+    const url = `${LOGIN_API}/common/user/${id}`;
+    fetch(url , requestOptions)
+      .then((response) => response.json())
+      .then((result) => {
+        console.log("id", result);
+        if (result.username) {
+          setUsername(result.username);
+        }
+        if (result.email) {
+          // setUserData(truncateString(result.email, maxLength)); // Set a maximum length for userData if email exists
+          // setUserEmail(result.email);
+        }
+
+        // console.log(userData)
+        // setEmailSyncEmail(result.emailSyncEmail)
+        // setUserid(result._id);
+        // setCurrentImage(result.profilePicture);
+      });
+  };
 
   const [selectedaccount, setSelectedaccount] = useState();
 
@@ -430,7 +460,7 @@ useEffect(() => {
       {
         message: description,
         fromwhome: "Admin",
-        senderid: loginUserId,
+        senderid: username,
        
         isRead:false
       },

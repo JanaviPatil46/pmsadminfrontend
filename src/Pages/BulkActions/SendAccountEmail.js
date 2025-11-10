@@ -339,7 +339,8 @@ const SendAccountEmail = ({ selectedAccounts, onClose }) => {
 
   const fetchAccountData = async () => {
     try {
-      const response = await fetch(`${ACCOUNT_API}/accounts/accountdetails`);
+      // const response = await fetch(`${ACCOUNT_API}/accounts/accountdetails`);
+      const response = await fetch("https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true")
       const data = await response.json();
       setaccountdata(data.accounts);
 
@@ -368,48 +369,48 @@ const SendAccountEmail = ({ selectedAccounts, onClose }) => {
 
   const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
   // Function to fetch account details
-  const fetchAccountDetails = async (accountId) => {
-    // console.log(accountId)
-    const requestOptions = {
-      method: "GET",
-      redirect: "follow",
-    };
+  // const fetchAccountDetails = async (accountId) => {
+  //   // console.log(accountId)
+  //   const requestOptions = {
+  //     method: "GET",
+  //     redirect: "follow",
+  //   };
 
-    try {
-      // const url = `${API_KEY}/admin/accountdetails/${accountId}`;
-      const url = `${ACCOUNT_API}/accounts/accountdetails/getAccountbyIdAll/${accountId}`;
-      const response = await fetch(url, requestOptions);
-      const result = await response.json();
-      console.log(result);
-      return result;
-    } catch (error) {
-      console.error("Error fetching account details:", error);
-    }
-  };
+  //   try {
+  //     // const url = `${API_KEY}/admin/accountdetails/${accountId}`;
+  //     const url = `${ACCOUNT_API}/accounts/accountdetails/getAccountbyIdAll/${accountId}`;
+  //     const response = await fetch(url, requestOptions);
+  //     const result = await response.json();
+  //     console.log(result);
+  //     return result;
+  //   } catch (error) {
+  //     console.error("Error fetching account details:", error);
+  //   }
+  // };
 
-  // Populate account options for the dropdown
-  useEffect(() => {
-    const populateOptions = async () => {
-      console.log(selectedAccounts.selectedAccounts);
-      if (!Array.isArray(selectedAccounts)) {
-        console.error("Selected accounts is not an array.");
-        return;
-      }
+  // // Populate account options for the dropdown
+  // useEffect(() => {
+  //   const populateOptions = async () => {
+  //     console.log(selectedAccounts.selectedAccounts);
+  //     if (!Array.isArray(selectedAccounts)) {
+  //       console.error("Selected accounts is not an array.");
+  //       return;
+  //     }
 
-      const options = [];
-      for (const accountId of selectedAccounts) {
-        console.log(accountId);
-        const account = await fetchAccountDetails(accountId);
-        console.log(account);
-        options.push({ value: account.account._id, label: account.account.accountName });
-      }
-      // setAccountOptions(options);
-      setSelectedTo(options);
-      setCombinedValues(options.map((option) => option.value));
-    };
+  //     const options = [];
+  //     for (const accountId of selectedAccounts) {
+  //       console.log(accountId);
+  //       const account = await fetchAccountDetails(accountId);
+  //       console.log(account);
+  //       options.push({ value: account.account._id, label: account.account.accountName });
+  //     }
+  //     // setAccountOptions(options);
+  //     setSelectedTo(options);
+  //     setCombinedValues(options.map((option) => option.value));
+  //   };
 
-    populateOptions();
-  }, [selectedAccounts]);
+  //   populateOptions();
+  // }, [selectedAccounts]);
 
   const navigate = useNavigate();
 

@@ -69,18 +69,22 @@ const PendingTasks = () => {
   //     })
   //     .catch((error) => console.error(error));
   // };
+
+  const [filterStatus, setFilterStatus] = useState("active"); 
+  
 const fetchTasksData = async () => {
   try {
     // ✅ Step 1: Fetch active accounts
     const accountsResponse = await axios.get(
-      `${ACCOUNT_API}/accounts/account/accountdetailslist/true`
-    );
+      // `${ACCOUNT_API}/accounts/account/accountdetailslist/true`
+           `https://www.snptaxes.com/api/accounts/list?active=${filterStatus === "active"}`
+ );
 
     const accountsData = accountsResponse.data.accountlist || [];
     console.log("Active accounts:", accountsData);
 
     // ✅ Step 2: Collect account IDs
-    const accountIds = accountsData.map((account) => account.id).join(",");
+    const accountIds = accountsData.map((account) => account._id).join(",");
     console.log("Account IDs string:", accountIds);
 
     // ✅ Step 3: Fetch tasks by all accountIds

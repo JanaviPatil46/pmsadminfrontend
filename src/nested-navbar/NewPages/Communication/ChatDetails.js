@@ -26,7 +26,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 
 
-const ChatDetails = ({ chat, getsChatDetails, accountwiseChatlist,onChatAction ,data, isActiveTrue }) => {
+const ChatDetails = ({ chat, getsChatDetails, accountwiseChatlist,onChatAction ,data, isActiveTrue,accountName }) => {
   const CHATTOCLIENT_API = process.env.REACT_APP_CHAT_API;
   const [showTasks, setShowTasks] = useState(false);
   const [chatId, setChatId] = useState(chat._id);
@@ -122,15 +122,14 @@ setSenderName(result.username)
     const newDescription = {
       message: contentToSend,
       fromwhome: "Admin",
-      senderid: loginUserId,
+      senderid: senderName,
     };
 
     if (replyTo) {
       newDescription.replyTo = replyTo._id;
     }
 
-    setEditorContent("");
-    setReplyTo(null);
+    
     const raw = JSON.stringify({
       newDescriptions: [newDescription],
     });
@@ -151,6 +150,8 @@ setSenderName(result.username)
       })
       .then(() => {
         toast.success("Message sent");
+        setEditorContent("");
+        setReplyTo(null);
          securemessagechatsend(chatId);
         updatechatStatus(chatId);
       accountwiseChatlist(data, isActiveTrue);
@@ -646,9 +647,9 @@ const MessageItem = ({
   const messageTime = desc.time ? formatDate(desc.time) : "Just now";
 
   let senderDisplayName = "";
-  if (isClient && desc.senderid?.username) {
-    senderDisplayName = desc.senderid.username;
-  } else if (isAdmin && desc.senderid?.username) {
+  if (isClient && desc.senderid) {
+    senderDisplayName = desc.senderid;
+  } else if (isAdmin && desc.senderid) {
     senderDisplayName = "You";
   }
 

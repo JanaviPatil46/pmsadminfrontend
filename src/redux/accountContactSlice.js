@@ -13,15 +13,13 @@ const initialContact = {
   ssn: "",
   tags: [],
   country: "",
-  streetAdd: "",
+  streetAddress: "",
   city: "",
   state: "",
-  zipCode: "",
+  postalCode: "",
   email: "",
   phoneNumbers: [""],
-  login: false,
-  notify: false,
-  emailSync: false,
+  
 };
 
 const initialState = {
@@ -30,13 +28,13 @@ const initialState = {
     clientType: "Individual",
     companyName: "",
     tags: [],
-    teamMembers: [],
+    teamMember: [],
     folderTemp: "",
     country: "",
-    streetAdd: "",
+    streetAddress: "",
     city: "",
     state: "",
-    zipCode: "",
+    postalCode: "",
   },
   contacts: [], // ✅ manually added contacts
   selectedContacts: [], // ✅ existing contacts selected from backend
@@ -90,21 +88,23 @@ const accountContactSlice = createSlice({
     removeSelectedContact: (state, action) => {
       state.selectedContacts.splice(action.payload, 1);
     },
-  updateSelectedContactField: (state, action) => {
-      const { index, field, value } = action.payload;
-      if (state.selectedContacts[index]) {
-        state.selectedContacts[index][field] = value;
-      }},
-    // updateSelectedContactField: (state, action) => {
-    //   const { index, field, value } = action.payload;
-    //   state.selectedContacts[index][field] = value;
-    // },
+    updateSelectedContactField: (state, action) => {
+   const { index, field, value } = action.payload;
+   state.selectedContacts[index][field] = value;
+}
+,
+  // updateSelectedContactField: (state, action) => {
+  //     const { index, field, value } = action.payload;
+  //     if (state.selectedContacts[index]) {
+  //       state.selectedContacts[index][field] = value;
+  //     }},
+   
     // 🔹 reducers for tags, team members, and folder template
     setTags: (state, action) => {
       state.accountData.tags = action.payload;
     },
     setTeamMembers: (state, action) => {
-      state.accountData.teamMembers = action.payload;
+      state.accountData.teamMember = action.payload;
     },
     setFolderTemplate: (state, action) => {
       state.accountData.folderTemp = action.payload;
@@ -118,8 +118,11 @@ const accountContactSlice = createSlice({
     setSelectedContacts: (state, action) => {
       state.selectedContacts = action.payload.map(contact => ({
         ...contact,
-        existingUser: contact.existingUser || false,
-        existingContact: contact.existingContact || false
+        login:contact.login,
+        emailSync:contact.emailSync,
+        notify:contact.notify
+        // existingUser: contact.existingUser || false,
+        // existingContact: contact.existingContact || false
       }));
     },
    

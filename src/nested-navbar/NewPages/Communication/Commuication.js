@@ -429,9 +429,29 @@ const Commuication = () => {
   const [open, setOpen] = useState(false);
   const [selectedChatIds, setSelectedChatIds] = useState([]);
   const [isActiveTrue, setIsActiveTrue] = useState(true); // Toggle state
+  const [accountName, setAccountName] = useState("");
 
   const [time, setTime] = useState();
 
+       const fetchAccountDetails = async () => {
+    try {
+      const res = await axios.get(
+        `https://www.snptaxes.com/api/accounts/${data}`
+      );
+      // setAccount(res.data);
+      setAccountName(res.data.accounts.accountName)
+      console.log("result", res.data);
+    } catch (error) {
+      console.error("Error fetching account details:", error);
+    }
+  };
+
+
+ useEffect(() => {
+    // if (loginUserId) {
+      fetchAccountDetails();
+    // }
+  }, [data]);
   useEffect(() => {
     if (logindata?.user?.id) {
       setLoginUserId(logindata.user.id);
@@ -770,7 +790,7 @@ const countUnreadAdminMessages = (chat) => {
                       const sender =
                         latest.fromwhome === "Admin"
                           ? "You"
-                          : latest.senderid?.username || "";
+                          : latest.senderid || "";
 
                       return `${sender}: ${
                         clean.length > 35 ? clean.slice(0, 35) + "..." : clean
@@ -803,6 +823,7 @@ const countUnreadAdminMessages = (chat) => {
               getsChatDetails={getsChatDetails}
               accountwiseChatlist={accountwiseChatlist}
               data={data}
+              accountName={accountName}
               isActiveTrue={isActiveTrue}
               onChatAction={() => setSelectedChat(null)}
             />

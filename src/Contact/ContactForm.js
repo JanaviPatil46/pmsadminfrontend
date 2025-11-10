@@ -56,34 +56,10 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   const [combinedValues, setCombinedValues] = useState();
 
   console.log(selectedCountry);
-  // useEffect(() => {
-  //   axios
-  //     .get("https://restcountries.com/v3.1/all?fields=name,cca2")
-  //     .then((response) => {
-  //       const countryData = response.data.map((country) => ({
-  //         name: country.name.common,
-  //         code: country.cca2,
-  //       }));
-  //       setCountries(countryData);
-  //     })
-  //     .catch((error) => console.error("Error fetching country data:", error));
-  // }, []);
+  
   const options = useMemo(() => countryList().getData(), []);
  
-//  const handlePhoneNumberChange = (phoneValue, countryData, id) => {
-//   setPhoneNumbers(prevPhoneNumbers =>
-//     prevPhoneNumbers.map(item =>
-//       item.id === id
-//         ? {
-//             ...item,
-//             phone: phoneValue,
-//             countryCode: countryData.dialCode, // Store country dial code
-//             country: countryData.countryCode.toLowerCase() // Store country code (e.g., 'us')
-//           }
-//         : item
-//     )
-//   );
-// };
+
    const handlePhoneNumberChange = (phoneValue, countryData, id) => {
   setPhoneNumbers(prevPhoneNumbers =>
     prevPhoneNumbers.map(item =>
@@ -103,12 +79,7 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
     setContactName(`${firstName} ${middleName} ${lastName}`.trim());
   }, [firstName, middleName, lastName]);
 
-  // const handleAddPhoneNumber = () => {
-  //   setPhoneNumbers((prevPhoneNumbers) => [
-  //     ...prevPhoneNumbers,
-  //     { id: Date.now(), phone: "", isPrimary: false },
-  //   ]);
-  // };
+  
   const handleAddPhoneNumber = () => {
   setPhoneNumbers(prevPhoneNumbers => [
     ...prevPhoneNumbers,
@@ -146,12 +117,7 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
     } else {
       setLastNameError("");
     }
-    // if (!email) {
-    //   setEmaileError("Email is required.");
-    //   isValid = false;
-    // } else {
-    //   setEmaileError("");
-    // }
+    
     // Email
   if (!email?.trim()) {
     setEmaileError("Email is required.");
@@ -166,75 +132,126 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   }
     return isValid;
   };
-  const sendingData = async (e) => {
-    e.preventDefault();
+//   const sendingData = async (e) => {
+//     e.preventDefault();
 
-    // Validate form before proceeding
-    if (!validateForm()) {
-      return; // Stop execution if validation fails
-    }
+//     // Validate form before proceeding
+//     if (!validateForm()) {
+//       return; // Stop execution if validation fails
+//     }
 
-    handleNewDrawerClose();
-    handleDrawerClose();
+//     handleNewDrawerClose();
+//     handleDrawerClose();
  
-  const formattedPhoneNumbers = phoneNumbers.map(phone => phone.phone);
+//   const formattedPhoneNumbers = phoneNumbers.map(phone => phone.phone);
 
 
-console.log("formattedPhoneNumbers",formattedPhoneNumbers)
-    const raw = JSON.stringify([
-      {
-        firstName: firstName,
-        middleName: middleName,
-        lastName: lastName,
-        contactName: contactName,
-        companyName: companyName,
-        note: note,
-        ssn: ssn,
-        email: email,
-        login: false,
-        notify: false,
-        emailSync: false,
-        tags: combinedValues,
+// console.log("formattedPhoneNumbers",formattedPhoneNumbers)
+//     const raw = JSON.stringify([
+//       {
+//         firstName: firstName,
+//         middleName: middleName,
+//         lastName: lastName,
+//         contactName: contactName,
+//         companyName: companyName,
+//         note: note,
+//         ssn: ssn,
+//         email: email,
+//         // login: false,
+//         // notify: false,
+//         // emailSync: false,
+//         tags: combinedValues,
 
-        country: selectedCountry,
-        streetAddress: streetAddress,
-        city: city,
-        state: state,
-        postalCode: postalCode,
-        phoneNumbers: formattedPhoneNumbers,
-      },
-    ]);
-    console.log(raw);
-    const requestOptions = {
-      method: "POST",
+//         country: selectedCountry,
+//         streetAddress: streetAddress,
+//         city: city,
+//         state: state,
+//         postalCode: postalCode,
+//         phoneNumbers: formattedPhoneNumbers,
+//       },
+//     ]);
+//     console.log(raw);
+//     const requestOptions = {
+//       method: "POST",
 
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: raw,
-      redirect: "follow",
-    };
-    const url = `${CONTACT_API}/contacts/`;
-    fetch(url, requestOptions)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
-      .then((result) => {
-        // Handle success
-        toast.success("Contact created successfully!");
-        //console.log('Contact ID:', result);  // Log the contactId
-        navigate("/clients/contacts");
-        // Additional logic after successful creation if needed
-      })
-      .catch((error) => {
-        // Handle errors
-        console.error(error);
-        toast.error("Failed to create contact");
-      });
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: raw,
+//       redirect: "follow",
+//     };
+//     const url = "https://www.snptaxes.com/api/contacts";
+//     fetch(url, requestOptions)
+//       .then((response) => {
+//         if (!response.ok) {
+//           throw new Error("Network response was not ok");
+//         }
+//         return response.json();
+//       })
+//       .then((result) => {
+//         // Handle success
+//         toast.success("Contact created successfully!");
+//         //console.log('Contact ID:', result);  // Log the contactId
+//         navigate("/clients/contacts");
+//         // Additional logic after successful creation if needed
+//       })
+//       .catch((error) => {
+//         // Handle errors
+//         console.error(error);
+//         toast.error("Failed to create contact");
+//       });
+//   };
+const sendingData = async (e) => {
+  e.preventDefault();
+
+  if (!validateForm()) return;
+
+  handleNewDrawerClose();
+  handleDrawerClose();
+
+  const formattedPhoneNumbers = phoneNumbers.map((item) => item.phone);
+
+  const countryPayload = selectedCountry
+    ? { name: selectedCountry.label, code: selectedCountry.value }
+    : null;
+
+  const payload = JSON.stringify({
+    firstName,
+    middleName,
+    lastName,
+    contactName,
+    companyName,
+    note,
+    ssn,
+    email,
+    tags: combinedValues,
+    country: countryPayload,
+    streetAddress,
+    city,
+    state,
+    postalCode,
+    phoneNumbers: formattedPhoneNumbers,
+  });
+
+  const requestOptions = {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: payload
   };
+
+  fetch("https://www.snptaxes.com/api/contacts", requestOptions)
+    .then((res) => {
+      if (!res.ok) throw new Error("Request failed");
+      return res.json();
+    })
+    .then(() => {
+      toast.success("Contact created successfully!");
+      navigate("/clients/contacts");
+    })
+    .catch(() => {
+      toast.error("Failed to create contact");
+    });
+};
 
   const handleClose = () => {
     handleNewDrawerClose();
@@ -453,16 +470,7 @@ console.log("formattedPhoneNumbers",formattedPhoneNumbers)
             placeholder="Email"
             size="small"
             sx={{ mt: 1.5, backgroundColor: "#fff" }}
-            // onChange={(e) => setFirstName(e.target.value)}
-            // onChange={(e) => {
-            //   const value = e.target.value;
-            //   setEmail(value);
-
-            //   // Clear the error message when input is not empty
-            //   if (value.trim() !== "") {
-            //     setEmaileError("");
-            //   }
-            // }}
+           
             onChange={(e) => {
   const value = e.target.value;
   setEmail(value);
@@ -569,43 +577,7 @@ console.log("formattedPhoneNumbers",formattedPhoneNumbers)
                 sx={{ position: "absolute", mt: -3 }}
               />
             )}
-            {/* <PhoneInput
-           country={phone.country || "us"}
-              value={phone.phone}
-              onChange={(phoneValue) =>
-                handlePhoneNumberChange(phone.id, phoneValue)
-              }
-              inputStyle={{
-                width: "100%",
-              }}
-              buttonStyle={{
-                borderTopLeftRadius: "8px",
-                borderBottomLeftRadius: "8px",
-              }}
-              containerStyle={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
-            /> */}
-            {/* <PhoneInput
-  country={phone.country || "us"}
-  value={phone.phone}
-  // onChange={(phoneValue) => handlePhoneNumberChange(phone.id, phoneValue)}
-     onChange={(value, country) => handlePhoneNumberChange(value, country, phone.id)}
-  inputStyle={{
-    width: "100%",
-  }}
-  buttonStyle={{
-    borderTopLeftRadius: "8px",
-    borderBottomLeftRadius: "8px",
-  }}
-  containerStyle={{
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
-  }}
-/> */}
+            
 <PhoneInput
 country={"us"}
   value={phone.phone}
@@ -655,38 +627,7 @@ country={"us"}
         <Box>
           <InputLabel sx={{ color: "black" }}>Country</InputLabel>
 
-          {/* <Autocomplete
-            size="small"
-            options={countries}
-            getOptionLabel={(option) => option.name}
-            value={selectedCountry}
-            onChange={(event, newValue) => setSelectedCountry(newValue)}
-            renderOption={(props, option) => (
-              <ListItem
-                {...props}
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  padding: "8px",
-                  borderBottom: "1px solid #ddd",
-                  cursor: "pointer",
-                }}
-              >
-                <Typography sx={{ fontWeight: 500 }}>{option.name}</Typography>
-                <Typography sx={{ fontSize: "0.9rem", color: "gray" }}>
-                  {option.code}
-                </Typography>
-              </ListItem>
-            )}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                placeholder="Country"
-                variant="outlined"
-                sx={{ marginTop: "8px", width: "100%" }}
-              />
-            )}
-          /> */}
+         
           <Autocomplete
       options={options}
       size="small"
@@ -814,95 +755,4 @@ country={"us"}
 export default ContactForm;
 
 
- {/* <FormControl sx={{ width: "100%" }}>
-            <Select
-              multiple
-              multiline
-              size="small"
-              fullWidth
-              value={selectedTags}
-              onChange={handleTagChange}
-              input={<OutlinedInput />}
-              renderValue={(selected) => (
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    gap: "6px",
-                    padding: "6px",
-                    borderRadius: "10px",
-                  }}
-                >
-                  {selected.map((value) => {
-                    const option = options.find((opt) => opt.value === value);
-                    return (
-                      <Chip
-                        key={value}
-                        label={option?.label}
-                        sx={{
-                          backgroundColor: option?.colour,
-                          color: "#fff",
-                          fontWeight: 500,
-                          fontSize: "10px",
-                          borderRadius: "16px",
-                          height: "20px",
-                          // padding: "1px",
-                          cursor: "pointer",
-                          boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)",
-                          "& .MuiChip-deleteIcon": {
-                            color: "#fff",
-                            opacity: 0.7,
-                            transition: "opacity 0.2s",
-                            "&:hover": { opacity: 1 },
-                          },
-                        }}
-                      />
-                    );
-                  })}
-                </Box>
-              )}
-              MenuProps={MenuProps}
-              sx={{
-                borderRadius: "10px",
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: "10px",
-                },
-              }}
-            >
-              {options.map((option) => {
-                const dynamicWidth = Math.min(option.label.length * 10, 150); // Adjust width dynamically
-                return (
-                  <MenuItem
-                    key={option.value}
-                    value={option.value}
-                    sx={{
-                      backgroundColor: option.colour,
-                      color: "#fff",
-                      fontSize: "10px",
-                      // fontWeight: theme.typography.fontWeightBold,
-                      borderRadius: "10px",
-                      margin: "5px",
-                      textAlign: "center",
-                      // transition: "0.2s ease-in-out",
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      paddingLeft: "10px",
-                      // width: "auto", // Allow text to define width
-                      whiteSpace: "nowrap", // Prevent line breaks
-                      textAlign: "left", // Ensure text is left-aligned
-                      paddingLeft: "10px", // Add left padding for proper alignment
-                      minWidth: `${dynamicWidth}px`,
-                      maxWidth: `${dynamicWidth}px`, // Dynamically set maxWidth
-                      "&:hover": {
-                        backgroundColor: option.colour,
-                        color: "#fff",
-                      },
-                    }}
-                  >
-                    {option.label}
-                  </MenuItem>
-                );
-              })}
-            </Select>
-          </FormControl> */}
+ 

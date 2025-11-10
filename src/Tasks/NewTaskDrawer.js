@@ -59,10 +59,12 @@ const NewTaskDrawer = ({ open, onClose, isEditMode, taskData }) => {
 
   const fetchAccountData = async () => {
     try {
-      const response = await fetch(`${ACCOUNT_API}/accounts/account/accountdetailslist/true`);
-      const data = await response.json();
-      setaccountdata(data.accountlist);
-      console.log("accountlist",data.accountlist)
+      // const response = await fetch(`${ACCOUNT_API}/accounts/account/accountdetailslist/true`);
+       const url = "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true"
+          const response = await fetch(url);
+          const data = await response.json();
+      setaccountdata(data.accounts);
+      console.log("accountlist",data.accounts)
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -70,8 +72,8 @@ const NewTaskDrawer = ({ open, onClose, isEditMode, taskData }) => {
 
   // console.log(userdata);
   const accountoptions = accountdata.map((account) => ({
-    value: account.id,
-    label: account.Name,
+    value: account._id,
+    label: account.accountName,
   }));
 
   //   *********joblist*******

@@ -64,14 +64,16 @@ const AccountTask = ({ handleNewDrawerClose, handleDrawerClose }) => {
 
 const fetchAccountData = async () => {
   try {
-    const response = await fetch(
-      `${ACCOUNT_API}/accounts/account/accountdetailslist/true`
-    );
-    const data = await response.json();
-
-    const accountList = (data.accountlist || []).map(account => ({
-      value: account.id,
-      label: account.Name
+    // const response = await fetch(
+    //   `${ACCOUNT_API}/accounts/account/accountdetailslist/true`
+    // );
+    // const data = await response.json();
+ const url = "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true"
+          const response = await fetch(url);
+          const data = await response.json();
+    const accountList = (data.accounts || []).map(account => ({
+      value: account._id,
+      label: account.accountName
     }));
 
     setaccountdata(accountList); // update the state with correct format

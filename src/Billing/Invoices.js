@@ -437,11 +437,13 @@ const Invoices = ({ charLimit = 4000 }) => {
 
   const fetchAccountData = async () => {
     try {
-      const response = await fetch(
-        `${ACCOUNT_API}/accounts/account/accountdetailslist/true`
-      );
+      // const response = await fetch(
+      //   `${ACCOUNT_API}/accounts/account/accountdetailslist/true`
+      // );
+      const url = "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true"
+          const response = await fetch(url);
       const data = await response.json();
-      setaccountdata(data.accountlist);
+      setaccountdata(data.accounts);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -449,8 +451,8 @@ const Invoices = ({ charLimit = 4000 }) => {
 
   // console.log(userdata);
   const accountoptions = accountdata.map((account) => ({
-    value: account.id,
-    label: account.Name,
+    value: account._id,
+    label: account.accountName,
   }));
 
   // team member
@@ -749,14 +751,14 @@ const Invoices = ({ charLimit = 4000 }) => {
   //     console.error("Error fetching email templates:", error);
   //   }
   // };
+  const [filterStatus, setFilterStatus] = useState("active"); // active | archived
 
 
 const fetchInvoiceData = async () => {
   try {
     // ✅ Step 1: Get active accounts
     const accountsResponse = await axios.get(
-      `${ACCOUNT_API}/accounts/account/accountdetailslist/true`
-    );
+`https://www.snptaxes.com/api/accounts/list?active=${filterStatus === "active"}`    );
 
     const accountsData = accountsResponse.data.accountlist || [];
     if (!accountsData.length) {
@@ -765,7 +767,7 @@ const fetchInvoiceData = async () => {
     }
 
     // ✅ Step 2: Prepare accountIds string
-    const accountIds = accountsData.map((account) => account.id).join(",");
+    const accountIds = accountsData.map((account) => account._id).join(",");
     console.log("Active Account IDs:", accountIds);
 
     // ✅ Step 3: Fetch invoices for these accounts
@@ -1512,7 +1514,7 @@ const fetchInvoiceData = async () => {
           }}
         >
           <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-            Create invoice 444
+            Create invoice 
           </Typography>
 
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>

@@ -129,13 +129,14 @@ const MultiSelectDropdown = ({
     if (!propOptions && !initialized) {
       const fetchData = async () => {
         try {
-          const url = `${ACCOUNT_API}/accounts/account/accountdetailslist/true`;
+          // const url = `${ACCOUNT_API}/accounts/account/accountdetailslist/true`;
+        const url = "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true"
           const response = await fetch(url);
           const data = await response.json();
 
-          const options = data.accountlist.map(account => ({
-            value: account.id,
-            label: account.Name,
+          const options = data.accounts.map(account => ({
+            value: account._id,
+            label: account.accountName,
           }));
 
           setInternalOptions(options);

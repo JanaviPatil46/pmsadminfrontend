@@ -112,6 +112,7 @@ import FolderTreeView from "./Templates/documentManagement/FolderTreeView.js";
 import DocsFolderTree from "./nested-navbar/documents-nav/DocsFolderTree.js";
 import AccountTable from "./AccountContactForm/AccountTable.js"
 import AccountDetails from "./AccountContactForm/AccountDetails.js"
+import ContactsTable from "./AccountContactForm/ContactTable.js";
 const App = () => {
   return (
     <BrowserRouter>
@@ -135,7 +136,7 @@ const App = () => {
             <Route path="active" element={<ActiveOrganizers />} />
             <Route path="archived" element={<ArchivedOrganizers />} />
           </Route>
-          <Route path="clients/contacts" element={<Contact />} />
+          <Route path="clients/contacts" element={<ContactsTable />} />
           <Route path="stages" element={<Stages />} />
           <Route path="firmtemp/tags" element={<NewTag />} />
           <Route path="firmtemp/pipelines" element={<PipelineTemp />} />

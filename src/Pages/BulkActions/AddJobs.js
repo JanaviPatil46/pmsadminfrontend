@@ -156,7 +156,8 @@ const CreateBulkJob = ({ selectedAccounts, onClose, charLimit = 4000 }) => {
   const [accountoptions, setAccountOptions] = useState([]);
   const fetchAccountData = async () => {
     try {
-      const response = await fetch(`${ACCOUNT_API}/accounts/accountdetails`);
+      // const response = await fetch(`${ACCOUNT_API}/accounts/accountdetails`);
+      const response = await fetch("https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true")
       const data = await response.json();
       setaccountdata(data.accounts);
 
@@ -2886,6 +2887,7 @@ console.log("org temp url", url)
                     value={selectedaccount}
                     onChange={handleAccountChange}
                     placeholder="Accounts"
+                    options={accountoptions}
                   />
                   {/* <Autocomplete
                     multiple

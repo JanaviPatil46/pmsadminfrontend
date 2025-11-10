@@ -1,217 +1,260 @@
-
-
-
-// import React, { useState } from "react";
-// import { useSelector } from "react-redux";
-// import { Box, Stepper, Step, StepLabel, Typography } from "@mui/material";
-// import AccountForm from "./AccountForm";
-// import ContactForm from "./ContactForm";
-// import axios from "axios";
-// const steps = ["Account Information", "Contact Information"];
-
-// export default function AccountContactForm({ isEditing, accountId, onCloseDrawer }) {
-//   const [activeStep, setActiveStep] = useState(0);
-//   const { accountData, contacts,selectedContacts } = useSelector(
-//     (state) => state.accountContact
-//   );
-
-// const handleSubmit = async () => {
-//   try {
-//     // 1. Create Account
-//     const { data: account } = await axios.post("http://localhost:5000:8022/api/accounts", {
-//       accountName: accountData.accountName,
-//       clientType: accountData.clientType,
-//       companyName: accountData.companyName,
-//     });
-
-//     // 2. Create NEW Contacts immutably and capture new _id
-//     let updatedContacts = [...contacts];
-//     const defaultPassword = "defaultPassword123";
-
-//     for (let i = 0; i < contacts.length; i++) {
-//       let contact = contacts[i];
-//       if (contact.firstName || contact.lastName || contact.email) {
-//         let payload = { ...contact, accountId: account._id };
-
-//         if (contact.login) {
-//           payload.password = defaultPassword;
-//         } else {
-//           delete payload.password;
-//         }
-
-//         const resp = await axios.post("http://localhost:5000:8022/api/contacts", payload);
-
-//         // Save _id returned from backend
-//         updatedContacts[i] = { ...contact, _id: resp.data._id };
-//       }
-//     }
-//  // 3. Update accountId in existing selected contacts that don't have the new accountId
-//     for (let i = 0; i < selectedContacts.length; i++) {
-//       let contact = selectedContacts[i];
-//       if (contact.accountId !== account._id) {
-//         await axios.put(`http://localhost:5000:8022/api/contacts/${contact._id}`, {
-//           ...contact,
-//           accountId: account._id,
-//         });
-//       }
-//     }
-//     // 3. Combine newly created contacts and selected existing contacts
-//     const allContacts = [
-//       ...updatedContacts.filter(c => c._id), // new contacts with _id
-//       ...selectedContacts // existing contacts selected from backend
-//     ];
-
-//     // 4. Map to API expected format { contact: _id, canLogin: bool }
-//     const accContacts = allContacts.map(c => ({
-//       contact: c._id,
-//       canLogin: c.login || false,
-//     }));
-
-//     // 5. Update account with full contacts list
-//     await axios.put(`http://localhost:5000:8022/api/accounts/${account._id}`, {
-//       contacts: accContacts,
-//     });
-
-//     alert("Account, contacts saved!");
-   
-
-//   } catch (err) {
-//     console.error(err);
-//     alert("Failed to save. Check console.");
-//   }
-// };
-
-//   return (
-//     <Box sx={{ maxWidth: 800, margin: "auto", mt: 5 }}>
-//       <Stepper activeStep={activeStep} alternativeLabel>
-//         {steps.map((label, index) => (
-//           <Step key={label} >
-//             <StepLabel>{label}</StepLabel>
-//           </Step>
-//         ))}
-//       </Stepper>
-
-//       <Box sx={{ mt: 4, p: 3, border: "1px solid #ddd", borderRadius: 2 }}>
-//         {activeStep === 0 && <AccountForm onContinue={() => setActiveStep(1)} />}
-//         {activeStep === 1 && (
-//           <ContactForm
-//             onBack={() => setActiveStep(0)}
-//             onSubmit={handleSubmit}
-//           />
-//         )}
-//       </Box>
-
-     
-//     </Box>
-//   );
-// }
-
-
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useSelector } from "react-redux";
 import { Box, Stepper, Step, StepLabel } from "@mui/material";
 import AccountForm from "./AccountForm";
 import ContactForm from "./ContactForm";
 import axios from "axios";
+import { toast } from "react-toastify";
+import { LoginContext } from "../Sidebar/Context/Context";
 
 const steps = ["Account Information", "Contact Information"];
 
-export default function AccountContactForm({ isEditing, accountId, onCloseDrawer }) {
+export default function AccountContactForm({
+  isEditing,
+  accountId,
+  onCloseDrawer,
+}) {
   const [activeStep, setActiveStep] = useState(0);
-  const { accountData, contacts, selectedContacts } = useSelector((state) => state.accountContact);
+  const { accountData, contacts, selectedContacts } = useSelector(
+    (state) => state.accountContact
+  );
+  console.log("accountdatainfo", selectedContacts);
+  const { logindata } = useContext(LoginContext);
+  const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
+  const [loginUserId, setLoginUserId] = useState();
+  useEffect(() => {
+    if (logindata?.user?.id) {
+      setLoginUserId(logindata.user.id);
+    }
+  }, [logindata]);
+  const CLIENT_DOCS_API = process.env.REACT_APP_CLIENT_DOCS_MANAGE;
+ 
 
-  const handleSubmit = async (event) => {
-     if (event) event.preventDefault(); 
+  const assignfoldertemp = (accountId, foldertempId) => {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    console.log("assignfoldertemp", accountId);
+    console.log("assignfoldertemp", foldertempId);
+    const raw = JSON.stringify({
+      accountId: accountId,
+      templateId: foldertempId || null,
+    });
+
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+
+    console.log(raw);
+    fetch(
+      `https://www.snptaxes.com/api/docManagement/apply-template`,
+      requestOptions
+    )
+      // fetch(`${CLIENT_DOCS_API}/clientdocs/accountfoldertemp`, requestOptions)
+      .then((response) => response.json())
+      .then((result) => console.log(result))
+      .catch((error) => console.error(error));
+  };
+  const handleSubmit = async (event, personalMessage = "") => {
+    if (event) event.preventDefault();
+    let isValid = true;
+
+    // Validate account data (your existing validation code)
+    if (!accountData.accountName?.trim()) {
+      toast.warning("Account Name is required");
+      setActiveStep(0);
+      isValid = false;
+      return;
+    }
+    if (
+      accountData.clientType === "Company" &&
+      !accountData.companyName?.trim()
+    ) {
+      toast.warning("Company Name is required");
+      setActiveStep(0);
+      isValid = false;
+      return;
+    }
+    if (!accountData.folderTemp) {
+      toast.warning("Folder Template is required");
+      setActiveStep(0);
+      isValid = false;
+      return;
+    }
+
+    // Validate contacts (your existing validation code)
+    const allContacts = [...contacts, ...selectedContacts];
+    if (allContacts.length === 0) {
+      toast.warning("At least one contact is required");
+      setActiveStep(1);
+      isValid = false;
+      return;
+    }
+    for (let contact of allContacts) {
+      if (
+        !contact.firstName?.trim() ||
+        !contact.lastName?.trim() ||
+        !contact.email?.trim()
+      ) {
+        toast.warning(
+          "All contacts must have First Name, Last Name, and Email"
+        );
+        setActiveStep(1);
+        isValid = false;
+        return;
+      }
+      // if (!contact.phoneNumbers || contact.phoneNumbers.length === 0 || !contact.phoneNumbers.some((phone) => phone && phone.trim())) {
+      //   toast.warning("All contacts must have at least one phone number");
+      //   setActiveStep(1);
+      //   isValid = false;
+      //   return;
+      // }
+    }
+
+    if (!isValid) return;
+
     try {
-      // 1. Create or Update Account
+      // Prepare the complete account data for backend
+      const accountPayload = {
+        accountName: accountData.accountName,
+        clientType: accountData.clientType,
+        companyName: accountData.companyName || "",
+
+        // Add the missing fields
+        teamMember: accountData.teamMembers
+          ? accountData.teamMembers.map((member) => member.value)
+          : [],
+        tags: accountData.tags ? accountData.tags.map((tag) => tag.value) : [],
+        folderTemp: accountData.folderTemp
+          ? accountData.folderTemp.value
+          : null,
+
+        // Address fields
+        country: accountData.country ? accountData.country.label : "",
+        streetAddress: accountData.streetAddress || "",
+        city: accountData.city || "",
+        state: accountData.state || "",
+        postalCode: accountData.postalCode || "",
+
+        // Admin user ID
+        adminUserId: loginUserId || "",
+        active: true,
+      };
+      console.log("accountpayload", accountPayload);
       let account;
+
+      // 1. Create or Update Account with complete data
       if (isEditing && accountId) {
-        const { data } = await axios.put(`https://www.snptaxes.com/api/accounts/${accountId}`, {
-          ...accountData,
-        });
+        const { data } = await axios.put(
+          `https://www.snptaxes.com/api/accounts/${accountId}`,
+          accountPayload
+        );
         account = data;
       } else {
-        const { data } = await axios.post("https://www.snptaxes.com/api/accounts", {
-          accountName: accountData.accountName,
-          clientType: accountData.clientType,
-          companyName: accountData.companyName,
-        });
+        const { data } = await axios.post(
+          "https://www.snptaxes.com/api/accounts",
+          accountPayload
+        );
         account = data;
       }
 
-      // 2. Handle new Contacts
+      // 2. Handle new Contacts (your existing code)
       let updatedContacts = [...contacts];
       const defaultPassword = "defaultPassword123";
-
       for (let i = 0; i < contacts.length; i++) {
         let contact = contacts[i];
         if (contact.firstName || contact.lastName || contact.email) {
+          let payload = {
+            ...contact,
+            contactName:contact.contactName,
+            accountId: account._id,
+            tags: contact.tags ? contact.tags.map((tag) => tag.value) : [],
+            // Include address fields
+            country: contact.country ? contact.country.label : "",
+            streetAddress: contact.streetAdd || "",
+            city: contact.city || "",
+            state: contact.state || "",
+            postalCode: contact.zipCode || "",
+          };
+          if (contact.login) {
+            payload.password = defaultPassword;
+          } else {
+            delete payload.password;
+          }
+          const resp = await axios.post(
+            "https://www.snptaxes.com/api/contacts",
+            payload
+          );
+          updatedContacts[i] = { ...contact, _id: resp.data._id };
+        }
+      }
+
+      // 3. Update selected existing contacts (your existing code)
+      for (let i = 0; i < selectedContacts.length; i++) {
+        let contact = selectedContacts[i];
+        let shouldUpdate = contact.accountId !== account._id || contact.login;
+        if (shouldUpdate) {
           let payload = { ...contact, accountId: account._id };
           if (contact.login) {
             payload.password = defaultPassword;
           } else {
             delete payload.password;
           }
-          const resp = await axios.post("https://www.snptaxes.com/api/contacts", payload);
-          updatedContacts[i] = { ...contact, _id: resp.data._id };
+          await axios.put(
+            `https://www.snptaxes.com/api/contacts/${contact._id}`,
+            payload
+          );
         }
       }
 
-
-// 3. Update selected existing contacts
-for (let i = 0; i < selectedContacts.length; i++) {
-   let contact = selectedContacts[i];
-  let shouldUpdate = (contact.accountId !== account._id) || contact.login;
-if (shouldUpdate) {
-  let payload = { ...contact, accountId: account._id };
-  if (contact.login) {
-    payload.password = defaultPassword;
-  } else {
-    delete payload.password;
-  }
-  await axios.put(`https://www.snptaxes.com/api/contacts/${contact._id}`, payload);
-}
-
-}
-
-      // 4. Combine contacts for linking
-      const allContacts = [
-        ...updatedContacts.filter(c => c._id),
-        ...selectedContacts
+      // 4. Combine contacts for linking (your existing code)
+      const allFinalContacts = [
+        ...updatedContacts.filter((c) => c._id),
+        ...selectedContacts,
       ];
-      const accContacts = allContacts.map(c => ({
+      const accContacts = allFinalContacts.map((c) => ({
         contact: c._id,
         canLogin: c.login || false,
         canNotify: c.notify || false,
-        canEmailSync: c.emailSync || false
+        canEmailSync: c.emailSync || false,
       }));
-   // ✅ 5. Correct PUT for linking contacts
-    const finalAccountId = isEditing && accountId ? accountId : account._id;
-      // 5. Update account with contacts (API expects contact links)
-      // await axios.put(`https://www.snptaxes.com/api/accounts/${account._id}`, {
-      //   contacts: accContacts,
-      // });
-  await axios.put(`https://www.snptaxes.com/api/accounts/${finalAccountId}`, {
-      contacts: accContacts,
-    });
+
+      // 5. Update account with contacts
+      const finalAccountId = isEditing && accountId ? accountId : account._id;
+      await axios.put(
+        `https://www.snptaxes.com/api/accounts/${finalAccountId}`,
+        { contacts: accContacts }
+      );
+
+      // 6. Handle folder template assignment if needed
+      if (accountData.folderTemp && accountData.folderTemp.value) {
+        assignfoldertemp(finalAccountId, accountData.folderTemp.value);
+      }
+
       alert("Account, contacts saved!");
-      console.log("accountdata",account)
+      console.log("accountdata", account);
       if (onCloseDrawer) onCloseDrawer();
     } catch (err) {
-      console.error(err);
+      console.error("Error saving account:", err);
       alert("Failed to save. Check console.");
     }
   };
-
+  
   return (
     <Box sx={{ maxWidth: 800, margin: "auto", mt: 2 }}>
-      <Stepper activeStep={activeStep} alternativeLabel>
-        {steps.map(label => (
-          <Step key={label}><StepLabel>{label}</StepLabel></Step>
+      <Stepper activeStep={activeStep}>
+        {steps.map((label) => (
+          <Step key={label}>
+            <StepLabel>{label}</StepLabel>
+          </Step>
         ))}
       </Stepper>
       <Box sx={{ mt: 4, p: 3, border: "1px solid #ddd", borderRadius: 2 }}>
-        {activeStep === 0 && <AccountForm onContinue={() => setActiveStep(1)} />}
+        {activeStep === 0 && (
+          <AccountForm onContinue={() => setActiveStep(1)} />
+        )}
         {activeStep === 1 && (
           <ContactForm
             onBack={() => setActiveStep(0)}
@@ -223,5 +266,3 @@ if (shouldUpdate) {
     </Box>
   );
 }
-
-

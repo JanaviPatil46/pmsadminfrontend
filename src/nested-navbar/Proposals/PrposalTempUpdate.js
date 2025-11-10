@@ -149,27 +149,29 @@ const MyStepperUpdate = () => {
   console.log(selectedAccount);
   const fetchAccountsData = async () => {
     try {
-      const url = `${ACCOUNT_API}/accounts/account/accountdetailslist/`;
-      const response = await fetch(url);
+      // const url = `${ACCOUNT_API}/accounts/account/accountdetailslist/`;
+      // const response = await fetch(url);
+                  const response = await fetch("https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true")
+
       const result = await response.json();
 
-      if (Array.isArray(result.accountlist)) {
-        setAccountData(result.accountlist);
-        console.log(result.accountlist);
+      if (Array.isArray(result.accounts)) {
+        setAccountData(result.accounts);
+        console.log(result.accounts);
 
         // Assuming `data` contains the selected account ID(s) as a string or array of IDs
 
         // Adjust _id to the actual selected ID or IDs you need
         console.log(data);
-        const selectedAccountData = result.accountlist.find(
-          (account) => account.id === data
+        const selectedAccountData = result.accounts.find(
+          (account) => account._id === data
         );
         console.log(selectedAccountData);
         if (selectedAccountData) {
           const selectedAccount = [
             {
-              label: selectedAccountData.Name,
-              value: selectedAccountData.id,
+              label: selectedAccountData.accountName,
+              value: selectedAccountData._id,
             },
           ];
           setSelectedAccount(selectedAccount); // Set single account
