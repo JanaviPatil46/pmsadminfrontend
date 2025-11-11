@@ -714,7 +714,7 @@ import {
   Drawer,
   IconButton,
   Divider,
-  Tooltip,Select,InputLabel,FormControl,TextField
+  Tooltip,Select,InputLabel,FormControl,TextField,Dialog,DialogActions,DialogTitle,DialogContent,List,ListItem,ListItemText,DialogContentText
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 
@@ -760,6 +760,8 @@ const AccountTable = () => {
   const [filterStatus, setFilterStatus] = useState("active"); // active | archived
   const [anchorE2, setAnchorE2] = useState(null);
    const [anchorEl, setAnchorEl] = useState(null);
+     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [accountsToDelete, setAccountsToDelete] = useState([]);
   const [filters, setFilters] = useState({
     accountName: "",
     type: "",
@@ -1168,6 +1170,42 @@ const handleFilterChange = (event) => {
     );
   }
 
+  const handleDeleteAccount = async () => {
+    try {
+      await axios.delete(`https://www.snptaxes.com/api/accounts/accounts/deleteMultipleAccounts`, {
+        data: { accountIds: selected }
+      });
+
+      console.log("Accounts deleted:", selected);
+
+      setSelected([]);
+      fetchAccountsList();
+      handleClose();
+      setIsDeleteDialogOpen(false);
+      toast.success("Account(s) deleted successfully");
+    } catch (error) {
+      console.error("Failed to delete account", error);
+      toast.error("Failed to delete account(s)");
+    }
+  };
+
+  const handleDeleteClick = () => {
+    // Get account names for confirmation dialog
+    const accountsToDeleteNames = selected.map(id => {
+      const account = accountList.find(acc => acc._id === id);
+      return account ? account.accountName : id;
+    });
+    
+    setAccountsToDelete(accountsToDeleteNames);
+    setIsDeleteDialogOpen(true);
+    handleClose(); // Close the menu
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setIsDeleteDialogOpen(false);
+    setAccountsToDelete([]);
+  };
+
   return (
     <Box sx={{ p: 2 }}>
       <Stack
@@ -1482,7 +1520,11 @@ const handleFilterChange = (event) => {
                   Activate Account
                 </MenuItem>
               )}
-
+             {filterStatus === "archived" && (
+    <MenuItem onClick={handleDeleteClick} sx={{ color: 'error.main' }}>
+      Delete Account
+    </MenuItem>
+  )}
               <MenuItem>Edit login notify emailSync</MenuItem>
             </Menu>
           </div>
@@ -1641,7 +1683,46 @@ const handleFilterChange = (event) => {
       )}
       
       <AccountContactDrawer open={openDrawer} onClose={handleDrawerClose} />
-
+<Dialog
+        open={isDeleteDialogOpen}
+        onClose={handleCloseDeleteDialog}
+        aria-labelledby="delete-dialog-title"
+        aria-describedby="delete-dialog-description"
+      >
+        <DialogTitle id="delete-dialog-title">
+          Confirm Delete
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="delete-dialog-description">
+            Are you sure you want to delete the following account(s)? This action cannot be undone.
+          </DialogContentText>
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="subtitle2" gutterBottom>
+              Accounts to be deleted:
+            </Typography>
+            <List dense>
+              {accountsToDelete.map((accountName, index) => (
+                <ListItem key={index}>
+                  <ListItemText primary={accountName} />
+                </ListItem>
+              ))}
+            </List>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteDialog} color="primary">
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleDeleteAccount} 
+            color="error" 
+            variant="contained"
+            autoFocus
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Drawer
         anchor="right"
         open={isDrawerOpen}

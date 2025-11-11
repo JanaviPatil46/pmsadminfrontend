@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 import { RxCross2 } from "react-icons/rx";
 import AccountContactForm from "../../AccountContactForm/AccountContactForm"
-const Drawer = ({ handleNewDrawerClose, handleDrawerClose ,editingAccountId}) => {
+const Drawer = ({ handleNewDrawerClose, handleDrawerClose ,editingAccountId,onClose}) => {
 
   return (
     <>
@@ -26,7 +26,7 @@ const Drawer = ({ handleNewDrawerClose, handleDrawerClose ,editingAccountId}) =>
         />
       </Box>
       <Box>
-       <AccountContactForm handleDrawerClose={handleDrawerClose} handleNewDrawerClose={handleNewDrawerClose} editingAccountId={editingAccountId} />
+       <AccountContactForm handleDrawerClose={handleDrawerClose} handleNewDrawerClose={handleNewDrawerClose} editingAccountId={editingAccountId} onClose={onClose}/>
       </Box>
     </>
   );

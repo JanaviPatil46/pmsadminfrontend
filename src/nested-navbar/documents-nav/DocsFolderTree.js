@@ -112,11 +112,15 @@ console.log("acount id for the documentation",data)
     const fetchAccountDetails = async () => {
       try {
         const res = await fetch(
-          `${ACCOUNT_API}/accounts/accountdetails/${accountId}`
+          `https://www.snptaxes.com/api/accounts/${accountId}`
         );
         const data = await res.json();
-        setClientEmail(data.account.contacts[0].email);
-        console.log(data.account.contacts[0].email); // adjust key if it's different
+        console.log("accounts details",data)
+          const email = data.contacts?.[0]?.contact?.email;
+
+    setClientEmail(email);
+        // setClientEmail(data.account.contacts[0].email);
+      console.log("Client Email:", email); // adjust key if it's different
       } catch (err) {
         console.error("Failed to fetch account details", err);
       }

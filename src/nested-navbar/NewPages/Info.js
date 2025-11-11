@@ -78,7 +78,6 @@
 //   const [openRemoveDialog, setOpenRemoveDialog] = useState(false);
 //   const [editingAccountId, setEditingAccountId] = useState(null);
 
-
 //   const [selectedUser, setSelectedUser] = useState(null);
 
 //   const handleSimpleSwitchChange = async (field, user) => {
@@ -122,15 +121,13 @@
 //     }
 //   };
 
- 
-
 //   const handleCloseDialog = () => {
 //     setOpenDialog(false); // Close dialog
 //   };
 //   const handleMessageChange = (event) => {
 //     setPersonalMessage(event.target.value); // Update personal message input
 //   };
-  
+
 //   const handleSave = () => {
 //     if (!selectedUser) return;
 
@@ -146,10 +143,8 @@
 //     setPersonalMessage("");
 //     setSelectedUser(null);
 //     fetchAccount()
-  
-//   };
 
-  
+//   };
 
 //   const handleConfirmRemoveAccess = async () => {
 //     if (!contact) return;
@@ -322,8 +317,6 @@
 //   // Derived state for menu open/close
 //   const menuOpen = Boolean(anchorEl);
 
-  
-
 //   const handleMenuClick = (
 //     event,
 //     contactId,
@@ -347,7 +340,6 @@
 //     setSelectedContact(null); // Reset selected contact when menu closes
 //   };
 
-
 //   const [contactId, setContactId] = useState();
 //   const handleEditDescription = () => {
 //     const contact = contacts.find((c) => c._id === selectedContact);
@@ -360,7 +352,6 @@
 //     handleMenuClose();
 //   };
 
-  
 //   const handleDescriptionSave = async () => {
 //     console.log("Save clicked", contactId);
 //     if (!contactId) return;
@@ -475,7 +466,7 @@
 //       })
 //       .catch((error) => console.error(error));
 //   };
- 
+
 //   const handleUnlink = () => {
 //     if (!selectedContact || !selectedUser) return;
 //     console.log(
@@ -658,7 +649,7 @@
 //     fetch(urlusersavedmail, requestOptions)
 //       .then((response) => {response.json()
 //         fetchAccount()
-      
+
 //       })
 
 //       .catch((error) => console.error(error));
@@ -736,10 +727,9 @@
 //       .catch((error) => console.error(error));
 //   };
 
-  
 //   // const handleLinkAccounts = () => {
 //   //   updateContactstoAccount(selectedContacts);
-   
+
 //   // };
 //   // console.log(selectedContacts);
 
@@ -781,10 +771,10 @@
 
 // const handleLinkAccounts = () => {
 //   // First, get detailed information about selected contacts
-//   const selectedContactDetails = filteredContacts.filter(contact => 
+//   const selectedContactDetails = filteredContacts.filter(contact =>
 //     selectedContacts.includes(contact.id)
 //   );
-  
+
 //   // Map to the format needed for the confirmation dialog
 //   const contactData = selectedContactDetails.map(contact => ({
 //     id: contact.id,
@@ -794,12 +784,12 @@
 //     middleName: contact.middlename || '',
 //     email: contact.email || '',
 //     companyName: contact.companyName || '',
-    
+
 //     login:  false, // Default to true if existing user
 //     notify: false, // Default values
 //     emailSync: false
 //   }));
-  
+
 //   setContactDetails(contactData);
 //   console.log("contactData",contactData)
 //   setIsConfirmDialogOpen(true);
@@ -855,20 +845,20 @@
 //   const existingContactIds = accountDatabyid.contacts.map(
 //     (contact) => contact._id
 //   );
-  
+
 //   const combinedContacts = [...existingContactIds, ...selectedContacts];
-  
+
 //   const raw = JSON.stringify({
 //     contacts: combinedContacts,
 //   });
-  
+
 //   const requestOptions = {
 //     method: "PATCH",
 //     headers: myHeaders,
 //     body: raw,
 //     redirect: "follow",
 //   };
-  
+
 //   fetch(
 //     `${ACCOUNT_API}/accounts/accountdetails/${accountDatabyid._id}`,
 //     requestOptions
@@ -931,7 +921,7 @@
 //         <Grid item xs={12} sm={6}>
 //           <Card sx={{ boxShadow: 3, borderRadius: 2, mr: 5 }}>
 //             <CardContent>
-             
+
 //               <Box
 //                 sx={{
 //                   display: "flex",
@@ -996,7 +986,7 @@
 //                     },
 //                   }}
 //                 >
-                 
+
 //                   {isNewDrawerOpen && (
 //                     <AccountDrawer
 //                       handleNewDrawerClose={handleDrawerClose}
@@ -1046,7 +1036,7 @@
 //                     </Typography>
 //                   </Box>
 //                 </Box>
-               
+
 //               </Box>
 
 //               {/* Account Info section */}
@@ -1314,7 +1304,7 @@
 //         Review and configure settings for the selected contacts
 //       </Typography>
 //     </DialogTitle>
-    
+
 //     <DialogContent>
 //       <Box sx={{ mt: 2 }}>
 //         {contactDetails.map((contact, index) => (
@@ -1387,7 +1377,7 @@
 //         ))}
 //       </Box>
 //     </DialogContent>
-    
+
 //     <DialogActions sx={{ p: 3, gap: 2 }}>
 //       <Button
 //         variant="outlined"
@@ -1427,9 +1417,9 @@
 //               </Box>
 
 //               <Box mt={2}>
-               
+
 //               </Box>
-              
+
 //               <Box mt={2}>
 //                 <TableContainer component={Paper}>
 //                   <Table>
@@ -1503,7 +1493,7 @@
 //                                   <TableCell>
 //                                     <Switch
 //                                       checked={user.notify}
-//                                       disabled={!user.login} 
+//                                       disabled={!user.login}
 //                                       onChange={() =>
 //                                         handleSimpleSwitchChange("notify", user)
 //                                       }
@@ -1512,7 +1502,7 @@
 //                                   <TableCell>
 //                                     <Switch
 //                                       checked={user.emailSync}
-//                                       disabled={!user.login} 
+//                                       disabled={!user.login}
 //                                       onChange={() =>
 //                                         handleSimpleSwitchChange(
 //                                           "emailSync",
@@ -1858,14 +1848,18 @@ import {
   FormControlLabel,
   Dialog,
   DialogTitle,
-  DialogContent,Grid,
-  DialogActions,Avatar,IconButton,
-  Drawer,
+  DialogContent,
+  Grid,
+  DialogActions,
+  Avatar,
+  IconButton,
+  Drawer,Autocomplete,TextField
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import AccountContactDrawer from "../../AccountContactForm/AccountContactDrawer";
-import ContactForm from "../../Contact/ContactForm"
-
+import ContactForm from "../../Pages/UpdateContact";
+import MenuDropdown from "./MenuDropdown"
+import CloseIcon from "@mui/icons-material/Close";
 const AccountDetails = () => {
   const { data } = useParams();
   const [account, setAccount] = useState(null);
@@ -1873,26 +1867,20 @@ const AccountDetails = () => {
   const [selectedContact, setSelectedContact] = useState(null);
   const [newCanLoginValue, setNewCanLoginValue] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
-const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
+  const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
   const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
-   
-    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [isRightDrawerOpen, setIsRightDrawerOpen] = useState(false);
- const handleDrawerClose = () => {
-    setIsDrawerOpen(false);
-    // setIsOrganizerDialogOpen(false);
-  };
-    const handleNewDrawerClose = () => {
-    setIsRightDrawerOpen(false);
 
-    //  dispatch(resetForm());
-  };
-    const fetchAccountDetails = async () => {
+ const [addContactDrawerOpen, setAddContactDrawerOpen] = useState(false);
+  const [availableContacts, setAvailableContacts] = useState([]);
+  const [selectedContacts, setSelectedContacts] = useState([]);
+
+  const fetchAccountDetails = async () => {
     try {
       const res = await axios.get(
         `https://www.snptaxes.com/api/accounts/${data}`
       );
       setAccount(res.data);
+      console.log("accounts details",res.data)
     } catch (error) {
       console.error("Error fetching account details:", error);
     }
@@ -1901,7 +1889,25 @@ const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
   useEffect(() => {
     fetchAccountDetails();
   }, [data]);
-
+// Fetch available contacts (excluding already linked ones)
+  const fetchAvailableContacts = async () => {
+    try {
+      const res = await axios.get(`https://www.snptaxes.com/api/contacts`);
+      const currentContactIds = account?.contacts?.map(c => c.contact._id) || [];
+      const filteredContacts = res.data.filter(
+        contact => !currentContactIds.includes(contact._id)
+      );
+      setAvailableContacts(filteredContacts);
+    } catch (error) {
+      console.error("Error fetching contacts:", error);
+    }
+  };
+// Fetch available contacts when account data is loaded and drawer is opened
+  useEffect(() => {
+    if (addContactDrawerOpen && account) {
+      fetchAvailableContacts();
+    }
+  }, [addContactDrawerOpen, account]);
   const handleSwitchClick = (contact) => {
     setSelectedContact(contact);
     setNewCanLoginValue(!contact.canLogin);
@@ -1945,6 +1951,25 @@ const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
       console.error("Error updating canEmailSync", error);
     }
   };
+ // Send activation email function
+  const sendActivationEmail = async (contact) => {
+    // console.log("contact",contact)
+    const ContactId = contact.contact._id
+    try {
+      const response = await axios.post(
+        `https://www.snptaxes.com/api/contacts/${ContactId}/resend-activation`,
+        { 
+          email: contact.contact.email,
+          contactId: ContactId 
+        }
+      );
+      console.log("Activation email sent successfully:", response.data);
+      return true;
+    } catch (error) {
+      console.error("Error sending activation email:", error);
+      return false;
+    }
+  };
 
   const handleConfirmToggle = async () => {
     if (!selectedContact) return;
@@ -1953,6 +1978,17 @@ const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
         `https://www.snptaxes.com/api/accounts/${account._id}/contact/${selectedContact.contact._id}`,
         { canLogin: newCanLoginValue }
       );
+      // If enabling login access, send activation email
+      if (newCanLoginValue) {
+        const emailSent = await sendActivationEmail(selectedContact);
+        
+        if (emailSent) {
+          // Show success message
+          alert(`Activation email sent to ${selectedContact.contact.email}`);
+        } else {
+          alert(`Failed to send activation email to ${selectedContact.contact.email}`);
+        }
+      }
       setAccount((prev) => ({
         ...prev,
         contacts: prev.contacts.map((c) =>
@@ -1973,7 +2009,7 @@ const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
     setDialogOpen(false);
     setSelectedContact(null);
   };
-    const [tagList, setTagList] = useState([]);
+  const [tagList, setTagList] = useState([]);
   const [teamMemberList, setTeamMemberList] = useState([]);
   // ✅ Fetch Tags
   useEffect(() => {
@@ -1981,7 +2017,7 @@ const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
       try {
         const res = await fetch(`${TAGS_API}/tags/`);
         const data = await res.json();
-        setTagList(data.tags); 
+        setTagList(data.tags);
       } catch (err) {
         console.error("Error fetching tags:", err);
       }
@@ -2004,386 +2040,565 @@ const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
     };
     fetchTeam();
   }, []);
-// ✅ Map selected tags
-  const accountTags = tagList.filter((tag) =>
-    account.tags?.includes(tag._id)
-  );
+  // // ✅ Map selected tags
+  // const accountTags = tagList.filter((tag) => account.tags?.includes(tag._id));
 
-  // ✅ Map selected team members
-  const assignedMembers = teamMemberList.filter((member) =>
-    account.teamMember?.includes(member._id)
-  );
+  // // ✅ Map selected team members
+  // const assignedMembers = teamMemberList.filter((member) =>
+  //   account.teamMember?.includes(member._id)
+  // );
+  // ✅ Always use empty array fallback
+const accountTags = tagList.length
+  ? tagList.filter((tag) => account?.tags?.includes(tag._id))
+  : [];
+
+const assignedMembers = teamMemberList.length
+  ? teamMemberList.filter((member) => account?.teamMember?.includes(member._id))
+  : [];
+ // Handle linking selected contacts to account - UPDATED FOR YOUR SCHEMA
+  const handleLinkContacts = async () => {
+    if (selectedContacts.length === 0) return;
+    
+    try {
+      // Prepare the contacts data according to your schema
+      const contactsToAdd = selectedContacts.map(contact => ({
+        contact: contact._id,
+        canLogin: false,
+        canNotify: false,
+        canEmailSync: false
+      }));
+
+      // Make API call to add contacts to account
+      await axios.post(
+        `https://www.snptaxes.com/api/accounts/${account._id}/contacts`,
+        { contacts: contactsToAdd }
+      );
+      
+      // Refresh account details
+      fetchAccountDetails();
+      setAddContactDrawerOpen(false);
+      setSelectedContacts([]);
+      
+    } catch (error) {
+      console.error("Error linking contacts:", error);
+    }
+  };
+   // Handle unlinking contact from account
+  const handleUnlinkContact = async (contact) => {
+    if (!window.confirm(`Are you sure you want to unlink ${contact.contact.firstName} ${contact.contact.lastName} from this account?`)) {
+      return;
+    }
+
+    try {
+      await axios.delete(
+        `https://www.snptaxes.com/api/accounts/${account._id}/contact/${contact.contact._id}`
+      );
+      
+      // Refresh account details to reflect the change
+      fetchAccountDetails();
+      
+    } catch (error) {
+      console.error('Error unlinking contact:', error);
+    }
+  };
+
+  // Handle reset password
+  const handleResetPassword = async (contact) => {
+    if (!contact.canLogin) {
+      alert('This contact does not have login access. Enable login access first.');
+      return;
+    }
+
+    if (!window.confirm(`Reset password for ${contact.contact.firstName} ${contact.contact.lastName}? They will receive an email with instructions to set a new password.`)) {
+      return;
+    }
+
+    try {
+      await axios.post(
+        `https://www.snptaxes.com/api/auth/reset-password`,
+        { email: contact.contact.email }
+      );
+      alert('Password reset email sent successfully!');
+      
+    } catch (error) {
+      console.error('Error resetting password:', error);
+      alert('Error sending password reset email');
+    }
+  };
+ // Separate state for contact edit drawer
+  const [contactEditDrawerOpen, setContactEditDrawerOpen] = useState(false);
+  const [selectedContactForEdit, setSelectedContactForEdit] = useState(null); // Renamed for clarity
+    // const [openDrawer, setOpenDrawer] = useState(false);
+  // const [selectedContact, setSelectedContact] = useState(null);
+  
+ // Handle opening contact edit drawer
+  const handleOpenContactEditDrawer = (contactData) => {
+    console.log("Opening drawer with contact:", contactData);
+    setSelectedContactForEdit(contactData.contact);
+    setContactEditDrawerOpen(true);
+  };
+   const handleContactUpdated =()=>{
+fetchAccountDetails();
+  }
   if (!account) return <Typography>Loading...</Typography>;
 
   return (
-//     <Box sx={{ p: 3 }}>
-//       <Button
-//         variant="contained"
-//         color="primary"
-//         onClick={() => setDrawerOpen(true)}
-//         sx={{ mb: 3 }}
-//       >
-//         Edit Account
-//       </Button>
+    //     <Box sx={{ p: 3 }}>
+    //       <Button
+    //         variant="contained"
+    //         color="primary"
+    //         onClick={() => setDrawerOpen(true)}
+    //         sx={{ mb: 3 }}
+    //       >
+    //         Edit Account
+    //       </Button>
 
-//       <Grid container spacing={3}>
-//   {/* Left Card - Account Details */}
-//   <Grid item xs={12} md={6} p={2}>
-//     <Paper sx={{ p: 3, mb: { xs: 2, md: 0 } }}>
-//       <Typography variant="h5">{account.accountName}</Typography>
-//       <Divider sx={{ my: 2 }} />
-//       <Typography variant="body1">
-//         <b>Client Type:</b> {account.clientType}
-//       </Typography>
-//       <Typography variant="body1">
-//         <b>Company Name:</b> {account.companyName || "—"}
-//       </Typography>
-//       {/* ✅ TAGS DISPLAY */}
-//         <Typography variant="h6" sx={{ mt: 2 }}>Tags</Typography>
-//         <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-//           {accountTags.length > 0 ? (
-//             accountTags.map((tag) => (
-//               <Chip
-//                 key={tag._id}
-//                 label={tag.tagName}
-//                 sx={{
-//                   background: tag.tagColour,
-//                   color: "#fff",
-//                   fontWeight: "bold",
-//                 }}
-//               />
-//             ))
-//           ) : (
-//             <Typography>—</Typography>
-//           )}
-//         </Box>
+    //       <Grid container spacing={3}>
+    //   {/* Left Card - Account Details */}
+    //   <Grid item xs={12} md={6} p={2}>
+    //     <Paper sx={{ p: 3, mb: { xs: 2, md: 0 } }}>
+    //       <Typography variant="h5">{account.accountName}</Typography>
+    //       <Divider sx={{ my: 2 }} />
+    //       <Typography variant="body1">
+    //         <b>Client Type:</b> {account.clientType}
+    //       </Typography>
+    //       <Typography variant="body1">
+    //         <b>Company Name:</b> {account.companyName || "—"}
+    //       </Typography>
+    //       {/* ✅ TAGS DISPLAY */}
+    //         <Typography variant="h6" sx={{ mt: 2 }}>Tags</Typography>
+    //         <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+    //           {accountTags.length > 0 ? (
+    //             accountTags.map((tag) => (
+    //               <Chip
+    //                 key={tag._id}
+    //                 label={tag.tagName}
+    //                 sx={{
+    //                   background: tag.tagColour,
+    //                   color: "#fff",
+    //                   fontWeight: "bold",
+    //                 }}
+    //               />
+    //             ))
+    //           ) : (
+    //             <Typography>—</Typography>
+    //           )}
+    //         </Box>
 
-//         {/* ✅ TEAM MEMBERS DISPLAY */}
-//         <Typography variant="h6" sx={{ mt: 2 }}>Team Members</Typography>
-//         <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-//           {assignedMembers.length > 0 ? (
-//             assignedMembers.map((user) => (
-//               <Chip
-//                 key={user._id}
-//                 label={user.username}
-//                 variant="outlined"
-//               />
-//             ))
-//           ) : (
-//             <Typography>—</Typography>
-//           )}
-//         </Box>
-//     </Paper>
-//   </Grid>
+    //         {/* ✅ TEAM MEMBERS DISPLAY */}
+    //         <Typography variant="h6" sx={{ mt: 2 }}>Team Members</Typography>
+    //         <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+    //           {assignedMembers.length > 0 ? (
+    //             assignedMembers.map((user) => (
+    //               <Chip
+    //                 key={user._id}
+    //                 label={user.username}
+    //                 variant="outlined"
+    //               />
+    //             ))
+    //           ) : (
+    //             <Typography>—</Typography>
+    //           )}
+    //         </Box>
+    //     </Paper>
+    //   </Grid>
 
-//   {/* Right Card - Contacts */}
-//   <Grid item xs={12} md={6} pt={2}>
-//     <Paper sx={{ p: 3 }}>
-//       <Typography variant="h6">Contacts</Typography>
-//       <Stack spacing={2} mt={2}>
-//         {account.contacts?.length > 0 ? (
-//           account.contacts.map((c) => (
-//             <Box
-//               key={c.contact._id}
-//               display="flex"
-//               flexDirection={{ xs: "column", sm: "row" }}
-//               justifyContent="space-between"
-//               alignItems={{ xs: "flex-start", sm: "center" }}
-//               gap={1}
-//             >
-//               <Typography>
-//                 {c.contact.firstName} {c.contact.lastName} — {c.contact.email}
-//               </Typography>
+    //   {/* Right Card - Contacts */}
+    //   <Grid item xs={12} md={6} pt={2}>
+    //     <Paper sx={{ p: 3 }}>
+    //       <Typography variant="h6">Contacts</Typography>
+    //       <Stack spacing={2} mt={2}>
+    //         {account.contacts?.length > 0 ? (
+    //           account.contacts.map((c) => (
+    //             <Box
+    //               key={c.contact._id}
+    //               display="flex"
+    //               flexDirection={{ xs: "column", sm: "row" }}
+    //               justifyContent="space-between"
+    //               alignItems={{ xs: "flex-start", sm: "center" }}
+    //               gap={1}
+    //             >
+    //               <Typography>
+    //                 {c.contact.firstName} {c.contact.lastName} — {c.contact.email}
+    //               </Typography>
 
-//               <Stack
-//                 direction={{ xs: "column", sm: "row" }}
-//                 spacing={1}
-//                 alignItems="center"
-//               >
-//                 <FormControlLabel
-//                   control={
-//                     <Switch
-//                       checked={c.canLogin}
-//                       onClick={() => handleSwitchClick(c)}
-//                       color="primary"
-//                     />
-//                   }
-//                   label="Login"
-//                 />
-//                 <FormControlLabel
-//                   control={
-//                     <Switch
-//                       checked={c.canNotify}
-//                       onClick={() => handleNotifyToggle(c)}
-//                       color="primary"
-//                     />
-//                   }
-//                   label="Notify"
-//                 />
-//                 <FormControlLabel
-//                   control={
-//                     <Switch
-//                       checked={c.canEmailSync}
-//                       onClick={() => handleEmailSyncToggle(c)}
-//                       color="primary"
-//                     />
-//                   }
-//                   label="EmailSync"
-//                 />
-//               </Stack>
-//             </Box>
-//           ))
-//         ) : (
-//           <Typography>No contacts found</Typography>
-//         )}
-//       </Stack>
-//     </Paper>
-//   </Grid>
-// </Grid>
+    //               <Stack
+    //                 direction={{ xs: "column", sm: "row" }}
+    //                 spacing={1}
+    //                 alignItems="center"
+    //               >
+    //                 <FormControlLabel
+    //                   control={
+    //                     <Switch
+    //                       checked={c.canLogin}
+    //                       onClick={() => handleSwitchClick(c)}
+    //                       color="primary"
+    //                     />
+    //                   }
+    //                   label="Login"
+    //                 />
+    //                 <FormControlLabel
+    //                   control={
+    //                     <Switch
+    //                       checked={c.canNotify}
+    //                       onClick={() => handleNotifyToggle(c)}
+    //                       color="primary"
+    //                     />
+    //                   }
+    //                   label="Notify"
+    //                 />
+    //                 <FormControlLabel
+    //                   control={
+    //                     <Switch
+    //                       checked={c.canEmailSync}
+    //                       onClick={() => handleEmailSyncToggle(c)}
+    //                       color="primary"
+    //                     />
+    //                   }
+    //                   label="EmailSync"
+    //                 />
+    //               </Stack>
+    //             </Box>
+    //           ))
+    //         ) : (
+    //           <Typography>No contacts found</Typography>
+    //         )}
+    //       </Stack>
+    //     </Paper>
+    //   </Grid>
+    // </Grid>
 
+    //       {/* Drawer */}
+    //       <AccountContactDrawer
+    //         open={drawerOpen}
+    //         onClose={() => {
+    //           setDrawerOpen(false);
+    //           fetchAccountDetails();
+    //         }}
+    //         accountId={account._id}
+    //       />
 
-//       {/* Drawer */}
-//       <AccountContactDrawer
-//         open={drawerOpen}
-//         onClose={() => {
-//           setDrawerOpen(false);
-//           fetchAccountDetails();
-//         }}
-//         accountId={account._id}
-//       />
+    //       {/* Dialog */}
+    //       <Dialog open={dialogOpen} onClose={handleCancelToggle}>
+    //         <DialogTitle>Confirm Access Change</DialogTitle>
+    //         <DialogContent>
+    //           <Typography>
+    //             {newCanLoginValue
+    //               ? `Do you want to give access of client portal to ${selectedContact?.contact.email}?`
+    //               : `Do you want to remove access of client portal from ${selectedContact?.contact.email}?`}
+    //           </Typography>
+    //         </DialogContent>
+    //         <DialogActions>
+    //           <Button onClick={handleCancelToggle} variant="outlined">
+    //             Cancel
+    //           </Button>
+    //           <Button onClick={handleConfirmToggle} variant="contained" color="primary">
+    //             Confirm
+    //           </Button>
+    //         </DialogActions>
+    //       </Dialog>
+    //     </Box>
+    <Box sx={{ p: 3 }}>
+      {/* Top bar button */}
 
-//       {/* Dialog */}
-//       <Dialog open={dialogOpen} onClose={handleCancelToggle}>
-//         <DialogTitle>Confirm Access Change</DialogTitle>
-//         <DialogContent>
-//           <Typography>
-//             {newCanLoginValue
-//               ? `Do you want to give access of client portal to ${selectedContact?.contact.email}?`
-//               : `Do you want to remove access of client portal from ${selectedContact?.contact.email}?`}
-//           </Typography>
-//         </DialogContent>
-//         <DialogActions>
-//           <Button onClick={handleCancelToggle} variant="outlined">
-//             Cancel
-//           </Button>
-//           <Button onClick={handleConfirmToggle} variant="contained" color="primary">
-//             Confirm
-//           </Button>
-//         </DialogActions>
-//       </Dialog>
-//     </Box>
-<Box sx={{ p: 3 }}>
-  {/* Top bar button */}
-  
-
-  <Grid container spacing={3}>
-    {/* ✅ LEFT SIDE - ACCOUNT DETAILS */}
-    <Grid item xs={12} md={6} p={2}>
-      <Paper sx={{ p: 3 }}>
-        <Box sx={{display:'flex', alignItems:'center',justifyContent:'space-between'}}> <Typography variant="h5" fontWeight="bold">
-          Account Details
-        </Typography>
-       <Button
-    variant="contained"
-    color="primary"
-    onClick={() => setDrawerOpen(true)}
-    sx={{ mb: 3 }}
-  >
-    Edit Account
-  </Button>
-        </Box>
-       
-
-        <Divider sx={{ my: 2 }} />
-
-        {/* Avatar + Name */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Avatar sx={{ width: 60, height: 60 }} />
-          <Box>
-            <Typography variant="h6" fontWeight="bold">
-              {account.accountName}
-            </Typography>
-            <Typography color="text.secondary">
-              {account.clientType}
-            </Typography>
-          </Box>
-        </Box>
-
-        <Typography variant="h6" sx={{ mt: 3 }}>
-          Account Info
-        </Typography>
-
-        {/* ✅ TAGS */}
-        <Typography variant="body1" sx={{ mt: 1, fontWeight: "bold" }}>
-          Tags
-        </Typography>
-        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mt: 1 }}>
-          {accountTags?.length > 0 ? (
-            accountTags.map((tag) => (
-              <Chip
-                key={tag._id}
-                label={tag.tagName}
-                sx={{
-                  backgroundColor: tag.tagColour,
-                  color: "white",
-                  fontWeight: "bold",
-                }}
-              />
-            ))
-          ) : (
-            <Typography color="text.secondary">—</Typography>
-          )}
-        </Box>
-
-        {/* ✅ TEAM MEMBERS */}
-        <Typography variant="body1" sx={{ mt: 3, fontWeight: "bold" }}>
-          Team Members
-        </Typography>
-        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mt: 1 }}>
-          {assignedMembers?.length > 0 ? (
-            assignedMembers.map((m) => (
-              <Chip key={m._id} label={m.username} variant="outlined" />
-            ))
-          ) : (
-            <Typography color="text.secondary">—</Typography>
-          )}
-        </Box>
-      </Paper>
-    </Grid>
-
-    {/* ✅ RIGHT SIDE - CONTACTS */}
-    <Grid item xs={12} md={6} p={2}>
-      <Paper sx={{ p: 3 }}>
-        <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Typography variant="h5" fontWeight="bold">
-            Contacts
-          </Typography>
-
-          <Button variant="text" color="primary" onClick={() => setIsRightDrawerOpen(true)}>
-            ADD CONTACT
-          </Button>
-        </Box>
-
-        <Divider sx={{ my: 2 }} />
-
-        {/* Table Header */}
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          sx={{ px: 2, py: 1, fontWeight: "bold", color: "gray" }}
-        >
-          <Box flex={1}></Box>
-          <Box width={260} display="flex" justifyContent="space-between">
-            <Typography>Login</Typography>
-            <Typography>Notify</Typography>
-            <Typography>Email Sync</Typography>
-          </Box>
-        </Box>
-
-        <Divider />
-
-        {/* Contact List */}
-        {account.contacts?.length > 0 ? (
-          account.contacts.map((c) => (
-            <Box key={c.contact._id}>
-              <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-                sx={{ px: 2, py: 2 }}
+      <Grid container spacing={3}>
+        {/* ✅ LEFT SIDE - ACCOUNT DETAILS */}
+        <Grid item xs={12} md={6} p={2}>
+          <Paper sx={{ p: 3 }}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              {" "}
+              <Typography variant="h5" fontWeight="bold">
+                Account Details
+              </Typography>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => setDrawerOpen(true)}
+                sx={{ mb: 3 }}
               >
-                {/* Contact name/email */}
-                <Box flex={1}>
-                  <Typography fontWeight="bold">
-                    {c.contact.firstName} {c.contact.lastName}
-                  </Typography>
-                  <Typography color="text.secondary" fontSize={14}>
-                    {c.contact.email || "-"}
-                  </Typography>
-                </Box>
-
-                {/* Switches */}
-                <Box
-                  width={260}
-                  display="flex"
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  <Switch
-                    checked={c.canLogin}
-                    onChange={() => handleSwitchClick(c)}
-                    color="primary"
-                  />
-                  <Switch
-                    checked={c.canNotify}
-                    onChange={() => handleNotifyToggle(c)}
-                    color="primary"
-                  />
-                  <Switch
-                    checked={c.canEmailSync}
-                    onChange={() => handleEmailSyncToggle(c)}
-                    color="primary"
-                  />
-                  <IconButton>
-                    <MoreVertIcon />
-                  </IconButton>
-                </Box>
-              </Box>
-
-              <Divider />
+                Edit Account
+              </Button>
             </Box>
-          ))
-        ) : (
-          <Typography sx={{ p: 2 }}>No contacts found</Typography>
+
+            <Divider sx={{ my: 2 }} />
+
+            {/* Avatar + Name */}
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+              <Avatar sx={{ width: 60, height: 60 }} />
+              <Box>
+                <Typography variant="h6" fontWeight="bold">
+                  {account.accountName}
+                </Typography>
+                <Typography color="text.secondary">
+                  {account.clientType}
+                </Typography>
+              </Box>
+            </Box>
+
+            <Typography variant="h6" sx={{ mt: 3 }}>
+              Account Info
+            </Typography>
+
+            {/* ✅ TAGS */}
+            <Typography variant="body1" sx={{ mt: 1, fontWeight: "bold" }}>
+              Tags
+            </Typography>
+            <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mt: 1 }}>
+              {accountTags?.length > 0 ? (
+                accountTags.map((tag) => (
+                  <Chip
+                    key={tag._id}
+                    label={tag.tagName}
+                    sx={{
+                      backgroundColor: tag.tagColour,
+                      color: "white",
+                      fontWeight: "bold",
+                    }}
+                  />
+                ))
+              ) : (
+                <Typography color="text.secondary">—</Typography>
+              )}
+            </Box>
+
+            {/* ✅ TEAM MEMBERS */}
+            <Typography variant="body1" sx={{ mt: 3, fontWeight: "bold" }}>
+              Team Members
+            </Typography>
+            <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mt: 1 }}>
+              {assignedMembers?.length > 0 ? (
+                assignedMembers.map((m) => (
+                  <Chip key={m._id} label={m.username} variant="outlined" />
+                ))
+              ) : (
+                <Typography color="text.secondary">—</Typography>
+              )}
+            </Box>
+          </Paper>
+        </Grid>
+
+        {/* ✅ RIGHT SIDE - CONTACTS */}
+        <Grid item xs={12} md={6} p={2}>
+          <Paper sx={{ p: 3 }}>
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <Typography variant="h5" fontWeight="bold">
+                Contacts
+              </Typography>
+
+              <Button
+                variant="text"
+                color="primary"
+              onClick={() => setAddContactDrawerOpen(true)}
+              >
+                ADD CONTACT
+              </Button>
+            </Box>
+
+            <Divider sx={{ my: 2 }} />
+
+            {/* Table Header */}
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              sx={{ px: 2, py: 1, fontWeight: "bold", color: "gray" }}
+            >
+              <Box flex={1}></Box>
+              <Box width={260} display="flex" justifyContent="space-between">
+                <Typography>Login</Typography>
+                <Typography>Notify</Typography>
+                <Typography>Email Sync</Typography>
+              </Box>
+            </Box>
+
+            <Divider />
+
+            {/* Contact List */}
+            {account.contacts?.length > 0 ? (
+              account.contacts.map((c) => (
+                <Box key={c.contact._id}>
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    sx={{ px: 2, py: 2 }}
+                  >
+                    {/* Contact name/email */}
+                    <Box flex={1}>
+                      <Typography fontWeight="bold" sx={{cursor:'pointer'}}    onClick={() => handleOpenContactEditDrawer(c)}>
+                        {c.contact.contactName} 
+                      </Typography>
+                      <Typography color="text.secondary" fontSize={14}>
+                        {c.contact.email || "-"}
+                      </Typography>
+                    </Box>
+
+                    {/* Switches */}
+                    <Box
+                      width={260}
+                      display="flex"
+                      justifyContent="space-between"
+                      alignItems="center"
+                    >
+                      <Switch
+                        checked={c.canLogin}
+                        onChange={() => handleSwitchClick(c)}
+                        color="primary"
+                      />
+                      <Switch
+                        checked={c.canNotify}
+                        onChange={() => handleNotifyToggle(c)}
+                        color="primary"
+                      />
+                      <Switch
+                        checked={c.canEmailSync}
+                        onChange={() => handleEmailSyncToggle(c)}
+                        color="primary"
+                      />
+                       <MenuDropdown 
+                contact={c}
+                onUnlink={handleUnlinkContact}
+                onResetPassword={handleResetPassword}
+              />
+                    </Box>
+                  </Box>
+
+                  <Divider />
+                </Box>
+              ))
+            ) : (
+              <Typography sx={{ p: 2 }}>No contacts found</Typography>
+            )}
+          </Paper>
+        </Grid>
+      </Grid>
+
+      {/* Drawer */}
+      <AccountContactDrawer
+        open={drawerOpen}
+        onClose={() => {
+          setDrawerOpen(false);
+          fetchAccountDetails();
+        }}
+        accountId={account._id}
+      />
+      
+      {/* Dialog */}
+      <Dialog open={dialogOpen} onClose={handleCancelToggle}>
+        <DialogTitle>Confirm Access Change</DialogTitle>
+        <DialogContent>
+          <Typography>
+            {newCanLoginValue
+              ? `Give portal access to ${selectedContact?.contact.email}?`
+              : `Remove portal access from ${selectedContact?.contact.email}?`}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelToggle} variant="outlined">
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirmToggle}
+            variant="contained"
+            color="primary"
+          >
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Add Contact Drawer */}
+      <Drawer
+        anchor="right"
+        open={addContactDrawerOpen}
+        onClose={() => {
+          setAddContactDrawerOpen(false);
+          setSelectedContacts([]);
+        }}
+       PaperProps={{ sx: { width: 500, p:5 } }}
+      >
+        <Box >
+          <Typography variant="h6" gutterBottom>
+            Add Contacts to Account
+          </Typography>
+          
+          <Autocomplete
+            multiple
+            options={availableContacts}
+            getOptionLabel={(option) => 
+              `${option.contactName} (${option.email})`
+            }
+            value={selectedContacts}
+            onChange={(event, newValue) => {
+              setSelectedContacts(newValue);
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                // label="Select Contacts"
+                placeholder="Search contacts..."
+                variant="outlined"
+                fullWidth
+              />
+            )}
+            sx={{ mb: 2 }}
+          />
+
+          <Box sx={{ flexGrow: 1 }} />
+
+          <Box sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}>
+            <Button
+              onClick={() => {
+                setAddContactDrawerOpen(false);
+                setSelectedContacts([]);
+              }}
+              variant="outlined"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleLinkContacts}
+              variant="contained"
+              disabled={selectedContacts.length === 0}
+            >
+              Link Contacts ({selectedContacts.length})
+            </Button>
+          </Box>
+        </Box>
+      </Drawer>
+        <Drawer
+        anchor="right"
+        open={contactEditDrawerOpen}
+        onClose={() => setContactEditDrawerOpen(false)}
+        sx={{ width: 600 }}
+      >
+        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "20px", ml: 1 }}>
+          <Typography sx={{ fontWeight: "bold" }} variant="h6">Edit Contact</Typography>
+          <IconButton onClick={() => setContactEditDrawerOpen(false)}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
+        <Divider />
+        {selectedContactForEdit && (
+          <ContactForm
+            selectedContact={selectedContactForEdit}
+            handleClose={() => setContactEditDrawerOpen(false)}
+            onContactUpdated={handleContactUpdated}
+          />
         )}
-      </Paper>
-    </Grid>
-  </Grid>
-
-  {/* Drawer */}
-  <AccountContactDrawer
-    open={drawerOpen}
-    onClose={() => {
-      setDrawerOpen(false);
-      fetchAccountDetails();
-    }}
-    accountId={account._id}
-  />
-<Drawer
- anchor="right"
-        open={isRightDrawerOpen}
-        onClose={handleNewDrawerClose}
-
-
-
-><ContactForm
-              handleNewDrawerClose={handleNewDrawerClose}
-              handleDrawerClose={handleDrawerClose}
-            /></Drawer>
-  {/* Dialog */}
-  <Dialog open={dialogOpen} onClose={handleCancelToggle}>
-    <DialogTitle>Confirm Access Change</DialogTitle>
-    <DialogContent>
-      <Typography>
-        {newCanLoginValue
-          ? `Give portal access to ${selectedContact?.contact.email}?`
-          : `Remove portal access from ${selectedContact?.contact.email}?`}
-      </Typography>
-    </DialogContent>
-    <DialogActions>
-      <Button onClick={handleCancelToggle} variant="outlined">
-        Cancel
-      </Button>
-      <Button onClick={handleConfirmToggle} variant="contained" color="primary">
-        Confirm
-      </Button>
-    </DialogActions>
-  </Dialog>
-</Box>
-
+      </Drawer>
+    </Box>
   );
 };
-
 
 export default AccountDetails;

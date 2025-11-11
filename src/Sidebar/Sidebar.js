@@ -368,7 +368,10 @@ function Sidebar() {
 
      dispatch(resetForm());
   };
-
+const handleCloseDrawers =()=>{
+  handleDrawerClose()
+  handleNewDrawerClose()
+}
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isOrganizerDialogOpen, setIsOrganizerDialogOpen] = useState(false);
 // Get accountId from cookie
@@ -1222,6 +1225,7 @@ const [fetchError, setFetchError] = useState("");
             <AccountDrawer
                handleNewDrawerClose={handleNewDrawerClose}
               handleDrawerClose={handleDrawerClose}
+              onClose={handleCloseDrawers}
               />
           )}
           {rightDrawerContent === "Contact" && (

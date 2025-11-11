@@ -495,7 +495,7 @@ export default function AccountForm({ onContinue }) {
             margin="normal"
             size="small"
             label="Street Address"
-            name="streetAdd"
+            name="streetAddress"
             value={accountData.streetAddress  || ""}
             onChange={handleChange}
           />
@@ -525,7 +525,7 @@ export default function AccountForm({ onContinue }) {
             margin="normal"
             size="small"
             label="Zip Code"
-            name="zipCode"
+            name="postalCode"
             value={accountData.postalCode  || ""}
             onChange={handleChange}
           />

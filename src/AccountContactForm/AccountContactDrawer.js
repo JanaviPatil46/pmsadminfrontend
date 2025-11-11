@@ -23,8 +23,8 @@ useEffect(() => {
           const selectedContacts = account.contacts?.map(c => ({
             ...c.contact,
             login: c.canLogin, // map backend canLogin to frontend login
-            notify: c.notify || false,
-            emailSync: c.emailSync || false,
+            notify: c.canNotify || false,
+            emailSync: c.canEmailSync || false,
             _id: c.contact._id,
           })) || [];
 
