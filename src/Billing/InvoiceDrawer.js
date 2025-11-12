@@ -251,12 +251,15 @@ const InvoiceDrawer = ({
   const [accountData, setAccountData] = useState([]);
   const fetchAccountData = async () => {
     try {
-      const response = await fetch(
-        `${ACCOUNT_API}/accounts/account/accountdetailslist/true`
-      );
+      // const response = await fetch(
+      //   `${ACCOUNT_API}/accounts/account/accountdetailslist/true`
+      // );
+        const response = await fetch("https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true")
       const data = await response.json();
       console.log("client list", data);
-      setAccountData(data.accountlist);
+      setAccountData(data.accounts);
+        const accountIdFromCookie = Cookies.get("accountId");
+        
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -268,8 +271,8 @@ const InvoiceDrawer = ({
 
   // Map account data into options
   const accountOptions = accountData.map((account) => ({
-    value: account.id,
-    label: account.Name,
+    value: account._id,
+    label: account.accountName,
   }));
   const handlePayInvoiceChange = (event) => {
     setIsPayInvoice(event.target.checked);
@@ -487,43 +490,43 @@ const InvoiceDrawer = ({
   const handleOpenpreviewDrawer = () => setpreviewDrawerOpen(true);
   const handleClosepreviewDrawer = () => setpreviewDrawerOpen(false);
 
-  const contactMail = () => {
-    const requestOptions = {
-      method: "GET",
-      redirect: "follow",
-    };
+  // const contactMail = () => {
+  //   const requestOptions = {
+  //     method: "GET",
+  //     redirect: "follow",
+  //   };
 
-    fetch(
-      `${CONTACT_API}/accounts/accountdetails/accountdetailslist/listbyid/${selectedAccount?.value}`,
-      requestOptions
-    )
-      .then((response) => response.json())
-      .then((result) => {
-        if (
-          result?.accountlist?.Contacts &&
-          Array.isArray(result.accountlist.Contacts)
-        ) {
-          const email = result.accountlist.Contacts[0]?.email;
-          if (email) {
-            setFirstContactEmail(email);
-          } else {
-            setFirstContactEmail("[CONTACT EMAIL]");
-          }
-        } else {
-          setFirstContactEmail("[CONTACT EMAIL]");
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching contacts:", error);
-        setFirstContactEmail("Error fetching email");
-      });
-  };
+  //   fetch(
+  //     `${CONTACT_API}/accounts/accountdetails/accountdetailslist/listbyid/${selectedAccount?.value}`,
+  //     requestOptions
+  //   )
+  //     .then((response) => response.json())
+  //     .then((result) => {
+  //       if (
+  //         result?.accountlist?.Contacts &&
+  //         Array.isArray(result.accountlist.Contacts)
+  //       ) {
+  //         const email = result.accountlist.Contacts[0]?.email;
+  //         if (email) {
+  //           setFirstContactEmail(email);
+  //         } else {
+  //           setFirstContactEmail("[CONTACT EMAIL]");
+  //         }
+  //       } else {
+  //         setFirstContactEmail("[CONTACT EMAIL]");
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error fetching contacts:", error);
+  //       setFirstContactEmail("Error fetching email");
+  //     });
+  // };
 
-  useEffect(() => {
-    if (selectedAccount?.value) {
-      contactMail();
-    }
-  }, [selectedAccount]);
+  // useEffect(() => {
+  //   if (selectedAccount?.value) {
+  //     contactMail();
+  //   }
+  // }, [selectedAccount]);
 
   useEffect(() => {
     const calculateSubtotal = () => {
@@ -711,18 +714,18 @@ const [lineItemsError, setLineItemsError]= useState("")
     } else {
       setTemplateNameError("");
     }
-    if (!selectedservice){
-      setLineItemsError("selecte the Line Items");
-      isValid = false;
-    }
-    else{
-      setLineItemsError("")
-    }
+    // if (!selectedservice){
+    //   setLineItemsError("selecte the Line Items");
+    //   isValid = false;
+    // }
+    // else{
+    //   setLineItemsError("")
+    // }
 
     return isValid;
   };
   const createinvoice = () => {
-
+console.log("invoice creation")
      if (!validateForm()) {
       return; // Prevent form submission if validation fails
     }
@@ -731,7 +734,7 @@ const [lineItemsError, setLineItemsError]= useState("")
     myHeaders.append("Content-Type", "application/json");
 
     const raw = JSON.stringify({
-      account: selectedAccount.value,
+      account: selectedAccount?.value,
       invoicenumber: "",
       invoicedate: startDate,
       description: description,
@@ -760,7 +763,7 @@ const [lineItemsError, setLineItemsError]= useState("")
       invoiceStatus: "Pending",
       balanceDueAmount: "",
     });
-
+console.log("invoice raw",raw)
     const requestOptions = {
       method: "POST",
       headers: myHeaders,

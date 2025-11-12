@@ -437,7 +437,10 @@ const handleRequestApproval = async () => {
         if (response.ok && data.success) {
           // alert(data.message);
           toast.success(data.message)
-           fetchFolderTree(accountId);
+           setTimeout(() => {
+    fetchFolderTree(accountId);
+  }, 800); 
+          //  fetchFolderTree(accountId);
         } else {
           alert(data.message || "Failed to delete");
                 toast.error(data.message)
@@ -738,6 +741,7 @@ const handleRequestApproval = async () => {
             onClose={() => setFileUploadDrawerOpen(false)}
             folderTree={folderTree}
             fetchFolderTree={() => fetchFolderTree(data)}
+             accountId={data}
             selectedFolderForMenu={selectedFolderForMenu}
           />
   

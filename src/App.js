@@ -110,9 +110,12 @@ import Bulkaccount from "./Pages/Bulkaccount.js";
 import TemplateCreator from "./Templates/documentManagement/TemplateCreator.js";
 import FolderTreeView from "./Templates/documentManagement/FolderTreeView.js";
 import DocsFolderTree from "./nested-navbar/documents-nav/DocsFolderTree.js";
-import AccountTable from "./AccountContactForm/AccountTable.js"
-import AccountDetails from "./AccountContactForm/AccountDetails.js"
+import AccountTable from "./AccountContactForm/AccountTable.js";
+import AccountDetails from "./AccountContactForm/AccountDetails.js";
 import ContactsTable from "./AccountContactForm/ContactTable.js";
+import ProposalsTable from "./ProposalandEls/components/ProposalsTable.js"
+import ProposalForm from "./ProposalandEls/components/ProposalForm.js"
+import AccountProposalForm from "./ProposalandEls/components/AccountProposalForm.js"
 const App = () => {
   return (
     <BrowserRouter>
@@ -128,8 +131,8 @@ const App = () => {
           <Route path="/docs" element={<Docs />} />
           <Route path="/clients/accounts" element={<Account />}>
             {/* <Route path="activeaccounts" element={<ActiveAccount />} /> */}
-             <Route path="activeaccounts" element={<AccountTable />}/>
-              <Route path="account/:id" element={<AccountDetails/>}/>
+            <Route path="activeaccounts" element={<AccountTable />} />
+            <Route path="account/:id" element={<AccountDetails />} />
             <Route path="archivedaccounts" element={<ArchivedAccount />} />
           </Route>
           <Route path="/organizers" element={<AccountOrganizers />}>
@@ -218,7 +221,9 @@ const App = () => {
               element={<RecurringInvoiceTemp />}
             />
             <Route path="signatures" element={<SignatureTemp />} />
-            <Route path="proposals" element={<ProposalTemp />} />
+            {/* <Route path="proposals" element={<ProposalTemp />} /> */}
+             <Route path="proposals" element={<ProposalsTable />} />
+             <Route path="proposals/proposal-form" element={<ProposalForm />} />
             <Route
               path="proposals/ProposalTempUpdate/:_id"
               element={<ProposalTempUpdate />}
@@ -275,8 +280,8 @@ const App = () => {
             </Route>
             <Route path="proposals/:data" element={<Proposals />} />
             <Route
-              path="proposals/:data/new"
-              element={<AccountWiseProposal />}
+              path="proposals/:data/account-proposal"
+              element={<AccountProposalForm />}
             />
             <Route
               path="proposals/:data/update/:_id"

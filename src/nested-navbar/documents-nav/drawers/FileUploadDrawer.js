@@ -26,7 +26,7 @@ const FileUploadDrawer = ({
   onClose,
   folderTree,
   fetchFolderTree,
-  selectedFolderForMenu,
+  selectedFolderForMenu,accountId
 }) => {
   const [file, setFile] = useState(null);
    const [files, setFiles] = useState([]);

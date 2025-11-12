@@ -1351,6 +1351,7 @@ const [username, setUsername] = useState("");
       jobId = null
     ) => {
       console.log("bvhgv", automation);
+      console.log(`Updating account tags for Account ID: ${automationAccountId}`)
       if (!automationType || !automationAccountId) {
         console.error("Missing required parameters");
         return;
@@ -1363,14 +1364,18 @@ const [username, setUsername] = useState("");
           );
 
           try {
-            // Fetch the current account data
-            const response = await fetch(
-              `${ACCOUNT_API}/accounts/accountdetails/${automationAccountId}`
-            );
-            if (!response.ok) throw new Error("Failed to fetch account data");
+           
+           const res = await axios.get(
+  `https://www.snptaxes.com/api/accounts/${automationAccountId}`
+);
 
-            const accountsData = await response.json();
-            let currentTags = accountsData.account.tags || []; // Existing tag IDs
+// The JSON data is in res.data
+const accountsData = res.data;
+
+console.log("accountsData", accountsData);
+
+          
+            let currentTags = accountsData.tags || []; // Existing tag IDs
 
             // Extract tag IDs from automation object
             const addTagIds = automation?.addTags?.map((tag) => tag._id) || [];
@@ -1393,7 +1398,7 @@ const [username, setUsername] = useState("");
 
             // Send updated tags back to the server
             const updateResponse = await fetch(
-              `${ACCOUNT_API}/accounts/accountdetails/updateaccounttags/${automationAccountId}`,
+              `https://www.snptaxes.com/api/accounts/accountdetails/updateaccounttags/${automationAccountId}`,
               {
                 method: "PATCH",
                 headers: {
@@ -2362,7 +2367,7 @@ const createJob = async () => {
         alignItems="center"
         padding={1.5}
       >
-        <Typography variant="h6">Add Job</Typography>
+        <Typography variant="h6">Add Job 22</Typography>
         <IconButton onClick={handleClose}>
           <CloseIcon />
         </IconButton>

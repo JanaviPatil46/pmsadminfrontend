@@ -15,6 +15,7 @@ const AccountsDash = () => {
     if (data) {
     
       Cookies.set('accountId', data);
+
     }
   }, [data]);
 
@@ -54,6 +55,7 @@ const AccountsDash = () => {
         `https://www.snptaxes.com/api/accounts/${data}`
       );
       setAccName(res.data.accountName);
+      Cookies.set('accountName',res.data.accountName)
       console.log("result", res.data);
     } catch (error) {
       console.error("Error fetching account details:", error);

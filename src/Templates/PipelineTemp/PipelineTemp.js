@@ -636,17 +636,17 @@ const PipelineTemp = () => {
 
   const fectProposalandElsTemp = async () => {
     try {
-      const url = `${PROPOSAL_API}/workflow/proposalesandels/proposalesandels`;
+      const url = `https://www.snptaxes.com/api/proposals`;
       const response = await fetch(url);
       const data = await response.json();
-      setAddProposalsandElsTeplates(data.proposalesAndElsTemplates);
+      setAddProposalsandElsTeplates(data.proposallist);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
   const proposalElsOptions = addProposalsandElsTeplates.map((temp) => ({
     value: temp._id,
-    label: temp.templatename,
+    label: temp.general.templateName,
   }));
 
   const fetchOrganizerTemplates = async () => {
@@ -4127,47 +4127,99 @@ case "Update job assignees":
   const [templateError, setTemplateError] = useState("");
   const [userError, setUserError] = useState("");
   const [stageNameErrors, setStageNameErrors] = useState([]);
+const [isPipelineNameValid, setIsPipelineNameValid] = useState(true);
 
   const validateForm = () => {
-    let isValid = true;
-    if (!pipelineName) {
-      setPipelineNameError("Pipeline name is required");
+  let isValid = true;
 
-      isValid = false;
-    } else {
-      setPipelineNameError("");
-    }
-    if (!selectedSortByJob) {
-      setSortByJobError("Sort By Job is required.");
-      isValid = false;
-    } else {
-      setSortByJobError("");
-    }
+  // pipeline name
+  if (!pipelineName.trim()) {
+    setPipelineNameError("Pipeline name is required");
+    isValid = false;
+  } else if (!isPipelineNameValid) {
+    // 🚫 stop if API says name exists
+    setPipelineNameError("Pipeline name already exists");
+    isValid = false;
+  } else {
+    setPipelineNameError("");
+  }
 
-    if (!selectedJobtemp) {
-      setTemplateError("Job Template is required.");
-      isValid = false;
-    } else {
-      setTemplateError("");
-    }
+  // Sort by Job
+  if (!selectedSortByJob) {
+    setSortByJobError("Sort By Job is required.");
+    isValid = false;
+  } else {
+    setSortByJobError("");
+  }
 
-    if (selectedUser.length === 0) {
-      setUserError("At least one user must be selected.");
-      isValid = false;
-    } else {
-      setUserError("");
-    }
-    // Validate stage names
-    const newStageErrors = stages.map((stage) =>
-      stage.name ? "" : "Stage name is required"
-    );
-    setStageNameErrors(newStageErrors);
+  // Job Template
+  if (!selectedJobtemp) {
+    setTemplateError("Job Template is required.");
+    isValid = false;
+  } else {
+    setTemplateError("");
+  }
 
-    if (newStageErrors.some((error) => error !== "")) {
-      isValid = false;
-    }
-    return isValid;
-  };
+  // Users
+  if (selectedUser.length === 0) {
+    setUserError("At least one user must be selected.");
+    isValid = false;
+  } else {
+    setUserError("");
+  }
+
+  // Stage names
+  const newStageErrors = stages.map((stage) =>
+    stage.name ? "" : "Stage name is required"
+  );
+  setStageNameErrors(newStageErrors);
+
+  if (newStageErrors.some((error) => error !== "")) {
+    isValid = false;
+  }
+
+  return isValid;
+};
+  // const validateForm = () => {
+  //   let isValid = true;
+  //   if (!pipelineName) {
+  //     setPipelineNameError("Pipeline name is required");
+
+  //     isValid = false;
+  //   } else {
+  //     setPipelineNameError("");
+  //   }
+  //   if (!selectedSortByJob) {
+  //     setSortByJobError("Sort By Job is required.");
+  //     isValid = false;
+  //   } else {
+  //     setSortByJobError("");
+  //   }
+
+  //   if (!selectedJobtemp) {
+  //     setTemplateError("Job Template is required.");
+  //     isValid = false;
+  //   } else {
+  //     setTemplateError("");
+  //   }
+
+  //   if (selectedUser.length === 0) {
+  //     setUserError("At least one user must be selected.");
+  //     isValid = false;
+  //   } else {
+  //     setUserError("");
+  //   }
+  //   // Validate stage names
+  //   const newStageErrors = stages.map((stage) =>
+  //     stage.name ? "" : "Stage name is required"
+  //   );
+  //   setStageNameErrors(newStageErrors);
+
+  //   if (newStageErrors.some((error) => error !== "")) {
+  //     isValid = false;
+  //   }
+  //   return isValid;
+  // };
   const [searchQuery, setSearchQuery] = useState("");
   // Filter pipelineData based on searchQuery
   const filteredPipelines = pipelineData.filter((row) =>
@@ -4193,33 +4245,45 @@ case "Update job assignees":
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+// ✅ Debounced function to check template/pipeline name existence
+const checkTemplateName = async (name) => {
+  try {
+    const res = await axios.get(`${PIPELINE_API}/workflow/pipeline/check-name`, {
+      params: { name },
+    });
 
-    // Debounced function to check template name existence
-    const checkTemplateName = async (name) => {
-        try {
-          const res = await axios.get(`${PIPELINE_API}/workflow/pipeline/check-name`, {
-            params: { name },
-          });
-          if (res.data.exists) {
-            setPipelineNameError('Template name already exists');
-          } else {
-            setPipelineNameError('');
-          }
-        } catch (err) {
-          console.error(err);
-          setPipelineNameError('');
-        }
-      };
-    
-     const debouncedCheck = debounce((name) => {
-        if (name.trim()) checkTemplateName(name);
-        else setPipelineNameError('');
-      }, 500);
-    
-      useEffect(() => {
-        debouncedCheck(pipelineName);
-        return debouncedCheck.cancel;
-      }, [pipelineName]);
+    if (res.data.exists) {
+      setPipelineNameError("Pipeline name already exists");
+      setIsPipelineNameValid(false);
+    } else {
+      setPipelineNameError("");
+      setIsPipelineNameValid(true);
+    }
+  } catch (err) {
+    console.error(err);
+    setIsPipelineNameValid(true); // avoid blocking form
+  }
+};
+
+// ✅ debounced
+const debouncedCheck = debounce((name) => {
+  if (name.trim()) checkTemplateName(name);
+  else {
+    setPipelineNameError("");
+    setIsPipelineNameValid(false);
+  }
+}, 500);
+
+// ✅ Call debounce whenever name changes
+useEffect(() => {
+  debouncedCheck(pipelineName);
+  return debouncedCheck.cancel;
+}, [pipelineName]);
+
+
+// ✅ Update validateForm function
+
+
   return (
     <Box>
       {!showForm ? (

@@ -1372,49 +1372,7 @@ const handleFilterChange = (event) => {
   </div>
 )}
 
-{/* Tag Filter */}
-{/* {showFilters.tags && (
-  <div
-    style={{
-      display: "flex",
-      alignItems: "center",
-      width: "250px",
-      gap: 3,
-    }}
-  >
-    <Box mr={3}>
-      <TagsMultiSelectDropDown
-        value={filters.tags.map(tag => ({
-          value: tag.tagName,
-          label: tag.tagName,
-          colour: tag.tagColour
-        }))}
-        onChange={(newValue) => {
-          setFilters(prev => ({
-            ...prev,
-            tags: newValue.map(item => ({
-              tagName: item.value,
-              tagColour: item.colour
-            }))
-          }));
-          setPage(0);
-        }}
-        options={uniqueTags.map(tag => ({
-          value: tag.tagName,
-          label: tag.tagName,
-          colour: tag.tagColour
-        }))}
-        width="250px"
-        placeholder="Select tags..."
-      />
-    </Box>
 
-    <DeleteIcon
-      onClick={() => clearFilter("tags")}
-      style={{ cursor: "pointer", color: "red" }}
-    />
-  </div>
-)} */}
 {/* Tag Filter */}
 {showFilters.tags && (
   <div style={{ display: "flex", alignItems: "center", width: "250px" }}>
@@ -1608,18 +1566,18 @@ const handleFilterChange = (event) => {
                         component="button"
                         underline="hover"
                         color="primary"
-                         onClick={() => {
-    // Store in cookies
-    Cookies.set("accountId", account._id, { path: "/" });
-    Cookies.set("accountName", account.accountName, { path: "/" });
-    console.log("✅ Stored accountId:", account._id, "accountName:", account.accountName);
+  //                        onClick={() => {
+  //   // Store in cookies
+  //   Cookies.set("accountId", account._id, { path: "/" });
+  //   Cookies.set("accountName", account.accountName, { path: "/" });
+  //   console.log("✅ Stored accountId:", account._id, "accountName:", account.accountName);
 
-    // Navigate to account dashboard
-    navigate(`/clients/accounts/accountsdash/overview/${account._id}`);
-  }}
-                        // onClick={() =>
-                        //   navigate(`/clients/accounts/accountsdash/overview/${account._id}`)
-                        // }
+  //   // Navigate to account dashboard
+  //   navigate(`/clients/accounts/accountsdash/overview/${account._id}`);
+  // }}
+                        onClick={() =>
+                          navigate(`/clients/accounts/accountsdash/overview/${account._id}`)
+                        }
                       >
                         {account.accountName}
                       </Link>

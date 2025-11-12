@@ -1185,19 +1185,33 @@ const assigneeOptions = assignee.map((ass)=>({
     value: temp._id,
     label: temp.templatename,
   }));
+  // const fectProposalandElsTemp = async () => {
+  //   try {
+  //     const url = `${PROPOSAL_API}/workflow/proposalesandels/proposalesandels`;
+  //     const response = await fetch(url);
+  //     const data = await response.json();
+  //     setAddProposalsandElsTeplates(data.proposalesAndElsTemplates);
+  //   } catch (error) {
+  //     console.error("Error fetching data:", error);
+  //   }
+  // };
+  // const proposalElsOptions = addProposalsandElsTeplates.map((temp) => ({
+  //   value: temp._id,
+  //   label: temp.templatename,
+  // }));
   const fectProposalandElsTemp = async () => {
     try {
-      const url = `${PROPOSAL_API}/workflow/proposalesandels/proposalesandels`;
+      const url = `https://www.snptaxes.com/api/proposals`;
       const response = await fetch(url);
       const data = await response.json();
-      setAddProposalsandElsTeplates(data.proposalesAndElsTemplates);
+      setAddProposalsandElsTeplates(data.proposallist);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
   const proposalElsOptions = addProposalsandElsTeplates.map((temp) => ({
     value: temp._id,
-    label: temp.templatename,
+    label: temp.general.templateName,
   }));
 
   const fetchOrganizerTemplates = async () => {
