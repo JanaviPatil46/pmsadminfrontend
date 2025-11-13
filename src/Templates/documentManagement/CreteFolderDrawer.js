@@ -296,7 +296,7 @@ const CreateFolderDrawer = ({
       toast.success(`✅ Folder created: ${res.data.metaData.name}`)
       setFolderName("");
      
-      fetchFolderTree();
+    await  fetchFolderTree();
       // ✅ Wait for folder tree refresh
     // await fetchFolderTree();
        onClose();

@@ -470,7 +470,7 @@ const SendAccountEmail = ({ selectedAccounts, onClose }) => {
       body: raw,
       redirect: "follow",
     };
-    const url = `${CONTACT_API}/sendemails/sendBulkEmails`;
+    const url = "https://www.snptaxes.com/api/accounts/sendBulkEmails";
     fetch(url, requestOptions)
       .then((response) => {
         if (!response.ok) {
@@ -485,7 +485,7 @@ const SendAccountEmail = ({ selectedAccounts, onClose }) => {
         console.error(error);
         toast.error("An error occurred while sending emails");
       });
-    toast.success("After sending all mails you will get notification mail.");
+    // toast.success("After sending all mails you will get notification mail.");
     //  setTimeout(() =>  navigate('/accounts'), 1000);
     // window.location.reload();
     handleCancel();

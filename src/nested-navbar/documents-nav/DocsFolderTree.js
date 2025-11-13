@@ -36,6 +36,9 @@ import {
 } from "lucide-react";
 import DownloadIcon from '@mui/icons-material/Download';
 import { toast } from 'react-toastify';
+import { FaFilePdf, FaFileWord, FaFileExcel, FaFileImage, FaFileAlt } from "react-icons/fa";
+import { AiFillFileUnknown } from "react-icons/ai";
+
 const DOCS_MANAGMENTS = process.env.REACT_APP_CLIENT_DOCS_MANAGE;
 const DocsFolderTree = () => {
 const { data } = useParams();
@@ -88,7 +91,8 @@ console.log("acount id for the documentation",data)
        
         // alert("Folder Template Assign Successfully");
         toast.success("Folder Template Assign Successfully")
-        
+        setSelectedTemplate("")
+       
       })
       .catch((error) => {
         console.error(error);
@@ -232,19 +236,7 @@ const toggleSignStatus = async (item) => {
   }
 };
 
-    // const toggleSignStatus = (item) => {
-    //   console.log("signature item", item)
-    //   
-    //   const currentStatus = item.meta?.signStatus || "sendForSignature";
-  
-    //   // Find the next status in the cycle
-    //   const currentIndex = SIGN_STATUSES.indexOf(currentStatus);
-    //   const nextIndex = (currentIndex + 1) % SIGN_STATUSES.length; // loops back to start if at end
-    //   const nextStatus = SIGN_STATUSES[nextIndex];
-  
-    //   // Update the item meta
-    //   updateStatus(item, "signStatus", nextStatus);
-    // };
+ 
     const APPROVAL_STATUSES = [
       "sendForApproval",
       "pendingApproval",
@@ -259,17 +251,7 @@ const toggleSignStatus = async (item) => {
       approvalCompleted: "Approval Completed",
     };
   
-    // const toggleApprovalStatus = (item) => {
-    //   const currentStatus = item.meta?.authStatus || "sendForApproval";
-  
-    //   // Find the next status in the cycle
-    //   const currentIndex = APPROVAL_STATUSES.indexOf(currentStatus);
-    //   const nextIndex = (currentIndex + 1) % APPROVAL_STATUSES.length; // loops back to start if at end
-    //   const nextStatus = APPROVAL_STATUSES[nextIndex];
-  
-    //   // Update the item meta
-    //   updateStatus(item, "authStatus", nextStatus);
-    // };
+   
   
     // 🔹 Step 1: Click menu item → open dialog
 const toggleApprovalStatus = (item) => {
@@ -491,8 +473,33 @@ const handleRequestApproval = async () => {
       console.error("Error opening/downloading file:", error);
     }
   };
-  
+  const getFileIcon = (fileName) => {
+  const ext = fileName.split(".").pop().toLowerCase();
+
+  switch (ext) {
+    case "pdf":
+      return <FaFilePdf color="#d32f2f" size={18} />;
+    case "jpg":
+    case "jpeg":
+    case "png":
+    case "gif":
+      return <FaFileImage color="#1976d2" size={18} />;
+    case "doc":
+    case "docx":
+      return <FaFileWord color="#1565c0" size={18} />;
+    case "xls":
+    case "xlsx":
+      return <FaFileExcel color="#2e7d32" size={18} />;
+    case "txt":
+    case "md":
+      return <FaFileAlt color="#616161" size={18} />;
+    default:
+      return <AiFillFileUnknown color="#757575" size={18} />;
+  }
+};
+
    const renderTree = (items, level = 0, parentPath = "") => {
+
       return (
         <>
         <Box component="ul" sx={{ listStyle: "none", pl: level * 2, mb: 1 }}>
@@ -578,11 +585,12 @@ const handleRequestApproval = async () => {
                       "&:hover .file-menu-icon": { opacity: 1 },
                     }}
                   >
-                    <FileIcon
+                    {/* <FileIcon
                       size={16}
                       color="#757575"
                       style={{ marginRight: 6 }}
-                    />
+                    /> */}
+                      <Box sx={{ mr: 1 }}>{getFileIcon(item.name)}</Box>
                     <Typography
                       variant="body2"
                       sx={{ flex: 1, wordBreak: "break-word", color: meta.readOnly ? "#999" : "#1976d2", textDecoration: meta.readOnly ? "none" : "underline",

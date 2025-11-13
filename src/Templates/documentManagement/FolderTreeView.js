@@ -626,6 +626,7 @@ console.log("hgjhg",templateId)
           isOpen={fileUploadDrawerOpen}
           onClose={() => setFileUploadDrawerOpen(false)}
           folderTree={folderTree}
+          templateId={templateId}
           fetchFolderTree={() => fetchFolderTree(templateId)}
           selectedFolderForMenu={selectedFolderForMenu}
         />

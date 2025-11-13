@@ -19,49 +19,37 @@ import axios from "axios";
 const ProposalsEls = () => {
     const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
   const PROPOSAL_API = process.env.REACT_APP_PROPOSAL_URL;
-  const [ProposalsTemplates, setProposalsTemplates] = useState([]);
+  const [proposallist, setProposalList] = useState([]);
   const [tempIdget, setTempIdGet] = useState("");
   const [openMenuId, setOpenMenuId] = useState(null);
 
   const navigate = useNavigate();
 
-  // const fetchPrprosalsAllData = async () => {
-  //   try {
-  //     const url = `${PROPOSAL_API}/proposalandels/proposalaccountwise/allproposallist/list`;
-
-  //     const response = await fetch(url);
-  //     if (!response.ok) {
-  //       throw new Error("Failed to fetch Proposals templates");
-  //     }
-  //     const result = await response.json();
-  //     console.log(result.proposalesandelsAccountwise);
-  //     setProposalsTemplates(result.proposalesandelsAccountwise);
-  //   } catch (error) {
-  //     console.error("Error fetching Proposals  templates:", error);
-  //   }
-  // };
+  const [filterStatus, setFilterStatus] = useState("active"); 
+  
 const fetchPrprosalsAllData = async () => {
   try {
     // Step 1: Fetch active accounts
     const accountsResponse = await axios.get(
-      `${ACCOUNT_API}/accounts/account/accountdetailslist/true`
+     `https://www.snptaxes.com/api/accounts/list?active=${filterStatus === "active"}`
+      // `${ACCOUNT_API}/accounts/account/accountdetailslist/true`
     );
 
     const accountsData = accountsResponse.data.accountlist || [];
     if (!accountsData.length) return;
 
     // Step 2: Build accountIds string
-    const accountIds = accountsData.map((acc) => acc.id).join(",");
+    const accountIds = accountsData.map((acc) => acc._id).join(",");
 
     // Step 3: Fetch proposals for all accounts in one request
-    const url = `${PROPOSAL_API}/proposalandels/proposalaccountwise/proposalbyaccount/${accountIds}`;
+    const url = `https://www.snptaxes.com/account/proposals/byaccount/${accountIds}`;
     const response = await fetch(url);
     if (!response.ok) throw new Error("Failed to fetch proposals");
 
     const result = await response.json();
-    console.log("Proposals:", result.proposalesandelsAccountwise);
+    console.log("Proposals:", result.proposallist);
 
-    setProposalsTemplates(result.proposalesandelsAccountwise || []);
+    setProposalList(result.proposallist || []);
   } catch (error) {
     console.error("Error fetching proposals:", error);
   }
@@ -74,7 +62,7 @@ const fetchPrprosalsAllData = async () => {
   const handleEdit = (_id, data) => {
     console.log(_id);
     console.log(data);
-    navigate(`/clients/accounts/accountsdash/proposals/${data}/update/` + _id);
+    navigate(`/clients/accounts/accountsdash/proposals/${data}/account-proposal?edit=${_id}`);
     // console.log(_id);
   };
 
@@ -99,7 +87,7 @@ const fetchPrprosalsAllData = async () => {
         method: "DELETE",
         redirect: "follow",
       };
-      const url = `${PROPOSAL_API}/proposalandels/proposalaccountwise/`;
+      const url = `https://www.snptaxes.com/account/proposals/`;
       fetch(url + _id, requestOptions)
         .then((response) => {
           if (!response.ok) {
@@ -152,7 +140,7 @@ const fetchPrprosalsAllData = async () => {
         </Button>
       </Box>
 
-      <TableContainer component={Paper} sx={{ overflow: "visible" }}>
+      {/* <TableContainer component={Paper} sx={{ overflow: "visible" }}>
         <Table sx={{ width: "100%" }}>
           <TableHead>
             <TableRow>
@@ -329,8 +317,7 @@ const fetchPrprosalsAllData = async () => {
                     cursor: "pointer",
                   }}
                 >
-                  {/* {row.createdAt}
-                   */}
+                
                   {new Intl.DateTimeFormat("en-US", {
                     day: "2-digit",
                     month: "2-digit",
@@ -390,7 +377,158 @@ const fetchPrprosalsAllData = async () => {
             ))}
           </TableBody>
         </Table>
-      </TableContainer>
+      </TableContainer> */}
+       <TableContainer component={Paper} sx={{ overflow: "visible" }}>
+      <Table sx={{ width: "100%" }}>
+        <TableHead>
+          <TableRow>
+            {[
+              "Client Name",
+              "Proposal Name",
+              "Status",
+              "Payment",
+              "Auth",
+              "Invoicing",
+              "Date",
+              "Signed",
+              "Settings",
+            ].map((header, i) => (
+              <TableCell
+                key={i}
+                style={{
+                  fontSize: "12px",
+                  fontWeight: "bold",
+                  padding: "16px",
+                }}
+              >
+                {header}
+              </TableCell>
+            ))}
+          </TableRow>
+        </TableHead>
+
+        <TableBody>
+          {proposallist.map((row) => (
+            <TableRow key={row._id}>
+              {/* ✅ Client Name */}
+              <TableCell>
+                <Typography
+                  style={{
+                    fontSize: "12px",
+                    padding: "4px 8px",
+                    lineHeight: "1",
+                    cursor: "pointer",
+                    color: "#3f51b5",
+                  }}
+                  onClick={() =>
+                    handleAccountDash(
+                      row._id,
+                      row.general.account?.[0]?._id
+                    )
+                  }
+                >
+                  {row.general.account?.[0]?.accountName || "—"}
+                </Typography>
+              </TableCell>
+
+              {/* ✅ Proposal Name */}
+              <TableCell>
+                <Typography
+                  style={{
+                    fontSize: "12px",
+                    padding: "4px 8px",
+                    lineHeight: "1",
+                    cursor: "pointer",
+                    color: "#3f51b5",
+                  }}
+                  onClick={() =>
+                    handleEdit(row._id, row.general.account?.[0]?._id)
+                  }
+                >
+                  {row.general.proposalName || "Untitled"}
+                </Typography>
+              </TableCell>
+
+              {/* ✅ Status */}
+              <TableCell
+                style={{
+                  fontSize: "12px",
+                  padding: "4px 8px",
+                  lineHeight: "1",
+                }}
+              >
+                {row.status}
+              </TableCell>
+
+              {/* Placeholder Columns */}
+              <TableCell>—</TableCell>
+              <TableCell>—</TableCell>
+              <TableCell>—</TableCell>
+
+              {/* ✅ Date */}
+              <TableCell
+                style={{
+                  fontSize: "12px",
+                  padding: "4px 8px",
+                  lineHeight: "1",
+                }}
+              >
+                {new Intl.DateTimeFormat("en-US", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                }).format(new Date(row.createdAt))}
+              </TableCell>
+
+              <TableCell>—</TableCell>
+
+              {/* ✅ Settings (menu) */}
+              <TableCell>
+                <IconButton
+                  onClick={() => toggleMenu(row._id)}
+                  style={{ color: "#2c59fa" }}
+                >
+                  <CiMenuKebab style={{ fontSize: "25px" }} />
+                  {openMenuId === row._id && (
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        zIndex: 1,
+                        backgroundColor: "#fff",
+                        boxShadow: 1,
+                        borderRadius: 1,
+                        p: 1,
+                        left: "20px",
+                        m: 2,
+                        top: "10px",
+                        textAlign: "start",
+                      }}
+                    >
+                      <Typography
+                        sx={{ fontSize: "12px", fontWeight: "bold" }}
+                        onClick={() => handleEdit(row._id)}
+                      >
+                        Edit
+                      </Typography>
+                      <Typography
+                        sx={{
+                          fontSize: "12px",
+                          color: "red",
+                          fontWeight: "bold",
+                        }}
+                        onClick={() => handleDelete(row._id)}
+                      >
+                        Delete
+                      </Typography>
+                    </Box>
+                  )}
+                </IconButton>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
     </Box>
   );
 };

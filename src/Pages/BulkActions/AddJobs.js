@@ -1285,79 +1285,104 @@ console.log("org temp url", url)
         })
         .catch((error) => console.error(error));
     };
-    const assignProposalToAccount = (
-      proposalesandelsData,
-      automationTemp,
-      automationAccountId
-    ) => {
-      console.log(
-        "Assigning proposal",
-        proposalesandelsData,
-        automationTemp,
-        automationAccountId
-      );
-      const options = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          accountids: automationAccountId,
-          proposaltemplateid: automationTemp,
-          templatename: proposalesandelsData.templatename,
-          teammember: proposalesandelsData.teammember,
-          proposalname: proposalesandelsData.proposalname,
-          introduction: proposalesandelsData.introduction,
-          terms: proposalesandelsData.terms,
-          servicesandinvoices: proposalesandelsData.servicesandinvoices,
-          introductiontext: proposalesandelsData.introductiontext,
-          custommessageinemail: proposalesandelsData.custommessageinemail,
-          custommessageinemailtext:
-            proposalesandelsData.custommessageinemailtext,
-          reminders: proposalesandelsData.reminders,
-          daysuntilnextreminder: proposalesandelsData.daysuntilnextreminder,
-          numberofreminder: proposalesandelsData.numberofreminder,
-          introductiontextname: proposalesandelsData.introductiontextname,
-          termsandconditionsname: proposalesandelsData.termsandconditionsname,
-          termsandconditions: proposalesandelsData.termsandconditions,
-          lineItems: proposalesandelsData.lineItems,
-          summary: proposalesandelsData.summary,
-          Addinvoiceoraskfordeposit:
-            proposalesandelsData.Addinvoiceoraskfordeposit,
-          Additemizedserviceswithoutcreatinginvoices:
-            proposalesandelsData.Additemizedserviceswithoutcreatinginvoices,
-          invoicetemplatename: proposalesandelsData.invoicetemplatename,
-          invoiceteammember: proposalesandelsData.invoiceteammember,
-          issueinvoice: proposalesandelsData.issueinvoice,
-          specificdate: proposalesandelsData.specificdate,
-          specifictime: proposalesandelsData.specifictime,
-          description: proposalesandelsData.description,
-          notetoclient: proposalesandelsData.notetoclient,
-          paymentterms: proposalesandelsData.paymentterms,
-          paymentduedate: proposalesandelsData.paymentduedate,
-          paymentamount: proposalesandelsData.paymentamount,
-          status: "Pending",
-          active: true,
-        }),
-      };
-      const url = `${PROPOSAL_ACCOUNT_API}/proposalandels/proposalaccountwise/`;
-      console.log(url); // Log the URL for debugging
-      console.log(options.body); // Log request body for debugging
-      fetch(url, options)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(`Request failed with status ${response.status}`);
-          }
-          return response.json();
-        })
-        .then((result) => {
-          console.log(result);
-        })
-        .catch((error) => {
-          console.error("Fetch Error:", error);
-          // toast.error("An error occurred while updating ProposalesAndEls.");
-        });
-    };
+    const assignProposalToAccount = async (automationTemp,automationAccountId) => {
+  try {
+    const response = await fetch("https://www.snptaxes.com/account/proposals/automation", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        proposalTemp: automationTemp,
+        account: [
+          automationAccountId
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json(); // or .text() if backend returns plain text
+    console.log("✅ Success:", result);
+  } catch (error) {
+    console.error("❌ Error sending proposal automation:", error);
+  }
+};
+    // const assignProposalToAccount = (
+    //   proposalesandelsData,
+    //   automationTemp,
+    //   automationAccountId
+    // ) => {
+    //   console.log(
+    //     "Assigning proposal",
+    //     proposalesandelsData,
+    //     automationTemp,
+    //     automationAccountId
+    //   );
+    //   const options = {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify({
+    //       accountids: automationAccountId,
+    //       proposaltemplateid: automationTemp,
+    //       templatename: proposalesandelsData.templatename,
+    //       teammember: proposalesandelsData.teammember,
+    //       proposalname: proposalesandelsData.proposalname,
+    //       introduction: proposalesandelsData.introduction,
+    //       terms: proposalesandelsData.terms,
+    //       servicesandinvoices: proposalesandelsData.servicesandinvoices,
+    //       introductiontext: proposalesandelsData.introductiontext,
+    //       custommessageinemail: proposalesandelsData.custommessageinemail,
+    //       custommessageinemailtext:
+    //         proposalesandelsData.custommessageinemailtext,
+    //       reminders: proposalesandelsData.reminders,
+    //       daysuntilnextreminder: proposalesandelsData.daysuntilnextreminder,
+    //       numberofreminder: proposalesandelsData.numberofreminder,
+    //       introductiontextname: proposalesandelsData.introductiontextname,
+    //       termsandconditionsname: proposalesandelsData.termsandconditionsname,
+    //       termsandconditions: proposalesandelsData.termsandconditions,
+    //       lineItems: proposalesandelsData.lineItems,
+    //       summary: proposalesandelsData.summary,
+    //       Addinvoiceoraskfordeposit:
+    //         proposalesandelsData.Addinvoiceoraskfordeposit,
+    //       Additemizedserviceswithoutcreatinginvoices:
+    //         proposalesandelsData.Additemizedserviceswithoutcreatinginvoices,
+    //       invoicetemplatename: proposalesandelsData.invoicetemplatename,
+    //       invoiceteammember: proposalesandelsData.invoiceteammember,
+    //       issueinvoice: proposalesandelsData.issueinvoice,
+    //       specificdate: proposalesandelsData.specificdate,
+    //       specifictime: proposalesandelsData.specifictime,
+    //       description: proposalesandelsData.description,
+    //       notetoclient: proposalesandelsData.notetoclient,
+    //       paymentterms: proposalesandelsData.paymentterms,
+    //       paymentduedate: proposalesandelsData.paymentduedate,
+    //       paymentamount: proposalesandelsData.paymentamount,
+    //       status: "Pending",
+    //       active: true,
+    //     }),
+    //   };
+    //   const url = `${PROPOSAL_ACCOUNT_API}/proposalandels/proposalaccountwise/`;
+    //   console.log(url); // Log the URL for debugging
+    //   console.log(options.body); // Log request body for debugging
+    //   fetch(url, options)
+    //     .then((response) => {
+    //       if (!response.ok) {
+    //         throw new Error(`Request failed with status ${response.status}`);
+    //       }
+    //       return response.json();
+    //     })
+    //     .then((result) => {
+    //       console.log(result);
+    //     })
+    //     .catch((error) => {
+    //       console.error("Fetch Error:", error);
+    //       // toast.error("An error occurred while updating ProposalesAndEls.");
+    //     });
+    // };
     const assignOrganizerToAccount = (
       organizerData,
       automationTemp,
@@ -1630,7 +1655,7 @@ console.log("accountsData", accountsData);
 
             // Send updated tags back to the server
             const updateResponse = await fetch(
-              `${ACCOUNT_API}/accounts/accountdetails/updateaccounttags/${automationAccountId}`,
+             `https://www.snptaxes.com/api/accounts/accountdetails/updateaccounttags/${automationAccountId}`,
               {
                 method: "PATCH",
                 headers: {
@@ -1738,10 +1763,10 @@ console.log("accountsData", accountsData);
             `Creating Proposals with template: ${automationTemp}, Account ID: ${automationAccountId}`
           );
           try {
-            const proposalData = await fetchproposalbyid(automationTemp);
-            console.log("Fetched Proposals data", proposalData);
+            // const proposalData = await fetchproposalbyid(automationTemp);
+            // console.log("Fetched Proposals data", proposalData);
             assignProposalToAccount(
-              proposalData,
+              // proposalData,
               automationTemp,
               automationAccountId
             );

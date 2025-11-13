@@ -159,7 +159,7 @@ const App = () => {
           <Route path="billing/proposalsandels" element={<ProposalsELS />} />
           <Route
             path="billing/proposalsandels/new"
-            element={<CreateProposals />}
+            element={<AccountProposalForm />}
           />
           {/* <Route path="workflow/tasks" element={<WorkflowTask />} /> */}
           <Route path="tasks" element={<WorkflowTask />}>

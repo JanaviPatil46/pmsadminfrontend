@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Select, MenuItem, Button, Typography, Box } from "@mui/material";
 import { toast } from "react-toastify";
 
-const ManageTeams = ({ selectedAccounts, onClose,fetchAccountData }) => {
+const ManageTeams = ({ selectedAccounts, onClose,fetchAccountData,fetchaccountList }) => {
   const USER_API = process.env.REACT_APP_USER_URL;
   const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
   const [userData, setUserData] = useState([]);
@@ -67,7 +67,7 @@ const ManageTeams = ({ selectedAccounts, onClose,fetchAccountData }) => {
       redirect: "follow",
     };
 
-    fetch(`${ACCOUNT_API}/manageteammember/teamMembertomultipleaccount`, requestOptions)
+    fetch(`https://www.snptaxes.com/api/accounts/manageteammember/teamMembertomultipleaccount`, requestOptions)
       .then((response) => response.text())
       .then((result) => {
         console.log(result);
@@ -95,13 +95,14 @@ const ManageTeams = ({ selectedAccounts, onClose,fetchAccountData }) => {
       redirect: "follow",
     };
 
-    fetch(`${ACCOUNT_API}/manageteammember/removeteammember`, requestOptions)
+    fetch(`https://www.snptaxes.com/api/accounts/manageteammember/removeteammember`, requestOptions)
       .then((response) => response.text())
       .then((result) => {
         console.log(result);
         toast.success("Team Member Assign Successfully");
-        fetchAccountData()
-        handleCancel();
+       
+        onClose();
+         fetchaccountList()
       })
       .catch((error) => console.error(error));
   };

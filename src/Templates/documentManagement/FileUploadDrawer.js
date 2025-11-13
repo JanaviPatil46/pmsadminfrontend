@@ -251,6 +251,8 @@ const FileUploadDrawer = ({
   fetchFolderTree,
   selectedFolderForMenu,
 }) => {
+
+  console.log("foldertree",folderTree)
   const [file, setFile] = useState(null);
   const [selectedFolder, setSelectedFolder] = useState("");
   const [message, setMessage] = useState("");
@@ -286,35 +288,7 @@ const handleFileChange = (e) => {
   // const handleFileChange = (e) => setFile(e.target.files[0]);
   const handleFolderSelect = (path) => setSelectedFolder(path);
 
-  // const handleUpload = async () => {
-  //   if (!file || !selectedFolder) {
-  //     setMessage("Please select a file and folder.");
-  //     return;
-  //   }
-
-  //   try {
-  //     const formData = new FormData();
-  //     formData.append("file", file);
-
-  //     const res = await axios.post(
-  //       `https://www.snptaxes.com/api/docManagement/file/upload?folderPath=${encodeURIComponent(
-  //         selectedFolder
-  //       )}`,
-  //       formData,
-  //       { headers: { "Content-Type": "multipart/form-data" } }
-  //     );
-
-  //     setMessage(`✅ File uploaded: ${res.data.fileMeta.name}`);
-  //     toast.success(`✅ File uploaded: ${res.data.fileMeta.name}`)
-  //     setFile(null);
-  //     onClose();
-  //     fetchFolderTree();
-  //   } catch (err) {
-  //     console.error(err);
-  //     toast.error(err)
-  //     setMessage("❌ Error uploading file");
-  //   }
-  // };
+  
  const handleUpload = async () => {
     if (files.length === 0 || !selectedFolder) {
       setMessage("Please select files and a folder.");
@@ -337,7 +311,7 @@ const handleFileChange = (e) => {
       toast.success(`✅ ${res.data.message || "Files uploaded successfully"}`)
       setFiles([]);
       onClose();
-      fetchFolderTree();
+    await  fetchFolderTree();
     } catch (err) {
       console.error(err);
       setMessage("❌ Error uploading files");

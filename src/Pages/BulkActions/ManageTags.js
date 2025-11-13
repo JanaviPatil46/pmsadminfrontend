@@ -83,7 +83,7 @@ const ManageTags = ({ selectedAccounts, onClose,fetchData }) => {
       redirect: "follow",
     };
 
-    fetch(`${ACCOUNT_API}/assignbulktags/tomultipleaccount`, requestOptions)
+    fetch(`https://www.snptaxes.com/api/accounts/assignbulktags/tomultipleaccount`, requestOptions)
       .then((response) => response.text())
       .then((result) => {
         console.log(result);
@@ -111,7 +111,7 @@ const ManageTags = ({ selectedAccounts, onClose,fetchData }) => {
       redirect: "follow",
     };
 
-    fetch(`${ACCOUNT_API}/assignbulktags/removetags`, requestOptions)
+    fetch(`https://www.snptaxes.com/api/accounts/assignbulktags/removetags`, requestOptions)
       .then((response) => response.json())
       .then((result) => {
         console.log(result);

@@ -1,6 +1,9 @@
 
 
 import React, { useState, useEffect } from "react";
+import { FaFilePdf, FaFileWord, FaFileExcel, FaFileImage, FaFileAlt } from "react-icons/fa";
+import { AiFillFileUnknown } from "react-icons/ai";
+
 import {
   Drawer,
   Box,
@@ -199,6 +202,30 @@ const FolderTreeSelector = ({ items, onSelect, selectedFolder, level = 0 }) => {
   const toggleExpand = (path) => {
     setExpanded((prev) => ({ ...prev, [path]: !prev[path] }));
   };
+const getFileIcon = (fileName) => {
+  const ext = fileName.split(".").pop().toLowerCase();
+
+  switch (ext) {
+    case "pdf":
+      return <FaFilePdf color="#d32f2f" size={18} />;
+    case "jpg":
+    case "jpeg":
+    case "png":
+    case "gif":
+      return <FaFileImage color="#1976d2" size={18} />;
+    case "doc":
+    case "docx":
+      return <FaFileWord color="#1565c0" size={18} />;
+    case "xls":
+    case "xlsx":
+      return <FaFileExcel color="#2e7d32" size={18} />;
+    case "txt":
+    case "md":
+      return <FaFileAlt color="#616161" size={18} />;
+    default:
+      return <AiFillFileUnknown color="#757575" size={18} />;
+  }
+};
 
   return (
     <List disablePadding>
@@ -276,7 +303,7 @@ const FolderTreeSelector = ({ items, onSelect, selectedFolder, level = 0 }) => {
                       sx={{ pl: 2 }}
                     >
                       <ListItemIcon>
-                        <InsertDriveFileIcon fontSize="small" />
+                        <Box sx={{ mr: 1 }}>{getFileIcon(file.name)}</Box>
                       </ListItemIcon>
                       <ListItemText
                         primary={`${file.name}${

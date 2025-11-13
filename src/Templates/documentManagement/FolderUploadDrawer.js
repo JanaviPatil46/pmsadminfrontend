@@ -418,7 +418,7 @@ const handleUpload = async () => {
   toast.success("✅ Folder uploaded successfully!");
   setMessage(`✅ Folder uploaded (${files.length} files)`);
 
-  fetchFolderTree();
+ await fetchFolderTree();
   setFiles([]);
   onClose();
 };
