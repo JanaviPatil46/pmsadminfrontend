@@ -554,11 +554,11 @@ const handleUserChange = (newSelectedUsers) => {
             size="small"
             fullWidth
             placeholder="Template name (not visible to clients)"
-            value={formData.general.templateName || ""}
+            value={formData.general.templatename || ""}
             onChange={(e) => handleInputChange("templateName", e.target.value)}
             onBlur={() => handleBlur("templateName")}
-            error={!!stepErrors.templateName}
-            helperText={stepErrors.templateName}
+            error={!!stepErrors.templatename}
+            helperText={stepErrors.templatename}
             margin="normal"
             required
           />

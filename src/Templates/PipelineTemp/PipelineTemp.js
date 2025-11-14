@@ -225,29 +225,7 @@ const PipelineTemp = () => {
     setIsConditionsEditFormOpen(false);
   };
 
-  // const handleTagSelectionChange = (index, type, selectedValues) => {
-  //   setSelectedAutomationData((prevData) =>
-  //     prevData.map((automation, i) => {
-  //       if (i !== index) return automation; // Keep other automations unchanged
 
-  //       // Determine the correct options source
-  //       const options = type === "addTags" ? tagsoptions : tagsoptions;
-
-  //       // Convert selected values into full tag objects
-  //       const selectedTags = options.filter((tag) => selectedValues.includes(tag.value));
-
-  //       // Ensure previously selected tags remain while adding new ones
-  //       const updatedTags = [...automation[type], ...selectedTags].reduce((acc, tag) => {
-  //         if (!acc.find((t) => t._id === tag._id)) {
-  //           acc.push(tag); // Avoid duplicates
-  //         }
-  //         return acc;
-  //       }, []);
-
-  //       return { ...automation, [type]: updatedTags };
-  //     })
-  //   );
-  // };
 
   const handleTagSelectionChange = (index, field, selectedValues) => {
     setSelectedAutomationData((prevData) =>
@@ -440,11 +418,6 @@ const PipelineTemp = () => {
     setSelectedAutomationData(updatedData);
   };
 
-  // const handleEditClientChange=(index,newValue)=>{
-  //    const updatedData = [...selectedAutomationData];
-  //     updatedData[index].visibilityForClient = newValue;
-  //      setSelectedAutomationData(updatedData);
-  // }
   const[ editClientDescription, setEditClientDescripation]=useState("")
   const handleEditClientChange = async (index, newValue) => {
   const updatedData = [...selectedAutomationData];
@@ -552,10 +525,7 @@ const PipelineTemp = () => {
     // Handle option action here
     console.log("Adding automation to stage index:", stageSelected);
     console.log("automation  clicked!");
-    // const newStages = [...stages]; // Create a copy of the stages array
-    // newStages[stageSelected].automations.push(option); // Append the new option
-    // setStages(newStages); // Update the state with the modified stages array
-    // console.log(newStages)
+
     console.log("Added automation to stage", stageSelected, option);
     handleDrawerOpen(option, stageSelected);
     handleClose();
@@ -734,12 +704,6 @@ const PipelineTemp = () => {
     setIsConditionsFormOpen(false);
   };
 
-  // const handleCheckboxChange = (tag) => {
-  //   const updatedSelectedTags = tempSelectedTags.includes(tag) ? tempSelectedTags.filter((t) => t._id !== tag._id) : [...tempSelectedTags, tag];
-  //   setTempSelectedTags(updatedSelectedTags);
-  //   setIsAnyCheckboxChecked(updatedSelectedTags.length > 0);
-  // };
-
   const handleCheckboxChange = (tag) => {
     const updatedSelectedTags = tempSelectedTags.includes(tag)
       ? tempSelectedTags.filter((t) => t._id !== tag._id)
@@ -747,11 +711,7 @@ const PipelineTemp = () => {
     setTempSelectedTags(updatedSelectedTags);
     setIsAnyCheckboxChecked(updatedSelectedTags.length > 0);
   };
-  // const handleAddTags = () => {
-  //   setSelectedTags([...selectedTags, ...tempSelectedTags.filter((tag) => !selectedTags.some((t) => t._id === tag._id))]);
-  //   setIsConditionsFormOpen(false);
-  //   setTempSelectedTags([]);
-  // };
+
 
   const handleAddTags = () => {
     setSelectedTags([
@@ -864,13 +824,6 @@ const assigneeOptions = assignee.map((ass)=>({
 }))
 
 
-  // const handleAddTagChange = (event, newValue) => {
-  //   setAddTags(newValue.map((option) => option.value));
-  //   console.log(
-  //     "Selected Add Tags:",
-  //     newValue.map((option) => option.value)
-  //   );
-  // };
 
   const handleAddTagChange = (event) => {
     const selectedValues = event.target.value;
@@ -880,45 +833,7 @@ const assigneeOptions = assignee.map((ass)=>({
     console.log("Selected Values:", selectedValues);
   };
 
-  // handleEditAddTagsChange
-  const handleEditAddTagsChange = (index, event) => {
-    const selectedIds = event.target.value || [];
-
-    setSelectedAutomationData((prevData) =>
-      prevData.map((automation, i) =>
-        i === index
-          ? {
-              ...automation,
-              addTags: tagsoptions.filter((tag) =>
-                selectedIds.includes(tag.value)
-              ), // Store full objects
-            }
-          : automation
-      )
-    );
-
-    console.log("Updated Add Tags:", selectedIds);
-  };
-  // handleEditRemoveTagsChange
-  const handleEditRemoveTagsChange = (index, event) => {
-    const selectedIds = event.target.value || [];
-
-    setSelectedAutomationData((prevData) =>
-      prevData.map((automation, i) =>
-        i === index
-          ? {
-              ...automation,
-              removeTags: tagsoptions.filter((tag) =>
-                selectedIds.includes(tag.value)
-              ), // Store full objects
-            }
-          : automation
-      )
-    );
-
-    console.log("Updated Remove Tags:", selectedIds);
-  };
-
+ 
   const handleRemoveTagChange = (event) => {
     const selectedValues = event.target.value;
     setRemoveTags(selectedValues);
@@ -926,13 +841,7 @@ const assigneeOptions = assignee.map((ass)=>({
     // Send selectedValues array to your backend
     console.log("Selected Values:", selectedValues);
   };
-  // const handleRemoveTagChange = (event, newValue) => {
-  //   setRemoveTags(newValue.map((option) => option.value));
-  //   console.log(
-  //     "Selected Remove Tags:",
-  //     newValue.map((option) => option.value)
-  //   );
-  // };
+
 
   const filteredAddTagsOptions = tagsoptions.filter(
     (tag) => !removeTags.includes(tag.value)
@@ -1290,8 +1199,7 @@ const assigneeOptions = assignee.map((ass)=>({
                             onChange={(event) =>
                               handleReminderChange(event.target.checked)
                             }
-                            // checked={sendreminderstoclient}
-                            // onChange={(event)=>handleDateSwitchChange(event.target.checked)}
+                            
                             color="primary"
                           />
                         }
@@ -3400,80 +3308,7 @@ case "Update job assignees":
     }
   };
 
-  // const handleSaveAutomation = (index) => {
-  //   return () => {
-  //     const updatedStages = [...stages];
-  //     const selectedAutomation = {
-  //       type: automationSelect, // The type of automation (e.g., "Send Email")
-  //       template: selectedtemp
-  //         ? { label: selectedtemp.label, value: selectedtemp.value }
-  //         : null, // Store label and value of selected template
-  //       tags: selectedTags.map((tag) => ({
-  //         // Map selectedTags to include necessary tag data
-  //         _id: tag._id,
-  //         tagName: tag.tagName,
-  //         tagColour: tag.tagColour,
-  //       })),
-  //     };
-  //     updatedStages[index].automations.push(selectedAutomation);
-  //     setStages(updatedStages);
-  //     console.log("Automation saved for stage:", index, selectedAutomation);
-  //     setselectedTemp(null); // Clear the selected template after saving
-  //     setSelectedTags([]);
-  //     setIsAnyCheckboxChecked(false);
-  //     handleDrawerClose();
-  //   };
-  // };
-
-  // const handleSaveAutomation = () => {
-  //   return () => {
-  //     if (stageSelected === null || stageSelected === undefined) {
-  //       console.error("No stage selected for automation.");
-  //       return;
-  //     }
-  //     console.log("stage index for automations:", stageSelected);
-  //     const updatedStages = [...stages];
-
-  //     const selectedAutomation = {
-  //       type: automationSelect, // The type of automation (e.g., "Send Email")
-  //       template: selectedtemp
-  //         ? { label: selectedtemp.label, value: selectedtemp.value }
-  //         : null, // Store label and value of selected template
-  //       tags: selectedTags.map((tag) => ({
-  //         _id: tag._id,
-  //         tagName: tag.tagName,
-  //         tagColour: tag.tagColour,
-  //       })),
-  //     };
-
-  //     // Ensure selected stage exists before pushing automation
-  //     // if (!updatedStages[stageSelected].automations) {
-  //     //   updatedStages[stageSelected].automations = [];
-  //     // }
-
-  //     // updatedStages[stageSelected].automations.push(selectedAutomation);
-  //     updatedStages[stageSelected] = {
-  //       ...updatedStages[stageSelected], // Ensure we keep the other properties of the stage intact
-  //       automations: [
-  //         ...updatedStages[stageSelected].automations,
-  //         selectedAutomation,
-  //       ], // Add the new automation to automations
-  //     };
-  //     setStages(updatedStages);
-  //     console.log("updatedstages", updatedStages);
-  //     console.log(
-  //       "Automation saved for stage:",
-  //       stageSelected,
-  //       selectedAutomation
-  //     );
-
-  //     // Reset states after saving
-  //     setselectedTemp(null);
-  //     setSelectedTags([]);
-  //     setIsAnyCheckboxChecked(false);
-  //     handleDrawerClose();
-  //   };
-  // };
+  
   const handleSaveAutomation = () => {
     return () => {
       if (stageSelected === null || stageSelected === undefined) {
@@ -3633,71 +3468,6 @@ case "Update job assignees":
   };
   const [selectedAutomationIndex, setSelectedAutomationIndex] = useState(null);
 
-  //   const handleEditAddTags = () => {
-  //     console.log("automation index", selectedAutomationIndex);
-  //     const updatedTags = [
-  //       ...selectedAutomationData[selectedAutomationIndex].tags, // Only update tags for the selected automation
-  //       ...tempSelectedTags.filter(
-  //         (newTag) =>
-  //           !selectedAutomationData[selectedAutomationIndex].tags.some(
-  //             (existingTag) => existingTag._id === newTag._id
-  //           )
-  //       ),
-  //     ];
-  // console.log("new selcted atgs",tempSelectedTags)
-  //     console.log("Updated Tags for Selected Automation:", updatedTags);
-
-  //     // Update the tags for the selected automation only
-  //     setSelectedAutomationData((prevData) =>
-  //       prevData.map((automation, idx) => {
-  //         if (idx === selectedAutomationIndex) {
-  //           return {
-  //             ...automation,
-  //             tags: updatedTags, // Add updated tags to the selected automation
-  //           };
-  //         }
-  //         return automation;
-  //       })
-  //     );
-
-  //     setTempSelectedTags([]); // Clear the temporary selected tags
-  //     setIsConditionsEditFormOpen(false); // Close the drawer
-  //   };
-
-  //handle automation save edit
-
-  // const handleEditSaveAutomation = (defaultValueInvoice, index) => {
-  //   console.log("edit working ", defaultValueInvoice);
-  //   return () => {
-  //     const updatedStages = [...stages];
-  //     const selectedAutomation = {
-  //       type: automationSelect, // The type of automation (e.g., "Send Email")
-  //       template: defaultValueInvoice
-  //         ? {
-  //             label: defaultValueInvoice.label,
-  //             value: defaultValueInvoice.value,
-  //           }
-  //         : null, // Store label and value of selected template
-  //       tags: selectedTags.map((tag) => ({
-  //         // Map selectedTags to include necessary tag data
-  //         _id: tag._id,
-  //         tagName: tag.tagName,
-  //         tagColour: tag.tagColour,
-  //       })),
-  //     };
-  //     updatedStages[index].automations.push(selectedAutomation);
-  //     setStages(updatedStages);
-  //     console.log(
-  //       "Automation edit saved for stage:",
-  //       index,
-  //       selectedAutomation
-  //     );
-  //     setselectedTemp(null); // Clear the selected template after saving
-  //     setSelectedTags([]);
-  //     setIsAnyCheckboxChecked(false);
-  //     handleDrawerClose();
-  //   };
-  // };
 
   const handleEditAddTags = () => {
     if (selectedAutomationIndex !== null) {
@@ -3713,22 +3483,6 @@ case "Update job assignees":
     setIsConditionsEditFormOpen(false);
   };
 
-  //   const handleEditSaveAutomation = () => {
-  //     if (editingStageIndex === null) return; // Ensure the stage index is valid
-
-  //     console.log("Save automation for stage:", editingStageIndex);
-
-  //     // Update the automations for the selected stage
-  //     const updatedStages = [...stages];
-  //     updatedStages[editingStageIndex].automations = selectedAutomationData;
-  // console.log("automationdata",selectedAutomationData)
-  //     // Update the stages state
-  //     setStages(updatedStages);
-  // console.log(updatedStages)
-  //     // Close the drawer and show success message
-  //     setIsEditDrawerOpen(false);
-  //     toast.success("Automation edited successfully");
-  //   };
 
   const handleEditSaveAutomation = () => {
     if (editingStageIndex === null) return; // Ensure the stage index is valid
@@ -4180,46 +3934,7 @@ const [isPipelineNameValid, setIsPipelineNameValid] = useState(true);
 
   return isValid;
 };
-  // const validateForm = () => {
-  //   let isValid = true;
-  //   if (!pipelineName) {
-  //     setPipelineNameError("Pipeline name is required");
-
-  //     isValid = false;
-  //   } else {
-  //     setPipelineNameError("");
-  //   }
-  //   if (!selectedSortByJob) {
-  //     setSortByJobError("Sort By Job is required.");
-  //     isValid = false;
-  //   } else {
-  //     setSortByJobError("");
-  //   }
-
-  //   if (!selectedJobtemp) {
-  //     setTemplateError("Job Template is required.");
-  //     isValid = false;
-  //   } else {
-  //     setTemplateError("");
-  //   }
-
-  //   if (selectedUser.length === 0) {
-  //     setUserError("At least one user must be selected.");
-  //     isValid = false;
-  //   } else {
-  //     setUserError("");
-  //   }
-  //   // Validate stage names
-  //   const newStageErrors = stages.map((stage) =>
-  //     stage.name ? "" : "Stage name is required"
-  //   );
-  //   setStageNameErrors(newStageErrors);
-
-  //   if (newStageErrors.some((error) => error !== "")) {
-  //     isValid = false;
-  //   }
-  //   return isValid;
-  // };
+  
   const [searchQuery, setSearchQuery] = useState("");
   // Filter pipelineData based on searchQuery
   const filteredPipelines = pipelineData.filter((row) =>
@@ -4368,57 +4083,6 @@ useEffect(() => {
                       </Typography>
                     </TableCell>
 
-                    {/* <TableCell
-                      style={{
-                        fontSize: "12px",
-                        padding: "4px 8px",
-                        lineHeight: "1",
-                        cursor: "pointer",
-                      }}
-                    >
-                      <IconButton
-                        onClick={() => toggleMenu(row._id)}
-                        style={{ color: "#2c59fa" }}
-                      >
-                        <CiMenuKebab />
-                        {openMenuId === row._id && (
-                          <Box
-                            sx={{
-                              position: "absolute",
-                              zIndex: 1,
-                              backgroundColor: "#fff",
-                              boxShadow: 1,
-                              borderRadius: 1,
-                              p: 1,
-                              left: "20px",
-
-                              m: 2,
-                              top: "10px",
-                              textAlign: "start",
-                            }}
-                          >
-                           
-
-                            <Typography
-                              sx={{ fontSize: "12px", fontWeight: "bold" }}
-                              onClick={() => handleEdit(row._id)}
-                            >
-                              Edit 
-                            </Typography>
-                            <Typography
-                              sx={{
-                                fontSize: "12px",
-                                color: "red",
-                                fontWeight: "bold",
-                              }}
-                              onClick={() => handleDelete(row._id)}
-                            >
-                              Delete
-                            </Typography>
-                          </Box>
-                        )}
-                      </IconButton>
-                    </TableCell> */}
                    <TableCell
                                     style={{
                                       fontSize: "12px",

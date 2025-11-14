@@ -466,7 +466,7 @@ const ProposalForm = () => {
       termsEnabled: true,
       servicesEnabled: true,
       paymentsEnabled: false,
-      templateName: "",
+      templatename: "",
       proposalName: "",
       teamMembers:[]
     },
@@ -574,7 +574,7 @@ const ProposalForm = () => {
         termsEnabled: apiData.general?.termsEnabled ?? true,
         servicesEnabled: apiData.general?.servicesEnabled ?? true,
         paymentsEnabled: apiData.general?.paymentsEnabled ?? false,
-        templateName: apiData.general?.templateName || "",
+        templatename: apiData.general?.templateName || "",
         teamMembers: apiData.general?.teamMembers || [],
         proposalName: apiData.general?.proposalName || "",
       },
@@ -754,8 +754,8 @@ const ProposalForm = () => {
           newErrors.proposalName = "Proposal name is required";
           isValid = false;
         }
-        if (!formData.general.templateName?.trim()) {
-          newErrors.templateName = "Template name is required";
+        if (!formData.general.templatename?.trim()) {
+          newErrors.templatename = "Template name is required";
           isValid = false;
         }
         break;

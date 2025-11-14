@@ -116,6 +116,8 @@ import ContactsTable from "./AccountContactForm/ContactTable.js";
 import ProposalsTable from "./ProposalandEls/components/ProposalsTable.js"
 import ProposalForm from "./ProposalandEls/components/ProposalForm.js"
 import AccountProposalForm from "./ProposalandEls/components/AccountProposalForm.js"
+import PipelineTable from "./Templates/NewPipelineworking/PipelineTable.js";
+import PipelineForm from "./Templates/NewPipelineworking/PipelineForm.js";
 const App = () => {
   return (
     <BrowserRouter>
@@ -142,7 +144,9 @@ const App = () => {
           <Route path="clients/contacts" element={<ContactsTable />} />
           <Route path="stages" element={<Stages />} />
           <Route path="firmtemp/tags" element={<NewTag />} />
-          <Route path="firmtemp/pipelines" element={<PipelineTemp />} />
+          {/* <Route path="firmtemp/pipelines" element={<PipelineTemp />} /> */}
+          <Route path="firmtemp/pipelines" element={<PipelineTable />} />
+          <Route path="firmtemp/pipelineform" element={<PipelineForm/>} />
           <Route path="/firmtemp/marketplace" element={<MarketPlaces />} />
           <Route
             path="/PipelineTemplateUpdate/:id"

@@ -138,7 +138,7 @@ const ProposalsTable = () => {
                 </TableCell>
                 <TableCell>
                   <Chip 
-                    label={proposal.general.templateName} 
+                    label={proposal.general.templatename} 
                     color="primary" 
                     variant="filled"
                     size="small"
