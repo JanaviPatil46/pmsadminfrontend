@@ -136,16 +136,20 @@ const handleJobUpdates = async (jobId, automations) => {
     // Prepare the data object with updates
     const data = {};
 
-    // Handle client-facing status if automation exists
     if (automations.clientStatus) {
-      const { visibilityForClient, selectedClientStatus, statusDescription } = automations.clientStatus;
+      const { status, selectedClientStatus, statusDescription } = automations.clientStatus;
       Object.assign(data, {
-        showinclientportal: visibilityForClient,
-        clientfacingstatus: selectedClientStatus?.value,
+        showinclientportal: status, // This matches the 'status' property from automation
+        clientfacingstatus: selectedClientStatus, // This is already the ID, no need for .value
         clientfacingDescription: statusDescription,
       });
+      
+      console.log("Updating client-facing status:", {
+        showinclientportal: status,
+        clientfacingstatus: selectedClientStatus,
+        clientfacingDescription: statusDescription
+      });
     }
-
     // Handle assignee updates if automation exists
     if (automations.assignees) {
       const { addAssignees = [], removeAssignees = [] } = automations.assignees;
@@ -194,18 +198,27 @@ const handleJobUpdates = async (jobId, automations) => {
     }
   };
 
-  
-
   const handleAutomationComplete = (selectedAutomationIndices) => {
-  // Get the selected automations
-  const selectedAutomations = selectedAutomationIndices.map(index => automationData[index]);
+  // Handle both array and object parameters
+  let selectedIndices;
+  
+  if (Array.isArray(selectedAutomationIndices)) {
+    // Direct array passed from AutomationDrawer
+    selectedIndices = selectedAutomationIndices;
+  } else {
+    // Object with additional data - extract what we need
+    const { clientStatus, assignees, ...rest } = selectedAutomationIndices;
+    // You might need to adjust this based on what data you actually need
+    selectedIndices = rest.selectedIndices || [];
+  }
+  
+  const selectedAutomations = selectedIndices.map(index => automationData[index]);
   
   // Find specific automations if needed
   const clientStatusAutomation = selectedAutomations.find(a => a.type === "Update client-facing job status");
   const assigneeAutomation = selectedAutomations.find(a => a.type === "Update job assignees");
 
   if (currentJobId && currentTargetStage) {
-    // Pass the automation data to moveJob
     moveJob(currentJobId, currentTargetStage.name, currentTargetStage, {
       clientStatus: clientStatusAutomation,
       assignees: assigneeAutomation
@@ -213,6 +226,24 @@ const handleJobUpdates = async (jobId, automations) => {
   }
   setAutomationDrawerOpen(false);
 };
+
+//   const handleAutomationComplete = (selectedAutomationIndices) => {
+//   // Get the selected automations
+//   const selectedAutomations = selectedAutomationIndices.map(index => automationData[index]);
+  
+//   // Find specific automations if needed
+//   const clientStatusAutomation = selectedAutomations.find(a => a.type === "Update client-facing job status");
+//   const assigneeAutomation = selectedAutomations.find(a => a.type === "Update job assignees");
+
+//   if (currentJobId && currentTargetStage) {
+//     // Pass the automation data to moveJob
+//     moveJob(currentJobId, currentTargetStage.name, currentTargetStage, {
+//       clientStatus: clientStatusAutomation,
+//       assignees: assigneeAutomation
+//     });
+//   }
+//   setAutomationDrawerOpen(false);
+// };
   const uniquePipelines = Array.from(
     new Map(pipelineData.map((pipeline) => [pipeline._id, pipeline])).values()
   );
@@ -768,8 +799,34 @@ const AutomationDrawer = ({
   const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
   const ACCOUNT_TASKS_API = process.env.REACT_APP_TASKS_API;
   const TASK_API = process.env.REACT_APP_TASK_TEMP_URL;
+  const EMAIL_API = process.env.REACT_APP_EMAIL_TEMP_URL;
   const DOCS_MANAGMENTS = process.env.REACT_APP_CLIENT_DOCS_MANAGE;
-
+const [clientFacingJobs, setClientFacingJobs] = useState([]);
+const CLIENT_FACING_API = process.env.REACT_APP_CLIENT_FACING_URL;
+  const fetchClientFacingJobsData = async () => {
+    try {
+      const response = await fetch(
+        `${CLIENT_FACING_API}/workflow/clientfacingjobstatus/`
+      );
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      setClientFacingJobs(data.clientFacingJobStatues);
+      console.log(data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+  
+  const clientStatusOptions = clientFacingJobs.map((status) => ({
+    value: status._id,
+    label: status.clientfacingName,
+    clientfacingColour: status.clientfacingColour,
+  }));
+   useEffect(() => {
+    fetchClientFacingJobsData();
+  }, []);
   // State
   const [tags, setTags] = useState([]);
   const [accountTags, setAccountTags] = useState([]);
@@ -922,6 +979,9 @@ const { logindata } = useContext(LoginContext);
       let response;
 
       switch (templateType) {
+         case "EmailTemplate":
+            url = `${EMAIL_API}/workflow/emailtemplate/${templateId}`;
+            break;
         case "TaskTemplate":
           url = `${TASK_API}/workflow/tasks/tasktemplate/tasktemplatebyid/${templateId}`;
           break;
@@ -949,6 +1009,10 @@ const { logindata } = useContext(LoginContext);
       const result = await response.json();
 
       switch (templateType) {
+         case "EmailTemplate":
+            return (
+              result.emailTemplate?.templatename || "Unknown Email Template"
+            );
         case "TaskTemplate":
           return result.taskTemplate?.templatename || "Unknown Task Template";
         case "InvoiceTemplate":
@@ -1502,10 +1566,12 @@ const { logindata } = useContext(LoginContext);
       }
 
       // Move the job with any relevant automations
-      onMoveJob(jobId, targetStage, {
-        clientStatus: clientStatusAutomation,
-        assignees: assigneeAutomation
-      });
+      // onMoveJob(jobId, targetStage, {
+      //   clientStatus: clientStatusAutomation,
+      //   assignees: assigneeAutomation
+      // });
+          onMoveJob(selectedAutomationIndices);
+
 
       onClose();
     } catch (error) {
@@ -1612,7 +1678,160 @@ const { logindata } = useContext(LoginContext);
                     </Box>
                   </Box>
                 )}
+ {/* Add Tags for Update account tags */}
+                {automation.type === "Update account tags" &&
+                  currentTagData.addTags &&
+                  currentTagData.addTags.length > 0 && (
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="subtitle1" fontWeight="bold" color="success.main">
+                        Add Tags:
+                      </Typography>
+                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: 1 }}>
+                        {currentTagData.addTags.map((tag) => (
+                          <Chip
+                            key={tag._id}
+                            label={tag.tagName}
+                            sx={{
+                              backgroundColor: tag.tagColour,
+                              color: "#fff",
+                              fontWeight: "500",
+                              borderRadius: "20px",
+                              border: "2px solid #4caf50",
+                            }}
+                            size="small"
+                          />
+                        ))}
+                      </Box>
+                    </Box>
+                  )}
 
+                {/* Remove Tags for Update account tags */}
+                {automation.type === "Update account tags" &&
+                  currentTagData.removeTags &&
+                  currentTagData.removeTags.length > 0 && (
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="subtitle1" fontWeight="bold" color="error.main">
+                        Remove Tags:
+                      </Typography>
+                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: 1 }}>
+                        {currentTagData.removeTags.map((tag) => (
+                          <Chip
+                            key={tag._id}
+                            label={tag.tagName}
+                            sx={{
+                              backgroundColor: tag.tagColour,
+                              color: "#fff",
+                              fontWeight: "500",
+                              borderRadius: "20px",
+                              border: "2px solid #f44336",
+                              textDecoration: "line-through",
+                            }}
+                            size="small"
+                          />
+                        ))}
+                      </Box>
+                    </Box>
+                  )}
+
+                {/* Client Status Information */}
+                {automation.type === "Update client-facing job status" && (
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="subtitle1" fontWeight="bold">
+                      Client Status:
+                    </Typography>
+                    
+                    {/* Display status with colored dot */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
+                      {automation.selectedClientStatus && (
+                        <>
+                          <Box
+                            sx={{
+                              width: 12,
+                              height: 12,
+                              borderRadius: '50%',
+                              backgroundColor: clientStatusOptions?.find(
+                                opt => opt.value === automation.selectedClientStatus
+                              )?.clientfacingColour || '#ccc'
+                            }}
+                          />
+                          <Typography variant="body2">
+                            {clientStatusOptions?.find(
+                              opt => opt.value === automation.selectedClientStatus
+                            )?.label || automation.selectedClientStatus || "Not set"}
+                          </Typography>
+                        </>
+                      )}
+                    </Box>
+                
+                    {/* Display visibility setting */}
+                    <Typography variant="body2" sx={{ mt: 1 }}>
+                      Visibility: {automation.status ? "Visible to client" : "Hidden from client"}
+                    </Typography>
+                
+                    {/* Display status description if available */}
+                    {automation.statusDescription && (
+                      <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
+                        Description: {automation.statusDescription}
+                      </Typography>
+                    )}
+                  </Box>
+                )}
+
+                {/* Job Assignees Information */}
+                {automation.type === "Update job assignees" && (
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="subtitle1" fontWeight="bold">
+                      Job Assignees:
+                    </Typography>
+                    
+                    {/* Add Assignees */}
+                    {automation.addAssignees && automation.addAssignees.length > 0 && (
+                      <Box sx={{ mt: 1 }}>
+                        <Typography variant="body2" color="success.main">
+                          Add Assignees:
+                        </Typography>
+                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: 1 }}>
+                          {automation.addAssignees.map((assignee) => (
+                            <Chip
+                              key={assignee._id}
+                              label={assignee.name || assignee.username || "Unknown"}
+                              sx={{
+                                backgroundColor: "#4caf50",
+                                color: "#fff",
+                                borderRadius: "20px",
+                              }}
+                              size="small"
+                            />
+                          ))}
+                        </Box>
+                      </Box>
+                    )}
+                
+                    {/* Remove Assignees */}
+                    {automation.removeAssignees && automation.removeAssignees.length > 0 && (
+                      <Box sx={{ mt: 1 }}>
+                        <Typography variant="body2" color="error.main">
+                          Remove Assignees:
+                        </Typography>
+                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: 1 }}>
+                          {automation.removeAssignees.map((assignee) => (
+                            <Chip
+                              key={assignee._id}
+                              label={assignee.name || assignee.username || "Unknown"}
+                              sx={{
+                                backgroundColor: "#f44336",
+                                color: "#fff",
+                                borderRadius: "20px",
+                                textDecoration: "line-through",
+                              }}
+                              size="small"
+                            />
+                          ))}
+                        </Box>
+                      </Box>
+                    )}
+                  </Box>
+                )}
                 {/* Warning for Account Tags Automation */}
                 {automation.type === "Update account tags" && (
                   <Alert severity="warning" sx={{ mt: 2 }}>

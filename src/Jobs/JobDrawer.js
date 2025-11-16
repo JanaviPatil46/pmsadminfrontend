@@ -2278,7 +2278,31 @@ const JobDrawer = ({
         return [];
       }
     };
-
+ const [clientFacingJobs, setClientFacingJobs] = useState([]);
+  const fetchClientFacingJobsData = async () => {
+    try {
+      const response = await fetch(
+        `${CLIENT_FACING_API}/workflow/clientfacingjobstatus/`
+      );
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      setClientFacingJobs(data.clientFacingJobStatues);
+      console.log(data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+  
+  const clientStatusOptions = clientFacingJobs.map((status) => ({
+    value: status._id,
+    label: status.clientfacingName,
+    clientfacingColour: status.clientfacingColour,
+  }));
+   useEffect(() => {
+    fetchClientFacingJobsData();
+  }, []);
     // Initialize template and tag data
     useEffect(() => {
       const initializeAutomationData = async () => {
@@ -2916,7 +2940,7 @@ const JobDrawer = ({
       const clientStatusAutomation = automations.find(
         (automation) => automation.type === "Update client-facing job status"
       );
-
+console.log("clientStatusAutomation",clientStatusAutomation)
       const assigneesAutomation = automations.find(
         (automation) => automation.type === "Update job assignees"
       );
@@ -2955,14 +2979,14 @@ const JobDrawer = ({
             duein: duein,
             dueinduration: dueinduration,
             showinclientportal: clientStatusAutomation
-              ? clientStatusAutomation.visibilityForClient
-              : clientFacingStatus,
+              ? clientStatusAutomation.status
+              : false,
             jobnameforclient: inputText,
             clientfacingstatus: clientStatusAutomation
-              ? clientStatusAutomation.selectedClientStatus?.value
-              : selectedJob?.value,
+              ? clientStatusAutomation.selectedClientStatus
+              : null,
             clientfacingDescription: clientStatusAutomation
-              ? clientStatusAutomation.statusDescription
+              ? clientStatusAutomation.clientDescription
               : clientDescription,
             startdate: startDate,
             enddate: dueDate,
@@ -3224,7 +3248,7 @@ const JobDrawer = ({
                   )}
 
                 {/* Client Status Information */}
-                {automation.type === "Update client-facing job status" && (
+                {/* {automation.type === "Update client-facing job status" && (
                   <Box sx={{ mb: 2 }}>
                     <Typography variant="subtitle1" fontWeight="bold">
                       Client Status:
@@ -3240,8 +3264,49 @@ const JobDrawer = ({
                       </Typography>
                     )}
                   </Box>
-                )}
+                )} */}
+{automation.type === "Update client-facing job status" && (
+  <Box sx={{ mb: 2 }}>
+    <Typography variant="subtitle1" fontWeight="bold">
+      Client Status:
+    </Typography>
+    
+    {/* Display status with colored dot */}
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
+      {automation.selectedClientStatus && (
+        <>
+          <Box
+            sx={{
+              width: 12,
+              height: 12,
+              borderRadius: '50%',
+              backgroundColor: clientStatusOptions?.find(
+                opt => opt.value === automation.selectedClientStatus
+              )?.clientfacingColour || '#ccc'
+            }}
+          />
+          <Typography variant="body2">
+            {clientStatusOptions?.find(
+              opt => opt.value === automation.selectedClientStatus
+            )?.label || automation.selectedClientStatus || "Not set"}
+          </Typography>
+        </>
+      )}
+    </Box>
 
+    {/* Display visibility setting */}
+    <Typography variant="body2" sx={{ mt: 1 }}>
+      Visibility: {automation.status ? "Visible to client" : "Hidden from client"}
+    </Typography>
+
+    {/* Display status description if available */}
+    {automation.statusDescription && (
+      <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
+        Description: {automation.statusDescription}
+      </Typography>
+    )}
+  </Box>
+)}
                 {/* Warning for Account Tags Automation */}
                 {automation.type === "Update account tags" && (
                   <Alert severity="warning" sx={{ mt: 2 }}>
