@@ -1,3 +1,5 @@
+
+
 import {
   Chip,
   Box,
@@ -48,7 +50,7 @@ const JobDrawer = ({
 }) => {
   const { logindata } = useContext(LoginContext);
   const [loginuserid, setLoginUserId] = useState("");
-const [username, setUsername] = useState("");
+  const [username, setUsername] = useState("");
   const fetchUserData = async (id) => {
     const myHeaders = new Headers();
 
@@ -73,9 +75,9 @@ const [username, setUsername] = useState("");
       setLoginUserId(logindata.user.id);
     }
   }, [logindata]);
-    useEffect(() => {
-      fetchUserData(loginuserid);
-    }, []);
+  useEffect(() => {
+    fetchUserData(loginuserid);
+  }, []);
   const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
   const JOBS_API = process.env.REACT_APP_ADD_JOBS_URL;
   const JOBS_TEMP_API = process.env.REACT_APP_JOBS_TEMP_URL;
@@ -146,9 +148,12 @@ const [username, setUsername] = useState("");
 
   const fetchAccountData = async () => {
     try {
-      const response = await fetch("https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true");
+      const response = await fetch(
+        "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true"
+      );
       const data = await response.json();
       setaccountdata(data.accounts);
+      console.log("account data", data.accounts);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -287,18 +292,18 @@ const [username, setUsername] = useState("");
         console.error("Error fetching pipeline details:", error);
       }
     }
-     fetchPipelineDataByID(selectedOptions.value);
+    fetchPipelineDataByID(selectedOptions.value);
   };
   useEffect(() => {
     fetchPipelineData();
   }, []);
-   const [selectedStage, setSelectedStage] = useState(null);
+  const [selectedStage, setSelectedStage] = useState(null);
   const [stagesoptions, setStagesOptions] = useState([]);
   const handleStageChange = (event, newValue) => {
     setSelectedStage(newValue);
   };
 
-    const fetchPipelineDataByID = async (pipelineid) => {
+  const fetchPipelineDataByID = async (pipelineid) => {
     try {
       const url = `${PIPELINE_API}/workflow/pipeline/pipeline/${pipelineid}`;
       const response = await fetch(url);
@@ -336,43 +341,29 @@ const [username, setUsername] = useState("");
 
   const [automations, setAutomations] = useState([]);
   const createjob = () => {
-    // Check if the first stage of the selected pipeline contains automations
-    // if (
-    //   selectedPipelineDetails?.pipeline?.stages?.[0]?.automations?.length > 0
-    // ) {
-    //   // Get automations data from the first stage
-    //   const automationsData =
-    //     selectedPipelineDetails?.pipeline?.stages?.[0]?.automations || [];
-    //   console.log("janavi", automationsData);
-    //   setAutomations(automationsData);
+    // Find the details of the selected stage
+    const selectedStageDetails =
+      selectedPipelineDetails?.pipeline?.stages?.find(
+        (stage) => stage._id === selectedStage?.value
+      );
 
-    //   // Open the drawer with the automations data
-    //   // openDrawer(automationsData);
-    //   setDrawerOpen(true);
-    //   return; // Stop further execution of createjob
-    // }
-  // Find the details of the selected stage
-  const selectedStageDetails = selectedPipelineDetails?.pipeline?.stages?.find(
-    (stage) => stage._id === selectedStage?.value
-  );
+    // Check if the selected stage contains automations
+    if (selectedStageDetails?.automations?.length > 0) {
+      const automationsData = selectedStageDetails.automations || [];
+      console.log("janavi", automationsData);
+      setAutomations(automationsData);
 
-  // Check if the selected stage contains automations
-  if (selectedStageDetails?.automations?.length > 0) {
-    const automationsData = selectedStageDetails.automations || [];
-    console.log("janavi", automationsData);
-    setAutomations(automationsData);
-
-    // Open the drawer with automations data
-    setDrawerOpen(true);
-    return; // Stop further execution of createjob
-  }
+      // Open the drawer with automations data
+      setDrawerOpen(true);
+      return; // Stop further execution of createjob
+    }
     const myHeaders = {
       "Content-Type": "application/json",
     };
 
     const data = {
       accounts: combinedaccountValues,
-        stageid: selectedStage.value,
+      stageid: selectedStage.value,
       pipeline: selectedPipeline.value,
       templatename: selectedtemp.value,
       jobname: jobName,
@@ -789,27 +780,29 @@ const [username, setUsername] = useState("");
       return updatedAutomations;
     });
   };
-    const [assignee, setAssignee] = useState([]);
+  const [assignee, setAssignee] = useState([]);
   const [selectedAssignees, setSelectedAssignees] = useState([]);
   const [assigneesToRemove, setAssigneesToRemove] = useState([]);
   useEffect(() => {
     const fetchAssignees = async () => {
       try {
-        const response = await axios.get(`${LOGIN_API}/common/users/roles?roles=TeamMember,Admin`);
-        console.log("assigness data",response.data)
+        const response = await axios.get(
+          `${LOGIN_API}/common/users/roles?roles=TeamMember,Admin`
+        );
+        console.log("assigness data", response.data);
         setAssignee(response.data);
       } catch (error) {
         console.error("Error fetching assignees:", error);
       }
     };
-    
+
     fetchAssignees();
   }, []);
-  const assigneeOptions = assignee.map((ass)=>({
-     value: ass._id,
-      label: ass.username,
-  }))
-   const handleAssigneeChange = (index, type, event) => {
+  const assigneeOptions = assignee.map((ass) => ({
+    value: ass._id,
+    label: ass.username,
+  }));
+  const handleAssigneeChange = (index, type, event) => {
     const { value } = event.target; // Array of selected tag IDs
 
     setAutomations((prev) => {
@@ -822,9 +815,7 @@ const [username, setUsername] = useState("");
       const selectedTags = value
         .map((assId) => {
           const ass = assigneeoptions.find((t) => t.value === assId);
-          return ass
-            ? { _id: ass.value, username: ass.label,  }
-            : null;
+          return ass ? { _id: ass.value, username: ass.label } : null;
         })
         .filter(Boolean); // Remove null values
 
@@ -843,7 +834,9 @@ const [username, setUsername] = useState("");
       } else if (type === "removeAssignees") {
         updatedAutomations[index].addAssignees = updatedAutomations[
           index
-        ].addAssignees.filter((tag) => !uniqueTags.some((t) => t._id === tag._id));
+        ].addAssignees.filter(
+          (tag) => !uniqueTags.some((t) => t._id === tag._id)
+        );
       }
 
       updatedAutomations[index] = {
@@ -854,6 +847,1298 @@ const [username, setUsername] = useState("");
       return updatedAutomations;
     });
   };
+  // Drawer Component
+  //   const DrawerContent = () => {
+  //     const ITEM_HEIGHT = 48;
+  //     const ITEM_PADDING_TOP = 8;
+  //     const MenuProps = {
+  //       PaperProps: {
+  //         style: {
+  //           maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+  //           width: "auto",
+  //         },
+  //       },
+  //     };
+
+  //     // Get the tags for the selected accounts
+  //     const accountTags = combinedaccountValues
+
+  //       .map((accountId) => {
+  //         console.log("combinedaccountValues", combinedaccountValues);
+  //         const account = accountdata.find(
+  //           (account) => account._id === accountId
+  //         );
+  //         return account ? account.tags || [] : []; // Assuming accounts have tags
+  //       })
+  //       .flat(); // Flattening array to get all tags
+  //     console.log("hghg", accountTags);
+
+  //     const ACCOUNT_TASKS_API = process.env.REACT_APP_TASKS_API;
+  //     const CHAT_API = process.env.REACT_APP_CHAT_TEMP_URL;
+  //     const CHATTOCLIENT_API = process.env.REACT_APP_CHAT_API;
+  //     const INVOICE_API = process.env.REACT_APP_INVOICE_TEMP_URL;
+  //     const INVOICE_NEW = process.env.REACT_APP_INVOICES_URL;
+  //     const PROPOSAL_API = process.env.REACT_APP_PROPOSAL_TEMP_URL;
+  //     const PROPOSAL_ACCOUNT_API = process.env.REACT_APP_PROPOSAL_URL;
+  //     const ORGANIZER_TEMP_API = process.env.REACT_APP_ORGANIZER_TEMP_URL;
+  //     const AUTOMATION_API = process.env.REACT_APP_AUTOMATION_API;
+  //     // fetch invoive temp by id
+  //     const fetchinvoicetempbyid = async (automationTemp) => {
+  //       const requestOptions = {
+  //         method: "GET",
+  //         redirect: "follow",
+  //       };
+  //       const url = `${INVOICE_API}/workflow/invoicetemp/invoicetemplate/${automationTemp}`;
+  //       try {
+  //         const response = await fetch(url, requestOptions); // Fetch the data
+  //         const result = await response.json(); // Parse the JSON response
+  //         console.log("Fetched invoice template:", result.invoiceTemplate);
+  //         return result.invoiceTemplate; // Return the data
+  //       } catch (error) {
+  //         console.error("Error fetching invoice template:", error);
+  //         throw error; // Let the calling function handle the error
+  //       }
+  //     };
+
+  //     // fetch chat temp by id
+  //     const fetchchattempbyid = async (automationTemp) => {
+  //       const requestOptions = {
+  //         method: "GET",
+  //         redirect: "follow",
+  //       };
+  //       const url = `${CHAT_API}/workflow/chats/chattemplate/chattemplateList/${automationTemp}`;
+  //       try {
+  //         const response = await fetch(url, requestOptions); // Fetch the data
+  //         const result = await response.json(); // Parse the JSON response
+  //         console.log("Fetched chat template:", result.chatTemplate);
+  //         return result.chatTemplate; // Return the data
+  //       } catch (error) {
+  //         console.error("Error fetching invoice template:", error);
+  //         throw error; // Let the calling function handle the error
+  //       }
+  //     };
+
+  //     // fetch task temp by id
+  //     const TASK_API = process.env.REACT_APP_TASK_TEMP_URL;
+  //     const fetchtasktempbyid = async (automationTemp) => {
+  //       const requestOptions = {
+  //         method: "GET",
+  //         redirect: "follow",
+  //       };
+  //       const url = `${TASK_API}/workflow/tasks/tasktemplate/tasktemplatebyid/${automationTemp}`;
+  //       try {
+  //         const response = await fetch(url, requestOptions); // Fetch the data
+  //         const result = await response.json(); // Parse the JSON response
+  //         console.log("Fetched task template:", result.taskTemplate);
+  //         return result.taskTemplate; // Return the data
+  //       } catch (error) {
+  //         console.error("Error fetching invoice template:", error);
+  //         throw error; // Let the calling function handle the error
+  //       }
+  //     };
+  //     // fetch proposal temp by id
+  //     const fetchproposalbyid = async (automationTemp) => {
+  //       const requestOptions = {
+  //         method: "GET",
+  //         redirect: "follow",
+  //       };
+  //       const url = `${PROPOSAL_API}/workflow/proposalesandels/proposalesandels/${automationTemp}`;
+  //       try {
+  //         const response = await fetch(url, requestOptions); // Fetch the data
+  //         const result = await response.json(); // Parse the JSON response
+  //         console.log(
+  //           "Fetched proposalsels template:",
+  //           result.proposalesAndElsTemplate
+  //         );
+  //         return result.proposalesAndElsTemplate; // Return the data
+  //       } catch (error) {
+  //         console.error("Error fetching proposal template:", error);
+  //         throw error; // Let the calling function handle the error
+  //       }
+  //     };
+  //     // fetch organizer temp by id
+  //     const fetchorganizertempbyid = async (automationTemp) => {
+  //       const requestOptions = {
+  //         method: "GET",
+  //         redirect: "follow",
+  //       };
+  //       const url = `${ORGANIZER_TEMP_API}/workflow/organizers/organizertemplate/${automationTemp}`;
+
+  //       try {
+  //         const response = await fetch(url, requestOptions); // Fetch the data
+  //         const result = await response.json(); // Parse the JSON response
+  //         console.log("Fetched organizer template:", result.organizerTemplate);
+  //         return result.organizerTemplate; // Return the data
+  //       } catch (error) {
+  //         console.error("Error fetching organizer template:", error);
+  //         throw error; // Let the calling function handle the error
+  //       }
+  //     };
+
+  //     const getCurrentDate = () => {
+  //       const today = new Date();
+  //       const year = today.getFullYear();
+  //       const month = String(today.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+  //       const day = String(today.getDate()).padStart(2, "0");
+  //       return `${year}-${month}-${day}`; // Format: YYYY-MM-DD
+  //     };
+
+  //     const assignInvoiceToAccount = (invoiceData, automationTemp, accountId) => {
+  //       const myHeaders = new Headers();
+  //       myHeaders.append("Content-Type", "application/json");
+
+  //       // Dynamically prepare the payload from invoiceData
+  //       const raw = JSON.stringify({
+  //         account: accountId,
+  //         invoicenumber: "", // Fill in if required
+  //         invoicedate: getCurrentDate(), // Today's date
+  //         description: invoiceData.description || "",
+  //         invoicetemplate: automationTemp,
+  //         paymentMethod: invoiceData.paymentMethod || "",
+  //         teammember: loginuserid, // Fill in if required
+  //         payInvoicewithcredits: invoiceData.payInvoicewithcredits || false,
+  //         emailinvoicetoclient: invoiceData.sendEmailWhenInvCreated || false,
+  //         reminders: invoiceData.sendReminderstoClients || false,
+  //         daysuntilnextreminder: invoiceData.daysuntilnextreminder || null,
+  //         numberOfreminder: invoiceData.numberOfreminder || null,
+  //         scheduleinvoice: false, // Optional, adjust as needed
+  //         scheduleinvoicedate: new Date(), // Current date and time
+  //         scheduleinvoicetime: new Date().toLocaleTimeString("en-US", {
+  //           hour12: false,
+  //         }),
+  //         lineItems: invoiceData.lineItems.map((item) => ({
+  //           productorService: item.productorService || "",
+  //           description: item.description || "",
+  //           rate: item.rate || "",
+  //           quantity: item.quantity || "",
+  //           amount: item.amount || "",
+  //           tax: item.tax || false,
+  //         })),
+  //         summary: {
+  //           subtotal: invoiceData.summary.subtotal || "",
+  //           taxRate: invoiceData.summary.taxRate || "",
+  //           taxTotal: invoiceData.summary.taxTotal || "",
+  //           total: invoiceData.summary.total || "",
+  //         },
+  //         paidAmount: "",
+  //         invoiceStatus: "Pending",
+  //         balanceDueAmount: "",
+  //       });
+  //       console.log("invoices", raw);
+  //       const requestOptions = {
+  //         method: "POST",
+  //         headers: myHeaders,
+  //         body: raw,
+  //         redirect: "follow",
+  //       };
+  //       fetch(`${INVOICE_NEW}/workflow/invoices/invoice`, requestOptions)
+  //         .then((response) => response.json())
+  //         .then((result) => {
+  //           console.log("Invoice assigned successfully:", result);
+  //         })
+  //         .catch((error) => console.error("Error assigning invoice:", error));
+  //     };
+
+  //     const [chatId, setChatId] = useState();
+  //     const [adminusername, setAdminUsername] = useState("");
+  //     const fetchLoginUserData = async (loginuserid) => {
+  //       const myHeaders = new Headers();
+
+  //       const requestOptions = {
+  //         method: "GET",
+  //         headers: myHeaders,
+  //         redirect: "follow",
+  //       };
+  //       const url = `${LOGIN_API}/common/user/${loginuserid}`;
+  //       fetch(url, requestOptions)
+  //         .then((response) => response.json())
+  //         .then((result) => {
+  //           // console.log("jbhguhid", result);
+
+  //           // console.log(userData)
+  //           setAdminUsername(result.username);
+  //         });
+  //     };
+  //     useEffect(() => {
+  //       // console.log("teammenber", loginuserid);
+  //       fetchLoginUserData(loginuserid);
+  //     }, []);
+  //     // sendChatToAccount
+  //     const sendChatToAccount = (
+  //       chatData,
+  //       automationTemp,
+  //       automationAccountId
+  //     ) => {
+  //       console.log(
+  //         "sending chat",
+  //         chatData,
+  //         automationTemp,
+  //         automationAccountId
+  //       );
+
+  //       const myHeaders = new Headers();
+  //       myHeaders.append("Content-Type", "application/json");
+  //       const subtaskData = chatData.clienttasks.map(({ id, text, checked }) => ({
+  //         id,
+  //         text,
+  //         checked: checked !== undefined ? checked : false, // Ensure checked is either true or false
+  //       }));
+  //       const messageData = [
+  //         {
+  //           message: chatData.description,
+  //           fromwhome: "Admin",
+  //           senderid: username,
+  //           isRead: false,
+  //         },
+  //       ];
+  //       // Dynamically prepare the payload from invoiceData
+  //       const raw = JSON.stringify({
+  //         accountids: [automationAccountId],
+  //         chattemplateid: automationTemp, // Fill in if required
+  //         chatsubject: chatData.chatsubject, // Today's date
+  //         description: messageData || "",
+  //          templatename:chatData.templatename,
+  //           from : username,
+  //         sendreminderstoclient: chatData.sendreminderstoclient,
+  //         daysuntilnextreminder: chatData.daysuntilnextreminder,
+  //         numberofreminders: chatData.numberofreminders,
+  //         clienttasks: subtaskData,
+
+  //       });
+  //       console.log("chats", raw);
+  //       const requestOptions = {
+  //         method: "POST",
+  //         headers: myHeaders,
+  //         body: raw,
+  //         redirect: "follow",
+  //       };
+  //       fetch(`${CHATTOCLIENT_API}/chats/chatsaccountwise`, requestOptions)
+  //         .then((response) => response.json())
+  //         .then((result) => {
+  //           console.log("send chat to account successfully:", result);
+  //         })
+  //         .catch((error) => console.error("Error assigning invoice:", error));
+  //     };
+  //     // mail for drawer btn
+  //     const sendSaveChatMail = (
+  //       chatId,
+  //       automationAccountId,
+  //       automationTemp,
+  //       adminusername
+  //     ) => {
+  //       const myHeaders = new Headers();
+  //       myHeaders.append("Content-Type", "application/json");
+
+  //       const raw = JSON.stringify({
+  //         accountid: automationAccountId,
+  //         chattemplateid: automationTemp,
+  //         username: adminusername,
+  //         chatId: chatId,
+  //         viewchatlink: "/login",
+  //       });
+
+  //       const requestOptions = {
+  //         method: "POST",
+  //         headers: myHeaders,
+  //         body: raw,
+  //         redirect: "follow",
+  //       };
+  //       console.log(raw);
+  //       fetch(`${CHATTOCLIENT_API}/chatsend/securechatsend`, requestOptions)
+  //         .then((response) => response.json())
+  //         .then((result) => console.log(result))
+  //         .catch((error) => console.error(error));
+  //     };
+
+  //     const assignTaskToAccount = (
+  //       taskData,
+  //       automationTemp,
+  //       automationAccountId,
+  //       jobId
+  //     ) => {
+  //       console.log(
+  //         "Assigning task",
+  //         taskData,
+  //         automationTemp,
+  //         automationAccountId,
+  //         jobId
+  //       );
+
+  //       const myHeaders = new Headers();
+  //       myHeaders.append("Content-Type", "application/json");
+
+  //       const raw = JSON.stringify({
+  //         accounts: automationAccountId,
+  //         job: jobId,
+  //         templatename: automationTemp,
+  //         taskname: taskData.templatename,
+  //         status: taskData.status,
+  //         taskassignees: taskData.taskassignees,
+  //         priority: taskData.priority,
+  //         description: taskData.description,
+  //         tasktags: taskData.tasktags,
+  //         issubtaskschecked: taskData.issubtaskschecked,
+  //         startdate: taskData.startdate,
+  //         enddate: taskData.enddate,
+  //         subtasks: taskData.subtasks,
+  //       });
+  //       console.log("tasks creation", raw);
+  //       const requestOptions = {
+  //         method: "POST",
+  //         headers: myHeaders,
+  //         body: raw,
+  //         redirect: "follow",
+  //       };
+
+  //       fetch(`${ACCOUNT_TASKS_API}/accountstasks/newtask`, requestOptions)
+  //         .then((response) => response.json())
+  //         .then((result) => {
+  //           console.log("task created", result);
+  //           // onClose()
+  //         })
+  //         .catch((error) => console.error(error));
+  //     };
+  // const assignProposalToAccount = async (automationTemp,automationAccountId) => {
+  //   try {
+  //     const response = await fetch("https://www.snptaxes.com/account/proposals/automation", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         proposalTemp: automationTemp,
+  //         account: [
+  //           automationAccountId
+  //         ],
+  //       }),
+  //     });
+
+  //     if (!response.ok) {
+  //       throw new Error(`HTTP error! status: ${response.status}`);
+  //     }
+
+  //     const result = await response.json(); // or .text() if backend returns plain text
+  //     console.log("✅ Success:", result);
+  //   } catch (error) {
+  //     console.error("❌ Error sending proposal automation:", error);
+  //   }
+  // };
+
+  //     const assignOrganizerToAccount = (
+  //       organizerData,
+  //       automationTemp,
+  //       accountId
+  //     ) => {
+  //       console.log(
+  //         "Assigning proposal",
+  //         organizerData,
+  //         automationTemp,
+  //         accountId
+  //       );
+  //       const myHeaders = new Headers();
+  //       myHeaders.append("Content-Type", "application/json");
+  //       const raw = JSON.stringify({
+  //         accountid: accountId,
+  //         organizertemplateid: automationTemp,
+  //         organizerName: organizerData.organizerName,
+  //         reminders: organizerData.reminders,
+  //         noofreminders: organizerData.noOfReminder,
+  //         daysuntilnextreminder: organizerData.daysuntilNextReminder,
+  //         sections: organizerData.sections,
+  //         status: "Pending",
+  //         active: true,
+  //       });
+  //       const requestOptions = {
+  //         method: "POST",
+  //         headers: myHeaders,
+  //         body: raw,
+  //         redirect: "follow",
+  //       };
+  //       console.log(raw);
+  //       const url = `${ORGANIZER_TEMP_API}/workflow/orgaccwise/organizeraccountwise/org`;
+  //       fetch(url, requestOptions)
+  //         .then((response) => response.json())
+  //         .then((result) => {
+  //           console.log(result);
+  //         })
+  //         .catch((error) => console.error(error));
+  //     };
+
+  //     const CLIENT_DOCS_API = process.env.REACT_APP_CLIENT_DOCS_MANAGE;
+  //     const assignfoldertemp = (accountId, automationTemp) => {
+  //       const myHeaders = new Headers();
+  //       myHeaders.append("Content-Type", "application/json");
+
+  //       const raw = JSON.stringify({
+  //         accountId: accountId,
+  //         templateId: automationTemp,
+  //       });
+
+  //       const requestOptions = {
+  //         method: "POST",
+  //         headers: myHeaders,
+  //         body: raw,
+  //         redirect: "follow",
+  //       };
+
+  //       console.log(raw);
+  //       // fetch(`${CLIENT_DOCS_API}/clientdocs/accountfoldertemp`, requestOptions)
+  //         fetch(`https://www.snptaxes.com/api/docManagement/apply-template`, requestOptions)
+  //          .then((response) => response.json())
+  //         .then((result) => console.log(result))
+  //         .catch((error) => console.error(error));
+  //     };
+
+  //     const selectAutomationApi = async (
+  //       automationType,
+  //       automationTemp,
+  //       automationAccountId,
+  //       automation,
+  //       jobId = null
+  //     ) => {
+  //       console.log("bvhgv", automation);
+  //       console.log(`Updating account tags for Account ID: ${automationAccountId}`)
+  //       if (!automationType || !automationAccountId) {
+  //         console.error("Missing required parameters");
+  //         return;
+  //       }
+
+  //       switch (automationType) {
+  //         case "Update account tags":
+  //           console.log(
+  //             `Updating account tags for Account ID: ${automationAccountId}`
+  //           );
+
+  //           try {
+
+  //            const res = await axios.get(
+  //   `https://www.snptaxes.com/api/accounts/${automationAccountId}`
+  // );
+
+  // // The JSON data is in res.data
+  // const accountsData = res.data;
+
+  // console.log("accountsData", accountsData);
+
+  //             let currentTags = accountsData.tags || []; // Existing tag IDs
+
+  //             // Extract tag IDs from automation object
+  //             const addTagIds = automation?.addTags?.map((tag) => tag._id) || [];
+  //             const removeTagIds =
+  //               automation?.removeTags?.map((tag) => tag._id) || [];
+
+  //             console.log("Current Tags:", currentTags);
+  //             console.log("Tags to Add:", addTagIds);
+  //             console.log("Tags to Remove:", removeTagIds);
+
+  //             // Remove tags that match `removeTags`
+  //             let updatedTags = currentTags.filter(
+  //               (tagId) => !removeTagIds.includes(tagId)
+  //             );
+
+  //             // Add new tags without duplication
+  //             updatedTags = [...new Set([...updatedTags, ...addTagIds])];
+
+  //             console.log("Final Updated Tags:", updatedTags);
+
+  //             // Send updated tags back to the server
+  //             const updateResponse = await fetch(
+  //               `https://www.snptaxes.com/api/accounts/accountdetails/updateaccounttags/${automationAccountId}`,
+  //               {
+  //                 method: "PATCH",
+  //                 headers: {
+  //                   "Content-Type": "application/json",
+  //                 },
+  //                 body: JSON.stringify({ tags: updatedTags }),
+  //               }
+  //             );
+
+  //             console.log("PATCH Response Status:", updateResponse.status);
+  //             console.log("PATCH Response OK:", updateResponse.ok);
+
+  //             const updateResponseData = await updateResponse.json();
+  //             console.log("PATCH Response Data:", updateResponseData);
+
+  //             if (!updateResponse.ok)
+  //               throw new Error("Failed to update account tags");
+
+  //             console.log("Account tags updated successfully");
+  //           } catch (error) {
+  //             console.error("Error updating account tags:", error);
+  //           }
+  //           break;
+
+  //         // Other automation cases (unchanged)
+  //         case "Send Invoice":
+  //           console.log(
+  //             `Processing 'Send Invoice' with template: ${automationTemp}, Account ID: ${automationAccountId}`
+  //           );
+  //           try {
+  //             const invoiceData = await fetchinvoicetempbyid(automationTemp);
+  //             console.log("Fetched invoice data", invoiceData);
+  //             assignInvoiceToAccount(
+  //               invoiceData,
+  //               automationTemp,
+  //               automationAccountId
+  //             );
+  //           } catch (error) {
+  //             console.error("Error processing 'Send Invoice':", error);
+  //           }
+  //           break;
+  //         case "Send message":
+  //           console.log(
+  //             `Processing 'Send message' with template: ${automationTemp}, Account ID: ${automationAccountId}`
+  //           );
+  //           try {
+  //             const chatData = await fetchchattempbyid(automationTemp);
+  //             console.log("Fetched chat data", chatData);
+  //             sendChatToAccount(chatData, automationTemp, automationAccountId);
+  //           } catch (error) {
+  //             console.error("Error processing 'Send Invoice':", error);
+  //           }
+  //           break;
+  //         case "Create Task":
+  //           try {
+  //             const taskData = await fetchtasktempbyid(automationTemp);
+  //             console.log("Creating task with:", jobId);
+  //             return await assignTaskToAccount(
+  //               taskData,
+  //               automationTemp,
+  //               automationAccountId,
+  //               jobId
+  //             );
+  //           } catch (error) {
+  //             console.error("Task creation failed:", error);
+  //             throw new Error(`Failed to create task: ${error.message}`);
+  //           }
+  //         case "Apply folder template":
+  //           console.log(
+  //             `Applying folder template with template: ${automationTemp}, Account ID: ${automationAccountId}`
+  //           );
+  //           try {
+  //             await assignfoldertemp(automationAccountId, automationTemp);
+  //             console.log("Folder template assigned successfully");
+  //           } catch (error) {
+  //             console.error("Error applying folder template:", error);
+  //           }
+  //           break;
+
+  //         case "Create Organizer":
+  //           console.log(
+  //             `Processing 'Create Organizer' with template: ${automationTemp}, Account ID: ${automationAccountId}`
+  //           );
+  //           try {
+  //             const organizerData = await fetchorganizertempbyid(automationTemp);
+  //             console.log("Fetched organizer data", organizerData);
+  //             assignOrganizerToAccount(
+  //               organizerData,
+  //               automationTemp,
+  //               automationAccountId
+  //             );
+  //           } catch (error) {
+  //             console.error("Error processing 'Create Organizer':", error);
+  //           }
+  //           break;
+
+  //         case "Send Proposal/Els":
+  //           console.log(
+  //             `Creating Proposals with template: ${automationTemp}, Account ID: ${automationAccountId}`
+  //           );
+  //           try {
+  //             // const proposalData = await fetchproposalbyid(automationTemp);
+  //             // console.log("Fetched Proposals data", proposalData);
+  //             assignProposalToAccount(
+  //               // proposalData,
+  //               automationTemp,
+  //               automationAccountId
+  //             );
+  //           } catch (error) {
+  //             console.error("Error processing 'Send Proposal/Els':", error);
+  //           }
+  //           break;
+
+  //         case "Send Email":
+  //           console.log(
+  //             `Sending email with template: ${automationTemp}, Account ID: ${automationAccountId}`
+  //           );
+  //           const myHeaders = new Headers();
+  //           myHeaders.append("Content-Type", "application/json");
+
+  //           const raw = JSON.stringify({
+  //             automationType,
+  //             templateId: automationTemp,
+  //             accountId: automationAccountId,
+  //           });
+
+  //           const requestOptions = {
+  //             method: "POST",
+  //             headers: myHeaders,
+  //             body: raw,
+  //             redirect: "follow",
+  //           };
+
+  //           fetch(`${AUTOMATION_API}/automations/`, requestOptions)
+  //             .then((response) => response.json())
+  //             .then((result) => console.log(result))
+  //             .catch((error) => console.error(error));
+  //           break;
+
+  //         default:
+  //           console.warn(`Unhandled automation type: ${automationType}`);
+  //           break;
+  //       }
+  //     };
+
+  //     const [selectedAutomations, setSelectedAutomations] = useState([]);
+
+  //     // Initialize selectedAutomations to include all indices
+  //     useEffect(() => {
+  //       const allIndices = automations.map((_, index) => index);
+  //       setSelectedAutomations(allIndices);
+  //     }, [automations]);
+  //     const handleCheckboxChange = (index) => {
+  //       setSelectedAutomations((prevSelected) =>
+  //         prevSelected.includes(index)
+  //           ? prevSelected.filter((i) => i !== index)
+  //           : [...prevSelected, index]
+  //       );
+  //     };
+
+  //     const handleMove = async () => {
+  //       try {
+  //         // 1. Create all jobs first
+  //         const { accountJobMap } = await createJob();
+  //         console.log("Job mapping created:", accountJobMap);
+
+  //         // 2. Process automations for each account
+  //         const automationResults = await Promise.allSettled(
+  //           combinedaccountValues.map(async (accountId) => {
+  //             const jobId = accountJobMap[accountId];
+  //             if (!jobId) {
+  //               throw new Error(`No job ID found for account ${accountId}`);
+  //             }
+
+  //             // Process each automation for this account
+  //             await Promise.all(
+  //               selectedAutomations.map(async (automationIndex) => {
+  //                 const automation = automations[automationIndex];
+  //                 if (!automation || !automation.type) {
+  //                   throw new Error(
+  //                     `Invalid automation at index ${automationIndex}`
+  //                   );
+  //                 }
+
+  //                 const automationType = automation.type;
+  //                 const automationTemp = automation?.template?.value || null;
+
+  //                 // Check for tag matching if automation has tags
+  //                 if (automation.tags && automation.tags.length > 0) {
+  //                   const account = accountdata.find(
+  //                     (acc) => acc._id === accountId
+  //                   );
+  //                   if (!account) {
+  //                     console.warn(
+  //                       `Account with ID ${accountId} not found. Skipping.`
+  //                     );
+  //                     return;
+  //                   }
+
+  //                   const accountTags = account.tags || [];
+  //                   const tagMatch = automation.tags.some((automationTag) =>
+  //                     accountTags.some(
+  //                       (accountTag) =>
+  //                         accountTag.tagName === automationTag.tagName
+  //                     )
+  //                   );
+
+  //                   if (!tagMatch) {
+  //                     console.warn(
+  //                       `Tags do not match for automation index: ${automationIndex} and account ID: ${accountId}. Skipping this account.`
+  //                     );
+  //                     return;
+  //                   }
+  //                 }
+
+  //                 await selectAutomationApi(
+  //                   automationType,
+  //                   automationTemp,
+  //                   [accountId],
+  //                   automation,
+  //                   automationType === "Create Task" ? jobId : null
+  //                 );
+  //               })
+  //             );
+  //           })
+  //         );
+
+  //         // Check for failures
+  //         const failedResults = automationResults.filter(
+  //           (r) => r.status === "rejected"
+  //         );
+  //         if (failedResults.length > 0) {
+  //           console.error("Some automations failed:", failedResults);
+  //           toast.error(
+  //             `${failedResults.length} automations failed (job was created)`
+  //           );
+  //         } else {
+  //           toast.success("Job created successfully");
+  //           handleDrawerClose();
+  //           navigate("/jobs/activejob");
+  //         }
+  //         setDrawerOpen(false);
+  //         handleNewDrawerClose();
+  //         handleDrawerClose();
+  //         // handleDrawerClose();
+  //         // fetchJobData();
+  //       } catch (error) {
+  //         console.error("Operation failed:", error);
+  //         toast.error(`Operation failed: ${error.message}`);
+  //       }
+  //     };
+
+  // const createJob = async () => {
+  //   const myHeaders = new Headers();
+  //   myHeaders.append("Content-Type", "application/json");
+
+  //   // Find relevant automations
+  //   const clientStatusAutomation = automations.find(
+  //     (automation) => automation.type === "Update client-facing job status"
+  //   );
+
+  //   const assigneesAutomation = automations.find(
+  //     (automation) => automation.type === "Update job assignees"
+  //   );
+
+  //   // Create jobs for each account
+  //   const jobCreationPromises = combinedaccountValues.map(
+  //     async (accountId) => {
+  //       // Start with the base assignees from combinedValues
+  //       let finalAssignees = [...combinedValues];
+
+  //       // Apply assignees automation if it exists
+  //       if (assigneesAutomation) {
+  //         // Add new assignees (avoid duplicates)
+  //         assigneesAutomation.addAssignees.forEach(assignee => {
+  //           if (!finalAssignees.includes(assignee._id)) {
+  //             finalAssignees.push(assignee._id);
+  //           }
+  //         });
+
+  //         // Remove specified assignees
+  //         finalAssignees = finalAssignees.filter(assigneeId =>
+  //           !assigneesAutomation.removeAssignees.some(
+  //             removeAssignee => removeAssignee._id === assigneeId
+  //           )
+  //         );
+  //       }
+
+  //       const jobData = {
+  //         accounts: [accountId],
+  //            stageid: selectedStage.value,
+  //         pipeline: selectedPipeline.value,
+  //         templatename: selectedtemp.value,
+  //         jobname: jobName,
+  //         jobassignees: finalAssignees, // Use the modified assignees list
+  //         priority: priority,
+  //         description: description,
+  //         absolutedates: absoluteDate,
+  //         startsin: startsin,
+  //         startsinduration: startsInDuration,
+  //         duein: duein,
+  //         dueinduration: dueinduration,
+  //         showinclientportal: clientStatusAutomation
+  //           ? clientStatusAutomation.visibilityForClient
+  //           : clientFacingStatus,
+  //         jobnameforclient: inputText,
+  //         clientfacingstatus: clientStatusAutomation
+  //           ? clientStatusAutomation.selectedClientStatus?.value
+  //           : selectedJob?.value,
+  //         clientfacingDescription: clientStatusAutomation
+  //           ? clientStatusAutomation.statusDescription
+  //           : clientDescription,
+  //         startdate: startDate,
+  //         enddate: dueDate,
+  //       };
+
+  //       const response = await fetch(`${JOBS_API}/workflow/jobs/newjob`, {
+  //         method: "POST",
+  //         headers: myHeaders,
+  //         body: JSON.stringify(jobData),
+  //       });
+
+  //       console.log("jobs automation creation", jobData);
+  //       if (!response.ok) {
+  //         const error = await response.json();
+  //         throw new Error(
+  //           `Failed to create job for account ${accountId}: ${error.message}`
+  //         );
+  //       }
+
+  //       const result = await response.json();
+  //       if (!result.createdJobs || result.createdJobs.length === 0) {
+  //         throw new Error(`No job created for account ${accountId}`);
+  //       }
+
+  //       return {
+  //         accountId,
+  //         jobId: result.createdJobs[0]._id,
+  //         jobData: result.createdJobs[0],
+  //       };
+  //     }
+  //   );
+
+  //   try {
+  //     const jobResults = await Promise.all(jobCreationPromises);
+
+  //     const accountJobMap = {};
+  //     jobResults.forEach((result) => {
+  //       accountJobMap[result.accountId] = result.jobId;
+  //     });
+
+  //     return {
+  //       success: true,
+  //       accountJobMap,
+  //       jobs: jobResults.map((r) => r.jobData),
+  //     };
+  //   } catch (error) {
+  //     console.error("Job creation failed:", error);
+  //     throw error;
+  //   }
+  // };
+  //     return (
+  //       <Box p={2}>
+  //         <Typography variant="h6" sx={{ display: "flex", alignItems: "center" }}>
+  //           Automations for{" "}
+  //           <Typography variant="h6" ml={1}>
+  //             {combinedaccountValues
+  //               .map((accountId) => {
+  //                 const account = accountdata.find(
+  //                   (account) => account._id === accountId
+  //                 );
+  //                 return account ? account.accountName : null;
+  //               })
+  //               .join(", ")}
+  //           </Typography>
+  //         </Typography>
+
+  //         <Box>
+  //           {automations.map((automation, index) => {
+  //             const hasMatchingTags = automation.tags?.length
+  //               ? automation.tags.some((automationTag) =>
+  //                   accountTags.some(
+  //                     (accountTag) => accountTag._id === automationTag._id
+  //                   )
+  //                 )
+  //               : true; // Allow if no tags are specified
+
+  //             return (
+  //               <Box key={index} sx={{ marginBottom: 2 }}>
+  //                 <Box sx={{ display: "flex", alignItems: "center" }}>
+  //                   <FormControlLabel
+  //                     control={
+  //                       <Checkbox
+  //                         checked={selectedAutomations.includes(index)}
+  //                         onChange={() => handleCheckboxChange(index)}
+  //                         disabled={!hasMatchingTags} // Disable checkbox if tags don't match
+  //                       />
+  //                     }
+  //                   />
+  //                   {!hasMatchingTags && (
+  //                     <Typography
+  //                       variant="body2"
+  //                       color="error"
+  //                       sx={{ fontStyle: "italic" }}
+  //                     >
+  //                       The tags do not match the account
+  //                     </Typography>
+  //                   )}
+  //                 </Box>
+  //                 {automation.type === "Update account tags" ? (
+  //                   <Box>
+  //                     <Box sx={{ width: 500 }}>
+  //                       <Typography variant="body2" sx={{ marginBottom: 1 }}>
+  //                         Add tags to account
+  //                       </Typography>
+
+  //                       <Select
+  //                         multiple
+  //                         displayEmpty
+  //                         multiline
+  //                         size="small"
+  //                         value={automation.addTags.map((tag) => tag._id)}
+  //                         onChange={(event) =>
+  //                           handleTagChange(index, "addTags", event)
+  //                         }
+  //                         renderValue={(selected) =>
+  //                           selected.length === 0 ? (
+  //                             <Typography color="gray">
+  //                               Select tags to add
+  //                             </Typography>
+  //                           ) : (
+  //                             <Box
+  //                               sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}
+  //                             >
+  //                               {automation.addTags.map((tag) => (
+  //                                 <Chip
+  //                                   key={tag._id}
+  //                                   label={tag.tagName}
+  //                                   sx={{
+  //                                     backgroundColor: tag.tagColour,
+  //                                     color: "#fff",
+  //                                     fontWeight: "500",
+  //                                     borderRadius: "20px",
+  //                                   }}
+  //                                 />
+  //                               ))}
+  //                             </Box>
+  //                           )
+  //                         }
+  //                         fullWidth
+  //                         MenuProps={MenuProps}
+  //                         sx={{ width: "100%", marginBottom: 2 }}
+  //                       >
+  //                         {tagsoptions
+  //                           .filter(
+  //                             (option) =>
+  //                               !automation.removeTags.some(
+  //                                 (tag) => tag._id === option.value
+  //                               )
+  //                           ) // Hide selected removeTags
+  //                           .map((option) => {
+  //                             // Create a hidden canvas to measure text width
+  //                             const canvas = document.createElement("canvas");
+  //                             const context = canvas.getContext("2d");
+  //                             context.font = "14px Arial"; // Match the MenuItem font style
+
+  //                             const textWidth = context.measureText(
+  //                               option.label
+  //                             ).width; // Get exact width
+  //                             const dynamicWidth = Math.min(textWidth + 20, 200); // Add padding & set max width
+
+  //                             return (
+  //                               <MenuItem
+  //                                 key={option.value}
+  //                                 value={option.value}
+  //                                 sx={{
+  //                                   backgroundColor: option.colour,
+  //                                   color: "#fff",
+  //                                   fontSize: "10px",
+  //                                   borderRadius: "10px",
+  //                                   margin: "5px",
+  //                                   textAlign: "center",
+  //                                   display: "flex",
+  //                                   justifyContent: "center",
+  //                                   padding: "4px 9px",
+  //                                   whiteSpace: "nowrap", // Prevent text wrapping
+  //                                   minWidth: `${dynamicWidth}px`,
+  //                                   maxWidth: `${dynamicWidth}px`, // Set dynamic max width
+  //                                   "&:hover": {
+  //                                     backgroundColor: option.colour,
+  //                                     color: "#fff",
+  //                                   },
+  //                                 }}
+  //                               >
+  //                                 {option.label}
+  //                               </MenuItem>
+  //                             );
+  //                           })}
+  //                       </Select>
+  //                       <Typography variant="body2" sx={{ marginBottom: 1 }}>
+  //                         Remove tags from account
+  //                       </Typography>
+
+  //                       <Select
+  //                         multiple
+  //                         size="small"
+  //                         multiline
+  //                         displayEmpty
+  //                         value={automation.removeTags.map((tag) => tag._id)}
+  //                         onChange={(event) =>
+  //                           handleTagChange(index, "removeTags", event)
+  //                         }
+  //                         renderValue={(selected) =>
+  //                           selected.length === 0 ? (
+  //                             <Typography color="gray">
+  //                               Select tags to remove
+  //                             </Typography>
+  //                           ) : (
+  //                             <Box
+  //                               sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}
+  //                             >
+  //                               {automation.removeTags.map((tag) => (
+  //                                 <Chip
+  //                                   key={tag._id}
+  //                                   label={tag.tagName}
+  //                                   sx={{
+  //                                     backgroundColor: tag.tagColour,
+  //                                     color: "#fff",
+  //                                     fontWeight: "500",
+  //                                     borderRadius: "20px",
+  //                                   }}
+  //                                 />
+  //                               ))}
+  //                             </Box>
+  //                           )
+  //                         }
+  //                         MenuProps={MenuProps}
+  //                         sx={{ width: "100%", marginBottom: 2 }}
+  //                       >
+  //                         {tagsoptions
+  //                           .filter(
+  //                             (option) =>
+  //                               !automation.addTags.some(
+  //                                 (tag) => tag._id === option.value
+  //                               )
+  //                           ) // Hide selected removeTags
+  //                           .map((option) => {
+  //                             // Create a hidden canvas to measure text width
+  //                             const canvas = document.createElement("canvas");
+  //                             const context = canvas.getContext("2d");
+  //                             context.font = "14px Arial"; // Match the MenuItem font style
+
+  //                             const textWidth = context.measureText(
+  //                               option.label
+  //                             ).width; // Get exact width
+  //                             const dynamicWidth = Math.min(textWidth + 20, 200); // Add padding & set max width
+
+  //                             return (
+  //                               <MenuItem
+  //                                 key={option.value}
+  //                                 value={option.value}
+  //                                 sx={{
+  //                                   backgroundColor: option.colour,
+  //                                   color: "#fff",
+  //                                   fontSize: "10px",
+  //                                   borderRadius: "10px",
+  //                                   margin: "5px",
+  //                                   textAlign: "center",
+  //                                   display: "flex",
+  //                                   justifyContent: "center",
+  //                                   padding: "4px 9px",
+  //                                   whiteSpace: "nowrap", // Prevent text wrapping
+  //                                   minWidth: `${dynamicWidth}px`,
+  //                                   maxWidth: `${dynamicWidth}px`, // Set dynamic max width
+  //                                   "&:hover": {
+  //                                     backgroundColor: option.colour,
+  //                                     color: "#fff",
+  //                                   },
+  //                                 }}
+  //                               >
+  //                                 {option.label}
+  //                               </MenuItem>
+  //                             );
+  //                           })}
+  //                       </Select>
+  //                       {/* Warning Message */}
+  //                       <Alert severity="warning" sx={{ marginBottom: 2 }}>
+  //                         This automation can affect conditions for automations
+  //                         below
+  //                       </Alert>
+  //                     </Box>
+  //                   </Box>
+  //                 ) : automation.type === "Update job assignees" ? (
+  //           <Box>
+  //             <Box sx={{ width: 500 }}>
+  //               <Typography variant="body2" sx={{ marginBottom: 1 }}>
+  //                 Add assignees to job
+  //               </Typography>
+
+  //               <Select
+  //                 multiple
+  //                 displayEmpty
+  //                 multiline
+  //                 size="small"
+  //                 value={automation.addAssignees.map((assignee) => assignee._id)}
+  //                 onChange={(event) =>
+  //                   handleAssigneeChange(index, "addAssignees", event)
+  //                 }
+  //                 renderValue={(selected) =>
+  //                   selected.length === 0 ? (
+  //                     <Typography color="gray">
+  //                       Select assignees to add
+  //                     </Typography>
+  //                   ) : (
+  //                     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+  //                       {automation.addAssignees.map((assignee) => (
+  //                         <Chip
+  //                           key={assignee._id}
+  //                           label={assignee.username}
+  //                           sx={{
+  //                             backgroundColor: '#e0e0e0',
+  //                             color: "#000",
+  //                             fontWeight: "500",
+  //                             borderRadius: "20px",
+  //                           }}
+  //                         />
+  //                       ))}
+  //                     </Box>
+  //                   )
+  //                 }
+  //                 fullWidth
+  //                 MenuProps={MenuProps}
+  //                 sx={{ width: "100%", marginBottom: 2 }}
+  //               >
+  //                 {assigneeOptions.map((option) => (
+  //                   <MenuItem
+  //                     key={option.value}
+  //                     value={option.value}
+  //                     sx={{
+  //                       '&:hover': {
+  //                         backgroundColor: '#f5f5f5',
+  //                       },
+  //                     }}
+  //                   >
+  //                     {option.label}
+  //                   </MenuItem>
+  //                 ))}
+  //               </Select>
+
+  //               <Typography variant="body2" sx={{ marginBottom: 1 }}>
+  //                 Remove assignees from job
+  //               </Typography>
+
+  //               <Select
+  //                 multiple
+  //                 size="small"
+  //                 multiline
+  //                 displayEmpty
+  //                 value={automation.removeAssignees.map((assignee) => assignee._id)}
+  //                 onChange={(event) =>
+  //                   handleAssigneeChange(index, "removeAssignees", event)
+  //                 }
+  //                 renderValue={(selected) =>
+  //                   selected.length === 0 ? (
+  //                     <Typography color="gray">
+  //                       Select assignees to remove
+  //                     </Typography>
+  //                   ) : (
+  //                     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+  //                       {automation.removeAssignees.map((assignee) => (
+  //                         <Chip
+  //                           key={assignee._id}
+  //                          label={assignee.username}
+  //                           sx={{
+  //                             backgroundColor: '#e0e0e0',
+  //                             color: "#000",
+  //                             fontWeight: "500",
+  //                             borderRadius: "20px",
+  //                           }}
+  //                         />
+  //                       ))}
+  //                     </Box>
+  //                   )
+  //                 }
+  //                 MenuProps={MenuProps}
+  //                 sx={{ width: "100%", marginBottom: 2 }}
+  //               >
+  //                 {assigneeOptions.map((option) => (
+  //                   <MenuItem
+  //                     key={option.value}
+  //                     value={option.value}
+  //                     sx={{
+  //                       '&:hover': {
+  //                         backgroundColor: '#f5f5f5',
+  //                       },
+  //                     }}
+  //                   >
+  //                     {option.label}
+  //                   </MenuItem>
+  //                 ))}
+  //               </Select>
+
+  //               <Alert severity="warning" sx={{ marginBottom: 2 }}>
+  //                 This automation can affect job assignment notifications
+  //               </Alert>
+  //             </Box>
+  //           </Box>
+
+  //         ) : automation.type === "Update client-facing job status" ? (
+  //                   <Box>
+  //                     <Typography variant="body1">
+  //                       <strong>Type:</strong> {automation.type}
+  //                       {automation.visibilityForClient &&
+  //                         automation.selectedClientStatus && (
+  //                           <span>
+  //                             {" "}
+  //                             : {automation.selectedClientStatus.label}
+  //                           </span>
+  //                         )}
+  //                       {!automation.visibilityForClient && (
+  //                         <span> : Hide status</span>
+  //                       )}
+  //                     </Typography>
+  //                   </Box>
+  //                 ) : (
+  //                   <Box>
+  //                     <Typography variant="body1">
+  //                       <strong>Type:</strong> {automation.type}
+  //                     </Typography>
+
+  //                     <Typography variant="body1">
+  //                       <strong>Template:</strong> {automation.template.label}
+  //                     </Typography>
+  //                     <Typography variant="body1">
+  //                       <strong>Tags:</strong>
+  //                     </Typography>
+  //                     {automation.tags.map((tag) => (
+  //                       <Box
+  //                         key={tag._id}
+  //                         sx={{
+  //                           display: "inline-block",
+  //                           backgroundColor: tag.tagColour,
+  //                           color: "white",
+  //                           borderRadius: "15px",
+  //                           padding: "3px 8px",
+  //                           marginRight: "4px",
+  //                         }}
+  //                       >
+  //                         {tag.tagName}
+  //                       </Box>
+  //                     ))}
+  //                   </Box>
+  //                 )}
+  //               </Box>
+  //             );
+  //           })}
+  //         </Box>
+  //         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mt: 5 }}>
+  //           <Button
+  //             variant="contained"
+  //             onClick={handleMove}
+  //             sx={{
+  //               backgroundColor: "var(--color-save-btn)", // Normal background
+
+  //               "&:hover": {
+  //                 backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+  //               },
+  //               borderRadius: "15px",
+  //               width: "80px",
+  //             }}
+  //           >
+  //             Move
+  //           </Button>
+  //           <Button
+  //             variant="outlined"
+  //             onClick={() => setDrawerOpen(false)}
+  //             sx={{
+  //               borderColor: "var(--color-border-cancel-btn)", // Normal background
+  //               color: "var(--color-save-btn)",
+  //               "&:hover": {
+  //                 backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+  //                 color: "#fff",
+  //                 border: "none",
+  //               },
+  //               width: "80px",
+  //               borderRadius: "15px",
+  //             }}
+  //           >
+  //             Close
+  //           </Button>
+  //         </Box>
+  //       </Box>
+  //     );
+  //   };
+
   // Drawer Component
   const DrawerContent = () => {
     const ITEM_HEIGHT = 48;
@@ -869,147 +2154,290 @@ const [username, setUsername] = useState("");
 
     // Get the tags for the selected accounts
     const accountTags = combinedaccountValues
-
       .map((accountId) => {
         console.log("combinedaccountValues", combinedaccountValues);
         const account = accountdata.find(
           (account) => account._id === accountId
         );
-        return account ? account.tags || [] : []; // Assuming accounts have tags
+        return account ? account.tags || [] : [];
       })
-      .flat(); // Flattening array to get all tags
-    console.log("hghg", accountTags);
+      .flat();
+    console.log("Account Tags:", accountTags);
 
+    // API endpoints
     const ACCOUNT_TASKS_API = process.env.REACT_APP_TASKS_API;
     const CHAT_API = process.env.REACT_APP_CHAT_TEMP_URL;
     const CHATTOCLIENT_API = process.env.REACT_APP_CHAT_API;
     const INVOICE_API = process.env.REACT_APP_INVOICE_TEMP_URL;
     const INVOICE_NEW = process.env.REACT_APP_INVOICES_URL;
     const PROPOSAL_API = process.env.REACT_APP_PROPOSAL_TEMP_URL;
-    const PROPOSAL_ACCOUNT_API = process.env.REACT_APP_PROPOSAL_URL;
     const ORGANIZER_TEMP_API = process.env.REACT_APP_ORGANIZER_TEMP_URL;
     const AUTOMATION_API = process.env.REACT_APP_AUTOMATION_API;
-    // fetch invoive temp by id
-    const fetchinvoicetempbyid = async (automationTemp) => {
-      const requestOptions = {
-        method: "GET",
-        redirect: "follow",
+    const TASK_API = process.env.REACT_APP_TASK_TEMP_URL;
+    const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
+    const JOBS_API = process.env.REACT_APP_ADD_JOBS_URL;
+    const EMAIL_API = process.env.REACT_APP_EMAIL_TEMP_URL;
+    // State
+
+    const [adminusername, setAdminUsername] = useState("");
+    const [selectedAutomations, setSelectedAutomations] = useState([]);
+    const [templateData, setTemplateData] = useState({});
+    const [tagData, setTagData] = useState({});
+
+    // Fetch template data for display
+    const fetchTemplateData = async (templateId, templateType) => {
+      if (!templateId) return null;
+
+      try {
+        let url = "";
+        let response;
+
+        switch (templateType) {
+          case "EmailTemplate":
+            url = `${EMAIL_API}/workflow/emailtemplate/${templateId}`;
+            break;
+          case "TaskTemplate":
+            url = `${TASK_API}/workflow/tasks/tasktemplate/tasktemplatebyid/${templateId}`;
+            break;
+          case "InvoiceTemplate":
+            url = `${INVOICE_API}/workflow/invoicetemp/invoicetemplate/${templateId}`;
+            break;
+          case "ChatTemplate":
+            url = `${CHAT_API}/workflow/chats/chattemplate/chattemplateList/${templateId}`;
+            break;
+          case "ProposalTemplate":
+            url = `https://www.snptaxes.com/api/proposals/${templateId}`;
+            break;
+          case "OrganizerTemplate":
+            url = `${ORGANIZER_TEMP_API}/workflow/organizers/organizertemplate/${templateId}`;
+            break;
+          case "FolderTemplate":
+            url = `https://www.snptaxes.com/api/foldertemp/${templateId}`;
+            break;
+          default:
+            return null;
+        }
+
+        const requestOptions = { method: "GET", redirect: "follow" };
+        response = await fetch(url, requestOptions);
+        const result = await response.json();
+
+        switch (templateType) {
+          case "EmailTemplate":
+            return (
+              result.emailTemplate?.templatename || "Unknown Email Template"
+            );
+          case "TaskTemplate":
+            return result.taskTemplate?.templatename || "Unknown Task Template";
+          case "InvoiceTemplate":
+            return (
+              result.invoiceTemplate?.templatename || "Unknown Invoice Template"
+            );
+          case "ChatTemplate":
+            return result.chatTemplate?.templatename || "Unknown Chat Template";
+          case "ProposalTemplate":
+            return result.templatename || "Unknown Proposal Template";
+          case "OrganizerTemplate":
+            return (
+              result.organizerTemplate?.templatename ||
+              "Unknown Organizer Template"
+            );
+          case "FolderTemplate":
+            return result.template?.templatename || "Unknown Folder Template";
+          default:
+            return "Unknown Template";
+        }
+      } catch (error) {
+        console.error(`Error fetching ${templateType}:`, error);
+        return "Error loading template";
+      }
+    };
+
+    // Fetch tag details for display
+    const fetchTagDetails = async (tagIds) => {
+      if (!tagIds || tagIds.length === 0) return [];
+
+      try {
+        const tagDetails = await Promise.all(
+          tagIds.map(async (tagId) => {
+            try {
+              const response = await fetch(
+                `${TAGS_API}/tags/${tagId}`
+              );
+              const result = await response.json();
+              return result.tag;
+            } catch (error) {
+              console.error(`Error fetching tag ${tagId}:`, error);
+              return null;
+            }
+          })
+        );
+        return tagDetails.filter((tag) => tag !== null);
+      } catch (error) {
+        console.error("Error fetching tag details:", error);
+        return [];
+      }
+    };
+
+    // Initialize template and tag data
+    useEffect(() => {
+      const initializeAutomationData = async () => {
+        const templatePromises = automations.map(async (automation, index) => {
+          if (automation.selectedtemp && automation.refModel) {
+            const templateName = await fetchTemplateData(
+              automation.selectedtemp,
+              automation.refModel
+            );
+            return { index, templateName };
+          }
+          return { index, templateName: null };
+        });
+
+        const tagPromises = automations.map(async (automation, index) => {
+          const selectedTags = await fetchTagDetails(automation.selectedTags);
+          const addTags = await fetchTagDetails(automation.addTags);
+          const removeTags = await fetchTagDetails(automation.removeTags);
+
+          return {
+            index,
+            selectedTags,
+            addTags,
+            removeTags,
+          };
+        });
+
+        const templateResults = await Promise.all(templatePromises);
+        const tagResults = await Promise.all(tagPromises);
+
+        const newTemplateData = {};
+        templateResults.forEach((result) => {
+          newTemplateData[result.index] = result.templateName;
+        });
+
+        const newTagData = {};
+        tagResults.forEach((result) => {
+          newTagData[result.index] = {
+            selectedTags: result.selectedTags,
+            addTags: result.addTags,
+            removeTags: result.removeTags,
+          };
+        });
+
+        setTemplateData(newTemplateData);
+        setTagData(newTagData);
       };
+
+      initializeAutomationData();
+    }, [automations]);
+
+    // Initialize selectedAutomations to include all indices
+    useEffect(() => {
+      const allIndices = automations.map((_, index) => index);
+      setSelectedAutomations(allIndices);
+    }, [automations]);
+
+    // API functions (keep your existing functions)
+    const fetchinvoicetempbyid = async (automationTemp) => {
+      const requestOptions = { method: "GET", redirect: "follow" };
       const url = `${INVOICE_API}/workflow/invoicetemp/invoicetemplate/${automationTemp}`;
       try {
-        const response = await fetch(url, requestOptions); // Fetch the data
-        const result = await response.json(); // Parse the JSON response
+        const response = await fetch(url, requestOptions);
+        const result = await response.json();
         console.log("Fetched invoice template:", result.invoiceTemplate);
-        return result.invoiceTemplate; // Return the data
+        return result.invoiceTemplate;
       } catch (error) {
         console.error("Error fetching invoice template:", error);
-        throw error; // Let the calling function handle the error
+        throw error;
       }
     };
 
-    // fetch chat temp by id
     const fetchchattempbyid = async (automationTemp) => {
-      const requestOptions = {
-        method: "GET",
-        redirect: "follow",
-      };
+      const requestOptions = { method: "GET", redirect: "follow" };
       const url = `${CHAT_API}/workflow/chats/chattemplate/chattemplateList/${automationTemp}`;
       try {
-        const response = await fetch(url, requestOptions); // Fetch the data
-        const result = await response.json(); // Parse the JSON response
+        const response = await fetch(url, requestOptions);
+        const result = await response.json();
         console.log("Fetched chat template:", result.chatTemplate);
-        return result.chatTemplate; // Return the data
+        return result.chatTemplate;
       } catch (error) {
-        console.error("Error fetching invoice template:", error);
-        throw error; // Let the calling function handle the error
+        console.error("Error fetching chat template:", error);
+        throw error;
       }
     };
 
-    // fetch task temp by id
-    const TASK_API = process.env.REACT_APP_TASK_TEMP_URL;
     const fetchtasktempbyid = async (automationTemp) => {
-      const requestOptions = {
-        method: "GET",
-        redirect: "follow",
-      };
+      const requestOptions = { method: "GET", redirect: "follow" };
       const url = `${TASK_API}/workflow/tasks/tasktemplate/tasktemplatebyid/${automationTemp}`;
       try {
-        const response = await fetch(url, requestOptions); // Fetch the data
-        const result = await response.json(); // Parse the JSON response
+        const response = await fetch(url, requestOptions);
+        const result = await response.json();
         console.log("Fetched task template:", result.taskTemplate);
-        return result.taskTemplate; // Return the data
+        return result.taskTemplate;
       } catch (error) {
-        console.error("Error fetching invoice template:", error);
-        throw error; // Let the calling function handle the error
+        console.error("Error fetching task template:", error);
+        throw error;
       }
     };
-    // fetch proposal temp by id
+
     const fetchproposalbyid = async (automationTemp) => {
-      const requestOptions = {
-        method: "GET",
-        redirect: "follow",
-      };
+      const requestOptions = { method: "GET", redirect: "follow" };
       const url = `${PROPOSAL_API}/workflow/proposalesandels/proposalesandels/${automationTemp}`;
       try {
-        const response = await fetch(url, requestOptions); // Fetch the data
-        const result = await response.json(); // Parse the JSON response
+        const response = await fetch(url, requestOptions);
+        const result = await response.json();
         console.log(
-          "Fetched proposalsels template:",
+          "Fetched proposal template:",
           result.proposalesAndElsTemplate
         );
-        return result.proposalesAndElsTemplate; // Return the data
+        return result.proposalesAndElsTemplate;
       } catch (error) {
         console.error("Error fetching proposal template:", error);
-        throw error; // Let the calling function handle the error
+        throw error;
       }
     };
-    // fetch organizer temp by id
-    const fetchorganizertempbyid = async (automationTemp) => {
-      const requestOptions = {
-        method: "GET",
-        redirect: "follow",
-      };
-      const url = `${ORGANIZER_TEMP_API}/workflow/organizers/organizertemplate/${automationTemp}`;
 
+    const fetchorganizertempbyid = async (automationTemp) => {
+      const requestOptions = { method: "GET", redirect: "follow" };
+      const url = `${ORGANIZER_TEMP_API}/workflow/organizers/organizertemplate/${automationTemp}`;
       try {
-        const response = await fetch(url, requestOptions); // Fetch the data
-        const result = await response.json(); // Parse the JSON response
+        const response = await fetch(url, requestOptions);
+        const result = await response.json();
         console.log("Fetched organizer template:", result.organizerTemplate);
-        return result.organizerTemplate; // Return the data
+        return result.organizerTemplate;
       } catch (error) {
         console.error("Error fetching organizer template:", error);
-        throw error; // Let the calling function handle the error
+        throw error;
       }
     };
 
     const getCurrentDate = () => {
       const today = new Date();
       const year = today.getFullYear();
-      const month = String(today.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+      const month = String(today.getMonth() + 1).padStart(2, "0");
       const day = String(today.getDate()).padStart(2, "0");
-      return `${year}-${month}-${day}`; // Format: YYYY-MM-DD
+      return `${year}-${month}-${day}`;
     };
 
+    // Assignment functions (keep your existing functions)
     const assignInvoiceToAccount = (invoiceData, automationTemp, accountId) => {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
 
-      // Dynamically prepare the payload from invoiceData
       const raw = JSON.stringify({
         account: accountId,
-        invoicenumber: "", // Fill in if required
-        invoicedate: getCurrentDate(), // Today's date
+        invoicenumber: "",
+        invoicedate: getCurrentDate(),
         description: invoiceData.description || "",
         invoicetemplate: automationTemp,
         paymentMethod: invoiceData.paymentMethod || "",
-        teammember: loginuserid, // Fill in if required
+        teammember: loginuserid,
         payInvoicewithcredits: invoiceData.payInvoicewithcredits || false,
         emailinvoicetoclient: invoiceData.sendEmailWhenInvCreated || false,
         reminders: invoiceData.sendReminderstoClients || false,
         daysuntilnextreminder: invoiceData.daysuntilnextreminder || null,
         numberOfreminder: invoiceData.numberOfreminder || null,
-        scheduleinvoice: false, // Optional, adjust as needed
-        scheduleinvoicedate: new Date(), // Current date and time
+        scheduleinvoice: false,
+        scheduleinvoicedate: new Date(),
         scheduleinvoicetime: new Date().toLocaleTimeString("en-US", {
           hour12: false,
         }),
@@ -1031,65 +2459,35 @@ const [username, setUsername] = useState("");
         invoiceStatus: "Pending",
         balanceDueAmount: "",
       });
-      console.log("invoices", raw);
+
       const requestOptions = {
         method: "POST",
         headers: myHeaders,
         body: raw,
         redirect: "follow",
       };
+
       fetch(`${INVOICE_NEW}/workflow/invoices/invoice`, requestOptions)
         .then((response) => response.json())
-        .then((result) => {
-          console.log("Invoice assigned successfully:", result);
-        })
+        .then((result) => console.log("Invoice assigned successfully:", result))
         .catch((error) => console.error("Error assigning invoice:", error));
     };
 
-    const [chatId, setChatId] = useState();
-    const [adminusername, setAdminUsername] = useState("");
-    const fetchLoginUserData = async (loginuserid) => {
-      const myHeaders = new Headers();
-
-      const requestOptions = {
-        method: "GET",
-        headers: myHeaders,
-        redirect: "follow",
-      };
-      const url = `${LOGIN_API}/common/user/${loginuserid}`;
-      fetch(url, requestOptions)
-        .then((response) => response.json())
-        .then((result) => {
-          // console.log("jbhguhid", result);
-
-          // console.log(userData)
-          setAdminUsername(result.username);
-        });
-    };
-    useEffect(() => {
-      // console.log("teammenber", loginuserid);
-      fetchLoginUserData(loginuserid);
-    }, []);
-    // sendChatToAccount
     const sendChatToAccount = (
       chatData,
       automationTemp,
       automationAccountId
     ) => {
-      console.log(
-        "sending chat",
-        chatData,
-        automationTemp,
-        automationAccountId
-      );
-
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
-      const subtaskData = chatData.clienttasks.map(({ id, text, checked }) => ({
-        id,
-        text,
-        checked: checked !== undefined ? checked : false, // Ensure checked is either true or false
-      }));
+
+      const subtaskData =
+        chatData.clienttasks?.map(({ id, text, checked }) => ({
+          id,
+          text,
+          checked: checked !== undefined ? checked : false,
+        })) || [];
+
       const messageData = [
         {
           message: chatData.description,
@@ -1098,63 +2496,33 @@ const [username, setUsername] = useState("");
           isRead: false,
         },
       ];
-      // Dynamically prepare the payload from invoiceData
+
       const raw = JSON.stringify({
         accountids: [automationAccountId],
-        chattemplateid: automationTemp, // Fill in if required
-        chatsubject: chatData.chatsubject, // Today's date
+        chattemplateid: automationTemp,
+        chatsubject: chatData.chatsubject,
         description: messageData || "",
-         templatename:chatData.templatename,
-          from : username,
+        templatename: chatData.templatename,
+        from: username,
         sendreminderstoclient: chatData.sendreminderstoclient,
         daysuntilnextreminder: chatData.daysuntilnextreminder,
         numberofreminders: chatData.numberofreminders,
         clienttasks: subtaskData,
-        
       });
-      console.log("chats", raw);
+
       const requestOptions = {
         method: "POST",
         headers: myHeaders,
         body: raw,
         redirect: "follow",
       };
+
       fetch(`${CHATTOCLIENT_API}/chats/chatsaccountwise`, requestOptions)
         .then((response) => response.json())
-        .then((result) => {
-          console.log("send chat to account successfully:", result);
-        })
-        .catch((error) => console.error("Error assigning invoice:", error));
-    };
-    // mail for drawer btn
-    const sendSaveChatMail = (
-      chatId,
-      automationAccountId,
-      automationTemp,
-      adminusername
-    ) => {
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-
-      const raw = JSON.stringify({
-        accountid: automationAccountId,
-        chattemplateid: automationTemp,
-        username: adminusername,
-        chatId: chatId,
-        viewchatlink: "/login",
-      });
-
-      const requestOptions = {
-        method: "POST",
-        headers: myHeaders,
-        body: raw,
-        redirect: "follow",
-      };
-      console.log(raw);
-      fetch(`${CHATTOCLIENT_API}/chatsend/securechatsend`, requestOptions)
-        .then((response) => response.json())
-        .then((result) => console.log(result))
-        .catch((error) => console.error(error));
+        .then((result) =>
+          console.log("Send chat to account successfully:", result)
+        )
+        .catch((error) => console.error("Error assigning chat:", error));
     };
 
     const assignTaskToAccount = (
@@ -1163,14 +2531,6 @@ const [username, setUsername] = useState("");
       automationAccountId,
       jobId
     ) => {
-      console.log(
-        "Assigning task",
-        taskData,
-        automationTemp,
-        automationAccountId,
-        jobId
-      );
-
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
 
@@ -1189,7 +2549,7 @@ const [username, setUsername] = useState("");
         enddate: taskData.enddate,
         subtasks: taskData.subtasks,
       });
-      console.log("tasks creation", raw);
+
       const requestOptions = {
         method: "POST",
         headers: myHeaders,
@@ -1199,122 +2559,45 @@ const [username, setUsername] = useState("");
 
       fetch(`${ACCOUNT_TASKS_API}/accountstasks/newtask`, requestOptions)
         .then((response) => response.json())
-        .then((result) => {
-          console.log("task created", result);
-          // onClose()
-        })
-        .catch((error) => console.error(error));
+        .then((result) => console.log("Task created:", result))
+        .catch((error) => console.error("Error creating task:", error));
     };
-const assignProposalToAccount = async (automationTemp,automationAccountId) => {
-  try {
-    const response = await fetch("https://www.snptaxes.com/account/proposals/automation", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        proposalTemp: automationTemp,
-        account: [
-          automationAccountId
-        ],
-      }),
-    });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+    const assignProposalToAccount = async (
+      automationTemp,
+      automationAccountId
+    ) => {
+      console.log("Assigning proposal to account:", automationTemp, automationAccountId);
+      try {
+        const response = await fetch(
+          "https://www.snptaxes.com/account/proposals/automation",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              proposalTemp: automationTemp,
+              account: [automationAccountId],
+            }),
+          }
+        );
 
-    const result = await response.json(); // or .text() if backend returns plain text
-    console.log("✅ Success:", result);
-  } catch (error) {
-    console.error("❌ Error sending proposal automation:", error);
-  }
-};
-    // const assignProposalToAccount = (
-    //   proposalesandelsData,
-    //   automationTemp,
-    //   automationAccountId
-    // ) => {
-    //   console.log(
-    //     "Assigning proposal",
-    //     proposalesandelsData,
-    //     automationTemp,
-    //     automationAccountId
-    //   );
-    //   const options = {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({
-    //       accountids: automationAccountId,
-    //       proposaltemplateid: automationTemp,
-    //       templatename: proposalesandelsData.templatename,
-    //       teammember: proposalesandelsData.teammember,
-    //       proposalname: proposalesandelsData.proposalname,
-    //       introduction: proposalesandelsData.introduction,
-    //       terms: proposalesandelsData.terms,
-    //       servicesandinvoices: proposalesandelsData.servicesandinvoices,
-    //       introductiontext: proposalesandelsData.introductiontext,
-    //       custommessageinemail: proposalesandelsData.custommessageinemail,
-    //       custommessageinemailtext:
-    //         proposalesandelsData.custommessageinemailtext,
-    //       reminders: proposalesandelsData.reminders,
-    //       daysuntilnextreminder: proposalesandelsData.daysuntilnextreminder,
-    //       numberofreminder: proposalesandelsData.numberofreminder,
-    //       introductiontextname: proposalesandelsData.introductiontextname,
-    //       termsandconditionsname: proposalesandelsData.termsandconditionsname,
-    //       termsandconditions: proposalesandelsData.termsandconditions,
-    //       lineItems: proposalesandelsData.lineItems,
-    //       summary: proposalesandelsData.summary,
-    //       Addinvoiceoraskfordeposit:
-    //         proposalesandelsData.Addinvoiceoraskfordeposit,
-    //       Additemizedserviceswithoutcreatinginvoices:
-    //         proposalesandelsData.Additemizedserviceswithoutcreatinginvoices,
-    //       invoicetemplatename: proposalesandelsData.invoicetemplatename,
-    //       invoiceteammember: proposalesandelsData.invoiceteammember,
-    //       issueinvoice: proposalesandelsData.issueinvoice,
-    //       specificdate: proposalesandelsData.specificdate,
-    //       specifictime: proposalesandelsData.specifictime,
-    //       description: proposalesandelsData.description,
-    //       notetoclient: proposalesandelsData.notetoclient,
-    //       paymentterms: proposalesandelsData.paymentterms,
-    //       paymentduedate: proposalesandelsData.paymentduedate,
-    //       paymentamount: proposalesandelsData.paymentamount,
-    //       active: true,
-    //     }),
-    //   };
-    //   const url = `${PROPOSAL_ACCOUNT_API}/proposalandels/proposalaccountwise/`;
-    //   console.log(url); // Log the URL for debugging
-    //   console.log(options.body); // Log request body for debugging
-    //   fetch(url, options)
-    //     .then((response) => {
-    //       if (!response.ok) {
-    //         throw new Error(`Request failed with status ${response.status}`);
-    //       }
-    //       return response.json();
-    //     })
-    //     .then((result) => {
-    //       console.log(result);
-    //     })
-    //     .catch((error) => {
-    //       console.error("Fetch Error:", error);
-    //       // toast.error("An error occurred while updating ProposalesAndEls.");
-    //     });
-    // };
+        if (!response.ok)
+          throw new Error(`HTTP error! status: ${response.status}`);
+        const result = await response.json();
+        console.log("✅ Success:", result);
+      } catch (error) {
+        console.error("❌ Error sending proposal automation:", error);
+      }
+    };
+
     const assignOrganizerToAccount = (
       organizerData,
       automationTemp,
       accountId
     ) => {
-      console.log(
-        "Assigning proposal",
-        organizerData,
-        automationTemp,
-        accountId
-      );
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
+
       const raw = JSON.stringify({
         accountid: accountId,
         organizertemplateid: automationTemp,
@@ -1326,23 +2609,23 @@ const assignProposalToAccount = async (automationTemp,automationAccountId) => {
         status: "Pending",
         active: true,
       });
+
       const requestOptions = {
         method: "POST",
         headers: myHeaders,
         body: raw,
         redirect: "follow",
       };
-      console.log(raw);
-      const url = `${ORGANIZER_TEMP_API}/workflow/orgaccwise/organizeraccountwise/org`;
-      fetch(url, requestOptions)
+
+      fetch(
+        `${ORGANIZER_TEMP_API}/workflow/orgaccwise/organizeraccountwise/org`,
+        requestOptions
+      )
         .then((response) => response.json())
-        .then((result) => {
-          console.log(result);
-        })
-        .catch((error) => console.error(error));
+        .then((result) => console.log("Organizer assigned:", result))
+        .catch((error) => console.error("Error assigning organizer:", error));
     };
 
-    const CLIENT_DOCS_API = process.env.REACT_APP_CLIENT_DOCS_MANAGE;
     const assignfoldertemp = (accountId, automationTemp) => {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
@@ -1359,14 +2642,18 @@ const assignProposalToAccount = async (automationTemp,automationAccountId) => {
         redirect: "follow",
       };
 
-      console.log(raw);
-      // fetch(`${CLIENT_DOCS_API}/clientdocs/accountfoldertemp`, requestOptions)
-        fetch(`https://www.snptaxes.com/api/docManagement/apply-template`, requestOptions)
-         .then((response) => response.json())
-        .then((result) => console.log(result))
-        .catch((error) => console.error(error));
+      fetch(
+        `https://www.snptaxes.com/api/docManagement/apply-template`,
+        requestOptions
+      )
+        .then((response) => response.json())
+        .then((result) => console.log("Folder template applied:", result))
+        .catch((error) =>
+          console.error("Error applying folder template:", error)
+        );
     };
 
+    // Main automation execution function
     const selectAutomationApi = async (
       automationType,
       automationTemp,
@@ -1374,207 +2661,122 @@ const assignProposalToAccount = async (automationTemp,automationAccountId) => {
       automation,
       jobId = null
     ) => {
-      console.log("bvhgv", automation);
-      console.log(`Updating account tags for Account ID: ${automationAccountId}`)
+      console.log("Processing automation:", automationType, automation);
+
       if (!automationType || !automationAccountId) {
         console.error("Missing required parameters");
         return;
       }
 
-      switch (automationType) {
-        case "Update account tags":
-          console.log(
-            `Updating account tags for Account ID: ${automationAccountId}`
-          );
+      try {
+        switch (automationType) {
+          case "Update account tags":
+            await handleAccountTagsUpdate(automationAccountId, automation);
+            break;
 
-          try {
-           
-           const res = await axios.get(
-  `https://www.snptaxes.com/api/accounts/${automationAccountId}`
-);
-
-// The JSON data is in res.data
-const accountsData = res.data;
-
-console.log("accountsData", accountsData);
-
-          
-            let currentTags = accountsData.tags || []; // Existing tag IDs
-
-            // Extract tag IDs from automation object
-            const addTagIds = automation?.addTags?.map((tag) => tag._id) || [];
-            const removeTagIds =
-              automation?.removeTags?.map((tag) => tag._id) || [];
-
-            console.log("Current Tags:", currentTags);
-            console.log("Tags to Add:", addTagIds);
-            console.log("Tags to Remove:", removeTagIds);
-
-            // Remove tags that match `removeTags`
-            let updatedTags = currentTags.filter(
-              (tagId) => !removeTagIds.includes(tagId)
-            );
-
-            // Add new tags without duplication
-            updatedTags = [...new Set([...updatedTags, ...addTagIds])];
-
-            console.log("Final Updated Tags:", updatedTags);
-
-            // Send updated tags back to the server
-            const updateResponse = await fetch(
-              `https://www.snptaxes.com/api/accounts/accountdetails/updateaccounttags/${automationAccountId}`,
-              {
-                method: "PATCH",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ tags: updatedTags }),
-              }
-            );
-
-            console.log("PATCH Response Status:", updateResponse.status);
-            console.log("PATCH Response OK:", updateResponse.ok);
-
-            const updateResponseData = await updateResponse.json();
-            console.log("PATCH Response Data:", updateResponseData);
-
-            if (!updateResponse.ok)
-              throw new Error("Failed to update account tags");
-
-            console.log("Account tags updated successfully");
-          } catch (error) {
-            console.error("Error updating account tags:", error);
-          }
-          break;
-
-        // Other automation cases (unchanged)
-        case "Send Invoice":
-          console.log(
-            `Processing 'Send Invoice' with template: ${automationTemp}, Account ID: ${automationAccountId}`
-          );
-          try {
+          case "Send Invoice":
             const invoiceData = await fetchinvoicetempbyid(automationTemp);
-            console.log("Fetched invoice data", invoiceData);
             assignInvoiceToAccount(
               invoiceData,
               automationTemp,
               automationAccountId
             );
-          } catch (error) {
-            console.error("Error processing 'Send Invoice':", error);
-          }
-          break;
-        case "Send message":
-          console.log(
-            `Processing 'Send message' with template: ${automationTemp}, Account ID: ${automationAccountId}`
-          );
-          try {
+            break;
+
+          case "Send message":
             const chatData = await fetchchattempbyid(automationTemp);
-            console.log("Fetched chat data", chatData);
             sendChatToAccount(chatData, automationTemp, automationAccountId);
-          } catch (error) {
-            console.error("Error processing 'Send Invoice':", error);
-          }
-          break;
-        case "Create Task":
-          try {
+            break;
+
+          case "Create Task":
             const taskData = await fetchtasktempbyid(automationTemp);
-            console.log("Creating task with:", jobId);
-            return await assignTaskToAccount(
+            assignTaskToAccount(
               taskData,
               automationTemp,
               automationAccountId,
               jobId
             );
-          } catch (error) {
-            console.error("Task creation failed:", error);
-            throw new Error(`Failed to create task: ${error.message}`);
-          }
-        case "Apply folder template":
-          console.log(
-            `Applying folder template with template: ${automationTemp}, Account ID: ${automationAccountId}`
-          );
-          try {
-            await assignfoldertemp(automationAccountId, automationTemp);
-            console.log("Folder template assigned successfully");
-          } catch (error) {
-            console.error("Error applying folder template:", error);
-          }
-          break;
+            break;
 
-        case "Create Organizer":
-          console.log(
-            `Processing 'Create Organizer' with template: ${automationTemp}, Account ID: ${automationAccountId}`
-          );
-          try {
+          case "Apply folder template":
+            await assignfoldertemp(automationAccountId, automationTemp);
+            break;
+
+          case "Create Organizer":
             const organizerData = await fetchorganizertempbyid(automationTemp);
-            console.log("Fetched organizer data", organizerData);
             assignOrganizerToAccount(
               organizerData,
               automationTemp,
               automationAccountId
             );
-          } catch (error) {
-            console.error("Error processing 'Create Organizer':", error);
-          }
-          break;
+            break;
 
-        case "Send Proposal/Els":
-          console.log(
-            `Creating Proposals with template: ${automationTemp}, Account ID: ${automationAccountId}`
-          );
-          try {
-            // const proposalData = await fetchproposalbyid(automationTemp);
-            // console.log("Fetched Proposals data", proposalData);
-            assignProposalToAccount(
-              // proposalData,
-              automationTemp,
-              automationAccountId
-            );
-          } catch (error) {
-            console.error("Error processing 'Send Proposal/Els':", error);
-          }
-          break;
+          case "Send Proposal/Els":
+            await assignProposalToAccount(automationTemp, automationAccountId);
+            break;
 
-        case "Send Email":
-          console.log(
-            `Sending email with template: ${automationTemp}, Account ID: ${automationAccountId}`
-          );
-          const myHeaders = new Headers();
-          myHeaders.append("Content-Type", "application/json");
+          case "Send Email":
+            const myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
 
-          const raw = JSON.stringify({
-            automationType,
-            templateId: automationTemp,
-            accountId: automationAccountId,
-          });
+            const raw = JSON.stringify({
+              automationType,
+              templateId: automationTemp,
+              accountId: automationAccountId,
+            });
 
-          const requestOptions = {
-            method: "POST",
-            headers: myHeaders,
-            body: raw,
-            redirect: "follow",
-          };
+            const requestOptions = {
+              method: "POST",
+              headers: myHeaders,
+              body: raw,
+              redirect: "follow",
+            };
 
-          fetch(`${AUTOMATION_API}/automations/`, requestOptions)
-            .then((response) => response.json())
-            .then((result) => console.log(result))
-            .catch((error) => console.error(error));
-          break;
+            await fetch(`${AUTOMATION_API}/automations/`, requestOptions);
+            break;
 
-        default:
-          console.warn(`Unhandled automation type: ${automationType}`);
-          break;
+          default:
+            console.warn(`Unhandled automation type: ${automationType}`);
+            break;
+        }
+      } catch (error) {
+        console.error(`Error processing ${automationType}:`, error);
+        throw error;
       }
     };
 
-    const [selectedAutomations, setSelectedAutomations] = useState([]);
+    // Account tags update handler
+    const handleAccountTagsUpdate = async (accountId, automation) => {
+      console.log(`Updating account tags for Account ID: ${accountId}`);
 
-    // Initialize selectedAutomations to include all indices
-    useEffect(() => {
-      const allIndices = automations.map((_, index) => index);
-      setSelectedAutomations(allIndices);
-    }, [automations]);
+      const res = await axios.get(
+        `https://www.snptaxes.com/api/accounts/${accountId}`
+      );
+      const accountsData = res.data;
+
+      let currentTags = accountsData.tags || [];
+      const addTagIds = automation?.addTags?.map((tag) => tag._id) || [];
+      const removeTagIds = automation?.removeTags?.map((tag) => tag._id) || [];
+
+      let updatedTags = currentTags.filter(
+        (tagId) => !removeTagIds.includes(tagId)
+      );
+      updatedTags = [...new Set([...updatedTags, ...addTagIds])];
+
+      const updateResponse = await fetch(
+        `https://www.snptaxes.com/api/accounts/accountdetails/updateaccounttags/${accountId}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ tags: updatedTags }),
+        }
+      );
+
+      if (!updateResponse.ok) throw new Error("Failed to update account tags");
+      console.log("Account tags updated successfully");
+    };
+
+    // Checkbox handler
     const handleCheckboxChange = (index) => {
       setSelectedAutomations((prevSelected) =>
         prevSelected.includes(index)
@@ -1582,22 +2784,77 @@ console.log("accountsData", accountsData);
           : [...prevSelected, index]
       );
     };
+ const [accountsWithTags, setAccountsWithTags] = useState([]);
+  const [loading, setLoading] = useState(false);
 
+  // Fetch complete account data with tags using your API
+  useEffect(() => {
+    const fetchAccountsWithTags = async () => {
+      if (!combinedaccountValues || combinedaccountValues.length === 0) return;
+      
+      setLoading(true);
+      try {
+        const response = await fetch('https://www.snptaxes.com/api/accounts/multiple', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ ids: combinedaccountValues })
+        });
+
+        if (!response.ok) throw new Error('Failed to fetch accounts');
+        
+        const accountsData = await response.json();
+        setAccountsWithTags(accountsData);
+        console.log('Fetched accounts with tags:', accountsData);
+      } catch (error) {
+        console.error('Error fetching accounts with tags:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAccountsWithTags();
+  }, [combinedaccountValues]);
+
+  // Get tags for selected accounts from the properly fetched data
+  const getAccountTags = (accountId) => {
+    const account = accountsWithTags.find(acc => acc._id === accountId);
+    return account ? account.tags || [] : [];
+  };
+
+  // Check if automation tags match account tags
+  const checkTagMatch = (automationSelectedTags, accountId) => {
+    if (!automationSelectedTags || automationSelectedTags.length === 0) {
+      return true; // No condition tags means always match
+    }
+
+    const accountTags = getAccountTags(accountId);
+    console.log(`Checking tags for account ${accountId}:`, {
+      automationTags: automationSelectedTags,
+      accountTags: accountTags
+    });
+
+    // Check if at least one automation tag exists in account tags
+    const hasMatch = automationSelectedTags.some(automationTagId => 
+      accountTags.includes(automationTagId)
+    );
+
+    console.log(`Tag match result for account ${accountId}:`, hasMatch);
+    return hasMatch;
+  };
+    // Move handler
     const handleMove = async () => {
       try {
-        // 1. Create all jobs first
         const { accountJobMap } = await createJob();
         console.log("Job mapping created:", accountJobMap);
 
-        // 2. Process automations for each account
         const automationResults = await Promise.allSettled(
           combinedaccountValues.map(async (accountId) => {
             const jobId = accountJobMap[accountId];
-            if (!jobId) {
+            if (!jobId)
               throw new Error(`No job ID found for account ${accountId}`);
-            }
 
-            // Process each automation for this account
             await Promise.all(
               selectedAutomations.map(async (automationIndex) => {
                 const automation = automations[automationIndex];
@@ -1607,50 +2864,28 @@ console.log("accountsData", accountsData);
                   );
                 }
 
-                const automationType = automation.type;
-                const automationTemp = automation?.template?.value || null;
-
-                // Check for tag matching if automation has tags
-                if (automation.tags && automation.tags.length > 0) {
-                  const account = accountdata.find(
-                    (acc) => acc._id === accountId
-                  );
-                  if (!account) {
-                    console.warn(
-                      `Account with ID ${accountId} not found. Skipping.`
-                    );
-                    return;
-                  }
-
-                  const accountTags = account.tags || [];
-                  const tagMatch = automation.tags.some((automationTag) =>
-                    accountTags.some(
-                      (accountTag) =>
-                        accountTag.tagName === automationTag.tagName
-                    )
-                  );
-
-                  if (!tagMatch) {
-                    console.warn(
-                      `Tags do not match for automation index: ${automationIndex} and account ID: ${accountId}. Skipping this account.`
-                    );
-                    return;
-                  }
-                }
+                  // Check tag matching using the proper function
+              const hasMatchingTags = checkTagMatch(automation.selectedTags, accountId);
+              
+              if (!hasMatchingTags) {
+                console.warn(
+                  `Tags do not match for automation "${automation.type}" and account ID: ${accountId}. Skipping.`
+                );
+                return;
+              }
 
                 await selectAutomationApi(
-                  automationType,
-                  automationTemp,
-                  [accountId],
+                  automation.type,
+                  automation.selectedtemp,
+                  accountId,
                   automation,
-                  automationType === "Create Task" ? jobId : null
+                  automation.type === "Create Task" ? jobId : null
                 );
               })
             );
           })
         );
 
-        // Check for failures
         const failedResults = automationResults.filter(
           (r) => r.status === "rejected"
         );
@@ -1664,289 +2899,139 @@ console.log("accountsData", accountsData);
           handleDrawerClose();
           navigate("/jobs/activejob");
         }
+
         setDrawerOpen(false);
         handleNewDrawerClose();
-        handleDrawerClose();
-        // handleDrawerClose();
-        // fetchJobData();
       } catch (error) {
         console.error("Operation failed:", error);
         toast.error(`Operation failed: ${error.message}`);
       }
     };
 
-    // const createJob = async () => {
-    //   const myHeaders = new Headers();
-    //   myHeaders.append("Content-Type", "application/json");
+    // Create job function
+    const createJob = async () => {
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
 
-    //   // Create jobs for each account
-    //   const jobCreationPromises = combinedaccountValues.map(
-    //     async (accountId) => {
-    //       const jobData = {
-    //         accounts: [accountId], // Single account per job
-    //         // stageid: selectedStage.value,
-    //         pipeline: selectedPipeline.value,
-    //         templatename: selectedtemp.value,
-    //         jobname: jobName,
-    //         jobassignees: combinedValues,
-    //         priority: priority,
-    //         description: description,
-    //         absolutedates: absoluteDate,
-    //         startsin: startsin,
-    //         startsinduration: startsInDuration,
-    //         duein: duein,
-    //         dueinduration: dueinduration,
-    //         showinclientportal: clientFacingStatus,
-    //         jobnameforclient: inputText,
-    //         clientfacingstatus: selectedJob?.value,
-    //         clientfacingDescription: clientDescription,
-    //         startdate: startDate,
-    //         enddate: dueDate,
-    //       };
+      const clientStatusAutomation = automations.find(
+        (automation) => automation.type === "Update client-facing job status"
+      );
 
-    //       const response = await fetch(`${JOBS_API}/workflow/jobs/newjob`, {
-    //         method: "POST",
-    //         headers: myHeaders,
-    //         body: JSON.stringify(jobData),
-    //       });
-    //       console.log("jobs automation creatyion", jobData);
-    //       if (!response.ok) {
-    //         const error = await response.json();
-    //         throw new Error(
-    //           `Failed to create job for account ${accountId}: ${error.message}`
-    //         );
-    //       }
+      const assigneesAutomation = automations.find(
+        (automation) => automation.type === "Update job assignees"
+      );
 
-    //       const result = await response.json();
-    //       if (!result.createdJobs || result.createdJobs.length === 0) {
-    //         throw new Error(`No job created for account ${accountId}`);
-    //       }
+      const jobCreationPromises = combinedaccountValues.map(
+        async (accountId) => {
+          let finalAssignees = [...combinedValues];
 
-    //       // Return both account and job information
-    //       return {
-    //         accountId,
-    //         jobId: result.createdJobs[0]._id, // Assuming one job per account
-    //         jobData: result.createdJobs[0],
-    //       };
-    //     }
-    //   );
+          if (assigneesAutomation) {
+            assigneesAutomation.addAssignees?.forEach((assignee) => {
+              if (!finalAssignees.includes(assignee._id)) {
+                finalAssignees.push(assignee._id);
+              }
+            });
 
-    //   try {
-    //     const jobResults = await Promise.all(jobCreationPromises);
-
-    //     // Create a mapping of accountId to jobId
-    //     const accountJobMap = {};
-    //     jobResults.forEach((result) => {
-    //       accountJobMap[result.accountId] = result.jobId;
-    //     });
-
-    //     return {
-    //       success: true,
-    //       accountJobMap,
-    //       jobs: jobResults.map((r) => r.jobData),
-    //     };
-    //   } catch (error) {
-    //     console.error("Job creation failed:", error);
-    //     throw error;
-    //   }
-    // };
-
-//     const createJob = async () => {
-//   const myHeaders = new Headers();
-//   myHeaders.append("Content-Type", "application/json");
-
-//   // Find the "Update client-facing job status" automation if it exists
-//   const clientStatusAutomation = automations.find(
-//     (automation) => automation.type === "Update client-facing job status"
-//   );
-
-//   // Create jobs for each account
-//   const jobCreationPromises = combinedaccountValues.map(
-//     async (accountId) => {
-//       const jobData = {
-//         accounts: [accountId], // Single account per job
-//         pipeline: selectedPipeline.value,
-//         templatename: selectedtemp.value,
-//         jobname: jobName,
-//         jobassignees: combinedValues,
-//         priority: priority,
-//         description: description,
-//         absolutedates: absoluteDate,
-//         startsin: startsin,
-//         startsinduration: startsInDuration,
-//         duein: duein,
-//         dueinduration: dueinduration,
-//         // Use values from automation if it exists, otherwise use the default values
-//         showinclientportal: clientStatusAutomation 
-//           ? clientStatusAutomation.visibilityForClient 
-//           : clientFacingStatus,
-//         jobnameforclient: inputText,
-//         clientfacingstatus: clientStatusAutomation 
-//           ? clientStatusAutomation.selectedClientStatus?.value 
-//           : selectedJob?.value,
-//         clientfacingDescription: clientStatusAutomation 
-//           ? clientStatusAutomation.statusDescription 
-//           : clientDescription,
-//         startdate: startDate,
-//         enddate: dueDate,
-//       };
-
-//       const response = await fetch(`${JOBS_API}/workflow/jobs/newjob`, {
-//         method: "POST",
-//         headers: myHeaders,
-//         body: JSON.stringify(jobData),
-//       });
-//       console.log("jobs automation creation", jobData);
-//       if (!response.ok) {
-//         const error = await response.json();
-//         throw new Error(
-//           `Failed to create job for account ${accountId}: ${error.message}`
-//         );
-//       }
-
-//       const result = await response.json();
-//       if (!result.createdJobs || result.createdJobs.length === 0) {
-//         throw new Error(`No job created for account ${accountId}`);
-//       }
-
-//       // Return both account and job information
-//       return {
-//         accountId,
-//         jobId: result.createdJobs[0]._id, // Assuming one job per account
-//         jobData: result.createdJobs[0],
-//       };
-//     }
-//   );
-
-//   try {
-//     const jobResults = await Promise.all(jobCreationPromises);
-
-//     // Create a mapping of accountId to jobId
-//     const accountJobMap = {};
-//     jobResults.forEach((result) => {
-//       accountJobMap[result.accountId] = result.jobId;
-//     });
-
-//     return {
-//       success: true,
-//       accountJobMap,
-//       jobs: jobResults.map((r) => r.jobData),
-//     };
-//   } catch (error) {
-//     console.error("Job creation failed:", error);
-//     throw error;
-//   }
-// };
-
-const createJob = async () => {
-  const myHeaders = new Headers();
-  myHeaders.append("Content-Type", "application/json");
-
-  // Find relevant automations
-  const clientStatusAutomation = automations.find(
-    (automation) => automation.type === "Update client-facing job status"
-  );
-  
-  const assigneesAutomation = automations.find(
-    (automation) => automation.type === "Update job assignees"
-  );
-
-  // Create jobs for each account
-  const jobCreationPromises = combinedaccountValues.map(
-    async (accountId) => {
-      // Start with the base assignees from combinedValues
-      let finalAssignees = [...combinedValues];
-      
-      // Apply assignees automation if it exists
-      if (assigneesAutomation) {
-        // Add new assignees (avoid duplicates)
-        assigneesAutomation.addAssignees.forEach(assignee => {
-          if (!finalAssignees.includes(assignee._id)) {
-            finalAssignees.push(assignee._id);
+            finalAssignees = finalAssignees.filter(
+              (assigneeId) =>
+                !assigneesAutomation.removeAssignees?.some(
+                  (removeAssignee) => removeAssignee._id === assigneeId
+                )
+            );
           }
+
+          const jobData = {
+            accounts: [accountId],
+            stageid: selectedStage.value,
+            pipeline: selectedPipeline.value,
+            templatename: selectedtemp.value,
+            jobname: jobName,
+            jobassignees: finalAssignees,
+            priority: priority,
+            description: description,
+            absolutedates: absoluteDate,
+            startsin: startsin,
+            startsinduration: startsInDuration,
+            duein: duein,
+            dueinduration: dueinduration,
+            showinclientportal: clientStatusAutomation
+              ? clientStatusAutomation.visibilityForClient
+              : clientFacingStatus,
+            jobnameforclient: inputText,
+            clientfacingstatus: clientStatusAutomation
+              ? clientStatusAutomation.selectedClientStatus?.value
+              : selectedJob?.value,
+            clientfacingDescription: clientStatusAutomation
+              ? clientStatusAutomation.statusDescription
+              : clientDescription,
+            startdate: startDate,
+            enddate: dueDate,
+          };
+
+          const response = await fetch(`${JOBS_API}/workflow/jobs/newjob`, {
+            method: "POST",
+            headers: myHeaders,
+            body: JSON.stringify(jobData),
+          });
+
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(
+              `Failed to create job for account ${accountId}: ${error.message}`
+            );
+          }
+
+          const result = await response.json();
+          if (!result.createdJobs || result.createdJobs.length === 0) {
+            throw new Error(`No job created for account ${accountId}`);
+          }
+
+          return {
+            accountId,
+            jobId: result.createdJobs[0]._id,
+            jobData: result.createdJobs[0],
+          };
+        }
+      );
+
+      try {
+        const jobResults = await Promise.all(jobCreationPromises);
+        const accountJobMap = {};
+        jobResults.forEach((result) => {
+          accountJobMap[result.accountId] = result.jobId;
         });
-        
-        // Remove specified assignees
-        finalAssignees = finalAssignees.filter(assigneeId => 
-          !assigneesAutomation.removeAssignees.some(
-            removeAssignee => removeAssignee._id === assigneeId
-          )
-        );
+
+        return {
+          success: true,
+          accountJobMap,
+          jobs: jobResults.map((r) => r.jobData),
+        };
+      } catch (error) {
+        console.error("Job creation failed:", error);
+        throw error;
       }
-
-      const jobData = {
-        accounts: [accountId],
-           stageid: selectedStage.value,
-        pipeline: selectedPipeline.value,
-        templatename: selectedtemp.value,
-        jobname: jobName,
-        jobassignees: finalAssignees, // Use the modified assignees list
-        priority: priority,
-        description: description,
-        absolutedates: absoluteDate,
-        startsin: startsin,
-        startsinduration: startsInDuration,
-        duein: duein,
-        dueinduration: dueinduration,
-        showinclientportal: clientStatusAutomation 
-          ? clientStatusAutomation.visibilityForClient 
-          : clientFacingStatus,
-        jobnameforclient: inputText,
-        clientfacingstatus: clientStatusAutomation 
-          ? clientStatusAutomation.selectedClientStatus?.value 
-          : selectedJob?.value,
-        clientfacingDescription: clientStatusAutomation 
-          ? clientStatusAutomation.statusDescription 
-          : clientDescription,
-        startdate: startDate,
-        enddate: dueDate,
-      };
-
-      const response = await fetch(`${JOBS_API}/workflow/jobs/newjob`, {
-        method: "POST",
-        headers: myHeaders,
-        body: JSON.stringify(jobData),
-      });
-      
-      console.log("jobs automation creation", jobData);
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(
-          `Failed to create job for account ${accountId}: ${error.message}`
-        );
-      }
-
-      const result = await response.json();
-      if (!result.createdJobs || result.createdJobs.length === 0) {
-        throw new Error(`No job created for account ${accountId}`);
-      }
-
-      return {
-        accountId,
-        jobId: result.createdJobs[0]._id,
-        jobData: result.createdJobs[0],
-      };
-    }
-  );
-
-  try {
-    const jobResults = await Promise.all(jobCreationPromises);
-
-    const accountJobMap = {};
-    jobResults.forEach((result) => {
-      accountJobMap[result.accountId] = result.jobId;
-    });
-
-    return {
-      success: true,
-      accountJobMap,
-      jobs: jobResults.map((r) => r.jobData),
     };
-  } catch (error) {
-    console.error("Job creation failed:", error);
-    throw error;
-  }
-};
+
+    // Fetch login user data
+    const fetchLoginUserData = async (loginuserid) => {
+      const myHeaders = new Headers();
+      const requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow",
+      };
+
+      fetch(`${LOGIN_API}/common/user/${loginuserid}`, requestOptions)
+        .then((response) => response.json())
+        .then((result) => setAdminUsername(result.username))
+        .catch((error) => console.error("Error fetching user data:", error));
+    };
+
+    useEffect(() => {
+      fetchLoginUserData(loginuserid);
+    }, [loginuserid]);
+
+    // Render function
     return (
       <Box p={2}>
         <Typography variant="h6" sx={{ display: "flex", alignItems: "center" }}>
@@ -1965,394 +3050,216 @@ const createJob = async () => {
 
         <Box>
           {automations.map((automation, index) => {
-            const hasMatchingTags = automation.tags?.length
-              ? automation.tags.some((automationTag) =>
-                  accountTags.some(
-                    (accountTag) => accountTag._id === automationTag._id
-                  )
-                )
-              : true; // Allow if no tags are specified
+            const currentTagData = tagData[index] || {};
+            const templateName = templateData[index] || "Loading...";
 
+            // const hasMatchingTags = automation.selectedTags?.length
+            //   ? automation.selectedTags.some((automationTagId) =>
+            //       accountTags.some(
+            //         (accountTag) => accountTag._id === automationTagId
+            //       )
+            //     )
+            //   : true;
+// Check if ALL selected accounts have matching tags for this automation
+          const allAccountsHaveMatchingTags = combinedaccountValues.every(accountId => 
+            checkTagMatch(automation.selectedTags, accountId)
+          );
             return (
-              <Box key={index} sx={{ marginBottom: 2 }}>
-                <Box sx={{ display: "flex", alignItems: "center" }}>
+              <Box
+                key={index}
+                sx={{
+                  marginBottom: 2,
+                  p: 2,
+                  border: "1px solid #e0e0e0",
+                  borderRadius: 2,
+                }}
+              >
+                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                   <FormControlLabel
                     control={
                       <Checkbox
                         checked={selectedAutomations.includes(index)}
                         onChange={() => handleCheckboxChange(index)}
-                        disabled={!hasMatchingTags} // Disable checkbox if tags don't match
-                      />
+ disabled={!allAccountsHaveMatchingTags}                      />
+                    }
+                    label={
+                      <Typography variant="h6" component="span">
+                        {automation.type}
+                      </Typography>
                     }
                   />
-                  {!hasMatchingTags && (
+                  {!allAccountsHaveMatchingTags && (
                     <Typography
                       variant="body2"
                       color="error"
-                      sx={{ fontStyle: "italic" }}
+                      sx={{ fontStyle: "italic", ml: 2 }}
                     >
                       The tags do not match the account
                     </Typography>
                   )}
                 </Box>
-                {automation.type === "Update account tags" ? (
-                  <Box>
-                    <Box sx={{ width: 500 }}>
-                      <Typography variant="body2" sx={{ marginBottom: 1 }}>
-                        Add tags to account
-                      </Typography>
 
-                      <Select
-                        multiple
-                        displayEmpty
-                        multiline
-                        size="small"
-                        value={automation.addTags.map((tag) => tag._id)}
-                        onChange={(event) =>
-                          handleTagChange(index, "addTags", event)
-                        }
-                        renderValue={(selected) =>
-                          selected.length === 0 ? (
-                            <Typography color="gray">
-                              Select tags to add
-                            </Typography>
-                          ) : (
-                            <Box
-                              sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}
-                            >
-                              {automation.addTags.map((tag) => (
-                                <Chip
-                                  key={tag._id}
-                                  label={tag.tagName}
-                                  sx={{
-                                    backgroundColor: tag.tagColour,
-                                    color: "#fff",
-                                    fontWeight: "500",
-                                    borderRadius: "20px",
-                                  }}
-                                />
-                              ))}
-                            </Box>
-                          )
-                        }
-                        fullWidth
-                        MenuProps={MenuProps}
-                        sx={{ width: "100%", marginBottom: 2 }}
-                      >
-                        {tagsoptions
-                          .filter(
-                            (option) =>
-                              !automation.removeTags.some(
-                                (tag) => tag._id === option.value
-                              )
-                          ) // Hide selected removeTags
-                          .map((option) => {
-                            // Create a hidden canvas to measure text width
-                            const canvas = document.createElement("canvas");
-                            const context = canvas.getContext("2d");
-                            context.font = "14px Arial"; // Match the MenuItem font style
-
-                            const textWidth = context.measureText(
-                              option.label
-                            ).width; // Get exact width
-                            const dynamicWidth = Math.min(textWidth + 20, 200); // Add padding & set max width
-
-                            return (
-                              <MenuItem
-                                key={option.value}
-                                value={option.value}
-                                sx={{
-                                  backgroundColor: option.colour,
-                                  color: "#fff",
-                                  fontSize: "10px",
-                                  borderRadius: "10px",
-                                  margin: "5px",
-                                  textAlign: "center",
-                                  display: "flex",
-                                  justifyContent: "center",
-                                  padding: "4px 9px",
-                                  whiteSpace: "nowrap", // Prevent text wrapping
-                                  minWidth: `${dynamicWidth}px`,
-                                  maxWidth: `${dynamicWidth}px`, // Set dynamic max width
-                                  "&:hover": {
-                                    backgroundColor: option.colour,
-                                    color: "#fff",
-                                  },
-                                }}
-                              >
-                                {option.label}
-                              </MenuItem>
-                            );
-                          })}
-                      </Select>
-                      <Typography variant="body2" sx={{ marginBottom: 1 }}>
-                        Remove tags from account
-                      </Typography>
-
-                      <Select
-                        multiple
-                        size="small"
-                        multiline
-                        displayEmpty
-                        value={automation.removeTags.map((tag) => tag._id)}
-                        onChange={(event) =>
-                          handleTagChange(index, "removeTags", event)
-                        }
-                        renderValue={(selected) =>
-                          selected.length === 0 ? (
-                            <Typography color="gray">
-                              Select tags to remove
-                            </Typography>
-                          ) : (
-                            <Box
-                              sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}
-                            >
-                              {automation.removeTags.map((tag) => (
-                                <Chip
-                                  key={tag._id}
-                                  label={tag.tagName}
-                                  sx={{
-                                    backgroundColor: tag.tagColour,
-                                    color: "#fff",
-                                    fontWeight: "500",
-                                    borderRadius: "20px",
-                                  }}
-                                />
-                              ))}
-                            </Box>
-                          )
-                        }
-                        MenuProps={MenuProps}
-                        sx={{ width: "100%", marginBottom: 2 }}
-                      >
-                        {tagsoptions
-                          .filter(
-                            (option) =>
-                              !automation.addTags.some(
-                                (tag) => tag._id === option.value
-                              )
-                          ) // Hide selected removeTags
-                          .map((option) => {
-                            // Create a hidden canvas to measure text width
-                            const canvas = document.createElement("canvas");
-                            const context = canvas.getContext("2d");
-                            context.font = "14px Arial"; // Match the MenuItem font style
-
-                            const textWidth = context.measureText(
-                              option.label
-                            ).width; // Get exact width
-                            const dynamicWidth = Math.min(textWidth + 20, 200); // Add padding & set max width
-
-                            return (
-                              <MenuItem
-                                key={option.value}
-                                value={option.value}
-                                sx={{
-                                  backgroundColor: option.colour,
-                                  color: "#fff",
-                                  fontSize: "10px",
-                                  borderRadius: "10px",
-                                  margin: "5px",
-                                  textAlign: "center",
-                                  display: "flex",
-                                  justifyContent: "center",
-                                  padding: "4px 9px",
-                                  whiteSpace: "nowrap", // Prevent text wrapping
-                                  minWidth: `${dynamicWidth}px`,
-                                  maxWidth: `${dynamicWidth}px`, // Set dynamic max width
-                                  "&:hover": {
-                                    backgroundColor: option.colour,
-                                    color: "#fff",
-                                  },
-                                }}
-                              >
-                                {option.label}
-                              </MenuItem>
-                            );
-                          })}
-                      </Select>
-                      {/* Warning Message */}
-                      <Alert severity="warning" sx={{ marginBottom: 2 }}>
-                        This automation can affect conditions for automations
-                        below
-                      </Alert>
-                    </Box>
+                {/* Template Information */}
+                {automation.selectedtemp && (
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="subtitle1" fontWeight="bold">
+                      Template:
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary">
+                      {templateName}
+                    </Typography>
+                    {/* <Typography variant="caption" color="textSecondary">
+                    Type: {automation.refModel}
+                  </Typography> */}
                   </Box>
-                ) : automation.type === "Update job assignees" ? (
-          <Box>
-            <Box sx={{ width: 500 }}>
-              <Typography variant="body2" sx={{ marginBottom: 1 }}>
-                Add assignees to job
-              </Typography>
+                )}
 
-              <Select
-                multiple
-                displayEmpty
-                multiline
-                size="small"
-                value={automation.addAssignees.map((assignee) => assignee._id)}
-                onChange={(event) =>
-                  handleAssigneeChange(index, "addAssignees", event)
-                }
-                renderValue={(selected) =>
-                  selected.length === 0 ? (
-                    <Typography color="gray">
-                      Select assignees to add
-                    </Typography>
-                  ) : (
-                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                      {automation.addAssignees.map((assignee) => (
-                        <Chip
-                          key={assignee._id}
-                          label={assignee.username}
-                          sx={{
-                            backgroundColor: '#e0e0e0',
-                            color: "#000",
-                            fontWeight: "500",
-                            borderRadius: "20px",
-                          }}
-                        />
-                      ))}
-                    </Box>
-                  )
-                }
-                fullWidth
-                MenuProps={MenuProps}
-                sx={{ width: "100%", marginBottom: 2 }}
-              >
-                {assigneeOptions.map((option) => (
-                  <MenuItem
-                    key={option.value}
-                    value={option.value}
-                    sx={{
-                      '&:hover': {
-                        backgroundColor: '#f5f5f5',
-                      },
-                    }}
-                  >
-                    {option.label}
-                  </MenuItem>
-                ))}
-              </Select>
-
-              <Typography variant="body2" sx={{ marginBottom: 1 }}>
-                Remove assignees from job
-              </Typography>
-
-              <Select
-                multiple
-                size="small"
-                multiline
-                displayEmpty
-                value={automation.removeAssignees.map((assignee) => assignee._id)}
-                onChange={(event) =>
-                  handleAssigneeChange(index, "removeAssignees", event)
-                }
-                renderValue={(selected) =>
-                  selected.length === 0 ? (
-                    <Typography color="gray">
-                      Select assignees to remove
-                    </Typography>
-                  ) : (
-                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                      {automation.removeAssignees.map((assignee) => (
-                        <Chip
-                          key={assignee._id}
-                         label={assignee.username}
-                          sx={{
-                            backgroundColor: '#e0e0e0',
-                            color: "#000",
-                            fontWeight: "500",
-                            borderRadius: "20px",
-                          }}
-                        />
-                      ))}
-                    </Box>
-                  )
-                }
-                MenuProps={MenuProps}
-                sx={{ width: "100%", marginBottom: 2 }}
-              >
-                {assigneeOptions.map((option) => (
-                  <MenuItem
-                    key={option.value}
-                    value={option.value}
-                    sx={{
-                      '&:hover': {
-                        backgroundColor: '#f5f5f5',
-                      },
-                    }}
-                  >
-                    {option.label}
-                  </MenuItem>
-                ))}
-              </Select>
-
-              <Alert severity="warning" sx={{ marginBottom: 2 }}>
-                This automation can affect job assignment notifications
-              </Alert>
-            </Box>
-          </Box>
-          
-        ) : automation.type === "Update client-facing job status" ? (
-                  <Box>
-                    <Typography variant="body1">
-                      <strong>Type:</strong> {automation.type}
-                      {automation.visibilityForClient &&
-                        automation.selectedClientStatus && (
-                          <span>
-                            {" "}
-                            : {automation.selectedClientStatus.label}
-                          </span>
-                        )}
-                      {!automation.visibilityForClient && (
-                        <span> : Hide status</span>
-                      )}
-                    </Typography>
-                  </Box>
-                ) : (
-                  <Box>
-                    <Typography variant="body1">
-                      <strong>Type:</strong> {automation.type}
-                    </Typography>
-
-                    <Typography variant="body1">
-                      <strong>Template:</strong> {automation.template.label}
-                    </Typography>
-                    <Typography variant="body1">
-                      <strong>Tags:</strong>
-                    </Typography>
-                    {automation.tags.map((tag) => (
+                {/* Selected Tags (Condition Tags) */}
+                {currentTagData.selectedTags &&
+                  currentTagData.selectedTags.length > 0 && (
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Condition Tags:
+                      </Typography>
                       <Box
-                        key={tag._id}
                         sx={{
-                          display: "inline-block",
-                          backgroundColor: tag.tagColour,
-                          color: "white",
-                          borderRadius: "15px",
-                          padding: "3px 8px",
-                          marginRight: "4px",
+                          display: "flex",
+                          flexWrap: "wrap",
+                          gap: 1,
+                          mt: 1,
                         }}
                       >
-                        {tag.tagName}
+                        {currentTagData.selectedTags.map((tag) => (
+                          <Chip
+                            key={tag._id}
+                            label={tag.tagName}
+                            sx={{
+                              backgroundColor: tag.tagColour,
+                              color: "#fff",
+                              fontWeight: "500",
+                              borderRadius: "20px",
+                            }}
+                            size="small"
+                          />
+                        ))}
                       </Box>
-                    ))}
+                    </Box>
+                  )}
+
+                {/* Add Tags */}
+                {automation.type === "Update account tags" &&
+                  currentTagData.addTags &&
+                  currentTagData.addTags.length > 0 && (
+                    <Box sx={{ mb: 2 }}>
+                      <Typography
+                        variant="subtitle1"
+                        fontWeight="bold"
+                        color="success.main"
+                      >
+                        Add Tags:
+                      </Typography>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          gap: 1,
+                          mt: 1,
+                        }}
+                      >
+                        {currentTagData.addTags.map((tag) => (
+                          <Chip
+                            key={tag._id}
+                            label={tag.tagName}
+                            sx={{
+                              backgroundColor: tag.tagColour,
+                              color: "#fff",
+                              fontWeight: "500",
+                              borderRadius: "20px",
+                              border: "2px solid #4caf50",
+                            }}
+                            size="small"
+                          />
+                        ))}
+                      </Box>
+                    </Box>
+                  )}
+
+                {/* Remove Tags */}
+                {automation.type === "Update account tags" &&
+                  currentTagData.removeTags &&
+                  currentTagData.removeTags.length > 0 && (
+                    <Box sx={{ mb: 2 }}>
+                      <Typography
+                        variant="subtitle1"
+                        fontWeight="bold"
+                        color="error.main"
+                      >
+                        Remove Tags:
+                      </Typography>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          gap: 1,
+                          mt: 1,
+                        }}
+                      >
+                        {currentTagData.removeTags.map((tag) => (
+                          <Chip
+                            key={tag._id}
+                            label={tag.tagName}
+                            sx={{
+                              backgroundColor: tag.tagColour,
+                              color: "#fff",
+                              fontWeight: "500",
+                              borderRadius: "20px",
+                              border: "2px solid #f44336",
+                              textDecoration: "line-through",
+                            }}
+                            size="small"
+                          />
+                        ))}
+                      </Box>
+                    </Box>
+                  )}
+
+                {/* Client Status Information */}
+                {automation.type === "Update client-facing job status" && (
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="subtitle1" fontWeight="bold">
+                      Client Status:
+                    </Typography>
+                    <Typography variant="body2">
+                      {automation.selectedClientStatus
+                        ? `Status: ${automation.selectedClientStatus.label}`
+                        : "Hide status"}
+                    </Typography>
+                    {automation.statusDescription && (
+                      <Typography variant="body2" color="textSecondary">
+                        Description: {automation.statusDescription}
+                      </Typography>
+                    )}
                   </Box>
+                )}
+
+                {/* Warning for Account Tags Automation */}
+                {automation.type === "Update account tags" && (
+                  <Alert severity="warning" sx={{ mt: 2 }}>
+                    This automation can affect conditions for automations below
+                  </Alert>
                 )}
               </Box>
             );
           })}
         </Box>
+
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mt: 5 }}>
           <Button
             variant="contained"
             onClick={handleMove}
             sx={{
-              backgroundColor: "var(--color-save-btn)", // Normal background
-
-              "&:hover": {
-                backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-              },
+              backgroundColor: "var(--color-save-btn)",
+              "&:hover": { backgroundColor: "var(--color-save-hover-btn)" },
               borderRadius: "15px",
               width: "80px",
             }}
@@ -2363,10 +3270,10 @@ const createJob = async () => {
             variant="outlined"
             onClick={() => setDrawerOpen(false)}
             sx={{
-              borderColor: "var(--color-border-cancel-btn)", // Normal background
+              borderColor: "var(--color-border-cancel-btn)",
               color: "var(--color-save-btn)",
               "&:hover": {
-                backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+                backgroundColor: "var(--color-save-hover-btn)",
                 color: "#fff",
                 border: "none",
               },
@@ -2380,6 +3287,7 @@ const createJob = async () => {
       </Box>
     );
   };
+
   const handleClose = () => {
     handleNewDrawerClose();
   };
@@ -2443,25 +3351,25 @@ const createJob = async () => {
               />
             </Box>
             <Box mt={2}>
-                  <label className="job-input-label">Stage</label>
-                  <Autocomplete
-                    // disabled // Disable the Autocomplete input
-                    size="small"
-                    options={stagesoptions}
-                    getOptionLabel={(option) => option.label}
-                    value={selectedStage}
-                    onChange={handleStageChange}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        placeholder="Stages"
-                        variant="outlined"
-                        className="add-jobs-select-dropdown"
-                      />
-                    )}
-                    sx={{ width: "100%", marginTop: "8px" }}
+              <label className="job-input-label">Stage</label>
+              <Autocomplete
+                // disabled // Disable the Autocomplete input
+                size="small"
+                options={stagesoptions}
+                getOptionLabel={(option) => option.label}
+                value={selectedStage}
+                onChange={handleStageChange}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder="Stages"
+                    variant="outlined"
+                    className="add-jobs-select-dropdown"
                   />
-                </Box>
+                )}
+                sx={{ width: "100%", marginTop: "8px" }}
+              />
+            </Box>
             <Box mt={2}>
               <label className="job-input-label">Template</label>
               <Autocomplete
@@ -2557,7 +3465,7 @@ const createJob = async () => {
                   <Typography>Start Date</Typography>
                   <DatePicker
                     //  format="MM/DD/YYYY"
-                       format="MM/DD/YYYY"
+                    format="MM/DD/YYYY"
                     sx={{ width: "100%", backgroundColor: "#fff" }}
                     // value={startDate}
                     // onChange={handleStartDateChange}
@@ -2571,7 +3479,7 @@ const createJob = async () => {
                 <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
                   <Typography>Due Date</Typography>
                   <DatePicker
-                     format="MM/DD/YYYY"
+                    format="MM/DD/YYYY"
                     sx={{ width: "100%", backgroundColor: "#fff" }}
                     // value={dueDate}
                     // onChange={handleDueDateChange}

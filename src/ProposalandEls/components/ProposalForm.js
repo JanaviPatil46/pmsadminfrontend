@@ -180,7 +180,7 @@ const ProposalForm = () => {
       services: {
         option: apiData.services?.option || "",
         invoices: transformInvoicesForForm(apiData.services?.invoices || [], teamMemberOptions),
-        itemizedData: transformItemizedDataForForm(apiData.services?.itemizedData)
+        itemizedData: transformItemizedDataForForm(apiData.services?.itemizedData) || {}
       },
       payments: {
         method: apiData.payments?.method || '',
@@ -531,7 +531,7 @@ const handleSubmit = async () => {
       services: {
         ...formData.services,
         invoices: formData.services.option === 'invoice' ? transformInvoiceData(formData.services.invoices) : [],
-        itemizedData: formData.services.option === 'services' ? transformItemizedData(formData.services.itemizedData) : null
+        itemizedData: formData.services.option === 'services' ? transformItemizedData(formData.services.itemizedData) : {}
       }
     };
 

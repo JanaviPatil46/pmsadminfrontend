@@ -907,6 +907,8 @@ const ProposalForm = () => {
       // Prepare data for submission
       const submissionData = {
         ...formData,
+        templatename: formData.general.templatename,
+        proposalName: formData.general.proposalName,
         services: {
           ...formData.services,
           invoices:

@@ -261,7 +261,8 @@ console.log("accountsResponse",accountsResponse)
 
       const accountIds = accountsData.map((account) => account.id).join(",");
       url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
-      } else {
+     console.log("url",url)
+    } else {
         // TeamMember with restricted access → fetch user's accounts
         const accountsResponse = await axios.get(
           `${ACCOUNT_API}/accounts/getaccounts/${loginuserid}/${isActiveTrue}`
@@ -280,6 +281,7 @@ console.log("accountsResponse",accountsResponse)
 
         const accountIds = accountsData.map((account) => account.id).join(",");
         url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
+   console.log("url",url);
       }
     }
 

@@ -18,7 +18,8 @@ import { useNavigate } from "react-router-dom";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { Box } from "lucide-react";
 
-
+import axios from "axios";
+import { toast } from "react-toastify";
   const PIPELINE_API = process.env.REACT_APP_PIPELINE_TEMP_URL;
 const PipelineTable = () => {
   
@@ -59,34 +60,61 @@ const navigate = useNavigate();
   // ============================
   // 💥 EDIT Pipeline
   // ============================
+ // EDIT Pipeline - Navigate with pipeline ID
   const handleEdit = () => {
-    console.log("Edit clicked:", selectedPipeline);
-    navigate(`/firmtemp/pipelineform?edit=${selectedPipeline._id}`);
-    // 👉 Open drawer/modal here
+    if (selectedPipeline) {
+      navigate(`/firmtemp/pipelineform?edit=${selectedPipeline._id}`);
+    }
     handleMenuClose();
   };
 
   // ============================
   // 💥 DELETE Pipeline
   // ============================
-  const handleDelete = async () => {
-    console.log("Delete clicked:", selectedPipeline);
+  // const handleDelete = async () => {
+  //   console.log("Delete clicked:", selectedPipeline);
 
-    // Example API call
-    try {
-      await fetch(`/api/pipelines/${selectedPipeline._id}`, {
-        method: "DELETE",
-      });
+  //   // Example API call
+  //   try {
+  //     await fetch(`/api/pipelines/${selectedPipeline._id}`, {
+  //       method: "DELETE",
+  //     });
 
-      // Refresh list
-      fetchPipelineData();
-    } catch (error) {
-      console.log("Delete error:", error);
+  //     // Refresh list
+  //     fetchPipelineData();
+  //   } catch (error) {
+  //     console.log("Delete error:", error);
+  //   }
+
+  //   handleMenuClose();
+  // };
+ const handleDelete = async (_id) => {
+    // Show a confirmation prompt
+    const isConfirmed = window.confirm(
+      "Are you sure you want to delete this pipeline?"
+    );
+
+    // Proceed with deletion if confirmed
+    if (isConfirmed) {
+      const config = {
+        method: "delete",
+        maxBodyLength: Infinity,
+        url: `${PIPELINE_API}/workflow/pipeline/pipeline/${selectedPipeline._id}`,
+        headers: {},
+      };
+
+      try {
+        const response = await axios.request(config);
+        console.log("Delete response:", response.data);
+        toast.success("Pipeline deleted successfully");
+        handleMenuClose()
+        fetchPipelineData();
+        // Optionally, you can refresh the data or update the state to reflect the deletion
+      } catch (error) {
+        console.error("Error deleting pipeline:", error);
+      }
     }
-
-    handleMenuClose();
   };
-
   const handelCreateNew = () => {
     // Navigate to empty proposal form
     navigate(`/firmtemp/pipelineform`);
@@ -124,7 +152,7 @@ const navigate = useNavigate();
               <TableRow key={pipeline._id}>
                 
                 <TableCell>{pipeline.pipelineName}</TableCell>
-                <TableCell>{pipeline.stages?.length || 0}</TableCell>
+                <TableCell>{pipeline.stages?.length }</TableCell>
 
                 <TableCell sx={{ textAlign: "right" }}>
                   <IconButton onClick={(e) => handleMenuOpen(e, pipeline)}>

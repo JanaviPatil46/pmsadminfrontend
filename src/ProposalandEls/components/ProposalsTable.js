@@ -163,7 +163,8 @@ toast.success("Proposal deleted successfully")
                 
                 <TableCell>
                
-                  {proposal.general.templateName} 
+                  {/* {proposal.general.templateName}  */}
+                  {proposal.templatename} 
                 </TableCell>
                   <TableCell>
                   <IconButton onClick={(e) => handleMenuOpen(e, proposal)}>

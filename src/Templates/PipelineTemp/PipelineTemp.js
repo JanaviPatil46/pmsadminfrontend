@@ -616,7 +616,7 @@ const PipelineTemp = () => {
   };
   const proposalElsOptions = addProposalsandElsTeplates.map((temp) => ({
     value: temp._id,
-    label: temp.general.templateName,
+    label: temp.templatename,
   }));
 
   const fetchOrganizerTemplates = async () => {
