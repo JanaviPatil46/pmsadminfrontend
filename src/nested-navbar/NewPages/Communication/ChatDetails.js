@@ -149,9 +149,10 @@ setSenderName(result.username)
         return response.json();
       })
       .then(() => {
-        toast.success("Message sent");
-        setEditorContent("");
+          setEditorContent("");
         setReplyTo(null);
+        toast.success("Message sent");
+      
          securemessagechatsend(chatId);
         updatechatStatus(chatId);
       accountwiseChatlist(data, isActiveTrue);
