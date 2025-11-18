@@ -68,35 +68,7 @@ const FileUploadDrawer = ({
   };
   const handleFolderSelect = (path) => setSelectedFolder(path);
 
-  // const handleUpload = async () => {
-  //  if (files.length === 0 || !selectedFolder) {
-  //     setMessage("Please select files and a folder.");
-  //     return;
-  //   }
-
-  //   try {
-  //     const formData = new FormData();
-  //     files.forEach((file) => formData.append("files", file));
-
-  //     const res = await axios.post(
-        // `https://www.snptaxes.com/api/accountsdoc/file/upload?folderPath=${encodeURIComponent(
-        //   selectedFolder
-        // )}`,
-  //       formData,
-  //       { headers: { "Content-Type": "multipart/form-data" } }
-  //     );
-
-  //     // setMessage(`✅ File uploaded: ${res.data.fileMeta.name}`);
-  //     toast.success(`✅ File uploaded: ${res.data.message}`)
-  //    setFiles([]);
-  //     onClose();
-  //     fetchFolderTree();
-  //   } catch (err) {
-  //     console.error(err);
-  //     toast.error(err)
-  //     setMessage("❌ Error uploading file");
-  //   }
-  // };
+ 
   const handleUpload = async () => {
     if (files.length === 0 || !selectedFolder) {
       setMessage("Please select files and a folder.");

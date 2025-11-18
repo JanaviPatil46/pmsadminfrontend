@@ -2028,9 +2028,9 @@ case "Update client-facing job status":
         <MenuItem onClick={() => handleAddAutomation(stageSelected, "Update account tags")}>
           Update account tags
         </MenuItem>
-        <MenuItem onClick={() => handleAddAutomation(stageSelected, "Update job assignees")}>
+        {/* <MenuItem onClick={() => handleAddAutomation(stageSelected, "Update job assignees")}>
           Update job assignees
-        </MenuItem>
+        </MenuItem> */}
         <MenuItem onClick={() => handleAddAutomation(stageSelected, "Create Task")}>
           Create Task
         </MenuItem>
@@ -2184,9 +2184,9 @@ case "Update client-facing job status":
             <MenuItem onClick={() => handleDrawerMenuItemSelect("Update account tags")}>
               Update account tags
             </MenuItem>
-            <MenuItem onClick={() => handleDrawerMenuItemSelect("Update job assignees")}>
+            {/* <MenuItem onClick={() => handleDrawerMenuItemSelect("Update job assignees")}>
               Update job assignees
-            </MenuItem>
+            </MenuItem> */}
             <MenuItem onClick={() => handleDrawerMenuItemSelect("Create Task")}>
               Create Task
             </MenuItem>
