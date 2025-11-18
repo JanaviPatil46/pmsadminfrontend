@@ -22,7 +22,7 @@ import { RxCross2, RxDragHandleDots2 } from "react-icons/rx";
 import {IoMdArrowRoundBack} from "react-icons/io";
 import  {AiOutlineSearch} from "react-icons/ai";
 import TagsMultiSelectDropDown from "../TagsMultiSelectDropDown";
-
+import MultiSelectDropdown from "../MultiSelectDropdown"; 
 const StagesSection = ({
   stages,
   stageNameErrors,
@@ -82,7 +82,33 @@ const StagesSection = ({
       console.error("Error fetching data:", error);
     }
   };
+    const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
   
+    const [users, setUsers] = useState([]);
+   
+  
+    // Fetch Users
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const url = `${LOGIN_API}/common/users/roles?roles=TeamMember,Admin`;
+          const response = await fetch(url);
+          const data = await response.json();
+  
+          const userOptions = data.map((u) => ({
+            value: u._id,
+            label: u.username,
+            // email: u.email,
+          }));
+  
+          setUsers(userOptions);
+        } catch (error) {
+          console.error("Error fetching users:", error);
+        }
+      };
+  
+      fetchData();
+    }, [LOGIN_API]);
   const fetchTaskTemplates = async () => {
     try {
       const url = `${TASK_API}/workflow/tasks/tasktemplate/`;
@@ -323,92 +349,220 @@ const handleClientStatusSelection = async (event, newValue, automationIndex) => 
     handleAutomationMenuClose();
   };
 
-  const handleEditAutomations = (stageIndex) => {
-    const stage = stages[stageIndex];
-    if (stage && stage.automations && stage.automations.length > 0) {
-      // Restore automations with proper template and tag objects
-      const restoredAutomations = stage.automations.map(automation => {
-        const restoredAutomation = { ...automation };
+  // const handleEditAutomations = (stageIndex) => {
+  //   const stage = stages[stageIndex];
+  //   if (stage && stage.automations && stage.automations.length > 0) {
+  //     // Restore automations with proper template and tag objects
+  //     const restoredAutomations = stage.automations.map(automation => {
+  //       const restoredAutomation = { ...automation };
         
-        // Restore template object based on automation type
-        if (automation.selectedtemp) {
-          let templateOptions = [];
-          switch (automation.type) {
-            case "Create Task":
-              templateOptions = taskTemplateOptions;
-              break;
-            case "Send Email":
-              templateOptions = emailTemplateOptions;
-              break;
-            case "Send message":
-              templateOptions = chatTemplateOptions;
-              break;
-            case "Send Invoice":
-              templateOptions = invoiceTemplateOptions;
-              break;
-            case "Send Proposal/Els":
-              templateOptions = proposalElsOptions;
-              break;
-            case "Apply folder template":
-              templateOptions = optionfolder;
-              break;
-            case "Create Organizer":
-              templateOptions = organizerOptions;
-              break;
-            default:
-              templateOptions = [];
-          }
+  //       // Restore template object based on automation type
+  //       if (automation.selectedtemp) {
+  //         let templateOptions = [];
+  //         switch (automation.type) {
+  //           case "Create Task":
+  //             templateOptions = taskTemplateOptions;
+  //             break;
+  //           case "Send Email":
+  //             templateOptions = emailTemplateOptions;
+  //             break;
+  //           case "Send message":
+  //             templateOptions = chatTemplateOptions;
+  //             break;
+  //           case "Send Invoice":
+  //             templateOptions = invoiceTemplateOptions;
+  //             break;
+  //           case "Send Proposal/Els":
+  //             templateOptions = proposalElsOptions;
+  //             break;
+  //           case "Apply folder template":
+  //             templateOptions = optionfolder;
+  //             break;
+  //           case "Create Organizer":
+  //             templateOptions = organizerOptions;
+  //             break;
+  //           default:
+  //             templateOptions = [];
+  //         }
           
-          // Find the template object
-          const templateObj = templateOptions.find(opt => opt.value === automation.selectedtemp);
-          restoredAutomation.selectedtemp = templateObj || null;
+  //         // Find the template object
+  //         const templateObj = templateOptions.find(opt => opt.value === automation.selectedtemp);
+  //         restoredAutomation.selectedtemp = templateObj || null;
+  //       }
+        
+  //       // Restore tags as objects (not just IDs)
+  //       if (automation.selectedTags && Array.isArray(automation.selectedTags)) {
+  //         restoredAutomation.selectedTags = automation.selectedTags.map(tagId => 
+  //           filteredTags.find(tag => tag._id === tagId)
+  //         ).filter(Boolean);
+  //       }
+        
+  //       // SPECIAL: Restore addTags and removeTags for "Update account tags"
+  //       if (automation.type === "Update account tags") {
+  //         if (automation.addTags && Array.isArray(automation.addTags)) {
+  //           restoredAutomation.addTags = automation.addTags.map(tagId => 
+  //             tags.find(tag => tag.value === tagId || tag._id === tagId)
+  //           ).filter(Boolean);
+  //         }
+          
+  //         if (automation.removeTags && Array.isArray(automation.removeTags)) {
+  //           restoredAutomation.removeTags = automation.removeTags.map(tagId => 
+  //             tags.find(tag => tag.value === tagId || tag._id === tagId)
+  //           ).filter(Boolean);
+  //         }
+  //       }
+  //        // SPECIAL: Restore addTags and removeTags for "Update account tags"
+  //       if (automation.type === "Update account tags") {
+  //         if (automation.addTags && Array.isArray(automation.addTags)) {
+  //           restoredAutomation.addTags = automation.addTags.map(tagId => 
+  //             tags.find(tag => tag.value === tagId || tag._id === tagId)
+  //           ).filter(Boolean);
+  //         }
+          
+  //         if (automation.removeTags && Array.isArray(automation.removeTags)) {
+  //           restoredAutomation.removeTags = automation.removeTags.map(tagId => 
+  //             tags.find(tag => tag.value === tagId || tag._id === tagId)
+  //           ).filter(Boolean);
+  //         }
+  //       }
+        
+  //       // SPECIAL: Restore job assignees for "Update job assignees"
+  //       if (automation.type === "Update job assignees") {
+  //         if (automation.selectedJobAssignees && Array.isArray(automation.selectedJobAssignees)) {
+  //           restoredAutomation.selectedJobAssignees = automation.selectedJobAssignees.map(assigneeId => 
+  //             // Assuming you have a users/teamMembers array to search from
+  //             users.find(user => user._id === assigneeId || user.value === assigneeId)
+  //           ).filter(Boolean);
+  //         }
+  //       }
+  //       // Restore client status
+  //       if (automation.selectedClientStatus) {
+  //         const statusObj = optionstatus.find(opt => opt.value === automation.selectedClientStatus);
+  //         restoredAutomation.selectedClientStatus = statusObj || null;
+  //       }
+        
+  //       // Restore status
+  //       if (automation.status !== undefined && automation.status !== null) {
+  //         const statusObj = statusOptions.find(opt => opt.value === automation.status);
+  //         restoredAutomation.status = statusObj || null;
+  //       }
+        
+  //       return restoredAutomation;
+  //     });
+  //     console.log("Restored automations for editing:", restoredAutomations);
+  //     setDrawerAutomations(restoredAutomations);
+  //     setStageSelected(stageIndex);
+  //     setIsDrawerOpen(true);
+  //   } else {
+  //     console.log("No existing automations to edit");
+  //   }
+  // };
+const handleEditAutomations = (stageIndex) => {
+  const stage = stages[stageIndex];
+  if (stage && stage.automations && stage.automations.length > 0) {
+    // Restore automations with proper template and tag objects
+    const restoredAutomations = stage.automations.map(automation => {
+      const restoredAutomation = { ...automation };
+      
+      // Restore template object based on automation type
+      if (automation.selectedtemp) {
+        let templateOptions = [];
+        switch (automation.type) {
+          case "Create Task":
+            templateOptions = taskTemplateOptions;
+            break;
+          case "Send Email":
+            templateOptions = emailTemplateOptions;
+            break;
+          case "Send message":
+            templateOptions = chatTemplateOptions;
+            break;
+          case "Send Invoice":
+            templateOptions = invoiceTemplateOptions;
+            break;
+          case "Send Proposal/Els":
+            templateOptions = proposalElsOptions;
+            break;
+          case "Apply folder template":
+            templateOptions = optionfolder;
+            break;
+          case "Create Organizer":
+            templateOptions = organizerOptions;
+            break;
+          default:
+            templateOptions = [];
         }
         
-        // Restore tags as objects (not just IDs)
-        if (automation.selectedTags && Array.isArray(automation.selectedTags)) {
-          restoredAutomation.selectedTags = automation.selectedTags.map(tagId => 
-            filteredTags.find(tag => tag._id === tagId)
+        // Find the template object
+        const templateObj = templateOptions.find(opt => opt.value === automation.selectedtemp);
+        restoredAutomation.selectedtemp = templateObj || null;
+      }
+      
+      // Restore tags as objects (not just IDs)
+      if (automation.selectedTags && Array.isArray(automation.selectedTags)) {
+        restoredAutomation.selectedTags = automation.selectedTags.map(tagId => 
+          filteredTags.find(tag => tag._id === tagId)
+        ).filter(Boolean);
+      }
+      
+      // SPECIAL: Restore addTags and removeTags for "Update account tags"
+      if (automation.type === "Update account tags") {
+        if (automation.addTags && Array.isArray(automation.addTags)) {
+          restoredAutomation.addTags = automation.addTags.map(tagId => 
+            tags.find(tag => tag.value === tagId || tag._id === tagId)
           ).filter(Boolean);
         }
         
-        // SPECIAL: Restore addTags and removeTags for "Update account tags"
-        if (automation.type === "Update account tags") {
-          if (automation.addTags && Array.isArray(automation.addTags)) {
-            restoredAutomation.addTags = automation.addTags.map(tagId => 
-              tags.find(tag => tag.value === tagId || tag._id === tagId)
-            ).filter(Boolean);
-          }
-          
-          if (automation.removeTags && Array.isArray(automation.removeTags)) {
-            restoredAutomation.removeTags = automation.removeTags.map(tagId => 
-              tags.find(tag => tag.value === tagId || tag._id === tagId)
-            ).filter(Boolean);
-          }
+        if (automation.removeTags && Array.isArray(automation.removeTags)) {
+          restoredAutomation.removeTags = automation.removeTags.map(tagId => 
+            tags.find(tag => tag.value === tagId || tag._id === tagId)
+          ).filter(Boolean);
         }
-        
-        // Restore client status
-        if (automation.selectedClientStatus) {
-          const statusObj = optionstatus.find(opt => opt.value === automation.selectedClientStatus);
-          restoredAutomation.selectedClientStatus = statusObj || null;
-        }
-        
-        // Restore status
-        if (automation.status !== undefined && automation.status !== null) {
-          const statusObj = statusOptions.find(opt => opt.value === automation.status);
-          restoredAutomation.status = statusObj || null;
-        }
-        
-        return restoredAutomation;
-      });
+      }
       
-      setDrawerAutomations(restoredAutomations);
-      setStageSelected(stageIndex);
-      setIsDrawerOpen(true);
-    } else {
-      console.log("No existing automations to edit");
-    }
-  };
-
+      // FIX: Restore job assignees for "Update job assignees" - CORRECT FIELD NAMES
+      if (automation.type === "Update job assignees") {
+        console.log("Restoring Update job assignees automation:", automation);
+        
+        // Restore selectedAssignees (to add)
+        if (automation.selectedAssignees && Array.isArray(automation.selectedAssignees)) {
+          restoredAutomation.selectedAssignees = automation.selectedAssignees.map(assigneeId => 
+            users.find(user => user._id === assigneeId || user.value === assigneeId)
+          ).filter(Boolean);
+          console.log("Restored selectedAssignees:", restoredAutomation.selectedAssignees);
+        }
+        
+        // Restore assigneesToRemove (to remove)  
+        if (automation.assigneesToRemove && Array.isArray(automation.assigneesToRemove)) {
+          restoredAutomation.assigneesToRemove = automation.assigneesToRemove.map(assigneeId => 
+            users.find(user => user._id === assigneeId || user.value === assigneeId)
+          ).filter(Boolean);
+          console.log("Restored assigneesToRemove:", restoredAutomation.assigneesToRemove);
+        }
+      }
+      
+      // Restore client status
+      if (automation.selectedClientStatus) {
+        const statusObj = optionstatus.find(opt => opt.value === automation.selectedClientStatus);
+        restoredAutomation.selectedClientStatus = statusObj || null;
+      }
+      
+      // Restore status
+      if (automation.status !== undefined && automation.status !== null) {
+        const statusObj = statusOptions.find(opt => opt.value === automation.status);
+        restoredAutomation.status = statusObj || null;
+      }
+      
+      return restoredAutomation;
+    });
+    console.log("Restored automations for editing:", restoredAutomations);
+    setDrawerAutomations(restoredAutomations);
+    setStageSelected(stageIndex);
+    setIsDrawerOpen(true);
+  } else {
+    console.log("No existing automations to edit");
+  }
+};
   const handleDrawerClose = () => {
     setIsDrawerOpen(false);
     setAutomationSelect(null);
@@ -578,8 +732,9 @@ console.log("Preparing automation for saving:", automationData);
       }
 
       // Store assignee IDs (for "Update job assignees" automation)
-      automationData.selectedAssignees = automation.selectedAssignees ? automation.selectedAssignees.map(user => user._id) : [];
-      automationData.assigneesToRemove = automation.assigneesToRemove ? automation.assigneesToRemove.map(user => user._id) : [];
+        // Store assignee IDs (for "Update job assignees" automation)
+    automationData.selectedAssignees = automation.selectedAssignees ? automation.selectedAssignees.map(user => user.value || user._id) : [];
+    automationData.assigneesToRemove = automation.assigneesToRemove ? automation.assigneesToRemove.map(user => user.value || user._id) : [];
 
       return automationData;
     });
@@ -597,87 +752,7 @@ console.log("Preparing automation for saving:", automationData);
     handleDrawerClose();
   };
 
-  const handleEditAutomation = (stageIndex, automationIndex) => {
-    const stage = stages[stageIndex];
-    if (stage && stage.automations) {
-      const automationToEdit = stage.automations[automationIndex];
-      
-      // Restore the automation data
-      const restoredAutomation = { ...automationToEdit };
-      
-      // Restore template object
-      if (automationToEdit.selectedtemp) {
-        let templateOptions = [];
-        switch (automationToEdit.type) {
-          case "Create Task":
-            templateOptions = taskTemplateOptions;
-            break;
-          case "Send Email":
-            templateOptions = emailTemplateOptions;
-            break;
-          case "Send message":
-            templateOptions = chatTemplateOptions;
-            break;
-          case "Send Invoice":
-            templateOptions = invoiceTemplateOptions;
-            break;
-          case "Send Proposal/Els":
-            templateOptions = proposalElsOptions;
-            break;
-          case "Apply folder template":
-            templateOptions = optionfolder;
-            break;
-          case "Create Organizer":
-            templateOptions = organizerOptions;
-            break;
-          default:
-            templateOptions = [];
-        }
-        
-        const templateObj = templateOptions.find(opt => opt.value === automationToEdit.selectedtemp);
-        restoredAutomation.selectedtemp = templateObj || null;
-      }
-      
-      // Restore tags as objects
-      if (automationToEdit.selectedTags && Array.isArray(automationToEdit.selectedTags)) {
-        restoredAutomation.selectedTags = automationToEdit.selectedTags.map(tagId => 
-          filteredTags.find(tag => tag._id === tagId)
-        ).filter(Boolean);
-      }
-      
-      // SPECIAL: Restore addTags and removeTags for "Update account tags"
-      if (automationToEdit.type === "Update account tags") {
-        if (automationToEdit.addTags && Array.isArray(automationToEdit.addTags)) {
-          restoredAutomation.addTags = automationToEdit.addTags.map(tagId => 
-            tags.find(tag => tag.value === tagId || tag._id === tagId)
-          ).filter(Boolean);
-        }
-        
-        if (automationToEdit.removeTags && Array.isArray(automationToEdit.removeTags)) {
-          restoredAutomation.removeTags = automationToEdit.removeTags.map(tagId => 
-            tags.find(tag => tag.value === tagId || tag._id === tagId)
-          ).filter(Boolean);
-        }
-      }
-      
-      // Restore client status
-      if (automationToEdit.selectedClientStatus) {
-        const statusObj = optionstatus.find(opt => opt.value === automationToEdit.selectedClientStatus);
-        restoredAutomation.selectedClientStatus = statusObj || null;
-      }
-      
-      // Restore status
-      if (automationToEdit.status !== undefined && automationToEdit.status !== null) {
-        const statusObj = statusOptions.find(opt => opt.value === automationToEdit.status);
-        restoredAutomation.status = statusObj || null;
-      }
-      
-      setDrawerAutomations([restoredAutomation]);
-      setAutomationSelect(restoredAutomation.type);
-      setStageSelected(stageIndex);
-      setIsDrawerOpen(true);
-    }
-  };
+  
 
   // Delete saved automation from stage
   const handleDeleteSavedAutomation = (stageIndex, automationIndex) => {
@@ -1359,7 +1434,57 @@ case "Update client-facing job status":
             </Grid>
           </>
         );
+  case "Update job assignees":
+        return (
+          <>
+            <Grid item>
+              <Box sx={{ border: "2px solid #ddd", borderRadius: "8px", padding: 2 }}>
+                <Typography gutterBottom>{automationSelect}</Typography>
+                
+                {/* Add Tags Section */}
+                <Typography fontWeight={600} mt={1}>Add Job Assignes</Typography>
+                <MultiSelectDropdown
+                  value={automation.selectedAssignees || []}
+                  onChange={(newValue) => updateAutomationState(automationIndex, { selectedAssignees: newValue })}
+                  options={users.filter(user => 
+                    user && 
+                    user.value && 
+                    user.label &&
+                    !(automation.assigneesToRemove || []).some(assigneesToRemove => assigneesToRemove && assigneesToRemove.value === user.value)
+                  )}
+                  placeholder="Select Assignees to ADD"
+                />
 
+                {/* Remove Tags Section */}
+                <Typography fontWeight={600} mt={3}>Remove Job Assignes</Typography>
+                <MultiSelectDropdown
+                  value={automation.assigneesToRemove || []}
+                  onChange={(newValue) => updateAutomationState(automationIndex, { assigneesToRemove: newValue })}
+                  options={users.filter(user => 
+                    user && 
+                    user.value && 
+                    user.label &&
+                    !(automation.selectedAssignees || []).some(selectedAssignees => selectedAssignees && selectedAssignees.value === user.value)
+                  )}
+                  placeholder="Select Assignees to REMOVE"
+                />
+
+                {/* Conditions Section */}
+                <Box mt={2}>
+                  {selectedTags.length > 0 && (
+                    <Grid container alignItems="center" gap={1}>
+                      <Typography>Only for:</Typography>
+                      <Grid item>{selectedTagElements}</Grid>
+                    </Grid>
+                  )}
+                </Box>
+                <Button variant="text" onClick={() => handleAddConditions(automationIndex)}>
+                  {selectedTags.length > 0 ? "Edit Conditions" : "Add Conditions"}
+                </Button>
+              </Box>
+            </Grid>
+          </>
+        );
       default:
         return (
           <Box>
@@ -1713,6 +1838,57 @@ case "Update client-facing job status":
                                   </Box>
                                 )}
 
+   {/* Add Assignees - For "Update job assignees" */}
+            {automation.type === "Update job assignees" && automation.selectedAssignees && automation.selectedAssignees.length > 0 && (
+              <Box sx={{ mb: 1 }}>
+                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold' }}>
+                  Add Assignees:
+                </Typography>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.5 }}>
+                  {automation.selectedAssignees.map((userId, userIndex) => {
+                    const user = users.find(u => u.value === userId);
+                    return user ? (
+                      <Chip
+                        key={user.value}
+                        label={user.label}
+                        size="small"
+                        variant="outlined"
+                        sx={{
+                          fontSize: '0.7rem'
+                        }}
+                      />
+                    ) : null;
+                  })}
+                </Box>
+              </Box>
+            )}
+
+            {/* Remove Assignees - For "Update job assignees" */}
+            {automation.type === "Update job assignees" && automation.assigneesToRemove && automation.assigneesToRemove.length > 0 && (
+              <Box sx={{ mb: 1 }}>
+                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold' }}>
+                  Remove Assignees:
+                </Typography>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.5 }}>
+                  {automation.assigneesToRemove.map((userId, userIndex) => {
+                    const user = users.find(u => u.value === userId);
+                    return user ? (
+                      <Chip
+                        key={user.value}
+                        label={user.label}
+                        size="small"
+                        variant="outlined"
+                        color="error"
+                        sx={{
+                          fontSize: '0.7rem'
+                        }}
+                      />
+                    ) : null;
+                  })}
+                </Box>
+              </Box>
+            )}
+
                                 {/* Conditions Tags */}
                                 {tagDetails.length > 0 && (
                                   <Box>
@@ -1878,7 +2054,7 @@ case "Update client-facing job status":
           } 
         }}
       >
-        <Box sx={{ padding: 2, display: "flex", flexDirection: "column", height: "100%" }}>
+        <Box sx={{  display: "flex", flexDirection: "column", height: "100%" }}>
           {/* Header */}
           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
             <Typography variant="h5">
@@ -1939,8 +2115,8 @@ case "Update client-facing job status":
           </Box>
 
           {/* Footer with Action Buttons */}
-          <Box sx={{ borderTop: "1px solid #e0e0e0", pt: 2 }}>
-            <Box sx={{ mb: 2, display: "flex", justifyContent: "center" }}>
+          <Box sx={{ borderTop: "1px solid #e0e0e0", pb:5,pt: 2 }}>
+            <Box sx={{ mb: 2, display: "flex", justifyContent: "center" ,}}>
               <Button
                 variant="outlined"
                 startIcon={<LuPlusCircle />}

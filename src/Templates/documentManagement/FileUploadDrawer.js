@@ -317,6 +317,7 @@ const handleFileChange = (e) => {
       setMessage("❌ Error uploading files");
     }
   };
+  
   return (
     <Drawer anchor="right" open={isOpen} onClose={onClose}>
       <Box sx={{ width: 400, p: 3, bgcolor: "#f0f8ff", height: "100%" }}>

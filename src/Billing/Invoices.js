@@ -285,6 +285,7 @@ const Invoices = ({ charLimit = 4000 }) => {
   }, [selectedOption]);
   const handleCloseDropdown = () => {
     setAnchorEl(null);
+     setShowDropdown(false);
   };
   //for table
   const [rows, setRows] = useState([]);
@@ -1958,7 +1959,7 @@ const fetchInvoiceData = async () => {
                   borderRadius: "15px",
                 }}
               >
-                Add Shortcode
+                Add Shortcode2
               </Button>
 
               <Popover

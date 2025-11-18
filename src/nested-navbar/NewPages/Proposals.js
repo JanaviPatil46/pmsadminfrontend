@@ -17,7 +17,7 @@ import {
   Button,IconButton,MenuItem,Menu
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 // import ProposalPreviewDialog from "../../ProposalandEls/components/ProposalPreviewDialog"
@@ -179,16 +179,22 @@ toast.success("Proposal Deleted Successfully")
                 }}
               >
                 <TableCell
-                  onClick={() => handleProposalNameClick(proposal)}
-                  style={{ cursor: "pointer" }}
+                
                 >
-                  <Typography
+                  <Link  to={`/clients/accounts/accountsdash/proposals/${data}/account-proposal?edit=${proposal._id}`}  style={{
+                        textDecoration: "none",
+                        color: "blue",
+                        fontWeight: 500,
+                      }}>
+                    <Typography
                     variant="body1"
                     fontWeight="medium"
                     color="primary"
                   >
                     {proposal.general.proposalName}
                   </Typography>
+                  </Link>
+                
                 </TableCell>
 
                 <TableCell>{proposal.status}</TableCell>

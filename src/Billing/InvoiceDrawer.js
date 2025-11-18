@@ -314,6 +314,7 @@ const InvoiceDrawer = ({
 
   const handleCloseDropdown = () => {
     setAnchorEl(null);
+     setShowDropdown(false);
   };
 
   const handleStartDateChange = (date) => {

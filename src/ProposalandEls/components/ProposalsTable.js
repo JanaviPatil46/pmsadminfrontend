@@ -16,7 +16,7 @@ import {
   Chip,
   Button
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { IconButton, Menu, MenuItem } from "@mui/material";
 import { toast } from 'react-toastify';
@@ -163,8 +163,13 @@ toast.success("Proposal deleted successfully")
                 
                 <TableCell>
                
-                  {/* {proposal.general.templateName}  */}
-                  {proposal.templatename} 
+                 <Link  to={`/firmtemp/templates/proposals/proposal-form?edit=${proposal._id}`}
+                      style={{
+                        textDecoration: "none",
+                        color: "blue",
+                        fontWeight: 500,
+                      }}> {proposal.templatename} </Link>
+                 
                 </TableCell>
                   <TableCell>
                   <IconButton onClick={(e) => handleMenuOpen(e, proposal)}>

@@ -243,99 +243,6 @@ const [isEditMode, setIsEditMode] = useState(false);
     }
   }, [location]);
 
-  // Fetch pipeline data for editing
-  // const fetchPipelineData = async (id) => {
-  //   try {
-  //     setLoading(true);
-  //     const response = await fetch(`${PIPELINE_API}/workflow/pipeline/pipeline/${id}`);
-      
-  //     if (!response.ok) {
-  //       throw new Error("Failed to fetch pipeline data");
-  //     }
-      
-  //     const data = await response.json();
-  //     const pipeline = data.pipeline;
-      
-  //     // Populate form with existing data
-  //     setPipelineName(pipeline.pipelineName);
-      
-  //     // Set available to users
-  //     if (pipeline.availableto && pipeline.availableto.length > 0) {
-  //       const availableToOptions = pipeline.availableto.map(userId => {
-  //         const user = userData.find(u => u._id === userId);
-  //         return user ? { value: user._id, label: user.username } : null;
-  //       }).filter(Boolean);
-  //       setSelectedUser(availableToOptions);
-  //     }
-      
-  //     // Set sort jobs by
-  //     if (pipeline.sortjobsby) {
-  //       const sortOption = optionsort.find(opt => opt.value === pipeline.sortjobsby);
-  //       setSelectedSortByJob(sortOption || null);
-  //     }
-      
-  //     // Set default job template
-  //     if (pipeline.defaultjobtemplate) {
-  //       const tempOption = optiontemp.find(opt => opt.value === pipeline.defaultjobtemplate);
-  //       setselectedJobTemp(tempOption || null);
-  //     }
-      
-  //     // Set job card fields
-  //     setAccount_id(pipeline.accountId || false);
-  //     setDays_on_stage(pipeline.days_on_Stage || false);
-  //     setAccount_tags(pipeline.accounttags || false);
-  //     setClientFacing_status(pipeline.clientFacing_status || false);
-  //     setStartDate(pipeline.startdate || false);
-  //     setName(pipeline.name || false);
-  //     setDue_date(pipeline.duedate || false);
-  //     setPriority(pipeline.priority || false);
-  //     setDescription(pipeline.description || false);
-  //     setAssignees(pipeline.assignees || false);
-      
-  //     // Set stages
-  //     if (pipeline.stages && pipeline.stages.length > 0) {
-  //       const formattedStages = pipeline.stages.map((stage, index) => ({
-  //         name: stage.name,
-  //         order: stage.order || index + 1,
-  //         conditions: stage.conditions || [],
-  //         automations: stage.automations ? stage.automations.map(auto => ({
-  //           type: auto.type,
-  //           index: auto.index,
-  //           selectedtemp: auto.selectedtemp ? {
-  //             value: auto.selectedtemp,
-  //             label: "" // You might need to fetch the label separately
-  //           } : null,
-  //           selectedTags: auto.selectedTags || [],
-  //           reminderChecked: auto.reminderChecked || false,
-  //           daysuntilNextReminder: auto.daysuntilNextReminder || "",
-  //           noOfReminder: auto.noOfReminder || "",
-  //           addTags: auto.addTags || [],
-  //           removeTags: auto.removeTags || [],
-  //           selectedAssignees: auto.selectedAssignees || [],
-  //           assigneesToRemove: auto.assigneesToRemove || [],
-  //           status: auto.status || null,
-  //           selectedClientStatus: auto.selectedClientStatus ? {
-  //             value: auto.selectedClientStatus,
-  //             label: "" // You might need to fetch the label separately
-  //           } : null,
-  //           clientDescription: auto.clientDescription || "",
-  //           template: auto.template || null,
-  //           tags: auto.tags || []
-  //         })) : [],
-  //         autoMove: stage.autoMove || false,
-  //         showDropdown: false,
-  //         activeAction: null
-  //       }));
-  //       setStages(formattedStages);
-  //     }
-      
-  //   } catch (error) {
-  //     console.error("Error fetching pipeline data:", error);
-  //     toast.error("Failed to load pipeline data");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 // Fetch pipeline data for editing
 const fetchPipelineData = async (id) => {
   try {
@@ -352,14 +259,7 @@ const fetchPipelineData = async (id) => {
     // Populate form with existing data
     setPipelineName(pipeline.pipelineName);
     
-    // Set available to users
-    // if (pipeline.availableto && pipeline.availableto.length > 0) {
-    //   const availableToOptions = pipeline.availableto.map(userId => {
-    //     const user = userData.find(u => u._id === userId);
-    //     return user ? { value: user._id, label: user.username } : null;
-    //   }).filter(Boolean);
-    //   setSelectedUser(availableToOptions);
-    // }
+   
     if (pipeline && pipeline.availableto) {
           const assigneesData = pipeline.availableto.map(
             (assignee) => ({
@@ -408,6 +308,7 @@ const fetchPipelineData = async (id) => {
     // Set stages - FIXED: Properly handle automations with selectedtemp
     if (pipeline.stages && pipeline.stages.length > 0) {
       const formattedStages = pipeline.stages.map((stage, index) => ({
+        _id: stage._id,
         name: stage.name,
         order: stage.order || index + 1,
         conditions: stage.conditions || [],
@@ -430,7 +331,7 @@ const fetchPipelineData = async (id) => {
           clientDescription: auto.clientDescription || "",
           template: auto.template || null,
           tags: auto.tags || [],
-          // _id: auto._id // Include the automation ID if it exists
+           _id: auto._id // Include the automation ID if it exists
         })) : [],
         autoMove: stage.autoMove || false,
         showDropdown: false,
@@ -446,112 +347,7 @@ const fetchPipelineData = async (id) => {
     setLoading(false);
   }
 };
-  // Update the handleSavePipeline function for edit mode
-//   const handleSavePipeline = async (exitAfterSave = false) => {
-//     const errors = validateForm();
-    
-//     if (Object.keys(errors).length > 0) {
-//       if (errors.stageNames) {
-//         setStageNameErrors(errors.stageNames);
-//       }
-//       toast.error("Please fix the form errors before saving");
-//       return;
-//     }
 
-//     setLoading(true);
-
-//     try {
-//       const pipelineData = {
-//         pipelineName: pipelineName.trim(),
-//         availableto: combinedValues,
-//         sortjobsby: selectedSortByJob.value,
-//         defaultjobtemplate: selectedJobtemp?.value,
-      
-//         accountId: Account_id,
-//       description: Description,
-//       duedate: Due_date,
-//       accounttags: Account_tags,
-//       priority: Priority,
-//       days_on_Stage: Days_on_stage,
-//       assignees: Assignees,
-//       name: Name,
-//        clientFacing_status:clientFacing_status,
-//       startdate: startDate,
-//         stages: stages.map((stage, index) => ({
-//           name: stage.name.trim(),
-//           order: stage.order || index + 1,
-//           conditions: stage.conditions || [],
-//          automations: stage.automations ? stage.automations.map(auto => ({
-//   type: auto.type,
-//   index: auto.index,
-//   selectedtemp: auto.selectedtemp ? auto.selectedtemp.value || auto.selectedtemp : null,
-//   selectedTags: auto.selectedTags || [],
-//   reminderChecked: auto.reminderChecked || false,
-//   daysuntilNextReminder: auto.daysuntilNextReminder || "",
-//   noOfReminder: auto.noOfReminder || "",
-//   addTags: auto.addTags || [],
-//   removeTags: auto.removeTags || [],
-//   selectedAssignees: auto.selectedAssignees || [],
-//   assigneesToRemove: auto.assigneesToRemove || [],
-//   status: auto.status || null,
-//   selectedClientStatus: auto.selectedClientStatus ? auto.selectedClientStatus.value : null,
-//   clientDescription: auto.clientDescription || "",
-
-//   // Important: Save required ref models
-//   refModel: auto.refModel || null,
-//   templateRefModel: auto.templateRefModel || null
-// })) : [],
-
-//           autoMove: stage.autoMove || false
-//         })),
-//         active: true
-//       };
-
-//       let url, method;
-      
-//       if (isEditMode && pipelineId) {
-//         // Update existing pipeline
-//         url = `${PIPELINE_API}/workflow/pipeline/pipeline/${pipelineId}`;
-//         method = "PATCH";
-//       } else {
-//         // Create new pipeline
-//         url = `${PIPELINE_API}/workflow/pipeline/createpipeline`;
-//         method = "POST";
-//       }
-
-//       const response = await fetch(url, {
-//         method: method,
-//         headers: {
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify(pipelineData),
-//       });
-
-//       if (!response.ok) {
-//         const errorData = await response.json();
-//         throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
-//       }
-
-//       const result = await response.json();
-//       console.log("Pipeline saved successfully:", result);
-
-//       toast.success(`Pipeline ${isEditMode ? 'updated' : 'saved'} successfully!`);
-
-//       if (exitAfterSave) {
-//         // setTimeout(() => {
-//         //   window.location.href = "/firmtemp/pipelines";
-//         // }, 1500);
-//         navigate('/firmtemp/pipelines');
-//       }
-
-//     } catch (error) {
-//       console.error("Error saving pipeline:", error);
-//       console.log("Is Edit Mode:", error);
-//       toast.error(error.message || `Failed to ${isEditMode ? 'update' : 'save'} pipeline. Please try again.`);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
 const handleSavePipeline = async (exitAfterSave = false) => {
     const errors = validateForm();
     
@@ -582,6 +378,7 @@ const handleSavePipeline = async (exitAfterSave = false) => {
         clientFacing_status: clientFacing_status,
         startdate: startDate,
         stages: stages.map((stage, index) => ({
+          _id: stage._id || null,
           name: stage.name.trim(),
           order: stage.order || index + 1,
           conditions: stage.conditions || [],
@@ -660,121 +457,7 @@ const navigate = useNavigate();
     // window.location.href = "/firmtemp/pipelines";
     navigate('/firmtemp/pipelines');
   };
-// const handleSavePipeline = async (exitAfterSave = false) => {
-//     const errors = validateForm();
-    
-//     if (Object.keys(errors).length > 0) {
-//       // Set stage name errors if any
-//       if (errors.stageNames) {
-//         setStageNameErrors(errors.stageNames);
-//       }
-      
-  
-//       return;
-//     }
 
-//     setLoading(true);
-
-//     try {
-//       // Prepare pipeline data matching backend schema
-//       const pipelineData = {
-//         pipelineName: pipelineName.trim(),
-//         availableTo: selectedUser.map(user => user.value),
-//         sortJobsBy: selectedSortByJob ? selectedSortByJob.value : null,
-//         defaultJobTemplate: selectedJobtemp ? selectedJobtemp.value : null,
-//         jobCardFields: {
-//           accountId: Account_id,
-//           daysInStage: Days_on_stage,
-//           accountTags: Account_tags,
-//           clientFacingStatus: clientFacing_status,
-//           startDate: startDate,
-//           name: Name,
-//           dueDate: Due_date,
-//           description: Description,
-//           assignees: Assignees,
-//           priority: Priority
-//         },
-//         stages: stages.map((stage, index) => ({
-//           name: stage.name.trim(),
-//           order: stage.order || index + 1,
-//           conditions: stage.conditions || [],
-//           automations: stage.automations ? stage.automations.map(auto => ({
-//             type: auto.type,
-//             index: auto.index,
-//             selectedtemp: auto.selectedtemp ? {
-//               value: auto.selectedtemp.value,
-//               label: auto.selectedtemp.label
-//             } : null,
-//             selectedTags: auto.selectedTags ? auto.selectedTags.map(tag => ({
-//               _id: tag._id || tag.id,
-//               tagName: tag.tagName || tag.name,
-//               tagColour: tag.tagColour || tag.color
-//             })) : [],
-//             reminderChecked: auto.reminderChecked || false,
-//             daysuntilNextReminder: auto.daysuntilNextReminder || "",
-//             noOfReminder: auto.noOfReminder || "",
-//             addTags: auto.addTags || [],
-//             removeTags: auto.removeTags || [],
-//             selectedAssignees: auto.selectedAssignees || [],
-//             assigneesToRemove: auto.assigneesToRemove || [],
-//             status: auto.status || null,
-//             selectedClientStatus: auto.selectedClientStatus ? {
-//               value: auto.selectedClientStatus.value,
-//               label: auto.selectedClientStatus.label,
-//               clientfacingColour: auto.selectedClientStatus.clientfacingColour
-//             } : null,
-//             clientDescription: auto.clientDescription || "",
-//             template: auto.template ? {
-//               id: auto.template.id,
-//               name: auto.template.name
-//             } : null,
-//             tags: auto.tags ? auto.tags.map(tag => ({
-//               id: tag.id,
-//               name: tag.name,
-//               color: tag.color
-//             })) : []
-//           })) : [],
-//           autoMove: stage.autoMove || false
-//         })),
-//         active: true
-//       };
-
-//       console.log("Saving pipeline data:", pipelineData);
-
-//       // Make API call to save pipeline - UPDATED URL
-//       const response = await fetch(`${PIPELINE_API}/workflow/pipeline/createpipeline`, {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify(pipelineData),
-//       });
-
-//       if (!response.ok) {
-//         const errorData = await response.json();
-//         throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
-//       }
-
-//       const result = await response.json();
-//       console.log("Pipeline saved successfully:", result);
-
-// toast.success("Pipeline saved successfully!");
-//       // If exit after save, you can redirect or close the form
-//       if (exitAfterSave) {
-//         setTimeout(() => {
-//           // Redirect to pipelines list or close the form
-//           window.location.href = "/firmtemp/pipelines"; // Update with your actual route
-//         }, 1500);
-//       }
-
-//     } catch (error) {
-//       console.error("Error saving pipeline:", error);
-  
-//     toast.error(error.message || "Failed to save pipeline. Please try again.");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
 
   // Handle save (without exiting)
   const handleSave = () => {
@@ -785,6 +468,8 @@ const navigate = useNavigate();
   const handleSaveAndExit = () => {
     handleSavePipeline(true);
   };
+
+  
   return (
     <Box p={3}>
       <Typography variant="h5" gutterBottom>

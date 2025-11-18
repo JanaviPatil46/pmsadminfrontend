@@ -287,6 +287,7 @@ const MoveDrawer = ({
 
       setMessage(res.data.message);
       toast.success(res.data.message)
+      onClose();
       fetchFolderTree?.();
     } catch (err) {
      if (err.response) {
@@ -304,7 +305,7 @@ const MoveDrawer = ({
           📁 Move Folder / File
         </Typography>
 
-        <TextField
+        {/* <TextField
           label="Source Path"
           value={sourcePath}
           fullWidth
@@ -318,7 +319,7 @@ const MoveDrawer = ({
           onChange={(e) => setDestinationPath(e.target.value)}
           fullWidth
           margin="dense"
-        />
+        /> */}
 
         <Button
           variant="contained"
