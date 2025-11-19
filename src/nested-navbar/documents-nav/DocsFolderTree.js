@@ -995,14 +995,14 @@ const DocsFolderTree = () => {
                 const isApproved =
                   currentApprovalStatus === "approvalCompleted";
 
-                   const isSignatureDisabled =
-    currentStatus === "pendingSignature" ||
-    currentStatus === "signatureCompleted";
+                const isSignatureDisabled =
+                  currentStatus === "pendingSignature" ||
+                  currentStatus === "signatureCompleted";
 
-  const isApprovalDisabled =
-    currentApprovalStatus === "pendingApproval" ||
-    currentApprovalStatus === "cancledApproval" ||
-    currentApprovalStatus === "approvalCompleted";
+                const isApprovalDisabled =
+                  currentApprovalStatus === "pendingApproval" ||
+                  currentApprovalStatus === "cancledApproval" ||
+                  currentApprovalStatus === "approvalCompleted";
                 menuItems.push(
                   {
                     icon: <DriveFileMoveIcon />,
@@ -1014,14 +1014,14 @@ const DocsFolderTree = () => {
                     label: "Move",
                     action: () => setMoveDrawerOpen(true),
                   },
-                 
+
                   {
                     icon: <PenTool size={16} />,
                     label: statusTextMap[currentStatus],
                     action: () => toggleSignStatus(item),
                     custom: true, // flag to handle differently
                     currentStatus, // pass for icon color
-                      disabled: isSignatureDisabled,
+                    disabled: isSignatureDisabled,
                   },
                   {
                     icon: <Stamp size={16} />,
@@ -1029,14 +1029,14 @@ const DocsFolderTree = () => {
                     action: () => toggleApprovalStatus(item),
                     type: "approval",
                     currentApprovalStatus,
-                     disabled: isApprovalDisabled,
+                    disabled: isApprovalDisabled,
                   },
                   // { icon: <Stamp size={16} />, label: "Send Approval", action: () => toggleApprovalStatus(item) },
                   {
                     icon: <DeleteIcon />,
                     label: "Delete",
                     action: () => deleteItem(item),
-                  },
+                  }
                   // {
                   //   icon: <DownloadIcon />,
                   //   label: "Download",
@@ -1059,10 +1059,10 @@ const DocsFolderTree = () => {
               }
             }
 
-            return menuItems.map(({ icon, label, action,disabled  }) => (
+            return menuItems.map(({ icon, label, action, disabled }) => (
               <MenuItem
                 key={label}
-                  disabled={(label !== "Unlock" && isLocked) || disabled}
+                disabled={(label !== "Unlock" && isLocked) || disabled}
                 // disabled={label !== "Unlock" && isLocked} // allow unlock even if locked
                 onClick={() => {
                   action();
@@ -1076,8 +1076,6 @@ const DocsFolderTree = () => {
             ));
           })()}
         </Menu>
-
-       
       </Box>
     );
   };

@@ -26,7 +26,7 @@ const Drawer = ({ handleNewDrawerClose, handleDrawerClose ,editingAccountId,onCl
         />
       </Box>
       <Box>
-       <AccountContactForm handleDrawerClose={handleDrawerClose} handleNewDrawerClose={handleNewDrawerClose} editingAccountId={editingAccountId} onClose={onClose}/>
+       <AccountContactForm handleDrawerClose={handleDrawerClose} handleNewDrawerClose={handleNewDrawerClose} editingAccountId={editingAccountId} />
       </Box>
     </>
   );

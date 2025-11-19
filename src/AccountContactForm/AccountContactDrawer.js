@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 import { setAccountData, setSelectedContacts, resetForm } from "../redux/accountContactSlice";
 import axios from "axios";
 
-export default function AccountContactDrawer({ open, onClose, accountId = null,fetchAccountDetails }) {
+export default function AccountContactDrawer({ open, onClose, accountId = null,fetchAccountsList }) {
   const dispatch = useDispatch();
 
   
@@ -48,7 +48,7 @@ useEffect(() => {
         <IconButton onClick={onClose}><CloseIcon /></IconButton>
       </Box>
       <Box sx={{ p: 3 }}>
-        <AccountContactForm isEditing={!!accountId} accountId={accountId} onCloseDrawer={onClose} />
+        <AccountContactForm isEditing={!!accountId} accountId={accountId} onCloseDrawer={onClose} fetchAccountsList={fetchAccountsList}/>
       </Box>
     </Drawer>
   );

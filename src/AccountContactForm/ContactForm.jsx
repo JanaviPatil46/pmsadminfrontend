@@ -210,6 +210,59 @@ export default function ContactForm({ onBack, onSubmit, isEditing ,}) {
                 helperText={contactErrors[contactIndex]?.email}
                 required
               />
+               <FormGroup row sx={{ mt: 2 }}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={contact.login || false}
+                      onChange={(e) =>
+                        dispatch(
+                          updateContactField({
+                            index: contactIndex,
+                            field: "login",
+                            value: e.target.checked,
+                          })
+                        )
+                      }
+                    />
+                  }
+                  label="Login"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={contact.notify || false}
+                      onChange={(e) =>
+                        dispatch(
+                          updateContactField({
+                            index: contactIndex,
+                            field: "notify",
+                            value: e.target.checked,
+                          })
+                        )
+                      }
+                    />
+                  }
+                  label="Notify"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={contact.emailSync || false}
+                      onChange={(e) =>
+                        dispatch(
+                          updateContactField({
+                            index: contactIndex,
+                            field: "emailSync",
+                            value: e.target.checked,
+                          })
+                        )
+                      }
+                    />
+                  }
+                  label="Email Sync"
+                />
+              </FormGroup>
               <Autocomplete
                             multiple
                             options={tags}
@@ -306,59 +359,7 @@ export default function ContactForm({ onBack, onSubmit, isEditing ,}) {
                     )}
                   </Box>
                 ))}
-              <FormGroup row sx={{ mt: 2 }}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={contact.login || false}
-                      onChange={(e) =>
-                        dispatch(
-                          updateContactField({
-                            index: contactIndex,
-                            field: "login",
-                            value: e.target.checked,
-                          })
-                        )
-                      }
-                    />
-                  }
-                  label="Login"
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={contact.notify || false}
-                      onChange={(e) =>
-                        dispatch(
-                          updateContactField({
-                            index: contactIndex,
-                            field: "notify",
-                            value: e.target.checked,
-                          })
-                        )
-                      }
-                    />
-                  }
-                  label="Notify"
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={contact.emailSync || false}
-                      onChange={(e) =>
-                        dispatch(
-                          updateContactField({
-                            index: contactIndex,
-                            field: "emailSync",
-                            value: e.target.checked,
-                          })
-                        )
-                      }
-                    />
-                  }
-                  label="Email Sync"
-                />
-              </FormGroup>
+             
 
                <Box>
               <FormLabel

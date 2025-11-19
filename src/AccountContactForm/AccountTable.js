@@ -66,8 +66,11 @@ const AccountTable = () => {
   const [selected, setSelected] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [order, setOrder] = useState("asc");
-  const [orderBy, setOrderBy] = useState("accountName");
+  // const [order, setOrder] = useState("asc");
+  // const [orderBy, setOrderBy] = useState("accountName");
+  const [order, setOrder] = useState(null);
+const [orderBy, setOrderBy] = useState(null);
+
   const [filterStatus, setFilterStatus] = useState("active"); // active | archived
   const [anchorE2, setAnchorE2] = useState(null);
    const [anchorEl, setAnchorEl] = useState(null);
@@ -338,38 +341,6 @@ const handleClick = (account) => {
   }
 };
 
-  // const handleClick = (account) => {
-  //   const selectedIndex = selected.indexOf(account._id);
-  //   let newSelected = [];
-
-  //   if (selectedIndex === -1) {
-  //     newSelected = newSelected.concat(selected, account._id);
-  //   } else if (selectedIndex === 0) {
-  //     newSelected = newSelected.concat(selected.slice(1));
-  //   } else if (selectedIndex === selected.length - 1) {
-  //     newSelected = newSelected.concat(selected.slice(0, -1));
-  //   } else if (selectedIndex > 0) {
-  //     newSelected = newSelected.concat(
-  //       selected.slice(0, selectedIndex),
-  //       selected.slice(selectedIndex + 1)
-  //     );
-  //   }
-
-  //   setSelected(newSelected);
-
-  //   // Console log the selected accounts
-  //   console.log(
-  //     "Selected accounts:",
-  //     newSelected
-  //       .map((id) => {
-  //         const account = accountList.find((acc) => acc._id === id);
-  //         return account
-  //           ? { value: account._id, label: account.accountName }
-  //           : null;
-  //       })
-  //       .filter(Boolean)
-  //   );
-  // };
   const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
     const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
     const [tags, setTags] = useState([]);
@@ -437,7 +408,12 @@ if (filters.tags.length > 0) {
   return filtered;
 };
 const filteredList = applyFilters();
-const sortedList = filteredList.slice().sort(getComparator(order, orderBy));
+// const sortedList = filteredList.slice().sort(getComparator(order, orderBy));
+const sortedList =
+  orderBy && order
+    ? filteredList.slice().sort(getComparator(order, orderBy))
+    : filteredList; // keep API order
+
 const paginatedList = sortedList.slice(
   page * rowsPerPage,
   page * rowsPerPage + rowsPerPage
@@ -593,13 +569,13 @@ const handleFilterChange = (event) => {
           </Button>
         </ButtonGroup>
 
-        <Button
+        {/* <Button
           variant="contained"
           color="primary"
           onClick={() => setOpenDrawer(true)}
         >
           Add Account
-        </Button>
+        </Button> */}
       </Stack>
 <Box
                 sx={{
@@ -988,6 +964,7 @@ const handleFilterChange = (event) => {
             page={page}
             onPageChange={(e, newPage) => setPage(newPage)}
             rowsPerPage={rowsPerPage}
+             rowsPerPageOptions={[5, 10, 25,30, 50, 100,]} 
             onRowsPerPageChange={(e) => {
               setRowsPerPage(parseInt(e.target.value));
               setPage(0);
@@ -996,7 +973,7 @@ const handleFilterChange = (event) => {
         </TableContainer>
       )}
       
-      <AccountContactDrawer open={openDrawer} onClose={handleDrawerClose} />
+      {/* <AccountContactDrawer open={openDrawer} onCloseDrawer={handleDrawerClose} fetchAccountsList={fetchAccountsList}/> */}
 <Dialog
         open={isDeleteDialogOpen}
         onClose={handleCloseDeleteDialog}

@@ -1225,7 +1225,7 @@ const [fetchError, setFetchError] = useState("");
             <AccountDrawer
                handleNewDrawerClose={handleNewDrawerClose}
               handleDrawerClose={handleDrawerClose}
-              onClose={handleCloseDrawers}
+              // onClose={handleCloseDrawers}
               />
           )}
           {rightDrawerContent === "Contact" && (

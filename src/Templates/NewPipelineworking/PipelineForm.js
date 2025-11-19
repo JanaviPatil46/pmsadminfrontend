@@ -207,8 +207,8 @@ const PipelineForm = () => {
       errors.pipelineName = "Pipeline name is required";
     }
 
-    if (stages.length === 0) {
-      errors.stages = "At least one stage is required";
+    if (stages.length < 2) {
+      errors.stages = "Please add at least 2 stages";
     }
 
     // Validate stage names
@@ -351,13 +351,35 @@ const fetchPipelineData = async (id) => {
 const handleSavePipeline = async (exitAfterSave = false) => {
     const errors = validateForm();
     
-    if (Object.keys(errors).length > 0) {
-      if (errors.stageNames) {
-        setStageNameErrors(errors.stageNames);
-      }
-      toast.error("Please fix the form errors before saving");
-      return;
+    // if (Object.keys(errors).length > 0) {
+    //   if (errors.stageNames) {
+    //     setStageNameErrors(errors.stageNames);
+    //   }
+    //   toast.error("Please fix the form errors before saving");
+    //   return;
+    // }
+if (Object.keys(errors).length > 0) {
+    // Show toast for pipeline name error
+    if (errors.pipelineName) {
+      toast.error("Pipeline name is required");
     }
+    
+    // Show toast for stages count error
+    if (errors.stages) {
+      toast.error("Please add at least 2 stages");
+    }
+    
+    // Show toast for stage names error
+    if (errors.stageNames) {
+      setStageNameErrors(errors.stageNames);
+      const emptyStageCount = errors.stageNames.filter(error => error !== "").length;
+      if (emptyStageCount > 0) {
+        toast.error(`${emptyStageCount} stage name(s) are required`);
+      }
+    }
+    
+    return;
+  }
 
     setLoading(true);
 
@@ -378,7 +400,7 @@ const handleSavePipeline = async (exitAfterSave = false) => {
         clientFacing_status: clientFacing_status,
         startdate: startDate,
         stages: stages.map((stage, index) => ({
-          _id: stage._id || null,
+          ...(stage._id && { _id: stage._id }), 
           name: stage.name.trim(),
           order: stage.order || index + 1,
           conditions: stage.conditions || [],
