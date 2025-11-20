@@ -20,7 +20,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { Link, useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-// import ProposalPreviewDialog from "../../ProposalandEls/components/ProposalPreviewDialog"
+import ProposalPreviewDialog from "./ProposalDialog"
 const AccountProposalTable = () => {
    const { data } = useParams();
   const [proposals, setProposals] = useState([]);
@@ -36,7 +36,16 @@ const [selectedProposal, setSelectedProposal] = useState(null);
     setSelectedProposal(proposal);
     setOpenDialog(true);
   };
+  const handleOpenDialog = (proposal) => {
+    setSelectedProposal(proposal);
+    setOpenDialog(true);
+  };
 
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setSelectedProposal(null);
+// fetchPrprosalsAllData(accountId);
+  };
    useEffect(() => {
       const fetchData = async () => {
         try {
@@ -181,19 +190,21 @@ toast.success("Proposal Deleted Successfully")
                 <TableCell
                 
                 >
-                  <Link  to={`/clients/accounts/accountsdash/proposals/${data}/account-proposal?edit=${proposal._id}`}  style={{
+                  {/* <Link  to={`/clients/accounts/accountsdash/proposals/${data}/account-proposal?edit=${proposal._id}`}  style={{
                         textDecoration: "none",
                         color: "blue",
                         fontWeight: 500,
-                      }}>
+                      }}> */}
                     <Typography
                     variant="body1"
                     fontWeight="medium"
+                    sx={{cursor:'pointer'}}
                     color="primary"
+                      onClick={() => handleOpenDialog(proposal)}
                   >
                     {proposal.general.proposalName}
                   </Typography>
-                  </Link>
+                  {/* </Link> */}
                 
                 </TableCell>
 
@@ -249,6 +260,11 @@ toast.success("Proposal Deleted Successfully")
     proposal={selectedProposal}
   />
 )} */}
+ <ProposalPreviewDialog
+    open={openDialog}
+    handleClose={handleCloseDialog}
+    proposal={selectedProposal}
+  />
     </Box>
   );
 };

@@ -1873,13 +1873,14 @@ const AccountDetails = () => {
  const [addContactDrawerOpen, setAddContactDrawerOpen] = useState(false);
   const [availableContacts, setAvailableContacts] = useState([]);
   const [selectedContacts, setSelectedContacts] = useState([]);
-
+const [profilePictureUrl, setProfilePictureUrl] = useState('');
   const fetchAccountDetails = async () => {
     try {
       const res = await axios.get(
         `https://www.snptaxes.com/api/accounts/${data}`
       );
       setAccount(res.data);
+      console.log("account details",res.data.profilePicture)
       console.log("accounts details",res.data)
     } catch (error) {
       console.error("Error fetching account details:", error);
@@ -2330,7 +2331,7 @@ fetchAccountDetails();
 
             {/* Avatar + Name */}
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              <Avatar sx={{ width: 60, height: 60 }} />
+              <Avatar  src={`https://www.snptaxes.com/accountprofile/${account.profilePicture}`} sx={{ width: 60, height: 60 }} />
               <Box>
                 <Typography variant="h6" fontWeight="bold">
                   {account.accountName}

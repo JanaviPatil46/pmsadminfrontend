@@ -40,6 +40,48 @@ export default function ContactForm({ onBack, onSubmit, isEditing ,}) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [showContactForm, setShowContactForm] = useState(contacts.length > 0);
   const [contactErrors, setContactErrors] = useState([]);
+  const formatSSN = (value) => {
+  const v = value.replace(/\D/g, "").slice(0, 9); // digits only
+
+  if (v.length > 5) return `${v.slice(0, 3)}-${v.slice(3, 5)}-${v.slice(5)}`;
+  if (v.length > 3) return `${v.slice(0, 3)}-${v.slice(3)}`;
+  return v;
+};
+
+const validateSSN = (value) => {
+  const cleaned = value.replace(/-/g, "");
+
+  if (cleaned.length !== 9) return "SSN must be 9 digits";
+
+  if (/^(000|666|9\d{2})/.test(cleaned)) return "Invalid SSN starting digits";
+  if (/^\d{3}00\d{4}$/.test(cleaned)) return "Invalid SSN middle digits";
+  if (/^\d{5}0000$/.test(cleaned)) return "Invalid SSN last digits";
+
+  return "";
+};
+
+const handleSSNChange = (index,e) => {
+  const formatted = formatSSN(e.target.value);
+
+  const error = validateSSN(formatted);
+
+  // update SSN value
+  handleChange(index, {
+    target: {
+      name: "ssn",
+      value: formatted,
+    },
+  });
+
+  // update SSN error
+  handleChange(index, {
+    target: {
+      name: "ssnError",
+      value: error, // "" means no error — helper text goes back to normal
+    },
+  });
+};
+
   const handleChange = (index, e) => {
     const { name, value } = e.target;
     let updated = { [name]: value };
@@ -189,7 +231,7 @@ export default function ContactForm({ onBack, onSubmit, isEditing ,}) {
                 value={contact.note || ""}
                 onChange={(e) => handleChange(contactIndex, e)}
               />
-              <TextField
+              {/* <TextField
                 fullWidth
                 margin="normal"
                 label="SSN"
@@ -198,7 +240,23 @@ export default function ContactForm({ onBack, onSubmit, isEditing ,}) {
                 onChange={(e) => handleChange(contactIndex, e)}
                 type="number"
                 inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-              />
+              /> */}
+              <TextField
+  fullWidth
+  margin="normal"
+  label="SSN"
+  name="ssn"
+  value={contact.ssn || ""}
+  onChange={(e) => handleSSNChange(contactIndex,e)}
+  inputProps={{
+    maxLength: 11, // 123-45-6789
+    inputMode: "numeric",
+    pattern: "[0-9]*",
+  }}
+   helperText={contact.ssnError ? contact.ssnError : "Format: 123-45-6789"}
+  error={!!contact.ssnError}
+/>
+
               <TextField
                 fullWidth
                 margin="normal"

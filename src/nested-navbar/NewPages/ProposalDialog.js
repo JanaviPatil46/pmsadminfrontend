@@ -1,705 +1,586 @@
 
 
 
-import React, { useState, useRef, useEffect,useContext } from 'react';
+import React, { useState, useRef } from "react";
 import {
   Dialog,
   DialogTitle,
   DialogContent,
-  IconButton,
-  Typography,
   Box,
   List,
   ListItemButton,
-  ListItemText,
+  Typography,
   Divider,
-  Button,ButtonGroup,TextField
-} from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import SignatureCanvas from 'react-signature-canvas';
-// import { LoginContext } from "../../context/Context";
-const ProposalDialog = ({ open, handleClose, proposal, onProposalSigned }) => {
-//    const { logindata } = useContext(LoginContext);
-//    const [loginUserId, setLoginUserId] = useState();
-//     useEffect(() => {
-//       if (logindata?.user?.id) {
-//         setLoginUserId(logindata.user.id);
-//       }
-//     }, [logindata]);
-  console.log("proposal",proposal)
-  const [selectedSection, setSelectedSection] = useState(null);
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  TextField,
+  Button,
+  ButtonGroup,
+  FormControlLabel,
+  Checkbox,
+  ListItemText,
+  ListItemIcon
+} from "@mui/material";
+import SignatureCanvas from "react-signature-canvas";
+import axios from "axios";
+import CloseIcon from "@mui/icons-material/Close";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import HTMLReactParser from "html-react-parser";
+import { toast } from "react-toastify";
+
+const ProposalPreviewDialog = ({ open, handleClose, proposal }) => {
+  const [activeStep, setActiveStep] = useState("general");
+  // Signature States
+  const [signatureType, setSignatureType] = useState("draw");
   const [signatureData, setSignatureData] = useState(null);
+  const [typedSignature, setTypedSignature] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const [signatureType, setSignatureType] = useState('draw'); // 'draw' or 'type'
-  const [typedSignature, setTypedSignature] = useState('');
-  const sectionRefs = useRef({});
-  const sigCanvas = useRef(null);
   const [isSigning, setIsSigning] = useState(false);
-    const contentRef = useRef(null); // Add this ref for the content container
 
-  const [isManualScroll, setIsManualScroll] = useState(false);
+  const sigCanvas = useRef(null);
+  
+  // Check if proposal is signed
+  const isSigned = proposal?.status === "Signed";
+  
+  // Determine enabled sections
+  const steps = [
+    { id: "introduction", label: "Introduction", enabled: proposal?.general?.introductionEnabled },
+    { id: "terms", label: "Terms & Conditions", enabled: proposal?.general?.termsEnabled },
+    { id: "services", label: "Services", enabled: proposal?.general?.servicesEnabled },
+    { id: "payments", label: "Payments", enabled: proposal?.general?.paymentsEnabled },
+    { id: "signature", label: "Sign & Accept", enabled: true },
+  ].filter(s => s.enabled);
 
-useEffect(() => {
-  const contentElement = contentRef.current;
-  if (!contentElement) return;
+  const introRef = useRef(null);
+  const termsRef = useRef(null);
+  const servicesRef = useRef(null);
+  const paymentsRef = useRef(null);
+  const signatureRef = useRef(null);
+  const refMap = {
+    introduction: introRef,
+    terms: termsRef,
+    services: servicesRef,
+    payments: paymentsRef,
+    signature: signatureRef,
+  };
 
-  const handleScroll = () => {
-    if (isManualScroll) return; // Prevent updates during manual scroll
+  const handleStepClick = (id) => {
+    const sectionRef = refMap[id];
+    if (sectionRef?.current) {
+      sectionRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+    setActiveStep(id);
+  };
 
-    const scrollPosition = contentElement.scrollTop + 600; 
-    let activeSection = null;
+  const handleScroll = (e) => {
+    const scrollTop = e.target.scrollTop;
 
-    for (const [sectionKey, sectionElement] of Object.entries(sectionRefs.current)) {
-      if (!sectionElement) continue;
-      
-      const { offsetTop, offsetHeight } = sectionElement;
-      if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
-        activeSection = sectionKey;
-        break;
+    for (let step of steps) {
+      const stepRef = refMap[step.id];
+      if (stepRef?.current) {
+        const offsetTop = stepRef.current.offsetTop;
+        if (scrollTop + 50 >= offsetTop) {
+          setActiveStep(step.id);
+        }
       }
     }
+  };
 
-    if (activeSection && activeSection !== selectedSection) {
-      setSelectedSection(activeSection);
+  /** ✅ Complete button action */
+  const handleCompleteProposal = async () => {
+    try {
+      setIsSigning(true);
+
+      const payload = {
+        status: "Signed",
+        signedAt: new Date(),
+        signature: signatureType === "draw" ? signatureData : typedSignature,
+      };
+
+      await axios.post(`https://www.snptaxes.com/account/proposals/sign/${proposal._id}`, payload);
+      toast.success("Proposal signed successfully");
+      handleClose();
+    } catch (err) {
+      console.error("Signature save error:", err);
+    } finally {
+      setIsSigning(false);
     }
   };
 
-  contentElement.addEventListener('scroll', handleScroll);
-  return () => {
-    contentElement.removeEventListener('scroll', handleScroll);
-  };
-}, [selectedSection, isManualScroll]);
+  return (
+    <Dialog open={open} onClose={handleClose} fullScreen>
+      <DialogTitle sx={{ display: "flex", justifyContent: "space-between" }}>
+        {proposal?.general?.proposalName || "Proposal"}
+        <CloseIcon sx={{ cursor: "pointer" }} onClick={handleClose} />
+      </DialogTitle>
 
-  useEffect(() => {
-    if (!proposal) return;
-
-    if (proposal.introduction) setSelectedSection("introduction");
-    else if (proposal.terms) setSelectedSection("terms");
-    else if (
-      proposal.servicesandinvoices &&
-      proposal.Additemizedserviceswithoutcreatinginvoices === "service"
-    )
-      setSelectedSection("services");
-    else if (
-      proposal.servicesandinvoices &&
-      proposal.Addinvoiceoraskfordeposit === "invoice"
-    )
-      setSelectedSection("invoices");
-  }, [proposal]);
-
-  useEffect(() => {
-    if (selectedSection && sectionRefs.current[selectedSection]) {
-      sectionRefs.current[selectedSection].scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }
-  }, [selectedSection]);
-
-//   const clearSignature = () => {
-//     sigCanvas.current.clear();
-//     setSignatureData(null);
-//   };
-
-//   const saveSignature = () => {
-//     if (!sigCanvas.current?.isEmpty()) {
-//       try {
-//         // Get the canvas and create a copy
-//         const canvas = sigCanvas.current.getCanvas();
-//         const tempCanvas = document.createElement('canvas');
-//         const ctx = tempCanvas.getContext('2d');
+      <DialogContent sx={{ display: "flex", height: "75vh", p: 0 }}>
         
-//         // Set dimensions
-//         tempCanvas.width = canvas.width;
-//         tempCanvas.height = canvas.height;
-        
-//         // Draw the signature
-//         ctx.drawImage(canvas, 0, 0);
-        
-//         // Convert to data URL
-//         const signature = tempCanvas.toDataURL('image/png');
-//         setSignatureData(signature);
-//       } catch (error) {
-//         console.error('Error saving signature:', error);
-//         alert('Failed to save signature. Please try again.');
-//       }
-//     }
-//   };
-
-
-//  const handleCompleteProposal = async () => {
-//     if (!termsAccepted || (!signatureData && !typedSignature)) {
-//       alert('Please accept the terms and provide a signature');
-//       return;
-//     }
-
-//     setIsSigning(true);
-//     try {
-//       await onProposalSigned({
-//         proposalId: proposal._id,
-//         signature: signatureData || typedSignature,
-//         signedAt: new Date().toISOString(),
-//         signedBy:loginUserId
-//       });
-      
-//       handleClose();
-//     } catch (error) {
-//       console.error('Error saving signature:', error);
-//       alert('Failed to save signature. Please try again.');
-//     } finally {
-//       setIsSigning(false);
-//     }
-//   };
-  if (!proposal) return null;
-
-  const sections = [];
-
-  if (proposal.introduction) {
-    sections.push({
-      key: "introduction",
-      label: proposal.introductiontextname,
-      content: proposal.introductiontext,
-    });
-  }
-
-  if (proposal.terms) {
-    sections.push({
-      key: "terms",
-      label: proposal.termsandconditionsname,
-      content: proposal.termsandconditions,
-    });
-  }
-
-  // if (
-  //   proposal.servicesandinvoices &&
-  //   proposal.Additemizedserviceswithoutcreatinginvoices === "service"
-  // ) {
-  //   const taxRate = proposal.summary?.taxRate || 0;
-
-  //   const serviceHTML = `
-  //     <div style="font-family: Arial, sans-serif; color: #1e1e1e;">
-  //       <table style="width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden;">
-  //         <thead style="background-color: #f9fafb;">
-  //           <tr>
-  //             <th style="text-align: left; padding: 8px;">Service</th>
-  //             <th style="text-align: right; padding: 8px;">Rate</th>
-  //             <th style="text-align: right; padding: 8px;">Qty</th>
-  //             <th style="text-align: right; padding: 8px;">Tax</th>
-  //             <th style="text-align: right; padding: 8px;">Amount</th>
-  //           </tr>
-  //         </thead>
-  //         <tbody>
-  //           ${proposal.lineItems
-  //             .map((item) => {
-  //               const rate = Number(item.rate);
-  //               const quantity = Number(item.quantity);
-  //               const baseAmount = rate * quantity;
-  //               const taxAmount = item.tax ? (baseAmount * taxRate) / 100 : 0;
-  //               const totalAmount = baseAmount + taxAmount;
-
-  //               return `
-  //                 <tr>
-  //                   <td style="padding: 8px;">
-  //                     <div><strong>${item.productorService}</strong></div>
-  //                     <div style="font-size: 12px; color: #6b7280;">${item.description}</div>
-  //                   </td>
-  //                   <td style="text-align: right; padding: 8px;">$ ${rate.toFixed(2)}</td>
-  //                   <td style="text-align: right; padding: 8px;">${quantity}</td>
-  //                   <td style="text-align: right; padding: 8px;">$ ${taxAmount.toFixed(2)}</td>
-  //                   <td style="text-align: right; padding: 8px;">$ ${totalAmount.toFixed(2)}</td>
-  //                 </tr>`;
-  //             })
-  //             .join("")}
-  //         </tbody>
-  //         <tfoot>
-  //           <tr>
-  //             <td colspan="4" style="text-align: right; padding: 8px;"><strong>Total</strong></td>
-  //             <td style="text-align: right; padding: 8px;"><strong>$ ${proposal.summary?.total.toFixed(2)}</strong></td>
-  //           </tr>
-  //         </tfoot>
-  //       </table>
-  //     </div>
-  //   `;
-
-  //   sections.push({
-  //     key: "services",
-  //     label: "Services",
-  //     content: serviceHTML,
-  //   });
-  // }
-
-  // if (
-  //   proposal.servicesandinvoices &&
-  //   proposal.Addinvoiceoraskfordeposit === "invoice"
-  // ) {
-  //   const taxRate = proposal.summary?.taxRate || 0;
-
-  //   const invoiceHTML = `
-  //     <div style="font-family: Arial, sans-serif; color: #1e1e1e;">
-  //       <div style="margin-bottom: 20px;">
-  //         <p><strong>Amount</strong></p>
-  //         <p style="background-color: #f9fafb; padding: 10px; border-radius: 8px;">$${proposal.summary?.total.toFixed(2)}</p>
-
-  //         <p><strong>Invoice will be issued</strong></p>
-  //         <p style="background-color: #f9fafb; padding: 10px; border-radius: 8px;">${proposal.issueinvoice}</p>
-
-  //         <p><strong>Description</strong></p>
-  //         <p style="background-color: #f9fafb; padding: 10px; border-radius: 8px;">${proposal.description}</p>
-  //       </div>
-
-  //       <div>
-  //         <p 
-  //           style="font-weight: bold; margin-bottom: 10px; cursor: pointer;"
-  //           onclick="const table = this.nextElementSibling; const arrow = this.querySelector('span'); if (table.style.display === 'none') { table.style.display = 'block'; arrow.innerHTML = '&#x25B2;'; } else { table.style.display = 'none'; arrow.innerHTML = '&#x25BC;'; }"
-  //         >
-  //           <span>&#x25BC;</span> Invoice details
-  //         </p>
-
-  //         <div style="display: none;">
-  //           <table style="width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb;">
-  //             <thead style="background-color: #f9fafb;">
-  //               <tr>
-  //                 <th style="text-align: left; padding: 8px;">Service</th>
-  //                 <th style="text-align: right; padding: 8px;">Rate</th>
-  //                 <th style="text-align: right; padding: 8px;">Qty</th>
-  //                 <th style="text-align: right; padding: 8px;">Tax</th>
-  //                 <th style="text-align: right; padding: 8px;">Amount</th>
-  //               </tr>
-  //             </thead>
-  //             <tbody>
-  //               ${proposal.lineItems
-  //                 .map((item) => {
-  //                   const rate = Number(item.rate);
-  //                   const quantity = Number(item.quantity);
-  //                   const baseAmount = rate * quantity;
-  //                   const taxAmount = item.tax ? (baseAmount * taxRate) / 100 : 0;
-  //                   const totalAmount = baseAmount + taxAmount;
-
-  //                   return `
-  //                     <tr>
-  //                       <td style="padding: 8px;">
-  //                         <div><strong>${item.productorService}</strong></div>
-  //                         <div style="font-size: 12px; color: #6b7280;">${item.description}</div>
-  //                       </td>
-  //                       <td style="text-align: right; padding: 8px;">$ ${rate.toFixed(2)}</td>
-  //                       <td style="text-align: right; padding: 8px;">${quantity}</td>
-  //                       <td style="text-align: right; padding: 8px;">$ ${taxAmount.toFixed(2)}</td>
-  //                       <td style="text-align: right; padding: 8px;">$ ${totalAmount.toFixed(2)}</td>
-  //                     </tr>`;
-  //                 })
-  //                 .join("")}
-  //             </tbody>
-  //             <tfoot>
-  //               <tr>
-  //                 <td colspan="4" style="text-align: right; padding: 8px;"><strong>Total</strong></td>
-  //                 <td style="text-align: right; padding: 8px;"><strong>$ ${proposal.summary?.total.toFixed(2)}</strong></td>
-  //               </tr>
-  //             </tfoot>
-  //           </table>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   `;
-
-  //   sections.push({
-  //     key: "invoices",
-  //     label: "Invoices",
-  //     content: invoiceHTML,
-  //   });
-  // }
-
-  
- // Add this check at the beginning of your component
-  const isSigned = proposal?.status === "Signed";
-  const existingSignature = proposal?.signature;
-   sections.push({
-    key: "signature",
-    label: "Sign & accept",
-    content: (
-      <div style={{ fontFamily: 'Arial, sans-serif', color: '#1e1e1e', maxWidth: '500px' }}>
-        <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-          {isSigned ? (
-            <>
-              <p style={{ color: '#666', marginBottom: '20px' }}>Signed on {new Date(proposal.signedAt).toLocaleString()}</p>
-              <div style={{ marginBottom: '20px' }}>
-                <p>Signature:</p>
-                {existingSignature.startsWith('data:image') ? (
-                  <img 
-                    src={existingSignature} 
-                    alt="Saved signature" 
-                    style={{ 
-                      maxWidth: '300px', 
-                      border: '1px solid #e5e7eb', 
-                      backgroundColor: 'white',
-                      padding: '10px'
-                    }} 
-                  />
-                ) : (
-                  <div style={{
-                    fontSize: '24px',
-                    fontFamily: 'cursive',
-                    border: '1px solid #e5e7eb',
-                    padding: '20px',
-                    backgroundColor: '#f9fafb',
-                    borderRadius: '4px'
-                  }}>
-                    {existingSignature}
-                  </div>
-                )}
-              </div>
-              {/* <div style={{ textAlign: 'left', marginBottom: '25px' }}>
-                <label style={{ display: 'flex', alignItems: 'flex-start' }}>
-                  <input 
-                    type="checkbox" 
-                    checked={true}
-                    disabled
-                    style={{ marginRight: '10px', marginTop: '3px' }}
-                  />
-                  <span>Terms accepted on {new Date(proposal.signedAt).toLocaleString()}</span>
-                </label>
-              </div> */}
-              {/* <Button
-                variant="contained"
-                disabled
-                style={{
-                  backgroundColor: '#3f80ff',
-                  color: 'white',
-                  padding: '12px 24px',
-                  borderRadius: '6px',
-                  fontSize: '16px',
-                  width: '100%',
-                  fontWeight: 'bold',
-                  opacity: 0.7
+        {/* LEFT SIDE MENU */}
+        <Box sx={{ width: "28%", borderRight: "1px solid #ddd" }}>
+          <List>
+            {steps.map((step) => (
+              <ListItemButton
+                key={step.id}
+                selected={activeStep === step.id}
+                onClick={() => handleStepClick(step.id)}
+                sx={{
+                  // Apply green color when signed
+                  ...(isSigned && {
+                    color: "success.main",
+                    "& .MuiListItemText-primary": {
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                    },
+                  }),
                 }}
               >
-                Already Signed
-              </Button> */}
-            </>
-          ) : (
-            <>
-              <p style={{ color: '#666', marginBottom: '20px' }}>Your signature</p>
-              
-              {/* Signature Type Toggle */}
-              {/* <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center' }}>
-                <ButtonGroup>
-                  <Button
-                    variant={signatureType === 'draw' ? 'contained' : 'outlined'}
-                    onClick={() => setSignatureType('draw')}
+                {/* Show checkmark icon when signed */}
+                {isSigned && (
+                  <ListItemIcon sx={{ minWidth: "auto", mr: 1 }}>
+                    <CheckCircleOutlineIcon 
+                      fontSize="small" 
+                      sx={{ color: "success.main" }} 
+                    />
+                  </ListItemIcon>
+                )}
+                <ListItemText 
+                  primary={step.label}
+                  sx={{
+                    // Ensure text color changes when signed
+                    color: isSigned ? "success.main" : "inherit",
+                  }}
+                />
+              </ListItemButton>
+            ))}
+          </List>
+        </Box>
+
+        {/* RIGHT CONTENT */}
+        <Box sx={{ flexGrow: 1, overflowY: "auto", p: 2 }} onScroll={handleScroll}>
+
+          {/* ✅ INTRODUCTION */}
+          {proposal?.general?.introductionEnabled && (
+            <Box ref={introRef} sx={{ mb: 3 }}>
+              <Typography variant="h6">{proposal?.introduction?.title || "Introduction"}</Typography>
+              {HTMLReactParser(proposal?.introduction?.description || "")}
+              <Divider sx={{ my: 2 }} />
+            </Box>
+          )}
+
+          {/* ✅ TERMS */}
+          {proposal?.general?.termsEnabled && (
+            <Box ref={termsRef} sx={{ mb: 3 }}>
+              <Typography variant="h6">Terms & Conditions</Typography>
+              {HTMLReactParser(proposal?.terms?.description || "")}
+              <Divider sx={{ my: 2 }} />
+            </Box>
+          )}
+
+          {/* ✅ SERVICES - ITEMIZED */}
+          {proposal?.general?.servicesEnabled && proposal?.services?.option === "services" && (
+            <Box ref={servicesRef} sx={{ mb: 3 }}>
+              <Typography variant="h6" sx={{ mb: 2 }}>Services</Typography>
+
+              <Box sx={{ border: "1px solid #e5e7eb", borderRadius: "10px", overflow: "hidden" }}>
+                <Box sx={{
+                  p: 1, fontWeight: "bold",
+                  display: "grid", gridTemplateColumns: "3fr 1fr 1fr 1fr 1fr"
+                }}>
+                  <Typography>Service</Typography>
+                  <Typography textAlign="right">Rate</Typography>
+                  <Typography textAlign="right">Qty</Typography>
+                  <Typography textAlign="right">Tax</Typography>
+                  <Typography textAlign="right">Amount</Typography>
+                </Box>
+
+                {proposal?.services?.itemizedData?.lineItems?.map((item, i) => {
+                  const rate = Number(item.rate || 0);
+                  const qty = Number(item.quantity || 1);
+                  const taxRate = proposal?.services?.itemizedData?.taxRate || 0;
+
+                  const base = rate * qty;
+                  const tax = item.tax ? (base * taxRate) / 100 : 0;
+                  const total = base + tax;
+
+                  return (
+                    <Box key={i} sx={{
+                      p: 1,
+                      borderTop: "1px solid #e5e7eb",
+                      display: "grid",
+                      gridTemplateColumns: "3fr 1fr 1fr 1fr 1fr"
+                    }}>
+                      <Box>
+                        <Typography fontWeight="bold">{item.productorService}</Typography>
+                        <Typography fontSize={12} color="text.secondary">{item.description}</Typography>
+                      </Box>
+
+                      <Typography textAlign="right">${rate.toFixed(2)}</Typography>
+                      <Typography textAlign="right">{qty}</Typography>
+                      <Typography textAlign="right">${tax.toFixed(2)}</Typography>
+                      <Typography textAlign="right">${total.toFixed(2)}</Typography>
+                    </Box>
+                  );
+                })}
+
+                <Box sx={{
+                  borderTop: "1px solid #e5e7eb",
+                  p: 1,
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  fontWeight: "bold"
+                }}>
+                  Total: ${proposal?.services?.itemizedData?.totalAmount?.toFixed(2)}
+                </Box>
+              </Box>
+
+              <Divider sx={{ my: 2 }} />
+            </Box>
+          )}
+
+          {/* ✅ SERVICES - INVOICE MODE */}
+          {proposal?.general?.servicesEnabled && proposal?.services?.option === "invoice" && (
+            <Box ref={servicesRef} sx={{ mb: 3 }}>
+              <Typography variant="h6" sx={{ mb: 2 }}>Invoice</Typography>
+
+              <Box sx={{ mb: 2 }}>
+                <Typography fontWeight="bold">Amount</Typography>
+                <Box sx={{ bgcolor: "#f9fafb", p: 1, borderRadius: "8px" }}>
+                  ${proposal?.services?.invoices?.[0]?.totalAmount?.toFixed(2)}
+                </Box>
+
+                <Typography fontWeight="bold" sx={{ mt: 2 }}>Invoice will be issued</Typography>
+                <Box sx={{ bgcolor: "#f9fafb", p: 1, borderRadius: "8px" }}>
+                  {proposal?.services?.invoices?.[0]?.issueinvoice || "N/A"}
+                </Box>
+
+                <Typography fontWeight="bold" sx={{ mt: 2 }}>Description</Typography>
+                <Box sx={{ bgcolor: "#f9fafb", p: 1, borderRadius: "8px" }}>
+                  {proposal?.services?.invoices?.[0]?.description || "N/A"}
+                </Box>
+              </Box>
+
+              <Accordion>
+                <AccordionSummary expandIcon={<span>▼</span>}>
+                  <Typography fontWeight="bold">Invoice details</Typography>
+                </AccordionSummary>
+
+                <AccordionDetails>
+                  <Box sx={{ border: "1px solid #e5e7eb", borderRadius: "10px", overflow: "hidden" }}>
+                    <Box sx={{
+                      bgcolor: "#f9fafb", p: 1, fontWeight: "bold",
+                      display: "grid", gridTemplateColumns: "3fr 1fr 1fr 1fr 1fr"
+                    }}>
+                      <Typography>Service</Typography>
+                      <Typography textAlign="right">Rate</Typography>
+                      <Typography textAlign="right">Qty</Typography>
+                      <Typography textAlign="right">Tax</Typography>
+                      <Typography textAlign="right">Amount</Typography>
+                    </Box>
+
+                    {proposal?.services?.invoices?.[0]?.lineItems?.map((item, i) => {
+                      const rate = Number(item.rate || 0);
+                      const qty = Number(item.quantity || 1);
+                      const taxRate = proposal?.services?.invoices?.[0]?.taxRate || 0;
+
+                      const base = rate * qty;
+                      const tax = item.tax ? (base * taxRate) / 100 : 0;
+                      const total = base + tax;
+
+                      return (
+                        <Box key={i} sx={{
+                          p: 1,
+                          borderTop: "1px solid #e5e7eb",
+                          display: "grid",
+                          gridTemplateColumns: "3fr 1fr 1fr 1fr 1fr"
+                        }}>
+                          <Box>
+                            <Typography fontWeight="bold">{item.productorService}</Typography>
+                            <Typography fontSize={12} color="text.secondary">{item.description}</Typography>
+                          </Box>
+
+                          <Typography textAlign="right">${rate.toFixed(2)}</Typography>
+                          <Typography textAlign="right">{qty}</Typography>
+                          <Typography textAlign="right">${tax.toFixed(2)}</Typography>
+                          <Typography textAlign="right">${total.toFixed(2)}</Typography>
+                        </Box>
+                      );
+                    })}
+
+                    <Box sx={{
+                      borderTop: "1px solid #e5e7eb",
+                      p: 1,
+                      display: "flex",
+                      justifyContent: "flex-end",
+                      fontWeight: "bold"
+                    }}>
+                      Total: ${proposal?.services?.invoices?.[0]?.totalAmount?.toFixed(2)}
+                    </Box>
+                  </Box>
+                </AccordionDetails>
+              </Accordion>
+
+              <Divider sx={{ my: 2 }} />
+            </Box>
+          )}
+
+          {/* ✅ PAYMENTS */}
+          {proposal?.general?.paymentsEnabled && (
+            <Box ref={paymentsRef} sx={{ mb: 3 }}>
+              <Typography variant="h6">Payments</Typography>
+              <Typography><b>Method:</b> {proposal?.payments?.method}</Typography>
+              <Typography><b>Amount:</b> ${proposal?.payments?.amount}</Typography>
+              <Divider sx={{ my: 2 }} />
+            </Box>
+          )}
+
+          {/* ✅ SIGNATURE SECTION */}
+          {/* <Box ref={signatureRef} sx={{ mb: 4 }}>
+            <Typography variant="h6" sx={{ mb: 2 }}>Sign & Accept</Typography>
+            <Divider sx={{ mb: 2 }} />
+
+            {proposal?.status === "Signed" ? (
+              <>
+                <Typography sx={{ mb: 2 }} color="text.secondary">
+                  Signed on {new Date(proposal.signedAt).toLocaleString()}
+                </Typography>
+
+                <Typography fontWeight="bold">Signature:</Typography>
+
+                {proposal?.signature?.startsWith("data:image") ? (
+                  <img
+                    src={proposal.signature}
+                    alt="signature"
+                    style={{
+                      maxWidth: 300,
+                      border: "1px solid #ddd",
+                      background: "white",
+                      padding: 10,
+                      marginTop: 10,
+                    }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      fontSize: 24,
+                      fontFamily: "cursive",
+                      border: "1px solid #ccc",
+                      padding: 20,
+                      background: "#f7f7f7",
+                      marginTop: 10,
+                      borderRadius: 6,
+                    }}
                   >
-                    Draw Signature
+                    {proposal.signature}
+                  </div>
+                )}
+
+                <Button variant="contained" disabled sx={{ mt: 2, opacity: 0.7 }}>
+                  Already Signed
+                </Button>
+              </>
+            ) : (
+              <>
+               
+                <ButtonGroup sx={{ mb: 2 }}>
+                  <Button
+                    variant={signatureType === "draw" ? "contained" : "outlined"}
+                    onClick={() => setSignatureType("draw")}
+                  >
+                    Draw
                   </Button>
                   <Button
-                    variant={signatureType === 'type' ? 'contained' : 'outlined'}
-                    onClick={() => setSignatureType('type')}
+                    variant={signatureType === "type" ? "contained" : "outlined"}
+                    onClick={() => setSignatureType("type")}
                   >
-                    Type Signature
+                    Type
                   </Button>
                 </ButtonGroup>
-              </div> */}
-              
-              {/* Drawing Signature */}
-              {/* {signatureType === 'draw' && (
-                <>
-                  <div style={{ 
-                    border: '1px solid #e5e7eb', 
-                    borderRadius: '4px',
-                    marginBottom: '20px',
-                    backgroundColor: '#f9fafb'
-                  }}>
+
+                
+                {signatureType === "draw" && (
+                  <>
                     <SignatureCanvas
                       ref={sigCanvas}
                       penColor="black"
                       canvasProps={{
                         width: 500,
                         height: 200,
-                        className: 'signature-canvas',
-                        style: { background: 'transparent' }
+                        style: {
+                          border: "1px solid #ccc",
+                          background: "#fafafa",
+                          borderRadius: 6,
+                        },
                       }}
                     />
-                  </div>
-                  
-                  <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-                    <Button 
-                      variant="outlined" 
-                      onClick={clearSignature}
-                      style={{ flex: 1 }}
-                      disabled={isSigning}
-                    >
-                      Clear
-                    </Button>
-                    <Button 
-                      color="primary"
-                      sx={{
-                        backgroundColor: 'text.menu',
-                        color: 'primary.contrastText',
-                        '&:hover': {
-                          backgroundColor: 'menu.dark',
-                          boxShadow: 1,
-                        },
-                        transition: 'background-color 0.2s ease'
+
+                    <Box sx={{ display: "flex", gap: 1, my: 2 }}>
+                      <Button variant="outlined" onClick={() => sigCanvas.current.clear()}>
+                        Clear
+                      </Button>
+                      <Button
+                        variant="contained"
+                        onClick={() => {
+                          if (sigCanvas.current.isEmpty()) {
+                            alert("Please draw your signature first");
+                            return;
+                          }
+                          const signature = sigCanvas.current.toDataURL("image/png");
+                          setSignatureData(signature);
+                        }}
+                      >
+                        Save Signature
+                      </Button>
+                    </Box>
+
+                    {signatureData && (
+                      <>
+                        <Typography variant="body2" color="success.main" sx={{ mb: 1 }}>
+                          ✓ Signature saved successfully
+                        </Typography>
+                        <img
+                          src={signatureData}
+                          alt="preview"
+                          style={{
+                            maxWidth: 300,
+                            border: "1px solid #ddd",
+                            padding: 10,
+                            background: "white",
+                          }}
+                        />
+                      </>
+                    )}
+                  </>
+                )}
+
+               
+                {signatureType === "type" && (
+                  <>
+                    <TextField
+                      fullWidth
+                      placeholder="Type your full name"
+                      value={typedSignature}
+                      onChange={(e) => setTypedSignature(e.target.value)}
+                      sx={{ mb: 2 }}
+                      InputProps={{
+                        style: { fontFamily: "cursive", fontSize: 22 },
                       }}
-                      onClick={saveSignature}
-                      style={{ flex: 1 }}
-                    >
-                      Save Signature
-                    </Button>
-                  </div>
-                  
-                  {signatureData && (
-                    <div style={{ marginBottom: '20px' }}>
-                      <p>Your saved signature:</p>
-                      <img 
-                        src={signatureData} 
-                        alt="Saved signature" 
-                        style={{ 
-                          maxWidth: '300px', 
-                          border: '1px solid #e5e7eb', 
-                          backgroundColor: 'white',
-                          padding: '10px'
-                        }} 
-                      />
-                    </div>
-                  )}
-                </>
-              )} */}
-              
-              {/* Typed Signature */}
-              {/* {signatureType === 'type' && (
-                <>
-                  <TextField
-                    fullWidth
-                    size='small'
-                    variant="outlined"
-                    placeholder="Type your name as signature"
-                    value={typedSignature}
-                    onChange={(e) => setTypedSignature(e.target.value)}
-                    sx={{
-                      marginBottom: '20px',
-                      '& .MuiOutlinedInput-root': {
-                        '& fieldset': {
-                          borderColor: '#e5e7eb',
-                        },
-                        '&:hover fieldset': {
-                          borderColor: '#d1d5db',
-                        },
-                      },
-                    }}
-                    InputProps={{
-                      style: {
-                        fontFamily: 'cursive',
-                        //   fontFamily: '"Segoe Print", "Bradley Hand", cursive, sans-serif',
-                        fontSize: '20px',
-                        height: '60px'
-                      }
-                    }}
-                  />
-                  
-                  {typedSignature && (
-                    <div style={{ marginBottom: '20px' }}>
-                      <p>Your typed signature:</p>
-                      <div style={{
-                        fontSize: '24px',
-                        fontFamily: 'cursive',
-                        border: '1px solid #e5e7eb',
-                        padding: '20px',
-                        backgroundColor: '#f9fafb',
-                        borderRadius: '4px'
-                      }}>
+                    />
+
+                    {typedSignature && (
+                      <div
+                        style={{
+                          fontSize: 24,
+                          fontFamily: "cursive",
+                          border: "1px solid #ccc",
+                          padding: 20,
+                          background: "#fafafa",
+                          borderRadius: 6,
+                          marginBottom: 20,
+                        }}
+                      >
                         {typedSignature}
                       </div>
-                    </div>
-                  )}
-                </>
-              )} */}
-              
-              {/* Terms acceptance */}
-              <div style={{ textAlign: 'left', marginBottom: '25px' }}>
-                <label style={{ display: 'flex', alignItems: 'flex-start', cursor: 'pointer' }}>
-                  <input 
-                    type="checkbox" 
-                    checked={termsAccepted}
-                    onChange={(e) => setTermsAccepted(e.target.checked)}
-                    style={{ marginRight: '10px', marginTop: '3px' }}
-                    // disabled={isSigning}
-                    disabled
-                  />
-                  <span>I accept the above terms and TaxDome's Terms of Service</span>
-                </label>
-              </div>
-              
-              {/* Complete button */}
-              {/* <Button
-                color="primary"
-                onClick={handleCompleteProposal}
-                disabled={!termsAccepted || (signatureType === 'draw' ? !signatureData : !typedSignature) || isSigning}
-                sx={{
-                  backgroundColor: 'text.menu',
-                  color: 'primary.contrastText',
-                  '&:hover': {
-                    backgroundColor: 'menu.dark',
-                    boxShadow: 1,
-                  },
-                  transition: 'background-color 0.2s ease'
-                }}
-              >
-                {isSigning ? 'Processing...' : 'Complete'}
-              </Button> */}
-            </>
-          )}
-        </div>
-      </div>
-    ),
-  });
-  
-  return (
-    <Dialog fullScreen open={open} onClose={handleClose}>
-      <DialogTitle
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          px: 3,
-          py: 2,
-          borderBottom: "1px solid #ddd",
-        }}
-      >
-        <Typography variant="h6" component="p">
-          {proposal?.proposalname || "Proposal"}
-        </Typography>
-        <IconButton edge="end" onClick={handleClose}>
-          <CloseIcon />
-        </IconButton>
-      </DialogTitle>
+                    )}
+                  </>
+                )}
 
-      <DialogContent sx={{ display: "flex", height: "100%", p: 0 }}>
-        {/* Left Navigation */}
-        <Box
-          sx={{
-            width: 250,
-            borderRight: "1px solid #ddd",
-            height: "100%",
-          }}
-        >
-            <List>
-  {sections.map((section) => {
-    // Check "completion" status
-    let isCompleted = false;
+                
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={termsAccepted}
+                      onChange={(e) => setTermsAccepted(e.target.checked)}
+                      disabled={proposal?.status === "Signed"}
+                    />
+                  }
+                  label="I accept the Terms & Conditions"
+                  sx={{ mt: 2 }}
+                />
 
-    if (section.key === "introduction" && proposal?.introduction) {
-      isCompleted = true;
-    }
-    if (section.key === "terms" && proposal?.terms) {
-      isCompleted = true;
-    }
-    if (section.key === "services" && proposal?.lineItems?.length > 0) {
-      isCompleted = true;
-    }
-    if (section.key === "invoices" && proposal?.lineItems?.length > 0) {
-      isCompleted = true;
-    }
-    if (section.key === "signature" && proposal?.signature) {
-      isCompleted = true;
-    }
+                
+                <Button
+                  variant="contained"
+                  sx={{ mt: 2 }}
+                  disabled={
+                    isSigning ||
+                    !termsAccepted ||
+                    (signatureType === "draw" ? !signatureData : !typedSignature) ||
+                    proposal?.status === "Signed"
+                  }
+                  onClick={handleCompleteProposal}
+                >
+                  {isSigning ? "Saving..." : "Complete Proposal"}
+                </Button>
+              </>
+            )}
+          </Box> */}
+          {/* SIGNATURE SECTION */}
+<Box ref={signatureRef} sx={{ mb: 4 }}>
+  <Typography variant="h6" sx={{ mb: 2 }}>
+    Sign & Accept
+  </Typography>
+  <Divider sx={{ mb: 2 }} />
 
-    return (
-      <ListItemButton
-        key={section.key}
-        selected={selectedSection === section.key}
-        onClick={() => {
-          setSelectedSection(section.key);
-          setIsManualScroll(true);
-          sectionRefs.current[section.key]?.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          });
-          setTimeout(() => {
-            setIsManualScroll(false);
-          }, 800);
-        }}
-      >
-        <ListItemText
-          primary={section.label}
-          primaryTypographyProps={{
-            sx: {
-              color: isCompleted ? "green" : "inherit",  // ✅ green if completed
-              fontWeight: section.key === selectedSection ? 600 : 400,
-            },
+  {/* SHOW ONLY WHEN SIGNED */}
+  {proposal?.status === "Signed" ? (
+    <>
+      <Typography sx={{ mb: 2 }} color="text.secondary">
+        Signed on {new Date(proposal.signedAt).toLocaleString()}
+      </Typography>
+
+      <Typography fontWeight="bold">Signature:</Typography>
+
+      {/* IF SIGNATURE IS IMAGE */}
+      {proposal?.signature?.startsWith("data:image") ? (
+        <img
+          src={proposal.signature}
+          alt="signature"
+          style={{
+            maxWidth: 300,
+            border: "1px solid #ddd",
+            background: "white",
+            padding: 10,
+            marginTop: 10,
           }}
         />
-      </ListItemButton>
-    );
-  })}
-</List>
-
-          {/* <List>
-            {sections.map((section) => (
-             
-              <ListItemButton
-  key={section.key}
-  selected={selectedSection === section.key}
-  onClick={() => {
-    setSelectedSection(section.key);
-    setIsManualScroll(true); // lock
-    sectionRefs.current[section.key]?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
-
-    // Unlock after smooth scroll finishes (~800ms)
-    setTimeout(() => {
-      setIsManualScroll(false);
-    }, 800);
-  }}
->
-  <ListItemText primary={section.label} primaryTypographyProps={{
-          sx: {
-            color:
-              section.key === "signature" && proposal?.signature
-                ? "green" // ✅ make signature section green if signature exists
-                : "inherit",
-            fontWeight: section.key === selectedSection ? 600 : 400,
-          },
-        }} />
-</ListItemButton>
-
-            ))}
-          </List> */}
-        </Box>
-
-        {/* Right Content - Scrollable All Sections */}
-        <Box
-         ref={contentRef} // Add the ref here
-          sx={{
-            flexGrow: 1,
-            p: 3,
-            overflowY: "auto",
-            scrollBehavior: "smooth",
+      ) : (
+        /* IF SIGNATURE IS TYPED */
+        <div
+          style={{
+            fontSize: 24,
+            fontFamily: "cursive",
+            border: "1px solid #ccc",
+            padding: 20,
+            background: "#f7f7f7",
+            marginTop: 10,
+            borderRadius: 6,
           }}
         >
-          {sections.map((section) => (
-            <Box
-              key={section.key}
-              ref={(el) => (sectionRefs.current[section.key] = el)}
-              sx={{ mb: 6 }}
-            >
-              <Typography variant="h6" component="p" gutterBottom sx={{ fontWeight: "600" }}>
-                {section.label}
-              </Typography>
-              <Divider sx={{ mb: 2 }} />
-              {typeof section.content === 'string' ? (
-                <Box
-                  dangerouslySetInnerHTML={{ __html: section.content }}
-                  sx={{ lineHeight: 1.7 }}
-                />
-              ) : (
-                section.content
-              )}
-            </Box>
-          ))}
+          {proposal.signature}
+        </div>
+      )}
+
+      <Button variant="contained" disabled sx={{ mt: 2, opacity: 0.7 }}>
+        Already Signed
+      </Button>
+    </>
+  ) : (
+    <>
+      {/* UNSIGNED — SHOW NOTHING */}
+      <Typography color="error" sx={{ mt: 2 }}>
+        Proposal is not signed yet.
+      </Typography>
+    </>
+  )}
+</Box>
+
         </Box>
       </DialogContent>
     </Dialog>
   );
 };
 
-export default ProposalDialog;
+export default ProposalPreviewDialog;

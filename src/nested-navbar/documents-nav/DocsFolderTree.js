@@ -16,7 +16,7 @@ import {
   DialogTitle,
   DialogContent,
   TextField,
-  DialogActions,
+  DialogActions,Chip,Tooltip
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import customCss from "./docuseal-dark-theme.css";
@@ -513,217 +513,542 @@ const DocsFolderTree = () => {
           return <AiFillFileUnknown color="#757575" size={18} />;
       }
     };
+const renderTree = (items, level = 0, parentPath = "") => {
+  // const getStatusChip = (meta) => {
+  //   let signLabel = "Not Signed";
+  //   let signColor = "default";
 
-    const renderTree = (items, level = 0, parentPath = "") => {
-      return (
-        <>
-          <Box component="ul" sx={{ listStyle: "none", pl: level * 2, mb: 1 }}>
-            {items.map((item) => {
-              const fullPath = parentPath
-                ? `${parentPath}/${item.name}`
-                : item.name;
-              const meta = item.meta || {};
+  //   if (meta.signStatus === "signed") {
+  //     signLabel = "Signed";
+  //     signColor = "success";
+  //   } else if (meta.signStatus === "pending") {
+  //     signLabel = "Signature Pending";
+  //     signColor = "warning";
+  //   }
 
-              // 🎯 Define colors for statuses
-              const getColor = (status) => (status ? "#1976d2" : "#9e9e9e");
+  //   let approvalLabel = "Not Requested";
+  //   let approvalColor = "default";
 
-              const StatusIcons = () => (
-                <Box
-                  sx={{ display: "flex", gap: 1, alignItems: "center", ml: 1 }}
-                >
-                  <Eye size={16} color={getColor(meta.readStatus)} />
-                  <PenTool size={16} color={getColor(meta.signStatus)} />
-                  <Stamp size={16} color={getColor(meta.authStatus)} />
-                  <Lock
-                    size={16}
-                    color={meta.readOnly ? "#e53935" : "#9e9e9e"}
-                  />
-                </Box>
-              );
-              const handleSafeFileClick = () => {
-                if (meta.readOnly) {
-                  alert("This file is locked and cannot be opened.");
-                  return;
-                }
-                handleFileClick(fullPath, item.name);
-              };
-              return (
-                <li key={fullPath} style={{ marginBottom: 8 }}>
-                  {item.type === "folder" ? (
-                    // 📁 Folder with open/close icon
-                    <Box
-                      sx={{
-                        p: 1,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        borderRadius: 2,
-                        cursor: "pointer",
-                        backgroundColor: "#fff",
-                        "&:hover": { backgroundColor: "#f5f5f5" },
-                        transition: "background-color 0.2s ease-in-out",
-                      }}
-                      onClick={() => toggleFolder(fullPath, meta.readOnly)}
-                    >
-                      <Box
-                        display="flex"
-                        alignItems="center"
-                        sx={{ flexGrow: 1, gap: 1 }}
-                      >
-                        {expandedFolders[fullPath] ? (
-                          <FolderOpenIcon color="#1976d2" size={18} />
-                        ) : (
-                          <FolderClosedIcon color="#757575" size={18} />
-                        )}
-                        <Typography
-                          variant="body1"
-                          fontWeight="medium"
-                          sx={{ wordBreak: "break-word" }}
-                        >
-                          {item.name}
-                        </Typography>
-                        {/* <StatusIcons /> */}
-                      </Box>
+  //   switch (meta.authStatus) {
+  //     case "sendForApproval":
+  //       approvalLabel = "Approval Pending";
+  //       approvalColor = "warning";
+  //       break;
 
-                      {/* Optional: Folder menu */}
-                      <IconButton
-                        size="small"
-                        onClick={(e) =>
-                          handleMenuOpen(e, { ...item, fullPath })
-                        }
-                      >
-                        <MoreVertIcon size={16} />
-                      </IconButton>
-                    </Box>
-                  ) : (
-                    // 📄 File with single dot icon
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        pl: 4,
-                        mb: 1,
-                        borderRadius: 2,
-                        "&:hover .file-menu-icon": { opacity: 1 },
-                      }}
-                    >
-                      {/* <FileIcon
-                      size={16}
-                      color="#757575"
-                      style={{ marginRight: 6 }}
-                    /> */}
-                      <Box sx={{ mr: 1 }}>{getFileIcon(item.name)}</Box>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          flex: 1,
-                          wordBreak: "break-word",
-                          color: meta.readOnly ? "#999" : "#1976d2",
-                          textDecoration: meta.readOnly ? "none" : "underline",
-                          cursor: meta.readOnly ? "not-allowed" : "pointer",
-                        }}
-                        onClick={handleSafeFileClick}
-                      >
-                        {item.name}
-                      </Typography>
-                      <StatusIcons />
+  //     case "approvalCompleted":
+  //       approvalLabel = "Approved";
+  //       approvalColor = "success";
+  //       break;
 
-                      {/* 🔵 Single blue dot icon for file menu */}
-                      <Box
-                        className="file-menu-icon"
-                        sx={{
-                          width: 8,
-                          height: 8,
-                          borderRadius: "50%",
-                          backgroundColor: "#1976d2",
-                          opacity: 0,
-                          transition: "opacity 0.2s",
-                          cursor: "pointer",
-                          mr: 1,
-                          ml: 1,
-                        }}
-                        onClick={(e) =>
-                          handleMenuOpen(e, { ...item, fullPath })
-                        }
-                      />
-                    </Box>
-                  )}
+  //     case "rejectedApproval":
+  //       approvalLabel = "Rejected";
+  //       approvalColor = "error";
+  //       break;
 
-                  {/* Recursive children */}
-                  {expandedFolders[fullPath] &&
-                    item.children &&
-                    item.children.length > 0 && (
-                      <Box
-                        sx={{
-                          ml: 2,
-                          mt: 1,
-                          borderLeft: "2px dashed #ccc",
-                          pl: 2,
-                        }}
-                      >
-                        {renderTree(item.children, level + 1, fullPath)}
-                      </Box>
-                    )}
-                </li>
-              );
-            })}
-          </Box>
-          <Dialog
-            open={openDialog} // must match exactly
-            onClose={() => setOpenDialog(false)}
-            fullWidth
-            maxWidth="lg"
-          >
-            <DialogTitle>
-              {items.name}
-              <IconButton
-                aria-label="close"
-                onClick={() => setOpenDialog(false)}
-                style={{ position: "absolute", right: 8, top: 8 }}
-              >
-                <CloseIcon />
-              </IconButton>
-            </DialogTitle>
+  //     case "cancledApproval":
+  //       approvalLabel = "Canceled";
+  //       approvalColor = "error";
+  //       break;
 
-            <DialogContent dividers>
-              {token && showBuilderFor && (
-                <DocusealBuilder token={token} customCss={customCss} />
-              )}
-            </DialogContent>
-          </Dialog>
+  //     default:
+  //       break;
+  //   }
 
-          <Dialog
-            open={openApprovalDialog}
-            onClose={handleCloseDialog}
-            fullWidth
-            maxWidth="sm"
-          >
-            <DialogTitle>Request Approval</DialogTitle>
-            <DialogContent>
-              <TextField
-                multiline
-                rows={4}
-                fullWidth
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Type a short description or note for this approval..."
-              />
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleCloseDialog}>Cancel</Button>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleRequestApproval}
-                disabled={!description.trim()}
-              >
-                Send
-              </Button>
-            </DialogActions>
-          </Dialog>
-        </>
+  //   return (
+  //     <Box sx={{ display: "flex", gap: 1, ml: 1 }}>
+  //       <Chip
+  //         label={signLabel}
+  //         size="small"
+  //         variant="outlined"
+  //         color={signColor}
+  //       />
+
+  //       <Chip
+  //         label={approvalLabel}
+  //         size="small"
+  //         variant="outlined"
+  //         color={approvalColor}
+  //       />
+  //     </Box>
+  //   );
+  // };
+const getStatusChip = (meta) => {
+  const chips = [];
+
+  // ======= SIGNATURE STATUS =======
+  if (SIGN_STATUSES.includes(meta.signStatus)) {
+    let color = "default";
+
+    if (meta.signStatus === "pendingSignature") color = "warning";
+    if (meta.signStatus === "signatureCompleted") color = "success";
+
+    chips.push(
+      <Chip
+        key="signChip"
+        label={statusTextMap[meta.signStatus]}
+        size="small"
+        variant="outlined"
+        color={color}
+      />
+    );
+  }
+
+  // ======= APPROVAL STATUS =======
+  if (APPROVAL_STATUSES.includes(meta.authStatus)) {
+    let color = "default";
+    let chip = (
+      <Chip
+        key="approvalChip"
+        label={approvalStatusTextMap[meta.authStatus]}
+        size="small"
+        variant="outlined"
+        color={color}
+      />
+    );
+
+    if (meta.authStatus === "pendingApproval") color = "warning";
+    if (meta.authStatus === "approvalCompleted") color = "success";
+    if (meta.authStatus === "cancledApproval") color = "error";
+
+    // Handle tooltip only for canceled approval
+    if (meta.authStatus === "cancledApproval" && meta.cancelReason) {
+      chip = (
+        <Tooltip title={meta.cancelReason} placement="top-end" >
+          <Chip
+            key="approvalCanceledChip"
+            label="Approval Canceled"
+            size="small"
+            variant="outlined"
+            color="error"
+            sx={{ cursor: "pointer" }}
+          />
+        </Tooltip>
       );
-    };
+    } else {
+      chip = (
+        <Chip
+          key="approvalChip"
+          label={approvalStatusTextMap[meta.authStatus]}
+          size="small"
+          variant="outlined"
+          color={color}
+        />
+      );
+    }
+
+    chips.push(chip);
+  }
+
+  // ======= SHOW NOTHING IF NO STATUS =======
+  if (chips.length === 0) return null;
+
+  return (
+    <Box sx={{ display: "flex", gap: 1, ml: 1 }}>
+      {chips}
+    </Box>
+  );
+};
+
+
+  return (
+    <>
+      <Box component="ul" sx={{ listStyle: "none", pl: level * 2, mb: 1 }}>
+        {items.map((item) => {
+          const fullPath = parentPath ? `${parentPath}/${item.name}` : item.name;
+          const meta = item.meta || {};
+
+          const getColor = (status) => (status ? "#1976d2" : "#9e9e9e");
+
+          const StatusIcons = () => (
+            <Box sx={{ display: "flex", gap: 1, alignItems: "center", ml: 1 }}>
+              <Eye size={16} color={getColor(meta.readStatus)} />
+              <PenTool size={16} color={getColor(meta.signStatus)} />
+              <Stamp size={16} color={getColor(meta.authStatus)} />
+              <Lock size={16} color={meta.readOnly ? "#e53935" : "#9e9e9e"} />
+            </Box>
+          );
+
+          const handleSafeFileClick = () => {
+            if (meta.readOnly) {
+              alert("This file is locked and cannot be opened.");
+              return;
+            }
+            handleFileClick(fullPath, item.name);
+          };
+
+          return (
+            <li key={fullPath} style={{ marginBottom: 8 }}>
+              {item.type === "folder" ? (
+                <Box
+                  sx={{
+                    p: 1,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    borderRadius: 2,
+                    cursor: "pointer",
+                    backgroundColor: "#fff",
+                    "&:hover": { backgroundColor: "#f5f5f5" },
+                    transition: "background-color 0.2s ease-in-out",
+                  }}
+                  onClick={() => toggleFolder(fullPath, meta.readOnly)}
+                >
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    sx={{ flexGrow: 1, gap: 1 }}
+                  >
+                    {expandedFolders[fullPath] ? (
+                      <FolderOpenIcon color="#1976d2" size={18} />
+                    ) : (
+                      <FolderClosedIcon color="#757575" size={18} />
+                    )}
+
+                    <Typography variant="body1" fontWeight="medium">
+                      {item.name}
+                    </Typography>
+                  </Box>
+
+                  <IconButton
+                    size="small"
+                    onClick={(e) => handleMenuOpen(e, { ...item, fullPath })}
+                  >
+                    <MoreVertIcon size={16} />
+                  </IconButton>
+                </Box>
+              ) : (
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    pl: 4,
+                    mb: 1,
+                    borderRadius: 2,
+                    "&:hover .file-menu-icon": { opacity: 1 },
+                  }}
+                >
+                  <Box sx={{ mr: 1 ,display:'flex',alignItems:'center',gap:2}}>{getFileIcon(item.name)}
+                      <Typography
+                    variant="body2"
+                    sx={{
+                      flex: 1,
+                      wordBreak: "break-word",
+                      color: meta.readOnly ? "#999" : "#1976d2",
+                      textDecoration: meta.readOnly ? "none" : "underline",
+                      cursor: meta.readOnly ? "not-allowed" : "pointer",
+                    }}
+                    onClick={handleSafeFileClick}
+                  >
+                    {item.name}
+                  </Typography>
+                  </Box>
+                 
+
+                <Box> {/* ⬇️ Added the chips here */}
+                  {getStatusChip(meta)}</Box>
+
+                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <StatusIcons />
+                 
+
+
+                  <Box
+                    className="file-menu-icon"
+                    sx={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: "50%",
+                      backgroundColor: "#1976d2",
+                      opacity: 0,
+                      transition: "opacity 0.2s",
+                      cursor: "pointer",
+                      mr: 1,
+                      ml: 1,
+                    }}
+                    onClick={(e) => handleMenuOpen(e, { ...item, fullPath })}
+                  />
+                   </Box>
+                </Box>
+              )}
+
+              {expandedFolders[fullPath] &&
+                item.children &&
+                item.children.length > 0 && (
+                  <Box
+                    sx={{
+                      ml: 2,
+                      mt: 1,
+                      borderLeft: "2px dashed #ccc",
+                      pl: 2,
+                    }}
+                  >
+                    {renderTree(item.children, level + 1, fullPath)}
+                  </Box>
+                )}
+            </li>
+          );
+        })}
+      </Box>
+
+      {/* Your dialogs remain unchanged */}
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)} fullWidth maxWidth="lg">
+        <DialogTitle>
+          {items.name}
+          <IconButton
+            aria-label="close"
+            onClick={() => setOpenDialog(false)}
+            style={{ position: "absolute", right: 8, top: 8 }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+
+        <DialogContent dividers>
+          {token && showBuilderFor && (
+            <DocusealBuilder token={token} customCss={customCss} />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={openApprovalDialog} onClose={handleCloseDialog} fullWidth maxWidth="sm">
+        <DialogTitle>Request Approval</DialogTitle>
+        <DialogContent>
+          <TextField
+            multiline
+            rows={4}
+            fullWidth
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Type a short description or note..."
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog}>Cancel</Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleRequestApproval}
+            disabled={!description.trim()}
+          >
+            Send
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  );
+};
+
+    // const renderTree = (items, level = 0, parentPath = "") => {
+    //   return (
+    //     <>
+    //       <Box component="ul" sx={{ listStyle: "none", pl: level * 2, mb: 1 }}>
+    //         {items.map((item) => {
+    //           const fullPath = parentPath
+    //             ? `${parentPath}/${item.name}`
+    //             : item.name;
+    //           const meta = item.meta || {};
+
+    //           // 🎯 Define colors for statuses
+    //           const getColor = (status) => (status ? "#1976d2" : "#9e9e9e");
+
+    //           const StatusIcons = () => (
+    //             <Box
+    //               sx={{ display: "flex", gap: 1, alignItems: "center", ml: 1 }}
+    //             >
+    //               <Eye size={16} color={getColor(meta.readStatus)} />
+    //               <PenTool size={16} color={getColor(meta.signStatus)} />
+    //               <Stamp size={16} color={getColor(meta.authStatus)} />
+    //               <Lock
+    //                 size={16}
+    //                 color={meta.readOnly ? "#e53935" : "#9e9e9e"}
+    //               />
+    //             </Box>
+    //           );
+    //           const handleSafeFileClick = () => {
+    //             if (meta.readOnly) {
+    //               alert("This file is locked and cannot be opened.");
+    //               return;
+    //             }
+    //             handleFileClick(fullPath, item.name);
+    //           };
+    //           return (
+    //             <li key={fullPath} style={{ marginBottom: 8 }}>
+    //               {item.type === "folder" ? (
+    //                 // 📁 Folder with open/close icon
+    //                 <Box
+    //                   sx={{
+    //                     p: 1,
+    //                     display: "flex",
+    //                     alignItems: "center",
+    //                     justifyContent: "space-between",
+    //                     borderRadius: 2,
+    //                     cursor: "pointer",
+    //                     backgroundColor: "#fff",
+    //                     "&:hover": { backgroundColor: "#f5f5f5" },
+    //                     transition: "background-color 0.2s ease-in-out",
+    //                   }}
+    //                   onClick={() => toggleFolder(fullPath, meta.readOnly)}
+    //                 >
+    //                   <Box
+    //                     display="flex"
+    //                     alignItems="center"
+    //                     sx={{ flexGrow: 1, gap: 1 }}
+    //                   >
+    //                     {expandedFolders[fullPath] ? (
+    //                       <FolderOpenIcon color="#1976d2" size={18} />
+    //                     ) : (
+    //                       <FolderClosedIcon color="#757575" size={18} />
+    //                     )}
+    //                     <Typography
+    //                       variant="body1"
+    //                       fontWeight="medium"
+    //                       sx={{ wordBreak: "break-word" }}
+    //                     >
+    //                       {item.name}
+    //                     </Typography>
+    //                     {/* <StatusIcons /> */}
+    //                   </Box>
+
+    //                   {/* Optional: Folder menu */}
+    //                   <IconButton
+    //                     size="small"
+    //                     onClick={(e) =>
+    //                       handleMenuOpen(e, { ...item, fullPath })
+    //                     }
+    //                   >
+    //                     <MoreVertIcon size={16} />
+    //                   </IconButton>
+    //                 </Box>
+    //               ) : (
+    //                 // 📄 File with single dot icon
+    //                 <Box
+    //                   sx={{
+    //                     display: "flex",
+    //                     alignItems: "center",
+    //                     pl: 4,
+    //                     mb: 1,
+    //                     borderRadius: 2,
+    //                     "&:hover .file-menu-icon": { opacity: 1 },
+    //                   }}
+    //                 >
+    //                   {/* <FileIcon
+    //                   size={16}
+    //                   color="#757575"
+    //                   style={{ marginRight: 6 }}
+    //                 /> */}
+    //                   <Box sx={{ mr: 1 }}>{getFileIcon(item.name)}</Box>
+    //                   <Typography
+    //                     variant="body2"
+    //                     sx={{
+    //                       flex: 1,
+    //                       wordBreak: "break-word",
+    //                       color: meta.readOnly ? "#999" : "#1976d2",
+    //                       textDecoration: meta.readOnly ? "none" : "underline",
+    //                       cursor: meta.readOnly ? "not-allowed" : "pointer",
+    //                     }}
+    //                     onClick={handleSafeFileClick}
+    //                   >
+    //                     {item.name}
+    //                   </Typography>
+    //                   <StatusIcons />
+
+    //                   {/* 🔵 Single blue dot icon for file menu */}
+    //                   <Box
+    //                     className="file-menu-icon"
+    //                     sx={{
+    //                       width: 8,
+    //                       height: 8,
+    //                       borderRadius: "50%",
+    //                       backgroundColor: "#1976d2",
+    //                       opacity: 0,
+    //                       transition: "opacity 0.2s",
+    //                       cursor: "pointer",
+    //                       mr: 1,
+    //                       ml: 1,
+    //                     }}
+    //                     onClick={(e) =>
+    //                       handleMenuOpen(e, { ...item, fullPath })
+    //                     }
+    //                   />
+    //                 </Box>
+    //               )}
+
+    //               {/* Recursive children */}
+    //               {expandedFolders[fullPath] &&
+    //                 item.children &&
+    //                 item.children.length > 0 && (
+    //                   <Box
+    //                     sx={{
+    //                       ml: 2,
+    //                       mt: 1,
+    //                       borderLeft: "2px dashed #ccc",
+    //                       pl: 2,
+    //                     }}
+    //                   >
+    //                     {renderTree(item.children, level + 1, fullPath)}
+    //                   </Box>
+    //                 )}
+    //             </li>
+    //           );
+    //         })}
+    //       </Box>
+    //       <Dialog
+    //         open={openDialog} // must match exactly
+    //         onClose={() => setOpenDialog(false)}
+    //         fullWidth
+    //         maxWidth="lg"
+    //       >
+    //         <DialogTitle>
+    //           {items.name}
+    //           <IconButton
+    //             aria-label="close"
+    //             onClick={() => setOpenDialog(false)}
+    //             style={{ position: "absolute", right: 8, top: 8 }}
+    //           >
+    //             <CloseIcon />
+    //           </IconButton>
+    //         </DialogTitle>
+
+    //         <DialogContent dividers>
+    //           {token && showBuilderFor && (
+    //             <DocusealBuilder token={token} customCss={customCss} />
+    //           )}
+    //         </DialogContent>
+    //       </Dialog>
+
+    //       <Dialog
+    //         open={openApprovalDialog}
+    //         onClose={handleCloseDialog}
+    //         fullWidth
+    //         maxWidth="sm"
+    //       >
+    //         <DialogTitle>Request Approval</DialogTitle>
+    //         <DialogContent>
+    //           <TextField
+    //             multiline
+    //             rows={4}
+    //             fullWidth
+    //             value={description}
+    //             onChange={(e) => setDescription(e.target.value)}
+    //             placeholder="Type a short description or note for this approval..."
+    //           />
+    //         </DialogContent>
+    //         <DialogActions>
+    //           <Button onClick={handleCloseDialog}>Cancel</Button>
+    //           <Button
+    //             variant="contained"
+    //             color="primary"
+    //             onClick={handleRequestApproval}
+    //             disabled={!description.trim()}
+    //           >
+    //             Send
+    //           </Button>
+    //         </DialogActions>
+    //       </Dialog>
+    //     </>
+    //   );
+    // };
     return (
       <Box sx={{ margin: "auto", p: 3 }}>
         {/* Action Buttons */}
@@ -1031,17 +1356,13 @@ const DocsFolderTree = () => {
                     currentApprovalStatus,
                     disabled: isApprovalDisabled,
                   },
-                  // { icon: <Stamp size={16} />, label: "Send Approval", action: () => toggleApprovalStatus(item) },
+                
                   {
                     icon: <DeleteIcon />,
                     label: "Delete",
                     action: () => deleteItem(item),
                   }
-                  // {
-                  //   icon: <DownloadIcon />,
-                  //   label: "Download",
-                  //   action: () => window.open(item.url, "_blank"),
-                  // }
+                 
                 );
               } else if (docType === "private") {
                 menuItems.push(

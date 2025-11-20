@@ -14,17 +14,17 @@ import {
 } from "@mui/material";
 import StagesSection from "./StagesSection";
 import { toast } from "react-toastify";
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from "react-router-dom";
 const PipelineForm = () => {
   const JOBS_API = process.env.REACT_APP_JOBS_TEMP_URL;
   const SORTJOBS_API = process.env.REACT_APP_SORTJOBS_URL;
- const PIPELINE_API = process.env.REACT_APP_PIPELINE_TEMP_URL;
+  const PIPELINE_API = process.env.REACT_APP_PIPELINE_TEMP_URL;
   const [pipelineName, setPipelineName] = useState("");
 
   // sort jobs
   const [sortbyjobs, setSortbyJobs] = useState([]);
   const [selectedSortByJob, setSelectedSortByJob] = useState(null);
- const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const handleSortingByJobs = (selectedOptions) => {
     setSelectedSortByJob(selectedOptions);
     console.log(selectedOptions);
@@ -125,7 +125,7 @@ const PipelineForm = () => {
   const [selectedJobtemp, setselectedJobTemp] = useState(null);
   const handleJobtemp = (selectedOptions) => {
     setselectedJobTemp(selectedOptions);
-    console.log("selcted job template",selectedOptions);
+    console.log("selcted job template", selectedOptions);
   };
   useEffect(() => {
     fetchtemp();
@@ -149,7 +149,6 @@ const PipelineForm = () => {
   // Stages functionality
   const [stages, setStages] = useState([]);
   const [stageNameErrors, setStageNameErrors] = useState([]);
-  
 
   const handleAddStage = (index) => {
     const newStage = {
@@ -198,7 +197,7 @@ const PipelineForm = () => {
       return updatedStages;
     });
   };
-// Save pipeline to backend
+  // Save pipeline to backend
   // Validate form before saving
   const validateForm = () => {
     const errors = {};
@@ -219,23 +218,23 @@ const PipelineForm = () => {
       return "";
     });
 
-    if (stageErrors.some(error => error !== "")) {
+    if (stageErrors.some((error) => error !== "")) {
       errors.stageNames = stageErrors;
     }
 
     return errors;
   };
-const [isEditMode, setIsEditMode] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
   const [pipelineId, setPipelineId] = useState(null);
 
   // Get URL parameters for edit mode
   const location = useLocation();
-  
+
   // Add this useEffect to handle edit mode
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
-    const editId = searchParams.get('edit');
-    
+    const editId = searchParams.get("edit");
+
     if (editId) {
       setIsEditMode(true);
       setPipelineId(editId);
@@ -243,143 +242,136 @@ const [isEditMode, setIsEditMode] = useState(false);
     }
   }, [location]);
 
-// Fetch pipeline data for editing
-const fetchPipelineData = async (id) => {
-  try {
-    setLoading(true);
-    const response = await fetch(`${PIPELINE_API}/workflow/pipeline/pipeline/${id}`);
-    
-    if (!response.ok) {
-      throw new Error("Failed to fetch pipeline data");
-    }
-    
-    const data = await response.json();
-    const pipeline = data.pipeline;
-    
-    // Populate form with existing data
-    setPipelineName(pipeline.pipelineName);
-    
-   
-    if (pipeline && pipeline.availableto) {
-          const assigneesData = pipeline.availableto.map(
-            (assignee) => ({
-              value: assignee._id,
-              label: assignee.username,
-            })
-          );
-          console.log("assigneesData",assigneesData);
-          setSelectedUser(assigneesData);
+  // Fetch pipeline data for editing
+  const fetchPipelineData = async (id) => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `${PIPELINE_API}/workflow/pipeline/pipeline/${id}`
+      );
 
-          const selectedValues = assigneesData.map((option) => option.value);
-          setCombinedValues(selectedValues);
-        }
-
-  
-    if (pipeline && pipeline.sortjobsby) {
-          const sortjobsbyData = {
-            value: pipeline.sortjobsby._id,
-            label: pipeline.sortjobsby.description,
-          };
-
-          setSelectedSortByJob(sortjobsbyData);
-        }
-   
-   if (pipeline && pipeline.defaultjobtemplate) {
-          const defaultjobtemplateData = {
-            value: pipeline.defaultjobtemplate._id,
-            label: pipeline.defaultjobtemplate.templatename,
-          };
-
-          setselectedJobTemp(defaultjobtemplateData);
-          console.log("defaultjobtemplateData",defaultjobtemplateData);
-        }
-    // Set job card fields
-    setAccount_id(pipeline.accountId || false);
-    setDays_on_stage(pipeline.days_on_Stage || false);
-    setAccount_tags(pipeline.accounttags || false);
-    setClientFacing_status(pipeline.clientFacing_status || false);
-    setStartDate(pipeline.startdate || false);
-    setName(pipeline.name || false);
-    setDue_date(pipeline.duedate || false);
-    setPriority(pipeline.priority || false);
-    setDescription(pipeline.description || false);
-    setAssignees(pipeline.assignees || false);
-    
-    // Set stages - FIXED: Properly handle automations with selectedtemp
-    if (pipeline.stages && pipeline.stages.length > 0) {
-      const formattedStages = pipeline.stages.map((stage, index) => ({
-        _id: stage._id,
-        name: stage.name,
-        order: stage.order || index + 1,
-        conditions: stage.conditions || [],
-        automations: stage.automations ? stage.automations.map(auto => ({
-          type: auto.type,
-          index: auto.index,
-          selectedtemp: auto.selectedtemp, // Keep as string ID, not object
-          refModel: auto.refModel, // Include refModel
-          templateRefModel: auto.templateRefModel, // Include templateRefModel
-          selectedTags: auto.selectedTags || [],
-          reminderChecked: auto.reminderChecked || false,
-          daysuntilNextReminder: auto.daysuntilNextReminder || "",
-          noOfReminder: auto.noOfReminder || "",
-          addTags: auto.addTags || [],
-          removeTags: auto.removeTags || [],
-          selectedAssignees: auto.selectedAssignees || [],
-          assigneesToRemove: auto.assigneesToRemove || [],
-          status: auto.status || null,
-          selectedClientStatus: auto.selectedClientStatus || null,
-          clientDescription: auto.clientDescription || "",
-          template: auto.template || null,
-          tags: auto.tags || [],
-           _id: auto._id // Include the automation ID if it exists
-        })) : [],
-        autoMove: stage.autoMove || false,
-        showDropdown: false,
-        activeAction: null
-      }));
-      setStages(formattedStages);
-    }
-    
-  } catch (error) {
-    console.error("Error fetching pipeline data:", error);
-    toast.error("Failed to load pipeline data");
-  } finally {
-    setLoading(false);
-  }
-};
-
-const handleSavePipeline = async (exitAfterSave = false) => {
-    const errors = validateForm();
-    
-    // if (Object.keys(errors).length > 0) {
-    //   if (errors.stageNames) {
-    //     setStageNameErrors(errors.stageNames);
-    //   }
-    //   toast.error("Please fix the form errors before saving");
-    //   return;
-    // }
-if (Object.keys(errors).length > 0) {
-    // Show toast for pipeline name error
-    if (errors.pipelineName) {
-      toast.error("Pipeline name is required");
-    }
-    
-    // Show toast for stages count error
-    if (errors.stages) {
-      toast.error("Please add at least 2 stages");
-    }
-    
-    // Show toast for stage names error
-    if (errors.stageNames) {
-      setStageNameErrors(errors.stageNames);
-      const emptyStageCount = errors.stageNames.filter(error => error !== "").length;
-      if (emptyStageCount > 0) {
-        toast.error(`${emptyStageCount} stage name(s) are required`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch pipeline data");
       }
+
+      const data = await response.json();
+      const pipeline = data.pipeline;
+
+      // Populate form with existing data
+      setPipelineName(pipeline.pipelineName);
+
+      if (pipeline && pipeline.availableto) {
+        const assigneesData = pipeline.availableto.map((assignee) => ({
+          value: assignee._id,
+          label: assignee.username,
+        }));
+        console.log("assigneesData", assigneesData);
+        setSelectedUser(assigneesData);
+
+        const selectedValues = assigneesData.map((option) => option.value);
+        setCombinedValues(selectedValues);
+      }
+
+      if (pipeline && pipeline.sortjobsby) {
+        const sortjobsbyData = {
+          value: pipeline.sortjobsby._id,
+          label: pipeline.sortjobsby.description,
+        };
+
+        setSelectedSortByJob(sortjobsbyData);
+      }
+
+      if (pipeline && pipeline.defaultjobtemplate) {
+        const defaultjobtemplateData = {
+          value: pipeline.defaultjobtemplate._id,
+          label: pipeline.defaultjobtemplate.templatename,
+        };
+
+        setselectedJobTemp(defaultjobtemplateData);
+        console.log("defaultjobtemplateData", defaultjobtemplateData);
+      }
+      // Set job card fields
+      setAccount_id(pipeline.accountId || false);
+      setDays_on_stage(pipeline.days_on_Stage || false);
+      setAccount_tags(pipeline.accounttags || false);
+      setClientFacing_status(pipeline.clientFacing_status || false);
+      setStartDate(pipeline.startdate || false);
+      setName(pipeline.name || false);
+      setDue_date(pipeline.duedate || false);
+      setPriority(pipeline.priority || false);
+      setDescription(pipeline.description || false);
+      setAssignees(pipeline.assignees || false);
+
+      // Set stages - FIXED: Properly handle automations with selectedtemp
+      if (pipeline.stages && pipeline.stages.length > 0) {
+        const formattedStages = pipeline.stages.map((stage, index) => ({
+          _id: stage._id,
+          name: stage.name,
+          order: stage.order || index + 1,
+          conditions: stage.conditions || [],
+          automations: stage.automations
+            ? stage.automations.map((auto) => ({
+                type: auto.type,
+                index: auto.index,
+                selectedtemp: auto.selectedtemp, // Keep as string ID, not object
+                refModel: auto.refModel, // Include refModel
+                templateRefModel: auto.templateRefModel, // Include templateRefModel
+                selectedTags: auto.selectedTags || [],
+                reminderChecked: auto.reminderChecked || false,
+                daysuntilNextReminder: auto.daysuntilNextReminder || "",
+                noOfReminder: auto.noOfReminder || "",
+                addTags: auto.addTags || [],
+                removeTags: auto.removeTags || [],
+                selectedAssignees: auto.selectedAssignees || [],
+                assigneesToRemove: auto.assigneesToRemove || [],
+                status: auto.status || null,
+                selectedClientStatus: auto.selectedClientStatus || null,
+                clientDescription: auto.clientDescription || "",
+                template: auto.template || null,
+                tags: auto.tags || [],
+                _id: auto._id, // Include the automation ID if it exists
+              }))
+            : [],
+          autoMove: stage.autoMove || false,
+          showDropdown: false,
+          activeAction: null,
+        }));
+        setStages(formattedStages);
+      }
+    } catch (error) {
+      console.error("Error fetching pipeline data:", error);
+      toast.error("Failed to load pipeline data");
+    } finally {
+      setLoading(false);
     }
-    
-    return;
-  }
+  };
+  const handleSavePipeline = async (exitAfterSave = false) => {
+    const errors = validateForm();
+
+    if (Object.keys(errors).length > 0) {
+      // Show toast for pipeline name error
+      if (errors.pipelineName) {
+        toast.error("Pipeline name is required");
+      }
+
+      // Show toast for stages count error
+      if (errors.stages) {
+        toast.error("Please add at least 2 stages");
+      }
+
+      // Show toast for stage names error
+      if (errors.stageNames) {
+        setStageNameErrors(errors.stageNames);
+        const emptyStageCount = errors.stageNames.filter(
+          (error) => error !== ""
+        ).length;
+        if (emptyStageCount > 0) {
+          toast.error(`${emptyStageCount} stage name(s) are required`);
+        }
+      }
+
+      return;
+    }
 
     setLoading(true);
 
@@ -387,7 +379,7 @@ if (Object.keys(errors).length > 0) {
       const pipelineData = {
         pipelineName: pipelineName.trim(),
         availableto: combinedValues,
-        sortjobsby: selectedSortByJob.value,
+        sortjobsby: selectedSortByJob?.value,
         defaultjobtemplate: selectedJobtemp?.value,
         accountId: Account_id,
         description: Description,
@@ -400,42 +392,52 @@ if (Object.keys(errors).length > 0) {
         clientFacing_status: clientFacing_status,
         startdate: startDate,
         stages: stages.map((stage, index) => ({
-          ...(stage._id && { _id: stage._id }), 
+          ...(stage._id && { _id: stage._id }),
           name: stage.name.trim(),
           order: stage.order || index + 1,
           conditions: stage.conditions || [],
-          automations: stage.automations ? stage.automations.map(auto => ({
-            type: auto.type,
-            index: auto.index,
-            selectedtemp: auto.selectedtemp ? auto.selectedtemp.value || auto.selectedtemp : null,
-            selectedTags: auto.selectedTags || [],
-            reminderChecked: auto.reminderChecked || false,
-            daysuntilNextReminder: auto.daysuntilNextReminder || "",
-            noOfReminder: auto.noOfReminder || "",
-            addTags: auto.addTags || [],
-            removeTags: auto.removeTags || [],
-            selectedAssignees: auto.selectedAssignees || [],
-            assigneesToRemove: auto.assigneesToRemove || [],
-            status: auto.status || null,
-            // FIX: Ensure selectedClientStatus is properly saved
-            selectedClientStatus: auto.selectedClientStatus ? auto.selectedClientStatus : null,
-            clientDescription: auto.clientDescription || "",
-            // Important: Save required ref models
-            refModel: auto.refModel || null,
-            templateRefModel: auto.templateRefModel || null
-          })) : [],
-          autoMove: stage.autoMove || false
+          automations: stage.automations
+            ? stage.automations.map((auto) => ({
+                type: auto.type,
+                index: auto.index,
+                selectedtemp: auto.selectedtemp
+                  ? auto.selectedtemp.value || auto.selectedtemp
+                  : null,
+                selectedTags: auto.selectedTags || [],
+                reminderChecked: auto.reminderChecked || false,
+                daysuntilNextReminder: auto.daysuntilNextReminder || "",
+                noOfReminder: auto.noOfReminder || "",
+                addTags: auto.addTags || [],
+                removeTags: auto.removeTags || [],
+                selectedAssignees: auto.selectedAssignees || [],
+                assigneesToRemove: auto.assigneesToRemove || [],
+                status: auto.status || null,
+                selectedClientStatus: auto.selectedClientStatus
+                  ? auto.selectedClientStatus
+                  : null,
+                clientDescription: auto.clientDescription || "",
+                refModel: auto.refModel || null,
+                templateRefModel: auto.templateRefModel || null,
+              }))
+            : [],
+          autoMove: stage.autoMove || false,
         })),
-        active: true
+        active: true,
       };
 
-      console.log("Pipeline data being sent:", JSON.stringify(pipelineData, null, 2));
+      console.log(
+        "Pipeline data being sent:",
+        JSON.stringify(pipelineData, null, 2)
+      );
 
       let url, method;
-      
-      if (isEditMode && pipelineId) {
-        // Update existing pipeline
-        url = `${PIPELINE_API}/workflow/pipeline/pipeline/${pipelineId}`;
+
+      // FIX: Check if we're in edit mode OR if we already have a pipelineId
+      // This ensures that after creating a pipeline, subsequent saves will update it
+      if (isEditMode || pipelineId) {
+        // Use the pipelineId for update (either from edit mode or from previous creation)
+        const idToUpdate = pipelineId;
+        url = `${PIPELINE_API}/workflow/pipeline/pipeline/${idToUpdate}`;
         method = "PATCH";
       } else {
         // Create new pipeline
@@ -453,33 +455,160 @@ if (Object.keys(errors).length > 0) {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+        throw new Error(
+          errorData.error || `HTTP error! status: ${response.status}`
+        );
       }
 
       const result = await response.json();
       console.log("Pipeline saved successfully:", result);
 
-      toast.success(`Pipeline ${isEditMode ? 'updated' : 'saved'} successfully!`);
-
-      if (exitAfterSave) {
-        navigate('/firmtemp/pipelines');
+      // FIX: Store the pipeline ID after creation so future saves will update
+      if (!pipelineId && result.pipeline && result.pipeline._id) {
+        setPipelineId(result.pipeline._id);
+        setIsEditMode(true); // Set to edit mode after creation
       }
 
+      const successMessage = isEditMode || pipelineId ? "updated" : "created";
+      toast.success(`Pipeline ${successMessage} successfully!`);
+
+      if (exitAfterSave) {
+        navigate("/firmtemp/pipelines");
+      }
     } catch (error) {
       console.error("Error saving pipeline:", error);
-      console.log("Is Edit Mode:", error);
-      toast.error(error.message || `Failed to ${isEditMode ? 'update' : 'save'} pipeline. Please try again.`);
+      toast.error(
+        error.message ||
+          `Failed to ${isEditMode ? "update" : "save"} pipeline. Please try again.`
+      );
     } finally {
       setLoading(false);
     }
   };
-const navigate = useNavigate();
+  // const handleSavePipeline = async (exitAfterSave = false) => {
+  //     const errors = validateForm();
+
+  // if (Object.keys(errors).length > 0) {
+  //     // Show toast for pipeline name error
+  //     if (errors.pipelineName) {
+  //       toast.error("Pipeline name is required");
+  //     }
+
+  //     // Show toast for stages count error
+  //     if (errors.stages) {
+  //       toast.error("Please add at least 2 stages");
+  //     }
+
+  //     // Show toast for stage names error
+  //     if (errors.stageNames) {
+  //       setStageNameErrors(errors.stageNames);
+  //       const emptyStageCount = errors.stageNames.filter(error => error !== "").length;
+  //       if (emptyStageCount > 0) {
+  //         toast.error(`${emptyStageCount} stage name(s) are required`);
+  //       }
+  //     }
+
+  //     return;
+  //   }
+
+  //     setLoading(true);
+
+  //     try {
+  //       const pipelineData = {
+  //         pipelineName: pipelineName.trim(),
+  //         availableto: combinedValues,
+  //         sortjobsby: selectedSortByJob.value,
+  //         defaultjobtemplate: selectedJobtemp?.value,
+  //         accountId: Account_id,
+  //         description: Description,
+  //         duedate: Due_date,
+  //         accounttags: Account_tags,
+  //         priority: Priority,
+  //         days_on_Stage: Days_on_stage,
+  //         assignees: Assignees,
+  //         name: Name,
+  //         clientFacing_status: clientFacing_status,
+  //         startdate: startDate,
+  //         stages: stages.map((stage, index) => ({
+  //           ...(stage._id && { _id: stage._id }),
+  //           name: stage.name.trim(),
+  //           order: stage.order || index + 1,
+  //           conditions: stage.conditions || [],
+  //           automations: stage.automations ? stage.automations.map(auto => ({
+  //             type: auto.type,
+  //             index: auto.index,
+  //             selectedtemp: auto.selectedtemp ? auto.selectedtemp.value || auto.selectedtemp : null,
+  //             selectedTags: auto.selectedTags || [],
+  //             reminderChecked: auto.reminderChecked || false,
+  //             daysuntilNextReminder: auto.daysuntilNextReminder || "",
+  //             noOfReminder: auto.noOfReminder || "",
+  //             addTags: auto.addTags || [],
+  //             removeTags: auto.removeTags || [],
+  //             selectedAssignees: auto.selectedAssignees || [],
+  //             assigneesToRemove: auto.assigneesToRemove || [],
+  //             status: auto.status || null,
+  //             // FIX: Ensure selectedClientStatus is properly saved
+  //             selectedClientStatus: auto.selectedClientStatus ? auto.selectedClientStatus : null,
+  //             clientDescription: auto.clientDescription || "",
+  //             // Important: Save required ref models
+  //             refModel: auto.refModel || null,
+  //             templateRefModel: auto.templateRefModel || null
+  //           })) : [],
+  //           autoMove: stage.autoMove || false
+  //         })),
+  //         active: true
+  //       };
+
+  //       console.log("Pipeline data being sent:", JSON.stringify(pipelineData, null, 2));
+
+  //       let url, method;
+
+  //       if (isEditMode && pipelineId) {
+  //         // Update existing pipeline
+  //         url = `${PIPELINE_API}/workflow/pipeline/pipeline/${pipelineId}`;
+  //         method = "PATCH";
+  //       } else {
+  //         // Create new pipeline
+  //         url = `${PIPELINE_API}/workflow/pipeline/createpipeline`;
+  //         method = "POST";
+  //       }
+
+  //       const response = await fetch(url, {
+  //         method: method,
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify(pipelineData),
+  //       });
+
+  //       if (!response.ok) {
+  //         const errorData = await response.json();
+  //         throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+  //       }
+
+  //       const result = await response.json();
+  //       console.log("Pipeline saved successfully:", result);
+
+  //       toast.success(`Pipeline ${isEditMode ? 'updated' : 'saved'} successfully!`);
+
+  //       if (exitAfterSave) {
+  //         navigate('/firmtemp/pipelines');
+  //       }
+
+  //     } catch (error) {
+  //       console.error("Error saving pipeline:", error);
+  //       console.log("Is Edit Mode:", error);
+  //       toast.error(error.message || `Failed to ${isEditMode ? 'update' : 'save'} pipeline. Please try again.`);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  const navigate = useNavigate();
   // Update the cancel handler
   const handleCancel = () => {
     // window.location.href = "/firmtemp/pipelines";
-    navigate('/firmtemp/pipelines');
+    navigate("/firmtemp/pipelines");
   };
-
 
   // Handle save (without exiting)
   const handleSave = () => {
@@ -491,11 +620,10 @@ const navigate = useNavigate();
     handleSavePipeline(true);
   };
 
-  
   return (
     <Box p={3}>
       <Typography variant="h5" gutterBottom>
-     {isEditMode ? 'Edit Pipeline' : 'Create Pipeline'}
+        {isEditMode ? "Edit Pipeline" : "Create Pipeline"}
       </Typography>
       <Divider />
       <Box p={3}>
@@ -702,7 +830,7 @@ const navigate = useNavigate();
         </Box>
       </Box>
       {/* ACTION BUTTONS */}
-      <Box display="flex" gap={2} mt={4}>
+      {/* <Box display="flex" gap={2} mt={4}>
         <Button 
           variant="contained" 
           sx={{ borderRadius: "15px" }}
@@ -723,6 +851,36 @@ const navigate = useNavigate();
           Cancel
         </Button>
       
+      </Box> */}
+      {/* Update button labels to be more clear */}
+      <Box display="flex" gap={2} mt={4}>
+        <Button
+          variant="contained"
+          sx={{ borderRadius: "15px" }}
+          onClick={handleSaveAndExit}
+          disabled={loading}
+        >
+          {loading
+            ? "Saving..."
+            : isEditMode || pipelineId
+              ? "Update & exit"
+              : "Save & exit"}
+        </Button>
+        <Button
+          variant="contained"
+          sx={{ borderRadius: "15px" }}
+          onClick={handleSave}
+          disabled={loading}
+        >
+          {loading ? "Saving..." : isEditMode || pipelineId ? "Update" : "Save"}
+        </Button>
+        <Button
+          variant="outlined"
+          sx={{ borderRadius: "15px" }}
+          onClick={handleCancel}
+        >
+          Cancel
+        </Button>
       </Box>
     </Box>
   );

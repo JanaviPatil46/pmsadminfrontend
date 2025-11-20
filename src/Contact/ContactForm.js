@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 
@@ -23,13 +23,12 @@ import { useTheme } from "@mui/material/styles";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./contact.css";
-import TagsMultiSelectDropDown from "../Templates/TagsMultiSelectDropDown"
+import TagsMultiSelectDropDown from "../Templates/TagsMultiSelectDropDown";
 import { toast } from "react-toastify";
 import { RxCross2 } from "react-icons/rx";
 import countryList from "react-select-country-list";
 const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   const CONTACT_API = process.env.REACT_APP_CONTACTS_URL;
-
 
   const navigate = useNavigate();
   const theme = useTheme();
@@ -54,43 +53,71 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   const [state, setState] = useState("");
   const [postalCode, setPostalCode] = useState("");
   const [combinedValues, setCombinedValues] = useState();
-
+  const [ssnError, setSsnError] = useState("");
   console.log(selectedCountry);
-  
-  const options = useMemo(() => countryList().getData(), []);
- 
+  // SSN auto-formatter
+  const formatSSN = (value) => {
+    const v = value.replace(/\D/g, "").slice(0, 9); // only digits
 
-   const handlePhoneNumberChange = (phoneValue, countryData, id) => {
-  setPhoneNumbers(prevPhoneNumbers =>
-    prevPhoneNumbers.map(item =>
-      item.id === id
-        ? {
-            ...item,
-            phone: phoneValue,
-            countryCode: countryData.dialCode, // Store country dial code
-            country: countryData.countryCode.toLowerCase() // Store country code (e.g., 'us')
-          }
-        : item
-    )
-  );
-};
+    if (v.length > 5) return `${v.slice(0, 3)}-${v.slice(3, 5)}-${v.slice(5)}`;
+    if (v.length > 3) return `${v.slice(0, 3)}-${v.slice(3)}`;
+    return v;
+  };
+
+  // SSN validation rules
+  const validateSSN = (value) => {
+    const cleaned = value.replace(/-/g, "");
+
+    if (cleaned.length !== 9) return "SSN must be 9 digits";
+
+    if (/^(000|666|9\d{2})/.test(cleaned)) return "Invalid SSN starting digits";
+    if (/^\d{3}00\d{4}$/.test(cleaned)) return "Invalid SSN middle digits";
+    if (/^\d{5}0000$/.test(cleaned)) return "Invalid SSN last digits";
+
+    return ""; // valid
+  };
+
+  // Main change handler
+  const handleSSNChange = (e) => {
+    const formatted = formatSSN(e.target.value);
+    setSsn(formatted);
+
+    const error = validateSSN(formatted);
+    setSsnError(error); // "" means no error
+  };
+
+  const options = useMemo(() => countryList().getData(), []);
+
+  const handlePhoneNumberChange = (phoneValue, countryData, id) => {
+    setPhoneNumbers((prevPhoneNumbers) =>
+      prevPhoneNumbers.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              phone: phoneValue,
+              countryCode: countryData.dialCode, // Store country dial code
+              country: countryData.countryCode.toLowerCase(), // Store country code (e.g., 'us')
+            }
+          : item
+      )
+    );
+  };
   // Update contactName when firstName, middleName, or lastName changes
   useEffect(() => {
     setContactName(`${firstName} ${middleName} ${lastName}`.trim());
   }, [firstName, middleName, lastName]);
 
-  
   const handleAddPhoneNumber = () => {
-  setPhoneNumbers(prevPhoneNumbers => [
-    ...prevPhoneNumbers,
-    { 
-      id: Date.now(), 
-      phone: "", 
-      country: "us", // Default country
-      isPrimary: false 
-    },
-  ]);
-};
+    setPhoneNumbers((prevPhoneNumbers) => [
+      ...prevPhoneNumbers,
+      {
+        id: Date.now(),
+        phone: "",
+        country: "us", // Default country
+        isPrimary: false,
+      },
+    ]);
+  };
 
   const handleDeletePhoneNumber = (id) => {
     setPhoneNumbers((prevPhoneNumbers) =>
@@ -117,141 +144,140 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
     } else {
       setLastNameError("");
     }
-    
+
     // Email
-  if (!email?.trim()) {
-    setEmaileError("Email is required.");
-    isValid = false;
-  } else if (
-    !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)
-  ) {
-    setEmaileError("Please enter a valid email address.");
-    isValid = false;
-  } else {
-    setEmaileError("");
-  }
+    if (!email?.trim()) {
+      setEmaileError("Email is required.");
+      isValid = false;
+    } else if (
+      !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)
+    ) {
+      setEmaileError("Please enter a valid email address.");
+      isValid = false;
+    } else {
+      setEmaileError("");
+    }
     return isValid;
   };
-//   const sendingData = async (e) => {
-//     e.preventDefault();
+  //   const sendingData = async (e) => {
+  //     e.preventDefault();
 
-//     // Validate form before proceeding
-//     if (!validateForm()) {
-//       return; // Stop execution if validation fails
-//     }
+  //     // Validate form before proceeding
+  //     if (!validateForm()) {
+  //       return; // Stop execution if validation fails
+  //     }
 
-//     handleNewDrawerClose();
-//     handleDrawerClose();
- 
-//   const formattedPhoneNumbers = phoneNumbers.map(phone => phone.phone);
+  //     handleNewDrawerClose();
+  //     handleDrawerClose();
 
+  //   const formattedPhoneNumbers = phoneNumbers.map(phone => phone.phone);
 
-// console.log("formattedPhoneNumbers",formattedPhoneNumbers)
-//     const raw = JSON.stringify([
-//       {
-//         firstName: firstName,
-//         middleName: middleName,
-//         lastName: lastName,
-//         contactName: contactName,
-//         companyName: companyName,
-//         note: note,
-//         ssn: ssn,
-//         email: email,
-//         // login: false,
-//         // notify: false,
-//         // emailSync: false,
-//         tags: combinedValues,
+  // console.log("formattedPhoneNumbers",formattedPhoneNumbers)
+  //     const raw = JSON.stringify([
+  //       {
+  //         firstName: firstName,
+  //         middleName: middleName,
+  //         lastName: lastName,
+  //         contactName: contactName,
+  //         companyName: companyName,
+  //         note: note,
+  //         ssn: ssn,
+  //         email: email,
+  //         // login: false,
+  //         // notify: false,
+  //         // emailSync: false,
+  //         tags: combinedValues,
 
-//         country: selectedCountry,
-//         streetAddress: streetAddress,
-//         city: city,
-//         state: state,
-//         postalCode: postalCode,
-//         phoneNumbers: formattedPhoneNumbers,
-//       },
-//     ]);
-//     console.log(raw);
-//     const requestOptions = {
-//       method: "POST",
+  //         country: selectedCountry,
+  //         streetAddress: streetAddress,
+  //         city: city,
+  //         state: state,
+  //         postalCode: postalCode,
+  //         phoneNumbers: formattedPhoneNumbers,
+  //       },
+  //     ]);
+  //     console.log(raw);
+  //     const requestOptions = {
+  //       method: "POST",
 
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//       body: raw,
-//       redirect: "follow",
-//     };
-//     const url = "https://www.snptaxes.com/api/contacts";
-//     fetch(url, requestOptions)
-//       .then((response) => {
-//         if (!response.ok) {
-//           throw new Error("Network response was not ok");
-//         }
-//         return response.json();
-//       })
-//       .then((result) => {
-//         // Handle success
-//         toast.success("Contact created successfully!");
-//         //console.log('Contact ID:', result);  // Log the contactId
-//         navigate("/clients/contacts");
-//         // Additional logic after successful creation if needed
-//       })
-//       .catch((error) => {
-//         // Handle errors
-//         console.error(error);
-//         toast.error("Failed to create contact");
-//       });
-//   };
-const sendingData = async (e) => {
-  e.preventDefault();
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: raw,
+  //       redirect: "follow",
+  //     };
+  //     const url = "https://www.snptaxes.com/api/contacts";
+  //     fetch(url, requestOptions)
+  //       .then((response) => {
+  //         if (!response.ok) {
+  //           throw new Error("Network response was not ok");
+  //         }
+  //         return response.json();
+  //       })
+  //       .then((result) => {
+  //         // Handle success
+  //         toast.success("Contact created successfully!");
+  //         //console.log('Contact ID:', result);  // Log the contactId
+  //         navigate("/clients/contacts");
+  //         // Additional logic after successful creation if needed
+  //       })
+  //       .catch((error) => {
+  //         // Handle errors
+  //         console.error(error);
+  //         toast.error("Failed to create contact");
+  //       });
+  //   };
+  const sendingData = async (e) => {
+    e.preventDefault();
 
-  if (!validateForm()) return;
+    if (!validateForm()) return;
 
-  handleNewDrawerClose();
-  handleDrawerClose();
+    handleNewDrawerClose();
+    handleDrawerClose();
 
-  const formattedPhoneNumbers = phoneNumbers.map((item) => item.phone);
+    const formattedPhoneNumbers = phoneNumbers.map((item) => item.phone);
 
-  const countryPayload = selectedCountry
-    ? { name: selectedCountry.label, code: selectedCountry.value }
-    : null;
+    const countryPayload = selectedCountry
+      ? { name: selectedCountry.label, code: selectedCountry.value }
+      : null;
 
-  const payload = JSON.stringify({
-    firstName,
-    middleName,
-    lastName,
-    contactName,
-    companyName,
-    note,
-    ssn,
-    email,
-    tags: combinedValues,
-    country: countryPayload,
-    streetAddress,
-    city,
-    state,
-    postalCode,
-    phoneNumbers: formattedPhoneNumbers,
-  });
-
-  const requestOptions = {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: payload
-  };
-
-  fetch("https://www.snptaxes.com/api/contacts", requestOptions)
-    .then((res) => {
-      if (!res.ok) throw new Error("Request failed");
-      return res.json();
-    })
-    .then(() => {
-      toast.success("Contact created successfully!");
-      navigate("/clients/contacts");
-    })
-    .catch(() => {
-      toast.error("Failed to create contact");
+    const payload = JSON.stringify({
+      firstName,
+      middleName,
+      lastName,
+      contactName,
+      companyName,
+      note,
+      ssn,
+      email,
+      tags: combinedValues,
+      country: countryPayload,
+      streetAddress,
+      city,
+      state,
+      postalCode,
+      phoneNumbers: formattedPhoneNumbers,
     });
-};
+
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: payload,
+    };
+
+    fetch("https://www.snptaxes.com/api/contacts", requestOptions)
+      .then((res) => {
+        if (!res.ok) throw new Error("Request failed");
+        return res.json();
+      })
+      .then(() => {
+        toast.success("Contact created successfully!");
+        navigate("/clients/contacts");
+      })
+      .catch(() => {
+        toast.error("Failed to create contact");
+      });
+  };
 
   const handleClose = () => {
     handleNewDrawerClose();
@@ -263,10 +289,10 @@ const sendingData = async (e) => {
   //Tag FetchData ================
   const handleTagChange = (newSelectedTags) => {
     setSelectedTags(newSelectedTags);
-    console.log(newSelectedTags)
+    console.log(newSelectedTags);
     const selectedValues = newSelectedTags.map((option) => option.value);
     setCombinedValues(selectedValues);
-    console.log(selectedValues)
+    console.log(selectedValues);
   };
   return (
     <Box>
@@ -280,7 +306,7 @@ const sendingData = async (e) => {
         }}
       >
         <Typography sx={{ fontWeight: "550", fontSize: "20px" }}>
-          New Contact 
+          New Contact
         </Typography>
         <RxCross2
           onClick={handleNewDrawerClose}
@@ -289,7 +315,6 @@ const sendingData = async (e) => {
       </Box>
       <form
         style={{
-       
           paddingRight: "3%",
           paddingLeft: "3%",
           height: "90vh",
@@ -297,7 +322,6 @@ const sendingData = async (e) => {
         }}
         className="contact-form"
       >
-   
         <Box
           sx={{
             display: "flex",
@@ -308,7 +332,6 @@ const sendingData = async (e) => {
           }}
         >
           <Box>
-          
             <InputLabel
               sx={{
                 color: "black",
@@ -339,10 +362,8 @@ const sendingData = async (e) => {
               size="small"
               error={!!firstNameError}
             />
-           
           </Box>
           <Box>
-         
             <InputLabel
               sx={{
                 color: "black",
@@ -353,7 +374,6 @@ const sendingData = async (e) => {
               Middle Name
             </InputLabel>
             <TextField
-           
               sx={{ mt: 1.5, backgroundColor: "#fff" }}
               fullWidth
               name="middleName"
@@ -364,7 +384,6 @@ const sendingData = async (e) => {
             />
           </Box>
           <Box>
-          
             <InputLabel
               sx={{
                 color: "black",
@@ -375,17 +394,14 @@ const sendingData = async (e) => {
               Last Name
               <Typography sx={{ color: "red", ml: 0.5 }}>*</Typography>
             </InputLabel>
-            
 
             <TextField
               fullWidth
               name="lastName"
               value={lastName}
-            
               placeholder="Last name"
               size="small"
               sx={{ mt: 1.5, backgroundColor: "#fff" }}
-             
               onChange={(e) => {
                 const value = e.target.value;
                 setLastName(value);
@@ -450,7 +466,6 @@ const sendingData = async (e) => {
           />
         </Box>
         <Box mt={1}>
-          
           <InputLabel
             sx={{
               color: "black",
@@ -470,20 +485,20 @@ const sendingData = async (e) => {
             placeholder="Email"
             size="small"
             sx={{ mt: 1.5, backgroundColor: "#fff" }}
-           
             onChange={(e) => {
-  const value = e.target.value;
-  setEmail(value);
+              const value = e.target.value;
+              setEmail(value);
 
-  if (!value.trim()) {
-    setEmaileError("Email is required.");
-  } else if (!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(value)) {
-    setEmaileError("Please enter a valid email address.");
-  } else {
-    setEmaileError(""); // Clear error when valid
-  }
-}}
-
+              if (!value.trim()) {
+                setEmaileError("Email is required.");
+              } else if (
+                !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(value)
+              ) {
+                setEmaileError("Please enter a valid email address.");
+              } else {
+                setEmaileError(""); // Clear error when valid
+              }
+            }}
             error={!!emailError}
           />
           {!!emailError && (
@@ -512,15 +527,13 @@ const sendingData = async (e) => {
           )}
         </Box>
         <Box mt={1} mr={2}>
-         
           <InputLabel sx={{ color: "black", mb: 1 }}>Tags</InputLabel>
-         
-          <TagsMultiSelectDropDown 
-  value={selectedTags}
-  onChange={handleTagChange}
-  placeholder="Tags"
-/>
 
+          <TagsMultiSelectDropDown
+            value={selectedTags}
+            onChange={handleTagChange}
+            placeholder="Tags"
+          />
         </Box>
         <Box mt={1}>
           <InputLabel sx={{ color: "black" }}>Note</InputLabel>
@@ -536,7 +549,7 @@ const sendingData = async (e) => {
             size="small"
           />
         </Box>
-        <Box mt={1}>
+        {/* <Box mt={1}>
           <InputLabel sx={{ color: "black" }}>SSN</InputLabel>
 
           <TextField
@@ -547,6 +560,26 @@ const sendingData = async (e) => {
             margin="normal"
             placeholder="SSN"
             size="small"
+          />
+        </Box> */}
+        <Box mt={1}>
+          <InputLabel sx={{ color: "black" }}>SSN</InputLabel>
+
+          <TextField
+            fullWidth
+            name="ssn"
+            value={ssn}
+            onChange={handleSSNChange}
+            margin="normal"
+            placeholder="123-45-6789"
+            size="small"
+            error={Boolean(ssnError)}
+            helperText={ssnError ? ssnError : "Format: 123-45-6789"}
+            inputProps={{
+              maxLength: 11,
+              inputMode: "numeric",
+              pattern: "[0-9]*",
+            }}
           />
         </Box>
 
@@ -577,25 +610,27 @@ const sendingData = async (e) => {
                 sx={{ position: "absolute", mt: -3 }}
               />
             )}
-            
-<PhoneInput
-country={"us"}
-  value={phone.phone}
-  // onChange={(phoneValue) => handlePhoneNumberChange(phone.id, phoneValue)}
-     onChange={(value, country) => handlePhoneNumberChange(value, country, phone.id)}
-  inputStyle={{
-    width: "100%",
-  }}
-  buttonStyle={{
-    borderTopLeftRadius: "8px",
-    borderBottomLeftRadius: "8px",
-  }}
-  containerStyle={{
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
-  }}
-/>
+
+            <PhoneInput
+              country={"us"}
+              value={phone.phone}
+              // onChange={(phoneValue) => handlePhoneNumberChange(phone.id, phoneValue)}
+              onChange={(value, country) =>
+                handlePhoneNumberChange(value, country, phone.id)
+              }
+              inputStyle={{
+                width: "100%",
+              }}
+              buttonStyle={{
+                borderTopLeftRadius: "8px",
+                borderBottomLeftRadius: "8px",
+              }}
+              containerStyle={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+              }}
+            />
             <AiOutlineDelete
               onClick={() => handleDeletePhoneNumber(phone.id)}
               style={{ cursor: "pointer", color: "red" }}
@@ -627,18 +662,20 @@ country={"us"}
         <Box>
           <InputLabel sx={{ color: "black" }}>Country</InputLabel>
 
-         
           <Autocomplete
-      options={options}
-      size="small"
-      getOptionLabel={(option) => option.label} // show country name
-      value={selectedCountry}
-      onChange={(event, newValue) => setSelectedCountry(newValue)}
-      renderInput={(params) => (
-        <TextField {...params} placeholder="Select Country" variant="outlined" />
-      )}
-      
-    />
+            options={options}
+            size="small"
+            getOptionLabel={(option) => option.label} // show country name
+            value={selectedCountry}
+            onChange={(event, newValue) => setSelectedCountry(newValue)}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                placeholder="Select Country"
+                variant="outlined"
+              />
+            )}
+          />
         </Box>
         <Box>
           <InputLabel sx={{ color: "black", mt: 2 }}>Street address</InputLabel>
@@ -711,7 +748,6 @@ country={"us"}
             variant="contained"
             color="primary"
             onClick={sendingData}
-  
             sx={{
               backgroundColor: "var(--color-save-btn)", // Normal background
 
@@ -730,7 +766,6 @@ country={"us"}
             variant="outlined"
             color="primary"
             onClick={handleClose}
-           
             sx={{
               borderColor: "var(--color-border-cancel-btn)", // Normal background
               color: "var(--color-save-btn)",
@@ -753,6 +788,3 @@ country={"us"}
 };
 
 export default ContactForm;
-
-
- 

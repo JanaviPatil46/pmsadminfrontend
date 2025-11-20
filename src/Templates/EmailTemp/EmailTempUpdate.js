@@ -239,7 +239,7 @@ console.log("formdata",formData)
       .then((result) => {
         console.log("Data update result:", result);
         toast.success("Template updated successfully!"); // Success message
-        navigate("/firmtemp/templates/emails")
+        // navigate("/firmtemp/templates/emails")
         fetchEmailTemplates();
       })
       .catch((error) => {

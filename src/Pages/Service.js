@@ -158,7 +158,7 @@ const Service = () => {
               // Clear form fields
               setservicename("");
               setdiscription("");
-              setrate("");
+              setrate("$ 0.00");
               setSelectedOption("");
               setService(false);
               setSelectedCategory(null);
