@@ -43,7 +43,7 @@ const StagesSection = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [tempSelectedTags, setTempSelectedTags] = useState([]);
   const [filteredTags, setFilteredTags] = useState([]);
- 
+//  const [conditionsFilterTags, setConditionsFilterTags] = useState([]);
   const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
   const TASK_API = process.env.REACT_APP_TASK_TEMP_URL;
   const EMAIL_API = process.env.REACT_APP_EMAIL_TEMP_URL;
@@ -82,6 +82,9 @@ const StagesSection = ({
       console.error("Error fetching data:", error);
     }
   };
+  const filteredConditionTags = filteredTags.filter((tag) =>
+    tag.tagName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
     const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
   
     const [users, setUsers] = useState([]);
@@ -2232,7 +2235,7 @@ case "Update client-facing job status":
           />
 
           <Box sx={{ marginTop: 2, height: "68vh", overflowY: "auto" }}>
-            {filteredTags.map((tag) => (
+            {filteredConditionTags.map((tag) => (
               <Box
                 key={tag._id}
                 sx={{

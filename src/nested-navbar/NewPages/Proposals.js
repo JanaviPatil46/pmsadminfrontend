@@ -58,6 +58,7 @@ const [selectedProposal, setSelectedProposal] = useState(null);
           
           
           const result = await response.json();
+          console.log("Fetched Proposals:", result);
           setProposals(result.proposallist || []);
         } catch (err) {
           setError(err.message);
