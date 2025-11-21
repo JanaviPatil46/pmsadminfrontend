@@ -5,7 +5,7 @@ import {
   Select,
   MenuItem,
   Checkbox,
-  ListItemText
+  ListItemText,
 } from "@mui/material";
 
 const UsersMultiSelectDropDown = ({
@@ -13,7 +13,7 @@ const UsersMultiSelectDropDown = ({
   onChange,
   options,
   placeholder,
-  withCheckbox = false
+  withCheckbox = false,
 }) => {
   const handleChange = (event) => {
     const {

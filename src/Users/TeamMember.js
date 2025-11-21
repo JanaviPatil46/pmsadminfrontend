@@ -25,72 +25,69 @@ import { unstable_ClassNameGenerator as ClassNameGenerator } from "@mui/material
 ClassNameGenerator.configure((componentName) => `foo-bar-${componentName}`); //autoclassnameGenerator
 
 const TeamMember = () => {
-
-
   const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
 
-  
   const WINDOWS_PORT = process.env.REACT_APP_SERVER_URI;
   const [loading, setLoading] = useState(true);
   const [teamMembers, setTeamMembers] = useState([]);
-   const { logindata } = useContext(LoginContext);
-  
-    // const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
-    const [userData, setUserData] = useState([]);
-    const fetchuserData = async () => {
-      try {
-        const url = `${LOGIN_API}/common/user/${logindata.user.id}`;
-        const response = await fetch(url);
-        const data = await response.json();
-        setUserData(data);
-        console.log(data.user.id);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-     useEffect(() => {
-        fetchuserData();
-      }, []);
- 
-   const fetchData = async () => {
-      try {
-        const requestOptions = {
-          method: "GET",
-          redirect: "follow",
-        };
-  
-        const url = `${LOGIN_API}/admin/teammember/teammemberlist/list/true`;
-  
-        const response = await fetch(url, requestOptions);
-        const result = await response.json();
-  
-        const loggedInUser = {
-          _id: userData._id,
-          FirstName: userData.username, // Assuming you want to display the username in FirstName
-          MiddleName: "",
-          LastName: "",
-          // Name: userData.username,
-          Email: userData.email,
-          Role: userData.role,
-          has2FA: "Disabled",
-          Created: userData.updatedAt,
-        };
-  
-        const updatedTeamMembers = [loggedInUser, ...result.teamMemberslist];
-  
-        setTeamMembers(updatedTeamMembers);
-        setLoading(false);
-      } catch (error) {
-        console.error(error);
-        setLoading(false);
-      }
-    };
-    useEffect(() => {
-      if (userData) {
-        fetchData();
-      }
-    }, [userData]);
-    console.log("teamsdata",teamMembers)
+  const { logindata } = useContext(LoginContext);
+
+  // const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
+  const [userData, setUserData] = useState([]);
+  const fetchuserData = async () => {
+    try {
+      const url = `${LOGIN_API}/common/user/${logindata.user.id}`;
+      const response = await fetch(url);
+      const data = await response.json();
+      setUserData(data);
+      console.log(data.user.id);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+  useEffect(() => {
+    fetchuserData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const requestOptions = {
+        method: "GET",
+        redirect: "follow",
+      };
+
+      const url = `${LOGIN_API}/admin/teammember/teammemberlist/list/true`;
+
+      const response = await fetch(url, requestOptions);
+      const result = await response.json();
+
+      const loggedInUser = {
+        _id: userData._id,
+        FirstName: userData.username, // Assuming you want to display the username in FirstName
+        MiddleName: "",
+        LastName: "",
+        // Name: userData.username,
+        Email: userData.email,
+        Role: userData.role,
+        has2FA: "Disabled",
+        Created: userData.updatedAt,
+      };
+
+      const updatedTeamMembers = [loggedInUser, ...result.teamMemberslist];
+
+      setTeamMembers(updatedTeamMembers);
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    if (userData) {
+      fetchData();
+    }
+  }, [userData]);
+  console.log("teamsdata", teamMembers);
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const [isNewDrawerOpen, setIsNewDrawerOpen] = useState(false);
@@ -281,7 +278,6 @@ const TeamMember = () => {
   const [emailValidation, setEmailValidation] = useState("");
   const [teamMemberIdUpdate, setTeamMemberId] = useState("");
 
- 
   //todo handle submit indivisual
   const handleSubmitTeamMember = async () => {
     if (firstName === "") {
@@ -381,7 +377,9 @@ const TeamMember = () => {
   const newUser = (teammemberuserid) => {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
-const username = [firstName,middleName,lastName].filter(Boolean).join(" ")
+    const username = [firstName, middleName, lastName]
+      .filter(Boolean)
+      .join(" ");
     const password = `${firstName}@123`;
 
     const raw = JSON.stringify({
@@ -405,8 +403,8 @@ const username = [firstName,middleName,lastName].filter(Boolean).join(" ")
         console.log(result);
         console.log(result._id);
         updateTeammemberUserid(result._id, teammemberuserid);
-       insertNotificationAccess(result._id);
-       
+        insertNotificationAccess(result._id);
+
         // ******************required to send email************
         sendmail();
       })
@@ -526,9 +524,9 @@ const username = [firstName,middleName,lastName].filter(Boolean).join(" ")
       .then((response) => response.json())
       .then((result) => {
         console.log(result);
-//         toast.success("Team Member created successfully!");
-//        handleNewDrawerClose()
-// fetchData();
+        //         toast.success("Team Member created successfully!");
+        //        handleNewDrawerClose()
+        // fetchData();
         // navigate
       })
 
@@ -568,9 +566,9 @@ const username = [firstName,middleName,lastName].filter(Boolean).join(" ")
         // fetchData();
         // navigate("/firmtemp/teammember/activemember");
         // window.location.reload();
-           toast.success("Team Member created successfully!");
-       handleNewDrawerClose()
-fetchData();
+        toast.success("Team Member created successfully!");
+        handleNewDrawerClose();
+        fetchData();
       })
       .catch((error) => {
         console.error(error);
@@ -592,66 +590,76 @@ fetchData();
   return (
     <Box>
       <Box>
-       
-        <Box sx={{display:'flex', alignItems:'center',justifyContent:'space-between'}}> 
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
-            backgroundColor: "#EBF0F5", // Light grayish-blue background
-            borderRadius: "12px",
-            padding: "6px",
-            width: "max-content",
+            justifyContent: "space-between",
           }}
         >
-          <NavLink
-            to="/firmtemp/teammember/activemember"
-            style={({ isActive }) => ({
-              padding: "8px 16px",
-              borderRadius: "10px",
-              fontSize: "15px",
-              cursor: "pointer",
-              textDecoration: "none",
-              fontWeight: isActive ? "bold" : "normal",
-              color: isActive ? "var(--color-save-btn)" : "#333",
-              backgroundColor: isActive ? "#fff" : "transparent",
-              transition: "all 0.3s ease",
-            })}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              backgroundColor: "#EBF0F5", // Light grayish-blue background
+              borderRadius: "12px",
+              padding: "6px",
+              width: "max-content",
+            }}
           >
-            Active Members
-          </NavLink>
-          <NavLink
-            to="/firmtemp/teammember/deactivatemember"
-            style={({ isActive }) => ({
-              padding: "8px 16px",
-              borderRadius: "10px",
-              fontSize: "15px",
-              cursor: "pointer",
-              textDecoration: "none",
-              fontWeight: isActive ? "bold" : "normal",
-              color: isActive ? "var(--color-save-btn)" : "#333",
-              backgroundColor: isActive ? "#fff" : "transparent",
-              transition: "all 0.3s ease",
-            })}
-          >
-            Deactivated Members
-          </NavLink>
-        </Box>
-        <Box>
-            <Button onClick={setIsNewDrawerOpen} variant="contained"  sx={{
-                  backgroundColor: 'var(--color-save-btn)',  // Normal background
-                 
-                  '&:hover': {
-                    backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                  },
-  borderRadius:'15px', whiteSpace: "nowrap" 
-                }}>
+            <NavLink
+              to="/firmtemp/teammember/activemember"
+              style={({ isActive }) => ({
+                padding: "8px 16px",
+                borderRadius: "10px",
+                fontSize: "15px",
+                cursor: "pointer",
+                textDecoration: "none",
+                fontWeight: isActive ? "bold" : "normal",
+                color: isActive ? "var(--color-save-btn)" : "#333",
+                backgroundColor: isActive ? "#fff" : "transparent",
+                transition: "all 0.3s ease",
+              })}
+            >
+              Active Members
+            </NavLink>
+            <NavLink
+              to="/firmtemp/teammember/deactivatemember"
+              style={({ isActive }) => ({
+                padding: "8px 16px",
+                borderRadius: "10px",
+                fontSize: "15px",
+                cursor: "pointer",
+                textDecoration: "none",
+                fontWeight: isActive ? "bold" : "normal",
+                color: isActive ? "var(--color-save-btn)" : "#333",
+                backgroundColor: isActive ? "#fff" : "transparent",
+                transition: "all 0.3s ease",
+              })}
+            >
+              Deactivated Members
+            </NavLink>
+          </Box>
+          <Box>
+            <Button
+              onClick={setIsNewDrawerOpen}
+              variant="contained"
+              sx={{
+                backgroundColor: "var(--color-save-btn)", // Normal background
+
+                "&:hover": {
+                  backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+                },
+                borderRadius: "15px",
+                whiteSpace: "nowrap",
+              }}
+            >
               Team Member
             </Button>
           </Box>
-          </Box>
+        </Box>
         <Box mt={2}>
-          <Outlet context={{ fetchData, teamMembers, loading }}/>
+          <Outlet context={{ fetchData, teamMembers, loading }} />
         </Box>
       </Box>
 
@@ -679,10 +687,7 @@ fetchData();
                 padding: "20px",
               }}
             >
-              <Typography variant="h6">
-                {" "}
-                Add New Team Member
-              </Typography>
+              <Typography variant="h6"> Add New Team Member</Typography>
               <CloseRoundedIcon
                 onClick={handleNewDrawerClose}
                 style={{ cursor: "pointer" }}
@@ -690,9 +695,12 @@ fetchData();
             </Box>
             <Divider />
           </Box>
-          <form >
-            <Box sx={{height:'80vh',overflowY:'auto',p:2}} className="bulk-job-form">
-              <Box sx={{ width: "100%",}}>
+          <form>
+            <Box
+              sx={{ height: "80vh", overflowY: "auto", p: 2 }}
+              className="bulk-job-form"
+            >
+              <Box sx={{ width: "100%" }}>
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={4}>
                     <Box>
@@ -766,30 +774,30 @@ fetchData();
                   <Alert
                   />
                 )} */}
-                 {!!emailValidation && (
-                                        <Alert
-                                          sx={{
-                                            width: "96%",
-                                            p: "0", // Adjust padding to control the size
-                                            pl: "4%",
-                                            height: "23px",
-                                            borderRadius: "10px",
-                                            borderTopLeftRadius: "0",
-                                            borderTopRightRadius: "0",
-                                            fontSize: "15px",
-                                            display: "flex",
-                                            alignItems: "center", // Center content vertically
-                                            "& .MuiAlert-icon": {
-                                              fontSize: "16px", // Adjust the size of the icon
-                                              mr: "8px", // Add margin to the right of the icon
-                                            },
-                                          }}
-                                          variant="filled"
-                                          severity="error"
-                                        >
-                                          {emailValidation}
-                                        </Alert>
-                                      )}
+                {!!emailValidation && (
+                  <Alert
+                    sx={{
+                      width: "96%",
+                      p: "0", // Adjust padding to control the size
+                      pl: "4%",
+                      height: "23px",
+                      borderRadius: "10px",
+                      borderTopLeftRadius: "0",
+                      borderTopRightRadius: "0",
+                      fontSize: "15px",
+                      display: "flex",
+                      alignItems: "center", // Center content vertically
+                      "& .MuiAlert-icon": {
+                        fontSize: "16px", // Adjust the size of the icon
+                        mr: "8px", // Add margin to the right of the icon
+                      },
+                    }}
+                    variant="filled"
+                    severity="error"
+                  >
+                    {emailValidation}
+                  </Alert>
+                )}
               </Box>
 
               <Box>
@@ -987,7 +995,8 @@ fetchData();
                               checkedIcon={false}
                               height={20}
                               width={32}
-                              className="react-switch"disabled
+                              className="react-switch"
+                              disabled
                             />
                             <p style={{ color: "black" }}>
                               Manage firm balance
@@ -1257,7 +1266,8 @@ fetchData();
                               checkedIcon={false}
                               height={20}
                               width={32}
-                              className="react-switch"disabled
+                              className="react-switch"
+                              disabled
                             />
                             <p style={{ color: "black" }}>
                               Manage custome fields
@@ -1330,7 +1340,6 @@ fetchData();
                               height={20}
                               width={32}
                               className="react-switch"
-                              
                             />
                             <p style={{ color: "black" }}>Manage proposals</p>
                           </Box>
@@ -1473,9 +1482,8 @@ fetchData();
               alignItems: "center",
               gap: 5,
               // margin: "8px",
-              mt:1,
+              mt: 1,
               ml: 3,
-              
             }}
           >
             <Button
@@ -1510,8 +1518,6 @@ fetchData();
               Cancel
             </Button>
           </Box>
-
-          
         </Box>
       </Drawer>
     </Box>

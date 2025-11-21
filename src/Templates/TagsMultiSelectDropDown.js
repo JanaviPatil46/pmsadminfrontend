@@ -5,7 +5,7 @@ import {
   Menu,
   Chip,
   Typography,
-  IconButton
+  IconButton,
 } from "@mui/material";
 import { FaCaretUp, FaCaretDown, FaTimes } from "react-icons/fa";
 
@@ -35,11 +35,13 @@ const TagsMultiSelectDropDown = ({
           const url = `${TAGS_API}/tags/`;
           const response = await fetch(url);
           const data = await response.json();
-          setInternalOptions(data.tags.map(tag => ({
-            value: tag._id,
-            label: tag.tagName,
-            colour: tag.tagColour
-          })));
+          setInternalOptions(
+            data.tags.map((tag) => ({
+              value: tag._id,
+              label: tag.tagName,
+              colour: tag.tagColour,
+            }))
+          );
         } catch (error) {
           console.error("Error fetching data:", error);
         }
@@ -60,10 +62,10 @@ const TagsMultiSelectDropDown = ({
   };
 
   const handleSelect = (selectedValue) => {
-    const newValue = value.some(item => item.value === selectedValue)
-      ? value.filter(item => item.value !== selectedValue)
-      : [...value, options.find(option => option.value === selectedValue)];
-    
+    const newValue = value.some((item) => item.value === selectedValue)
+      ? value.filter((item) => item.value !== selectedValue)
+      : [...value, options.find((option) => option.value === selectedValue)];
+
     if (onChange) {
       onChange(newValue);
     }
@@ -79,20 +81,18 @@ const TagsMultiSelectDropDown = ({
     }
   };
 
-//   const filteredOptions = options.filter((option) =>
-//     option.label.toLowerCase().includes(searchQuery.toLowerCase())
-//   );
-const filteredOptions = options
-  .filter((option) => 
-    option.label.toLowerCase().includes(searchQuery.toLowerCase())
-  )
-  .filter((option) => 
-    !value.some(selected => selected.value === option.value)
-  );
+  //   const filteredOptions = options.filter((option) =>
+  //     option.label.toLowerCase().includes(searchQuery.toLowerCase())
+  //   );
+  const filteredOptions = options
+    .filter((option) =>
+      option.label.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .filter(
+      (option) => !value.some((selected) => selected.value === option.value)
+    );
   return (
-    <Box >
-    
-      
+    <Box>
       <Box
         ref={containerRef}
         sx={{
@@ -105,7 +105,7 @@ const filteredOptions = options
           cursor: "pointer",
           bgcolor: "background.paper",
           // width: "100%",
-          mt:2
+          mt: 2,
         }}
         onClick={handleClick}
       >
@@ -172,7 +172,7 @@ const filteredOptions = options
           style: {
             width: menuWidth || "auto",
             maxHeight: "250px",
-          }
+          },
         }}
       >
         <Box sx={{ p: 1 }}>
@@ -188,35 +188,35 @@ const filteredOptions = options
           />
         </Box>
 
-       
         {filteredOptions.length > 0 ? (
-                    
-                    filteredOptions.map((option) => (
-                        <Box
-                          key={option.value}
-                          sx={{
-                            color: "#fff",
-                            fontSize: "10px",
-                            borderRadius: "10px",
-                            // ml:"10px",
-                            margin: "5px 10px", // Vertical margin only (since they stack)
-                            display: "flex", // Flex container (but stacks vertically due to parent)
-                            width: "fit-content", // Box width adjusts to content
-                            backgroundColor: option.colour,
-                            alignItems: "center",
-                            justifyContent: "center", // Center text horizontally
-                            padding: "4px 8px", // Padding for spacing
-                            cursor: "pointer",
-                            whiteSpace: "nowrap", // Prevent text wrapping
-                          }}
-                          onClick={() => handleSelect(option.value)}
-                        >
-                          <Typography sx={{ fontSize: "inherit" }}>{option.label}</Typography>
-                        </Box>
-                      ))
-                  ) : (
-                    <Typography sx={{ p: 2, color: "gray" }}>No results found</Typography>
-                  )}
+          filteredOptions.map((option) => (
+            <Box
+              key={option.value}
+              sx={{
+                color: "#fff",
+                fontSize: "10px",
+                borderRadius: "10px",
+                // ml:"10px",
+                margin: "5px 10px", // Vertical margin only (since they stack)
+                display: "flex", // Flex container (but stacks vertically due to parent)
+                width: "fit-content", // Box width adjusts to content
+                backgroundColor: option.colour,
+                alignItems: "center",
+                justifyContent: "center", // Center text horizontally
+                padding: "4px 8px", // Padding for spacing
+                cursor: "pointer",
+                whiteSpace: "nowrap", // Prevent text wrapping
+              }}
+              onClick={() => handleSelect(option.value)}
+            >
+              <Typography sx={{ fontSize: "inherit" }}>
+                {option.label}
+              </Typography>
+            </Box>
+          ))
+        ) : (
+          <Typography sx={{ p: 2, color: "gray" }}>No results found</Typography>
+        )}
       </Menu>
     </Box>
   );

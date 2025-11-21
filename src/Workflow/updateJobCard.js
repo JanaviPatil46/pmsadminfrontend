@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Drawer,
   Box,
@@ -17,16 +17,16 @@ import {
   Switch,
   InputAdornment,
   Autocomplete,
-} from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import dayjs from 'dayjs';
-import { toast } from 'react-toastify';
-import Priority from '../Templates/Priority/Priority'; // Adjust path as needed
-import Editor from '../Templates/Texteditor/Editor'; // Adjust path as needed
-import MultiSelectDropdown from '../Templates/MultiSelectDropdown'; // Adjust path as needed
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
+import { toast } from "react-toastify";
+import Priority from "../Templates/Priority/Priority"; // Adjust path as needed
+import Editor from "../Templates/Texteditor/Editor"; // Adjust path as needed
+import MultiSelectDropdown from "../Templates/MultiSelectDropdown"; // Adjust path as needed
 
 const EditJobDrawer = ({
   open,
@@ -39,7 +39,7 @@ const EditJobDrawer = ({
   userOptions,
   clientFacingOptions,
   theme,
-  isSmallScreen
+  isSmallScreen,
 }) => {
   // API endpoints
   const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
@@ -69,7 +69,7 @@ const EditJobDrawer = ({
   const [charCount, setCharCount] = useState(0);
   const charLimit = 500;
   const [dataAccountjob, setDataAccountjob] = useState("");
-const [jobName,setJobName]=useState("")
+  const [jobName, setJobName] = useState("");
   // Fetch job data when component mounts or jobId changes
   useEffect(() => {
     if (jobId) {
@@ -86,16 +86,16 @@ const [jobName,setJobName]=useState("")
       }
       const data = await response.json();
       console.log("jobasdata", data);
-      
+
       const jobData = data.jobList;
-      console.log("joblist",jobData)
+      console.log("joblist", jobData);
       // Set account data
       if (jobData.Account && jobData.Account.length > 0) {
         const { _id, accountName } = jobData.Account[0];
         setSelectedAccount(accountName);
         setAccountId(_id);
       }
-      setJobName(jobData.Name)
+      setJobName(jobData.Name);
       // Set pipeline data
       if (jobData.Pipeline) {
         const pipelineData = {
@@ -106,11 +106,11 @@ const [jobName,setJobName]=useState("")
         setPipelineId(jobData.Pipeline._id);
         fetchPipelineStages(jobData.Pipeline._id);
       }
-      
+
       // Set dates
       setDueDate(jobData.DueDate ? dayjs(jobData.DueDate) : null);
       setStartDate(jobData.StartDate ? dayjs(jobData.StartDate) : null);
-      
+
       // Set stage data
       if (jobData.Stage && jobData.Stage.length > 0) {
         const stageData = {
@@ -119,15 +119,19 @@ const [jobName,setJobName]=useState("")
         };
         setSelectedStage(stageData);
       }
-      
+
       // Set other fields
       setPriority(jobData.Priority || "");
       setDescription(jobData.Description || "");
       setClientFacingStatus(jobData.ShowinClientPortal || false);
       setInputText(jobData.jobClientName || "");
       setClientDescription(jobData.ClientFacingDecription || "");
-      setCharCount(jobData.ClientFacingDecription ? jobData.ClientFacingDecription.length : 0);
-      
+      setCharCount(
+        jobData.ClientFacingDecription
+          ? jobData.ClientFacingDecription.length
+          : 0
+      );
+
       // Set client facing status
       if (jobData.ClientFacingStatus) {
         const clientStatusData = {
@@ -137,35 +141,34 @@ const [jobName,setJobName]=useState("")
         };
         setSelectedJob(clientStatusData);
       }
-      
+
       // Set account name
       if (jobData.Account) {
         setDataAccountjob(jobData.Account[0].accountName);
       }
-      
+
       // Set tags
       if (jobData.Account && jobData.Account[0].tags) {
         const tagsData = jobData.Account[0].tags
-          .flatMap(tagArray => tagArray)
-          .map(tag => ({
+          .flatMap((tagArray) => tagArray)
+          .map((tag) => ({
             value: tag._id,
             label: tag.tagName,
             colour: tag.tagColour,
           }));
         setSelectedTags(tagsData);
-        setCombinedTagsValues(tagsData.map(option => option.value));
+        setCombinedTagsValues(tagsData.map((option) => option.value));
       }
-      
+
       // Set assignees
       if (jobData.JobAssignee) {
-        const assigneesData = jobData.JobAssignee.map(assignee => ({
+        const assigneesData = jobData.JobAssignee.map((assignee) => ({
           value: assignee._id,
           label: assignee.username,
         }));
         setSelectedUser(assigneesData);
-        setCombinedValues(assigneesData.map(option => option.value));
+        setCombinedValues(assigneesData.map((option) => option.value));
       }
-      
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -173,11 +176,13 @@ const [jobName,setJobName]=useState("")
 
   const fetchPipelineStages = async (pipelineId) => {
     try {
-      const response = await fetch(`${PIPELINE_API}/workflow/pipeline/pipeline/${pipelineId}`);
+      const response = await fetch(
+        `${PIPELINE_API}/workflow/pipeline/pipeline/${pipelineId}`
+      );
       const data = await response.json();
 
       if (data.pipeline && data.pipeline.stages) {
-        const stagesData = data.pipeline.stages.map(stage => ({
+        const stagesData = data.pipeline.stages.map((stage) => ({
           value: stage._id,
           label: stage.name,
         }));
@@ -209,14 +214,14 @@ const [jobName,setJobName]=useState("")
   const handleTagChange = (event) => {
     const { value } = event.target;
     setSelectedTags(
-      tagOptions.filter(option => value.includes(option.value))
+      tagOptions.filter((option) => value.includes(option.value))
     );
     setCombinedTagsValues(value);
   };
 
   const handleUserChange = (newSelectedUsers) => {
     setSelectedUser(newSelectedUsers);
-    setCombinedValues(newSelectedUsers.map(option => option.value));
+    setCombinedValues(newSelectedUsers.map((option) => option.value));
   };
 
   const handleStartDateChange = (date) => {
@@ -270,18 +275,18 @@ const [jobName,setJobName]=useState("")
     };
 
     fetch(`${JOBS_API}/workflow/jobs/job/` + jobId, requestOptions)
-      .then(response => {
+      .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
         return response.json();
       })
-      .then(result => {
+      .then((result) => {
         toast.success("Job updated successfully");
         handleSaveTags();
         fetchJobData();
       })
-      .catch(error => {
+      .catch((error) => {
         console.error(error);
         toast.error("Failed to update Job");
       });
@@ -314,19 +319,19 @@ const [jobName,setJobName]=useState("")
     };
 
     fetch(`${JOBS_API}/workflow/jobs/job/` + jobId, requestOptions)
-      .then(response => {
+      .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
         return response.json();
       })
-      .then(result => {
+      .then((result) => {
         toast.success("Job updated successfully");
         handleSaveTags();
         onClose();
         fetchJobData();
       })
-      .catch(error => {
+      .catch((error) => {
         console.error(error);
         toast.error("Failed to update Job");
       });
@@ -334,27 +339,27 @@ const [jobName,setJobName]=useState("")
 
   const handleSaveTags = () => {
     if (!accountId) return;
-    
+
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
-    
+
     const raw = JSON.stringify({
       tags: combinedTagsValues,
     });
-    
+
     const requestOptions = {
       method: "PATCH",
       headers: myHeaders,
       body: raw,
       redirect: "follow",
     };
-    
+
     fetch(`${ACCOUNT_API}/accounts/accountdetails/${accountId}`, requestOptions)
-      .then(response => response.json())
-      .then(result => {
+      .then((response) => response.json())
+      .then((result) => {
         console.log("Tags updated successfully");
       })
-      .catch(error => {
+      .catch((error) => {
         console.error(error);
       });
   };
@@ -412,7 +417,7 @@ const [jobName,setJobName]=useState("")
             <InputLabel sx={{ color: "black" }}>Job Name</InputLabel>
             <TextField
               value={jobName}
-               onChange={(e) => setJobName(e.target.value)}
+              onChange={(e) => setJobName(e.target.value)}
               size="small"
               fullWidth
               margin="normal"
@@ -426,7 +431,9 @@ const [jobName,setJobName]=useState("")
               getOptionLabel={(option) => option.label}
               value={selectedPipeline}
               onChange={(event, newValue) => handlePipelineChange(newValue)}
-              isOptionEqualToValue={(option, value) => option.value === value.value}
+              isOptionEqualToValue={(option, value) =>
+                option.value === value.value
+              }
               renderOption={(props, option) => (
                 <Box
                   component="li"
@@ -463,7 +470,9 @@ const [jobName,setJobName]=useState("")
                 onChange={handleTagChange}
                 renderValue={(selected) => {
                   if (selected.length === 0) {
-                    return <span style={{ color: "#aaa" }}>Select tags...</span>;
+                    return (
+                      <span style={{ color: "#aaa" }}>Select tags...</span>
+                    );
                   }
                   return (
                     <Box
@@ -543,7 +552,7 @@ const [jobName,setJobName]=useState("")
 
           <Box mt={2} mr={2.5}>
             <InputLabel sx={{ color: "black" }}>Job Assignee</InputLabel>
-            <MultiSelectDropdown 
+            <MultiSelectDropdown
               value={selectedUser}
               onChange={handleUserChange}
               placeholder="Job Assignees"
@@ -558,7 +567,9 @@ const [jobName,setJobName]=useState("")
               getOptionLabel={(option) => option.label}
               value={selectedStage}
               onChange={(event, newValue) => handleStageChange(newValue)}
-              isOptionEqualToValue={(option, value) => option.value === value.value}
+              isOptionEqualToValue={(option, value) =>
+                option.value === value.value
+              }
               renderOption={(props, option) => (
                 <Box
                   component="li"
@@ -596,9 +607,7 @@ const [jobName,setJobName]=useState("")
               sx={{ width: "100%", backgroundColor: "#fff", mt: 2 }}
               value={startDate}
               onChange={handleStartDateChange}
-              renderInput={(params) => (
-                <TextField {...params} size="small" />
-              )}
+              renderInput={(params) => <TextField {...params} size="small" />}
             />
           </Box>
 
@@ -609,9 +618,7 @@ const [jobName,setJobName]=useState("")
               sx={{ width: "100%", backgroundColor: "#fff", mt: 2 }}
               value={dueDate}
               onChange={handleDueDateChange}
-              renderInput={(params) => (
-                <TextField {...params} size="small" />
-              )}
+              renderInput={(params) => <TextField {...params} size="small" />}
             />
           </Box>
 
@@ -670,9 +677,7 @@ const [jobName,setJobName]=useState("")
                       />
 
                       <Box mt={2}>
-                        <InputLabel sx={{ color: "black" }}>
-                          Status
-                        </InputLabel>
+                        <InputLabel sx={{ color: "black" }}>Status</InputLabel>
                         <Autocomplete
                           options={clientFacingOptions}
                           size="small"

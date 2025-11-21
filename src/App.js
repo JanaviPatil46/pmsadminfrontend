@@ -113,9 +113,9 @@ import DocsFolderTree from "./nested-navbar/documents-nav/DocsFolderTree.js";
 import AccountTable from "./AccountContactForm/AccountTable.js";
 import AccountDetails from "./AccountContactForm/AccountDetails.js";
 import ContactsTable from "./AccountContactForm/ContactTable.js";
-import ProposalsTable from "./ProposalandEls/components/ProposalsTable.js"
-import ProposalForm from "./ProposalandEls/components/ProposalForm.js"
-import AccountProposalForm from "./ProposalandEls/components/AccountProposalForm.js"
+import ProposalsTable from "./ProposalandEls/components/ProposalsTable.js";
+import ProposalForm from "./ProposalandEls/components/ProposalForm.js";
+import AccountProposalForm from "./ProposalandEls/components/AccountProposalForm.js";
 import PipelineTable from "./Templates/NewPipelineworking/PipelineTable.js";
 import PipelineForm from "./Templates/NewPipelineworking/PipelineForm.js";
 const App = () => {
@@ -146,7 +146,7 @@ const App = () => {
           <Route path="firmtemp/tags" element={<NewTag />} />
           {/* <Route path="firmtemp/pipelines" element={<PipelineTemp />} /> */}
           <Route path="firmtemp/pipelines" element={<PipelineTable />} />
-          <Route path="firmtemp/pipelineform" element={<PipelineForm/>} />
+          <Route path="firmtemp/pipelineform" element={<PipelineForm />} />
           <Route path="/firmtemp/marketplace" element={<MarketPlaces />} />
           <Route
             path="/PipelineTemplateUpdate/:id"
@@ -226,8 +226,8 @@ const App = () => {
             />
             <Route path="signatures" element={<SignatureTemp />} />
             {/* <Route path="proposals" element={<ProposalTemp />} /> */}
-             <Route path="proposals" element={<ProposalsTable />} />
-             <Route path="proposals/proposal-form" element={<ProposalForm />} />
+            <Route path="proposals" element={<ProposalsTable />} />
+            <Route path="proposals/proposal-form" element={<ProposalForm />} />
             <Route
               path="proposals/ProposalTempUpdate/:_id"
               element={<ProposalTempUpdate />}

@@ -154,7 +154,7 @@ const ActiveAccounts = () => {
     } else {
       setConfirmPasswordValidation("");
     }
-// if passwords don't match → stop
+    // if passwords don't match → stop
     if (password !== confirmPassword) {
       setPasswordMatchValidation("Passwords do not match");
       return;
@@ -163,7 +163,6 @@ const ActiveAccounts = () => {
     if (firstName && lastName && password && confirmPassword) {
       UserValidToken();
     }
-  
   };
 
   const UserValidToken = async () => {

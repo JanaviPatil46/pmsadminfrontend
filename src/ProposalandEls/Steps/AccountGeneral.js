@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Box,
   TextField,
@@ -19,6 +19,10 @@ import {
   FormHelperText,
   Autocomplete,
   Grid,
+  Popover,
+  List,
+  ListItem,
+  ListItemText,
 } from "@mui/material";
 import { InfoOutlined } from "@mui/icons-material";
 import { useParams } from "react-router-dom";
@@ -38,7 +42,70 @@ const GeneralStep = ({
   const [loading, setLoading] = useState(false);
   const [invoiceTemplates, setInvoiceTemplates] = useState([]);
   const [internalOptions, setInternalOptions] = useState([]);
-
+  // === SHORTCODES States ===
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [shortcuts, setShortcuts] = useState([]);
+  const [filteredShortcuts, setFilteredShortcuts] = useState([]);
+  const [cursorPosition, setCursorPosition] = useState(0);
+  const textFieldRef = useRef(null);
+  useEffect(() => {
+    const accountShortcuts = [
+      { title: "Account Shortcodes", isBold: true },
+      { title: "Account Name", isBold: false, value: "ACCOUNT_NAME" },
+      { title: "Date Shortcodes", isBold: true },
+      {
+        title: "Current day full date",
+        isBold: false,
+        value: "CURRENT_DAY_FULL_DATE",
+      },
+      {
+        title: "Current day number",
+        isBold: false,
+        value: "CURRENT_DAY_NUMBER",
+      },
+      { title: "Current day name", isBold: false, value: "CURRENT_DAY_NAME" },
+      { title: "Current week", isBold: false, value: "CURRENT_WEEK" },
+      {
+        title: "Current month number",
+        isBold: false,
+        value: "CURRENT_MONTH_NUMBER",
+      },
+      {
+        title: "Current month name",
+        isBold: false,
+        value: "CURRENT_MONTH_NAME",
+      },
+      { title: "Current quarter", isBold: false, value: "CURRENT_QUARTER" },
+      { title: "Current year", isBold: false, value: "CURRENT_YEAR" },
+      {
+        title: "Last day full date",
+        isBold: false,
+        value: "LAST_DAY_FULL_DATE",
+      },
+      { title: "Last day number", isBold: false, value: "LAST_DAY_NUMBER" },
+      { title: "Last day name", isBold: false, value: "LAST_DAY_NAME" },
+      { title: "Last week", isBold: false, value: "LAST_WEEK" },
+      { title: "Last month number", isBold: false, value: "LAST_MONTH_NUMBER" },
+      { title: "Last month name", isBold: false, value: "LAST_MONTH_NAME" },
+      { title: "Last quarter", isBold: false, value: "LAST_QUARTER" },
+      { title: "Last year", isBold: false, value: "LAST_YEAR" },
+      {
+        title: "Next day full date",
+        isBold: false,
+        value: "NEXT_DAY_FULL_DATE",
+      },
+      { title: "Next day number", isBold: false, value: "NEXT_DAY_NUMBER" },
+      { title: "Next day name", isBold: false, value: "NEXT_DAY_NAME" },
+      { title: "Next week", isBold: false, value: "NEXT_WEEK" },
+      { title: "Next month number", isBold: false, value: "NEXT_MONTH_NUMBER" },
+      { title: "Next month name", isBold: false, value: "NEXT_MONTH_NAME" },
+      { title: "Next quarter", isBold: false, value: "NEXT_QUARTER" },
+      { title: "Next year", isBold: false, value: "NEXT_YEAR" },
+    ];
+    setShortcuts(accountShortcuts);
+    setFilteredShortcuts(accountShortcuts);
+  }, []);
   const LOGIN_API =
     process.env.REACT_APP_USER_LOGIN || "https://www.snptaxes.com";
   const ACCOUNT_API =
@@ -54,20 +121,10 @@ const GeneralStep = ({
     fetchTeamMembers();
   }, []);
 
-  // const fetchAccounts = async () => {
-  //   try {
-  //     const url =
-  //       "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true";
-  //     const response = await fetch(url);
-  //     const data = await response.json();
-  //     setAccounts(data.accounts);
-  //   } catch (error) {
-  //     console.error("Error fetching data:", error);
-  //   }
-  // };
-    const fetchAccounts = async () => {
+  const fetchAccounts = async () => {
     try {
-      const url = "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true";
+      const url =
+        "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true";
       const response = await fetch(url);
       const result = await response.json();
 
@@ -81,52 +138,28 @@ const GeneralStep = ({
           (account) => account._id === data
         );
         console.log("Found account:", selectedAccountData);
-        
-        // if (selectedAccountData) {
-        //   const selectedAccount = {
-        //     label: selectedAccountData.accountName,
-        //     value: selectedAccountData._id,
-        //   };
-          
-        //   // Update form data with the selected account
-        //   updateFormData("general", {
-        //     account: selectedAccount,
-        //     accountId: selectedAccount.value
-        //   });
 
-        //   // Clear any existing account error
-        //   if (stepErrors.account) {
-        //     setStepErrors((prev) => {
-        //       const newErrors = { ...prev };
-        //       delete newErrors.account;
-        //       return newErrors;
-        //     });
-        //   }
-          
-        //   console.log("Auto-selected account:", selectedAccount);
-        // } 
-     if (selectedAccountData) {
-  const selectedAccount = {
-    label: selectedAccountData.accountName,
-    value: selectedAccountData._id,
-  };
+        if (selectedAccountData) {
+          const selectedAccount = {
+            label: selectedAccountData.accountName,
+            value: selectedAccountData._id,
+          };
 
-  // ✅ wrap inside array
-  updateFormData("general", {
-    account: [selectedAccount],
-  });
+          // ✅ wrap inside array
+          updateFormData("general", {
+            account: [selectedAccount],
+          });
 
-  if (stepErrors.account) {
-    setStepErrors((prev) => {
-      const newErrors = { ...prev };
-      delete newErrors.account;
-      return newErrors;
-    });
-  }
+          if (stepErrors.account) {
+            setStepErrors((prev) => {
+              const newErrors = { ...prev };
+              delete newErrors.account;
+              return newErrors;
+            });
+          }
 
-  console.log("Auto-selected account:", selectedAccount);
-}
-   else {
+          console.log("Auto-selected account:", selectedAccount);
+        } else {
           console.warn("No account found with ID:", data);
         }
       } else {
@@ -425,35 +458,20 @@ const GeneralStep = ({
     setTouched((prev) => ({ ...prev, [field]: true }));
   };
 
-  // const handleAccountChange = (selectedAccount) => {
-  //   updateFormData("general", {
-  //     account: selectedAccount,
-  //     accountId: selectedAccount?.value || "",
-  //   });
-
-  //   if (selectedAccount && stepErrors.account) {
-  //     setStepErrors((prev) => {
-  //       const newErrors = { ...prev };
-  //       delete newErrors.account;
-  //       return newErrors;
-  //     });
-  //   }
-  // };
- const handleAccountChange = (selectedAccounts) => {
-  updateFormData("general", {
-    account: selectedAccounts || [],
-  });
-
-  // Remove error if any account selected
-  if (selectedAccounts?.length > 0 && stepErrors.account) {
-    setStepErrors((prev) => {
-      const newErrors = { ...prev };
-      delete newErrors.account;
-      return newErrors;
+  const handleAccountChange = (selectedAccounts) => {
+    updateFormData("general", {
+      account: selectedAccounts || [],
     });
-  }
-};
 
+    // Remove error if any account selected
+    if (selectedAccounts?.length > 0 && stepErrors.account) {
+      setStepErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors.account;
+        return newErrors;
+      });
+    }
+  };
 
   const getCurrentTemplateValue = () => {
     if (!formData.general.template && formData.general.proposalTemp) {
@@ -550,6 +568,47 @@ const GeneralStep = ({
     updateFormData("general", { [field]: value });
   };
 
+  // Toggle dropdown
+  const toggleDropdown = (event) => {
+    setAnchorEl(event.currentTarget);
+    setShowDropdown(!showDropdown);
+  };
+
+  const handleCloseDropdown = () => {
+    setAnchorEl(null);
+    setShowDropdown(false);
+  };
+
+  // Track cursor position inside Proposal Name
+  const handleTextFieldClick = () => {
+    if (textFieldRef.current) {
+      setCursorPosition(textFieldRef.current.selectionStart);
+    }
+  };
+
+  // Insert shortcode at cursor position
+  const handleAddShortcut = (shortcutValue) => {
+    const current = formData.general.proposalName || "";
+
+    const newValue =
+      current.slice(0, cursorPosition) +
+      `[${shortcutValue}]` +
+      current.slice(cursorPosition);
+
+    updateFormData("general", { proposalName: newValue });
+
+    setTimeout(() => {
+      if (textFieldRef.current) {
+        const newCursor = cursorPosition + shortcutValue.length + 2;
+        textFieldRef.current.focus();
+        textFieldRef.current.setSelectionRange(newCursor, newCursor);
+        setCursorPosition(newCursor);
+      }
+    }, 0);
+
+    setShowDropdown(false);
+  };
+
   const StepCard = ({ title, description, checked, onChange, name }) => (
     <Card
       variant="outlined"
@@ -639,9 +698,8 @@ const GeneralStep = ({
 
         {/* Account Selection */}
         <FormControl fullWidth error={!!stepErrors.account} sx={{ mb: 3 }}>
-          {/* <Autocomplete
-          // disabled
-           multiple
+          <Autocomplete
+            multiple
             options={accountOptions}
             value={formData.general.account || []}
             onChange={(event, value) => handleAccountChange(value)}
@@ -659,34 +717,12 @@ const GeneralStep = ({
               />
             )}
             loading={loading}
-          /> */}
-          <Autocomplete
-  multiple
-  options={accountOptions}
-  value={formData.general.account || []}
-  onChange={(event, value) => handleAccountChange(value)}
-  isOptionEqualToValue={(option, value) =>
-    option?.value === value?.value
-  }
-  getOptionLabel={(option) => option?.label || ""}
-  renderInput={(params) => (
-    <TextField
-      {...params}
-      label="Select Account *"
-      error={!!stepErrors.account}
-      helperText={stepErrors.account}
-      placeholder="Search for an account..."
-    />
-  )}
-  loading={loading}
-/>
-
+          />
         </FormControl>
 
         {/* Template Selection */}
         <FormControl fullWidth error={!!stepErrors.template} sx={{ mb: 3 }}>
           <Autocomplete
-
             options={templateOptions}
             // value={formData.general.template || null}
             value={getCurrentTemplateValue()}
@@ -712,7 +748,7 @@ const GeneralStep = ({
         </FormControl>
 
         {/* Proposal Name */}
-        <TextField
+        {/* <TextField
           fullWidth
           label="Proposal Name *"
           value={formData.general.proposalName || ""}
@@ -725,8 +761,83 @@ const GeneralStep = ({
           margin="normal"
           required
           sx={{ mb: 2 }}
+        /> */}
+        <TextField
+          fullWidth
+          // label="Proposal Name"
+          label="Proposal name (visible to clients)"
+          value={formData.general.proposalName || ""}
+          onChange={(e) => {
+            handleInputChange("proposalName", e.target.value);
+            handleTextFieldClick();
+          }}
+          onClick={handleTextFieldClick}
+          inputRef={textFieldRef}
+          margin="normal"
+          required
+          sx={{ mb: 2 }}
+          error={!!stepErrors.proposalName}
+          helperText={stepErrors.proposalName}
         />
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={toggleDropdown}
+          sx={{
+            backgroundColor: "var(--color-save-btn)",
+            "&:hover": { backgroundColor: "var(--color-save-hover-btn)" },
+            borderRadius: "15px",
+            mt: 1,
+          }}
+        >
+          Add Shortcode
+        </Button>
 
+        <Popover
+          open={showDropdown}
+          anchorEl={anchorEl}
+          onClose={handleCloseDropdown}
+          anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+          transformOrigin={{ vertical: "top", horizontal: "left" }}
+        >
+          <Box>
+            <List
+              sx={{
+                width: "300px",
+                height: "300px",
+                overflow: "auto",
+                cursor: "pointer",
+              }}
+            >
+              {filteredShortcuts.map((shortcut, index) => (
+                <ListItem
+                  key={index}
+                  onClick={() =>
+                    !shortcut.isBold && handleAddShortcut(shortcut.value)
+                  }
+                  sx={{
+                    backgroundColor: shortcut.isBold
+                      ? "grey.100"
+                      : "transparent",
+                    fontWeight: shortcut.isBold ? "bold" : "normal",
+                    "&:hover": shortcut.isBold
+                      ? {}
+                      : { backgroundColor: "grey.200" },
+                  }}
+                >
+                  <ListItemText
+                    primary={shortcut.title}
+                    primaryTypographyProps={{
+                      style: {
+                        fontWeight: shortcut.isBold ? "bold" : "normal",
+                      },
+                    }}
+                  />
+                </ListItem>
+              ))}
+            </List>
+          </Box>
+        </Popover>
         {/* Team Members */}
         <Box sx={{ mt: 2 }}>
           <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>

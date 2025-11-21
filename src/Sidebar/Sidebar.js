@@ -15,7 +15,8 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  CircularProgress,Popover
+  CircularProgress,
+  Popover,
 } from "@mui/material";
 import {
   ChevronLeft,
@@ -31,7 +32,7 @@ import { Outlet, Link } from "react-router-dom";
 import axios from "axios";
 import "./Sidebar.css";
 import iconMapping from "./icons/index";
-import Logo from "../Images/Logo.svg";
+// import Logo from "../Images/Logo.svg";
 import { FaBars } from "react-icons/fa6";
 import { FaPlus } from "react-icons/fa6";
 // import { AiOutlinePlusCircle } from "react-icons/ai";
@@ -63,6 +64,8 @@ import ClientSelectionDialog from "../Billing/ClientSelectionDialog";
 import { faL } from "@fortawesome/free-solid-svg-icons";
 import OrganizerDialog from "../Pages/Organizers/ClientSelectionDialog";
 import ChatForm from "../Pages/ChatForm";
+import FullLogo from "../Images/snp.png";
+import Logo from "../Images/only s.png";
 import JobDrawer from "../Jobs/JobDrawer";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import InvoiceDrawer from "../Billing/InvoiceDrawer";
@@ -72,7 +75,7 @@ import {
   setSelectedContacts,
   removeSelectedContact,
 } from "../redux/accountContactSlice";
-import AccountDrawer from "../components/AccountContactForm/Drawer"
+import AccountDrawer from "../components/AccountContactForm/Drawer";
 function Sidebar() {
   const StyledBadge = styled(Badge)(({ theme }) => ({
     "& .MuiBadge-badge": {
@@ -104,7 +107,7 @@ function Sidebar() {
   }));
   const location = useLocation();
   const navigate = useNavigate();
-   const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
   const SIDEBAR_API = process.env.REACT_APP_SIDEBAR_URL;
   const NEW_SIDEBAR_API = process.env.REACT_APP_SIDEBAR_URL;
@@ -117,7 +120,7 @@ function Sidebar() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isRightDrawerOpen, setIsRightDrawerOpen] = useState(false);
   const [rightDrawerContent, setRightDrawerContent] = useState(null);
-  
+
   useEffect(() => {
     const handleResize = () => {
       setIsSmallScreen(window.innerWidth <= 768);
@@ -130,7 +133,6 @@ function Sidebar() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  
   const fetchSidebarData = async () => {
     try {
       const response = await axios.get(`${SIDEBAR_API}/api/`);
@@ -221,126 +223,125 @@ function Sidebar() {
 
   // }, []);
 
-//   useEffect(() => {
-//     if (isDrawerOpen) {
-//       const fetchNewSidebarData = async () => {
-//         try {
-//           const response = await axios.get(`${NEW_SIDEBAR_API}/newsidebar/`);
-//           let NewSidebarData = response.data;
-// console.log("newsidebardata", NewSidebarData)
-//           // Retrieve team member data if the user is a team member
-//           const teamMemberData = JSON.parse(
-//             localStorage.getItem("teamMemberData")
-//           );
-//           if (teamMemberData) {
-           
+  //   useEffect(() => {
+  //     if (isDrawerOpen) {
+  //       const fetchNewSidebarData = async () => {
+  //         try {
+  //           const response = await axios.get(`${NEW_SIDEBAR_API}/newsidebar/`);
+  //           let NewSidebarData = response.data;
+  // console.log("newsidebardata", NewSidebarData)
+  //           // Retrieve team member data if the user is a team member
+  //           const teamMemberData = JSON.parse(
+  //             localStorage.getItem("teamMemberData")
+  //           );
+  //           if (teamMemberData) {
 
-//             NewSidebarData = NewSidebarData.map((item) => {
-//               if (
-//                 item.label === "Account" &&
-//                 !teamMemberData.teammember.manageAccounts
-//               ) {
-//                 return { ...item, restricted: true };
-//               }
-//               if (
-//                 item.label === "Contact" &&
-//                 !teamMemberData.teammember.manageContacts
-//               ) {
-//                 return { ...item, restricted: true };
-//               }
-//               if (
-//                 item.label === "Jobs" &&
-//                 !teamMemberData.teammember.managePipelines
-//               ) {
-//                 return { ...item, restricted: true };
-//               }
-//               if (
-//                 item.label === "Organizer" &&
-//                 !teamMemberData.teammember.manageOrganizers
-//               ) {
-//                 return { ...item, restricted: true };
-//               }
-//               if (
-//                 item.label === "Invoice" &&
-//                 !teamMemberData.teammember.manageInvoices
-//               ) {
-//                 return { ...item, restricted: true };
-//               }
-//               return item;
-//             });
-//           }
+  //             NewSidebarData = NewSidebarData.map((item) => {
+  //               if (
+  //                 item.label === "Account" &&
+  //                 !teamMemberData.teammember.manageAccounts
+  //               ) {
+  //                 return { ...item, restricted: true };
+  //               }
+  //               if (
+  //                 item.label === "Contact" &&
+  //                 !teamMemberData.teammember.manageContacts
+  //               ) {
+  //                 return { ...item, restricted: true };
+  //               }
+  //               if (
+  //                 item.label === "Jobs" &&
+  //                 !teamMemberData.teammember.managePipelines
+  //               ) {
+  //                 return { ...item, restricted: true };
+  //               }
+  //               if (
+  //                 item.label === "Organizer" &&
+  //                 !teamMemberData.teammember.manageOrganizers
+  //               ) {
+  //                 return { ...item, restricted: true };
+  //               }
+  //               if (
+  //                 item.label === "Invoice" &&
+  //                 !teamMemberData.teammember.manageInvoices
+  //               ) {
+  //                 return { ...item, restricted: true };
+  //               }
+  //               return item;
+  //             });
+  //           }
 
-//           setNewSidebarItems(NewSidebarData);
-//         } catch (error) {
-//           console.error("Error fetching new sidebar data:", error);
-//         }
-//       };
+  //           setNewSidebarItems(NewSidebarData);
+  //         } catch (error) {
+  //           console.error("Error fetching new sidebar data:", error);
+  //         }
+  //       };
 
-//       fetchNewSidebarData();
-//     }
-//   }, [isDrawerOpen]);
+  //       fetchNewSidebarData();
+  //     }
+  //   }, [isDrawerOpen]);
 
-   useEffect(() => {
-  if (isDrawerOpen) {
-    const fetchNewSidebarData = async () => {
-      try {
-        const response = await axios.get(`${NEW_SIDEBAR_API}/newsidebar/`);
-        let NewSidebarData = response.data;
-        console.log("newsidebardata", NewSidebarData);
+  useEffect(() => {
+    if (isDrawerOpen) {
+      const fetchNewSidebarData = async () => {
+        try {
+          const response = await axios.get(`${NEW_SIDEBAR_API}/newsidebar/`);
+          let NewSidebarData = response.data;
+          console.log("newsidebardata", NewSidebarData);
 
-        // Get team member permissions from localStorage
-        const teamMemberData = JSON.parse(
-          localStorage.getItem("teamMemberData")
-        );
+          // Get team member permissions from localStorage
+          const teamMemberData = JSON.parse(
+            localStorage.getItem("teamMemberData")
+          );
 
-        if (teamMemberData && teamMemberData.teammember) {
-          // Apply restrictions only if team member exists
-          NewSidebarData = NewSidebarData.map((item) => {
-            if (
-              item.label === "Account" &&
-              !teamMemberData.teammember.manageAccounts
-            ) {
-              return { ...item, restricted: true };
-            }
-            if (
-              item.label === "Contact" &&
-              !teamMemberData.teammember.manageContacts
-            ) {
-              return { ...item, restricted: true };
-            }
-            if (
-              item.label === "Jobs" &&
-              !teamMemberData.teammember.managePipelines
-            ) {
-              return { ...item, restricted: true };
-            }
-            if (
-              item.label === "Organizer" &&
-              !teamMemberData.teammember.manageOrganizers
-            ) {
-              return { ...item, restricted: true };
-            }
-            if (
-              item.label === "Invoice" &&
-              !teamMemberData.teammember.manageInvoices
-            ) {
-              return { ...item, restricted: true };
-            }
-            return item;
-          });
-        } else {
-          console.log("No team member data found — showing all items");
+          if (teamMemberData && teamMemberData.teammember) {
+            // Apply restrictions only if team member exists
+            NewSidebarData = NewSidebarData.map((item) => {
+              if (
+                item.label === "Account" &&
+                !teamMemberData.teammember.manageAccounts
+              ) {
+                return { ...item, restricted: true };
+              }
+              if (
+                item.label === "Contact" &&
+                !teamMemberData.teammember.manageContacts
+              ) {
+                return { ...item, restricted: true };
+              }
+              if (
+                item.label === "Jobs" &&
+                !teamMemberData.teammember.managePipelines
+              ) {
+                return { ...item, restricted: true };
+              }
+              if (
+                item.label === "Organizer" &&
+                !teamMemberData.teammember.manageOrganizers
+              ) {
+                return { ...item, restricted: true };
+              }
+              if (
+                item.label === "Invoice" &&
+                !teamMemberData.teammember.manageInvoices
+              ) {
+                return { ...item, restricted: true };
+              }
+              return item;
+            });
+          } else {
+            console.log("No team member data found — showing all items");
+          }
+
+          setNewSidebarItems(NewSidebarData);
+        } catch (error) {
+          console.error("Error fetching new sidebar data:", error);
         }
+      };
 
-        setNewSidebarItems(NewSidebarData);
-      } catch (error) {
-        console.error("Error fetching new sidebar data:", error);
-      }
-    };
-
-    fetchNewSidebarData();
-  }
-}, [isDrawerOpen]);
+      fetchNewSidebarData();
+    }
+  }, [isDrawerOpen]);
 
   const handleToggleSidebar = () => {
     if (isSmallScreen) {
@@ -349,11 +350,11 @@ function Sidebar() {
       setIsCollapsed(!isCollapsed);
     }
   };
-  
+
   const handleToggleSubmenu = (menuId, label) => {
     setOpenMenu((prevMenu) => (prevMenu === menuId ? null : menuId)); // Toggle submenu
   };
-  
+
   const handleDrawerOpen = () => {
     setIsDrawerOpen(true);
   };
@@ -366,48 +367,47 @@ function Sidebar() {
   const handleNewDrawerClose = () => {
     setIsRightDrawerOpen(false);
 
-     dispatch(resetForm());
+    dispatch(resetForm());
   };
-const handleCloseDrawers =()=>{
-  handleDrawerClose()
-  handleNewDrawerClose()
-}
+  const handleCloseDrawers = () => {
+    handleDrawerClose();
+    handleNewDrawerClose();
+  };
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isOrganizerDialogOpen, setIsOrganizerDialogOpen] = useState(false);
-// Get accountId from cookie
+  // Get accountId from cookie
 
-const [isInvoiceDrawerOpen, setIsInvoiceDrawerOpen] = useState(false);
-// const [selectedAccount, setSelectedAccount] = useState(null);
-const handleNewItemClick = (label) => {
-  console.log("menu", label);
-  const accountIdFromCookie = Cookies.get("accountId");
-const accountNameFromCppkie =Cookies.get("accountName")
-  if (
-    label === "Account" ||
-    label === "Contact" ||
-    label === "Task" ||
-    label === "Chat" ||
-    label === "Jobs"
-  ) {
-    setRightDrawerContent(label);
-    setIsRightDrawerOpen(true);
-  } else if (label === "Invoice") {
-    if (accountIdFromCookie && accountNameFromCppkie) {
-      // If account ID exists in cookies, directly open the invoice drawer
-      setSelectedAccount({
-        value: accountIdFromCookie,
-        label: accountNameFromCppkie // Temporary label until we fetch the name
-      });
-      setIsInvoiceDrawerOpen(true);
-    } else {
-      // Show client selection dialog
-      setIsDialogOpen(true);
+  const [isInvoiceDrawerOpen, setIsInvoiceDrawerOpen] = useState(false);
+  // const [selectedAccount, setSelectedAccount] = useState(null);
+  const handleNewItemClick = (label) => {
+    console.log("menu", label);
+    const accountIdFromCookie = Cookies.get("accountId");
+    const accountNameFromCppkie = Cookies.get("accountName");
+    if (
+      label === "Account" ||
+      label === "Contact" ||
+      label === "Task" ||
+      label === "Chat" ||
+      label === "Jobs"
+    ) {
+      setRightDrawerContent(label);
+      setIsRightDrawerOpen(true);
+    } else if (label === "Invoice") {
+      if (accountIdFromCookie && accountNameFromCppkie) {
+        // If account ID exists in cookies, directly open the invoice drawer
+        setSelectedAccount({
+          value: accountIdFromCookie,
+          label: accountNameFromCppkie, // Temporary label until we fetch the name
+        });
+        setIsInvoiceDrawerOpen(true);
+      } else {
+        // Show client selection dialog
+        setIsDialogOpen(true);
+      }
+    } else if (label === "Organizer") {
+      setIsOrganizerDialogOpen(true);
     }
-  
-  } else if (label === "Organizer") {
-    setIsOrganizerDialogOpen(true);
-  }
-};
+  };
 
   const [theme, setTheme] = useState("light-theme");
   const toggleTheme = () => {
@@ -457,7 +457,7 @@ const accountNameFromCppkie =Cookies.get("accountName")
   };
   const [data, setData] = useState(false);
   const [loginsData, setloginsData] = useState("");
-  const [emailSyncEmail,setEmailSyncEmail]= useState("")
+  const [emailSyncEmail, setEmailSyncEmail] = useState("");
   const [loading, setLoading] = useState(true);
   // const DashboardValid = async () => {
   //   let token = localStorage.getItem("usersdatatoken");
@@ -494,7 +494,6 @@ const accountNameFromCppkie =Cookies.get("accountName")
   //       navigate("/");
   //     }
 
-     
   //     else if (data.user.role === "TeamMember") {
   //       localStorage.setItem("userRole", data.user.role);
   //       fetchUserData(data.user.id);
@@ -513,74 +512,74 @@ const accountNameFromCppkie =Cookies.get("accountName")
   //   setData(true);
   // }, []);
 
-useEffect(() => {
-  const validateAndFetch = async () => {
-    try {
-      const token = localStorage.getItem("usersdatatoken");
-      console.log("fghfhf",token)
-      // if (!token) {
-      //   window.location.href = `${EMAIL_SYNC}/emailsync/auth/google`;
-      //   return;
-      // }
+  useEffect(() => {
+    const validateAndFetch = async () => {
+      try {
+        const token = localStorage.getItem("usersdatatoken");
+        console.log("fghfhf", token);
+        // if (!token) {
+        //   window.location.href = `${EMAIL_SYNC}/emailsync/auth/google`;
+        //   return;
+        // }
 
-      const res = await fetch(`${LOGIN_API}/common/login/verifytoken/`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json", Authorization: token },
-      });
+        const res = await fetch(`${LOGIN_API}/common/login/verifytoken/`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json", Authorization: token },
+        });
 
-      const data = await res.json();
+        const data = await res.json();
 
-      if (data.message === "Invalid token") {
-        navigate("/login");
-      }
+        if (data.message === "Invalid token") {
+          navigate("/login");
+        }
 
-      // token valid → fetch user data
-      setLoginData(data);
-      setloginsData(data.user.id);
-      localStorage.setItem("userRole", data.user.role);
-//       fetchUserData(data.user.id);
-// fectUsersDatabyUserid(data.user.id)
- // ✅ Role-based logic
-      if (data.user.role === "Admin") {
-        fetchUserData(data.user.id);
-        fetchSidebarData();
-        // navigate("/");
-      } else if (data.user.role === "TeamMember") {
-        fetchUserData(data.user.id);
-        fectUsersDatabyUserid(data.user.id);
-        // navigate("/");
-      } else {
-        toast.error("You are not a valid user.");
-        setTimeout(() => navigate("/login"), 1000);
-        return;
-      }
-      // fetch emails
-      if (emailSyncEmail) {
-        const emailRes = await axios.get(
-          `${EMAIL_SYNC}/emailsync/user/login-with-token/${emailSyncEmail}`
-        );
-
-        if (emailRes.data?.redirectUrl) {
-          window.location.href = `${EMAIL_SYNC}/emailsync/auth/google`;
+        // token valid → fetch user data
+        setLoginData(data);
+        setloginsData(data.user.id);
+        localStorage.setItem("userRole", data.user.role);
+        //       fetchUserData(data.user.id);
+        // fectUsersDatabyUserid(data.user.id)
+        // ✅ Role-based logic
+        if (data.user.role === "Admin") {
+          fetchUserData(data.user.id);
+          fetchSidebarData();
+          // navigate("/");
+        } else if (data.user.role === "TeamMember") {
+          fetchUserData(data.user.id);
+          fectUsersDatabyUserid(data.user.id);
+          // navigate("/");
+        } else {
+          toast.error("You are not a valid user.");
+          setTimeout(() => navigate("/login"), 1000);
           return;
         }
-        setEmails(emailRes.data?.emails || []);
+        // fetch emails
+        if (emailSyncEmail) {
+          const emailRes = await axios.get(
+            `${EMAIL_SYNC}/emailsync/user/login-with-token/${emailSyncEmail}`
+          );
+
+          if (emailRes.data?.redirectUrl) {
+            window.location.href = `${EMAIL_SYNC}/emailsync/auth/google`;
+            return;
+          }
+          setEmails(emailRes.data?.emails || []);
+        }
+
+        setLoading(false); // finished validation
+      } catch (err) {
+        console.error("Validation failed", err);
+        // window.location.href = `${EMAIL_SYNC}/emailsync/auth/google`;
       }
+    };
 
-      setLoading(false); // finished validation
-    } catch (err) {
-      console.error("Validation failed", err);
-      // window.location.href = `${EMAIL_SYNC}/emailsync/auth/google`;
-    }
-  };
-
-  validateAndFetch();
-}, [emailSyncEmail]);
-// Call this on component mount
-useEffect(() => {
-  // validateAndFetch();
-  setData(true)
-}, []);
+    validateAndFetch();
+  }, [emailSyncEmail]);
+  // Call this on component mount
+  useEffect(() => {
+    // validateAndFetch();
+    setData(true);
+  }, []);
   const [userData, setUserData] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [username, setUsername] = useState("");
@@ -600,7 +599,7 @@ useEffect(() => {
       setPreview(`${LOGIN_API}/${transformedUrl}`);
     }
   }, [currentImage]);
-  
+
   const fetchUserData = async (id) => {
     const maxLength = 15;
     const myHeaders = new Headers();
@@ -611,7 +610,7 @@ useEffect(() => {
       redirect: "follow",
     };
     const url = `${LOGIN_API}/common/user/${id}`;
-    fetch(url , requestOptions)
+    fetch(url, requestOptions)
       .then((response) => response.json())
       .then((result) => {
         console.log("id", result);
@@ -624,7 +623,7 @@ useEffect(() => {
         }
 
         // console.log(userData)
-        setEmailSyncEmail(result.emailSyncEmail)
+        setEmailSyncEmail(result.emailSyncEmail);
         setUserid(result._id);
         setCurrentImage(result.profilePicture);
       });
@@ -643,9 +642,7 @@ useEffect(() => {
         // Store result in local storage
         localStorage.setItem("teamMemberData", JSON.stringify(result));
 
-        
         fetchSidebarData();
-       
       })
       .catch((error) => console.error(error));
   };
@@ -658,14 +655,14 @@ useEffect(() => {
     }
   };
 
-const [anchorEl, setAnchorEl] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   // const toggleDropdown = () => setDropdownOpen(!isDropdownOpen);
-   const toggleDropdown = (event) => {
+  const toggleDropdown = (event) => {
     setAnchorEl(event.currentTarget);
     setDropdownOpen(!isDropdownOpen);
   };
- const handleCloseDropdown = () => {
+  const handleCloseDropdown = () => {
     setAnchorEl(null);
     setDropdownOpen(false);
   };
@@ -704,16 +701,13 @@ const [anchorEl, setAnchorEl] = useState(null);
   const unreadHashEmailCount = Cookies.get("unreadHashEmailCount");
   console.log("Stored unread count:", unreadHashEmailCount);
 
-
-  //chek inbox email working 
-   const EMAIL_SYNC = process.env.REACT_APP_EMAILSYNC_API;
- // redirect to google login
+  //chek inbox email working
+  const EMAIL_SYNC = process.env.REACT_APP_EMAILSYNC_API;
+  // redirect to google login
   const [emails, setEmails] = useState([]);
   // const [loading, setLoading] = useState(false);
-const [fetchError, setFetchError] = useState("");
+  const [fetchError, setFetchError] = useState("");
 
-
- 
   return (
     <div className="grid-container">
       <header className="header">
@@ -744,21 +738,17 @@ const [fetchError, setFetchError] = useState("");
             <Box>
               <FaPlusCircle className="add-icon" onClick={handleDrawerOpen} />
             </Box>
-
-          
           </Box>
 
           <Box>
             <SearchComponent />
           </Box>
-         
+
           <Box
             ml={"auto"}
             mr={3}
             sx={{ display: "flex", alignItems: "center", gap: 3 }}
           >
-            
-
             <Link to="#" className="logout-link">
               <Box className="info">
                 <Box
@@ -770,7 +760,6 @@ const [fetchError, setFetchError] = useState("");
                     anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                     variant="dot"
                   >
-                    
                     <Avatar
                       src={preview || currentImage}
                       sx={{
@@ -794,155 +783,80 @@ const [fetchError, setFetchError] = useState("");
               </Box>
             </Link>
           </Box>
-          {/* {isDropdownOpen && (
-            
+       
+          <Popover
+            open={isDropdownOpen}
+            anchorEl={anchorEl}
+            onClose={handleCloseDropdown}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "left",
+            }}
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "left",
+            }}
+            sx={{ mt: 2 }}
+          >
             <Box
               sx={{
-                position: "absolute",
-                top: "100px",
-                right: "20px",
-                width: "250px",
-                backgroundColor: "#fff",
-                border: "1px solid #ddd",
-                borderRadius: "10px",
-                boxShadow: "0px 6px 12px rgba(0, 0, 0, 0.1)",
-                zIndex: 10,
-                overflow: "hidden",
+                padding: "16px",
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
               }}
             >
-              <Box
-                sx={{
-                  padding: "16px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "12px",
-                }}
+              <StyledBadge
+                overlap="circular"
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                variant="dot"
               >
-                <StyledBadge
-                  overlap="circular"
-                  anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                  variant="dot"
-                >
-                  <Avatar
-                    src={preview || currentImage}
-                    sx={{
-                      width: 40,
-                      height: 40,
-                      border: "2px solid #eee",
-                    }}
-                  />
-                </StyledBadge>
-                <Box>
-                  <Typography
-                    sx={{ fontWeight: "600", fontSize: "13px", color: "#333" }}
-                  >
-                    {username}
-                  </Typography>
-                  <Typography sx={{ fontSize: "11px", color: "#777" }}>
-                    {userEmail}
-                  </Typography>
-                </Box>
-              </Box>
-
-              <Box sx={{ borderTop: "1px solid #eee" }} />
-
-              <Box sx={{ padding: "14px" }}>
-                <Box
+                <Avatar
+                  src={preview || currentImage}
                   sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "10px",
-                    cursor: "pointer",
-                    color: "red",
-                    fontWeight: "500",
-                    padding: "8px",
-                    borderRadius: "6px",
-                    transition: "background 0.3s",
-                    "&:hover": {
-                      backgroundColor: "#f8d7da",
-                    },
+                    width: 40,
+                    height: 40,
+                    border: "2px solid #eee",
                   }}
-                  onClick={logoutuser}
+                />
+              </StyledBadge>
+              <Box>
+                <Typography
+                  sx={{ fontWeight: "600", fontSize: "13px", color: "#333" }}
                 >
-                  <AiOutlineLogout size={18} />
-                  <Typography sx={{ fontSize: "13px" }}>Log out</Typography>
-                </Box>
+                  {username}
+                </Typography>
+                <Typography sx={{ fontSize: "11px", color: "#777" }}>
+                  {userEmail}
+                </Typography>
               </Box>
             </Box>
-          )} */}
-           <Popover
-                                open={isDropdownOpen}
-                                anchorEl={anchorEl}
-                                onClose={handleCloseDropdown}
-                                anchorOrigin={{
-                                  vertical: "bottom",
-                                  horizontal: "left",
-                                }}
-                                transformOrigin={{
-                                  vertical: "top",
-                                  horizontal: "left",
-                                }}
-                                sx={{mt:2}}
-                              >
-                               <Box
+
+            <Box sx={{ borderTop: "1px solid #eee" }} />
+
+            <Box sx={{ padding: "14px" }}>
+              <Box
                 sx={{
-                  padding: "16px",
                   display: "flex",
                   alignItems: "center",
-                  gap: "12px",
+                  gap: "10px",
+                  cursor: "pointer",
+                  color: "red",
+                  fontWeight: "500",
+                  padding: "8px",
+                  borderRadius: "6px",
+                  transition: "background 0.3s",
+                  "&:hover": {
+                    backgroundColor: "#f8d7da",
+                  },
                 }}
+                onClick={logoutuser}
               >
-                <StyledBadge
-                  overlap="circular"
-                  anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                  variant="dot"
-                >
-                  <Avatar
-                    src={preview || currentImage}
-                    sx={{
-                      width: 40,
-                      height: 40,
-                      border: "2px solid #eee",
-                    }}
-                  />
-                </StyledBadge>
-                <Box>
-                  <Typography
-                    sx={{ fontWeight: "600", fontSize: "13px", color: "#333" }}
-                  >
-                    {username}
-                  </Typography>
-                  <Typography sx={{ fontSize: "11px", color: "#777" }}>
-                    {userEmail}
-                  </Typography>
-                </Box>
+                <AiOutlineLogout size={18} />
+                <Typography sx={{ fontSize: "13px" }}>Log out</Typography>
               </Box>
-
-              <Box sx={{ borderTop: "1px solid #eee" }} />
-
-              <Box sx={{ padding: "14px" }}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "10px",
-                    cursor: "pointer",
-                    color: "red",
-                    fontWeight: "500",
-                    padding: "8px",
-                    borderRadius: "6px",
-                    transition: "background 0.3s",
-                    "&:hover": {
-                      backgroundColor: "#f8d7da",
-                    },
-                  }}
-                  onClick={logoutuser}
-                >
-                  <AiOutlineLogout size={18} />
-                  <Typography sx={{ fontSize: "13px" }}>Log out</Typography>
-                </Box>
-              </Box>
-                              </Popover>
+            </Box>
+          </Popover>
         </Box>
       </header>
 
@@ -973,18 +887,21 @@ const [fetchError, setFetchError] = useState("");
               gap: 1,
             }}
           >
-            <img
-              src={Logo}
-              alt="logo"
-              style={{ height: "40px", display: "block" }}
-            />
-            {!isCollapsed && (
-              <Typography variant="h5" className="company-name-text">
-                SNP
-              </Typography>
-            )}
+            
+             {isCollapsed ? (
+    <img
+      src={Logo}
+      alt="logo"
+      style={{ height: "40px", display: "block" }}
+    />
+  ) : (
+    <img
+      src={FullLogo}
+      alt="logo"
+      style={{ height: "60px", display: "block" ,width:'90%'}}
+    />
+  )}
           </Box>
-         
 
           <Box
             className="sidebar-contents"
@@ -1117,8 +1034,6 @@ const [fetchError, setFetchError] = useState("");
                 );
               })}
             </List>
-
-          
           </Box>
         </Box>
       </aside>
@@ -1203,7 +1118,6 @@ const [fetchError, setFetchError] = useState("");
               </ListItem>
             ))}
           </List>
-          
         </Box>
       </Drawer>
       <Drawer
@@ -1221,12 +1135,11 @@ const [fetchError, setFetchError] = useState("");
             }}
           ></Box>
           {rightDrawerContent === "Account" && (
-           
             <AccountDrawer
-               handleNewDrawerClose={handleNewDrawerClose}
+              handleNewDrawerClose={handleNewDrawerClose}
               handleDrawerClose={handleDrawerClose}
               // onClose={handleCloseDrawers}
-              />
+            />
           )}
           {rightDrawerContent === "Contact" && (
             <ContactForm
@@ -1262,13 +1175,13 @@ const [fetchError, setFetchError] = useState("");
         handleDrawerClose={handleDrawerClose}
       />
 
-<InvoiceDrawer
-  isDrawerOpen={isInvoiceDrawerOpen}
-  setDrawerOpen={setIsInvoiceDrawerOpen}
-  selectedAccount={selectedAccount}
-  handleDrawerClose={() => setIsInvoiceDrawerOpen(false)}
-  leftsidebarDrawer={handleDrawerClose}
-/>
+      <InvoiceDrawer
+        isDrawerOpen={isInvoiceDrawerOpen}
+        setDrawerOpen={setIsInvoiceDrawerOpen}
+        selectedAccount={selectedAccount}
+        handleDrawerClose={() => setIsInvoiceDrawerOpen(false)}
+        leftsidebarDrawer={handleDrawerClose}
+      />
       <OrganizerDialog
         open={isOrganizerDialogOpen}
         onClose={() => setIsOrganizerDialogOpen(false)}

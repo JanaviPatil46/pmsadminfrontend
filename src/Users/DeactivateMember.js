@@ -404,7 +404,7 @@ const DeactivateMember = () => {
         {/* Pagination */}
       </TableContainer>
       <TablePagination
-      rowsPerPageOptions={[30,40,50,60,100]}
+        rowsPerPageOptions={[30, 40, 50, 60, 100]}
         component="div"
         count={teamMembers.length}
         rowsPerPage={rowsPerPage}
