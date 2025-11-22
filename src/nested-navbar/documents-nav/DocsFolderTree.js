@@ -414,7 +414,7 @@ const DocsFolderTree = () => {
     // 🗑️ Delete File or Folder (Universal)
     const deleteItem = async (item) => {
       if (!item?.path) return alert("Invalid path");
-
+console.log("delete path", item.path);
       const confirmDelete = window.confirm(
         `Are you sure you want to delete "${item.name}"? This cannot be undone!`
       );

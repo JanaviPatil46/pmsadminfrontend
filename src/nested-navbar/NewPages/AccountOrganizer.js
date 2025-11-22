@@ -37,42 +37,114 @@ const AccountOrganizer = () => {
   };
 
   const [accountData, setAccountData] = useState([]);
-  const fetchAccountsData = async () => {
-    try {
-      // const url = `${ACCOUNT_API}/accounts/account/accountdetailslist/`;
-       const response = await fetch("https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true")
-      // const response = await fetch(url);
-      const result = await response.json();
-console.log("accounts result",result)
-      if (Array.isArray(result.accounts)) {
-        setAccountData(result.accounts);
-        // console.log(result.accounts);
+//   const fetchAccountsData = async () => {
+//     try {
+//       // const url = `${ACCOUNT_API}/accounts/account/accountdetailslist/`;
+//        const response = await fetch("https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true")
+//       // const response = await fetch(url);
+//       const result = await response.json();
+// console.log("accounts result",result)
+//       if (Array.isArray(result.accounts)) {
+//         setAccountData(result.accounts);
+//         // console.log(result.accounts);
 
-        // Assuming `data` contains the selected account ID(s) as a string or array of IDs
+//         // Assuming `data` contains the selected account ID(s) as a string or array of IDs
 
-        const selectedAccounts = result.accounts
-          .filter((account) => (Array.isArray(data) ? data.includes(account._id) : account._id === data))
-          .map((selectedAccount) => ({
-            label: selectedAccount.accountName,
-            value: selectedAccount._id,
-          }));
+//         const selectedAccounts = result.accounts
+//           .filter((account) => (Array.isArray(data) ? data.includes(account._id) : account._id === data))
+//           .map((selectedAccount) => ({
+//             label: selectedAccount.accountName,
+//             value: selectedAccount._id,
+//           }));
 
-        if (selectedAccounts.length > 0) {
-          setSelectedAccount(selectedAccounts);
-        } else {
-          setSelectedAccount([]); // Clear if no matching accounts found
-        }
-      } else {
-        console.error("Account list is not an array", result.accountlist);
-      }
-    } catch (error) {
-      console.log("Error:", error);
+//         if (selectedAccounts.length > 0) {
+//           setSelectedAccount(selectedAccounts);
+//         } else {
+//           setSelectedAccount([]); // Clear if no matching accounts found
+//         }
+//       } else {
+//         console.error("Account list is not an array", result.accountlist);
+//       }
+//     } catch (error) {
+//       console.log("Error:", error);
+//     }
+//   };
+//  const AccountsOptions = (accountData || []).map((account) => ({
+//     value: account.id,
+//     label: account.Name,
+//   }));
+useEffect(() => {
+  fetchAccountsData();
+}, []);
+
+const fetchAccountsData = async () => {
+  try {
+    const storedUserRole = localStorage.getItem("userRole");
+    const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
+    const loginuserid = storedData?.teammember?.userid;
+    const viewAllAccounts = storedData?.teammember?.viewallAccounts;
+
+    let url = "";
+
+    // === ROLE-BASED URL LOGIC ===
+    if (storedUserRole === "Admin") {
+      url =
+        "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true";
+    } else {
+      url =
+        viewAllAccounts === true
+          ? "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true"
+          : `https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=true`;
     }
-  };
- const AccountsOptions = (accountData || []).map((account) => ({
-    value: account.id,
-    label: account.Name,
-  }));
+
+    console.log("Fetching accounts from:", url);
+
+    const response = await fetch(url);
+    const result = await response.json();
+
+    console.log("accounts result", result);
+
+    // Normalize for both API responses
+    const accounts =
+      result.accounts ||
+      result.accountlist ||
+      result.teamAccounts ||
+      [];
+
+    if (Array.isArray(accounts)) {
+      setAccountData(accounts);
+
+      // Handle selected data (account ID or multiple IDs)
+      const selectedAccounts = accounts
+        .filter((account) =>
+          Array.isArray(data)
+            ? data.includes(account._id)
+            : account._id === data
+        )
+        .map((selectedAccount) => ({
+          label: selectedAccount.accountName,
+          value: selectedAccount._id,
+        }));
+
+      if (selectedAccounts.length > 0) {
+        setSelectedAccount(selectedAccounts);
+      } else {
+        setSelectedAccount([]); 
+      }
+    } else {
+      console.error("Account list is not an array", result.accounts);
+    }
+  } catch (error) {
+    console.log("Error:", error);
+  }
+};
+
+// Dropdown Options
+const AccountsOptions = (accountData || []).map((account) => ({
+  value: account._id,
+  label: account.accountName,
+}));
+
   const handleOrganizerTemplateChange = (event) => {
     const selectedValue = event.target.value;
     setSelectedOrganizerTemplate(selectedValue);

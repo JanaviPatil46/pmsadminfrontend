@@ -61,7 +61,7 @@ const SearchComponent = () => {
         }),
       ]);
 
-      const accountsData = accountsResponse.data.accounts || [];
+      const accountsData = accountsResponse.data.accountlist || [];
       const contactsData = contactsResponse.data.data || [];
 // console.log("Accounts Data:", accountsData);
 console.log("Contacts Data:", contactsData);

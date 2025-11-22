@@ -610,7 +610,397 @@ export default function AccountContactForm({
     fetchAccountsList();
   }, [filterStatus, userRole]);
 
-  const handleSubmit = async (event, personalMessage = "") => {
+  // const handleSubmit = async (event, personalMessage = "") => {
+  //   if (event) event.preventDefault();
+
+  //   // Your existing validation code
+  //   let isValid = true;
+  //   if (!accountData.accountName?.trim()) {
+  //     toast.warning("Account Name is required");
+  //     setActiveStep(0);
+  //     isValid = false;
+  //     return;
+  //   }
+
+  //   if (
+  //     accountData.clientType === "Company" &&
+  //     !accountData.companyName?.trim()
+  //   ) {
+  //     toast.warning("Company Name is required");
+  //     setActiveStep(0);
+  //     isValid = false;
+  //     return;
+  //   }
+
+  //   if (!accountData.folderTemp) {
+  //     toast.warning("Folder Template is required");
+  //     setActiveStep(0);
+  //     isValid = false;
+  //     return;
+  //   }
+
+  //   const allContacts = [...contacts, ...selectedContacts];
+  //   if (allContacts.length === 0) {
+  //     toast.warning("At least one contact is required");
+  //     setActiveStep(1);
+  //     isValid = false;
+  //     return;
+  //   }
+
+  //   for (let contact of allContacts) {
+  //     if (
+  //       !contact.firstName?.trim() ||
+  //       !contact.lastName?.trim() ||
+  //       !contact.email?.trim()
+  //     ) {
+  //       toast.warning(
+  //         "All contacts must have First Name, Last Name, and Email"
+  //       );
+  //       setActiveStep(1);
+  //       isValid = false;
+  //       return;
+  //     }
+  //   }
+
+  //   if (!isValid) return;
+
+  //   try {
+  //     // STEP 1: Check for duplicate emails
+  //     const allContactEmails = [
+  //       ...contacts.map((c) => c.email?.toLowerCase().trim()),
+  //       ...selectedContacts.map((c) => c.email?.toLowerCase().trim()),
+  //     ].filter((email) => email);
+
+  //     const duplicateEmails = allContactEmails.filter(
+  //       (email, index) => allContactEmails.indexOf(email) !== index
+  //     );
+
+  //     if (duplicateEmails.length > 0) {
+  //       toast.error(`Duplicate emails found: ${duplicateEmails.join(", ")}`);
+  //       return;
+  //     }
+
+  //     // STEP 2: Check if account name already exists (only for new accounts)
+  //     if (!isEditing) {
+  //       try {
+  //         console.log(
+  //           "Checking if account name exists:",
+  //           accountData.accountName
+  //         );
+
+  //         // Try method 1: Direct API check
+  //         const checkResponse = await axios.get(
+  //           `https://www.snptaxes.com/api/accounts/check-name/${encodeURIComponent(accountData.accountName.trim())}`
+  //         );
+
+  //         console.log("Check response:", checkResponse.data);
+
+  //         // If account name exists, show error and return
+  //         if (checkResponse.data.exists === true) {
+  //           toast.error(
+  //             `Account name "${accountData.accountName}" already exists. Please use a different account name.`
+  //           );
+  //           setActiveStep(0);
+  //           return;
+  //         }
+  //       } catch (checkError) {
+  //         console.log(
+  //           "Check endpoint failed, trying alternative method:",
+  //           checkError
+  //         );
+
+  //         // Alternative method: Get all accounts and check manually
+  //         try {
+  //           const allAccountsResponse = await axios.get(
+  //             "https://www.snptaxes.com/api/accounts"
+  //           );
+  //           const existingAccount = allAccountsResponse.data.find(
+  //             (account) =>
+  //               account.accountName?.toLowerCase().trim() ===
+  //               accountData.accountName.toLowerCase().trim()
+  //           );
+
+  //           if (existingAccount) {
+  //             toast.error(
+  //               `Account name "${accountData.accountName}" already exists. Please use a different account name.`
+  //             );
+  //             setActiveStep(0);
+  //             return;
+  //           }
+  //         } catch (searchError) {
+  //           console.warn(
+  //             "Both account check methods failed, proceeding with creation:",
+  //             searchError
+  //           );
+  //         }
+  //       }
+  //     }
+
+  //     // STEP 3: Create Contacts FIRST
+  //     const contactsWithActivation = [];
+  //     const createdContacts = []; // Store full contact objects with IDs
+  //     const updatedContacts = [...contacts];
+
+  //     // Create new contacts
+  //     for (let i = 0; i < contacts.length; i++) {
+  //       let contact = contacts[i];
+  //       if (contact.firstName || contact.lastName || contact.email) {
+  //         let payload = {
+  //           firstName: contact.firstName,
+  //           lastName: contact.lastName,
+  //           email: contact.email,
+  //           contactName:
+  //             contact.contactName || `${contact.firstName} ${contact.lastName}`,
+  //           companyName: contact.companyName || "",
+  //           note: contact.note || "",
+  //           tags: contact.tags ? contact.tags.map((tag) => tag.value) : [],
+  //           country: contact.country ? { name: contact.country.label } : {},
+  //           streetAddress: contact.streetAddress || "",
+  //           city: contact.city || "",
+  //           state: contact.state || "",
+  //           postalCode: contact.postalCode || "",
+  //           phoneNumbers: contact.phoneNumbers || [],
+  //           login: contact.login || false,
+  //           active: true,
+  //         };
+
+  //         if (contact.login) {
+  //           contactsWithActivation.push(contact);
+  //           delete payload.password;
+  //         } else {
+  //           delete payload.password;
+  //         }
+
+  //         try {
+  //           const resp = await axios.post(
+  //             "https://www.snptaxes.com/api/contacts",
+  //             payload
+  //           );
+  //           createdContacts.push(resp.data); // Store the full created contact
+  //           updatedContacts[i] = { ...contact, _id: resp.data._id };
+  //         } catch (contactError) {
+  //           if (contactError.response?.status === 409) {
+  //             toast.error(
+  //               `Contact email "${contact.email}" already exists. Please use a different email.`
+  //             );
+  //             throw contactError;
+  //           } else {
+  //             throw contactError;
+  //           }
+  //         }
+  //       }
+  //     }
+
+  //     // STEP 4: Prepare ALL contacts for account creation
+  //     const allContactsForAccount = [
+  //       ...createdContacts, // Newly created contacts with _id
+  //       ...selectedContacts, // Existing contacts with _id
+  //     ];
+
+  //     // Create the contacts array for account schema
+  //     const accountContacts = allContactsForAccount.map((contact) => {
+  //       const originalContact = [...contacts, ...selectedContacts].find(
+  //         (c) => c.email === contact.email
+  //       );
+
+  //       return {
+  //         contact: contact._id,
+  //         canLogin: originalContact?.login || false,
+  //         canNotify: originalContact?.notify || false,
+  //         canEmailSync: originalContact?.emailSync || false,
+  //       };
+  //     });
+
+  //     console.log("Account contacts to be created:", accountContacts);
+
+  //     // STEP 5: Create Account with ALL contacts
+  //     const accountPayload = {
+  //       accountName: accountData.accountName,
+  //       clientType: accountData.clientType,
+  //       companyName: accountData.companyName || "",
+  //       teamMember: accountData.teamMembers
+  //         ? accountData.teamMembers.map((member) => member.value)
+  //         : [],
+  //       tags: accountData.tags ? accountData.tags.map((tag) => tag.value) : [],
+  //       folderTemp: accountData.folderTemp
+  //         ? accountData.folderTemp.value
+  //         : null,
+  //       country: accountData.country ? { name: accountData.country.label } : {},
+  //       streetAddress: accountData.streetAddress || "",
+  //       city: accountData.city || "",
+  //       state: accountData.state || "",
+  //       postalCode: accountData.postalCode || "",
+  //       adminUserId: loginUserId || "",
+  //       contacts: accountContacts, // This should now include ALL contacts
+  //       active: true,
+  //     };
+
+  //     console.log("Final account payload:", accountPayload);
+
+  //     let account;
+  //     let finalAccountId;
+
+  //     try {
+  //       // Create or Update Account
+  //       if (isEditing && accountId) {
+  //         const { data } = await axios.put(
+  //           `https://www.snptaxes.com/api/accounts/${accountId}`,
+  //           accountPayload
+  //         );
+  //         account = data;
+  //         finalAccountId = accountId;
+  //       } else {
+  //         const { data } = await axios.post(
+  //           "https://www.snptaxes.com/api/accounts",
+  //           accountPayload
+  //         );
+  //         account = data;
+  //         finalAccountId = account._id;
+  //       }
+
+  //       console.log("Account created with ID:", finalAccountId);
+  //       console.log("Account contacts after creation:", account.contacts);
+  //     } catch (accountError) {
+  //       console.error("Account creation error:", accountError);
+
+  //       // Handle account creation/update errors specifically
+  //       if (
+  //         accountError.response?.status === 409 ||
+  //         accountError.response?.status === 400
+  //       ) {
+  //         const errorMessage =
+  //           accountError.response?.data?.message ||
+  //           accountError.response?.data?.error ||
+  //           JSON.stringify(accountError.response?.data);
+
+  //         console.log("Account error message:", errorMessage);
+
+  //         if (
+  //           errorMessage?.toLowerCase().includes("unique") ||
+  //           errorMessage?.toLowerCase().includes("already exists") ||
+  //           errorMessage?.toLowerCase().includes("duplicate")
+  //         ) {
+  //           toast.error(
+  //             `Account name "${accountData.accountName}" already exists. Please use a different account name.`
+  //           );
+  //           setActiveStep(0);
+
+  //           // Clean up created contacts if account creation fails due to duplicate name
+  //           if (createdContacts.length > 0) {
+  //             console.warn(
+  //               "Cleaning up created contacts due to account creation failure"
+  //             );
+  //             for (let contact of createdContacts) {
+  //               try {
+  //                 await axios.delete(
+  //                   `https://www.snptaxes.com/api/contacts/${contact._id}`
+  //                 );
+  //                 console.log("Cleaned up contact:", contact._id);
+  //               } catch (deleteError) {
+  //                 console.error("Failed to cleanup contact:", deleteError);
+  //               }
+  //             }
+  //           }
+  //           return;
+  //         }
+  //       }
+
+  //       // If we get here, it's a different error - show generic message
+  //       toast.error("Failed to create account. Please try again.");
+  //       throw accountError;
+  //     }
+
+  //     // STEP 6: Update Contacts with accountId (for backward compatibility)
+  //     const allContactIdsToUpdate = [
+  //       ...createdContacts.map((c) => c._id),
+  //       ...selectedContacts.map((c) => c._id),
+  //     ];
+
+  //     for (let contactId of allContactIdsToUpdate) {
+  //       try {
+  //         const contact = allContactsForAccount.find(
+  //           (c) => c._id === contactId
+  //         );
+  //         const currentAccountIds = contact?.accountIds || [];
+
+  //         // Only update if accountId is not already set
+  //         if (!currentAccountIds.includes(finalAccountId)) {
+  //           await axios.put(
+  //             `https://www.snptaxes.com/api/contacts/${contactId}`,
+  //             {
+  //               accountIds: [...currentAccountIds, finalAccountId],
+  //               accountId: finalAccountId,
+  //             }
+  //           );
+  //           console.log(`Updated contact ${contactId} with account ID`);
+  //         }
+  //       } catch (updateError) {
+  //         console.error(`Failed to update contact ${contactId}:`, updateError);
+  //       }
+  //     }
+
+  //     // STEP 7: Verify the account was created with contacts
+  //     try {
+  //       const verifyResponse = await axios.get(
+  //         `https://www.snptaxes.com/api/accounts/${finalAccountId}`
+  //       );
+  //       console.log("Verified account contacts:", verifyResponse.data.contacts);
+
+  //       if (
+  //         !verifyResponse.data.contacts ||
+  //         verifyResponse.data.contacts.length === 0
+  //       ) {
+  //         console.warn("Account was created but contacts array is empty!");
+  //         // Fallback: Update account with contacts again
+  //         await axios.put(
+  //           `https://www.snptaxes.com/api/accounts/${finalAccountId}`,
+  //           { contacts: accountContacts }
+  //         );
+  //       }
+  //     } catch (verifyError) {
+  //       console.error("Error verifying account:", verifyError);
+  //     }
+
+  //     // STEP 8: Handle folder template assignment
+  //     if (accountData.folderTemp && accountData.folderTemp.value) {
+  //       await assignfoldertemp(finalAccountId, accountData.folderTemp.value);
+  //     }
+
+  //     toast.success("Account and contacts saved successfully!");
+
+  //     // if (onCloseDrawer) {
+  //     //   onCloseDrawer();
+  //     //   fetchAccountsList();
+
+  //     // } else if (handleNewDrawerClose) {
+  //     //   handleNewDrawerClose();
+  //     // }
+  //     // handleNewDrawerClose()
+
+  //     // if (handleNewDrawerClose) {
+  //     //   handleNewDrawerClose();
+  //     // } else {
+  //       if (onCloseDrawer) {
+  //       onCloseDrawer();
+  //     } else {
+  //       handleDrawerClose();
+  //       handleNewDrawerClose();
+  //     }
+  //     // }
+  //     // fetchAccountsList();
+  //   } catch (err) {
+  //     console.error("Error saving account:", err);
+
+  //     if (err.response?.status === 409) {
+  //       // Email conflict error - already handled above
+  //     } else if (err.response?.data?.error) {
+  //       toast.error(`Failed to save: ${err.response.data.error}`);
+  //     } else {
+  //       toast.error("Failed to save account and contacts. Please try again.");
+  //     }
+  //   }
+  // };
+const handleSubmit = async (event, personalMessage = "") => {
     if (event) event.preventDefault();
 
     // Your existing validation code
@@ -831,7 +1221,7 @@ export default function AccountContactForm({
         state: accountData.state || "",
         postalCode: accountData.postalCode || "",
         adminUserId: loginUserId || "",
-        contacts: accountContacts, // This should now include ALL contacts
+        contacts: accountContacts, 
         active: true,
       };
 
@@ -863,7 +1253,6 @@ export default function AccountContactForm({
       } catch (accountError) {
         console.error("Account creation error:", accountError);
 
-        // Handle account creation/update errors specifically
         if (
           accountError.response?.status === 409 ||
           accountError.response?.status === 400
@@ -872,8 +1261,6 @@ export default function AccountContactForm({
             accountError.response?.data?.message ||
             accountError.response?.data?.error ||
             JSON.stringify(accountError.response?.data);
-
-          console.log("Account error message:", errorMessage);
 
           if (
             errorMessage?.toLowerCase().includes("unique") ||
@@ -885,17 +1272,12 @@ export default function AccountContactForm({
             );
             setActiveStep(0);
 
-            // Clean up created contacts if account creation fails due to duplicate name
             if (createdContacts.length > 0) {
-              console.warn(
-                "Cleaning up created contacts due to account creation failure"
-              );
               for (let contact of createdContacts) {
                 try {
                   await axios.delete(
                     `https://www.snptaxes.com/api/contacts/${contact._id}`
                   );
-                  console.log("Cleaned up contact:", contact._id);
                 } catch (deleteError) {
                   console.error("Failed to cleanup contact:", deleteError);
                 }
@@ -905,12 +1287,11 @@ export default function AccountContactForm({
           }
         }
 
-        // If we get here, it's a different error - show generic message
         toast.error("Failed to create account. Please try again.");
         throw accountError;
       }
 
-      // STEP 6: Update Contacts with accountId (for backward compatibility)
+      // STEP 6: Update Contacts with accountId
       const allContactIdsToUpdate = [
         ...createdContacts.map((c) => c._id),
         ...selectedContacts.map((c) => c._id),
@@ -923,7 +1304,6 @@ export default function AccountContactForm({
           );
           const currentAccountIds = contact?.accountIds || [];
 
-          // Only update if accountId is not already set
           if (!currentAccountIds.includes(finalAccountId)) {
             await axios.put(
               `https://www.snptaxes.com/api/contacts/${contactId}`,
@@ -932,26 +1312,22 @@ export default function AccountContactForm({
                 accountId: finalAccountId,
               }
             );
-            console.log(`Updated contact ${contactId} with account ID`);
           }
         } catch (updateError) {
           console.error(`Failed to update contact ${contactId}:`, updateError);
         }
       }
 
-      // STEP 7: Verify the account was created with contacts
+      // STEP 7: Verify account
       try {
         const verifyResponse = await axios.get(
           `https://www.snptaxes.com/api/accounts/${finalAccountId}`
         );
-        console.log("Verified account contacts:", verifyResponse.data.contacts);
 
         if (
           !verifyResponse.data.contacts ||
           verifyResponse.data.contacts.length === 0
         ) {
-          console.warn("Account was created but contacts array is empty!");
-          // Fallback: Update account with contacts again
           await axios.put(
             `https://www.snptaxes.com/api/accounts/${finalAccountId}`,
             { contacts: accountContacts }
@@ -961,6 +1337,45 @@ export default function AccountContactForm({
         console.error("Error verifying account:", verifyError);
       }
 
+      // ⭐⭐⭐ ADDED BLOCK — STEP 7.5 ⭐⭐⭐
+      // Send activation email ONLY for newly selected contacts (not form contacts)
+      try {
+        console.log("Checking newly selected contacts for activation emails...");
+
+        // 1. Re-fetch updated account to get current linked contacts
+        const accRes = await axios.get(
+          `https://www.snptaxes.com/api/accounts/${finalAccountId}`
+        );
+        const updatedAcc = accRes.data;
+
+        // 2. Get IDs already linked to account
+        const existingLinkedIds =
+          updatedAcc.contacts?.map((c) => c.contact) || [];
+
+        // 3. Find newly selected contacts (only from selectedContacts[])
+        const newSelectedContacts = selectedContacts.filter(
+          (sc) => !existingLinkedIds.includes(sc._id)
+        );
+
+        // 4. Filter only those with login = true
+        const activationTargets = newSelectedContacts.filter(
+          (c) => c.login === true
+        );
+
+        console.log(
+          "New selected contacts needing activation:",
+          activationTargets
+        );
+
+        // 5. Send activation email for each
+        for (let contact of activationTargets) {
+          await sendActivationEmail({ contact });
+        }
+      } catch (error) {
+        console.error("Activation email sending failed:", error);
+      }
+      // ⭐⭐⭐ END — STEP 7.5 ⭐⭐⭐
+
       // STEP 8: Handle folder template assignment
       if (accountData.folderTemp && accountData.folderTemp.value) {
         await assignfoldertemp(finalAccountId, accountData.folderTemp.value);
@@ -968,26 +1383,13 @@ export default function AccountContactForm({
 
       toast.success("Account and contacts saved successfully!");
 
-      // if (onCloseDrawer) {
-      //   onCloseDrawer();
-      //   fetchAccountsList();
-
-      // } else if (handleNewDrawerClose) {
-      //   handleNewDrawerClose();
-      // }
-      // handleNewDrawerClose()
-
-      // if (handleNewDrawerClose) {
-      //   handleNewDrawerClose();
-      // } else {
-        if (onCloseDrawer) {
+      if (onCloseDrawer) {
         onCloseDrawer();
       } else {
         handleDrawerClose();
         handleNewDrawerClose();
       }
-      // }
-      // fetchAccountsList();
+
     } catch (err) {
       console.error("Error saving account:", err);
 
@@ -1000,7 +1402,25 @@ export default function AccountContactForm({
       }
     }
   };
-
+ // Send activation email function
+  const sendActivationEmail = async (contact) => {
+    // console.log("contact",contact)
+    const ContactId = contact.contact._id;
+    try {
+      const response = await axios.post(
+        `https://www.snptaxes.com/api/contacts/${ContactId}/resend-activation`,
+        {
+          email: contact.contact.email,
+          contactId: ContactId,
+        }
+      );
+      console.log("Activation email sent successfully:", response.data);
+      return true;
+    } catch (error) {
+      console.error("Error sending activation email:", error);
+      return false;
+    }
+  };
   // const handleSubmit = async (event, personalMessage = "") => {
   //   if (event) event.preventDefault();
   //   let isValid = true;

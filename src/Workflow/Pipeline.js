@@ -119,6 +119,7 @@ const Pipeline = ({ charLimit = 4000 }) => {
   };
   const handleDrawerClose = () => {
     setIsDrawerOpen(false);
+    fetchJobData()
   };
   const handleEditDrawerOpen = () => {
     setIsEditDrawerOpen(true);
@@ -267,53 +268,92 @@ const Pipeline = ({ charLimit = 4000 }) => {
 
         const accountIds = accountsData.map((account) => account._id).join(",");
         url = `${JOBS_API}/workflow/jobs/job/joblist/list/true/${accountIds}`;
-      } else if (userRole === "TeamMember") {
-        if (viewAllAccounts) {
-          // TeamMember with full access gets all jobs
-          // url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}`;
-          // ✅ Fetch active accounts first
-          const accountsResponse = await axios.get(
-            `${ACCOUNT_API}/accounts/account/accountdetailslist/${isActiveTrue}`
-          );
+      } 
+      
+      // else if (userRole === "TeamMember") {
+      //   if (viewAllAccounts) {
+      //     // TeamMember with full access gets all jobs
+      //     // url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}`;
+      //     // ✅ Fetch active accounts first
+      //     const accountsResponse = await axios.get(`https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=${filterStatus === "active"}`);
+      //         const accountsData = accountsResponse.data.accountlist;
+      //     console.log("Admin accounts fetched:", accountsData);
 
-          const accountsData = accountsResponse.data.accountlist;
-          console.log("Admin accounts fetched:", accountsData);
+      //     if (!accountsData || accountsData.length === 0) {
+      //       console.warn("No active accounts found for Admin.");
+      //       setJobs([]);
+      //       await loaderDelay;
+      //       setLoading(false);
+      //       return;
+      //     }
 
-          if (!accountsData || accountsData.length === 0) {
-            console.warn("No active accounts found for Admin.");
-            setJobs([]);
-            await loaderDelay;
-            setLoading(false);
-            return;
-          }
+      //     const accountIds = accountsData
+      //       .map((account) => account._id)
+      //       .join(",");
+      //     url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
+      //   } else {
+      //     // TeamMember with restricted access → fetch user's accounts
+      //     const accountsResponse = await axios.get(
+      //       `${ACCOUNT_API}/accounts/getaccounts/${loginuserid}/${isActiveTrue}`
+      //     );
 
-          const accountIds = accountsData
-            .map((account) => account.id)
-            .join(",");
-          url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
-        } else {
-          // TeamMember with restricted access → fetch user's accounts
-          const accountsResponse = await axios.get(
-            `${ACCOUNT_API}/accounts/getaccounts/${loginuserid}/${isActiveTrue}`
-          );
+      //     const accountsData = accountsResponse.data.accountlist;
+      //     console.log("Accounts fetched:", accountsData);
 
-          const accountsData = accountsResponse.data.accountlist;
-          console.log("Accounts fetched:", accountsData);
+      //     if (!accountsData || accountsData.length === 0) {
+      //       console.warn("No accounts found for user.");
+      //       setJobs([]);
+      //       await loaderDelay;
+      //       setLoading(false);
+      //       return;
+      //     }
 
-          if (!accountsData || accountsData.length === 0) {
-            console.warn("No accounts found for user.");
-            setJobs([]);
-            await loaderDelay;
-            setLoading(false);
-            return;
-          }
+      //     const accountIds = accountsData
+      //       .map((account) => account.id)
+      //       .join(",");
+      //     url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
+      //   }
+      // }
+else if (userRole === "TeamMember") {
 
-          const accountIds = accountsData
-            .map((account) => account.id)
-            .join(",");
-          url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
-        }
-      }
+  let accountsData = [];
+
+  if (viewAllAccounts) {
+    // 🔹 TeamMember WITH view all access → fetch ALL active accounts
+    const accountsResponse = await axios.get(
+      `https://www.snptaxes.com/api/accounts/list?active=${filterStatus === "active"}`
+    );
+
+    accountsData = accountsResponse.data.accountlist;
+    console.log("TeamMember (view all) accounts:", accountsData);
+
+  } else {
+    // 🔹 TeamMember WITHOUT view all access → fetch assigned accounts only
+    const accountsResponse = await axios.get(
+      `https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=${filterStatus === "active"}`
+    );
+
+    accountsData = accountsResponse.data.accountlist;
+    console.log("TeamMember assigned accounts:", accountsData);
+  }
+
+  // 🔹 Validate accounts
+  if (!accountsData || accountsData.length === 0) {
+    console.warn("No accounts found for TeamMember.");
+    setJobs([]);
+    await loaderDelay;
+    setLoading(false);
+    return;
+  }
+
+  // 🔹 Map account IDs
+  const accountIds = accountsData.map((account) => account._id).join(",");
+
+  // 🔹 Prepare URL for jobs
+  url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
+
+  console.log("TeamMember Job Fetch URL:", url);
+}
 
       if (!url) {
         await loaderDelay;

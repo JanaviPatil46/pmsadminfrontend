@@ -432,30 +432,79 @@ const Invoices = ({ charLimit = 4000 }) => {
     setSelectedaccount(newValue);
   };
 
-  useEffect(() => {
-    fetchAccountData();
-  }, []);
+  // useEffect(() => {
+  //   fetchAccountData();
+  // }, []);
 
-  const fetchAccountData = async () => {
-    try {
-      // const response = await fetch(
-      //   `${ACCOUNT_API}/accounts/account/accountdetailslist/true`
-      // );
-      const url = "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true"
-          const response = await fetch(url);
-      const data = await response.json();
-      setaccountdata(data.accounts);
-    } catch (error) {
-      console.error("Error fetching data:", error);
+  // const fetchAccountData = async () => {
+  //   try {
+  //     // const response = await fetch(
+  //     //   `${ACCOUNT_API}/accounts/account/accountdetailslist/true`
+  //     // );
+  //     const url = "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true"
+  //         const response = await fetch(url);
+  //     const data = await response.json();
+  //     setaccountdata(data.accounts);
+  //   } catch (error) {
+  //     console.error("Error fetching data:", error);
+  //   }
+  // };
+
+  // // console.log(userdata);
+  // const accountoptions = accountdata.map((account) => ({
+  //   value: account._id,
+  //   label: account.accountName,
+  // }));
+useEffect(() => {
+  fetchAccountData();
+}, []);
+
+const fetchAccountData = async () => {
+  try {
+    const storedUserRole = localStorage.getItem("userRole");
+    const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
+    const loginuserid = storedData?.teammember?.userid;
+    const viewAllAccounts = storedData?.teammember?.viewallAccounts;
+
+    let url = "";
+
+    // === ROLE-BASED URL LOGIC ===
+    if (storedUserRole === "Admin") {
+      url =
+        "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true";
+    } else {
+      // Team Member
+      url =
+        viewAllAccounts === true
+          ? "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true"
+          : `https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=true`;
     }
-  };
 
-  // console.log(userdata);
-  const accountoptions = accountdata.map((account) => ({
-    value: account._id,
-    label: account.accountName,
-  }));
+    console.log("Fetching accounts from:", url);
 
+    const response = await fetch(url);
+    const data = await response.json();
+
+    // Handle both response formats (Admin & TeamMember)
+    const accounts = Array.isArray(data.accountlist)
+      ? data.accountlist
+      : Array.isArray(data.teamAccounts)
+      ? data.teamAccounts
+      : [];
+
+    console.log("Account list:", accounts);
+
+    setaccountdata(accounts);
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+};
+
+// Convert to dropdown options
+const accountoptions = accountdata.map((account) => ({
+  value: account._id,
+  label: account.accountName,
+}));
   // team member
   const USER_API = process.env.REACT_APP_USER_URL;
   const [selecteduser, setSelectedUser] = useState("");

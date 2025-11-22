@@ -11,100 +11,6 @@ import {
 } from "@mui/material";
 import { FaCaretUp, FaCaretDown } from "react-icons/fa";
 
-// const MultiSelectDropdown = ({
-//   value = [],
-//   onChange,
-//   options: propOptions,
-//   placeholder = "Select from list",
-//   width = "100%"
-// }) => {
-//   const containerRef = useRef(null);
-//   const [anchorEl, setAnchorEl] = useState(null);
-//   const [searchQuery, setSearchQuery] = useState("");
-//   const [menuWidth, setMenuWidth] = useState(null);
-//   const [internalOptions, setInternalOptions] = useState([]);
-
-//   const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
-//   const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
-//   // Determine if using internal or external options
-//   const options = propOptions || internalOptions;
-
-//   // useEffect(() => {
-//   //   // Only fetch data if no options prop provided
-//   //   if (!propOptions) {
-//   //     const fetchData = async () => {
-//   //       try {
-//   //         const url = `${ACCOUNT_API}/accounts/account/accountdetailslist/true`;
-//   //         const response = await fetch(url);
-//   //         const data = await response.json();
-//   //         console.log("accounts",data.accountlist)
-//   //         setInternalOptions(data.accountlist.map(account => ({
-//   //           value: account.id,
-//   //           label: account.Name,
-//   //         })));
-//   //       } catch (error) {
-//   //         console.error("Error fetching data:", error);
-//   //       }
-//   //     };
-//   //     fetchData();
-//   //   }
-//   // }, [ACCOUNT_API, propOptions]);
-
-
-//   useEffect(() => {
-//   if (!propOptions) {
-//     const fetchData = async () => {
-//       try {
-//         const url = `${ACCOUNT_API}/accounts/account/accountdetailslist/true`;
-//         const response = await fetch(url);
-//         const data = await response.json();
-
-//         const options = data.accountlist.map(account => ({
-//           value: account.id,
-//           label: account.Name,
-//         }));
-
-//         setInternalOptions(options);
-
-//         // Automatically select the account from cookie
-//         const accountIdFromCookie = Cookies.get('accountId');
-//         if (accountIdFromCookie) {
-//           const matchedAccount = options.find(
-//             (acc) => acc.value === accountIdFromCookie
-//           );
-//           if (matchedAccount && onChange) {
-//             onChange([matchedAccount]); // Set initial selected value
-//           }
-//         }
-//       } catch (error) {
-//         console.error("Error fetching data:", error);
-//       }
-//     };
-
-//     fetchData();
-//   }
-// }, [ACCOUNT_API, propOptions, onChange]);
-//   const handleClick = (event) => {
-//     setAnchorEl(event.currentTarget);
-//     if (containerRef.current) {
-//       setMenuWidth(containerRef.current.offsetWidth);
-//     }
-//   };
-
-//   const handleClose = () => {
-//     setAnchorEl(null);
-//   };
-
-//   const handleSelect = (selectedValue) => {
-//     const newValue = value.some(item => item.value === selectedValue)
-//       ? value.filter(item => item.value !== selectedValue)
-//       : [...value, options.find(option => option.value === selectedValue)];
-    
-//     if (onChange) {
-//       onChange(newValue);
-//       console.log(newValue)
-//     }
-//   };
 
 const MultiSelectDropdown = ({
   value = [],
@@ -126,43 +32,105 @@ const MultiSelectDropdown = ({
   const options = propOptions || internalOptions;
 
   useEffect(() => {
-    if (!propOptions && !initialized) {
-      const fetchData = async () => {
-        try {
-          // const url = `${ACCOUNT_API}/accounts/account/accountdetailslist/true`;
-        const url = "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true"
-          const response = await fetch(url);
-          const data = await response.json();
+  if (!propOptions && !initialized) {
+    const fetchData = async () => {
+      try {
+        const storedUserRole = localStorage.getItem("userRole");
+        const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
+        const loginuserid = storedData?.teammember?.userid;
+        const viewAllAccounts = storedData?.teammember?.viewallAccounts;
 
-          const options = data.accounts.map(account => ({
+        let url = "";
+
+        // ROLE BASED URL (Same logic as your pipeline code)
+        if (storedUserRole === "Admin") {
+          url =
+            "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true";
+        } else {
+          // TeamMember
+          url =
+            viewAllAccounts === true
+              ? "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true"
+              : `https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=true`;
+        }
+
+        console.log("Fetching accounts from:", url);
+
+        const response = await fetch(url);
+        const data = await response.json();
+
+        const options = (data.accountlist || data.teamAccounts || []).map(
+          (account) => ({
             value: account._id,
             label: account.accountName,
-          }));
+          })
+        );
 
-          setInternalOptions(options);
+        setInternalOptions(options);
 
-          // Only set cookie value if no existing value is provided
-          if (value.length === 0) {
-            const accountIdFromCookie = Cookies.get('accountId');
-            if (accountIdFromCookie) {
-              const matchedAccount = options.find(
-                (acc) => acc.value === accountIdFromCookie
-              );
-              if (matchedAccount && onChange) {
-                onChange([matchedAccount]);
-              }
+        // Auto-select from cookie (ONLY if no value selected from parent)
+        if (value.length === 0) {
+          const accountIdFromCookie = Cookies.get("accountId");
+
+          if (accountIdFromCookie) {
+            const matchedAccount = options.find(
+              (acc) => acc.value === accountIdFromCookie
+            );
+
+            if (matchedAccount && onChange) {
+              onChange([matchedAccount]);
             }
           }
-          
-          setInitialized(true);
-        } catch (error) {
-          console.error("Error fetching data:", error);
         }
-      };
 
-      fetchData();
-    }
-  }, [ACCOUNT_API, propOptions, onChange, value, initialized]);
+        setInitialized(true);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }
+}, [propOptions, onChange, value, initialized]);
+
+  // useEffect(() => {
+  //   if (!propOptions && !initialized) {
+  //     const fetchData = async () => {
+  //       try {
+       
+  //       const url = "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true"
+  //         const response = await fetch(url);
+  //         const data = await response.json();
+
+  //         const options = data.accounts.map(account => ({
+  //           value: account._id,
+  //           label: account.accountName,
+  //         }));
+
+  //         setInternalOptions(options);
+
+  //         // Only set cookie value if no existing value is provided
+  //         if (value.length === 0) {
+  //           const accountIdFromCookie = Cookies.get('accountId');
+  //           if (accountIdFromCookie) {
+  //             const matchedAccount = options.find(
+  //               (acc) => acc.value === accountIdFromCookie
+  //             );
+  //             if (matchedAccount && onChange) {
+  //               onChange([matchedAccount]);
+  //             }
+  //           }
+  //         }
+          
+  //         setInitialized(true);
+  //       } catch (error) {
+  //         console.error("Error fetching data:", error);
+  //       }
+  //     };
+
+  //     fetchData();
+  //   }
+  // }, [ACCOUNT_API, propOptions, onChange, value, initialized]);
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);

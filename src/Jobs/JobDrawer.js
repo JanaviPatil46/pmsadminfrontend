@@ -295,9 +295,7 @@ const JobDrawer = ({
     }
     fetchPipelineDataByID(selectedOptions.value);
   };
-  useEffect(() => {
-    fetchPipelineData();
-  }, []);
+  
   const [selectedStage, setSelectedStage] = useState(null);
   const [stagesoptions, setStagesOptions] = useState([]);
   const handleStageChange = (event, newValue) => {
@@ -325,16 +323,65 @@ const JobDrawer = ({
       console.error("Error fetching data:", error);
     }
   };
-  const fetchPipelineData = async () => {
-    try {
-      const url = `${PIPELINE_API}/workflow/pipeline/pipelines`;
-      const response = await fetch(url);
-      const data = await response.json();
-      setPipelineData(data.pipeline);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
+  // const fetchPipelineData = async () => {
+  //   try {
+  //     const url = `${PIPELINE_API}/workflow/pipeline/pipelines`;
+  //     const response = await fetch(url);
+  //     const data = await response.json();
+  //     setPipelineData(data.pipeline);
+  //   } catch (error) {
+  //     console.error("Error fetching data:", error);
+  //   }
+  // };
+  // useEffect(() => {
+  //   fetchPipelineData();
+  // }, []);
+  const [userRole, setUserRole] = useState("");
+// const [loading, setLoading] = useState(false);
+
+const fetchPipelineData = async () => {
+  setLoading(true);
+  try {
+    const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
+    const loginuserid = storedData?.teammember?.userid;
+
+    console.log("User role:", userRole);
+    console.log("TeamMember userId:", loginuserid);
+
+    // If Admin → fetch all pipelines
+    // If Teammember → fetch only user's pipelines
+    const url =
+      userRole === "Admin"
+        ? `${PIPELINE_API}/workflow/pipeline/pipelines`
+        : `${PIPELINE_API}/workflow/pipeline/pipelines/${loginuserid}`;
+
+    const response = await fetch(url);
+    const data = await response.json();
+
+    console.log("Pipeline data:", data);
+
+    setPipelineData(data.pipeline || []);
+  } catch (error) {
+    console.error("Error fetching pipeline data:", error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+// Fetch userRole first
+useEffect(() => {
+  const storedUserRole = localStorage.getItem("userRole") || "";
+  console.log("UserRole from localStorage:", storedUserRole);
+  setUserRole(storedUserRole);
+}, []);
+
+// After userRole is updated, fetch pipeline list
+useEffect(() => {
+  if (userRole) {
+    fetchPipelineData();
+  }
+}, [userRole]);
+
   const optionpipeline = pipelineData.map((pipelineData) => ({
     value: pipelineData._id,
     label: pipelineData.pipelineName,
@@ -853,7 +900,7 @@ const JobDrawer = ({
    const [jobData, setJobData] = useState([]);
      const [isActiveTrue, setIsActiveTrue] = useState(true);
     const [loading, setLoading] = useState(false);
-      const [userRole, setUserRole] = useState("");
+    
        useEffect(() => {
           const storedUserRole = localStorage.getItem("userRole");
           console.log("Fetched userRole from localStorage:", storedUserRole);

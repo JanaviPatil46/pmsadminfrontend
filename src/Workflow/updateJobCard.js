@@ -427,6 +427,7 @@ const EditJobDrawer = ({
           <Box>
             <InputLabel sx={{ color: "black" }}>Pipeline</InputLabel>
             <Autocomplete
+            disabled
               options={pipelineOptions}
               getOptionLabel={(option) => option.label}
               value={selectedPipeline}

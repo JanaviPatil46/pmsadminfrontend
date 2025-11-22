@@ -1,5 +1,40 @@
 import React, { useEffect, useState } from "react";
-import { DialogActions,Dialog ,DialogTitle,Menu,Checkbox,DialogContent, Autocomplete, Switch, FormControlLabel, Box, Button, Drawer, Typography, Chip, IconButton, Divider, Select, MenuItem, InputLabel, TextField, FormControl, FormLabel, InputAdornment, Popover, ListItem, List, ListItemText, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
+import {
+  DialogActions,
+  Dialog,
+  DialogTitle,
+  Menu,
+  Checkbox,
+  DialogContent,
+  Autocomplete,
+  Switch,
+  FormControlLabel,
+  Box,
+  Button,
+  Drawer,
+  Typography,
+  Chip,
+  IconButton,
+  Divider,
+  Select,
+  MenuItem,
+  InputLabel,
+  TextField,
+  FormControl,
+  FormLabel,
+  InputAdornment,
+  Popover,
+  ListItem,
+  List,
+  ListItemText,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+} from "@mui/material";
 import { CiMenuKebab } from "react-icons/ci";
 import { toast } from "react-toastify";
 import { useNavigate, useParams, useRouteLoaderData } from "react-router-dom";
@@ -19,7 +54,6 @@ const Invoice = () => {
   const [accountInvoicesData, setAccountInvoicesData] = useState([]);
   const { data } = useParams();
 
-
   useEffect(() => {
     fetchInvoices(data);
   }, []);
@@ -31,14 +65,15 @@ const Invoice = () => {
     const invoiceDate = new Date(invoice.invoicedate);
     const dueDate = new Date(invoiceDate);
     dueDate.setDate(dueDate.getDate() + paymentTermDays);
-    
+
     const today = new Date();
     const isUnpaid = invoice.invoiceStatus === "Pending";
-    const hasBalanceDue = invoice.balanceDueAmount === null || invoice.balanceDueAmount > 0;
-    
+    const hasBalanceDue =
+      invoice.balanceDueAmount === null || invoice.balanceDueAmount > 0;
+
     return today > dueDate && isUnpaid && hasBalanceDue;
   };
-const fetchInvoices = async (data) => {
+  const fetchInvoices = async (data) => {
     try {
       const requestOptions = {
         method: "GET",
@@ -74,106 +109,75 @@ const fetchInvoices = async (data) => {
       console.error("Error fetching invoices:", error);
     }
   };
- 
 
   console.log(accountInvoicesData);
- const [anchorEl, setAnchorEl] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   // const toggleMenu = (_id) => {
   //   setOpenMenuId(openMenuId === _id ? null : _id);
   //   setTempIdGet(_id);
   // };
-    const toggleMenu = (event, _id) => {
+  const toggleMenu = (event, _id) => {
     setAnchorEl(event.currentTarget);
     setOpenMenuId(_id);
     setTempIdGet(_id);
   };
-    const handleMenuClose = () => {
+  const handleMenuClose = () => {
     setAnchorEl(null);
     setOpenMenuId(null);
     setTempIdGet(null);
   };
-const handleDelete = async (_id) => {
-  const isConfirmed = window.confirm("Are you sure you want to delete this invoice?");
-  if (!isConfirmed) return;
+  const handleDelete = async (_id) => {
+    const isConfirmed = window.confirm(
+      "Are you sure you want to delete this invoice?"
+    );
+    if (!isConfirmed) return;
 
-  try {
-    const requestOptions = {
-      method: "DELETE",
-      redirect: "follow",
-    };
-    const url = `${INVOICES_API}/workflow/invoices/invoice/${_id}`;
+    try {
+      const requestOptions = {
+        method: "DELETE",
+        redirect: "follow",
+      };
+      const url = `${INVOICES_API}/workflow/invoices/invoice/${_id}`;
 
-    const response = await fetch(url, requestOptions);
+      const response = await fetch(url, requestOptions);
 
-    if (!response.ok) {
-      throw new Error("Failed to delete item");
+      if (!response.ok) {
+        throw new Error("Failed to delete item");
+      }
+
+      toast.success("Invoice deleted successfully");
+      handleMenuClose();
+      // ✅ Optimistic UI update: remove the deleted invoice from state
+      setAccountInvoicesData((prev) => prev.filter((inv) => inv._id !== _id));
+
+      // ✅ Also refresh from backend to stay in sync
+      await fetchInvoices(data);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to delete invoice");
     }
+  };
 
-    toast.success("Invoice deleted successfully");
-   handleMenuClose()
-    // ✅ Optimistic UI update: remove the deleted invoice from state
-    setAccountInvoicesData((prev) => prev.filter((inv) => inv._id !== _id));
-
-    // ✅ Also refresh from backend to stay in sync
-    await fetchInvoices(data);
-
-  } catch (error) {
-    console.error(error);
-    toast.error("Failed to delete invoice");
-  }
-};
-
-  // const handleDelete = (_id) => {
-  //   // Show a confirmation prompt
-  //   const isConfirmed = window.confirm("Are you sure you want to delete this organizer template?");
-
-  //   // Proceed with deletion if confirmed
-  //   if (isConfirmed) {
-  //     const requestOptions = {
-  //       method: "DELETE",
-  //       redirect: "follow",
-  //     };
-  //     const url = `${INVOICES_API}/workflow/invoices/invoice/`;
-  //     fetch(url + _id, requestOptions)
-  //       .then((response) => {
-  //         if (!response.ok) {
-  //           throw new Error("Failed to delete item");
-  //         }
-  //         return response.text();
-  //       })
-  //       .then((result) => {
-  //         console.log(result);
-  //         toast.success("Item deleted successfully");
-  //         fetchInvoices(data);
-  //         // setshowOrganizerTemplateForm(false);
-  //       })
-  //       .catch((error) => {
-  //         console.error(error);
-  //         toast.error("Failed to delete item");
-  //       });
-  //   }
-  // };
   const [openDialog, setOpenDialog] = useState(false);
-const [selectedStatus, setSelectedStatus] = useState("");
-const [currentInvoice, setCurrentInvoice] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState("");
+  const [currentInvoice, setCurrentInvoice] = useState(null);
 
-const handleUpdateStatus = (invoiceNumber, status) => {
-  if (!invoiceNumber || !status) return;
+  const handleUpdateStatus = (invoiceNumber, status) => {
+    if (!invoiceNumber || !status) return;
 
-  fetch(`${INVOICES_API}/workflow/invoices/invoicestatus/${invoiceNumber}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ invoiceStatus: status }),
-  })
-    .then((response) => response.json())
-    .then((result) => {
-      console.log("Invoice status updated:", result);
-      // Optionally refresh data here
+    fetch(`${INVOICES_API}/workflow/invoices/invoicestatus/${invoiceNumber}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ invoiceStatus: status }),
     })
-    .catch((error) => console.error("Error updating invoice status:", error));
-};
+      .then((response) => response.json())
+      .then((result) => {
+        console.log("Invoice status updated:", result);
+        // Optionally refresh data here
+      })
+      .catch((error) => console.error("Error updating invoice status:", error));
+  };
 
-  
   //***********Invoice Create */
 
   const handleCreateInvoiceClick = () => {
@@ -193,7 +197,7 @@ const handleUpdateStatus = (invoiceNumber, status) => {
   const [invoiceId, SetInvoiceId] = useState();
   const handleEdit = (_id) => {
     setShowInvoiceUpdateForm(true);
-    handleMenuClose()
+    handleMenuClose();
     SetInvoiceId(_id);
     // navigate("/" + _id);
   };
@@ -201,7 +205,9 @@ const handleUpdateStatus = (invoiceNumber, status) => {
 
   const handleDuplicate = async (_id) => {
     // Find the template by its ID
-    const InvoiceToDuplicate = accountInvoicesData.find((template) => template._id === _id);
+    const InvoiceToDuplicate = accountInvoicesData.find(
+      (template) => template._id === _id
+    );
     if (!InvoiceToDuplicate) {
       toast.error("Invocie not found");
       return;
@@ -226,12 +232,15 @@ const handleUpdateStatus = (invoiceNumber, status) => {
       };
 
       // Send the duplicated template to the server
-      const response = await fetch(`${INVOICES_API}/workflow/invoices/invoice`, requestOptions);
+      const response = await fetch(
+        `${INVOICES_API}/workflow/invoices/invoice`,
+        requestOptions
+      );
       const result = await response.json();
       console.log(result);
       if (result.message === "Invoice created successfully") {
         toast.success("Invoice duplicated successfully");
-        handleMenuClose()
+        handleMenuClose();
         fetchInvoices(data); // Refresh the list after duplication
       } else {
         toast.error(result.error || "Failed to duplicate Invoice");
@@ -244,16 +253,14 @@ const handleUpdateStatus = (invoiceNumber, status) => {
 
   const handlePrint = async (_id) => {
     try {
-      const response = await fetch(`${INVOICES_API}/workflow/invoices/invoice/invoiceforprint/${_id}`);
+      const response = await fetch(
+        `${INVOICES_API}/workflow/invoices/invoice/invoiceforprint/${_id}`
+      );
       const invoiceData = await response.json();
       console.log(invoiceData);
-      const accountId = invoiceData.invoice.account;
-      const accountResponse = await fetch(`${ACCOUNT_API}/accounts/accountdetails/${accountId}`);
-      const accountData = await accountResponse.json();
-      console.log(accountData);
-      console.log(accountData.account.accountName);
 
-      const accountName = accountData.account.accountName || "Unknown Account";
+      const accountName =
+        invoiceData.invoice.account.accountName || "Unknown Account";
       // Construct the HTML for printing
       const printContent = `
 
@@ -372,44 +379,46 @@ const handleUpdateStatus = (invoiceNumber, status) => {
         </html>
       `);
       printWindow.document.close();
-      handleMenuClose()
+      handleMenuClose();
     } catch (error) {
       console.error("Error printing invoice:", error);
       toast.error("Failed to print invoice");
     }
   };
 
-  
   const handleDownload = async (_id) => {
     try {
-      const response = await fetch(`${INVOICES_API}/workflow/invoices/invoice/${_id}`);
+      const response = await fetch(
+        `${INVOICES_API}/workflow/invoices/invoice/invoiceforprint/${_id}`
+      );
       const invoiceData = await response.json();
-
+      console.log(invoiceData);
       const doc = new jsPDF();
 
       // Set up styles for the PDF
       doc.setFont("Arial", "normal");
       doc.setFontSize(14);
       doc.text(`Invoice Number: ${invoiceData.invoice.invoicenumber}`, 10, 10);
-      doc.text(`Date: ${new Date(invoiceData.invoice.invoicedate).toLocaleDateString()}`, 10, 20);
+      doc.text(
+        `Date: ${new Date(invoiceData.invoice.invoicedate).toLocaleDateString()}`,
+        10,
+        20
+      );
       doc.text(`Description: ${invoiceData.invoice.description}`, 10, 30);
-
-      // Add Account Name
-      // const accountName = invoiceData.invoice.accountName || "Unknown Account";
-      const accountId = invoiceData.invoice.account;
-      const accountResponse = await fetch(`${ACCOUNT_API}/accounts/accountdetails/${accountId}`);
-      const accountData = await accountResponse.json();
-      console.log(accountData);
-      console.log(accountData.account.accountName);
-
-      const accountName = accountData.account.accountName || "Unknown Account";
+      const accountName =
+        invoiceData.invoice.account.accountName || "Unknown Account";
       doc.text(`Account Name: ${accountName}`, 10, 40);
 
       // Create line items table
       doc.autoTable({
         startY: 50,
         head: [["Product/Service", "Rate", "Quantity", "Amount"]],
-        body: invoiceData.invoice.lineItems.map((item) => [item.productorService, `$${item.rate}`, item.quantity, `$${item.amount}`]),
+        body: invoiceData.invoice.lineItems.map((item) => [
+          item.productorService,
+          `$${item.rate}`,
+          item.quantity,
+          `$${item.amount}`,
+        ]),
         theme: "grid", // Choose a theme, 'grid', 'striped', etc.
         headStyles: {
           fillColor: [242, 242, 242], // Light gray background for header
@@ -425,10 +434,22 @@ const handleUpdateStatus = (invoiceNumber, status) => {
       // Summary section
       const summaryY = doc.autoTable.previous.finalY + 10;
       doc.setFontSize(12);
-      doc.text(`Subtotal: $${invoiceData.invoice.summary.subtotal.toFixed(2)}`, 10, summaryY);
-      doc.text(`Tax: $${invoiceData.invoice.summary.taxTotal.toFixed(2)}`, 10, summaryY + 10);
+      doc.text(
+        `Subtotal: $${invoiceData.invoice.summary.subtotal.toFixed(2)}`,
+        10,
+        summaryY
+      );
+      doc.text(
+        `Tax: $${invoiceData.invoice.summary.taxTotal.toFixed(2)}`,
+        10,
+        summaryY + 10
+      );
       doc.setFontSize(14);
-      doc.text(`Total: $${invoiceData.invoice.summary.total.toFixed(2)}`, 10, summaryY + 20);
+      doc.text(
+        `Total: $${invoiceData.invoice.summary.total.toFixed(2)}`,
+        10,
+        summaryY + 20
+      );
 
       // Save the PDF to local storage
       const pdfBlob = doc.output("blob");
@@ -441,7 +462,7 @@ const handleUpdateStatus = (invoiceNumber, status) => {
       document.body.removeChild(a);
 
       toast.success("Invoice downloaded successfully");
-         handleMenuClose()
+      handleMenuClose();
     } catch (error) {
       console.error("Error downloading invoice:", error);
       toast.error("Failed to download invoice");
@@ -450,152 +471,201 @@ const handleUpdateStatus = (invoiceNumber, status) => {
 
   return (
     <Box sx={{ mt: 2 }}>
-      <Button variant="contained" onClick={handleCreateInvoiceClick} sx={{
-                backgroundColor: 'var(--color-save-btn)',  // Normal background
-               
-                '&:hover': {
-                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                },
-                mb:3,borderRadius:'15px'
-              }}>
+      <Button
+        variant="contained"
+        onClick={handleCreateInvoiceClick}
+        sx={{
+          backgroundColor: "var(--color-save-btn)", // Normal background
+
+          "&:hover": {
+            backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+          },
+          mb: 3,
+          borderRadius: "15px",
+        }}
+      >
         New Invoice
       </Button>
-   
-        <TableContainer component={Paper} sx={{ overflow: "visible" }}>
-        <Table sx={{width:'100%'}} >
+
+      <TableContainer component={Paper} sx={{ overflow: "visible" }}>
+        <Table sx={{ width: "100%" }}>
           <TableHead>
             <TableRow>
-              <TableCell style={{
+              <TableCell
+                style={{
                   fontSize: "12px",
                   fontWeight: "bold",
                   padding: "16px",
                 }}
-                width="100">
-               Invoice #
+                width="100"
+              >
+                Invoice #
               </TableCell>
-              <TableCell style={{
+              <TableCell
+                style={{
                   fontSize: "12px",
                   fontWeight: "bold",
                   padding: "16px",
                 }}
-                width="100">
-              Status
+                width="100"
+              >
+                Status
               </TableCell>
-              <TableCell style={{
+              <TableCell
+                style={{
                   fontSize: "12px",
                   fontWeight: "bold",
                   padding: "16px",
                 }}
-                width="100">
-           Posted
+                width="100"
+              >
+                Posted
               </TableCell>
-              <TableCell style={{
+              <TableCell
+                style={{
                   fontSize: "12px",
                   fontWeight: "bold",
                   padding: "16px",
                 }}
-                width="100">
+                width="100"
+              >
                 Total
               </TableCell>
-              <TableCell style={{
+              <TableCell
+                style={{
                   fontSize: "12px",
                   fontWeight: "bold",
                   padding: "16px",
                 }}
-                width="100">
+                width="100"
+              >
                 Amount Paid
               </TableCell>
-              <TableCell style={{
+              <TableCell
+                style={{
                   fontSize: "12px",
                   fontWeight: "bold",
                   padding: "16px",
                 }}
-                width="100">
+                width="100"
+              >
                 Balance due
               </TableCell>
-              <TableCell style={{
+              <TableCell
+                style={{
                   fontSize: "12px",
                   fontWeight: "bold",
                   padding: "16px",
                 }}
-                width="100">
-              Last Paid
+                width="100"
+              >
+                Last Paid
               </TableCell>
-              <TableCell style={{
+              <TableCell
+                style={{
                   fontSize: "12px",
                   fontWeight: "bold",
                   padding: "16px",
                 }}
-                width="250">
-               Description
+                width="250"
+              >
+                Description
               </TableCell>
-              <TableCell style={{
+              <TableCell
+                style={{
                   fontSize: "12px",
                   fontWeight: "bold",
                   padding: "16px",
                 }}
-                width="100">
-               Settings
+                width="100"
+              >
+                Settings
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            
             {Array.isArray(accountInvoicesData) ? (
               accountInvoicesData.map((row) => (
                 <TableRow key={row._id}>
-                  <TableCell style={{
-                   fontSize: "12px",
-                    padding: "4px 8px",
-                    lineHeight: "1",
-                    cursor: "pointer",
-                    color: "#3f51b5", 
-                  }} onClick={() => handleEdit(row._id)}>
+                  <TableCell
+                    style={{
+                      fontSize: "12px",
+                      padding: "4px 8px",
+                      lineHeight: "1",
+                      cursor: "pointer",
+                      color: "#3f51b5",
+                    }}
+                    onClick={() => handleEdit(row._id)}
+                  >
                     {/* <Typography sx={{ cursor: "pointer",
                       color: "#3f51b5", }} > */}
-                      {row.invoicenumber}
+                    {row.invoicenumber}
                     {/* </Typography> */}
                   </TableCell>
-                  <TableCell style={{
-                    fontSize: "12px",
-                    padding: "4px 8px",
-                    lineHeight: "1",
-                    cursor: "pointer",
-                  }}>{row.invoiceStatus}</TableCell>
-                  <TableCell style={{
-                    fontSize: "12px",
-                    padding: "4px 8px",
-                    lineHeight: "1",
-                    cursor: "pointer",
-                  }}>{new Intl.DateTimeFormat("en-US", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                  }).format(new Date(row.createdAt))}</TableCell>
-                  <TableCell style={{
-                    fontSize: "12px",
-                    padding: "4px 8px",
-                    lineHeight: "1",
-                    cursor: "pointer",
-                  }}>${row.summary.total}</TableCell>
-                  <TableCell style={{
-                    fontSize: "12px",
-                    padding: "4px 8px",
-                    lineHeight: "1",
-                    cursor: "pointer",
-                  }}>${row.paidAmount}</TableCell>
-                  <TableCell style={{
-                    fontSize: "12px",
-                    padding: "4px 8px",
-                    lineHeight: "1",
-                    cursor: "pointer",
-                  }}>${row.summary.total - row.paidAmount}</TableCell>
-                  <TableCell style={{
-                    fontSize: "12px",
-                    padding: "4px 8px",
-                    lineHeight: "1",
-                    cursor: "pointer",
-                  }}> </TableCell>
+                  <TableCell
+                    style={{
+                      fontSize: "12px",
+                      padding: "4px 8px",
+                      lineHeight: "1",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {row.invoiceStatus}
+                  </TableCell>
+                  <TableCell
+                    style={{
+                      fontSize: "12px",
+                      padding: "4px 8px",
+                      lineHeight: "1",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {new Intl.DateTimeFormat("en-US", {
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                    }).format(new Date(row.createdAt))}
+                  </TableCell>
+                  <TableCell
+                    style={{
+                      fontSize: "12px",
+                      padding: "4px 8px",
+                      lineHeight: "1",
+                      cursor: "pointer",
+                    }}
+                  >
+                    ${row.summary.total}
+                  </TableCell>
+                  <TableCell
+                    style={{
+                      fontSize: "12px",
+                      padding: "4px 8px",
+                      lineHeight: "1",
+                      cursor: "pointer",
+                    }}
+                  >
+                    ${row.paidAmount}
+                  </TableCell>
+                  <TableCell
+                    style={{
+                      fontSize: "12px",
+                      padding: "4px 8px",
+                      lineHeight: "1",
+                      cursor: "pointer",
+                    }}
+                  >
+                    ${row.summary.total - row.paidAmount}
+                  </TableCell>
+                  <TableCell
+                    style={{
+                      fontSize: "12px",
+                      padding: "4px 8px",
+                      lineHeight: "1",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {" "}
+                  </TableCell>
                   <TableCell>{row.description}</TableCell>
                   {/* <TableCell style={{
                     fontSize: "12px",
@@ -659,139 +729,142 @@ const handleUpdateStatus = (invoiceNumber, status) => {
                     </IconButton>
                   </TableCell> */}
                   <TableCell
-                                                    style={{
-                                                      fontSize: "12px",
-                                                      padding: "4px 8px",
-                                                      lineHeight: "1",
-                                                    }}
-                                                  >
-                                                    <IconButton
-                                                      onClick={(event) => toggleMenu(event, row._id)}
-                                                      style={{ color: "#2c59fa" }}
-                                                      size="small"
-                                                    >
-                                                      <CiMenuKebab />
-                                                    </IconButton>
-                                  
-                                                    {/* MUI Menu */}
-                                                  
-                                                  </TableCell>
+                    style={{
+                      fontSize: "12px",
+                      padding: "4px 8px",
+                      lineHeight: "1",
+                    }}
+                  >
+                    <IconButton
+                      onClick={(event) => toggleMenu(event, row._id)}
+                      style={{ color: "#2c59fa" }}
+                      size="small"
+                    >
+                      <CiMenuKebab />
+                    </IconButton>
+
+                    {/* MUI Menu */}
+                  </TableCell>
                 </TableRow>
-                
               ))
             ) : (
               <div></div>
             )}
           </TableBody>
         </Table>
-        </TableContainer>
-         <Menu
-                      anchorEl={anchorEl}
-                      open={Boolean(anchorEl)}
-                      onClose={handleMenuClose}
-                      anchorOrigin={{
-                        vertical: 'top',
-                        horizontal: 'right',
-                      }}
-                      transformOrigin={{
-                        vertical: 'top',
-                        horizontal: 'left',
-                      }}
-                      PaperProps={{
-                        sx: {
-                          mt: 3,
-                          ml: 1,
-                          boxShadow: 3,
-                          borderRadius: 1,
-                          minWidth: 120,
-                          '& .MuiMenuItem-root': {
-                            fontSize: '12px',
-                            padding: '8px 16px',
-                          }
-                        }
-                      }}
-                    >
-                      <MenuItem 
-                        onClick={() => handleEdit(tempIdget)}
-                        sx={{ 
-                          fontWeight: "bold",
-                          '&:hover': {
-                            backgroundColor: '#f5f5f5'
-                          }
-                        }}
-                      >
-                        Edit
-                      </MenuItem>
-                      <MenuItem 
-                        onClick={() => handleDelete(tempIdget)}
-                        sx={{ 
-                          color: "error.main", 
-                          fontWeight: "bold",
-                          '&:hover': {
-                            backgroundColor: '#ffebee'
-                          }
-                        }}
-                      >
-                        Delete
-                      </MenuItem>
-                       <MenuItem 
-                        onClick={() => handleDuplicate(tempIdget)}
-                        sx={{ 
-                          fontWeight: "bold",
-                          '&:hover': {
-                            backgroundColor: '#f5f5f5'
-                          }
-                        }}
-                      >
-                        Duplicate
-                      </MenuItem>
-                       <MenuItem 
-                        onClick={() => handlePrint(tempIdget)}
-                       sx={{ 
-                          fontWeight: "bold",
-                          '&:hover': {
-                            backgroundColor: '#f5f5f5'
-                          }
-                        }}
-                      >
-                        Print
-                      </MenuItem>
-                       <MenuItem 
-                        onClick={() => handleDownload(tempIdget)}
-                       sx={{ 
-                          fontWeight: "bold",
-                          '&:hover': {
-                            backgroundColor: '#f5f5f5'
-                          }
-                        }}
-                      >
-                        Download
-                      </MenuItem>
-
-                    </Menu>
-        <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-  <DialogTitle>Update Invoice Status</DialogTitle>
-  <DialogContent>
-    <Autocomplete
-      options={["Paid", "Pending", "Overdue"]}
-      value={selectedStatus}
-      onChange={(event, newValue) => setSelectedStatus(newValue)}
-      renderInput={(params) => <TextField {...params} placeholder="Select Status" sx={{cursor:'pointer'}}/>}
-    />
-  </DialogContent>
-  <DialogActions>
-    <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-    <Button 
-      onClick={() => {
-        handleUpdateStatus(currentInvoice, selectedStatus);
-        setOpenDialog(false);
-      }} 
-      disabled={!selectedStatus}
-    >
-      Update
-    </Button>
-  </DialogActions>
-</Dialog>
+      </TableContainer>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "left",
+        }}
+        PaperProps={{
+          sx: {
+            mt: 3,
+            ml: 1,
+            boxShadow: 3,
+            borderRadius: 1,
+            minWidth: 120,
+            "& .MuiMenuItem-root": {
+              fontSize: "12px",
+              padding: "8px 16px",
+            },
+          },
+        }}
+      >
+        <MenuItem
+          onClick={() => handleEdit(tempIdget)}
+          sx={{
+            fontWeight: "bold",
+            "&:hover": {
+              backgroundColor: "#f5f5f5",
+            },
+          }}
+        >
+          Edit
+        </MenuItem>
+        <MenuItem
+          onClick={() => handleDelete(tempIdget)}
+          sx={{
+            color: "error.main",
+            fontWeight: "bold",
+            "&:hover": {
+              backgroundColor: "#ffebee",
+            },
+          }}
+        >
+          Delete
+        </MenuItem>
+        <MenuItem
+          onClick={() => handleDuplicate(tempIdget)}
+          sx={{
+            fontWeight: "bold",
+            "&:hover": {
+              backgroundColor: "#f5f5f5",
+            },
+          }}
+        >
+          Duplicate
+        </MenuItem>
+        <MenuItem
+          onClick={() => handlePrint(tempIdget)}
+          sx={{
+            fontWeight: "bold",
+            "&:hover": {
+              backgroundColor: "#f5f5f5",
+            },
+          }}
+        >
+          Print
+        </MenuItem>
+        <MenuItem
+          onClick={() => handleDownload(tempIdget)}
+          sx={{
+            fontWeight: "bold",
+            "&:hover": {
+              backgroundColor: "#f5f5f5",
+            },
+          }}
+        >
+          Download
+        </MenuItem>
+      </Menu>
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+        <DialogTitle>Update Invoice Status</DialogTitle>
+        <DialogContent>
+          <Autocomplete
+            options={["Paid", "Pending", "Overdue"]}
+            value={selectedStatus}
+            onChange={(event, newValue) => setSelectedStatus(newValue)}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                placeholder="Select Status"
+                sx={{ cursor: "pointer" }}
+              />
+            )}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
+          <Button
+            onClick={() => {
+              handleUpdateStatus(currentInvoice, selectedStatus);
+              setOpenDialog(false);
+            }}
+            disabled={!selectedStatus}
+          >
+            Update
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Drawer
         anchor="right"
@@ -821,12 +894,13 @@ const handleUpdateStatus = (invoiceNumber, status) => {
           },
         }}
       >
-        <UpdateInvoice onClose={handleInvoiceUpdateClose} invoiceData={invoiceId} />
+        <UpdateInvoice
+          onClose={handleInvoiceUpdateClose}
+          invoiceData={invoiceId}
+        />
       </Drawer>
     </Box>
   );
 };
 
 export default Invoice;
-
-

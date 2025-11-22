@@ -90,38 +90,6 @@ const handleArchive = (_id, isActive) => {
     });
 };
 
-  // const handleArchive = (_id) => {
-  //   console.log(_id);
-  //   // handleSubmit(id);
-  //   const myHeaders = new Headers();
-  //   myHeaders.append("Content-Type", "application/json");
-
-  //   const raw = JSON.stringify({
-  //     active: !isActiveTrue,
-  //   });
-  //   console.log(raw);
-  //   const requestOptions = {
-  //     method: "PATCH",
-  //     headers: myHeaders,
-  //     body: raw,
-  //     redirect: "follow",
-  //   };
-  //   const url = `${ORGANIZER_TEMP_API}/workflow/orgaccwise/organizeraccountwise/active-archive/${_id}`;
-
-  //   fetch(url, requestOptions)
-  //     .then((response) => response.json())
-  //     .then((result) => {
-  //       console.log(result);
-  //       // console.log(result.updatedAccount); // Log the result
-  //       // setAccountId(result.updatedAccount._id);
-  //       toast.success("orgnizer updated successfully"); // Display success toast
-  //       fetchOrganizerTemplates(data);
-  //     })
-  //     .catch((error) => {
-  //       console.error(error); // Log the error
-  //       toast.error("An error occurred while submitting the form"); // Display error toast
-  //     });
-  // };
   const fetchOrganizerTemplates = async (accountid) => {
     try {
       // const url = http://127.0.0.1:7600/workflow/orgaccwise/organizeraccountwise/${isActiveTrue}/${accountid};
@@ -137,14 +105,7 @@ const handleArchive = (_id, isActive) => {
       console.log(data);
       setOrganizerTemplatesData(data.organizerAccountWise);
       console.log("orgData:", data.organizerAccountWise);
-      // if (isActiveTrue === true) {
-      //   setActiveButton("active");
-      //   setActiveorarchive("Archive");
-      // }
-      // else if (isActiveTrue === false) {
-      //   setActiveButton("archived");
-      //   setActiveorarchive("Active");
-      // }
+     
     } catch (error) {
       console.error("Error fetching email templates:", error);
     }
@@ -347,118 +308,130 @@ const handleDownload = async (organizer) => {
   pdf.save(`${organizer.organizerName}_answered.pdf`);
 };
   
-  const printOrganizerData = (id) => {
-    const organizer = organizerTemplatesData.find((org) => org._id === id);
-    console.log(organizer);
+  // const printOrganizerData = (id) => {
+  //   const organizer = organizerTemplatesData.find((org) => org._id === id);
+  //   console.log(organizer);
 
-    if (organizer) {
-      const printWindow = window.open("", "_blank");
+  //   if (organizer) {
+  //     const printWindow = window.open("", "_blank");
 
-      // Constructing the sections HTML
-      const sectionsHtml = organizer.sections
-        .map((section) => {
-          const formElementsHtml = section.formElements
-            .map((element) => {
-              return `
-            <div style="margin-bottom: 20px;">
-              <strong >${element.text}</strong>
-              <span style="margin-left: 5px; display: block; margin-top: 5px;">
-                <strong >Answer:</strong>  ${element.textvalue ?? "________"}
-                </span>
-            </div>
-          `;
-            })
-            .join("");
+  //     // Constructing the sections HTML
+  //     const sectionsHtml = organizer.sections
+  //       .map((section) => {
+  //         const formElementsHtml = section.formElements
+  //           .map((element) => {
+  //             return `
+  //           <div style="margin-bottom: 20px;">
+  //             <strong >${element.text}</strong>
+  //             <span style="margin-left: 5px; display: block; margin-top: 5px;">
+  //               <strong >Answer:</strong>  ${element.textvalue ?? "________"}
+  //               </span>
+  //           </div>
+  //         `;
+  //           })
+  //           .join("");
 
-          return `
-          <div style="margin-bottom: 20px;">
-            <h3>${section.name}</h3>
+  //         return `
+  //         <div style="margin-bottom: 20px;">
+  //           <h3>${section.name}</h3>
            
-            ${formElementsHtml}
-          </div>
-        `;
-        })
+  //           ${formElementsHtml}
+  //         </div>
+  //       `;
+  //       })
+  //       .join("");
+
+  //     printWindow.document.write(`
+  //       <html>
+  //         <head>
+  //           <title>Organizer Data</title>
+  //           <style>
+  //             body { font-family: Arial, sans-serif; }
+  //             h1 { color: #2c59fa; }
+  //             h3 { color: #555; }
+  //             table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+  //             th, td { padding: 8px 12px; border: 1px solid #ddd; text-align: left; }
+  //             th { background-color: #f4f4f4; }
+  //           </style>
+  //         </head>
+  //         <body>
+  //           <h1>Organizer Data</h1>
+           
+  //           <div>
+             
+  //             ${sectionsHtml}
+  //           </div>
+  //         </body>
+  //       </html>
+  //     `);
+
+  //     printWindow.document.close();
+  //     printWindow.print();
+  //   } else {
+  //     toast.error("Organizer not found.");
+  //   }
+  // };
+
+const printOrganizerData = (id) => {
+  const organizer = organizerTemplatesData.find((org) => org._id === id);
+
+  if (!organizer) {
+    toast.error("Organizer not found.");
+    return;
+  }
+
+  const sectionsHtml = organizer.sections
+    .map((section) => {
+      const formElementsHtml = section.formElements
+        .map(
+          (element) => `
+            <div style="margin-bottom: 20px;">
+              <strong>${element.text}</strong>
+              <span style="margin-left: 5px; display: block; margin-top: 5px;">
+                <strong>Answer:</strong> ${element.textvalue ?? "________"}
+              </span>
+            </div>
+          `
+        )
         .join("");
 
-      printWindow.document.write(`
-        <html>
-          <head>
-            <title>Organizer Data</title>
-            <style>
-              body { font-family: Arial, sans-serif; }
-              h1 { color: #2c59fa; }
-              h3 { color: #555; }
-              table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-              th, td { padding: 8px 12px; border: 1px solid #ddd; text-align: left; }
-              th { background-color: #f4f4f4; }
-            </style>
-          </head>
-          <body>
-            <h1>Organizer Data</h1>
-           
-            <div>
-             
-              ${sectionsHtml}
-            </div>
-          </body>
-        </html>
-      `);
+      return `
+        <div style="margin-bottom: 20px;">
+          <h3>${section.name}</h3>
+          ${formElementsHtml}
+        </div>
+      `;
+    })
+    .join("");
 
-      printWindow.document.close();
-      printWindow.print();
-    } else {
-      toast.error("Organizer not found.");
-    }
-  };
+  const printContent = `
+    <style>
+      body { font-family: Arial, sans-serif; padding: 20px; }
+      h1 { color: #2c59fa; }
+      h3 { color: #555; margin-top: 20px; }
+    </style>
 
-//   const printOrganizerData = (id) => {
-//   const organizer = organizerTemplatesData.find((org) => org._id === id);
-//   if (!organizer) {
-//     toast.error("Organizer not found.");
-//     return;
-//   }
-// console.log("organizerdata",organizer)
-//   // Build sections with questions + answers
-//   const sectionsHtml = organizer.sections
-//     .map((section) => {
-//       const formElementsHtml = section.formElements
-//         .map((element) => {
-//           return `
-//             <div style="margin-bottom: 10px;">
-//               <strong>${element.text}:</strong>
-//               <span style="margin-left: 8px;">
-//                 ${element.textvalue ?? "________"}   <!-- print the answer if available -->
-//               </span>
-//             </div>
-//           `;
-//         })
-//         .join("");
+    <h1>Organizer Data</h1>
+    ${sectionsHtml}
+  `;
 
-//       return `
-//         <div style="margin-bottom: 20px;">
-//           <h3>${section.name}</h3>
-//           ${formElementsHtml}
-//         </div>
-//       `;
-//     })
-//     .join("");
+  // Open a new window & auto-print & auto-close
+  const printWindow = window.open("", "_blank");
 
-//   // Create a printable section in DOM
-//   const printArea = document.createElement("div");
-//   printArea.innerHTML = `
-//     <div style="font-family: Arial, sans-serif; padding: 20px;">
-//       <h1 style="color: #2c59fa;">Organizer Data</h1>
-//       ${sectionsHtml}
-//     </div>
-//   `;
-//   document.body.appendChild(printArea);
+  printWindow.document.write(`
+    <html>
+      <head>
+        <title>Print Organizer</title>
+      </head>
+      <body onload="window.print(); window.close();">
+        ${printContent}
+      </body>
+    </html>
+  `);
 
-//   // Print only that area
-//   const originalContent = document.body.innerHTML;
-//   document.body.innerHTML = printArea.innerHTML;
-//   window.print();
-//   document.body.innerHTML = originalContent; // restore the page after print
-// };
+  printWindow.document.close();
+  handleMenuClose();
+};
 
    const [openDialog, setOpenDialog] = useState(false);
   // const [selectedOrganizer, setSelectedOrganizer] = useState(null);

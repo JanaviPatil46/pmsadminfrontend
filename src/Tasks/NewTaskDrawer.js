@@ -52,29 +52,79 @@ const NewTaskDrawer = ({ open, onClose, isEditMode, taskData }) => {
       fetchJobList(selectedOptions.value); // Fetch jobs based on selected account ID
   
   };
+useEffect(() => {
+  fetchAccountData();
+}, []);
 
-  useEffect(() => {
-    fetchAccountData();
-  }, []);
+const fetchAccountData = async () => {
+  try {
+    const storedUserRole = localStorage.getItem("userRole");
+    const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
+    const loginuserid = storedData?.teammember?.userid;
+    const viewAllAccounts = storedData?.teammember?.viewallAccounts;
 
-  const fetchAccountData = async () => {
-    try {
-      // const response = await fetch(`${ACCOUNT_API}/accounts/account/accountdetailslist/true`);
-       const url = "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true"
-          const response = await fetch(url);
-          const data = await response.json();
-      setaccountdata(data.accounts);
-      console.log("accountlist",data.accounts)
-    } catch (error) {
-      console.error("Error fetching data:", error);
+    let url = "";
+
+    // === ROLE-BASED URL LOGIC ===
+    if (storedUserRole === "Admin") {
+      url =
+        "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true";
+    } else {
+      // Team Member
+      url =
+        viewAllAccounts === true
+          ? "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true"
+          : `https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=true`;
     }
-  };
 
-  // console.log(userdata);
-  const accountoptions = accountdata.map((account) => ({
-    value: account._id,
-    label: account.accountName,
-  }));
+    console.log("Fetching accounts from:", url);
+
+    const response = await fetch(url);
+    const data = await response.json();
+
+    // Handle both response formats (Admin & TeamMember)
+    const accounts = Array.isArray(data.accountlist)
+      ? data.accountlist
+      : Array.isArray(data.teamAccounts)
+      ? data.teamAccounts
+      : [];
+
+    console.log("Account list:", accounts);
+
+    setaccountdata(accounts);
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+};
+
+// Convert to dropdown options
+const accountoptions = accountdata.map((account) => ({
+  value: account._id,
+  label: account.accountName,
+}));
+
+  // useEffect(() => {
+  //   fetchAccountData();
+  // }, []);
+
+  // const fetchAccountData = async () => {
+  //   try {
+  //     // const response = await fetch(`${ACCOUNT_API}/accounts/account/accountdetailslist/true`);
+  //      const url = "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true"
+  //         const response = await fetch(url);
+  //         const data = await response.json();
+  //     setaccountdata(data.accounts);
+  //     console.log("accountlist",data.accounts)
+  //   } catch (error) {
+  //     console.error("Error fetching data:", error);
+  //   }
+  // };
+
+  // // console.log(userdata);
+  // const accountoptions = accountdata.map((account) => ({
+  //   value: account._id,
+  //   label: account.accountName,
+  // }));
 
   //   *********joblist*******
   const JOBS_API = process.env.REACT_APP_ADD_JOBS_URL;

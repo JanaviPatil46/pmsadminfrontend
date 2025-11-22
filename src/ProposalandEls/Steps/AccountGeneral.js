@@ -121,54 +121,129 @@ const GeneralStep = ({
     fetchTeamMembers();
   }, []);
 
-  const fetchAccounts = async () => {
-    try {
-      const url =
+  // const fetchAccounts = async () => {
+  //   try {
+  //     const url =
+  //       "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true";
+  //     const response = await fetch(url);
+  //     const result = await response.json();
+
+  //     if (Array.isArray(result.accounts)) {
+  //       setAccounts(result.accounts);
+  //       console.log("All accounts:", result.accounts);
+
+  //       // Auto-select account if data from useParams is available
+  //       console.log("Looking for account ID:", data);
+  //       const selectedAccountData = result.accounts.find(
+  //         (account) => account._id === data
+  //       );
+  //       console.log("Found account:", selectedAccountData);
+
+  //       if (selectedAccountData) {
+  //         const selectedAccount = {
+  //           label: selectedAccountData.accountName,
+  //           value: selectedAccountData._id,
+  //         };
+
+  //         // ✅ wrap inside array
+  //         updateFormData("general", {
+  //           account: [selectedAccount],
+  //         });
+
+  //         if (stepErrors.account) {
+  //           setStepErrors((prev) => {
+  //             const newErrors = { ...prev };
+  //             delete newErrors.account;
+  //             return newErrors;
+  //           });
+  //         }
+
+  //         console.log("Auto-selected account:", selectedAccount);
+  //       } else {
+  //         console.warn("No account found with ID:", data);
+  //       }
+  //     } else {
+  //       console.error("Account list is not an array", result.accounts);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching accounts:", error);
+  //   }
+  // };
+const fetchAccounts = async () => {
+  try {
+    const storedUserRole = localStorage.getItem("userRole");
+    const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
+    const loginuserid = storedData?.teammember?.userid;
+    const viewAllAccounts = storedData?.teammember?.viewallAccounts;
+
+    let url = "";
+
+    // === ROLE BASED ACCOUNT FETCH ===
+    if (storedUserRole === "Admin") {
+      url =
         "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true";
-      const response = await fetch(url);
-      const result = await response.json();
-
-      if (Array.isArray(result.accounts)) {
-        setAccounts(result.accounts);
-        console.log("All accounts:", result.accounts);
-
-        // Auto-select account if data from useParams is available
-        console.log("Looking for account ID:", data);
-        const selectedAccountData = result.accounts.find(
-          (account) => account._id === data
-        );
-        console.log("Found account:", selectedAccountData);
-
-        if (selectedAccountData) {
-          const selectedAccount = {
-            label: selectedAccountData.accountName,
-            value: selectedAccountData._id,
-          };
-
-          // ✅ wrap inside array
-          updateFormData("general", {
-            account: [selectedAccount],
-          });
-
-          if (stepErrors.account) {
-            setStepErrors((prev) => {
-              const newErrors = { ...prev };
-              delete newErrors.account;
-              return newErrors;
-            });
-          }
-
-          console.log("Auto-selected account:", selectedAccount);
-        } else {
-          console.warn("No account found with ID:", data);
-        }
-      } else {
-        console.error("Account list is not an array", result.accounts);
-      }
-    } catch (error) {
-      console.error("Error fetching accounts:", error);
+    } else {
+      // Team Member
+      url =
+        viewAllAccounts === true
+          ? "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true"
+          : `https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=true`;
     }
-  };
+
+    console.log("Fetching Accounts From:", url);
+
+    const response = await fetch(url);
+    const result = await response.json();
+
+    // Handle both Admin & TeamMember API response formats
+    const accountList = Array.isArray(result.accountlist)
+      ? result.accountlist
+      : Array.isArray(result.teamAccounts)
+      ? result.teamAccounts
+      : [];
+
+    if (!Array.isArray(accountList)) {
+      console.error("Account list is not an array:", accountList);
+      return;
+    }
+
+    setAccounts(accountList);
+    console.log("Fetched accounts:", accountList);
+
+    // Auto-select account if useParams provides accountId
+    console.log("Looking for account ID:", data);
+    const selectedAccountData = accountList.find(
+      (account) => account._id === data
+    );
+
+    console.log("Found matched account:", selectedAccountData);
+
+    if (selectedAccountData) {
+      const selectedAccount = {
+        label: selectedAccountData.accountName,
+        value: selectedAccountData._id,
+      };
+
+      updateFormData("general", {
+        account: [selectedAccount], // wrap inside array
+      });
+
+      if (stepErrors.account) {
+        setStepErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors.account;
+          return newErrors;
+        });
+      }
+
+      console.log("Auto-selected account:", selectedAccount);
+    } else {
+      console.warn("No account found with ID:", data);
+    }
+  } catch (error) {
+    console.error("Error fetching accounts:", error);
+  }
+};
 
   const fetchTemplates = async () => {
     try {

@@ -55,58 +55,131 @@ const AccountTask = ({ handleNewDrawerClose, handleDrawerClose }) => {
     fetchJobList(selectedOptions.value); // Fetch jobs based on selected account ID
   };
 
-  useEffect(() => {
-    fetchAccountData();
-  }, []);
+//   useEffect(() => {
+//     fetchAccountData();
+//   }, []);
 
 
 
+
+// const fetchAccountData = async () => {
+//   try {
+   
+//  const url = "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true"
+//           const response = await fetch(url);
+//           const data = await response.json();
+//     const accountList = (data.accounts || []).map(account => ({
+//       value: account._id,
+//       label: account.accountName
+//     }));
+
+//     setaccountdata(accountList); // update the state with correct format
+
+//     // Get accountId from cookie
+//     const accountIdFromCookie = Cookies.get("accountId");
+// console.log("accountList", accountList.map(a => a.value));
+// console.log("accountIdFromCookie", accountIdFromCookie);
+
+
+//     if (accountIdFromCookie) {
+//       const matchedAccount = accountList.find(
+//         (acc) => acc.value === accountIdFromCookie
+//       );
+    
+
+//       if (matchedAccount) {
+//         setSelectedaccount(matchedAccount);
+//         console.log("matchedAccount",matchedAccount)
+//         fetchJobList(matchedAccount.value);
+//       }
+//     }
+//   } catch (error) {
+//     console.error("Error fetching data:", error);
+//   }
+// };
+
+// const accountoptions = accountdata;
+  
+ const [userRole, setUserRole] = useState("");
+// const [accountData, setaccountdata] = useState([]);
+// const [selectedAccount, setSelectedaccount] = useState(null);
 
 const fetchAccountData = async () => {
   try {
-    // const response = await fetch(
-    //   `${ACCOUNT_API}/accounts/account/accountdetailslist/true`
-    // );
-    // const data = await response.json();
- const url = "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true"
-          const response = await fetch(url);
-          const data = await response.json();
-    const accountList = (data.accounts || []).map(account => ({
-      value: account._id,
-      label: account.accountName
+    const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
+    const loginuserid = storedData?.teammember?.userid;
+    const viewAllAccounts = storedData?.teammember?.viewallAccounts;
+
+    console.log("UserRole:", userRole);
+    console.log("TeamMember userId:", loginuserid);
+    console.log("viewAllAccounts:", viewAllAccounts);
+
+    // === Choose API URL based on userRole & viewAllAccounts ===
+    let url = "";
+
+    if (userRole === "Admin") {
+      url = "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true";
+    } else {
+      // Teammember logic
+      url =
+        viewAllAccounts === true
+          ? "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true"
+          : `https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=${true}`;
+    }
+
+    console.log("Final Account Fetch URL:", url);
+
+    const response = await fetch(url);
+    const data = await response.json();
+
+    const accounts = (data.accountlist || data.teamAccounts || []).map((acc) => ({
+      value: acc._id,
+      label: acc.accountName,
     }));
 
-    setaccountdata(accountList); // update the state with correct format
+    setaccountdata(accounts);
 
-    // Get accountId from cookie
+    // === Read accountId from cookie ===
     const accountIdFromCookie = Cookies.get("accountId");
-console.log("accountList", accountList.map(a => a.value));
-console.log("accountIdFromCookie", accountIdFromCookie);
-
+    console.log("All Accounts:", accounts.map(a => a.value));
+    console.log("AccountId from cookie:", accountIdFromCookie);
 
     if (accountIdFromCookie) {
-      const matchedAccount = accountList.find(
-        (acc) => acc.value === accountIdFromCookie
+      const matchedAccount = accounts.find(
+        (a) => a.value === accountIdFromCookie
       );
-    
 
       if (matchedAccount) {
         setSelectedaccount(matchedAccount);
-        console.log("matchedAccount",matchedAccount)
+        console.log("Matched Cookie Account:", matchedAccount);
+
+        // Fetch job list for this account
         fetchJobList(matchedAccount.value);
       }
     }
+
   } catch (error) {
-    console.error("Error fetching data:", error);
+    console.error("Error fetching account data:", error);
   }
 };
 
+// STEP 1: Load userRole
+useEffect(() => {
+  const storedUserRole = localStorage.getItem("userRole") || "";
+  console.log("Loaded userRole:", storedUserRole);
+  setUserRole(storedUserRole);
+}, []);
+
+// STEP 2: Once userRole is known, fetch accounts
+useEffect(() => {
+  if (userRole) {
+    fetchAccountData();
+  }
+}, [userRole]);
+
+// For UI dropdown
 const accountoptions = accountdata;
-  
-  // const accountoptions = accountdata.map((account) => ({
-  //   value: account.id,
-  //   label: account.Name,
-  // }));
+
 
   //   *********joblist*******
   const JOBS_API = process.env.REACT_APP_ADD_JOBS_URL;

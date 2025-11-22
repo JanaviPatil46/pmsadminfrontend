@@ -1276,7 +1276,7 @@ const UpdateTeamMember = () => {
                         padding: "20px",
                       }}
                     >
-                      <Typography variant="h6">
+                      <Typography variant="h6" color={"red"}>
                         {" "}
                         Edit team member {firstName} {middleName} {lastName}
                       </Typography>
@@ -1737,7 +1737,7 @@ const UpdateTeamMember = () => {
                                       height={20}
                                       width={32}
                                       className="react-switch"
-                                      disabled
+                                      // disabled
                                     />
                                     <p style={{ color: "black" }}>
                                       Manage invoices

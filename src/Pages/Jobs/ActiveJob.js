@@ -239,51 +239,90 @@ console.log("accountsResponse",accountsResponse)
       url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
     } 
     
-    else if (userRole === "TeamMember") {
-      if (viewAllAccounts) {
-        // TeamMember with full access gets all jobs
-        // url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}`;
-        // ✅ Fetch active accounts first
-      const accountsResponse = await axios.get(
-        `${ACCOUNT_API}/accounts/account/accountdetailslist/${isActiveTrue}`
-      );
+  //   else if (userRole === "TeamMember") {
+  //     if (viewAllAccounts) {
+        
 
-      const accountsData = accountsResponse.data.accountlist;
-      console.log("Admin accounts fetched:", accountsData);
+  //     // const accountsData = accountsResponse.data.accountlist;
+  //      const accountsResponse = await axios.get(`https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=${filterStatus === "active"}`);
+  //             const accountsData = accountsResponse.data.accountlist;
+  //     console.log("Admin accounts fetched:", accountsData);
 
-      if (!accountsData || accountsData.length === 0) {
-        console.warn("No active accounts found for Admin.");
-        setJobData([]);
-        await loaderDelay;
-        setLoading(false);
-        return;
-      }
+  //     if (!accountsData || accountsData.length === 0) {
+  //       console.warn("No active accounts found for Admin.");
+  //       setJobData([]);
+  //       await loaderDelay;
+  //       setLoading(false);
+  //       return;
+  //     }
 
-      const accountIds = accountsData.map((account) => account.id).join(",");
-      url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
-     console.log("url",url)
-    } else {
-        // TeamMember with restricted access → fetch user's accounts
-        const accountsResponse = await axios.get(
-          `${ACCOUNT_API}/accounts/getaccounts/${loginuserid}/${isActiveTrue}`
-        );
+  //     const accountIds = accountsData.map((account) => account._id).join(",");
 
-        const accountsData = accountsResponse.data.accountlist;
-        console.log("Accounts fetched:", accountsData);
+  //     url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
+  //    console.log("url",url)
+  //   } else {
+  //       // TeamMember with restricted access → fetch user's accounts
+  //       const accountsResponse = await axios.get(
+  //         `${ACCOUNT_API}/accounts/getaccounts/${loginuserid}/${isActiveTrue}`
+  //       );
 
-        if (!accountsData || accountsData.length === 0) {
-          console.warn("No accounts found for user.");
-          setJobData([]);
-          await loaderDelay;
-          setLoading(false);
-          return;
-        }
+  //       const accountsData = accountsResponse.data.accountlist;
+  //       console.log("Accounts fetched:", accountsData);
 
-        const accountIds = accountsData.map((account) => account.id).join(",");
-        url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
-   console.log("url",url);
-      }
-    }
+  //       if (!accountsData || accountsData.length === 0) {
+  //         console.warn("No accounts found for user.");
+  //         setJobData([]);
+  //         await loaderDelay;
+  //         setLoading(false);
+  //         return;
+  //       }
+
+  //       const accountIds = accountsData.map((account) => account.id).join(",");
+   
+  //       url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
+  //  console.log("url",url);
+  //     }
+  //   }
+else if (userRole === "TeamMember") {
+
+  let accountsData = [];
+
+  if (viewAllAccounts) {
+    // 🔹 TeamMember WITH view all access → fetch ALL active accounts
+    const accountsResponse = await axios.get(
+      `https://www.snptaxes.com/api/accounts/list?active=${filterStatus === "active"}`
+    );
+
+    accountsData = accountsResponse.data.accountlist;
+    console.log("TeamMember (view all) accounts:", accountsData);
+
+  } else {
+    // 🔹 TeamMember WITHOUT view all access → fetch assigned accounts only
+    const accountsResponse = await axios.get(
+      `https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=${filterStatus === "active"}`
+    );
+
+    accountsData = accountsResponse.data.accountlist;
+    console.log("TeamMember assigned accounts:", accountsData);
+  }
+
+  // 🔹 Validate accounts
+  if (!accountsData || accountsData.length === 0) {
+    console.warn("No accounts found for TeamMember.");
+    setJobData([]);
+    await loaderDelay;
+    setLoading(false);
+    return;
+  }
+
+  // 🔹 Map account IDs
+  const accountIds = accountsData.map((account) => account._id).join(",");
+
+  // 🔹 Prepare URL for jobs
+  url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
+
+  console.log("TeamMember Job Fetch URL:", url);
+}
 
     if (!url) {
       await loaderDelay;
@@ -1177,44 +1216,7 @@ const getPriorityStyle = (priority) => {
   }
 };
 
-  // const getPriorityStyle = (priority) => {
-  //   switch (priority.toLowerCase()) {
-  //     case "urgent":
-  //       return {
-  //         color: "white",
-  //         backgroundColor: "#0E0402",
-  //         fontSize: "12px",
-  //         borderRadius: "50px",
-  //         padding: "3px 7px",
-  //       };
-  //     case "high":
-  //       return {
-  //         color: "white",
-  //         backgroundColor: "#fe676e",
-  //         fontSize: "12px",
-  //         borderRadius: "50px",
-  //         padding: "3px 7px",
-  //       }; // light red background
-  //     case "medium":
-  //       return {
-  //         color: "white",
-  //         backgroundColor: "#FFC300",
-  //         fontSize: "12px",
-  //         borderRadius: "50px",
-  //         padding: "3px 7px",
-  //       }; // light orange background
-  //     case "low":
-  //       return {
-  //         color: "white",
-  //         backgroundColor: "#56c288",
-  //         fontSize: "12px",
-  //         borderRadius: "50px",
-  //         padding: "3px 7px",
-  //       }; // light green background
-  //     default:
-  //       return {};
-  //   }
-  // };
+ 
   return (
     <>
       <Drawer
@@ -1282,6 +1284,7 @@ const getPriorityStyle = (priority) => {
               <InputLabel sx={{ color: "black" }}>Pipeline</InputLabel>
 
               <Autocomplete
+              disabled
                 options={optionpipeline}
                 getOptionLabel={(option) => option.label}
                 value={selectedPipeline}
@@ -1311,141 +1314,12 @@ const getPriorityStyle = (priority) => {
                 clearOnEscape // Enable clearable functionality
               />
             </Box>
-            {/* <Box mt={2}>
-              <label>Account Tags</label>
-              <Autocomplete
-                multiple // Enable multi-select
-                size="small"
-                sx={{ marginTop: "8px", marginBottom: "8px" }}
-                options={tagoptions} // The array of options
-                value={selectedTags} // Selected tags
-                onChange={handleTagChange}
-                getOptionLabel={(option) => option.label} // Assuming your tags have a 'label' property
-                isOptionEqualToValue={(option, value) =>
-                  option.value === value.value
-                } // Customize equality check
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    variant="outlined"
-                    placeholder="Select tags..."
-                  />
-                )}
-                filterSelectedOptions // Prevents duplicates in selection
-                renderOption={(props, option) => (
-                  <MenuItem
-                    {...props}
-                    key={option.value}
-                    style={{
-                      backgroundColor: option.colour,
-                      color: "#fff",
-                      borderRadius: "15px",
-                      margin: "2px 0",
-                      width: calculateWidthOptions(option.label),
-                    }}
-                  >
-                    {option.label}
-                  </MenuItem>
-                )}
-                renderTags={(value, getTagProps) =>
-                  value.map((option, index) => (
-                    <Chip
-                      {...getTagProps({ index })}
-                      key={option.value}
-                      label={option.label}
-                      style={{
-                        backgroundColor: option.colour,
-                        color: "#fff",
-                        borderRadius: "15px",
-                        fontSize: "10px",
-                        margin: "7px",
-                        alignItems: "center",
-                        textAlign: "center",
-                        marginBottom: "5px",
-                        padding: "2px,8px",
-                      }}
-                    />
-                  ))
-                }
-              />
-            </Box> */}
+            
             <Box mt={2}>
               <InputLabel sx={{ color: "black", mb: 1 }}>
                 Account Tags
               </InputLabel>
-              {/* <Autocomplete
-                  multiple // Enable multi-select
-                  size="small"
-                  sx={{ marginTop: "8px", marginBottom: "8px" }}
-                  options={tagoptions} // The array of options
-                  value={selectedTags} // Selected tags
-                  onChange={handleTagChange}
-                  getOptionLabel={(option) => option.label} // Assuming your tags have a 'label' property
-                  isOptionEqualToValue={(option, value) =>
-                    option.value === value.value
-                  } // Customize equality check
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      variant="outlined"
-                      placeholder="Select tags..."
-                    />
-                  )}
-                  filterSelectedOptions // Prevents duplicates in selection
-                  renderOption={(props, option) => (
-                    <MenuItem
-                      {...props}
-                      key={option.value}
-                      style={{
-                        backgroundColor: option.colour,
-                        color: "#fff",
-                        borderRadius: "15px",
-                        margin: "2px 0",
-                        width: calculateWidthOptions(option.label),
-                      }}
-                    >
-                      {option.label}
-                    </MenuItem>
-                  )}
-                  renderTags={(value, getTagProps) =>
-                    value.map((option, index) => (
-                      <Chip
-                        {...getTagProps({ index })}
-                        key={option.value}
-                        label={option.label}
-                        style={{
-                          backgroundColor: option.colour,
-                          color: "#fff",
-                          borderRadius: "15px",
-                          fontSize: "10px",
-                          margin: "7px",
-                          alignItems: "center",
-                          textAlign: "center",
-                          marginBottom: "5px",
-                          padding: "2px,8px",
-                        }}
-                      />
-                    ))
-                  }
-                /> 
-                 */}
-              {/* // renderValue={(selected) => (
-                  //   <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                  //     {selected.map((option) => (
-                  //       <Chip
-                  //         key={option.value}
-                  //         label={option.label}
-                  //         sx={{
-                  //           backgroundColor: option.colour,
-                  //           color: "#fff",
-                  //           borderRadius: "15px",
-                  //           fontSize: "10px",
-                  //           padding: "2px 8px",
-                  //         }}
-                  //       />
-                  //     ))}
-                  //   </Box>
-                  // )} */}
+            
               <TagsMultiSelectDropDown
                 value={selectedTags}
                 onChange={handleTagChange}
@@ -1454,34 +1328,7 @@ const getPriorityStyle = (priority) => {
             </Box>
             <Box mt={2} mr={2.5}>
               <InputLabel sx={{ color: "black" }}>Job Assignee</InputLabel>
-              {/* <Autocomplete
-                multiple
-                sx={{ background: "#fff", mt: 1 }}
-                options={useroptions}
-                size="small"
-                getOptionLabel={(option) => option.label}
-                value={selecteduser}
-                onChange={handleUserChange}
-                renderOption={(props, option) => (
-                  <Box
-                    component="li"
-                    {...props}
-                    sx={{ cursor: "pointer", margin: "5px 10px" }} // Add cursor pointer style
-                  >
-                    {option.label}
-                  </Box>
-                )}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    variant="outlined"
-                    placeholder="Assignees"
-                  />
-                )}
-                isOptionEqualToValue={(option, value) =>
-                  option.value === value.value
-                }
-              /> */}
+              
 
               <MultiSelectDropdown
                 value={selectedUser}
