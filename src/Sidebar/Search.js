@@ -26,7 +26,8 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import axios from "axios";
 import { RxCross2 } from "react-icons/rx";
-import ContactForm from "../Pages/UpdateContact"
+import ContactForm from "../Pages/UpdateContact";
+import CloseIcon from "@mui/icons-material/Close";
 import { useNavigate } from "react-router-dom";
 const SearchComponent = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -114,7 +115,9 @@ console.log("Contacts Data:", contactsData);
               throw new Error("Failed to fetch data");
           }
           const data = await response.json();
-          setSelectedContact(data.contact);
+          console.log("Fetched contact data:", data.data);
+          setSelectedContact(data.data);
+
           // console.log(data.contact); // Debug: Log the contact data
           selectedContacts();
           setIsDrawerOpen(true); // Open the drawer after setting the contact data
@@ -335,21 +338,25 @@ const handleContactUpdated = () => {
                 onClose={handleCloseDrawer}
                 sx={{ width: 600 }}
             >
+              <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            padding: "20px",
+                            ml: 1,
+                          }}
+                        >
+                          <Typography sx={{ fontWeight: "bold" }} variant="h6">
+                            Edit Contact
+                          </Typography>
+                          <IconButton onClick={handleCloseDrawer}>
+                            <CloseIcon />
+                          </IconButton>
+                        </Box>
+                        <Divider sx={{mb:2}}/>
                 {selectedContact && (
-                    // <ContactForm
-                    //     selectedContact={selectedContact}
-                    //     // uniqueTags={uniqueTags}
-                    //     // Pass additional props needed by ContactForm
-                    //     handleTagChange={() => { }}
-                    //     handlePhoneNumberChange={() => { }}
-                    //     handleDeletePhoneNumber={() => { }}
-                    //     handleAddPhoneNumber={() => { }}
-                    //     handleCountryChange={() => { }}
-                    //     sendingData={() => { }}
-                    //     handleClose={() => setIsDrawerOpen(false)}
-                    //     // isSmallScreen={isMobile}
-                    //     onContactUpdated={handleContactUpdated}
-                    // />
+                    
                     <ContactForm
                                   selectedContact={selectedContact}
                                   

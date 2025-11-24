@@ -141,6 +141,7 @@ const JobDrawer = ({
 
     const selectedValues = newSelectedAcc.map((option) => option.value);
     setCombinedaccountValues(selectedValues);
+    console.log("combined account", selectedValues);
   };
   useEffect(() => {
     fetchAccountData();
@@ -153,8 +154,8 @@ const JobDrawer = ({
         "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true"
       );
       const data = await response.json();
-      setaccountdata(data.accounts);
-      console.log("account data", data.accounts);
+      setaccountdata(data.accountlist);
+      console.log("account data", data.accountlist);
     } catch (error) {
       console.error("Error fetching data:", error);
     }

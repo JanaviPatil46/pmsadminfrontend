@@ -65,7 +65,7 @@ const AccountTable = () => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [selected, setSelected] = useState([]);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(30);
   // const [order, setOrder] = useState("asc");
   // const [orderBy, setOrderBy] = useState("accountName");
   const [order, setOrder] = useState(null);

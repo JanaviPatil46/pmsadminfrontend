@@ -30,6 +30,7 @@ const ContactsTable = () => {
 const [selectedContact, setSelectedContact] = useState(null);
 
 const handleOpenDrawer = (contact) => {
+  console.log("Opening drawer for contact:", contact);
   setSelectedContact(contact);
   setOpenDrawer(true);
 };

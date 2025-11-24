@@ -27,7 +27,7 @@ const ContactForm = ({
 }) => {
   const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
   const CONTACT_API = process.env.REACT_APP_CONTACTS_URL;
-
+console.log("selected contact in update form",selectedContact)
   // State variables for form fields
   const [firstName, setFirstName] = useState("");
   const [middleName, setMiddleName] = useState("");
@@ -47,7 +47,7 @@ console.log("selectedcountry",selectedCountry)
   const [state, setState] = useState("");
   const [postalCode, setPostalCode] = useState("");
   const [tagsNew, setTagsNew] = useState([]);
-  const [tags, setTags] = useState([]);
+  // const [tags, setTags] = useState([]);
   const [contactId, setContactId] = useState(null); // Added state for contact ID
   const [combinedTagsValues, setCombinedTagsValues] = useState(null);
   useEffect(() => {
@@ -461,7 +461,7 @@ country={"us"}
               options={options}
               size="small"
               getOptionLabel={(option) => option.label} // show country name
-              value={selectedCountry}
+              value={selectedCountry || ""}
               onChange={(event, newValue) => setSelectedCountry(newValue)}
               renderInput={(params) => (
                 <TextField {...params} placeholder="Select Country" variant="outlined" />
