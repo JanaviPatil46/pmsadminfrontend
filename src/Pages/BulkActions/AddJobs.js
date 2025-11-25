@@ -217,7 +217,7 @@ const fetchAccountData = async () => {
 
     const accounts = data.accountlist || data.teamAccounts || [];
 
-    setAccountData(accounts);
+    setaccountdata(accounts);
 
     // Convert to dropdown options
     const options = accounts.map((acc) => ({

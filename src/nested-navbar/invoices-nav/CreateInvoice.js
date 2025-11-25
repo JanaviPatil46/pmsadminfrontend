@@ -62,17 +62,17 @@ const CreateInvoice = ({ charLimit = 4000, onClose }) => {
   //     console.log(result.accounts);
   //     console.log(data);
 
-  //     const selectedAccount = result.accounts.find((account) => account._id === data); // Assume data contains the account ID
-  //     console.log(selectedAccount);
+      // const selectedAccount = result.accounts.find((account) => account._id === data); // Assume data contains the account ID
+      // console.log(selectedAccount);
 
-  //     if (selectedAccount) {
-  //       const account = {
-  //         label: selectedAccount.accountName,
-  //         value: selectedAccount._id,
-  //       };
-  //       console.log(account);
-  //       setSelectedaccount(account);
-  //     }
+      // if (selectedAccount) {
+      //   const account = {
+      //     label: selectedAccount.accountName,
+      //     value: selectedAccount._id,
+      //   };
+      //   console.log(account);
+      //   setSelectedaccount(account);
+      // }
   //   } catch (error) {
   //     console.error("Error fetching data:", error);
   //   }
@@ -110,18 +110,29 @@ const fetchAccountData = async () => {
     console.log("Fetching accounts from:", url);
 
     const response = await fetch(url);
-    const data = await response.json();
+    const accdata = await response.json();
 
     // Handle both response formats (Admin & TeamMember)
-    const accounts = Array.isArray(data.accountlist)
-      ? data.accountlist
-      : Array.isArray(data.teamAccounts)
-      ? data.teamAccounts
+    const accounts = Array.isArray(accdata.accountlist)
+      ? accdata.accountlist
+      : Array.isArray(accdata.teamAccounts)
+      ? accdata.teamAccounts
       : [];
 
     console.log("Account list:", accounts);
 
     setaccountdata(accounts);
+         const selectedAccount = accounts.find((account) => account._id === data); // Assume data contains the account ID
+      console.log("selectedAccount",selectedAccount);
+
+      if (selectedAccount) {
+        const account = {
+          label: selectedAccount.accountName,
+          value: selectedAccount._id,
+        };
+        console.log(account);
+        setSelectedaccount(account);
+      }
   } catch (error) {
     console.error("Error fetching data:", error);
   }
@@ -593,10 +604,10 @@ const validateInvoice = () => {
   let valid = true;
   let newErrors = { invoiceTemplate: "", lineItems: "" };
 
-  if (!selectInvoiceTemp?.value) {
-    newErrors.invoiceTemplate = "Invoice template is required";
-    valid = false;
-  }
+  // if (!selectInvoiceTemp?.value) {
+  //   newErrors.invoiceTemplate = "Invoice template is required";
+  //   valid = false;
+  // }
 
   if (!lineItems || lineItems.length === 0) {
     newErrors.lineItems = "At least one line item is required";

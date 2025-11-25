@@ -286,7 +286,7 @@ const AccountDetails = () => {
     }
 
     try {
-      await axios.post(`https://www.snptaxes.com/api/auth/reset-password`, {
+      await axios.post( 'https://www.snptaxes.com/api/auth/forgot-password', {
         email: contact.contact.email,
       });
       alert("Password reset email sent successfully!");
