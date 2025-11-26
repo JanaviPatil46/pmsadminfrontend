@@ -527,6 +527,7 @@ const SearchComponent = () => {
         placeholder="Search..."
         size="small"
         fullWidth
+        
         InputProps={{
           startAdornment: <SearchIcon sx={{ mr: 1, color: "gray" }} />,
           endAdornment: (

@@ -2475,9 +2475,9 @@ else if (userRole === "TeamMember") {
         const accountsData = res.data;
 
         let currentTags = accountsData.tags || [];
-        const addTagIds = automation?.addTags?.map((tag) => tag._id) || [];
+        const addTagIds = automation?.addTags || [];
         const removeTagIds =
-          automation?.removeTags?.map((tag) => tag._id) || [];
+          automation?.removeTags || [];
 
         let updatedTags = currentTags.filter(
           (tagId) => !removeTagIds.includes(tagId)

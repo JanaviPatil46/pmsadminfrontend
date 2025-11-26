@@ -193,13 +193,54 @@ const InvoicesUpdate = ({ charLimit = 4000, onClose, invoiceData }) => {
     value: service._id,
     label: service.serviceName,
   }));
+  const [selectedservice, setselectedService] = useState();
+      const fetchservicebyid = async (id, rowIndex) => {
+    const requestOptions = {
+      method: "GET",
+      redirect: "follow",
+    };
+    const url = `${SERVICE_API}/workflow/services/servicetemplate/${id}`;
+    fetch(url, requestOptions)
+      .then((response) => response.json())
+      .then((result) => {
+        const service = Array.isArray(result.serviceTemplate)
+          ? result.serviceTemplate[0]
+          : result.serviceTemplate;
+        const rate = service.rate
+          ? parseFloat(service.rate.replace("$", ""))
+          : 0;
+        const updatedRow = {
+          productName: service.serviceName || "",
+          description: service.description || "",
+          rate: `$${rate.toFixed(2)}`,
+          qty: "1",
+          amount: `$${rate.toFixed(2)}`,
+          tax: service.tax || false,
+          isDiscount: false,
+        };
 
-  const handleServiceChange = (index, selectedOptions) => {
+        const updatedRows = [...rows];
+        updatedRows[rowIndex] = { ...updatedRows[rowIndex], ...updatedRow };
+        setRows(updatedRows);
+      })
+      .catch((error) => console.error(error));
+  };
+  // const handleServiceChange = (index, selectedOptions) => {
+  //   const newRows = [...rows];
+  //   newRows[index].productName = selectedOptions ? selectedOptions.label : "";
+  //   setRows(newRows);
+  // };
+const handleServiceChange = (index, selectedOptions) => {
     const newRows = [...rows];
     newRows[index].productName = selectedOptions ? selectedOptions.label : "";
     setRows(newRows);
+     setselectedService(selectedOptions);
+    // fetchservicebyid(selectedOptions.value, index);
+     // Call fetch only if an option is actually selected
+  if (selectedOptions && selectedOptions.value) {
+    fetchservicebyid(selectedOptions.value, index);
+  }
   };
-
   const handleServiceInputChange = (inputValue, actionMeta, index) => {
     if (actionMeta.action === "input-change") {
       const newRows = [...rows];
@@ -1045,7 +1086,7 @@ if (result.invoice.teammember) {
   return (
     <Box>
       <Box sx={{ display: "flex", alignItems: "center", padding: 2 }}>
-        <Typography variant="h6">Edit Invoice</Typography>
+        <Typography variant="h6">Edit Invoice </Typography>
 
         <Box sx={{ display: "flex", alignItems: "center", ml: "auto" }}>
         <Box  onClick={handleOpenpreviewDrawer} display="flex"  alignItems="center" sx={{ mr: 2, color: "#1976d3" }}>

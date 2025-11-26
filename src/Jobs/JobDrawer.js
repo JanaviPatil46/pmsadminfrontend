@@ -2958,21 +2958,23 @@ console.log("accountsResponse",accountsResponse)
     // Account tags update handler
     const handleAccountTagsUpdate = async (accountId, automation) => {
       console.log(`Updating account tags for Account ID: ${accountId}`);
-
+console.log("Automation details:", automation);
       const res = await axios.get(
         `https://www.snptaxes.com/api/accounts/${accountId}`
       );
       const accountsData = res.data;
 
       let currentTags = accountsData.tags || [];
-      const addTagIds = automation?.addTags?.map((tag) => tag._id) || [];
-      const removeTagIds = automation?.removeTags?.map((tag) => tag._id) || [];
-
+      const addTagIds = automation?.addTags || [];
+      const removeTagIds = automation?.removeTags || [];
+console.log("Current Tags:", currentTags);
+console.log("Add Tag IDs:", addTagIds);
+console.log("Remove Tag IDs:", removeTagIds);
       let updatedTags = currentTags.filter(
         (tagId) => !removeTagIds.includes(tagId)
       );
       updatedTags = [...new Set([...updatedTags, ...addTagIds])];
-
+console.log("Updated Tags:", updatedTags);
       const updateResponse = await fetch(
         `https://www.snptaxes.com/api/accounts/accountdetails/updateaccounttags/${accountId}`,
         {

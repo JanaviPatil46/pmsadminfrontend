@@ -256,7 +256,7 @@ const DocsFolderTree = () => {
       "sendForApproval",
       "pendingApproval",
       "cancledApproval",
-      ,
+      
       "approvalCompleted",
     ];
 

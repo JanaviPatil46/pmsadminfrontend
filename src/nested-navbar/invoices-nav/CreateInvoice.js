@@ -1014,7 +1014,7 @@ const validateInvoice = () => {
     <Box>
       <Box sx={{display:'flex', alignItems:'center',justifyContent:'space-between',mr:2}}>
       <Typography p={2} variant="h6">
-        Create Invoice 
+        Create Invoice  
       </Typography>
       <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
     <Box
