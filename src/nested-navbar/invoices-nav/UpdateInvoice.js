@@ -514,7 +514,7 @@ const handleServiceChange = (index, selectedOptions) => {
       description: description,
       invoicetemplate: selectInvoiceTemp.value,
       paymentMethod: paymentMode.value,
-      teammember: selecteduser.value,
+      teammember: selecteduser?.value,
       emailinvoicetoclient: emailInvoice,
       scheduleinvoicedate: new Date(), // Current date and time
       scheduleinvoicetime: new Date().toLocaleTimeString('en-US', { hour12: false }), 
@@ -993,7 +993,7 @@ if (result.invoice.teammember) {
         console.log(result);
         if (result && result.message === "Category created successfully") {
           toast.success("Category created successfully");
-          handleCategoryFormClose(false);
+          handleCategoryFormClose();
           fetchData();
           setcategorycreate();
         } else {
@@ -1038,47 +1038,47 @@ if (result.invoice.teammember) {
 
  const [firstContactEmail, setFirstContactEmail] = useState("");
 
-  const contactMail = () => {
-    const requestOptions = {
-      method: "GET",
-      redirect: "follow",
-    };
+  // const contactMail = () => {
+  //   const requestOptions = {
+  //     method: "GET",
+  //     redirect: "follow",
+  //   };
   
-    console.log("Calling API with ID:", selectedaccount?.value); // Debug log
+  //   console.log("Calling API with ID:", selectedaccount?.value); // Debug log
   
-    fetch(`${ACCOUNT_API}/accounts/accountdetails/accountdetailslist/listbyid/${selectedaccount?.value}`, requestOptions)
-      .then((response) => {
-        console.log("Response status:", response.status); // Debug log
-        return response.json();
-      })
-      .then((result) => {
-        console.log("API Result:", result); // Debug log
+  //   fetch(`${ACCOUNT_API}/accounts/accountdetails/accountdetailslist/listbyid/${selectedaccount?.value}`, requestOptions)
+  //     .then((response) => {
+  //       console.log("Response status:", response.status); // Debug log
+  //       return response.json();
+  //     })
+  //     .then((result) => {
+  //       console.log("API Result:", result); // Debug log
         
-        if (result?.accountlist?.Contacts && Array.isArray(result.accountlist.Contacts)) {
-          const email = result.accountlist.Contacts[0]?.email;
-          if (email) {
-            console.log("First Contact Email:", email); // Debug log
-            setFirstContactEmail(email); // Update state
-          } else {
-            console.error("First contact does not have an email.");
-            setFirstContactEmail("[CONTACT EMAIL]"); // Handle missing email
-          }
-        } else {
-          console.error("No contacts found in the response.");
-          setFirstContactEmail("[CONTACT EMAIL]"); // Handle missing contacts
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching contacts:", error);
-        setFirstContactEmail("Error fetching email"); // Handle fetch error
-      });
-  };
+  //       if (result?.accountlist?.Contacts && Array.isArray(result.accountlist.Contacts)) {
+  //         const email = result.accountlist.Contacts[0]?.email;
+  //         if (email) {
+  //           console.log("First Contact Email:", email); // Debug log
+  //           setFirstContactEmail(email); // Update state
+  //         } else {
+  //           console.error("First contact does not have an email.");
+  //           setFirstContactEmail("[CONTACT EMAIL]"); // Handle missing email
+  //         }
+  //       } else {
+  //         console.error("No contacts found in the response.");
+  //         setFirstContactEmail("[CONTACT EMAIL]"); // Handle missing contacts
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error fetching contacts:", error);
+  //       setFirstContactEmail("Error fetching email"); // Handle fetch error
+  //     });
+  // };
   
-  useEffect(() => {
-    if (selectedaccount?.value) {
-      contactMail();
-    }
-  }, [selectedaccount]);
+  // useEffect(() => {
+  //   if (selectedaccount?.value) {
+  //     contactMail();
+  //   }
+  // }, [selectedaccount]);
   //preview drawer
  const [previewDrawerOpen, setpreviewDrawerOpen] = useState(false);
  const handleOpenpreviewDrawer = () => setpreviewDrawerOpen(true);

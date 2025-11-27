@@ -1312,7 +1312,7 @@ export default function ContactForm({ onBack, onSubmit, isEditing }) {
                   onChange={(e) => handleChange(contactIndex, e)}
                 />
               </Box>
-              {contacts.length > 1 && (
+              {/* {contacts.length > 1 && ( */}
                 <Button
                   color="error"
                   sx={{ mt: 2 }}
@@ -1320,7 +1320,7 @@ export default function ContactForm({ onBack, onSubmit, isEditing }) {
                 >
                   Remove Contact
                 </Button>
-              )}
+              {/* )} */}
             </Box>
           ))}
         </>
