@@ -6,6 +6,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { toast } from "react-toastify";
+import AccountMultiSelectDropdown from "../../Templates/AccountMultiSelectDropdown";
 
 const AddBulkOrganizer = ({ selectedAccounts, onClose }) => {
   console.log("selectedAccounts",selectedAccounts)
@@ -38,46 +39,116 @@ const AddBulkOrganizer = ({ selectedAccounts, onClose }) => {
   };
 
   const [accountData, setAccountData] = useState([]);
+   const [accountdata, setaccountdata] = useState([]);
   const [accountoptions, setAccountOptions] = useState([]);
+   const [userRole, setUserRole] = useState("");
+  const [loading, setLoading] = useState(false);
+   const [filterStatus, setFilterStatus] = useState("active"); 
   const [combinedaccountValues, setCombinedaccountValues] = useState([]);
+  const [selectedaccount, setSelectedaccount] = useState([]);
+//   const fetchAccountsData = async () => {
+//     try {
+//       // const url = `${ACCOUNT_API}/accounts/account/accountdetailslist/`;
+//       const url = "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true";
+//       const response = await fetch(url);
+//       const result = await response.json();
+// console.log("result",result.accounts)
+// setAccountData(result.accounts)
+//     const options = result.accounts.map((account) => ({
+//           value: account._id,
+//           label: account.accountName,
+//         }));
+//         setAccountOptions(options);
+//       // if (Array.isArray(result.accountlist)) {
+//       //   setAccountData(result.accountlist);
+//       //   console.log(result.accountlist);
 
-  const fetchAccountsData = async () => {
-    try {
-      // const url = `${ACCOUNT_API}/accounts/account/accountdetailslist/`;
-      const url = "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true";
-      const response = await fetch(url);
-      const result = await response.json();
-console.log("result",result.accounts)
-setAccountData(result.accounts)
-    const options = result.accounts.map((account) => ({
-          value: account._id,
-          label: account.accountName,
-        }));
-        setAccountOptions(options);
-      // if (Array.isArray(result.accountlist)) {
-      //   setAccountData(result.accountlist);
-      //   console.log(result.accountlist);
+//       //   // Map accounts to options
+//         // const options = result.accountlist.map((account) => ({
+//         //   value: account.id,
+//         //   label: account.Name,
+//         // }));
+//         // setAccountOptions(options);
 
-      //   // Map accounts to options
-        // const options = result.accountlist.map((account) => ({
-        //   value: account.id,
-        //   label: account.Name,
-        // }));
-        // setAccountOptions(options);
+//       //   // Filter options based on selectedAccounts
+//         const selectedOptions = options.filter((option) => selectedAccounts.includes(option.value));
+//       //   console.log("Selected Options:", selectedOptions);
+//         setSelectedAccount(selectedOptions);
+//         setCombinedaccountValues(selectedOptions.map((option) => option.value));
+//       // } else {
+//       //   console.error("Account list is not an array", result.accountlist);
+//       // }
+//     } catch (error) {
+//       console.log("Error:", error);
+//     }
+//   };
+const fetchAccountsData = async () => {
+  setLoading(true);
+  try {
+    const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
+    const loginuserid = storedData?.teammember?.userid;
+    const viewAllAccounts = storedData?.teammember?.viewallAccounts;
 
-      //   // Filter options based on selectedAccounts
-        const selectedOptions = options.filter((option) => selectedAccounts.includes(option.value));
-      //   console.log("Selected Options:", selectedOptions);
-        setSelectedAccount(selectedOptions);
-        setCombinedaccountValues(selectedOptions.map((option) => option.value));
-      // } else {
-      //   console.error("Account list is not an array", result.accountlist);
-      // }
-    } catch (error) {
-      console.log("Error:", error);
+    console.log("UserRole:", userRole);
+    console.log("Team Member userId:", loginuserid);
+    console.log("viewAllAccounts:", viewAllAccounts);
+
+    let url = "";
+
+    // --- Same logic pattern as pipeline data ---
+    if (userRole === "Admin") {
+      url = `https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true`;
+    } else {
+      // TeamMember
+      url =
+        viewAllAccounts === true
+          ? `https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true`
+          : `https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=${filterStatus === "active"}`;
     }
-  };
 
+    console.log("Fetching accounts from:", url);
+
+    const response = await fetch(url);
+    const data = await response.json();
+
+    const accounts = data.accountlist || data.teamAccounts || [];
+
+    setaccountdata(accounts);
+
+    // Convert to dropdown options
+    const options = accounts.map((acc) => ({
+      value: acc._id,
+      label: acc.accountName,
+    }));
+    setAccountOptions(options);
+
+    // Pre-select previously chosen accounts
+    const selectedOptions = options.filter((option) =>
+      selectedAccounts.includes(option.value)
+    );
+    setSelectedaccount(selectedOptions);
+    setCombinedaccountValues(selectedOptions.map((opt) => opt.value));
+
+  } catch (error) {
+    console.error("Error fetching account data:", error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+// STEP 1 — Fetch userRole first
+useEffect(() => {
+  const storedUserRole = localStorage.getItem("userRole") || "";
+  console.log("UserRole from localStorage:", storedUserRole);
+  setUserRole(storedUserRole);
+}, []);
+
+// STEP 2 — After userRole is loaded, fetch account list
+useEffect(() => {
+  if (userRole) {
+    fetchAccountsData();
+  }
+}, [userRole, filterStatus]);
   const handleOrganizerTemplateChange = (event) => {
     const selectedValue = event.target.value;
     setSelectedOrganizerTemplate(selectedValue);
@@ -608,7 +679,7 @@ const handleYesNoChange = (value, elementText, sectionId) => {
 
       <Box mt={3}>
         <Typography>Accounts</Typography>
-        <Autocomplete
+        {/* <Autocomplete
           multiple
           options={accountoptions}
           value={selectedAccount}
@@ -634,7 +705,13 @@ const handleYesNoChange = (value, elementText, sectionId) => {
                               )}
           renderInput={(params) => <TextField {...params} placeholder="Select Accounts" variant="outlined" size="small" sx={{ backgroundColor: "#fff" }}  multiline />}
           sx={{ width: "100%", marginTop: "8px" }}
-        />
+        /> */}
+         <AccountMultiSelectDropdown
+                            value={selectedaccount}
+                            onChange={handleAccountChange}
+                            placeholder="Accounts"
+                            options={accountoptions}
+                          />
       </Box>
 
       <Box mt={3}>

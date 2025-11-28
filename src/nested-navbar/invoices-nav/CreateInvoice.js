@@ -1,31 +1,66 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { Menu, useMediaQuery, Checkbox, Autocomplete, Switch, FormControlLabel, Box, Button, Drawer, Typography, IconButton, Divider, Select, MenuItem, InputLabel, TextField, FormControl, FormLabel, InputAdornment, Popover, ListItem, List, ListItemText, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
+import React, { useState, useEffect, useMemo ,useContext} from "react";
+import {
+  Menu,
+  useMediaQuery,
+  Checkbox,
+  Autocomplete,
+  Switch,
+  FormControlLabel,
+  Box,
+  Button,
+  Drawer,
+  Typography,
+  IconButton,
+  Divider,
+  Select,
+  MenuItem,
+  InputLabel,
+  TextField,
+  FormControl,
+  FormLabel,
+  InputAdornment,
+  Popover,
+  ListItem,
+  List,
+  ListItemText,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import Grid from "@mui/material/Unstable_Grid2";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-
+import { LoginContext } from "../../Sidebar/Context/Context";
 import { AiOutlinePlusCircle } from "react-icons/ai";
 import { CiDiscount1 } from "react-icons/ci";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { RiCloseLine } from "react-icons/ri";
 import "../../Billing/Invoices";
 import { toast } from "react-toastify";
+import dayjs from "dayjs";
 // import { useNavigate } from "react-router-dom";
-import { MaterialReactTable, useMaterialReactTable } from "material-react-table";
+import {
+  MaterialReactTable,
+  useMaterialReactTable,
+} from "material-react-table";
 import { CiMenuKebab } from "react-icons/ci";
 import CreatableSelect from "react-select/creatable";
 import { useParams } from "react-router-dom";
 import { RxCross2 } from "react-icons/rx";
 import { useTheme } from "@mui/material/styles";
-import PlagiarismIcon from '@mui/icons-material/Plagiarism';
+import PlagiarismIcon from "@mui/icons-material/Plagiarism";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 const CreateInvoice = ({ charLimit = 4000, onClose }) => {
   const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
   const SERVICE_API = process.env.REACT_APP_SERVICES_URL;
   const INVOICE_API = process.env.REACT_APP_INVOICE_TEMP_URL;
-
+ 
   const { data } = useParams();
   const theme = useTheme();
   //   const navigate = useNavigate();
@@ -39,91 +74,83 @@ const CreateInvoice = ({ charLimit = 4000, onClose }) => {
   const [reminders, setReminders] = useState(false);
   const [scheduledInvoice, setScheduledInvoice] = useState(false);
   const [charCount, setCharCount] = useState(0);
-  const [invoicenumber, setinvoicenumber] = useState();
-  const [paymentMode, setPaymentMode] = useState("");
+   const [invoicenumber, setinvoicenumber] = useState("");
+  const [isLoadingInvoiceNumber, setIsLoadingInvoiceNumber] = useState(true);
+  // const [paymentMode, setPaymentMode] = useState("");
+  const [paymentMode, setPaymentMode] = useState({
+  value: "Bank Debits", 
+  label: "Bank Debits"
+});
   const [showDropdown, setShowDropdown] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [filteredShortcuts, setFilteredShortcuts] = useState([]);
   const [shortcuts, setShortcuts] = useState([]);
   const [selectedOption, setSelectedOption] = useState("contacts");
 
-  // useEffect(() => {
-  //   fetchAccountData();
-  // }, []);
-
-  // console.log(selectedaccount);
-  // const fetchAccountData = async () => {
-  //   try {
-  //     // const response = await fetch(`${ACCOUNT_API}/accounts/accountdetails`);
-  //           const response = await fetch("https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true")
-
-  //           const result = await response.json();
-  //     setaccountdata(result.accounts);
-  //     console.log(result.accounts);
-  //     console.log(data);
-
-      // const selectedAccount = result.accounts.find((account) => account._id === data); // Assume data contains the account ID
-      // console.log(selectedAccount);
-
-      // if (selectedAccount) {
-      //   const account = {
-      //     label: selectedAccount.accountName,
-      //     value: selectedAccount._id,
-      //   };
-      //   console.log(account);
-      //   setSelectedaccount(account);
-      // }
-  //   } catch (error) {
-  //     console.error("Error fetching data:", error);
-  //   }
-  // };
-  // // console.log(userdata);
-  // const accountoptions = accountdata.map((account) => ({
-  //   value: account._id,
-  //   label: account.accountName,
-  // }));
-useEffect(() => {
-  fetchAccountData();
-}, []);
-
-const fetchAccountData = async () => {
-  try {
-    const storedUserRole = localStorage.getItem("userRole");
-    const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
-    const loginuserid = storedData?.teammember?.userid;
-    const viewAllAccounts = storedData?.teammember?.viewallAccounts;
-
-    let url = "";
-
-    // === ROLE-BASED URL LOGIC ===
-    if (storedUserRole === "Admin") {
-      url =
-        "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true";
-    } else {
-      // Team Member
-      url =
-        viewAllAccounts === true
-          ? "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true"
-          : `https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=true`;
+  useEffect(() => {
+    fetchAccountData();
+    fetchNextInvoiceNumber()
+  }, []);
+// Function to fetch the next invoice number
+  const fetchNextInvoiceNumber = async () => {
+    try {
+      setIsLoadingInvoiceNumber(true);
+      const url = `${INVOICE_NEW}/workflow/invoices/next-invoice-number`;
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch next invoice number');
+      }
+      
+      const data = await response.json();
+      setinvoicenumber(data.nextInvoiceNumber.toString());
+    } catch (error) {
+      console.error('Error fetching next invoice number:', error);
+      // If there's an error, set a placeholder or handle appropriately
+      setinvoicenumber("Auto-generated");
+      toast.error('Failed to load invoice number');
+    } finally {
+      setIsLoadingInvoiceNumber(false);
     }
+  };
+  const fetchAccountData = async () => {
+    try {
+      const storedUserRole = localStorage.getItem("userRole");
+      const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
+      const loginuserid = storedData?.teammember?.userid;
+      const viewAllAccounts = storedData?.teammember?.viewallAccounts;
 
-    console.log("Fetching accounts from:", url);
+      let url = "";
 
-    const response = await fetch(url);
-    const accdata = await response.json();
+      // === ROLE-BASED URL LOGIC ===
+      if (storedUserRole === "Admin") {
+        url =
+          "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true";
+      } else {
+        // Team Member
+        url =
+          viewAllAccounts === true
+            ? "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true"
+            : `https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=true`;
+      }
 
-    // Handle both response formats (Admin & TeamMember)
-    const accounts = Array.isArray(accdata.accountlist)
-      ? accdata.accountlist
-      : Array.isArray(accdata.teamAccounts)
-      ? accdata.teamAccounts
-      : [];
+      console.log("Fetching accounts from:", url);
 
-    console.log("Account list:", accounts);
+      const response = await fetch(url);
+      const accdata = await response.json();
 
-    setaccountdata(accounts);
-         const selectedAccount = accounts.find((account) => account._id === data); // Assume data contains the account ID
-      console.log("selectedAccount",selectedAccount);
+      // Handle both response formats (Admin & TeamMember)
+      const accounts = Array.isArray(accdata.accountlist)
+        ? accdata.accountlist
+        : Array.isArray(accdata.teamAccounts)
+          ? accdata.teamAccounts
+          : [];
+
+      console.log("Account list:", accounts);
+
+      setaccountdata(accounts);
+      const selectedAccount = accounts.find((account) => account._id === data); // Assume data contains the account ID
+      console.log("selectedAccount", selectedAccount);
 
       if (selectedAccount) {
         const account = {
@@ -133,16 +160,16 @@ const fetchAccountData = async () => {
         console.log(account);
         setSelectedaccount(account);
       }
-  } catch (error) {
-    console.error("Error fetching data:", error);
-  }
-};
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
-// Convert to dropdown options
-const accountoptions = accountdata.map((account) => ({
-  value: account._id,
-  label: account.accountName,
-}));
+  // Convert to dropdown options
+  const accountoptions = accountdata.map((account) => ({
+    value: account._id,
+    label: account.accountName,
+  }));
   const handleAccountChange = (event, newValue) => {
     console.log(newValue);
     setSelectedaccount(newValue);
@@ -182,7 +209,10 @@ const accountoptions = accountdata.map((account) => ({
   const paymentsOptions = [
     { value: "Bank Debits", label: "Bank Debits" },
     { value: "Credit Card", label: "Credit Card" },
-    { value: "Credit Card or Bank Debits", label: "Credit Card or Bank Debits" },
+    {
+      value: "Credit Card or Bank Debits",
+      label: "Credit Card or Bank Debits",
+    },
   ];
   const handlePaymentOptionChange = (event, selectedOption) => {
     setPaymentMode(selectedOption);
@@ -192,7 +222,8 @@ const accountoptions = accountdata.map((account) => ({
   const USER_API = process.env.REACT_APP_USER_URL;
   const [selecteduser, setSelectedUser] = useState("");
   const [userData, setUserData] = useState([]);
-
+const { logindata } = useContext(LoginContext);
+ console.log("logindata", logindata);
   useEffect(() => {
     fetchData();
   }, []);
@@ -203,11 +234,34 @@ const accountoptions = accountdata.map((account) => ({
       const response = await fetch(url);
       const data = await response.json();
       setUserData(data);
+       // Set default team member after fetching user data
+    setDefaultTeamMember(data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
-
+// Function to set default team member based on logged-in user
+const setDefaultTeamMember = (users) => {
+  if (logindata && logindata.user && logindata.user.id && Array.isArray(users)) {
+    // Find the user in the users array that matches the logged-in user ID
+    const currentUser = users.find(user => user._id === logindata.user.id);
+    
+    if (currentUser) {
+      const userOption = {
+        value: currentUser._id,
+        label: currentUser.username
+      };
+      setSelectedUser(userOption);
+      console.log('Default team member set to logged-in user:', userOption);
+    } else {
+      console.log('Logged in user not found in team members list');
+      console.log('Looking for ID:', logindata.user.id);
+      console.log('Available users:', users.map(u => ({ id: u._id, username: u.username })));
+    }
+  } else {
+    console.log('No logged in user data available');
+  }
+};
   const handleuserChange = (event, selectedOptions) => {
     setSelectedUser(selectedOptions);
   };
@@ -239,8 +293,8 @@ const accountoptions = accountdata.map((account) => ({
     value: service._id,
     label: service.serviceName,
   }));
-    const [selectedservice, setselectedService] = useState();
-      const fetchservicebyid = async (id, rowIndex) => {
+  const [selectedservice, setselectedService] = useState();
+  const fetchservicebyid = async (id, rowIndex) => {
     const requestOptions = {
       method: "GET",
       redirect: "follow",
@@ -275,12 +329,12 @@ const accountoptions = accountdata.map((account) => ({
     const newRows = [...rows];
     newRows[index].productName = selectedOptions ? selectedOptions.label : "";
     setRows(newRows);
-     setselectedService(selectedOptions);
+    setselectedService(selectedOptions);
     // fetchservicebyid(selectedOptions.value, index);
-     // Call fetch only if an option is actually selected
-  if (selectedOptions && selectedOptions.value) {
-    fetchservicebyid(selectedOptions.value, index);
-  }
+    // Call fetch only if an option is actually selected
+    if (selectedOptions && selectedOptions.value) {
+      fetchservicebyid(selectedOptions.value, index);
+    }
   };
 
   const handleServiceInputChange = (inputValue, actionMeta, index) => {
@@ -311,7 +365,25 @@ const accountoptions = accountdata.map((account) => ({
   };
 
   const addRow = (isDiscountRow = false) => {
-    const newRow = isDiscountRow ? { productName: "", description: "", rate: "$-10.00", qty: "1", amount: "$-10.00", tax: false, isDiscount: true } : { productName: "", description: "", rate: "$0.00", qty: "1", amount: "$0.00", tax: false, isDiscount: false };
+    const newRow = isDiscountRow
+      ? {
+          productName: "",
+          description: "",
+          rate: "$-10.00",
+          qty: "1",
+          amount: "$-10.00",
+          tax: false,
+          isDiscount: true,
+        }
+      : {
+          productName: "",
+          description: "",
+          rate: "$0.00",
+          qty: "1",
+          amount: "$0.00",
+          tax: false,
+          isDiscount: false,
+        };
     setRows([...rows, newRow]);
   };
 
@@ -319,8 +391,8 @@ const accountoptions = accountdata.map((account) => ({
     const newRows = rows.filter((_, i) => i !== index);
     setRows(newRows);
   };
-const [daysuntilnextreminder, setDaysuntilnextreminder]= useState(3)
-const [numberOfreminder, setNumberOfreminder]= useState(1)
+  const [daysuntilnextreminder, setDaysuntilnextreminder] = useState(3);
+  const [numberOfreminder, setNumberOfreminder] = useState(1);
   const fetchinvoicetempbyid = async (id) => {
     const requestOptions = {
       method: "GET",
@@ -335,8 +407,8 @@ const [numberOfreminder, setNumberOfreminder]= useState(1)
         setIsPayInvoice(result.invoiceTemplate.payInvoicewithcredits);
         setIsEmailInvoice(result.invoiceTemplate.sendEmailWhenInvCreated);
         setReminders(result.invoiceTemplate.sendReminderstoClients);
-setDaysuntilnextreminder(result.invoiceTemplate.daysuntilnextreminder);
-setNumberOfreminder(result.invoiceTemplate.numberOfreminder)
+        setDaysuntilnextreminder(result.invoiceTemplate.daysuntilnextreminder);
+        setNumberOfreminder(result.invoiceTemplate.numberOfreminder);
         const paymentMethod = {
           value: result.invoiceTemplate.paymentMethod,
           label: result.invoiceTemplate.paymentMethod,
@@ -359,12 +431,11 @@ setNumberOfreminder(result.invoiceTemplate.numberOfreminder)
         console.log(result.invoiceTemplate.summary.taxRate);
         setTaxTotal(result.invoiceTemplate.summary.taxTotal);
         setTotalAmount(result.invoiceTemplate.summary.total);
-
       })
       .catch((error) => console.error(error));
   };
 
-  const [startDate, setStartDate] = useState(null);
+  const [startDate, setStartDate] = useState(dayjs());
   const handleStartDateChange = (date) => {
     setStartDate(date);
   };
@@ -393,125 +464,78 @@ setNumberOfreminder(result.invoiceTemplate.numberOfreminder)
 
   useEffect(() => {
     // Simulate filtered shortcuts based on some logic (e.g., search)
-    setFilteredShortcuts(shortcuts.filter((shortcut) => shortcut.title.toLowerCase().includes("")));
+    setFilteredShortcuts(
+      shortcuts.filter((shortcut) => shortcut.title.toLowerCase().includes(""))
+    );
   }, [shortcuts]);
-useEffect(() => {
-  if (selectedOption === "contacts" || selectedOption === "account") {
-    const accountShortcuts = [
-      { title: "Account Shortcodes", isBold: true },
-      { title: "Account Name", isBold: false, value: "ACCOUNT_NAME" },
-      // { title: "Custom field:Website", isBold: false, value: "ACCOUNT_CUSTOM_FIELD:Website" },
-      { title: "Date Shortcodes", isBold: true },
-      { title: "Current day full date", isBold: false, value: "CURRENT_DAY_FULL_DATE" },
-      { title: "Current day number", isBold: false, value: "CURRENT_DAY_NUMBER" },
-      { title: "Current day name", isBold: false, value: "CURRENT_DAY_NAME" },
-      { title: "Current week", isBold: false, value: "CURRENT_WEEK" },
-      { title: "Current month number", isBold: false, value: "CURRENT_MONTH_NUMBER" },
-      { title: "Current month name", isBold: false, value: "CURRENT_MONTH_NAME" },
-      { title: "Current quarter", isBold: false, value: "CURRENT_QUARTER" },
-      { title: "Current year", isBold: false, value: "CURRENT_YEAR" },
-      { title: "Last day full date", isBold: false, value: "LAST_DAY_FULL_DATE" },
-      { title: "Last day number", isBold: false, value: "LAST_DAY_NUMBER" },
-      { title: "Last day name", isBold: false, value: "LAST_DAY_NAME" },
-      { title: "Last week", isBold: false, value: "LAST_WEEK" },
-      { title: "Last month number", isBold: false, value: "LAST_MONTH_NUMBER" },
-      { title: "Last month name", isBold: false, value: "LAST_MONTH_NAME" },
-      { title: "Last quarter", isBold: false, value: "LAST_QUARTER" },
-      { title: "Last_year", isBold: false, value: "LAST_YEAR" },
-      { title: "Next day full date", isBold: false, value: "NEXT_DAY_FULL_DATE" },
-      { title: "Next day number", isBold: false, value: "NEXT_DAY_NUMBER" },
-      { title: "Next day name", isBold: false, value: "NEXT_DAY_NAME" },
-      { title: "Next week", isBold: false, value: "NEXT_WEEK" },
-      { title: "Next month number", isBold: false, value: "NEXT_MONTH_NUMBER" },
-      { title: "Next month name", isBold: false, value: "NEXT_MONTH_NAME" },
-      { title: "Next quarter", isBold: false, value: "NEXT_QUARTER" },
-      { title: "Next year", isBold: false, value: "NEXT_YEAR" },
-    ];
-    setShortcuts(accountShortcuts);
-  }
-}, [selectedOption]);
+  useEffect(() => {
+    if (selectedOption === "contacts" || selectedOption === "account") {
+      const accountShortcuts = [
+        { title: "Account Shortcodes", isBold: true },
+        { title: "Account Name", isBold: false, value: "ACCOUNT_NAME" },
+        // { title: "Custom field:Website", isBold: false, value: "ACCOUNT_CUSTOM_FIELD:Website" },
+        { title: "Date Shortcodes", isBold: true },
+        {
+          title: "Current day full date",
+          isBold: false,
+          value: "CURRENT_DAY_FULL_DATE",
+        },
+        {
+          title: "Current day number",
+          isBold: false,
+          value: "CURRENT_DAY_NUMBER",
+        },
+        { title: "Current day name", isBold: false, value: "CURRENT_DAY_NAME" },
+        { title: "Current week", isBold: false, value: "CURRENT_WEEK" },
+        {
+          title: "Current month number",
+          isBold: false,
+          value: "CURRENT_MONTH_NUMBER",
+        },
+        {
+          title: "Current month name",
+          isBold: false,
+          value: "CURRENT_MONTH_NAME",
+        },
+        { title: "Current quarter", isBold: false, value: "CURRENT_QUARTER" },
+        { title: "Current year", isBold: false, value: "CURRENT_YEAR" },
+        {
+          title: "Last day full date",
+          isBold: false,
+          value: "LAST_DAY_FULL_DATE",
+        },
+        { title: "Last day number", isBold: false, value: "LAST_DAY_NUMBER" },
+        { title: "Last day name", isBold: false, value: "LAST_DAY_NAME" },
+        { title: "Last week", isBold: false, value: "LAST_WEEK" },
+        {
+          title: "Last month number",
+          isBold: false,
+          value: "LAST_MONTH_NUMBER",
+        },
+        { title: "Last month name", isBold: false, value: "LAST_MONTH_NAME" },
+        { title: "Last quarter", isBold: false, value: "LAST_QUARTER" },
+        { title: "Last_year", isBold: false, value: "LAST_YEAR" },
+        {
+          title: "Next day full date",
+          isBold: false,
+          value: "NEXT_DAY_FULL_DATE",
+        },
+        { title: "Next day number", isBold: false, value: "NEXT_DAY_NUMBER" },
+        { title: "Next day name", isBold: false, value: "NEXT_DAY_NAME" },
+        { title: "Next week", isBold: false, value: "NEXT_WEEK" },
+        {
+          title: "Next month number",
+          isBold: false,
+          value: "NEXT_MONTH_NUMBER",
+        },
+        { title: "Next month name", isBold: false, value: "NEXT_MONTH_NAME" },
+        { title: "Next quarter", isBold: false, value: "NEXT_QUARTER" },
+        { title: "Next year", isBold: false, value: "NEXT_YEAR" },
+      ];
+      setShortcuts(accountShortcuts);
+    }
+  }, [selectedOption]);
 
-  // useEffect(() => {
-  //   // Set shortcuts based on selected option
-  //   if (selectedOption === "contacts") {
-  //     const contactShortcuts = [
-  //       { title: "Account Shortcodes", isBold: true },
-  //       { title: "Account Name", isBold: false, value: "ACCOUNT_NAME" },
-  //       { title: "Custom field:Website", isBold: false, value: "ACCOUNT_CUSTOM_FIELD:Website" },
-  //       { title: "Contact Shortcodes", isBold: true },
-  //       { title: "Contact Name", isBold: false, value: "CONTACT_NAME" },
-  //       { title: "First Name", isBold: false, value: "FIRST_NAME" },
-  //       { title: "Middle Name", isBold: false, value: "MIDDLE_NAME" },
-  //       { title: "Last Name", isBold: false, value: "LAST_NAME" },
-  //       { title: "Phone number", isBold: false, value: "PHONE_NUMBER" },
-  //       { title: "Country", isBold: false, value: "COUNTRY" },
-  //       { title: "Company name", isBold: false, value: "COMPANY_NAME " },
-  //       { title: "Street address", isBold: false, value: "STREET_ADDRESS" },
-  //       { title: "City", isBold: false, value: "CITY" },
-  //       { title: "State/Province", isBold: false, value: "STATE / PROVINCE" },
-  //       { title: "Zip/Postal code", isBold: false, value: "ZIP / POSTAL CODE" },
-  //       { title: "Custom field:Email", isBold: false, value: "CONTACT_CUSTOM_FIELD:Email" },
-  //       { title: "Date Shortcodes", isBold: true },
-  //       { title: "Current day full date", isBold: false, value: "CURRENT_DAY_FULL_DATE" },
-  //       { title: "Current day number", isBold: false, value: "CURRENT_DAY_NUMBER" },
-  //       { title: "Current day name", isBold: false, value: "CURRENT_DAY_NAME" },
-  //       { title: "Current week", isBold: false, value: "CURRENT_WEEK" },
-  //       { title: "Current month number", isBold: false, value: "CURRENT_MONTH_NUMBER" },
-  //       { title: "Current month name", isBold: false, value: "CURRENT_MONTH_NAME" },
-  //       { title: "Current quarter", isBold: false, value: "CURRENT_QUARTER" },
-  //       { title: "Current year", isBold: false, value: "CURRENT_YEAR" },
-  //       { title: "Last day full date", isBold: false, value: "LAST_DAY_FULL_DATE" },
-  //       { title: "Last day number", isBold: false, value: "LAST_DAY_NUMBER" },
-  //       { title: "Last day name", isBold: false, value: "LAST_DAY_NAME" },
-  //       { title: "Last week", isBold: false, value: "LAST_WEEK" },
-  //       { title: "Last month number", isBold: false, value: "LAST_MONTH_NUMBER" },
-  //       { title: "Last month name", isBold: false, value: "LAST_MONTH_NAME" },
-  //       { title: "Last quarter", isBold: false, value: "LAST_QUARTER" },
-  //       { title: "Last_year", isBold: false, value: "LAST_YEAR" },
-  //       { title: "Next day full date", isBold: false, value: "NEXT_DAY_FULL_DATE" },
-  //       { title: "Next day number", isBold: false, value: "NEXT_DAY_NUMBER" },
-  //       { title: "Next day name", isBold: false, value: "NEXT_DAY_NAME" },
-  //       { title: "Next week", isBold: false, value: "NEXT_WEEK" },
-  //       { title: "Next month number", isBold: false, value: "NEXT_MONTH_NUMBER" },
-  //       { title: "Next month name", isBold: false, value: "NEXT_MONTH_NAME" },
-  //       { title: "Next quarter", isBold: false, value: "NEXT_QUARTER" },
-  //       { title: "Next year", isBold: false, value: "NEXT_YEAR" },
-  //     ];
-  //     setShortcuts(contactShortcuts);
-  //   } else if (selectedOption === "account") {
-  //     const accountShortcuts = [
-  //       { title: "Account Shortcodes", isBold: true },
-  //       { title: "Account Name", isBold: false, value: "ACCOUNT_NAME" },
-  //       { title: "Custom field:Website", isBold: false, value: "ACCOUNT_CUSTOM_FIELD:Website" },
-  //       { title: "Date Shortcodes", isBold: true },
-  //       { title: "Current day full date", isBold: false, value: "CURRENT_DAY_FULL_DATE" },
-  //       { title: "Current day number", isBold: false, value: "CURRENT_DAY_NUMBER" },
-  //       { title: "Current day name", isBold: false, value: "CURRENT_DAY_NAME" },
-  //       { title: "Current week", isBold: false, value: "CURRENT_WEEK" },
-  //       { title: "Current month number", isBold: false, value: "CURRENT_MONTH_NUMBER" },
-  //       { title: "Current month name", isBold: false, value: "CURRENT_MONTH_NAME" },
-  //       { title: "Current quarter", isBold: false, value: "CURRENT_QUARTER" },
-  //       { title: "Current year", isBold: false, value: "CURRENT_YEAR" },
-  //       { title: "Last day full date", isBold: false, value: "LAST_DAY_FULL_DATE" },
-  //       { title: "Last day number", isBold: false, value: "LAST_DAY_NUMBER" },
-  //       { title: "Last day name", isBold: false, value: "LAST_DAY_NAME" },
-  //       { title: "Last week", isBold: false, value: "LAST_WEEK" },
-  //       { title: "Last month number", isBold: false, value: "LAST_MONTH_NUMBER" },
-  //       { title: "Last month name", isBold: false, value: "LAST_MONTH_NAME" },
-  //       { title: "Last quarter", isBold: false, value: "LAST_QUARTER" },
-  //       { title: "Last_year", isBold: false, value: "LAST_YEAR" },
-  //       { title: "Next day full date", isBold: false, value: "NEXT_DAY_FULL_DATE" },
-  //       { title: "Next day number", isBold: false, value: "NEXT_DAY_NUMBER" },
-  //       { title: "Next day name", isBold: false, value: "NEXT_DAY_NAME" },
-  //       { title: "Next week", isBold: false, value: "NEXT_WEEK" },
-  //       { title: "Next month number", isBold: false, value: "NEXT_MONTH_NUMBER" },
-  //       { title: "Next month name", isBold: false, value: "NEXT_MONTH_NAME" },
-  //       { title: "Next quarter", isBold: false, value: "NEXT_QUARTER" },
-  //       { title: "Next year", isBold: false, value: "NEXT_YEAR" },
-  //     ];
-  //     setShortcuts(accountShortcuts);
-  //   }
-  // }, [selectedOption]);
   const handleCloseDropdown = () => {
     setAnchorEl(null);
   };
@@ -550,7 +574,7 @@ useEffect(() => {
     setTaxTotal(tax);
     setTotalAmount((subtotal + tax).toFixed(2));
   };
- useEffect(() => {
+  useEffect(() => {
     const calculateSummary = () => {
       let subtotal = 0;
       let taxableAmount = 0;
@@ -571,22 +595,7 @@ useEffect(() => {
 
     calculateSummary();
   }, [rows, taxRate]);
-  // useEffect(() => {
-  //   const calculateSubtotal = () => {
-  //     let subtotal = 0;
-
-  //     rows.forEach((row) => {
-  //       if (row.tax) {
-  //         subtotal += parseFloat(row.amount.replace("$", "")) || 0;
-  //       }
-  //       // subtotal += parseFloat(row.amount.replace("$", "")) || 0;
-  //     });
-  //     console.log(subtotal);
-  //     setSubtotal(subtotal);
-  //     calculateTotal(subtotal, taxRate);
-  //   };
-  //   calculateSubtotal();
-  // }, [rows,taxRate]);
+ 
   const INVOICE_NEW = process.env.REACT_APP_INVOICES_URL;
   const lineItems = rows.map((item) => ({
     productorService: item.productName, // Assuming productName maps to productorService
@@ -597,32 +606,27 @@ useEffect(() => {
     tax: item.tax.toString(), // Converting boolean to string
   }));
   const [errors, setErrors] = useState({
-  invoiceTemplate: "",
-  lineItems: "",
-});
-const validateInvoice = () => {
-  let valid = true;
-  let newErrors = { invoiceTemplate: "", lineItems: "" };
+    invoiceTemplate: "",
+    lineItems: "",
+  });
+  const validateInvoice = () => {
+    let valid = true;
+    let newErrors = { invoiceTemplate: "", lineItems: "" };
 
-  // if (!selectInvoiceTemp?.value) {
-  //   newErrors.invoiceTemplate = "Invoice template is required";
-  //   valid = false;
-  // }
 
-  if (!lineItems || lineItems.length === 0) {
-    newErrors.lineItems = "At least one line item is required";
-    valid = false;
-  } 
+    if (!lineItems || lineItems.length === 0) {
+      newErrors.lineItems = "At least one line item is required";
+      valid = false;
+    }
 
-  setErrors(newErrors); // ✅ updates error state (clears if fields are valid)
-  return valid;
-};
-
+    setErrors(newErrors); // ✅ updates error state (clears if fields are valid)
+    return valid;
+  };
 
   const createinvoice = () => {
-  if (!validateInvoice()) {
-    return; // stop if invalid
-  }
+    if (!validateInvoice()) {
+      return; // stop if invalid
+    }
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
@@ -631,12 +635,14 @@ const validateInvoice = () => {
       invoicenumber: invoicenumber,
       invoicedate: startDate,
       description: description,
-      invoicetemplate: selectInvoiceTemp.value,
+      invoicetemplate: selectInvoiceTemp?.value,
       paymentMethod: paymentMode.value,
       teammember: selecteduser.value,
       emailinvoicetoclient: emailInvoice,
       scheduleinvoicedate: new Date(), // Current date and time
-      scheduleinvoicetime: new Date().toLocaleTimeString('en-US', { hour12: false }), 
+      scheduleinvoicetime: new Date().toLocaleTimeString("en-US", {
+        hour12: false,
+      }),
       payInvoicewithcredits: payInvoice,
       reminders: reminders,
       scheduleinvoice: scheduledInvoice,
@@ -650,9 +656,9 @@ const validateInvoice = () => {
         total: totalAmount,
       },
       active: "true",
-      paidAmount:"",
-      invoiceStatus:"Pending",
-      balanceDueAmount:"",
+      paidAmount: "",
+      invoiceStatus: "Pending",
+      balanceDueAmount: "",
     });
 
     // console.log(raw)
@@ -727,23 +733,15 @@ const validateInvoice = () => {
     handleMenuClose();
     setIsEditDrawerOpen(true);
   };
-  // const handleSaveChanges = () => {
-  //   if (selectedRowIndex !== null) {
-  //     const updatedRows = [...rows];
-  //     updatedRows[selectedRowIndex] = { ...selectedRowData }; // Update the row with new data
-  //     setRows(updatedRows); // Update the state with the new rows
 
-  //     console.log("Updated Rows:", updatedRows);
-  //   }
-
-  //   handleEditDrawerClose();
-  // };
   const handleSaveChanges = () => {
     if (selectedRowIndex !== null) {
       const updatedRows = [...rows];
 
       // Calculate the amount based on rate and qty
-      const rateValue = parseFloat(selectedRowData.rate.replace(/[^0-9.-]+/g, "")); // Removing currency symbol
+      const rateValue = parseFloat(
+        selectedRowData.rate.replace(/[^0-9.-]+/g, "")
+      ); // Removing currency symbol
       const qtyValue = parseInt(selectedRowData.qty) || 0; // Convert to integer
 
       const amount = (rateValue * qtyValue).toFixed(2); // Calculate amount
@@ -770,7 +768,9 @@ const validateInvoice = () => {
     if (selectedRow !== null) {
       const duplicatedRow = {
         ...rows[selectedRow],
-        productName: rows[selectedRow].productName ? `${rows[selectedRow].productName} Copy` : "Copy",
+        productName: rows[selectedRow].productName
+          ? `${rows[selectedRow].productName} Copy`
+          : "Copy",
       };
       const updatedRows = [...rows, duplicatedRow];
       setRows(updatedRows); // Update the state with the duplicated row
@@ -841,7 +841,10 @@ const validateInvoice = () => {
       .then((result) => {
         console.log(result.message);
 
-        if (result && result.message === "ServiceTemplate created successfully") {
+        if (
+          result &&
+          result.message === "ServiceTemplate created successfully"
+        ) {
           toast.success("ServiceTemplate created successfully");
           handleNewDrawerClose();
           // fetchServicesData();
@@ -858,7 +861,10 @@ const validateInvoice = () => {
       })
       .catch((error) => {
         console.log(error);
-        const errorMessage = error.response && error.response.message ? error.response.message : "Failed to create invoice";
+        const errorMessage =
+          error.response && error.response.message
+            ? error.response.message
+            : "Failed to create invoice";
         toast.error(errorMessage);
       });
   };
@@ -938,10 +944,7 @@ const validateInvoice = () => {
   const handleEditDrawerClose = () => {
     setIsEditDrawerOpen(false);
   };
-  const [tax, setTax] = useState(false);
-  // const handleServiceWitch = (checked) => {
-  //   setTax(checked);
-  // };
+  
   const handleServiceWitch = (checked) => {
     setSelectedRowData({ ...selectedRowData, tax: checked });
   };
@@ -952,15 +955,18 @@ const validateInvoice = () => {
     const qty = selectedRowData?.qty || 0;
     const calculatedAmount = rate * qty;
 
-    console.log("Rate: ", rate, "Qty: ", qty, "Total Amount: $", calculatedAmount.toFixed(2));
+    console.log(
+      "Rate: ",
+      rate,
+      "Qty: ",
+      qty,
+      "Total Amount: $",
+      calculatedAmount.toFixed(2)
+    );
     setTotalamount(`$${calculatedAmount.toFixed(2)}`);
   }, [selectedRowData?.rate, selectedRowData?.qty]);
 
-  console.log(totalamount);
-  const [open, setOpen] = useState(false);
-  const handleClose = () => {
-    setOpen(false);
-  };
+
   const [firstContactEmail, setFirstContactEmail] = useState("");
 
   const contactMail = () => {
@@ -968,242 +974,314 @@ const validateInvoice = () => {
       method: "GET",
       redirect: "follow",
     };
-  
+
     console.log("Calling API with ID:", selectedaccount?.value); // Debug log
-  
-    fetch(`${ACCOUNT_API}/accounts/accountdetails/accountdetailslist/listbyid/${selectedaccount?.value}`, requestOptions)
+
+    fetch(
+      // `${ACCOUNT_API}/accounts/accountdetails/accountdetailslist/listbyid/${selectedaccount?.value}`,
+       `https://www.snptaxes.com/api/accounts/${selectedaccount?.value}`,
+      requestOptions
+    )
       .then((response) => {
         console.log("Response status:", response.status); // Debug log
         return response.json();
       })
       .then((result) => {
         console.log("API Result:", result); // Debug log
-        
-        if (result?.accountlist?.Contacts && Array.isArray(result.accountlist.Contacts)) {
-          const email = result.accountlist.Contacts[0]?.email;
-          if (email) {
-            console.log("First Contact Email:", email); // Debug log
-            setFirstContactEmail(email); // Update state
-          } else {
-            console.error("First contact does not have an email.");
-            setFirstContactEmail("[CONTACT EMAIL]"); // Handle missing email
-          }
+
+        // Check for `contacts` array
+      if (Array.isArray(result.contacts) && result.contacts.length > 0) {
+        const email = result.contacts[0]?.contact?.email;
+
+        if (email) {
+          console.log("First Contact Email:", email);
+          setFirstContactEmail(email);
         } else {
-          console.error("No contacts found in the response.");
-          setFirstContactEmail("[CONTACT EMAIL]"); // Handle missing contacts
+          console.error("First contact does not have an email.");
+          setFirstContactEmail("[CONTACT EMAIL]");
         }
-      })
-      .catch((error) => {
-        console.error("Error fetching contacts:", error);
-        setFirstContactEmail("Error fetching email"); // Handle fetch error
-      });
+      } else {
+        console.error("No contacts found.");
+        setFirstContactEmail("[CONTACT EMAIL]");
+      }
+    })
+    .catch((error) => {
+      console.error("Error fetching contacts:", error);
+      setFirstContactEmail("Error fetching email");
+    });
   };
-  
+
   useEffect(() => {
     if (selectedaccount?.value) {
       contactMail();
     }
   }, [selectedaccount]);
- //preview drawer
- const [previewDrawerOpen, setpreviewDrawerOpen] = useState(false);
- const handleOpenpreviewDrawer = () => setpreviewDrawerOpen(true);
- const handleClosepreviewDrawer = () => setpreviewDrawerOpen(false);
-
+  //preview drawer
+  const [previewDrawerOpen, setpreviewDrawerOpen] = useState(false);
+  const handleOpenpreviewDrawer = () => setpreviewDrawerOpen(true);
+  const handleClosepreviewDrawer = () => setpreviewDrawerOpen(false);
 
   return (
     <Box>
-      <Box sx={{display:'flex', alignItems:'center',justifyContent:'space-between',mr:2}}>
-      <Typography p={2} variant="h6">
-        Create Invoice  
-      </Typography>
-      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-    <Box
-      onClick={handleOpenpreviewDrawer}
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        cursor: "pointer",
-        color: "primary.main",
-      }}
-    >
-      <PlagiarismIcon sx={{ marginRight: 0.5 }} fontsize="small" />
-      <Typography color="primary">Preview</Typography>
-    </Box>
-
-   
-
-    <Box onClick={onClose} sx={{ cursor: "pointer" }}>
-      <CloseIcon />
-    </Box>
-  </Box>
-      </Box>
-     <Box>
-          <Drawer
-            anchor="right"
-            open={previewDrawerOpen}
-            onClose={handleClosepreviewDrawer}
-            PaperProps={{
-              sx: {
-                width: 800,
-                p: 2,
-                background: '#f8fafc',
-
-              },
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          mr: 2,
+        }}
+      >
+        <Typography p={2} variant="h6">
+          Create Invoice
+        </Typography>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Box
+            onClick={handleOpenpreviewDrawer}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              cursor: "pointer",
+              color: "primary.main",
             }}
           >
-            <Box sx={{ padding: 4 }}>
-              {/* Invoice Header */}
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Typography>Preview</Typography>
-                <CloseIcon sx={{ cursor: "pointer", color: "rgb(24, 118, 211)" }} onClick={handleClosepreviewDrawer} />
-              </Box>
-              <Divider sx={{ mt: 2 }} />
+            <PlagiarismIcon sx={{ marginRight: 0.5 }} fontsize="small" />
+            <Typography color="primary">Preview</Typography>
+          </Box>
 
-              {/* Table */}
-              <TableContainer component={Paper} sx={{ background: '#fdfdfd', marginBottom: 4, height: { xs: '50vh', md: 'auto' }, mt: 4 }}>
-                <Typography
-                  variant="h5"
-                  sx={{ color: '#ff6700', fontWeight: 'bold', marginBottom: 2, ml: 2, mt: 2 }}
-                >
-                  Invoice
-                </Typography>
+          <Box onClick={onClose} sx={{ cursor: "pointer" }}>
+            <CloseIcon />
+          </Box>
+        </Box>
+      </Box>
+      <Box>
+        <Drawer
+          anchor="right"
+          open={previewDrawerOpen}
+          onClose={handleClosepreviewDrawer}
+          PaperProps={{
+            sx: {
+              width: 800,
+              p: 2,
+              background: "#f8fafc",
+            },
+          }}
+        >
+          <Box sx={{ padding: 4 }}>
+            {/* Invoice Header */}
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <Typography>Preview</Typography>
+              <CloseIcon
+                sx={{ cursor: "pointer", color: "rgb(24, 118, 211)" }}
+                onClick={handleClosepreviewDrawer}
+              />
+            </Box>
+            <Divider sx={{ mt: 2 }} />
 
-                <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Typography sx={{ marginBottom: 2, ml: 2, fontSize: 13 }}>
-                    {selectedaccount?.label || '[ACCOUNT NAME]'}
-                  </Typography>
-                  <Typography fontSize={13}>
-                    Invoice number: <Typography component="span" sx={{ color: '#cbd5e1', mr: 2, marginBottom: 2, fontSize: 13 }}>[INVOICE_NUMBER]</Typography>
-                  </Typography>
-                </Box>
-
-
-
-                
-
-
-                <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Typography sx={{ marginBottom: 2, ml: 2, fontSize: 13 }} >{firstContactEmail || "[CONTACT EMAIL]"}</Typography>
-                  <Typography fontSize={13}>
-                    Date: <Typography component="span" sx={{ mr: 2, marginBottom: 2, fontSize: 13 }}>
-                      {startDate ? startDate.format('YYYY-MM-DD') : ''}
-                    </Typography>
-                  </Typography>
-                </Box>
-
-                <Box sx={{ ml: 2, marginBottom: 5, }} >
-                  <Typography sx={{ fontSize: 13 }}>Description: {description}</Typography>
-                </Box>
-
-                <Table sx={{ marginBottom: 5 }} >
-                  <TableHead >
-                    <TableRow sx={{ background: "#fff8f5" }}>
-                      <TableCell>
-                        <strong>Product/Service</strong>
-                      </TableCell>
-
-                      <TableCell>
-                        <strong>Description</strong>
-                      </TableCell>
-
-                      <TableCell align="right">
-                        <strong>Rate ($)</strong>
-                      </TableCell>
-                      <TableCell align="right">
-                        <strong>Qty</strong>
-                      </TableCell>
-                      <TableCell align="right">
-                        <strong>Amount</strong>
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {rows.map((row, index) => (
-                      <TableRow key={index}>
-                        <TableCell>{row.productName}</TableCell>
-                        <TableCell>{row.description}</TableCell>
-                        <TableCell align="right">{row.rate || '$0.00'}</TableCell>
-                        <TableCell align="right">{row.qty || '1'}</TableCell>
-                        <TableCell align="right">{row.amount || '$0.00'}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-
-<Table sx={{ width: "50%", ml: "auto" }}>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell>
-                        <strong>Subtotal:</strong>
-                      </TableCell>
-                      <TableCell>${subtotal || "0.00"}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>
-                        <strong>Tax Rate:</strong>
-                      </TableCell>
-                      <TableCell>{taxRate || "0.00"}%</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>
-                        <strong>Tax Total:</strong>
-                      </TableCell>
-                      <TableCell>${taxTotal?.toFixed(2) || "0.00"}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell sx={{ fontWeight: "bold" }}>
-                        <strong>Total:</strong>
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: "bold" }}>
-                        ${totalAmount || "0.00"}
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-
-              {/* Footer Buttons */}
-              <Box
+            {/* Table */}
+            <TableContainer
+              component={Paper}
+              sx={{
+                background: "#fdfdfd",
+                marginBottom: 4,
+                height: { xs: "50vh", md: "auto" },
+                mt: 4,
+              }}
+            >
+              <Typography
+                variant="h5"
                 sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  marginTop: 3,
+                  color: "#ff6700",
+                  fontWeight: "bold",
+                  marginBottom: 2,
+                  ml: 2,
+                  mt: 2,
                 }}
               >
-                <Button
-                  variant="contained"
-                 
-                  onClick={createinvoice}
-                  sx={{
-                    backgroundColor: 'var(--color-save-btn)',  // Normal background
-                   
-                    '&:hover': {
-                      backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                    },
-                    borderRadius:'15px'
-                  }}
-                >
-                  Save & Exit
-                </Button>
+                Invoice
+              </Typography>
 
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Typography sx={{ marginBottom: 2, ml: 2, fontSize: 13 }}>
+                  {selectedaccount?.label || "[ACCOUNT NAME]"}
+                </Typography>
+                <Typography fontSize={13}>
+                  Invoice number:{" "}
+                  <Typography
+                    component="span"
+                    sx={{
+                      color: "#cbd5e1",
+                      mr: 2,
+                      marginBottom: 2,
+                      fontSize: 13,
+                    }}
+                  >
+                   {invoicenumber || "[INVOICE_NUMBER]"} 
+                  </Typography>
+                </Typography>
               </Box>
-            </Box>
-          </Drawer>
-        </Box>
 
-      <Box p={2} sx={{ height: "80vh", overflowY: "auto" }} className="create-invoice">
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Typography sx={{ marginBottom: 2, ml: 2, fontSize: 13 }}>
+                  {firstContactEmail || "[CONTACT EMAIL]"}
+                </Typography>
+                <Typography fontSize={13}>
+                  Date:{" "}
+                  <Typography
+                    component="span"
+                    sx={{ mr: 2, marginBottom: 2, fontSize: 13 }}
+                  >
+                    {startDate ? startDate.format("YYYY-MM-DD") : ""}
+                  </Typography>
+                </Typography>
+              </Box>
+
+              <Box sx={{ ml: 2, marginBottom: 5 }}>
+                <Typography sx={{ fontSize: 13 }}>
+                  Description: {description}
+                </Typography>
+              </Box>
+
+              <Table sx={{ marginBottom: 5 }}>
+                <TableHead>
+                  <TableRow sx={{ background: "#fff8f5" }}>
+                    <TableCell>
+                      <strong>Product/Service</strong>
+                    </TableCell>
+
+                    <TableCell>
+                      <strong>Description</strong>
+                    </TableCell>
+
+                    <TableCell align="right">
+                      <strong>Rate ($)</strong>
+                    </TableCell>
+                    <TableCell align="right">
+                      <strong>Qty</strong>
+                    </TableCell>
+                    <TableCell align="right">
+                      <strong>Amount</strong>
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {rows.map((row, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{row.productName}</TableCell>
+                      <TableCell>{row.description}</TableCell>
+                      <TableCell align="right">{row.rate || "$0.00"}</TableCell>
+                      <TableCell align="right">{row.qty || "1"}</TableCell>
+                      <TableCell align="right">
+                        {row.amount || "$0.00"}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+
+            <Table sx={{ width: "50%", ml: "auto" }}>
+              <TableBody>
+                <TableRow>
+                  <TableCell>
+                    <strong>Subtotal:</strong>
+                  </TableCell>
+                  <TableCell>${subtotal || "0.00"}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>
+                    <strong>Tax Rate:</strong>
+                  </TableCell>
+                  <TableCell>{taxRate || "0.00"}%</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>
+                    <strong>Tax Total:</strong>
+                  </TableCell>
+                  <TableCell>${taxTotal?.toFixed(2) || "0.00"}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell sx={{ fontWeight: "bold" }}>
+                    <strong>Total:</strong>
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: "bold" }}>
+                    ${totalAmount || "0.00"}
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+
+            {/* Footer Buttons */}
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginTop: 3,
+              }}
+            >
+              <Button
+                variant="contained"
+                onClick={createinvoice}
+                sx={{
+                  backgroundColor: "var(--color-save-btn)", // Normal background
+
+                  "&:hover": {
+                    backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+                  },
+                  borderRadius: "15px",
+                }}
+              >
+                Save & Exit
+              </Button>
+            </Box>
+          </Box>
+        </Drawer>
+      </Box>
+
+      <Box
+        p={2}
+        sx={{ height: "80vh", overflowY: "auto" }}
+        className="create-invoice"
+      >
         <Box>
-          <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+          <Grid
+            container
+            rowSpacing={1}
+            columnSpacing={{ xs: 1, sm: 2, md: 3 }}
+          >
             <Grid xs={6}>
               <Box>
-                <InputLabel sx={{ color: "black" }}>Account name, ID or email</InputLabel>
+                <InputLabel sx={{ color: "black" }}>
+                  Account name, ID or email
+                </InputLabel>
 
                 <Autocomplete
                   options={accountoptions} // Ensure this is an array of objects with { label, value }
                   value={selectedaccount} // Display the selected account
                   onChange={handleAccountChange} // Update the selected account on change
                   getOptionLabel={(option) => option.label || ""} // Safely access label
-                  isOptionEqualToValue={(option, value) => option.value === value.value} // Compare values correctly
+                  isOptionEqualToValue={(option, value) =>
+                    option.value === value.value
+                  } // Compare values correctly
                   renderOption={(props, option) => (
                     <Box
                       component="li"
@@ -1213,44 +1291,132 @@ const validateInvoice = () => {
                       {option.label}
                     </Box>
                   )}
-                  renderInput={(params) => <TextField {...params} placeholder="Select Account" variant="outlined" size="small" sx={{ backgroundColor: "#fff" }} />}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      placeholder="Select Account"
+                      variant="outlined"
+                      size="small"
+                      sx={{ backgroundColor: "#fff" }}
+                    />
+                  )}
                   sx={{ width: "100%", marginTop: "8px" }}
                 />
               </Box>
             </Grid>
             <Grid xs={6}>
               <Box>
-                <InputLabel sx={{ color: "black" }}>Invoice Template</InputLabel>
-                <Autocomplete options={invoiceoptions} sx={{ mt: 1, mb: 2, backgroundColor: "#fff" }} size="small" value={selectInvoiceTemp} onChange={handleInvoiceTempChange} isOptionEqualToValue={(option, value) => option.value === value.value} getOptionLabel={(option) => option.label || ""} renderInput={(params) => <TextField {...params} placeholder="Invoice Template" />} isClearable={true} />
-               {errors.invoiceTemplate && (
-    <Typography sx={{ color: "red", fontSize: 12 }}>
-      {errors.invoiceTemplate}
-    </Typography>
-  )}
+                <InputLabel sx={{ color: "black" }}>
+                  Invoice Template
+                </InputLabel>
+                <Autocomplete
+                  options={invoiceoptions}
+                  sx={{ mt: 1, mb: 2, backgroundColor: "#fff" }}
+                  size="small"
+                  value={selectInvoiceTemp}
+                  onChange={handleInvoiceTempChange}
+                  isOptionEqualToValue={(option, value) =>
+                    option.value === value.value
+                  }
+                  getOptionLabel={(option) => option.label || ""}
+                  renderInput={(params) => (
+                    <TextField {...params} placeholder="Invoice Template" />
+                  )}
+                  isClearable={true}
+                />
+                {errors.invoiceTemplate && (
+                  <Typography sx={{ color: "red", fontSize: 12 }}>
+                    {errors.invoiceTemplate}
+                  </Typography>
+                )}
               </Box>
             </Grid>
           </Grid>
-          <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+          <Grid
+            container
+            rowSpacing={1}
+            columnSpacing={{ xs: 1, sm: 2, md: 3 }}
+          >
             <Grid xs={6}>
               <Box>
                 <InputLabel sx={{ color: "black" }}>Invoice Number</InputLabel>
-                <TextField fullWidth onChange={(e) => setinvoicenumber(e.target.value)} placeholder="Invoice Number" size="small" sx={{ mt: 1 }} />
+                {/* <TextField
+                  fullWidth
+                  onChange={(e) => setinvoicenumber(e.target.value)}
+                  placeholder="Invoice Number"
+                  size="small"
+                  sx={{ mt: 1 }}
+                /> */}
+                  <TextField
+                  fullWidth
+                  value={isLoadingInvoiceNumber ? "Loading..." : invoicenumber}
+                  placeholder="Invoice Number"
+                  size="small"
+                  sx={{ mt: 1 }}
+                  InputProps={{
+                    readOnly: true, // Make it read-only since it's auto-generated
+                  }}
+                  helperText="Auto-generated invoice number"
+                  disabled={isLoadingInvoiceNumber}
+                />
               </Box>
             </Grid>
             <Grid xs={6}>
               <Box>
-                <InputLabel sx={{ color: "black" }}>Choose payment method</InputLabel>
-                <Autocomplete size="small" fullWidth sx={{ mt: 1 }} options={paymentsOptions} getOptionLabel={(option) => option?.label || ""} onChange={handlePaymentOptionChange} value={paymentMode} renderInput={(params) => <TextField {...params} placeholder="Select Payment Mode" variant="outlined" />} isOptionEqualToValue={(option, value) => option.value === value?.value} clearOnEscape />
+                <InputLabel sx={{ color: "black" }}>
+                  Choose payment method
+                </InputLabel>
+                <Autocomplete
+                  size="small"
+                  fullWidth
+                  sx={{ mt: 1 }}
+                  options={paymentsOptions}
+                  getOptionLabel={(option) => option?.label || ""}
+                  onChange={handlePaymentOptionChange}
+                  value={paymentMode}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      placeholder="Select Payment Mode"
+                      variant="outlined"
+                    />
+                  )}
+                  isOptionEqualToValue={(option, value) =>
+                    option.value === value?.value
+                  }
+                  clearOnEscape
+                />
               </Box>
             </Grid>
           </Grid>
-          <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }} mt={2}>
+          <Grid
+            container
+            rowSpacing={1}
+            columnSpacing={{ xs: 1, sm: 2, md: 3 }}
+            mt={2}
+          >
             <Grid xs={6}>
               <Box>
                 <FormControl fullWidth>
-                  <FormLabel sx={{ marginBottom: "8px", color: "black" }}>Date</FormLabel>
+                  <FormLabel sx={{ marginBottom: "8px", color: "black" }}>
+                    Date
+                  </FormLabel>
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DatePicker  format="MM/DD/YYYY" sx={{ width: "100%", backgroundColor: "#fff" }} selected={startDate} onChange={handleStartDateChange} renderInput={(params) => <TextField {...params} size="small" />} />
+                    {/* <DatePicker
+                      format="MM/DD/YYYY"
+                      sx={{ width: "100%", backgroundColor: "#fff" }}
+                      selected={startDate}
+                      onChange={handleStartDateChange}
+                      renderInput={(params) => (
+                        <TextField {...params} size="small" />
+                      )}
+                    /> */}
+                    <DatePicker
+  format="MM/DD/YYYY"
+  sx={{ width: "100%", backgroundColor: "#fff" }}
+  value={startDate} // Default to today's date
+  onChange={handleStartDateChange}
+/>
                   </LocalizationProvider>
                 </FormControl>
               </Box>
@@ -1258,7 +1424,21 @@ const validateInvoice = () => {
             <Grid xs={6}>
               <Box>
                 <label className="email-input-label">Team Member</label>
-                <Autocomplete options={options} sx={{ mt: 2, mb: 2, backgroundColor: "#fff" }} size="small" value={selecteduser} onChange={handleuserChange} isOptionEqualToValue={(option, value) => option.value === value.value} getOptionLabel={(option) => option.label || ""} renderInput={(params) => <TextField {...params} placeholder="Team Member" />} isClearable={true} />
+                <Autocomplete
+                  options={options}
+                  sx={{ mt: 2, mb: 2, backgroundColor: "#fff" }}
+                  size="small"
+                  value={selecteduser}
+                  onChange={handleuserChange}
+                  isOptionEqualToValue={(option, value) =>
+                    option.value === value.value
+                  }
+                  getOptionLabel={(option) => option.label || ""}
+                  renderInput={(params) => (
+                    <TextField {...params} placeholder="Team Member" />
+                  )}
+                  isClearable={true}
+                />
               </Box>
             </Grid>
           </Grid>
@@ -1275,7 +1455,15 @@ const validateInvoice = () => {
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <Typography sx={{ color: "gray", fontSize: "12px", position: "absolute", bottom: "15px", right: "15px" }}>
+                    <Typography
+                      sx={{
+                        color: "gray",
+                        fontSize: "12px",
+                        position: "absolute",
+                        bottom: "15px",
+                        right: "15px",
+                      }}
+                    >
                       {charCount}/{charLimit}
                     </Typography>
                   </InputAdornment>
@@ -1284,14 +1472,19 @@ const validateInvoice = () => {
             />
           </Box>
           <Box>
-            <Button variant="contained"  onClick={toggleDropdown} sx={{
-                backgroundColor: 'var(--color-save-btn)',  // Normal background
-               
-                '&:hover': {
-                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
+            <Button
+              variant="contained"
+              onClick={toggleDropdown}
+              sx={{
+                backgroundColor: "var(--color-save-btn)", // Normal background
+
+                "&:hover": {
+                  backgroundColor: "var(--color-save-hover-btn)", // Hover background color
                 },
-                mt:2,borderRadius:'15px'
-              }}>
+                mt: 2,
+                borderRadius: "15px",
+              }}
+            >
               Add Shortcode
             </Button>
 
@@ -1309,9 +1502,15 @@ const validateInvoice = () => {
               }}
             >
               <Box>
-                <List className="dropdown-list" sx={{ width: "300px", height: "300px", cursor: "pointer" }}>
+                <List
+                  className="dropdown-list"
+                  sx={{ width: "300px", height: "300px", cursor: "pointer" }}
+                >
                   {filteredShortcuts.map((shortcut, index) => (
-                    <ListItem key={index} onClick={() => handleAddShortcut(shortcut.value)}>
+                    <ListItem
+                      key={index}
+                      onClick={() => handleAddShortcut(shortcut.value)}
+                    >
                       <ListItemText
                         primary={shortcut.title}
                         primaryTypographyProps={{
@@ -1331,16 +1530,52 @@ const validateInvoice = () => {
               Additioal
             </Typography>
             <Box mt={2}>
-              <FormControlLabel control={<Switch checked={payInvoice} onChange={handlePayInvoiceChange} color="primary" />} label={"Pay invoice using client credits"} />
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={payInvoice}
+                    onChange={handlePayInvoiceChange}
+                    color="primary"
+                  />
+                }
+                label={"Pay invoice using client credits"}
+              />
             </Box>
             <Box mt={1}>
-              <FormControlLabel control={<Switch checked={emailInvoice} onChange={handleEmailInvoiceChange} color="primary" />} label={"Email invoice to client"} />
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={emailInvoice}
+                    onChange={handleEmailInvoiceChange}
+                    color="primary"
+                  />
+                }
+                label={"Email invoice to client"}
+              />
             </Box>
             <Box mt={1}>
-              <FormControlLabel control={<Switch checked={reminders} onChange={handleRemindersChange} color="primary" />} label={"Reminders"} />
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={reminders}
+                    onChange={handleRemindersChange}
+                    color="primary"
+                  />
+                }
+                label={"Reminders"}
+              />
             </Box>
             <Box mt={1}>
-              <FormControlLabel control={<Switch checked={scheduledInvoice} onChange={handleScheduledInvoiceChange} color="primary" />} label={"Scheduled invoice"} />
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={scheduledInvoice}
+                    onChange={handleScheduledInvoiceChange}
+                    color="primary"
+                  />
+                }
+                label={"Scheduled invoice"}
+              />
             </Box>
           </Box>
 
@@ -1349,9 +1584,11 @@ const validateInvoice = () => {
               <Typography sx={{ mt: 2, fontWeight: "bold" }} variant="h5">
                 Line Items
               </Typography>
-              <p style={{ color: "grey" }}>Client-facing itemized list of products and services</p>
+              <p style={{ color: "grey" }}>
+                Client-facing itemized list of products and services
+              </p>
             </Box>
-            
+
             <Box sx={{ overflowX: "auto", width: "100%" }}>
               <Table>
                 <TableHead>
@@ -1370,48 +1607,125 @@ const validateInvoice = () => {
                   {rows.map((row, index) => (
                     <TableRow key={index}>
                       <TableCell>
-                       
                         <CreatableSelect
                           // placeholder='Product or Service'
-                          placeholder={row.isDiscount ? "Reason for discount" : "Product or Service"}
+                          placeholder={
+                            row.isDiscount
+                              ? "Reason for discount"
+                              : "Product or Service"
+                          }
                           options={serviceoptions}
                           // value={serviceoptions.find(option => option.label === row.productName) || { label: row.productName, value: row.productName }}
-                          value={row.productName ? serviceoptions.find((option) => option.label === row.productName) || { label: row.productName, value: row.productName } : null}
-                          onChange={(selectedOption) => handleServiceChange(index, selectedOption)}
-                          onInputChange={(inputValue, actionMeta) => handleServiceInputChange(inputValue, actionMeta, index)}
+                          value={
+                            row.productName
+                              ? serviceoptions.find(
+                                  (option) => option.label === row.productName
+                                ) || {
+                                  label: row.productName,
+                                  value: row.productName,
+                                }
+                              : null
+                          }
+                          onChange={(selectedOption) =>
+                            handleServiceChange(index, selectedOption)
+                          }
+                          onInputChange={(inputValue, actionMeta) =>
+                            handleServiceInputChange(
+                              inputValue,
+                              actionMeta,
+                              index
+                            )
+                          }
                           isClearable
                           styles={{
-                            container: (provided) => ({ ...provided, width: "180px" }),
-                            control: (provided) => ({ ...provided, width: "180px" }),
-                            menuPortal: (provided) => ({ ...provided, zIndex: 9999 }),
+                            container: (provided) => ({
+                              ...provided,
+                              width: "180px",
+                            }),
+                            control: (provided) => ({
+                              ...provided,
+                              width: "180px",
+                            }),
+                            menuPortal: (provided) => ({
+                              ...provided,
+                              zIndex: 9999,
+                            }),
                           }}
                           menuPortalTarget={document.body}
                         />
                       </TableCell>
 
                       <TableCell>
-                        <input type="text" name="description" value={row.description} onChange={(e) => handleInputChange(index, e)} style={{ border: "none" }} placeholder="Description" />
+                        <input
+                          type="text"
+                          name="description"
+                          value={row.description}
+                          onChange={(e) => handleInputChange(index, e)}
+                          style={{ border: "none" }}
+                          placeholder="Description"
+                        />
                       </TableCell>
                       <TableCell>
-                        <input type="text" name="rate" value={row.rate} onChange={(e) => handleInputChange(index, e)} style={{ border: "none" }} />
+                        <input
+                          type="text"
+                          name="rate"
+                          value={row.rate}
+                          onChange={(e) => handleInputChange(index, e)}
+                          style={{ border: "none" }}
+                        />
                       </TableCell>
                       <TableCell>
-                        <input type="text" name="qty" value={row.qty} onChange={(e) => handleInputChange(index, e)} style={{ border: "none" }} />
+                        <input
+                          type="text"
+                          name="qty"
+                          value={row.qty}
+                          onChange={(e) => handleInputChange(index, e)}
+                          style={{ border: "none" }}
+                        />
                       </TableCell>
-                      <TableCell className={row.isDiscount ? "discount-amount" : ""}>{row.amount}</TableCell>
-                      <TableCell>
-                        <Checkbox name="tax" checked={row.tax} onChange={(e) => handleInputChange(index, e)} />
+                      <TableCell
+                        className={row.isDiscount ? "discount-amount" : ""}
+                      >
+                        {row.amount}
                       </TableCell>
-                      
                       <TableCell>
-                        <IconButton onClick={(event) => handleMenuOpen(event, index)}>
+                        <Checkbox
+                          name="tax"
+                          checked={row.tax}
+                          onChange={(e) => handleInputChange(index, e)}
+                        />
+                      </TableCell>
+
+                      <TableCell>
+                        <IconButton
+                          onClick={(event) => handleMenuOpen(event, index)}
+                        >
                           <BsThreeDotsVertical />
                         </IconButton>
-                        <Menu anchorEl={anchorElNew} open={Boolean(anchorElNew) && selectedRow === index} onClose={handleMenuClose} anchorOrigin={{ vertical: "top", horizontal: "left" }} transformOrigin={{ vertical: "top", horizontal: "left" }}>
-                          <MenuItem onClick={() => handleEditService(row, index)}>Edit</MenuItem>
-                          <MenuItem onClick={handleDeleteService}>Delete</MenuItem>
-                          <MenuItem onClick={() => handleSaveAsNewService(row)}>Save as new service</MenuItem>
-                          <MenuItem onClick={handleDuplicate}>Duplicate</MenuItem>
+                        <Menu
+                          anchorEl={anchorElNew}
+                          open={Boolean(anchorElNew) && selectedRow === index}
+                          onClose={handleMenuClose}
+                          anchorOrigin={{ vertical: "top", horizontal: "left" }}
+                          transformOrigin={{
+                            vertical: "top",
+                            horizontal: "left",
+                          }}
+                        >
+                          <MenuItem
+                            onClick={() => handleEditService(row, index)}
+                          >
+                            Edit
+                          </MenuItem>
+                          <MenuItem onClick={handleDeleteService}>
+                            Delete
+                          </MenuItem>
+                          <MenuItem onClick={() => handleSaveAsNewService(row)}>
+                            Save as new service
+                          </MenuItem>
+                          <MenuItem onClick={handleDuplicate}>
+                            Duplicate
+                          </MenuItem>
                         </Menu>
                       </TableCell>
                       <TableCell>
@@ -1425,19 +1739,46 @@ const validateInvoice = () => {
               </Table>
             </Box>
 
-            <Box style={{ display: "flex", alignItems: "center", gap: "20px", marginTop: "20px" }}>
-              <Box onClick={() => addRow()} style={{ display: "flex", alignItems: "center", gap: "5px", cursor: "pointer", color: "blue", fontSize: "18px" }}>
+            <Box
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "20px",
+                marginTop: "20px",
+              }}
+            >
+              <Box
+                onClick={() => addRow()}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "5px",
+                  cursor: "pointer",
+                  color: "blue",
+                  fontSize: "18px",
+                }}
+              >
                 <AiOutlinePlusCircle /> Line item
               </Box>
-              <Box onClick={() => addRow(true)} style={{ display: "flex", alignItems: "center", gap: "5px", cursor: "pointer", color: "blue", fontSize: "18px" }}>
+              <Box
+                onClick={() => addRow(true)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "5px",
+                  cursor: "pointer",
+                  color: "blue",
+                  fontSize: "18px",
+                }}
+              >
                 <CiDiscount1 /> Discount
               </Box>
             </Box>
- {errors.lineItems && (
-  <Typography sx={{ color: "red", fontSize: 12,}}>
-    {errors.lineItems}
-  </Typography>
-)}
+            {errors.lineItems && (
+              <Typography sx={{ color: "red", fontSize: 12 }}>
+                {errors.lineItems}
+              </Typography>
+            )}
             <Box>
               <Box>
                 <Typography sx={{ mt: 2, mb: 2 }} variant="h5">
@@ -1457,11 +1798,22 @@ const validateInvoice = () => {
                   <TableBody>
                     <TableRow>
                       <TableCell>
-                      $
-                        <input type="number" value={subtotal} onChange={handleSubtotalChange} style={{ border: "none" }} />
+                        $
+                        <input
+                          type="number"
+                          value={subtotal}
+                          onChange={handleSubtotalChange}
+                          style={{ border: "none" }}
+                        />
                       </TableCell>
                       <TableCell>
-                        <input type="number" value={taxRate} onChange={handleTaxRateChange} style={{ border: "none" }} />%
+                        <input
+                          type="number"
+                          value={taxRate}
+                          onChange={handleTaxRateChange}
+                          style={{ border: "none" }}
+                        />
+                        %
                       </TableCell>
                       <TableCell>${taxTotal.toFixed(2)}</TableCell>
                       <TableCell>${totalAmount}</TableCell>
@@ -1471,29 +1823,39 @@ const validateInvoice = () => {
               </TableContainer>
             </Box>
           </Box>
-         
 
           <Box sx={{ pt: 4, display: "flex", alignItems: "center", gap: 5 }}>
-            <Button variant="contained" color="primary" onClick={createinvoice} sx={{
-                backgroundColor: 'var(--color-save-btn)',  // Normal background
-               
-                '&:hover': {
-                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={createinvoice}
+              sx={{
+                backgroundColor: "var(--color-save-btn)", // Normal background
+
+                "&:hover": {
+                  backgroundColor: "var(--color-save-hover-btn)", // Hover background color
                 },
-                width:'80px',borderRadius:'15px'
-              }}>
+                width: "80px",
+                borderRadius: "15px",
+              }}
+            >
               Save
             </Button>
-            <Button variant="outlined" onClick={onClose} sx={{
-                  borderColor: 'var(--color-border-cancel-btn)',  // Normal background
-                 color:'var(--color-save-btn)',
-                  '&:hover': {
-                    backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                    color:'#fff',
-                    border:"none"
-                  },
-                  width:'80px',borderRadius:'15px'
-                }}>
+            <Button
+              variant="outlined"
+              onClick={onClose}
+              sx={{
+                borderColor: "var(--color-border-cancel-btn)", // Normal background
+                color: "var(--color-save-btn)",
+                "&:hover": {
+                  backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+                  color: "#fff",
+                  border: "none",
+                },
+                width: "80px",
+                borderRadius: "15px",
+              }}
+            >
               Cancel
             </Button>
           </Box>
@@ -1511,17 +1873,33 @@ const validateInvoice = () => {
               },
             }}
           >
-            <Box role="presentation" sx={{ borderRadius: isSmallScreen ? "0" : "15px" }}>
+            <Box
+              role="presentation"
+              sx={{ borderRadius: isSmallScreen ? "0" : "15px" }}
+            >
               <Box>
-                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", p: 2, borderBottom: "1px solid grey" }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    p: 2,
+                    borderBottom: "1px solid grey",
+                  }}
+                >
                   <Typography variant="h6">Create Service</Typography>
-                  <RxCross2 onClick={handleNewDrawerClose} style={{ cursor: "pointer" }} />
+                  <RxCross2
+                    onClick={handleNewDrawerClose}
+                    style={{ cursor: "pointer" }}
+                  />
                 </Box>
               </Box>
               <form style={{ margin: "15px" }}>
                 <Box>
                   <Box>
-                    <InputLabel sx={{ color: "black" }}>Service Name</InputLabel>
+                    <InputLabel sx={{ color: "black" }}>
+                      Service Name
+                    </InputLabel>
                     <TextField
                       // margin="normal"
                       fullWidth
@@ -1530,7 +1908,12 @@ const validateInvoice = () => {
                       size="small"
                       margin="normal"
                       value={selectedRowData?.productName || ""} // Use selected row data
-                      onChange={(e) => setSelectedRowData({ ...selectedRowData, productName: e.target.value })}
+                      onChange={(e) =>
+                        setSelectedRowData({
+                          ...selectedRowData,
+                          productName: e.target.value,
+                        })
+                      }
                     />
                   </Box>
                   <Box sx={{ mt: 1 }}>
@@ -1542,55 +1925,15 @@ const validateInvoice = () => {
                       size="small"
                       margin="normal"
                       value={selectedRowData?.description || ""} // Use selected row data
-                      onChange={(e) => setSelectedRowData({ ...selectedRowData, description: e.target.value })}
+                      onChange={(e) =>
+                        setSelectedRowData({
+                          ...selectedRowData,
+                          description: e.target.value,
+                        })
+                      }
                     />
                   </Box>
-                  {/* <Box sx={{ width: "100%", mt: 2 }}>
-                <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
-                    <Box>
-                      <InputLabel sx={{ color: "black" }}>Rate</InputLabel>
-                      <TextField
-                        fullWidth
-                        name="Rate"
-                        placeholder="Rate"
-                        size="small"
-                        margin="normal"
-                        value={selectedRowData?.rate || ""} // Use selected row data
-                        onChange={(e) => setSelectedRowData({ ...selectedRowData, rate: e.target.value })}
-                      />
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Box sx={{ mr: "15px" }}>
-                      <InputLabel sx={{ color: "black" }}>Rate Type</InputLabel>
-                      <Autocomplete
-                        size="small"
-                        fullWidth
-                        sx={{ mt: 2 }}
-                        options={options}
-                        getOptionLabel={(option) => option?.label || ""}
-                        value={selectedOption}
-                        onChange={handleRateTypeChange}
-                        renderInput={(params) => <TextField {...params} variant="outlined" placeholder="Select Rate Type" />}
-                        isOptionEqualToValue={(option, value) => option.value === value.value}
-                        renderOption={(props, option) => (
-                          <Box
-                            component="li"
-                            {...props}
-                            sx={{
-                              margin: "4px",
-                              cursor: "pointer",
-                            }}
-                          >
-                            <Typography>{option.label}</Typography>
-                          </Box>
-                        )}
-                      />
-                    </Box>
-                  </Grid>
-                </Grid>
-              </Box> */}
+
                   <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                     <Box width="50%">
                       <Typography sx={{ color: "black" }}>Rate</Typography>
@@ -1600,9 +1943,13 @@ const validateInvoice = () => {
                         placeholder="Rate"
                         size="small"
                         sx={{ mt: 1 }}
-                       
                         value={selectedRowData?.rate || ""} // Use selected row data
-                        onChange={(e) => setSelectedRowData({ ...selectedRowData, rate: e.target.value })}
+                        onChange={(e) =>
+                          setSelectedRowData({
+                            ...selectedRowData,
+                            rate: e.target.value,
+                          })
+                        }
                       />
                     </Box>
 
@@ -1616,8 +1963,16 @@ const validateInvoice = () => {
                         getOptionLabel={(option) => option?.label || ""}
                         value={selectedOption}
                         onChange={handleRateTypeChange}
-                        renderInput={(params) => <TextField {...params} variant="outlined" placeholder="Select Rate Type" />}
-                        isOptionEqualToValue={(option, value) => option.value === value.value}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            variant="outlined"
+                            placeholder="Select Rate Type"
+                          />
+                        )}
+                        isOptionEqualToValue={(option, value) =>
+                          option.value === value.value
+                        }
                         renderOption={(props, option) => (
                           <Box
                             component="li"
@@ -1638,7 +1993,9 @@ const validateInvoice = () => {
                       control={
                         <Switch
                           checked={selectedRowData?.tax || false} // Use the tax value from state
-                          onChange={(event) => handleServiceSwitch(event.target.checked)}
+                          onChange={(event) =>
+                            handleServiceSwitch(event.target.checked)
+                          }
                           color="primary"
                         />
                       }
@@ -1647,12 +2004,18 @@ const validateInvoice = () => {
                   </Box>
                   <Box>
                     <Box>
-                      <Typography variant="h5" gutterBottom sx={{ fontWeight: "bold", mt: 2 }}>
+                      <Typography
+                        variant="h5"
+                        gutterBottom
+                        sx={{ fontWeight: "bold", mt: 2 }}
+                      >
                         Category
                       </Typography>
                     </Box>
                     <Box>
-                      <InputLabel sx={{ color: "black", mt: 2 }}>Category Name</InputLabel>
+                      <InputLabel sx={{ color: "black", mt: 2 }}>
+                        Category Name
+                      </InputLabel>
                       <Autocomplete
                         size="small"
                         fullWidth
@@ -1661,21 +2024,36 @@ const validateInvoice = () => {
                         getOptionLabel={(option) => option.label} // Adjust based on your data structure
                         value={selectedCategory}
                         onChange={handleCategoryChange}
-                        renderInput={(params) => <TextField {...params} placeholder="Category Name" variant="outlined" />}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            placeholder="Category Name"
+                            variant="outlined"
+                          />
+                        )}
                         clearOnEscape // Equivalent to isClearable
-                        isOptionEqualToValue={(option, value) => option.value === value.value} // Compare options for equality
+                        isOptionEqualToValue={(option, value) =>
+                          option.value === value.value
+                        } // Compare options for equality
                       />
                     </Box>
                   </Box>
                   <Box>
-                    <Button variant="contained" color="primary" onClick={setCategoryFormOpen}   sx={{
-                backgroundColor: 'var(--color-save-btn)',  // Normal background
-               
-                '&:hover': {
-                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                },
-                borderRadius:'15px',mt: 4, ml: 1
-              }}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={setCategoryFormOpen}
+                      sx={{
+                        backgroundColor: "var(--color-save-btn)", // Normal background
+
+                        "&:hover": {
+                          backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+                        },
+                        borderRadius: "15px",
+                        mt: 4,
+                        ml: 1,
+                      }}
+                    >
                       Create category
                     </Button>
 
@@ -1693,63 +2071,121 @@ const validateInvoice = () => {
                       }}
                     >
                       <Box>
-                        <Box style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px" }}>
-                          <ArrowBackRoundedIcon onClick={handleCategoryFormClose} style={{ cursor: "pointer" }} />
+                        <Box
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            padding: "20px",
+                          }}
+                        >
+                          <ArrowBackRoundedIcon
+                            onClick={handleCategoryFormClose}
+                            style={{ cursor: "pointer" }}
+                          />
                         </Box>
                         <Divider />
                       </Box>
                       <Box p={3}>
-                        <InputLabel sx={{ color: "black", mt: 2 }}>Category Name</InputLabel>
+                        <InputLabel sx={{ color: "black", mt: 2 }}>
+                          Category Name
+                        </InputLabel>
 
-                        <TextField fullWidth name="Rate" placeholder="Category Name" size="small" margin="normal" value={categorycreate} onChange={(e) => setcategorycreate(e.target.value)} />
+                        <TextField
+                          fullWidth
+                          name="Rate"
+                          placeholder="Category Name"
+                          size="small"
+                          margin="normal"
+                          value={categorycreate}
+                          onChange={(e) => setcategorycreate(e.target.value)}
+                        />
                       </Box>
-                      <Box sx={{ pt: 2, display: "flex", alignItems: "center", gap: 5, margin: "8px", ml: 3 }}>
-                        <Button variant="contained"  onClick={createCategory} sx={{
-                backgroundColor: 'var(--color-save-btn)',  // Normal background
-               
-                '&:hover': {
-                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                },
-                width:'80px',borderRadius:'15px'
-              }}> 
+                      <Box
+                        sx={{
+                          pt: 2,
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 5,
+                          margin: "8px",
+                          ml: 3,
+                        }}
+                      >
+                        <Button
+                          variant="contained"
+                          onClick={createCategory}
+                          sx={{
+                            backgroundColor: "var(--color-save-btn)", // Normal background
+
+                            "&:hover": {
+                              backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+                            },
+                            width: "80px",
+                            borderRadius: "15px",
+                          }}
+                        >
                           Create
                         </Button>
-                        <Button variant="outlined" onClick={handleCategoryFormClose} sx={{
-                  borderColor: 'var(--color-border-cancel-btn)',  // Normal background
-                 color:'var(--color-save-btn)',
-                  '&:hover': {
-                    backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                    color:'#fff',
-                    border:"none"
-                  },
-                  width:'80px',borderRadius:'15px'
-                }}>
+                        <Button
+                          variant="outlined"
+                          onClick={handleCategoryFormClose}
+                          sx={{
+                            borderColor: "var(--color-border-cancel-btn)", // Normal background
+                            color: "var(--color-save-btn)",
+                            "&:hover": {
+                              backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+                              color: "#fff",
+                              border: "none",
+                            },
+                            width: "80px",
+                            borderRadius: "15px",
+                          }}
+                        >
                           Cancel
                         </Button>
                       </Box>
                     </Drawer>
                   </Box>
-                  <Box sx={{ pt: 5, display: "flex", alignItems: "center", gap: 5, ml: 1 }}>
-                    <Button variant="contained" color="primary" onClick={createservicetemp} sx={{
-                backgroundColor: 'var(--color-save-btn)',  // Normal background
-               
-                '&:hover': {
-                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                },
-                width:'80px',borderRadius:'15px'
-              }}>
+                  <Box
+                    sx={{
+                      pt: 5,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 5,
+                      ml: 1,
+                    }}
+                  >
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={createservicetemp}
+                      sx={{
+                        backgroundColor: "var(--color-save-btn)", // Normal background
+
+                        "&:hover": {
+                          backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+                        },
+                        width: "80px",
+                        borderRadius: "15px",
+                      }}
+                    >
                       Save
                     </Button>
-                    <Button variant="outlined" onClick={handleNewDrawerClose} sx={{
-                  borderColor: 'var(--color-border-cancel-btn)',  // Normal background
-                 color:'var(--color-save-btn)',
-                  '&:hover': {
-                    backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                    color:'#fff',
-                    border:"none"
-                  },
-                  width:'80px',borderRadius:'15px'
-                }}>
+                    <Button
+                      variant="outlined"
+                      onClick={handleNewDrawerClose}
+                      sx={{
+                        borderColor: "var(--color-border-cancel-btn)", // Normal background
+                        color: "var(--color-save-btn)",
+                        "&:hover": {
+                          backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+                          color: "#fff",
+                          border: "none",
+                        },
+                        width: "80px",
+                        borderRadius: "15px",
+                      }}
+                    >
                       Cancel
                     </Button>
                   </Box>
@@ -1771,37 +2207,77 @@ const validateInvoice = () => {
             }}
           >
             <Box>
-              <Box style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px" }}>
-                <ArrowBackRoundedIcon onClick={handleCategoryFormClose} style={{ cursor: "pointer" }} />
+              <Box
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "20px",
+                }}
+              >
+                <ArrowBackRoundedIcon
+                  onClick={handleCategoryFormClose}
+                  style={{ cursor: "pointer" }}
+                />
               </Box>
               <Divider />
             </Box>
             <Box p={3}>
-              <InputLabel sx={{ color: "black", mt: 2 }}>Category Name</InputLabel>
+              <InputLabel sx={{ color: "black", mt: 2 }}>
+                Category Name
+              </InputLabel>
 
-              <TextField fullWidth name="Rate" placeholder="Category Name" size="small" margin="normal" value={categorycreate} onChange={(e) => setcategorycreate(e.target.value)} />
+              <TextField
+                fullWidth
+                name="Rate"
+                placeholder="Category Name"
+                size="small"
+                margin="normal"
+                value={categorycreate}
+                onChange={(e) => setcategorycreate(e.target.value)}
+              />
             </Box>
-            <Box sx={{ pt: 2, display: "flex", alignItems: "center", gap: 5, margin: "8px", ml: 3 }}>
-              <Button variant="contained" color="primary" onClick={createCategory} sx={{
-                backgroundColor: 'var(--color-save-btn)',  // Normal background
-               
-                '&:hover': {
-                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                },
-                width:'80px',borderRadius:'15px'
-              }} >
+            <Box
+              sx={{
+                pt: 2,
+                display: "flex",
+                alignItems: "center",
+                gap: 5,
+                margin: "8px",
+                ml: 3,
+              }}
+            >
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={createCategory}
+                sx={{
+                  backgroundColor: "var(--color-save-btn)", // Normal background
+
+                  "&:hover": {
+                    backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+                  },
+                  width: "80px",
+                  borderRadius: "15px",
+                }}
+              >
                 Create
               </Button>
-              <Button variant="outlined" onClick={handleCategoryFormClose} sx={{
-                  borderColor: 'var(--color-border-cancel-btn)',  // Normal background
-                 color:'var(--color-save-btn)',
-                  '&:hover': {
-                    backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                    color:'#fff',
-                    border:"none"
+              <Button
+                variant="outlined"
+                onClick={handleCategoryFormClose}
+                sx={{
+                  borderColor: "var(--color-border-cancel-btn)", // Normal background
+                  color: "var(--color-save-btn)",
+                  "&:hover": {
+                    backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+                    color: "#fff",
+                    border: "none",
                   },
-                  width:'80px',borderRadius:'15px'
-                }}>
+                  width: "80px",
+                  borderRadius: "15px",
+                }}
+              >
                 Cancel
               </Button>
             </Box>
@@ -1820,59 +2296,159 @@ const validateInvoice = () => {
               },
             }}
           >
-            <Box role="presentation" sx={{ borderRadius: isSmallScreen ? "0" : "15px" }}>
+            <Box
+              role="presentation"
+              sx={{ borderRadius: isSmallScreen ? "0" : "15px" }}
+            >
               <Box>
-                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", p: 2, borderBottom: "1px solid grey" }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    p: 2,
+                    borderBottom: "1px solid grey",
+                  }}
+                >
                   <Typography variant="h6">Edit Item</Typography>
-                  <RxCross2 onClick={handleEditDrawerClose} style={{ cursor: "pointer" }} />
+                  <RxCross2
+                    onClick={handleEditDrawerClose}
+                    style={{ cursor: "pointer" }}
+                  />
                 </Box>
                 <Box p={2}>
                   <Typography variant="h6" fontWeight="bold">
                     Product or service
                   </Typography>
-                  <TextField size="small" margin="normal" value={selectedRowData?.productName || ""} fullWidth onChange={(e) => setSelectedRowData({ ...selectedRowData, productName: e.target.value })} />
+                  <TextField
+                    size="small"
+                    margin="normal"
+                    value={selectedRowData?.productName || ""}
+                    fullWidth
+                    onChange={(e) =>
+                      setSelectedRowData({
+                        ...selectedRowData,
+                        productName: e.target.value,
+                      })
+                    }
+                  />
                   <Box>
                     <Typography>Description</Typography>
-                    <TextField size="small" margin="normal" value={selectedRowData?.description || ""} fullWidth multiline onChange={(e) => setSelectedRowData({ ...selectedRowData, description: e.target.value })} />
+                    <TextField
+                      size="small"
+                      margin="normal"
+                      value={selectedRowData?.description || ""}
+                      fullWidth
+                      multiline
+                      onChange={(e) =>
+                        setSelectedRowData({
+                          ...selectedRowData,
+                          description: e.target.value,
+                        })
+                      }
+                    />
                   </Box>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: "10px", mt: 1 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                      mt: 1,
+                    }}
+                  >
                     <Box>
                       <Typography>Rate</Typography>
-                      <TextField size="small" margin="normal" value={selectedRowData?.rate || ""} fullWidth onChange={(e) => setSelectedRowData({ ...selectedRowData, rate: e.target.value })} />
+                      <TextField
+                        size="small"
+                        margin="normal"
+                        value={selectedRowData?.rate || ""}
+                        fullWidth
+                        onChange={(e) =>
+                          setSelectedRowData({
+                            ...selectedRowData,
+                            rate: e.target.value,
+                          })
+                        }
+                      />
                     </Box>
                     <Box>
                       <Typography>QTY</Typography>
-                      <TextField size="small" margin="normal" value={selectedRowData?.qty || ""} fullWidth onChange={(e) => setSelectedRowData({ ...selectedRowData, qty: e.target.value })} />
+                      <TextField
+                        size="small"
+                        margin="normal"
+                        value={selectedRowData?.qty || ""}
+                        fullWidth
+                        onChange={(e) =>
+                          setSelectedRowData({
+                            ...selectedRowData,
+                            qty: e.target.value,
+                          })
+                        }
+                      />
                     </Box>
                     <Box>
                       <Typography>Amount</Typography>
-                      <TextField size="small" margin="normal" fullWidth disabled value={totalamount} />
+                      <TextField
+                        size="small"
+                        margin="normal"
+                        fullWidth
+                        disabled
+                        value={totalamount}
+                      />
                     </Box>
                   </Box>
                   <Box mt={2}>
-                    <FormControlLabel control={<Switch checked={selectedRowData?.tax} onChange={(event) => handleServiceWitch(event.target.checked)} color="primary" />} label={"Tax"} />
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={selectedRowData?.tax}
+                          onChange={(event) =>
+                            handleServiceWitch(event.target.checked)
+                          }
+                          color="primary"
+                        />
+                      }
+                      label={"Tax"}
+                    />
                   </Box>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 2, mt: 2 }}>
-                    <Button variant="contained" onClick={handleSaveChanges} sx={{
-                backgroundColor: 'var(--color-save-btn)',  // Normal background
-               
-                '&:hover': {
-                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                },
-               width:'80px',borderRadius:'15px'
-              }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 2,
+                      mt: 2,
+                    }}
+                  >
+                    <Button
+                      variant="contained"
+                      onClick={handleSaveChanges}
+                      sx={{
+                        backgroundColor: "var(--color-save-btn)", // Normal background
+
+                        "&:hover": {
+                          backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+                        },
+                        width: "80px",
+                        borderRadius: "15px",
+                      }}
+                    >
                       Save
                     </Button>
-                    <Button variant="outlined" onClick={handleEditDrawerClose} sx={{
-                  borderColor: 'var(--color-border-cancel-btn)',  // Normal background
-                 color:'var(--color-save-btn)',
-                  '&:hover': {
-                    backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                    color:'#fff',
-                    border:"none"
-                  },
-                  width:'80px',borderRadius:'15px'
-                }}>
+                    <Button
+                      variant="outlined"
+                      onClick={handleEditDrawerClose}
+                      sx={{
+                        borderColor: "var(--color-border-cancel-btn)", // Normal background
+                        color: "var(--color-save-btn)",
+                        "&:hover": {
+                          backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+                          color: "#fff",
+                          border: "none",
+                        },
+                        width: "80px",
+                        borderRadius: "15px",
+                      }}
+                    >
                       {" "}
                       Cancel
                     </Button>

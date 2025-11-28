@@ -512,7 +512,7 @@ const handleServiceChange = (index, selectedOptions) => {
       invoicenumber: invoicenumber,
       invoicedate: startDate,
       description: description,
-      invoicetemplate: selectInvoiceTemp.value,
+      invoicetemplate: selectInvoiceTemp?.value,
       paymentMethod: paymentMode.value,
       teammember: selecteduser?.value,
       emailinvoicetoclient: emailInvoice,
@@ -705,12 +705,24 @@ const handleServiceChange = (index, selectedOptions) => {
           console.log(account);
           setSelectedaccount(account);
 
-          // Set invoice template
-          const invoicetemplate = {
-            value: result.invoice.invoicetemplate._id,
-            label: result.invoice.invoicetemplate.templatename, // Use "templatename" field
-          };
-          setSelectedInvoiceTemp(invoicetemplate);
+          // // Set invoice template
+          // const invoicetemplate = {
+          //   value: result.invoice.invoicetemplate._id,
+          //   label: result.invoice.invoicetemplate.templatename, // Use "templatename" field
+          // };
+          // setSelectedInvoiceTemp(invoicetemplate);
+          // Set invoice template safely
+if (result?.invoice?.invoicetemplate) {
+  const invoicetemplate = {
+    value: result.invoice.invoicetemplate._id,
+    label: result.invoice.invoicetemplate.templatename,
+  };
+  setSelectedInvoiceTemp(invoicetemplate);
+} else {
+  // No template found – clear state
+  setSelectedInvoiceTemp(null);
+}
+
 
           // Set payment method
           const paymentMethod = {
@@ -1038,47 +1050,52 @@ if (result.invoice.teammember) {
 
  const [firstContactEmail, setFirstContactEmail] = useState("");
 
-  // const contactMail = () => {
-  //   const requestOptions = {
-  //     method: "GET",
-  //     redirect: "follow",
-  //   };
-  
-  //   console.log("Calling API with ID:", selectedaccount?.value); // Debug log
-  
-  //   fetch(`${ACCOUNT_API}/accounts/accountdetails/accountdetailslist/listbyid/${selectedaccount?.value}`, requestOptions)
-  //     .then((response) => {
-  //       console.log("Response status:", response.status); // Debug log
-  //       return response.json();
-  //     })
-  //     .then((result) => {
-  //       console.log("API Result:", result); // Debug log
-        
-  //       if (result?.accountlist?.Contacts && Array.isArray(result.accountlist.Contacts)) {
-  //         const email = result.accountlist.Contacts[0]?.email;
-  //         if (email) {
-  //           console.log("First Contact Email:", email); // Debug log
-  //           setFirstContactEmail(email); // Update state
-  //         } else {
-  //           console.error("First contact does not have an email.");
-  //           setFirstContactEmail("[CONTACT EMAIL]"); // Handle missing email
-  //         }
-  //       } else {
-  //         console.error("No contacts found in the response.");
-  //         setFirstContactEmail("[CONTACT EMAIL]"); // Handle missing contacts
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error fetching contacts:", error);
-  //       setFirstContactEmail("Error fetching email"); // Handle fetch error
-  //     });
-  // };
-  
-  // useEffect(() => {
-  //   if (selectedaccount?.value) {
-  //     contactMail();
-  //   }
-  // }, [selectedaccount]);
+   const contactMail = () => {
+    const requestOptions = {
+      method: "GET",
+      redirect: "follow",
+    };
+
+    console.log("Calling API with ID:", selectedaccount?.value); // Debug log
+
+    fetch(
+      // `${ACCOUNT_API}/accounts/accountdetails/accountdetailslist/listbyid/${selectedaccount?.value}`,
+       `https://www.snptaxes.com/api/accounts/${selectedaccount?.value}`,
+      requestOptions
+    )
+      .then((response) => {
+        console.log("Response status:", response.status); // Debug log
+        return response.json();
+      })
+      .then((result) => {
+        console.log("API Result:", result); // Debug log
+
+        // Check for `contacts` array
+      if (Array.isArray(result.contacts) && result.contacts.length > 0) {
+        const email = result.contacts[0]?.contact?.email;
+
+        if (email) {
+          console.log("First Contact Email:", email);
+          setFirstContactEmail(email);
+        } else {
+          console.error("First contact does not have an email.");
+          setFirstContactEmail("[CONTACT EMAIL]");
+        }
+      } else {
+        console.error("No contacts found.");
+        setFirstContactEmail("[CONTACT EMAIL]");
+      }
+    })
+    .catch((error) => {
+      console.error("Error fetching contacts:", error);
+      setFirstContactEmail("Error fetching email");
+    });
+  };
+  useEffect(() => {
+    if (selectedaccount?.value) {
+      contactMail();
+    }
+  }, [selectedaccount]);
   //preview drawer
  const [previewDrawerOpen, setpreviewDrawerOpen] = useState(false);
  const handleOpenpreviewDrawer = () => setpreviewDrawerOpen(true);
@@ -1340,7 +1357,7 @@ if (result.invoice.teammember) {
             <Grid xs={6}>
               <Box>
                 <InputLabel sx={{ color: "black" }}>Invoice Number</InputLabel>
-                <TextField fullWidth value={invoicenumber} onChange={(e) => setinvoicenumber(e.target.value)} placeholder="Invoice Number" size="small" sx={{ mt: 1 }} />
+                <TextField fullWidth disabled value={invoicenumber} onChange={(e) => setinvoicenumber(e.target.value)} placeholder="Invoice Number" size="small" sx={{ mt: 1 }} />
               </Box>
             </Grid>
             <Grid xs={6}>

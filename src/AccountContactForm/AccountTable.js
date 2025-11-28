@@ -853,6 +853,7 @@ const handleFilterChange = (event) => {
                 </TableCell>
                 <TableCell
                   sortDirection={orderBy === "accountName" ? order : false}
+                  width={"500px"}
                 >
                   <TableSortLabel
                     active={orderBy === "accountName"}

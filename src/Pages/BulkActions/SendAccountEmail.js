@@ -15,6 +15,7 @@ import { LuConstruction } from "react-icons/lu";
 import { ToastContainer, toast } from "react-toastify";
 
 import { Chip,TextField, Button, FormControl, Select, Autocomplete, MenuItem, Typography, Box } from "@mui/material";
+import AccountMultiSelectDropdown from "../../Templates/AccountMultiSelectDropdown";
 
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 
@@ -334,100 +335,126 @@ const SendAccountEmail = ({ selectedAccounts, onClose }) => {
     const { value } = e.target;
     setEmailSubject(value);
   };
-
+   const [selectedAccount, setSelectedAccount] = useState([]);
+  const [userRole, setUserRole] = useState("");
+    const [accountoptions, setAccountOptions] = useState([]);
+  const [loading, setLoading] = useState(false);
+   const [filterStatus, setFilterStatus] = useState("active"); 
+  const [combinedaccountValues, setCombinedaccountValues] = useState([]);
+  const [selectedaccount, setSelectedaccount] = useState([]);
   const [accountdata, setaccountdata] = useState([]);
+const fetchAccountsData = async () => {
+  setLoading(true);
+  try {
+    const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
+    const loginuserid = storedData?.teammember?.userid;
+    const viewAllAccounts = storedData?.teammember?.viewallAccounts;
 
-  const fetchAccountData = async () => {
-    try {
-      // const response = await fetch(`${ACCOUNT_API}/accounts/accountdetails`);
-      const response = await fetch("https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true")
-      const data = await response.json();
-      setaccountdata(data.accounts);
+    console.log("UserRole:", userRole);
+    console.log("Team Member userId:", loginuserid);
+    console.log("viewAllAccounts:", viewAllAccounts);
 
-      // Map accounts to options
-      const options = data.accounts.map((account) => ({
-        value: account._id,
-        label: account.accountName,
-      }));
-      setAccountOptions(options);
+    let url = "";
 
-      // Filter options based on selectedAccounts
-      const selectedOptions = options.filter((option) => selectedAccounts.includes(option.value));
-      console.log("Selected Options:", selectedOptions);
-      setSelectedTo(selectedOptions);
-      setCombinedValues(selectedOptions.map((option) => option.value));
-    } catch (error) {
-      console.error("Error fetching data:", error);
+    // --- Same logic pattern as pipeline data ---
+    if (userRole === "Admin") {
+      url = `https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true`;
+    } else {
+      // TeamMember
+      url =
+        viewAllAccounts === true
+          ? `https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true`
+          : `https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=${filterStatus === "active"}`;
     }
-  };
-  console.log(selectedto);
 
-  useEffect(() => {
-    fetchAccountData();
-  }, []);
-  const [accountOptions, setAccountOptions] = useState([]);
+    console.log("Fetching accounts from:", url);
 
-  const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
-  // Function to fetch account details
-  // const fetchAccountDetails = async (accountId) => {
-  //   // console.log(accountId)
-  //   const requestOptions = {
-  //     method: "GET",
-  //     redirect: "follow",
-  //   };
+    const response = await fetch(url);
+    const data = await response.json();
 
+    const accounts = data.accountlist || data.teamAccounts || [];
+
+    setaccountdata(accounts);
+
+    // Convert to dropdown options
+    const options = accounts.map((acc) => ({
+      value: acc._id,
+      label: acc.accountName,
+    }));
+    setAccountOptions(options);
+
+    // Pre-select previously chosen accounts
+    const selectedOptions = options.filter((option) =>
+      selectedAccounts.includes(option.value)
+    );
+    setSelectedaccount(selectedOptions);
+    setCombinedaccountValues(selectedOptions.map((opt) => opt.value));
+
+  } catch (error) {
+    console.error("Error fetching account data:", error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+// STEP 1 — Fetch userRole first
+useEffect(() => {
+  const storedUserRole = localStorage.getItem("userRole") || "";
+  console.log("UserRole from localStorage:", storedUserRole);
+  setUserRole(storedUserRole);
+}, []);
+
+// STEP 2 — After userRole is loaded, fetch account list
+useEffect(() => {
+  if (userRole) {
+    fetchAccountsData();
+  }
+}, [userRole, filterStatus]);
+  // const fetchAccountData = async () => {
   //   try {
-  //     // const url = `${API_KEY}/admin/accountdetails/${accountId}`;
-  //     const url = `${ACCOUNT_API}/accounts/accountdetails/getAccountbyIdAll/${accountId}`;
-  //     const response = await fetch(url, requestOptions);
-  //     const result = await response.json();
-  //     console.log(result);
-  //     return result;
+  //     // const response = await fetch(`${ACCOUNT_API}/accounts/accountdetails`);
+  //     const response = await fetch("https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true")
+  //     const data = await response.json();
+  //     setaccountdata(data.accounts);
+
+  //     // Map accounts to options
+  //     const options = data.accounts.map((account) => ({
+  //       value: account._id,
+  //       label: account.accountName,
+  //     }));
+  //     setAccountOptions(options);
+
+  //     // Filter options based on selectedAccounts
+  //     const selectedOptions = options.filter((option) => selectedAccounts.includes(option.value));
+  //     console.log("Selected Options:", selectedOptions);
+  //     setSelectedTo(selectedOptions);
+  //     setCombinedValues(selectedOptions.map((option) => option.value));
   //   } catch (error) {
-  //     console.error("Error fetching account details:", error);
+  //     console.error("Error fetching data:", error);
   //   }
   // };
+  // console.log(selectedto);
 
-  // // Populate account options for the dropdown
   // useEffect(() => {
-  //   const populateOptions = async () => {
-  //     console.log(selectedAccounts.selectedAccounts);
-  //     if (!Array.isArray(selectedAccounts)) {
-  //       console.error("Selected accounts is not an array.");
-  //       return;
-  //     }
+  //   fetchAccountData();
+  // }, []);
+ 
+ const handleAccountChange = (event, newValue) => {
+    setSelectedAccount(newValue);
+    console.log("Selected Options:", newValue); // Log full option objects
+    console.log(
+      "Selected Values:",
+      newValue.map((option) => option.value)
+    ); // Log just the values
 
-  //     const options = [];
-  //     for (const accountId of selectedAccounts) {
-  //       console.log(accountId);
-  //       const account = await fetchAccountDetails(accountId);
-  //       console.log(account);
-  //       options.push({ value: account.account._id, label: account.account.accountName });
-  //     }
-  //     // setAccountOptions(options);
-  //     setSelectedTo(options);
-  //     setCombinedValues(options.map((option) => option.value));
-  //   };
-
-  //   populateOptions();
-  // }, [selectedAccounts]);
-
-  const navigate = useNavigate();
+    // If you need to set combined account values separately
+    setCombinedaccountValues(newValue.map((option) => option.value));
+  };
+ 
 
   const [combinedValues, setCombinedValues] = useState([]);
 
-  //   const handleToselect = (selectedOptions) => {
-  // console.log(selectedOptions)
-  //     setSelectedTo(selectedOptions);
-  //     // Map selected options to their values and send as an array
-  //     const selectedValues = selectedOptions.map((option) => option.value);
-  //     console.log(selectedValues)
-  //     // const dataToSend = {
-  //     //   selectedAccounts: selectedValues
-  //     // };
-
-  //     setCombinedValues(selectedValues);
-  //   }
+  
 
   const handleToselect = (event, selectedOptions) => {
     console.log(selectedOptions);
@@ -457,7 +484,7 @@ const SendAccountEmail = ({ selectedAccounts, onClose }) => {
     myHeaders.append("Content-Type", "application/json");
 
     const raw = JSON.stringify({
-      selectedAccounts: combinedValues,
+      selectedAccounts: combinedaccountValues,
       emailtemplateid: emailTemplate.value,
       emailsubject: emailSubject,
       emailbody: htmlContent,
@@ -526,7 +553,7 @@ const SendAccountEmail = ({ selectedAccounts, onClose }) => {
         <Box sx={{ mt: 2 }}>
           <label className="email-input-label">To</label>
           {/* <Autocomplete multiple options={accountOptions} sx={{ mt: 2, mb: 2, backgroundColor: "#fff" }} size="small" value={selectedto} onChange={handleToselect} isOptionEqualToValue={(option, value) => option.value === value.value} getOptionLabel={(option) => option.label || ""} renderInput={(params) => <TextField {...params} placeholder="To" />} /> */}
-          <Autocomplete
+          {/* <Autocomplete
             multiple
             options={accountOptions}
             value={selectedto}
@@ -552,7 +579,13 @@ const SendAccountEmail = ({ selectedAccounts, onClose }) => {
             )}
             renderInput={(params) => <TextField {...params} placeholder="Select Accounts" variant="outlined" size="small" sx={{ backgroundColor: "#fff" }} />}
             sx={{ width: "100%", marginTop: "8px" }}   multiline
-          />
+          /> */}
+            <AccountMultiSelectDropdown
+                                      value={selectedaccount}
+                                      onChange={handleAccountChange}
+                                      placeholder="Accounts"
+                                      options={accountoptions}
+                                    />
         </Box>
 
         <Box sx={{ mt: 2 }}>

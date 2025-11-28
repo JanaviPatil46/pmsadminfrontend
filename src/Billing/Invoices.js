@@ -55,6 +55,9 @@ import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import CreatableSelect from "react-select/creatable";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import dayjs from "dayjs";
+import { useContext } from "react";
+import { LoginContext } from "../Sidebar/Context/Context";
 import PlagiarismIcon from "@mui/icons-material/Plagiarism";
 const Invoices = ({ charLimit = 4000 }) => {
   const theme = useTheme();
@@ -71,7 +74,8 @@ const Invoices = ({ charLimit = 4000 }) => {
   const [reminders, setReminders] = useState(false);
   const [scheduledInvoice, setScheduledInvoice] = useState(false);
   const [charCount, setCharCount] = useState(0);
-  const [invoicenumber, setinvoicenumber] = useState();
+   const [invoicenumber, setinvoicenumber] = useState("");
+    const [isLoadingInvoiceNumber, setIsLoadingInvoiceNumber] = useState(true);
   const handlePayInvoiceChange = (event) => {
     setIsPayInvoice(event.target.checked);
   };
@@ -293,7 +297,30 @@ const Invoices = ({ charLimit = 4000 }) => {
 
   useEffect(() => {
     fetchServiceData();
+     fetchNextInvoiceNumber()
   }, []);
+  // Function to fetch the next invoice number
+    const fetchNextInvoiceNumber = async () => {
+      try {
+        setIsLoadingInvoiceNumber(true);
+        const url = `${INVOICE_NEW}/workflow/invoices/next-invoice-number`;
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch next invoice number');
+        }
+        
+        const data = await response.json();
+        setinvoicenumber(data.nextInvoiceNumber.toString());
+      } catch (error) {
+        console.error('Error fetching next invoice number:', error);
+        // If there's an error, set a placeholder or handle appropriately
+        setinvoicenumber("Auto-generated");
+        toast.error('Failed to load invoice number');
+      } finally {
+        setIsLoadingInvoiceNumber(false);
+      }
+    };
   const fetchServiceData = async () => {
     try {
       const url = `${SERVICE_API}/workflow/services/servicetemplate`;
@@ -411,7 +438,10 @@ const Invoices = ({ charLimit = 4000 }) => {
     setRows(newRows);
   };
 
-  const [paymentMode, setPaymentMode] = useState("");
+ const [paymentMode, setPaymentMode] = useState({
+   value: "Bank Debits", 
+   label: "Bank Debits"
+ });
   const paymentsOptions = [
     { value: "Bank Debits", label: "Bank Debits" },
     { value: "Credit Card", label: "Credit Card" },
@@ -511,6 +541,8 @@ const accountoptions = accountdata.map((account) => ({
 
   const [userData, setUserData] = useState([]);
   const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
+  const { logindata } = useContext(LoginContext);
+   console.log("logindata", logindata);
   useEffect(() => {
     fetchUserData();
   }, []);
@@ -521,11 +553,33 @@ const accountoptions = accountdata.map((account) => ({
       const response = await fetch(url);
       const data = await response.json();
       setUserData(data);
+       setDefaultTeamMember(data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
-
+// Function to set default team member based on logged-in user
+const setDefaultTeamMember = (users) => {
+  if (logindata && logindata.user && logindata.user.id && Array.isArray(users)) {
+    // Find the user in the users array that matches the logged-in user ID
+    const currentUser = users.find(user => user._id === logindata.user.id);
+    
+    if (currentUser) {
+      const userOption = {
+        value: currentUser._id,
+        label: currentUser.username
+      };
+      setSelectedUser(userOption);
+      console.log('Default team member set to logged-in user:', userOption);
+    } else {
+      console.log('Logged in user not found in team members list');
+      console.log('Looking for ID:', logindata.user.id);
+      console.log('Available users:', users.map(u => ({ id: u._id, username: u.username })));
+    }
+  } else {
+    console.log('No logged in user data available');
+  }
+};
   const handleuserChange = (event, selectedOptions) => {
     setSelectedUser(selectedOptions);
   };
@@ -614,7 +668,7 @@ const accountoptions = accountdata.map((account) => ({
       })
       .catch((error) => console.error(error));
   };
-  const [startDate, setStartDate] = useState(null);
+   const [startDate, setStartDate] = useState(dayjs());
   const handleStartDateChange = (date) => {
     setStartDate(date);
   };
@@ -693,7 +747,7 @@ const accountoptions = accountdata.map((account) => ({
 
     const raw = JSON.stringify({
       account: selectedaccount.value,
-      invoicenumber: "",
+         invoicenumber: invoicenumber,
       invoicedate: startDate,
       description: description,
       invoicetemplate: selectInvoiceTemp.value,
@@ -1564,7 +1618,7 @@ const fetchInvoiceData = async () => {
           }}
         >
           <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-            Create invoice 
+            Create invoice  
           </Typography>
 
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -1663,7 +1717,7 @@ const fetchInvoiceData = async () => {
                         fontSize: 13,
                       }}
                     >
-                      [INVOICE_NUMBER]
+                      {invoicenumber || "[INVOICE_NUMBER]"}
                     </Typography>
                   </Typography>
                 </Box>
@@ -1879,13 +1933,25 @@ const fetchInvoiceData = async () => {
                   <InputLabel sx={{ color: "black" }}>
                     Invoice Number
                   </InputLabel>
-                  <TextField
+                  {/* <TextField
                     fullWidth
                     onChange={(e) => setinvoicenumber(e.target.value)}
                     placeholder="Invoice Number"
                     size="small"
                     sx={{ mt: 1 }}
-                  />
+                  /> */}
+                    <TextField
+                                    fullWidth
+                                    value={isLoadingInvoiceNumber ? "Loading..." : invoicenumber}
+                                    placeholder="Invoice Number"
+                                    size="small"
+                                    sx={{ mt: 1 }}
+                                    InputProps={{
+                                      readOnly: true, // Make it read-only since it's auto-generated
+                                    }}
+                                    helperText="Auto-generated invoice number"
+                                    disabled={isLoadingInvoiceNumber}
+                                  />
                 </Box>
               </Grid>
               <Grid xs={6}>
@@ -1929,7 +1995,7 @@ const fetchInvoiceData = async () => {
                       Date
                     </FormLabel>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
-                      <DatePicker
+                      {/* <DatePicker
                          format="MM/DD/YYYY"
                         sx={{ width: "100%", backgroundColor: "#fff" }}
                         selected={startDate}
@@ -1937,6 +2003,12 @@ const fetchInvoiceData = async () => {
                         renderInput={(params) => (
                           <TextField {...params} size="small" />
                         )}
+                      /> */}
+                       <DatePicker
+                        format="MM/DD/YYYY"
+                        sx={{ width: "100%", backgroundColor: "#fff" }}
+                        value={startDate} // Default to today's date
+                        onChange={handleStartDateChange}
                       />
                     </LocalizationProvider>
                   </FormControl>
@@ -1946,21 +2018,21 @@ const fetchInvoiceData = async () => {
                 <Box>
                   <label className="email-input-label">Team Member</label>
 
-                  <Autocomplete
-                    options={useroptions}
-                    sx={{ mt: 2, mb: 2, backgroundColor: "#fff" }}
-                    size="small"
-                    value={selecteduser}
-                    onChange={handleuserChange}
-                    isOptionEqualToValue={(option, value) =>
-                      option.value === value.value
-                    }
-                    getOptionLabel={(option) => option.label || ""}
-                    renderInput={(params) => (
-                      <TextField {...params} placeholder="Team Member" />
-                    )}
-                    isClearable={true}
-                  />
+                    <Autocomplete
+                                    options={options}
+                                    sx={{ mt: 2, mb: 2, backgroundColor: "#fff" }}
+                                    size="small"
+                                    value={selecteduser}
+                                    onChange={handleuserChange}
+                                    isOptionEqualToValue={(option, value) =>
+                                      option.value === value.value
+                                    }
+                                    getOptionLabel={(option) => option.label || ""}
+                                    renderInput={(params) => (
+                                      <TextField {...params} placeholder="Team Member" />
+                                    )}
+                                    isClearable={true}
+                                  />
                 </Box>
               </Grid>
             </Grid>
