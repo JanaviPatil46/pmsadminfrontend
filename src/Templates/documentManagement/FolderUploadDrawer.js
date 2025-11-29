@@ -1,7 +1,7 @@
 
 
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect ,useRef} from "react";
 import {
   Drawer,
   Box,
@@ -20,7 +20,8 @@ import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import { toast } from "react-toastify";
-
+import JSZip from "jszip";
+import axios from "axios";
 const FolderUploadDrawer = ({
   isOpen,
   onClose,
@@ -32,7 +33,13 @@ const FolderUploadDrawer = ({
   const [message, setMessage] = useState("");
   const [folderName, setFolderName] = useState("my-uploaded-folder");
   const [files, setFiles] = useState([]);
+  const hiddenFileInput = useRef(null);
+  // open hidden input
+  const handleClick = () => {
+    hiddenFileInput.current.click();
+  };
 
+  
   useEffect(() => {
     if (isOpen && selectedFolderForMenu) {
       setSelectedFolder(selectedFolderForMenu.path);
@@ -99,67 +106,114 @@ const FolderUploadDrawer = ({
   // };
   const [progress, setProgress] = useState(0);
 
-const handleUpload = async () => {
-  if (files.length === 0) {
-    setMessage("Please select a folder first");
-    return;
-  }
+// const handleUpload = async () => {
+//   if (files.length === 0) {
+//     setMessage("Please select a folder first");
+//     return;
+//   }
 
+//   let targetFolderPath = selectedFolder
+//     ? `${selectedFolder}/${folderName}`
+//     : folderName;
+
+//   targetFolderPath = targetFolderPath.replace(/\/+/g, "/");
+
+//   const CHUNK_SIZE = 30; // upload 30 files per request
+//   const totalChunks = Math.ceil(files.length / CHUNK_SIZE);
+
+//   setMessage("Uploading...");
+//   let uploadedChunks = 0;
+
+//   for (let i = 0; i < files.length; i += CHUNK_SIZE) {
+//     const formData = new FormData();
+//     const chunk = files.slice(i, i + CHUNK_SIZE);
+
+//     chunk.forEach((file) => {
+//       formData.append("files", file, file.webkitRelativePath);
+//     });
+
+//     try {
+//       const res = await fetch(
+//         `https://www.snptaxes.com/api/docManagement/folder/upload?folderPath=${encodeURIComponent(
+//           targetFolderPath
+//         )}`,
+//         { method: "POST", body: formData }
+//       );
+
+//       if (!res.ok) {
+//         const err = await res.json();
+//         toast.error(`❌ Upload failed: ${err.error || "Unknown error"}`);
+//         setMessage(`❌ Upload failed at chunk ${uploadedChunks + 1}`);
+//         return;
+//       }
+
+//       uploadedChunks++;
+//       const percent = Math.round((uploadedChunks / totalChunks) * 100);
+//         setProgress(percent);
+//       setMessage(`✅ Uploading... ${percent}% completed`);
+//     } catch (err) {
+//       console.error(err);
+//       setMessage("❌ Upload failed due to network error");
+//       return;
+//     }
+//   }
+
+//   // All chunks uploaded
+//   toast.success("✅ Folder uploaded successfully!");
+//   setMessage(`✅ Folder uploaded (${files.length} files)`);
+
+//  await fetchFolderTree();
+//   setFiles([]);
+//   onClose();
+// };
+ // Upload ZIP
+ 
+  const handleUpload = async () => {
+    if (!files.length) {
+      alert("Please select a folder first!");
+      return;
+    }
+
+     // ------------------------------
+  // ⭐ Use targetFolderPath logic
+  // ------------------------------
   let targetFolderPath = selectedFolder
     ? `${selectedFolder}/${folderName}`
     : folderName;
 
   targetFolderPath = targetFolderPath.replace(/\/+/g, "/");
+console.log("Target Folder Path:", targetFolderPath);
+    setMessage("Zipping folder...");
 
-  const CHUNK_SIZE = 30; // upload 30 files per request
-  const totalChunks = Math.ceil(files.length / CHUNK_SIZE);
-
-  setMessage("Uploading...");
-  let uploadedChunks = 0;
-
-  for (let i = 0; i < files.length; i += CHUNK_SIZE) {
-    const formData = new FormData();
-    const chunk = files.slice(i, i + CHUNK_SIZE);
-
-    chunk.forEach((file) => {
-      formData.append("files", file, file.webkitRelativePath);
+    const zip = new JSZip();
+    files.forEach((file) => {
+      zip.file(file.webkitRelativePath, file);
     });
 
+    const zipBlob = await zip.generateAsync({ type: "blob" });
+
+    const formData = new FormData();
+    formData.append("folderZip", zipBlob, `${folderName}.zip`);
+    formData.append("folderName", folderName);
+    formData.append("folderPath", targetFolderPath);
+
+    setMessage("Uploading...");
+
     try {
-      const res = await fetch(
-        `https://www.snptaxes.com/api/docManagement/folder/upload?folderPath=${encodeURIComponent(
-          targetFolderPath
-        )}`,
-        { method: "POST", body: formData }
+      const res = await axios.post(
+        "https://snptaxes.com/api/docManagement/upload-folder",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
       );
-
-      if (!res.ok) {
-        const err = await res.json();
-        toast.error(`❌ Upload failed: ${err.error || "Unknown error"}`);
-        setMessage(`❌ Upload failed at chunk ${uploadedChunks + 1}`);
-        return;
-      }
-
-      uploadedChunks++;
-      const percent = Math.round((uploadedChunks / totalChunks) * 100);
-        setProgress(percent);
-      setMessage(`✅ Uploading... ${percent}% completed`);
+      setMessage(res.data.message || "Uploaded successfully!");
+      console.log(res.data.message);
     } catch (err) {
       console.error(err);
-      setMessage("❌ Upload failed due to network error");
-      return;
+      setMessage("Upload failed!");
     }
-  }
-
-  // All chunks uploaded
-  toast.success("✅ Folder uploaded successfully!");
-  setMessage(`✅ Folder uploaded (${files.length} files)`);
-
- await fetchFolderTree();
-  setFiles([]);
-  onClose();
-};
- 
+  };
   return (
     <Drawer anchor="right" open={isOpen} onClose={onClose}>
       <Box sx={{ width: 400, p: 3, bgcolor: "#f0f8ff", height: "100%" }}>
@@ -168,7 +222,7 @@ const handleUpload = async () => {
         </Typography>
 
         
-        <Button
+        {/* <Button
           variant="outlined"
           component="label"
           fullWidth
@@ -183,8 +237,27 @@ const handleUpload = async () => {
             hidden
             onChange={handleUploadFolderSelect}
           />
-        </Button>
+        </Button> */}
+  {/* MUI Button instead of File Input */}
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleClick}
+        sx={{ mb: 2 }}
+      >
+        Select Folder
+      </Button>
 
+      {/* Hidden File Input */}
+      <input
+        type="file"
+        ref={hiddenFileInput}
+        onChange={handleUploadFolderSelect}
+        style={{ display: "none" }}
+        webkitdirectory="true"
+        directory="true"
+        multiple
+      />
         <Button
           variant="contained"
           color="primary"

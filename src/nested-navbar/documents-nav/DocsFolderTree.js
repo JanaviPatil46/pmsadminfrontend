@@ -225,7 +225,7 @@ const DocsFolderTree = () => {
     const [token, setToken] = useState("");
     const [showBuilderFor, setShowBuilderFor] = useState(null);
     const [openDialog, setOpenDialog] = useState(false);
-    const [currentExternalId, setCurrentExternalId] = useState(null);
+    // const [currentExternalId, setCurrentExternalId] = useState(null);
     // Toggle signature and request token
     const toggleSignStatus = async (item) => {
       try {

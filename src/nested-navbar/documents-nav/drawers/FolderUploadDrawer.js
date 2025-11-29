@@ -1,7 +1,7 @@
 
 
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useRef } from "react";
 import {
   Drawer,
   Box,
@@ -33,6 +33,12 @@ const FolderUploadDrawer = ({
   const [message, setMessage] = useState("");
   const [folderName, setFolderName] = useState("my-uploaded-folder");
   const [files, setFiles] = useState([]);
+    const hiddenFileInput = useRef(null);
+// open hidden input
+  const handleClick = () => {
+    hiddenFileInput.current.click();
+  };
+
 
   useEffect(() => {
     if (isOpen && selectedFolderForMenu) {
@@ -128,7 +134,7 @@ const FolderUploadDrawer = ({
 
        
 
-        <Button
+        {/* <Button
           variant="outlined"
           component="label"
           fullWidth
@@ -143,7 +149,28 @@ const FolderUploadDrawer = ({
             hidden
             onChange={handleUploadFolderSelect}
           />
-        </Button>
+        </Button> */}
+
+         {/* MUI Button instead of File Input */}
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleClick}
+        sx={{ mb: 2 }}
+      >
+        Select Folder
+      </Button>
+
+      {/* Hidden File Input */}
+      <input
+        type="file"
+        ref={hiddenFileInput}
+        onChange={handleUploadFolderSelect}
+        style={{ display: "none" }}
+        webkitdirectory="true"
+        directory="true"
+        multiple
+      />
 
         <Button
           variant="contained"
