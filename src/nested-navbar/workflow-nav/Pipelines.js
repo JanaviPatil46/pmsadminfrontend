@@ -450,11 +450,11 @@ const Stage = ({ stage, jobs, moveJob, onCheckboxChange, handleDrop,data,fetchJo
   });
 
   // State for tracking how many jobs to show
-  const [visibleJobsCount, setVisibleJobsCount] = useState(2);
+  const [visibleJobsCount, setVisibleJobsCount] = useState(50);
 
   // Function to load more jobs
   const loadMoreJobs = () => {
-    setVisibleJobsCount(prevCount => prevCount + 5);
+    setVisibleJobsCount(prevCount => prevCount + 50);
   };
   return (
     <Box

@@ -65,9 +65,8 @@ const AccountTable = () => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [selected, setSelected] = useState([]);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(30);
-  // const [order, setOrder] = useState("asc");
-  // const [orderBy, setOrderBy] = useState("accountName");
+  const [rowsPerPage, setRowsPerPage] = useState(25);
+
   const [order, setOrder] = useState(null);
 const [orderBy, setOrderBy] = useState(null);
 
@@ -81,12 +80,14 @@ const [orderBy, setOrderBy] = useState(null);
     type: "",
     teamMember: [],  // Changed from string to array
     tags: [],
+    email: "",
   });
     const [showFilters, setShowFilters] = useState({
       accountName: false,
       type: false,
       teamMember: false,
       tags: false,
+      email: false,
     });
      const handleFilterButtonClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -94,7 +95,7 @@ const [orderBy, setOrderBy] = useState(null);
   const clearFilter = (filterField) => {
   setFilters(prev => ({
     ...prev,
-    [filterField]: filterField === 'accountName' || filterField === 'type' ? '' : []
+    [filterField]: filterField === 'accountName' || filterField === 'type' ||  filterField === "email" ? '' : []
   }));
   setShowFilters(prev => ({
     ...prev,
@@ -206,6 +207,7 @@ const [orderBy, setOrderBy] = useState(null);
       console.log("Fetching from URL:", url);
       const response = await axios.get(url);
       setAccountList(response.data.accountlist || []);
+      console.log("Fetched accounts:", response.data.accountlist);
     } catch (err) {
       console.error("Error loading accounts:", err);
       setAccountList([]);
@@ -375,17 +377,23 @@ const handleClick = (account) => {
     );
   }
 
+  // ✅ Filter by Email (inside contacts.contact.email)
+if (filters.email.trim() !== "") {
+  const search = filters.email.toLowerCase();
+
+  filtered = filtered.filter(acc =>
+    acc.contacts?.some(c =>
+      c.contact?.email?.toLowerCase().includes(search)
+    )
+  );
+}
+
+
   // ✅ Filter by Type
   if (filters.type !== "") {
     filtered = filtered.filter(acc => acc.clientType === filters.type);
   }
 
-  // ✅ Filter by Team Members (multi-select)
-//   if (filters.teamMember.length > 0) {
-//   filtered = filtered.filter(acc =>
-//     acc.teamMember?.some(tm => filters.teamMember.includes(tm._id))
-//   );
-// }
 // ✅ Filter by Team Member
   if (filters.teamMember.length > 0) {
     const selectedIds = filters.teamMember.map(t => t.value);
@@ -605,6 +613,15 @@ const handleFilterChange = (event) => {
                           Account Name
                         </MenuItem>
                         <MenuItem
+  onClick={() => {
+    toggleFilter("email");
+    handleClose();
+  }}
+>
+  Email
+</MenuItem>
+
+                        <MenuItem
                           onClick={() => {
                             toggleFilter("type");
                             handleClose();
@@ -654,6 +671,29 @@ const handleFilterChange = (event) => {
                   />
                 </div>
               )}
+{showFilters.email && (
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      // marginBottom: "10px",
+    }}
+  >
+    <TextField
+      name="email"
+      value={filters.email}
+      onChange={handleFilterChange}
+      placeholder="Filter by Email"
+      variant="outlined"
+      size="small"
+      style={{ marginRight: "10px" }}
+    />
+    <DeleteIcon
+      onClick={() => clearFilter("email")}
+      style={{ cursor: "pointer", color: "red" }}
+    />
+  </div>
+)}
 
               {/* Type Filter */}
               {showFilters.type && (

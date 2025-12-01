@@ -16,7 +16,11 @@ import {
   Button,
   Menu,
   MenuItem,
-  IconButton,Divider,Typography,Drawer,Tooltip
+  IconButton,
+  Divider,
+  Typography,
+  Drawer,
+  Tooltip,Dialog,DialogTitle,DialogContent,DialogContentText,DialogActions  
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { FaTimes } from "react-icons/fa";
@@ -26,29 +30,18 @@ import { toast } from "react-toastify";
 import ContactForm from "../Pages/UpdateContact"; // adjust path
 
 const ContactsTable = () => {
-    const [openDrawer, setOpenDrawer] = useState(false);
-const [selectedContact, setSelectedContact] = useState(null);
-
-const handleOpenDrawer = (contact) => {
-  console.log("Opening drawer for contact:", contact);
-  setSelectedContact(contact);
-  setOpenDrawer(true);
-};
-
-const handleCloseDrawer = () => {
-  setOpenDrawer(false);
-  setSelectedContact(null);
-};
-
- const handleSave = (contactData) => {
-    if (selectedContact) {
-      console.log("Update contact:", contactData);
-      // call API to update
-    } else {
-      console.log("Create new contact:", contactData);
-      // call API to create
-    }
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const [selectedContact, setSelectedContact] = useState(null);
+const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+const [page, setPage] = useState(0);
+const [rowsPerPage, setRowsPerPage] = useState(25); // default 25 per page
+  const handleOpenDrawer = (contact) => {
+    console.log("Opening drawer for contact:", contact);
+    setSelectedContact(contact);
+    setOpenDrawer(true);
   };
+
+ 
 
   const [contacts, setContacts] = useState([]);
   const [filteredContacts, setFilteredContacts] = useState([]);
@@ -81,16 +74,8 @@ const handleCloseDrawer = () => {
     setFilters({ ...filters, [filter]: filter === "tags" ? [] : "" });
   };
 
-  // // ✅ Fetch
-  // useEffect(() => {
-  //   fetch("https://www.snptaxes.com/api/contacts/")
-  //     .then((res) => res.json())
-  //     .then((data) => {
-  //       setContacts(data);
-  //       setFilteredContacts(data);
-  //     });
-  // }, []);
-// ✅ central fetch function
+  
+  // ✅ central fetch function
   const fetchContacts = async () => {
     try {
       const res = await fetch("https://www.snptaxes.com/api/contacts/");
@@ -170,13 +155,14 @@ const handleCloseDrawer = () => {
       );
       setContacts(remaining);
       setSelectedContacts([]);
+      setOpenDeleteDialog(false); // CLOSE DIALOG
     } catch (error) {
       console.error("Delete error:", error);
     }
   };
-  const handleContactUpdated =()=>{
-fetchContacts();
-  }
+  const handleContactUpdated = () => {
+    fetchContacts();
+  };
 
   return (
     <Box p={2}>
@@ -280,13 +266,14 @@ fetchContacts();
         variant="contained"
         color="error"
         disabled={selectedContacts.length === 0}
-        onClick={handleDeleteSelected}
+        // onClick={handleDeleteSelected}
+        onClick={() => setOpenDeleteDialog(true)}
+
         sx={{ mb: 2 }}
       >
         Delete Selected ({selectedContacts.length})
       </Button>
 
-      
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -310,7 +297,7 @@ fetchContacts();
           </TableHead>
 
           <TableBody>
-            {filteredContacts.map((c) => (
+            {filteredContacts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((c) => (
               <TableRow key={c._id}>
                 <TableCell padding="checkbox">
                   <input
@@ -320,129 +307,150 @@ fetchContacts();
                   />
                 </TableCell>
 
-                {/* <TableCell>{c.contactName || "—"}</TableCell>
-                 */}
-                 <TableCell>
-  <Button
-    variant="text"
-    onClick={() => handleOpenDrawer(c)}
-    style={{ textTransform: "none" }}
-  >
-    {c.contactName || "—"}
-  </Button>
-</TableCell>
+                <TableCell>
+                  <Button
+                    variant="text"
+                    onClick={() => handleOpenDrawer(c)}
+                    style={{ textTransform: "none" }}
+                  >
+                    {c.contactName || "—"}
+                  </Button>
+                </TableCell>
 
                 <TableCell>{c.email || "—"}</TableCell>
                 <TableCell>{c.companyName || "—"}</TableCell>
                 {/* <TableCell>{c.phoneNumbers}</TableCell> */}
-<TableCell>
-  {Array.isArray(c.phoneNumbers) && c.phoneNumbers.length > 0
-    ? c.phoneNumbers.join(", ")
-    : "—"}
-</TableCell>
-                {/* <TableCell>
-                  {c.tags?.map((t) => (
-                    <Chip
-                      key={t._id}
-                      label={t.tagName}
-                      size="small"
-                      style={{
-                        backgroundColor: t.tagColour,
-                        color: "#fff",
-                        marginRight: "4px",
-                      }}
-                    />
-                  )) || "—"}
-                </TableCell> */}
                 <TableCell>
-  {c.tags && c.tags.length > 0 ? (
-    <>
-      {c.tags.slice(0, 2).map((t) => (
-        <Chip
-          key={t._id}
-          label={t.tagName}
-          size="small"
-          style={{
-            backgroundColor: t.tagColour,
-            color: "#fff",
-            marginRight: "4px",
-            marginBottom: "4px",
-          }}
-        />
-      ))}
+                  {Array.isArray(c.phoneNumbers) && c.phoneNumbers.length > 0
+                    ? c.phoneNumbers.join(", ")
+                    : "—"}
+                </TableCell>
+               
+                <TableCell>
+                  {c.tags && c.tags.length > 0 ? (
+                    <>
+                      {c.tags.slice(0, 2).map((t) => (
+                        <Chip
+                          key={t._id}
+                          label={t.tagName}
+                          size="small"
+                          style={{
+                            backgroundColor: t.tagColour,
+                            color: "#fff",
+                            marginRight: "4px",
+                            marginBottom: "4px",
+                          }}
+                        />
+                      ))}
 
-      {c.tags.length > 2 && (
-        <Tooltip
-          title={
-            <Box>
-              {c.tags.slice(2).map((t) => (
-                <Box key={t._id} sx={{ mb: 0.5 }} >
-                  • {t.tagName}
-                </Box>
-              ))}
-            </Box>
-          }
-          arrow
-          placement="top"
-        >
-          <Chip
-            label={`+${c.tags.length - 2} more`}
-            size="small"
-            style={{ backgroundColor: "#999", color: "white" }}
-          />
-        </Tooltip>
-      )}
-    </>
-  ) : (
-    "—"
-  )}
-</TableCell>
+                      {c.tags.length > 2 && (
+                        <Tooltip
+                          title={
+                            <Box>
+                              {c.tags.slice(2).map((t) => (
+                                <Box key={t._id} sx={{ mb: 0.5 }}>
+                                  • {t.tagName}
+                                </Box>
+                              ))}
+                            </Box>
+                          }
+                          arrow
+                          placement="top"
+                        >
+                          <Chip
+                            label={`+${c.tags.length - 2} more`}
+                            size="small"
+                            style={{ backgroundColor: "#999", color: "white" }}
+                          />
+                        </Tooltip>
+                      )}
+                    </>
+                  ) : (
+                    "—"
+                  )}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
 
+        
         <TablePagination
-          component="div"
-          count={filteredContacts.length}
-          rowsPerPage={5}
-          page={0}
-        />
+  component="div"
+  count={filteredContacts.length}
+  page={page}
+  onPageChange={(e, newPage) => setPage(newPage)}
+  rowsPerPage={rowsPerPage}
+  onRowsPerPageChange={(e) => {
+    setRowsPerPage(parseInt(e.target.value, 10));
+    setPage(0); // reset to first page on rows change
+  }}
+  rowsPerPageOptions={[25,30, 50, 80,100,200]}
+/>
+
       </TableContainer>
-    
-<Drawer
-          anchor="right"
-          open={openDrawer}
-          onClose={() => setOpenDrawer(false)}
-          sx={{ width: 600 }}
+
+      <Drawer
+        anchor="right"
+        open={openDrawer}
+        onClose={() => setOpenDrawer(false)}
+        sx={{ width: 600 }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            padding: "20px",
+            ml: 1,
+          }}
         >
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "20px",
-              ml: 1,
-            }}
-          >
-            <Typography sx={{ fontWeight: "bold" }} variant="h6">
-              Edit Contact
-            </Typography>
-            <IconButton onClick={() => setOpenDrawer(false)}>
-              <CloseIcon />
-            </IconButton>
-          </Box>
-          <Divider />
-          {selectedContact && (
-            <ContactForm
-              selectedContact={selectedContact}
-              
-              handleClose={() => setOpenDrawer(false)}
-             
-              onContactUpdated={handleContactUpdated}
-            />
-          )}
-        </Drawer>
+          <Typography sx={{ fontWeight: "bold" }} variant="h6">
+            Edit Contact
+          </Typography>
+          <IconButton onClick={() => setOpenDrawer(false)}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
+        <Divider />
+        {selectedContact && (
+          <ContactForm
+            selectedContact={selectedContact}
+            handleClose={() => setOpenDrawer(false)}
+            onContactUpdated={handleContactUpdated}
+          />
+        )}
+      </Drawer>
+      <Dialog
+  open={openDeleteDialog}
+  onClose={() => setOpenDeleteDialog(false)}
+>
+  <DialogTitle>Delete Contacts?</DialogTitle>
+
+  <DialogContent>
+    <DialogContentText>
+      Are you sure you want to delete 
+      <strong> {selectedContacts.length} </strong>
+      selected {selectedContacts.length === 1 ? "contact" : "contacts"}?
+      This action cannot be undone.
+    </DialogContentText>
+  </DialogContent>
+
+  <DialogActions>
+    <Button onClick={() => setOpenDeleteDialog(false)}>
+      Cancel
+    </Button>
+
+    <Button 
+      onClick={handleDeleteSelected} 
+      color="error" 
+      variant="contained"
+    >
+      Delete
+    </Button>
+  </DialogActions>
+</Dialog>
+
     </Box>
   );
 };

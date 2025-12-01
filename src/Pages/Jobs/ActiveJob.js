@@ -1129,7 +1129,7 @@ jobname:jobName,
   };
   // Pagination State
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(30);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
 
   const handleChangePage = (_, newPage) => {
     setPage(newPage);
@@ -2121,7 +2121,7 @@ const getPriorityStyle = (priority) => {
             </Table>
           </TableContainer>
           <TablePagination
-            rowsPerPageOptions={[30, 40, 50, 60, 100]}
+            rowsPerPageOptions={[25,30, 40, 50, 60, 100]}
             component="div"
             count={jobData.length}
             rowsPerPage={rowsPerPage}

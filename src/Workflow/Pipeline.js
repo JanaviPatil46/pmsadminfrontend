@@ -4334,7 +4334,7 @@ else if (userRole === "TeamMember") {
       (job) => job.Pipeline && job.Stages.some((s) => s._id === stage._id)
     );
     // console.log("jobs for stage", stageJobs);
-    const [displayCount, setDisplayCount] = useState(3);
+    const [displayCount, setDisplayCount] = useState(50);
     const displayedJobs = stageJobs.slice(0, displayCount);
     const truncatedStageName =
       stage.name.length > 30 ? `${stage.name.slice(0, 20)}...` : stage.name;
@@ -4364,7 +4364,7 @@ else if (userRole === "TeamMember") {
         {stageJobs.length > displayCount && (
           <Button
             variant="outlined"
-            onClick={() => setDisplayCount(displayCount + 5)}
+            onClick={() => setDisplayCount(displayCount + 50)}
             sx={{ marginTop: "16px", alignSelf: "center" }}
           >
             Load More
