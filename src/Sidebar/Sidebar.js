@@ -76,6 +76,7 @@ import {
   removeSelectedContact,
 } from "../redux/accountContactSlice";
 import AccountDrawer from "../components/AccountContactForm/Drawer";
+import AccountContactDrawer from "../AccountContactForm/AccountContactDrawer";
 function Sidebar() {
   const StyledBadge = styled(Badge)(({ theme }) => ({
     "& .MuiBadge-badge": {
@@ -376,15 +377,50 @@ function Sidebar() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isOrganizerDialogOpen, setIsOrganizerDialogOpen] = useState(false);
   // Get accountId from cookie
-
+  const [isAccountDrawerOpen, setIsAccountDrawerOpen] = useState(false);
+  const [selectedAccountId, setSelectedAccountId] = useState(null);
   const [isInvoiceDrawerOpen, setIsInvoiceDrawerOpen] = useState(false);
   // const [selectedAccount, setSelectedAccount] = useState(null);
+  // const handleNewItemClick = (label) => {
+  //   console.log("menu", label);
+  //   const accountIdFromCookie = Cookies.get("accountId");
+  //   const accountNameFromCppkie = Cookies.get("accountName");
+  //   if (
+  //     label === "Account" ||
+  //     label === "Contact" ||
+  //     label === "Task" ||
+  //     label === "Chat" ||
+  //     label === "Jobs"
+  //   ) {
+  //     setRightDrawerContent(label);
+  //     setIsRightDrawerOpen(true);
+  //   } else if (label === "Invoice") {
+  //     if (accountIdFromCookie && accountNameFromCppkie) {
+  //       // If account ID exists in cookies, directly open the invoice drawer
+  //       setSelectedAccount({
+  //         value: accountIdFromCookie,
+  //         label: accountNameFromCppkie, // Temporary label until we fetch the name
+  //       });
+  //       setIsInvoiceDrawerOpen(true);
+  //     } else {
+  //       // Show client selection dialog
+  //       setIsDialogOpen(true);
+  //     }
+  //   } else if (label === "Organizer") {
+  //     setIsOrganizerDialogOpen(true);
+  //   }
+  // };
   const handleNewItemClick = (label) => {
     console.log("menu", label);
-    const accountIdFromCookie = Cookies.get("accountId");
-    const accountNameFromCppkie = Cookies.get("accountName");
+
+    if (label === "Account") {
+      // Create Account → no ID
+      setSelectedAccountId(null);
+      setIsAccountDrawerOpen(true);
+      return;
+    }
+
     if (
-      label === "Account" ||
       label === "Contact" ||
       label === "Task" ||
       label === "Chat" ||
@@ -393,15 +429,16 @@ function Sidebar() {
       setRightDrawerContent(label);
       setIsRightDrawerOpen(true);
     } else if (label === "Invoice") {
-      if (accountIdFromCookie && accountNameFromCppkie) {
-        // If account ID exists in cookies, directly open the invoice drawer
+      const accountId = Cookies.get("accountId");
+      const accountName = Cookies.get("accountName");
+
+      if (accountId && accountName) {
         setSelectedAccount({
-          value: accountIdFromCookie,
-          label: accountNameFromCppkie, // Temporary label until we fetch the name
+          value: accountId,
+          label: accountName,
         });
         setIsInvoiceDrawerOpen(true);
       } else {
-        // Show client selection dialog
         setIsDialogOpen(true);
       }
     } else if (label === "Organizer") {
@@ -783,7 +820,7 @@ function Sidebar() {
               </Box>
             </Link>
           </Box>
-       
+
           <Popover
             open={isDropdownOpen}
             anchorEl={anchorEl}
@@ -887,20 +924,19 @@ function Sidebar() {
               gap: 1,
             }}
           >
-            
-             {isCollapsed ? (
-    <img
-      src={Logo}
-      alt="logo"
-      style={{ height: "40px", display: "block" }}
-    />
-  ) : (
-    <img
-      src={FullLogo}
-      alt="logo"
-      style={{ height: "60px", display: "block" ,width:'90%'}}
-    />
-  )}
+            {isCollapsed ? (
+              <img
+                src={Logo}
+                alt="logo"
+                style={{ height: "40px", display: "block" }}
+              />
+            ) : (
+              <img
+                src={FullLogo}
+                alt="logo"
+                style={{ height: "60px", display: "block", width: "90%" }}
+              />
+            )}
           </Box>
 
           <Box
@@ -1134,13 +1170,13 @@ function Sidebar() {
               alignItems: "center",
             }}
           ></Box>
-          {rightDrawerContent === "Account" && (
+          {/* {rightDrawerContent === "Account" && (
             <AccountDrawer
               handleNewDrawerClose={handleNewDrawerClose}
               handleDrawerClose={handleDrawerClose}
               // onClose={handleCloseDrawers}
             />
-          )}
+          )} */}
           {rightDrawerContent === "Contact" && (
             <ContactForm
               handleNewDrawerClose={handleNewDrawerClose}
@@ -1186,6 +1222,13 @@ function Sidebar() {
         open={isOrganizerDialogOpen}
         onClose={() => setIsOrganizerDialogOpen(false)}
         handleDrawerClose={handleDrawerClose}
+      />
+      <AccountContactDrawer
+        open={isAccountDrawerOpen}
+        onClose={() => setIsAccountDrawerOpen(false)}
+        accountId={selectedAccountId} // null → Create, ID → Update
+        handleDrawerClose={handleDrawerClose}
+        // fetchAccountsList={fetchAccountsList}
       />
     </div>
   );

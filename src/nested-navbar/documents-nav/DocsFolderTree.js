@@ -60,6 +60,7 @@ const DocsFolderTree = () => {
   const { data } = useParams();
   console.log("acount id for the documentation", data);
   const [templates, setTemplates] = useState([]);
+const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
 
   const [selectedTemplate, setSelectedTemplate] = useState("");
 
@@ -905,6 +906,7 @@ const getStatusChip = (meta) => {
             fetchFolderTree={() => fetchFolderTree(data)}
             accountId={data}
             selectedFolderForMenu={selectedFolderForMenu}
+            
           />
 
           <CreteFolderDrawer

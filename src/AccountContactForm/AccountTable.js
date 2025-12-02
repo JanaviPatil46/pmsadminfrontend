@@ -134,8 +134,11 @@ const [orderBy, setOrderBy] = useState(null);
     if (storedData) {
       setUserRole(storedData.teammember?.userrole || "");
       setViewAllAccounts(storedData.teammember?.viewallAccounts || false);
+      // const disableAll = storedData?.teammember?.manageAccounts === false;
     }
   }, []);
+const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
+const disableAll = storedData?.teammember?.manageAccounts === false;
 
   const handleFormClose = () => {
     setIsDrawerOpen(false);
@@ -577,13 +580,13 @@ const handleFilterChange = (event) => {
           </Button>
         </ButtonGroup>
 
-        {/* <Button
+        <Button
           variant="contained"
           color="primary"
           onClick={() => setOpenDrawer(true)}
         >
           Add Account
-        </Button> */}
+        </Button>
       </Stack>
 <Box
                 sx={{
@@ -785,7 +788,7 @@ const handleFilterChange = (event) => {
 )}
 
 
-      {selected.length > 0 && (
+      {/* {selected.length > 0 && (
         <Box data-test="clients-bulk-actions-panel" sx={{ mb: 2 }}>
           <div
             style={{
@@ -867,8 +870,249 @@ const handleFilterChange = (event) => {
             </Menu>
           </div>
         </Box>
-      )}
-      
+      )} */}
+
+{selected.length > 0 && (
+  <Box data-test="clients-bulk-actions-panel" sx={{ mb: 2 }}>
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "12px",
+        padding: "10px",
+        backgroundColor: "#f5f5f5",
+        borderRadius: "4px",
+      }}
+    >
+      {/* Send Organizer */}
+      <Tooltip
+        title={
+          storedData?.teammember?.manageOrganizers === false
+            ? "You don't have permission to send organizers"
+            : ""
+        }
+        disableHoverListener={
+          storedData?.teammember?.manageOrganizers !== false
+        }
+      >
+        <span>
+          <Button
+            variant="text"
+            startIcon={<ListIcon />}
+            onClick={handleAssignOrganizer}
+            disabled={storedData?.teammember?.manageOrganizers === false}
+          >
+            Send Organizer
+          </Button>
+        </span>
+      </Tooltip>
+
+      {/* Add Job */}
+      <Tooltip
+        title={
+          storedData?.teammember?.managePipelines === false
+            ? "You don't have permission to add jobs"
+            : ""
+        }
+        disableHoverListener={
+          storedData?.teammember?.managePipelines !== false
+        }
+      >
+        <span>
+          <Button
+            variant="text"
+            startIcon={<ListIcon />}
+            onClick={handleAddJob}
+            disabled={storedData?.teammember?.managePipelines === false}
+          >
+            Add Job
+          </Button>
+        </span>
+      </Tooltip>
+
+      {/* Manage Team */}
+      <Tooltip
+        title={
+          storedData?.teammember?.assignTeamMates === false
+            ? "You don't have permission to manage team"
+            : ""
+        }
+        disableHoverListener={
+          storedData?.teammember?.assignTeamMates !== false
+        }
+      >
+        <span>
+          <Button
+            variant="text"
+            startIcon={<PersonIcon />}
+            onClick={handleManageTeam}
+            disabled={storedData?.teammember?.assignTeamMates === false}
+          >
+            Manage Team
+          </Button>
+        </span>
+      </Tooltip>
+
+      {/* Send Email — no permission restriction? */}
+      <Tooltip title="">
+        <span>
+          <Button
+            variant="text"
+            startIcon={<EmailIcon />}
+            onClick={handleSendEmail}
+          >
+            Send Email
+          </Button>
+        </span>
+      </Tooltip>
+
+      {/* Manage Tags */}
+    <Tooltip
+  title={
+    storedData?.teammember?.manageTags === false
+      ? "You don't have permission to manage tags"
+      : ""
+  }
+  disableHoverListener={storedData?.teammember?.manageTags !== false}
+>
+  <span>
+    <Button
+      variant="text"
+      startIcon={<TagIcon />}
+      onClick={handleManageTags}
+      disabled={storedData?.teammember?.manageTags === false}
+    >
+      Manage Tags
+    </Button>
+  </span>
+</Tooltip>
+
+
+      {/* More Actions */}
+      {/* <Tooltip title="">
+        <span>
+          <Button
+            variant="text"
+            startIcon={<MoreVertIcon />}
+            onClick={handleMoreActionsClick}
+          >
+            More Actions
+          </Button>
+        </span>
+      </Tooltip> */}
+
+      {/* Menu Options */}
+      {/* <Menu anchorEl={anchorE2} open={Boolean(anchorE2)} onClose={handleClose}>
+        {filterStatus === "active" ? (
+          <MenuItem onClick={handleArchiveAccount}>Archive Account</MenuItem>
+        ) : (
+          <MenuItem onClick={handleActivateAccount}>Activate Account</MenuItem>
+        )}
+
+        {filterStatus === "archived" && (
+          <MenuItem onClick={handleDeleteClick} sx={{ color: "error.main" }}>
+            Delete Account
+          </MenuItem>
+        )}
+
+        <MenuItem>Edit login notify emailSync</MenuItem>
+      </Menu> */}
+      {/* More Actions */}
+<Tooltip
+  // title={
+  //   storedData?.teammember?.manageAccounts === false
+  //     ? "You don't have permission to access these actions"
+  //     : ""
+  // }
+  // disableHoverListener={storedData?.teammember?.manageAccounts !== false}
+>
+  <span>
+    <Button
+      variant="text"
+      startIcon={<MoreVertIcon />}
+      // onClick={
+      //   storedData?.teammember?.manageAccounts === false
+      //     ? undefined
+      //     : handleMoreActionsClick
+      // }
+      // disabled={storedData?.teammember?.manageAccounts === false}
+      onClick={handleMoreActionsClick}
+    >
+      More Actions
+    </Button>
+  </span>
+</Tooltip>
+
+
+{/* Menu Options */}
+<Menu anchorEl={anchorE2} open={Boolean(anchorE2)} onClose={handleClose}>
+  {filterStatus === "active" ? (
+    <Tooltip
+      title={
+        storedData?.teammember?.manageAccounts === false
+          ? "You don't have permission to archive accounts"
+          : ""
+      }
+      disableHoverListener={storedData?.teammember?.manageAccounts !== false}
+    >
+      <span>
+        <MenuItem
+          onClick={handleArchiveAccount}
+          disabled={storedData?.teammember?.manageAccounts === false}
+        >
+          Archive Account
+        </MenuItem>
+      </span>
+    </Tooltip>
+  ) : (
+    <Tooltip
+      title={
+        storedData?.teammember?.manageAccounts === false
+          ? "You don't have permission to activate accounts"
+          : ""
+      }
+      disableHoverListener={storedData?.teammember?.manageAccounts !== false}
+    >
+      <span>
+        <MenuItem
+          onClick={handleActivateAccount}
+          disabled={storedData?.teammember?.manageAccounts === false}
+        >
+          Activate Account
+        </MenuItem>
+      </span>
+    </Tooltip>
+  )}
+
+  {filterStatus === "archived" && (
+    <Tooltip
+      title={
+        storedData?.teammember?.manageAccounts === false
+          ? "You don't have permission to delete accounts"
+          : ""
+      }
+      disableHoverListener={storedData?.teammember?.manageAccounts !== false}
+    >
+      <span>
+        <MenuItem
+          onClick={handleDeleteClick}
+          disabled={storedData?.teammember?.manageAccounts === false}
+          sx={{ color: "error.main" }}
+        >
+          Delete Account
+        </MenuItem>
+      </span>
+    </Tooltip>
+  )}
+
+  <MenuItem>Edit login notify emailSync</MenuItem>
+</Menu>
+
+    </div>
+  </Box>
+)}
+
+
       {loading ? (
         <Typography sx={{ textAlign: "center", p: 3 }}>
           Loading accounts...
@@ -1014,7 +1258,7 @@ const handleFilterChange = (event) => {
         </TableContainer>
       )}
       
-      {/* <AccountContactDrawer open={openDrawer} onCloseDrawer={handleDrawerClose} fetchAccountsList={fetchAccountsList}/> */}
+      <AccountContactDrawer open={openDrawer} onClose={handleDrawerClose} fetchAccountsList={fetchAccountsList}/>
 <Dialog
         open={isDeleteDialogOpen}
         onClose={handleCloseDeleteDialog}

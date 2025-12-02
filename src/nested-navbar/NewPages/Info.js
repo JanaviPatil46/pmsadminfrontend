@@ -18,7 +18,7 @@ import {
   IconButton,
   Drawer,
   Autocomplete,
-  TextField,
+  TextField,Tooltip
 } from "@mui/material";
 
 import AccountContactDrawer from "../../AccountContactForm/AccountContactDrawer";
@@ -38,7 +38,7 @@ const AccountDetails = () => {
   const [addContactDrawerOpen, setAddContactDrawerOpen] = useState(false);
   const [availableContacts, setAvailableContacts] = useState([]);
   const [selectedContacts, setSelectedContacts] = useState([]);
-
+const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
   const fetchAccountDetails = async () => {
     try {
       const res = await axios.get(
@@ -329,14 +329,34 @@ const AccountDetails = () => {
               <Typography variant="h5" fontWeight="bold">
                 Account Details
               </Typography>
-              <Button
+              {/* <Button
                 variant="contained"
                 color="primary"
                 onClick={() => setDrawerOpen(true)}
+                disabled={storedData?.teammember?.manageAccounts === false}
                 sx={{ mb: 3 }}
               >
                 Edit Account
-              </Button>
+              </Button> */}
+              <Tooltip
+  title={
+    storedData?.teammember?.manageAccounts === false
+      ? "You don't have permission to edit accounts"
+      : ""
+  }
+  disableHoverListener={storedData?.teammember?.manageAccounts !== false}
+>
+  <span>
+    <Button
+      variant="contained"
+      onClick={() => setDrawerOpen(true)}
+      disabled={storedData?.teammember?.manageAccounts === false}
+    >
+      Edit
+    </Button>
+  </span>
+</Tooltip>
+
             </Box>
 
             <Divider sx={{ my: 2 }} />
@@ -453,13 +473,46 @@ const AccountDetails = () => {
                   >
                     {/* Contact name/email */}
                     <Box flex={1}>
-                      <Typography
+                      {/* <Typography
                         fontWeight="bold"
                         sx={{ cursor: "pointer" }}
                         onClick={() => handleOpenContactEditDrawer(c)}
+                        
                       >
                         {c.contact.contactName}
-                      </Typography>
+                      </Typography> */}
+                      <Tooltip
+  title={
+    storedData?.teammember?.manageContacts === false
+      ? "You don't have permission to edit contacts"
+      : ""
+  }
+  disableHoverListener={storedData?.teammember?.manageContacts !== false}
+>
+  <span>
+    <Typography
+      fontWeight="bold"
+      sx={{
+        cursor:
+          storedData?.teammember?.manageContacts === false
+            ? "not-allowed"
+            : "pointer",
+        color:
+          storedData?.teammember?.manageContacts === false
+            ? "gray"
+            : "inherit",
+        opacity: storedData?.teammember?.manageContacts === false ? 0.6 : 1,
+      }}
+      onClick={() => {
+        if (storedData?.teammember?.manageContacts === false) return; // 🚫 Block click
+        handleOpenContactEditDrawer(c); // ✅ Allowed
+      }}
+    >
+      {c.contact.contactName}
+    </Typography>
+  </span>
+</Tooltip>
+
                       <Typography color="text.secondary" fontSize={14}>
                         {c.contact.email || "-"}
                       </Typography>

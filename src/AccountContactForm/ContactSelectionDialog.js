@@ -34,6 +34,7 @@ export default function ContactSelectionDialog({ open, onClose, onSelectContacts
     if (currentIndex === -1) newSelected.push(contact);
     else newSelected.splice(currentIndex, 1);
     setSelectedContacts(newSelected);
+    setSearchTerm("");
   };
   const handleRemoveChip = (contactId) => setSelectedContacts(selectedContacts.filter(c => c._id !== contactId));
   const handleSubmit = () => { onSelectContacts(selectedContacts); setSelectedContacts([]); setSearchTerm(""); onClose(); };

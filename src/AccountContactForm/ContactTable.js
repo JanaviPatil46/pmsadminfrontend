@@ -33,15 +33,41 @@ const ContactsTable = () => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [selectedContact, setSelectedContact] = useState(null);
 const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+const [userRole, setUserRole] = useState("");
+const [canManageContacts, setCanManageContacts] = useState(true);
+
 const [page, setPage] = useState(0);
 const [rowsPerPage, setRowsPerPage] = useState(25); // default 25 per page
-  const handleOpenDrawer = (contact) => {
-    console.log("Opening drawer for contact:", contact);
-    setSelectedContact(contact);
-    setOpenDrawer(true);
-  };
+  // const handleOpenDrawer = (contact) => {
+  //   console.log("Opening drawer for contact:", contact);
+  //   setSelectedContact(contact);
+  //   setOpenDrawer(true);
+  // };
+const handleOpenDrawer = (contact) => {
+  if (!canManageContacts) {
+    toast.info("You do not have permission to edit contacts");
+    return;
+  }
+  setSelectedContact(contact);
+  setOpenDrawer(true);
+};
 
- 
+ useEffect(() => {
+  const storedUserRole = localStorage.getItem("userRole");
+  setUserRole(storedUserRole);
+
+  const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
+  const manage = storedData?.teammember?.manageContacts;
+
+  // If teamMember → use manageContacts
+  if (storedUserRole === "TeamMember") {
+    setCanManageContacts(Boolean(manage)); 
+  } else {
+    // Admin always has permission
+    setCanManageContacts(true);
+  }
+}, []);
+
 
   const [contacts, setContacts] = useState([]);
   const [filteredContacts, setFilteredContacts] = useState([]);
@@ -262,7 +288,7 @@ const [rowsPerPage, setRowsPerPage] = useState(25); // default 25 per page
           )}
         </Stack>
       </Paper>
-      <Button
+      {/* <Button
         variant="contained"
         color="error"
         disabled={selectedContacts.length === 0}
@@ -272,21 +298,49 @@ const [rowsPerPage, setRowsPerPage] = useState(25); // default 25 per page
         sx={{ mb: 2 }}
       >
         Delete Selected ({selectedContacts.length})
-      </Button>
+      </Button> */}
+<Button
+  variant="contained"
+  color="error"
+  disabled={selectedContacts.length === 0 || !canManageContacts}
+  onClick={() => {
+    if (!canManageContacts) {
+      toast.error("You do not have permission to delete contacts");
+      return;
+    }
+    setOpenDeleteDialog(true);
+  }}
+  sx={{ mb: 2 }}
+>
+  Delete Selected ({selectedContacts.length})
+</Button>
 
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
               <TableCell padding="checkbox">
-                <input
+                {/* <input
                   type="checkbox"
                   checked={
                     selectedContacts.length > 0 &&
                     selectedContacts.length === filteredContacts.length
                   }
                   onChange={handleSelectAll}
-                />
+                /> */}
+                <input
+  type="checkbox"
+  disabled={!canManageContacts}
+  checked={
+    selectedContacts.length > 0 &&
+    selectedContacts.length === filteredContacts.length
+  }
+  onChange={() => {
+    if (!canManageContacts) return;
+    handleSelectAll();
+  }}
+/>
+
               </TableCell>
               <TableCell>Contact Name</TableCell>
               <TableCell>Email</TableCell>
@@ -300,11 +354,21 @@ const [rowsPerPage, setRowsPerPage] = useState(25); // default 25 per page
             {filteredContacts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((c) => (
               <TableRow key={c._id}>
                 <TableCell padding="checkbox">
-                  <input
+                  {/* <input
                     type="checkbox"
                     checked={selectedContacts.includes(c._id)}
                     onChange={() => handleSelectOne(c._id)}
-                  />
+                  /> */}
+                  <input
+  type="checkbox"
+  disabled={!canManageContacts}
+  checked={selectedContacts.includes(c._id)}
+  onChange={() => {
+    if (!canManageContacts) return;
+    handleSelectOne(c._id);
+  }}
+/>
+
                 </TableCell>
 
                 <TableCell>
