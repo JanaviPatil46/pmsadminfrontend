@@ -168,10 +168,12 @@ export default function ContactForm({ onBack, onSubmit, isEditing }) {
     const activationContacts = getNewContactsNeedingActivation();
     return activationContacts.map(contact => contact.email).filter(Boolean);
   };
-
+const [isSubmitting, setIsSubmitting] = useState(false);
   const handleSubmitWithPersonalization = async (event) => {
     if (event) event.preventDefault();
     
+      // Prevent multiple submissions
+  if (isSubmitting) return;
     // Check if there are NEW contacts that need activation
     const newActivationContacts = getNewContactsNeedingActivation();
     const newActivationEmails = getNewContactEmailsNeedingActivation();
@@ -179,33 +181,67 @@ export default function ContactForm({ onBack, onSubmit, isEditing }) {
     console.log("New contacts needing activation:", newActivationContacts);
     console.log("New activation emails:", newActivationEmails);
     
+    // if (newActivationContacts.length > 0) {
+    //   // Show personalization dialog only for NEW contacts
+    //   setPendingSubmit(true);
+    //   setPersonalizationDialogOpen(true);
+    // } else {
+    //   // No NEW contacts need activation, submit directly without message
+    //   await onSubmit(event, "");
+    // }
     if (newActivationContacts.length > 0) {
-      // Show personalization dialog only for NEW contacts
-      setPendingSubmit(true);
-      setPersonalizationDialogOpen(true);
-    } else {
-      // No NEW contacts need activation, submit directly without message
+    // Show personalization dialog only for NEW contacts
+    setPendingSubmit(true);
+    setPersonalizationDialogOpen(true);
+  } else {
+    // No NEW contacts need activation, submit directly without message
+    setIsSubmitting(true); // Disable button
+    try {
       await onSubmit(event, "");
+    } finally {
+      setIsSubmitting(false); // Re-enable button
     }
+  }
   };
-
-  const handleConfirmPersonalization = async () => {
-    setPersonalizationDialogOpen(false);
+const handleConfirmPersonalization = async () => {
+  setIsSubmitting(true); // Disable button
+  setPersonalizationDialogOpen(false);
+  
+  try {
     // Submit with the personal message
     await onSubmit(null, personalMessage);
+    // Reset tracking after successful submission
     setPersonalMessage("");
     setPendingSubmit(false);
-    
-    // Reset tracking after submission
     setNewlySelectedContacts([]);
     setNewFormContacts([]);
-  };
+  } finally {
+    setIsSubmitting(false); // Re-enable button
+  }
+};
 
-  const handleCancelPersonalization = () => {
-    setPersonalizationDialogOpen(false);
-    setPersonalMessage("");
-    setPendingSubmit(false);
-  };
+const handleCancelPersonalization = () => {
+  setPersonalizationDialogOpen(false);
+  setPersonalMessage("");
+  setPendingSubmit(false);
+};
+  // const handleConfirmPersonalization = async () => {
+  //   setPersonalizationDialogOpen(false);
+  //   // Submit with the personal message
+  //   await onSubmit(null, personalMessage);
+  //   setPersonalMessage("");
+  //   setPendingSubmit(false);
+    
+  //   // Reset tracking after submission
+  //   setNewlySelectedContacts([]);
+  //   setNewFormContacts([]);
+  // };
+
+  // const handleCancelPersonalization = () => {
+  //   setPersonalizationDialogOpen(false);
+  //   setPersonalMessage("");
+  //   setPendingSubmit(false);
+  // };
 
   // Remove contact from tracking when it's removed from form
   const handleRemoveSelectedContact = (index) => {
@@ -691,9 +727,16 @@ export default function ContactForm({ onBack, onSubmit, isEditing }) {
         <Button variant="outlined" onClick={onBack}>
           Back
         </Button>
-        <Button variant="contained" onClick={handleSubmitWithPersonalization}>
+        {/* <Button variant="contained" onClick={handleSubmitWithPersonalization}>
           Submit
-        </Button>
+        </Button> */}
+        <Button 
+  variant="contained" 
+  onClick={handleSubmitWithPersonalization}
+  disabled={isSubmitting} // Add disabled state
+>
+  {isSubmitting ? "Submitting..." : "Submit"}
+</Button>
       </Box>
 
       <PersonalizationDialog

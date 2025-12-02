@@ -477,46 +477,94 @@ useEffect(() => {
   const CONTACT_API = process.env.REACT_APP_CONTACTS_URL;
   // console.log(combinedValues);
   // console.log(selectedto);
-  const sendbulkEmail = () => {
-    const rawContentState = convertToRaw(editorState.getCurrentContent());
-    const htmlContent = draftToHtml(rawContentState);
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
+  // const sendbulkEmail = () => {
+  //   const rawContentState = convertToRaw(editorState.getCurrentContent());
+  //   const htmlContent = draftToHtml(rawContentState);
+  //   const myHeaders = new Headers();
+  //   myHeaders.append("Content-Type", "application/json");
 
-    const raw = JSON.stringify({
-      selectedAccounts: combinedaccountValues,
-      emailtemplateid: emailTemplate.value,
-      emailsubject: emailSubject,
-      emailbody: htmlContent,
-      notificationemail: userEmailData,
-    });
-    console.log(raw);
-    const requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-    };
-    const url = "https://www.snptaxes.com/api/accounts/sendBulkEmails";
-    fetch(url, requestOptions)
-      .then((response) => {
-        if (!response.ok) {
-          console.log(response);
-          toast.error(response);
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
-      .then((success) => {})
-      .catch((error) => {
-        console.error(error);
-        toast.error("An error occurred while sending emails");
-      });
-    // toast.success("After sending all mails you will get notification mail.");
-    //  setTimeout(() =>  navigate('/accounts'), 1000);
-    // window.location.reload();
-    handleCancel();
+  //   const raw = JSON.stringify({
+  //     selectedAccounts: combinedaccountValues,
+  //     emailtemplateid: emailTemplate.value,
+  //     emailsubject: emailSubject,
+  //     emailbody: htmlContent,
+  //     notificationemail: userEmailData,
+  //   });
+  //   console.log(raw);
+  //   const requestOptions = {
+  //     method: "POST",
+  //     headers: myHeaders,
+  //     body: raw,
+  //     redirect: "follow",
+  //   };
+  //   const url = "https://www.snptaxes.com/api/accounts/sendBulkEmails";
+  //   fetch(url, requestOptions)
+  //     .then((response) => {
+  //       if (!response.ok) {
+  //         console.log(response);
+  //         toast.error(response);
+  //         throw new Error("Network response was not ok");
+  //       }
+  //       return response.json();
+  //     })
+  //     // .then((success) => {})
+  //        .then((data) => {
+  //     toast.success(
+  //       "Emails are being sent. You will receive a notification email once completed."
+  //     );
+
+  //     handleCancel(); // Close modal or drawer
+  //   })
+  //     .catch((error) => {
+  //       console.error(error);
+  //       toast.error("An error occurred while sending emails");
+  //     });
+  //   //  toast.success("After sending all mails you will get notification mail.");
+  //   //  setTimeout(() =>  navigate('/accounts'), 1000);
+  //   // window.location.reload();
+  //   handleCancel();
+  // };
+const sendbulkEmail = () => {
+  const rawContentState = convertToRaw(editorState.getCurrentContent());
+  const htmlContent = draftToHtml(rawContentState);
+
+  const payload = {
+    selectedAccounts: combinedaccountValues,
+    emailtemplateid: emailTemplate.value,
+    emailsubject: emailSubject,
+    emailbody: htmlContent,
+    notificationemail: userEmailData,
   };
+
+  fetch("https://www.snptaxes.com/api/accounts/sendBulkEmails", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  })
+    .then(async (response) => {
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Error Response:", errorText);
+        toast.error("Failed to send emails");
+        throw new Error("Request failed");
+      }
+
+      return response.json();
+    })
+    .then((data) => {
+      toast.success(
+        "Emails are being sent. You will receive a notification email once completed."
+      );
+
+      handleCancel(); // Close modal or drawer
+    })
+    .catch((error) => {
+      console.error("Bulk Email Error:", error.message);
+      toast.error("An error occurred while sending emails");
+    });
+};
 
   const handleCancel = () => {
     if (onClose) {

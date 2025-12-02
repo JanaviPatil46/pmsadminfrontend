@@ -111,6 +111,8 @@ export default function AccountContactForm({
   useEffect(() => {
     fetchAccountsList();
   }, [filterStatus, userRole]);
+  // Add a shared submitting state
+const [isSubmitting, setIsSubmitting] = useState(false);
 const handleSubmit = async (event, personalMessage = "") => {
   if (event) event.preventDefault();
 
@@ -487,7 +489,7 @@ const handleSubmit = async (event, personalMessage = "") => {
       await assignfoldertemp(finalAccountId, accountData.folderTemp.value);
     }
 
-    toast.success("Account and contacts saved successfully!");
+    // toast.success("Account and contacts saved successfully!");
 
 //    if (onCloseDrawer) {
 //   onCloseDrawer();
@@ -496,8 +498,19 @@ const handleSubmit = async (event, personalMessage = "") => {
 // }
 
 
-   onCloseDrawer();handleDrawerClose();
-   fetchAccountsList();
+  //  onCloseDrawer();handleDrawerClose();
+  //  fetchAccountsList();
+toast.success("Account and contacts saved successfully!");
+// 🚀 FIRST refresh the account list
+if (fetchAccountsList) await fetchAccountsList();
+// await fetchAccountsList();
+if (onCloseDrawer) onCloseDrawer();
+if (handleDrawerClose) handleDrawerClose();
+
+// fetchAccountsList();
+
+
+
 
   } catch (err) {
     console.error("Error saving account:", err);
@@ -552,6 +565,8 @@ const handleSubmit = async (event, personalMessage = "") => {
             onBack={() => setActiveStep(0)}
             onSubmit={handleSubmit}
             isEditing={isEditing}
+             isSubmitting={isSubmitting}
+    setIsSubmitting={setIsSubmitting}
           />
         )}
       </Box>

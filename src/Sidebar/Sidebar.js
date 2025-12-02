@@ -363,6 +363,7 @@ function Sidebar() {
   const handleDrawerClose = () => {
     setIsDrawerOpen(false);
     setIsOrganizerDialogOpen(false);
+    fetchAccountsList();
   };
 
   const handleNewDrawerClose = () => {
@@ -380,6 +381,55 @@ function Sidebar() {
   const [isAccountDrawerOpen, setIsAccountDrawerOpen] = useState(false);
   const [selectedAccountId, setSelectedAccountId] = useState(null);
   const [isInvoiceDrawerOpen, setIsInvoiceDrawerOpen] = useState(false);
+   const [userRole, setUserRole] = useState("");
+    const [accountList, setAccountList] = useState([]);
+    const [filterStatus, setFilterStatus] = useState("active");
+    const [viewAllAccounts, setViewAllAccounts] = useState(false);
+    // const [loading, setLoading] = useState(false);
+    useEffect(() => {
+      const storedUserRole = localStorage.getItem("userRole");
+      console.log("Fetched userRole from localStorage:", storedUserRole);
+      setUserRole(storedUserRole);
+    }, []);
+    const fetchAccountsList = async () => {
+      setLoading(true);
+      try {
+        const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
+        console.log("Received stored teamMemberData:", storedData);
+  
+        const loginuserid = storedData?.teammember?.userid;
+        // const userRole = storedData?.teammember?.userrole || "Admin";
+        console.log("User role is:", userRole);
+  
+        let url;
+  
+        if (userRole === "Admin") {
+          url = `https://www.snptaxes.com/api/accounts/list?active=${filterStatus === "active"}`;
+        } else if (userRole === "TeamMember") {
+          const viewAll = storedData?.teammember?.viewallAccounts || false;
+          setViewAllAccounts(viewAll);
+  
+          if (viewAll) {
+            url = `https://www.snptaxes.com/api/accounts/list?active=${filterStatus === "active"}`;
+          } else {
+            url = `https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=${filterStatus === "active"}`;
+          }
+        }
+  
+        console.log("Fetching from URL:", url);
+        const response = await axios.get(url);
+        setAccountList(response.data.accountlist || []);
+      } catch (err) {
+        console.error("Error loading accounts:", err);
+        setAccountList([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    useEffect(() => {
+      fetchAccountsList();
+    }, [filterStatus, userRole]);
   // const [selectedAccount, setSelectedAccount] = useState(null);
   // const handleNewItemClick = (label) => {
   //   console.log("menu", label);
@@ -1227,8 +1277,10 @@ function Sidebar() {
         open={isAccountDrawerOpen}
         onClose={() => setIsAccountDrawerOpen(false)}
         accountId={selectedAccountId} // null → Create, ID → Update
+
+        fetchAccountsList={fetchAccountsList}
         handleDrawerClose={handleDrawerClose}
-        // fetchAccountsList={fetchAccountsList}
+        
       />
     </div>
   );
