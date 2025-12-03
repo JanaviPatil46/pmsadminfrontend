@@ -16,7 +16,9 @@ import {
   DialogTitle,
   DialogContent,
   TextField,
-  DialogActions,Chip,Tooltip
+  DialogActions,
+  Chip,
+  Tooltip,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import customCss from "./docuseal-dark-theme.css";
@@ -60,7 +62,7 @@ const DocsFolderTree = () => {
   const { data } = useParams();
   console.log("acount id for the documentation", data);
   const [templates, setTemplates] = useState([]);
-const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
+  const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
 
   const [selectedTemplate, setSelectedTemplate] = useState("");
 
@@ -230,7 +232,6 @@ const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
     // Toggle signature and request token
     const toggleSignStatus = async (item) => {
       try {
-        
         //
 
         // Request token
@@ -240,19 +241,24 @@ const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
           `${SIGNATURE_API}/api/generate-token?url=${encodeURIComponent(fileUrl)}&name=${encodeURIComponent(fileName)}&accountId=${accountId}`
         );
         const data = await res.json();
-console.log("token data", data);
+        console.log("token data", data);
         setToken(data.token);
         setShowBuilderFor(item); // important: must match the Dialog condition
         setOpenDialog(true);
-// esignRequestId = (data.esignRequestId);
+        // esignRequestId = (data.esignRequestId);
         // Cycle status (optional, keep your logic)
         const currentStatus = item.meta?.signStatus || "sendForSignature";
         const currentIndex = SIGN_STATUSES.indexOf(currentStatus);
         const nextIndex = (currentIndex + 1) % SIGN_STATUSES.length;
         const nextStatus = SIGN_STATUSES[nextIndex];
         // await updateStatus(item, "signStatus", nextStatus,data.esignRequestId);
-        await updateStatus(item, "signStatus", nextStatus, null, data.esignRequestId);
-
+        await updateStatus(
+          item,
+          "signStatus",
+          nextStatus,
+          null,
+          data.esignRequestId
+        );
       } catch (err) {
         console.error(err);
       }
@@ -332,58 +338,69 @@ console.log("token data", data);
     //   }
     // };
     const handleRequestApproval = async () => {
-  if (!selectedItem) return;
+      if (!selectedItem) return;
 
-  try {
-    const fileUrl = `https://snptaxes.com/uploads/accounts/${selectedItem.path}`;
+      try {
+        const fileUrl = `https://snptaxes.com/uploads/accounts/${selectedItem.path}`;
 
-    const payload = {
-      accountId,
-      filename: selectedItem.name,
-      fileUrl,
-      clientEmail,
-      description,
+        const payload = {
+          accountId,
+          filename: selectedItem.name,
+          fileUrl,
+          clientEmail,
+          description,
+        };
+
+        const res = await fetch(
+          `${DOCS_MANAGMENTS}/approvals/request-approval`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          }
+        );
+
+        const result = await res.json();
+
+        if (!res.ok) throw new Error("Failed to send approval request.");
+
+        // ⬅️ Backend must return approvalId
+        const approvalId = result.approvalId;
+
+        alert(`Approval request sent to ${payload.clientEmail}`);
+
+        // Calculate next status
+        const currentStatus =
+          selectedItem.meta?.authStatus || "sendForApproval";
+        const currentIndex = APPROVAL_STATUSES.indexOf(currentStatus);
+        const nextIndex = (currentIndex + 1) % APPROVAL_STATUSES.length;
+        const nextStatus = APPROVAL_STATUSES[nextIndex];
+
+        // ⬅️ Send approvalId into updateStatus()
+        // await updateStatus(selectedItem, "authStatus", nextStatus, approvalId);
+        await updateStatus(
+          selectedItem,
+          "authStatus",
+          nextStatus,
+          approvalId,
+          null
+        );
+
+        handleCloseDialog();
+      } catch (err) {
+        console.error("Approval request failed:", err);
+        alert("Failed to send approval request.");
+      }
     };
 
-    const res = await fetch(
-      `${DOCS_MANAGMENTS}/approvals/request-approval`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      }
-    );
-
-    const result = await res.json();
-
-    if (!res.ok) throw new Error("Failed to send approval request.");
-
-    // ⬅️ Backend must return approvalId
-    const approvalId = result.approvalId;
-
-    alert(`Approval request sent to ${payload.clientEmail}`);
-
-    // Calculate next status
-    const currentStatus =
-      selectedItem.meta?.authStatus || "sendForApproval";
-    const currentIndex = APPROVAL_STATUSES.indexOf(currentStatus);
-    const nextIndex = (currentIndex + 1) % APPROVAL_STATUSES.length;
-    const nextStatus = APPROVAL_STATUSES[nextIndex];
-
-    // ⬅️ Send approvalId into updateStatus()
-    // await updateStatus(selectedItem, "authStatus", nextStatus, approvalId);
-    await updateStatus(selectedItem, "authStatus", nextStatus, approvalId, null);
-
-
-    handleCloseDialog();
-  } catch (err) {
-    console.error("Approval request failed:", err);
-    alert("Failed to send approval request.");
-  }
-};
-
     // 🔹 Frontend: Update any status (read, sign, approval)
-    const updateStatus = async (item, statusType, newValue,approvalId = null,esignRequestId = null) => {
+    const updateStatus = async (
+      item,
+      statusType,
+      newValue,
+      approvalId = null,
+      esignRequestId = null
+    ) => {
       try {
         if (!item?.path) return alert("Invalid item selected");
 
@@ -391,8 +408,8 @@ console.log("token data", data);
           targetPath: item.path,
           status: {
             [statusType]: newValue, // dynamic key
-             ...(approvalId && { approvalId }), 
-              ...(esignRequestId && { esignRequestId }),
+            ...(approvalId && { approvalId }),
+            ...(esignRequestId && { esignRequestId }),
           },
         };
 
@@ -472,7 +489,8 @@ console.log("token data", data);
     // 🗑️ Delete File or Folder (Universal)
     const deleteItem = async (item) => {
       if (!item?.path) return alert("Invalid path");
-console.log("delete path", item.path);
+      console.log("delete path", item.path);
+      console.log("delete item", item);
       const confirmDelete = window.confirm(
         `Are you sure you want to delete "${item.name}"? This cannot be undone!`
       );
@@ -571,286 +589,315 @@ console.log("delete path", item.path);
           return <AiFillFileUnknown color="#757575" size={18} />;
       }
     };
-const renderTree = (items, level = 0, parentPath = "") => {
-  
-const getStatusChip = (meta) => {
-  const chips = [];
+    const renderTree = (items, level = 0, parentPath = "") => {
+      const getStatusChip = (meta) => {
+        const chips = [];
 
-  // ======= SIGNATURE STATUS =======
-  if (SIGN_STATUSES.includes(meta.signStatus)) {
-    let color = "default";
+        // ======= SIGNATURE STATUS =======
+        if (SIGN_STATUSES.includes(meta.signStatus)) {
+          let color = "default";
 
-    if (meta.signStatus === "pendingSignature") color = "warning";
-    if (meta.signStatus === "signatureCompleted") color = "success";
+          if (meta.signStatus === "pendingSignature") color = "warning";
+          if (meta.signStatus === "signatureCompleted") color = "success";
 
-    chips.push(
-      <Chip
-        key="signChip"
-        label={statusTextMap[meta.signStatus]}
-        size="small"
-        variant="outlined"
-        color={color}
-      />
-    );
-  }
+          chips.push(
+            <Chip
+              key="signChip"
+              label={statusTextMap[meta.signStatus]}
+              size="small"
+              variant="outlined"
+              color={color}
+            />
+          );
+        }
 
-  // ======= APPROVAL STATUS =======
-  if (APPROVAL_STATUSES.includes(meta.authStatus)) {
-    let color = "default";
-    let chip = (
-      <Chip
-        key="approvalChip"
-        label={approvalStatusTextMap[meta.authStatus]}
-        size="small"
-        variant="outlined"
-        color={color}
-      />
-    );
-
-    if (meta.authStatus === "pendingApproval") color = "warning";
-    if (meta.authStatus === "approvalCompleted") color = "success";
-    if (meta.authStatus === "canceledApproval") color = "error";
-
-    // Handle tooltip only for canceled approval
-    if (meta.authStatus === "canceledApproval" && meta.cancelReason) {
-      chip = (
-        <Tooltip title={meta.cancelReason} placement="top-end" >
-          <Chip
-            key="approvalCanceledChip"
-            label="Approval Canceled"
-            size="small"
-            variant="outlined"
-            color="error"
-            sx={{ cursor: "pointer" }}
-          />
-        </Tooltip>
-      );
-    } else {
-      chip = (
-        <Chip
-          key="approvalChip"
-          label={approvalStatusTextMap[meta.authStatus]}
-          size="small"
-          variant="outlined"
-          color={color}
-        />
-      );
-    }
-
-    chips.push(chip);
-  }
-
-  // ======= SHOW NOTHING IF NO STATUS =======
-  if (chips.length === 0) return null;
-
-  return (
-    <Box sx={{ display: "flex", gap: 1, ml: 1 }}>
-      {chips}
-    </Box>
-  );
-};
-
-
-  return (
-    <>
-      <Box component="ul" sx={{ listStyle: "none", pl: level * 2, mb: 1 }}>
-        {items.map((item) => {
-          const fullPath = parentPath ? `${parentPath}/${item.name}` : item.name;
-          const meta = item.meta || {};
-
-          const getColor = (status) => (status ? "#1976d2" : "#9e9e9e");
-
-          const StatusIcons = () => (
-            <Box sx={{ display: "flex", gap: 1, alignItems: "center", ml: 1 }}>
-              <Eye size={16} color={getColor(meta.readStatus)} />
-              <PenTool size={16} color={getColor(meta.signStatus)} />
-              <Stamp size={16} color={getColor(meta.authStatus)} />
-              <Lock size={16} color={meta.readOnly ? "#e53935" : "#9e9e9e"} />
-            </Box>
+        // ======= APPROVAL STATUS =======
+        if (APPROVAL_STATUSES.includes(meta.authStatus)) {
+          let color = "default";
+          let chip = (
+            <Chip
+              key="approvalChip"
+              label={approvalStatusTextMap[meta.authStatus]}
+              size="small"
+              variant="outlined"
+              color={color}
+            />
           );
 
-          const handleSafeFileClick = () => {
-            if (meta.readOnly) {
-              alert("This file is locked and cannot be opened.");
-              return;
-            }
-            handleFileClick(fullPath, item.name);
-          };
+          if (meta.authStatus === "pendingApproval") color = "warning";
+          if (meta.authStatus === "approvalCompleted") color = "success";
+          if (meta.authStatus === "canceledApproval") color = "error";
 
-          return (
-            <li key={fullPath} style={{ marginBottom: 8 }}>
-              {item.type === "folder" ? (
+          // Handle tooltip only for canceled approval
+          if (meta.authStatus === "canceledApproval" && meta.cancelReason) {
+            chip = (
+              <Tooltip title={meta.cancelReason} placement="top-end">
+                <Chip
+                  key="approvalCanceledChip"
+                  label="Approval Canceled"
+                  size="small"
+                  variant="outlined"
+                  color="error"
+                  sx={{ cursor: "pointer" }}
+                />
+              </Tooltip>
+            );
+          } else {
+            chip = (
+              <Chip
+                key="approvalChip"
+                label={approvalStatusTextMap[meta.authStatus]}
+                size="small"
+                variant="outlined"
+                color={color}
+              />
+            );
+          }
+
+          chips.push(chip);
+        }
+
+        // ======= SHOW NOTHING IF NO STATUS =======
+        if (chips.length === 0) return null;
+
+        return <Box sx={{ display: "flex", gap: 1, ml: 1 }}>{chips}</Box>;
+      };
+
+      return (
+        <>
+          <Box component="ul" sx={{ listStyle: "none", pl: level * 2, mb: 1 }}>
+            {items.map((item) => {
+              const fullPath = parentPath
+                ? `${parentPath}/${item.name}`
+                : item.name;
+              const meta = item.meta || {};
+
+              const getColor = (status) => (status ? "#1976d2" : "#9e9e9e");
+
+              const StatusIcons = () => (
                 <Box
-                  sx={{
-                    p: 1,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    borderRadius: 2,
-                    cursor: "pointer",
-                    backgroundColor: "#fff",
-                    "&:hover": { backgroundColor: "#f5f5f5" },
-                    transition: "background-color 0.2s ease-in-out",
-                  }}
-                  onClick={() => toggleFolder(fullPath, meta.readOnly)}
+                  sx={{ display: "flex", gap: 1, alignItems: "center", ml: 1 }}
                 >
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    sx={{ flexGrow: 1, gap: 1 }}
-                  >
-                    {expandedFolders[fullPath] ? (
-                      <FolderOpenIcon color="#1976d2" size={18} />
-                    ) : (
-                      <FolderClosedIcon color="#757575" size={18} />
-                    )}
-
-                    <Typography variant="body1" fontWeight="medium">
-                      {item.name}
-                       {meta.readOnly && (
-    <Typography
-      variant="caption"
-      sx={{ color: "red", fontWeight: "bold", ml: 1 }}
-    >
-      (Locked)
-    </Typography>
-  )}
-                    </Typography>
-                  </Box>
-
-                  <IconButton
-                    size="small"
-                    onClick={(e) => handleMenuOpen(e, { ...item, fullPath })}
-                  >
-                    <MoreVertIcon size={16} />
-                  </IconButton>
-                </Box>
-              ) : (
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    pl: 4,
-                    mb: 1,
-                    borderRadius: 2,
-                    "&:hover .file-menu-icon": { opacity: 1 },
-                  }}
-                >
-                  <Box sx={{ mr: 1 ,display:'flex',alignItems:'center',gap:2}}>{getFileIcon(item.name)}
-                      <Typography
-                    variant="body2"
-                    sx={{
-                      flex: 1,
-                      wordBreak: "break-word",
-                      color: meta.readOnly ? "#999" : "#1976d2",
-                      textDecoration: meta.readOnly ? "none" : "underline",
-                      cursor: meta.readOnly ? "not-allowed" : "pointer",
-                    }}
-                    onClick={handleSafeFileClick}
-                  >
-                    {item.name}
-                  </Typography>
-                  </Box>
-                 
-
-                <Box> {/* ⬇️ Added the chips here */}
-                  {getStatusChip(meta)}</Box>
-
-                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <StatusIcons />
-                 
-
-
-                  <Box
-                    className="file-menu-icon"
-                    sx={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: "50%",
-                      backgroundColor: "#1976d2",
-                      opacity: 0,
-                      transition: "opacity 0.2s",
-                      cursor: "pointer",
-                      mr: 1,
-                      ml: 1,
-                    }}
-                    onClick={(e) => handleMenuOpen(e, { ...item, fullPath })}
+                  <Eye size={16} color={getColor(meta.readStatus)} />
+                  <PenTool size={16} color={getColor(meta.signStatus)} />
+                  <Stamp size={16} color={getColor(meta.authStatus)} />
+                  <Lock
+                    size={16}
+                    color={meta.readOnly ? "#e53935" : "#9e9e9e"}
                   />
-                   </Box>
                 </Box>
-              )}
+              );
 
-              {expandedFolders[fullPath] &&
-                item.children &&
-                item.children.length > 0 && (
-                  <Box
-                    sx={{
-                      ml: 2,
-                      mt: 1,
-                      borderLeft: "2px dashed #ccc",
-                      pl: 2,
-                    }}
-                  >
-                    {renderTree(item.children, level + 1, fullPath)}
-                  </Box>
-                )}
-            </li>
-          );
-        })}
-      </Box>
+              const handleSafeFileClick = () => {
+                if (meta.readOnly) {
+                  alert("This file is locked and cannot be opened.");
+                  return;
+                }
+                handleFileClick(fullPath, item.name);
+              };
 
-      {/* Your dialogs remain unchanged */}
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)} fullWidth maxWidth="lg">
-        <DialogTitle>
-          {items.name}
-          <IconButton
-            aria-label="close"
-            onClick={() => setOpenDialog(false)}
-            style={{ position: "absolute", right: 8, top: 8 }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
+              return (
+                <li key={fullPath} style={{ marginBottom: 8 }}>
+                  {item.type === "folder" ? (
+                    <Box
+                      sx={{
+                        p: 1,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        borderRadius: 2,
+                        cursor: "pointer",
+                        backgroundColor: "#fff",
+                        "&:hover": { backgroundColor: "#f5f5f5" },
+                        transition: "background-color 0.2s ease-in-out",
+                      }}
+                      onClick={() => toggleFolder(fullPath, meta.readOnly)}
+                    >
+                      <Box
+                        display="flex"
+                        alignItems="center"
+                        sx={{ flexGrow: 1, gap: 1 }}
+                      >
+                        {expandedFolders[fullPath] ? (
+                          <FolderOpenIcon color="#1976d2" size={18} />
+                        ) : (
+                          <FolderClosedIcon color="#757575" size={18} />
+                        )}
 
-        <DialogContent dividers>
-          {token && showBuilderFor && (
-            <DocusealBuilder token={token} customCss={customCss}  onComplete={() => {
-          console.log("DocuSeal finished sending document");
-          setShowBuilderFor(null);
-          setOpenDialog(false);
-        }} />
-          )}
-        </DialogContent>
-      </Dialog>
+                        <Typography variant="body1" fontWeight="medium">
+                          {item.name}
+                          {meta.readOnly && (
+                            <Typography
+                              variant="caption"
+                              sx={{ color: "red", fontWeight: "bold", ml: 1 }}
+                            >
+                              (Locked)
+                            </Typography>
+                          )}
+                        </Typography>
+                      </Box>
 
-      <Dialog open={openApprovalDialog} onClose={handleCloseDialog} fullWidth maxWidth="sm">
-        <DialogTitle>Request Approval</DialogTitle>
-        <DialogContent>
-          <TextField
-            multiline
-            rows={4}
+                      <IconButton
+                        size="small"
+                        onClick={(e) =>
+                          handleMenuOpen(e, { ...item, fullPath })
+                        }
+                      >
+                        <MoreVertIcon size={16} />
+                      </IconButton>
+                    </Box>
+                  ) : (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        pl: 4,
+                        mb: 1,
+                        borderRadius: 2,
+                        "&:hover .file-menu-icon": { opacity: 1 },
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          mr: 1,
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 2,
+                        }}
+                      >
+                        {getFileIcon(item.name)}
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            flex: 1,
+                            wordBreak: "break-word",
+                            color: meta.readOnly ? "#999" : "#1976d2",
+                            textDecoration: meta.readOnly
+                              ? "none"
+                              : "underline",
+                            cursor: meta.readOnly ? "not-allowed" : "pointer",
+                          }}
+                          onClick={handleSafeFileClick}
+                        >
+                          {item.name}
+                        </Typography>
+                      </Box>
+
+                      <Box>
+                        {" "}
+                        {/* ⬇️ Added the chips here */}
+                        {getStatusChip(meta)}
+                      </Box>
+
+                      <Box sx={{ display: "flex", alignItems: "center" }}>
+                        <StatusIcons />
+
+                        <Box
+                          className="file-menu-icon"
+                          sx={{
+                            width: 8,
+                            height: 8,
+                            borderRadius: "50%",
+                            backgroundColor: "#1976d2",
+                            opacity: 0,
+                            transition: "opacity 0.2s",
+                            cursor: "pointer",
+                            mr: 1,
+                            ml: 1,
+                          }}
+                          onClick={(e) =>
+                            handleMenuOpen(e, { ...item, fullPath })
+                          }
+                        />
+                      </Box>
+                    </Box>
+                  )}
+
+                  {expandedFolders[fullPath] &&
+                    item.children &&
+                    item.children.length > 0 && (
+                      <Box
+                        sx={{
+                          ml: 2,
+                          mt: 1,
+                          borderLeft: "2px dashed #ccc",
+                          pl: 2,
+                        }}
+                      >
+                        {renderTree(item.children, level + 1, fullPath)}
+                      </Box>
+                    )}
+                </li>
+              );
+            })}
+          </Box>
+
+          {/* Your dialogs remain unchanged */}
+          <Dialog
+            open={openDialog}
+            onClose={() => setOpenDialog(false)}
             fullWidth
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Type a short description or note..."
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>Cancel</Button>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleRequestApproval}
-            disabled={!description.trim()}
+            maxWidth="lg"
           >
-            Send
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </>
-  );
-};
+            <DialogTitle>
+              {items.name}
+              <IconButton
+                aria-label="close"
+                onClick={() => setOpenDialog(false)}
+                style={{ position: "absolute", right: 8, top: 8 }}
+              >
+                <CloseIcon />
+              </IconButton>
+            </DialogTitle>
+
+            <DialogContent dividers>
+              {token && showBuilderFor && (
+                <DocusealBuilder
+                  token={token}
+                  customCss={customCss}
+                  onComplete={() => {
+                    console.log("DocuSeal finished sending document");
+                    setShowBuilderFor(null);
+                    setOpenDialog(false);
+                  }}
+                />
+              )}
+            </DialogContent>
+          </Dialog>
+
+          <Dialog
+            open={openApprovalDialog}
+            onClose={handleCloseDialog}
+            fullWidth
+            maxWidth="sm"
+          >
+            <DialogTitle>Request Approval</DialogTitle>
+            <DialogContent>
+              <TextField
+                multiline
+                rows={4}
+                fullWidth
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Type a short description or note..."
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseDialog}>Cancel</Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleRequestApproval}
+                disabled={!description.trim()}
+              >
+                Send
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </>
+      );
+    };
 
     return (
       <Box sx={{ margin: "auto", p: 3 }}>
@@ -906,7 +953,6 @@ const getStatusChip = (meta) => {
             fetchFolderTree={() => fetchFolderTree(data)}
             accountId={data}
             selectedFolderForMenu={selectedFolderForMenu}
-            
           />
 
           <CreteFolderDrawer
@@ -1160,13 +1206,12 @@ const getStatusChip = (meta) => {
                     currentApprovalStatus,
                     disabled: isApprovalDisabled,
                   },
-                
+
                   {
                     icon: <DeleteIcon />,
                     label: "Delete",
                     action: () => deleteItem(item),
                   }
-                 
                 );
               } else if (docType === "private") {
                 menuItems.push(

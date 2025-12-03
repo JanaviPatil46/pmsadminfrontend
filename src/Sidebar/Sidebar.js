@@ -363,7 +363,7 @@ function Sidebar() {
   const handleDrawerClose = () => {
     setIsDrawerOpen(false);
     setIsOrganizerDialogOpen(false);
-    fetchAccountsList();
+ 
   };
 
   const handleNewDrawerClose = () => {
