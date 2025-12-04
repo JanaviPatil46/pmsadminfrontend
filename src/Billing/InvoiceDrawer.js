@@ -1494,7 +1494,7 @@ console.log("invoice raw",raw)
                     isClearable={true}
                   /> */}
                    <Autocomplete
-                                    options={options}
+                                    options={useroptions}
                                     sx={{ mt: 2, mb: 2, backgroundColor: "#fff" }}
                                     size="small"
                                     value={selecteduser}

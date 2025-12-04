@@ -799,7 +799,12 @@ const FileUploadDrawer = ({
       setMessage("Please select files and a folder.");
       return;
     }
-    setInvoiceConfirmOpen(true);
+    // setInvoiceConfirmOpen(true);
+    // Check if folder contains "Firm Documents Shared with Client"
+ if (selectedFolder.includes("Firm Documents Shared with Client")) {
+  setInvoiceConfirmOpen(true);          // ask user Yes/No
+} else {   performUpload();                      // directly upload without invoice dialog
+ }
   };
 
   // 🔹 Step 2: Upload files (direct or after invoice selection)
@@ -907,7 +912,13 @@ const FileUploadDrawer = ({
             variant="contained"
             onClick={() => {
               setInvoiceConfirmOpen(false);
-              setInvoiceDialogOpen(true); // Open invoice selection
+              // setInvoiceDialogOpen(true); // Open invoice selection
+                // open invoice dialog only if path matches
+  if (selectedFolder.includes("Firm Documents Shared with Client")) {
+    setInvoiceDialogOpen(true);
+  } else {
+    performUpload();
+  }
             }}
           >
             Yes
