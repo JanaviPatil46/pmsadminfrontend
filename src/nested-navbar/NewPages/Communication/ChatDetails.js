@@ -1,5 +1,3 @@
-
-
 import {
   Box,
   Typography,
@@ -25,12 +23,20 @@ import axios from "axios";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 
-
-const ChatDetails = ({ chat, getsChatDetails, accountwiseChatlist,onChatAction ,data, isActiveTrue,accountName }) => {
+const ChatDetails = ({
+  chat,
+  getsChatDetails,
+  accountwiseChatlist,
+  onChatAction,
+  data,
+  isActiveTrue,
+  accountName,
+}) => {
+  console.log("chat details", chat);
   const CHATTOCLIENT_API = process.env.REACT_APP_CHAT_API;
   const [showTasks, setShowTasks] = useState(false);
   const [chatId, setChatId] = useState(chat._id);
-  const [chatTemplate, setChatTemplate]=useState(chat.chattemplateid)
+  const [chatTemplate, setChatTemplate] = useState(chat.chattemplateid);
   const { logindata } = useContext(LoginContext);
   const [loginUserId, setLoginUserId] = useState();
   const messageRefs = useRef({});
@@ -50,17 +56,16 @@ const ChatDetails = ({ chat, getsChatDetails, accountwiseChatlist,onChatAction ,
       const id = logindata.user.id;
       setLoginUserId(id);
       // setLoginUserId(logindata.user.id);
-      fetchUserData(id)
+      fetchUserData(id);
     }
     if (chat.clienttasks) {
       setTasks(chat.clienttasks.flat());
     }
   }, [logindata, chat.clienttasks]);
-   const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
-   const [senderEmail,setSenderEmail]= useState("")
-   const [senderName,setSenderName]=useState("")
- const fetchUserData = async (id) => {
-  
+  const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
+  const [senderEmail, setSenderEmail] = useState("");
+  const [senderName, setSenderName] = useState("");
+  const fetchUserData = async (id) => {
     const myHeaders = new Headers();
 
     const requestOptions = {
@@ -69,12 +74,12 @@ const ChatDetails = ({ chat, getsChatDetails, accountwiseChatlist,onChatAction ,
       redirect: "follow",
     };
     const url = `${LOGIN_API}/common/user/${id}`;
-    fetch(url , requestOptions)
+    fetch(url, requestOptions)
       .then((response) => response.json())
       .then((result) => {
         console.log("id", result);
-        setSenderEmail(result.email)
-setSenderName(result.username)
+        setSenderEmail(result.email);
+        setSenderName(result.username);
       });
   };
   const formatDate = (timestamp) => {
@@ -129,7 +134,6 @@ setSenderName(result.username)
       newDescription.replyTo = replyTo._id;
     }
 
-    
     const raw = JSON.stringify({
       newDescriptions: [newDescription],
     });
@@ -149,13 +153,13 @@ setSenderName(result.username)
         return response.json();
       })
       .then(() => {
-          setEditorContent("");
+        setEditorContent("");
         setReplyTo(null);
         toast.success("Message sent");
-      
-         securemessagechatsend(chatId);
+
+        securemessagechatsend(chatId);
         updatechatStatus(chatId);
-      accountwiseChatlist(data, isActiveTrue);
+        accountwiseChatlist(data, isActiveTrue);
         getsChatDetails();
       })
       .catch(() => {
@@ -163,8 +167,8 @@ setSenderName(result.username)
       });
   };
 
-   const securemessagechatsend = (chatId) => {
-    console.log("bvhg", chatId)
+  const securemessagechatsend = (chatId) => {
+    console.log("bvhg", chatId);
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
@@ -217,11 +221,58 @@ setSenderName(result.username)
     });
   };
 
+  // const handleTaskToggle = (id) => {
+  //   const updated = tasks.map((task) =>
+  //     task.id === id ? { ...task, checked: !task.checked } : task
+  //   );
+  //   setTasks(updated);
+  // };
   const handleTaskToggle = (id) => {
-    const updated = tasks.map((task) =>
-      task.id === id ? { ...task, checked: !task.checked } : task
-    );
-    setTasks(updated);
+    setTasks((prevTasks) => {
+      const updated = prevTasks.map((task) =>
+        task.id === id ? { ...task, checked: !task.checked } : task
+      );
+
+      updateClientTask(updated);
+      return updated;
+    });
+  };
+
+  const updateClientTask = (updatedTasks) => {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    const raw = JSON.stringify({
+      chatId: chat._id,
+      taskUpdates: updatedTasks.map((task) => ({
+        id: task.id,
+        text: task.text,
+        checked: task.checked,
+      })),
+    });
+
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+    console.log("update task", raw);
+    fetch(
+      `${CHATTOCLIENT_API}/chats/chatsaccountwise/updateTaskCheckedStatus`,
+      requestOptions
+    )
+      .then((response) => response.json())
+      .then((result) => {
+        console.log("Tasks updated successfully", result);
+        toast.success("Task updated");
+        getsChatDetails();
+        accountwiseChatlist(data, isActiveTrue);
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error("Task update failed");
+      });
   };
 
   const handleAddTask = () => {
@@ -294,7 +345,7 @@ setSenderName(result.username)
     const raw = JSON.stringify({
       newDescriptions: [newDescription],
     });
-    console.log("clinet tasks",raw)
+    console.log("clinet tasks", raw);
     const requestOptions = {
       method: "PATCH",
       headers: myHeaders,
@@ -316,7 +367,7 @@ setSenderName(result.username)
         toast.success("Chat description updated successfully");
         getsChatDetails();
         updatechatStatus(chatId);
-   accountwiseChatlist(data, isActiveTrue);
+        accountwiseChatlist(data, isActiveTrue);
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -346,7 +397,7 @@ setSenderName(result.username)
 
       toast.success("Message deleted successfully");
       getsChatDetails();
-  accountwiseChatlist(data, isActiveTrue);
+      accountwiseChatlist(data, isActiveTrue);
     } catch (error) {
       console.error("Error deleting message:", error);
       toast.error("Failed to delete message");
@@ -355,34 +406,32 @@ setSenderName(result.username)
 
   const handleArchiveThread = (chatId) => {
     // Archive logic (e.g., update chat status or move to archive)
-  const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-  
-      const raw = JSON.stringify({
-      active: !chat.active,
-      });
-      console.log(raw);
-      const requestOptions = {
-        method: "PATCH",
-        headers: myHeaders,
-        body: raw,
-        redirect: "follow",
-      };
-      const url = `${CHATTOCLIENT_API}/chats/chatsaccountwise/${chatId}`;
-      fetch(url, requestOptions)
-        .then((response) => response.json())
-        .then((result) => {
-          console.log(result);
-          toast.success("chats archived successfully");
-            accountwiseChatlist(data, isActiveTrue);
-          onChatAction();
-     
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
 
-        })
-        .catch((error) => {
-          console.error(error); // Log the error
-          toast.error("An error occurred while submitting the form"); // Display error toast
-        });
+    const raw = JSON.stringify({
+      active: !chat.active,
+    });
+    console.log(raw);
+    const requestOptions = {
+      method: "PATCH",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+    const url = `${CHATTOCLIENT_API}/chats/chatsaccountwise/${chatId}`;
+    fetch(url, requestOptions)
+      .then((response) => response.json())
+      .then((result) => {
+        console.log(result);
+        toast.success("chats archived successfully");
+        accountwiseChatlist(data, isActiveTrue);
+        onChatAction();
+      })
+      .catch((error) => {
+        console.error(error); // Log the error
+        toast.error("An error occurred while submitting the form"); // Display error toast
+      });
     handleChatMenuClose();
     //   toast.success("Thread archived",chatId);
   };
@@ -400,9 +449,9 @@ setSenderName(result.username)
       );
 
       if (!response.ok) throw new Error("Failed to delete thread");
-onChatAction();
+      onChatAction();
       toast.success("Thread deleted successfully");
- accountwiseChatlist(data, isActiveTrue); // refresh list
+      accountwiseChatlist(data, isActiveTrue); // refresh list
     } catch (error) {
       console.error("Error deleting thread:", error);
       toast.error("Failed to delete thread");
@@ -431,19 +480,6 @@ onChatAction();
             </Typography>
           </Box>
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            {/* {tasks.length > 0 && (
-              <Typography
-                variant="subtitle2"
-                fontWeight={600}
-                sx={{
-                  cursor: "pointer",
-                }}
-                onClick={toggleTasks}
-              >
-                Client Tasks:{" "}
-                {`${tasks.filter((task) => task.checked).length}/${tasks.length}`}
-              </Typography>
-            )} */}
             {tasks.length > 0 ? (
               <Typography
                 variant="subtitle2"
@@ -482,7 +518,7 @@ onChatAction();
                 }}
               >
                 {/* Archive Thread */}
-                 {chat.active ? "Archive Thread" : "Activate Thread"}
+                {chat.active ? "Archive Thread" : "Activate Thread"}
               </MenuItem>
               <MenuItem
                 onClick={() => {
@@ -528,8 +564,8 @@ onChatAction();
             gap: 2,
             alignItems: "start",
             // border:'2px solid red',
-            height:'35vh',
-            overflowY:'auto'
+            height: "35vh",
+            overflowY: "auto",
           }}
         >
           {replyTo && (
@@ -872,22 +908,6 @@ const ReplyPreview = ({ replyTo, setReplyTo }) => (
 );
 
 export default ChatDetails;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // import { Box, Typography, Divider } from "@mui/material";
 // import { toast } from "react-toastify";
@@ -1362,7 +1382,6 @@ export default ChatDetails;
 // };
 
 // export default ChatDetails;
-
 
 // const ChatDetails = ({ chat, getsChatDetails, accountwiseChatlist }) => {
 //     const CHATTOCLIENT_API = process.env.REACT_APP_CHAT_API;

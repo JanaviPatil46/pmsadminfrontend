@@ -18,7 +18,13 @@ import {
   TextField,
   DialogActions,
   Chip,
-  Tooltip,Checkbox,TableCell,TableHead,TableRow,TableBody,Table,
+  Tooltip,
+  Checkbox,
+  TableCell,
+  TableHead,
+  TableRow,
+  TableBody,
+  Table,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import customCss from "./docuseal-dark-theme.css";
@@ -46,6 +52,9 @@ import {
   Folder as FolderClosedIcon,
   FolderOpen as FolderOpenIcon,
 } from "lucide-react";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import HighlightOffIcon from "@mui/icons-material/HighlightOff";
+import CancelIcon from "@mui/icons-material/Cancel";
 import DownloadIcon from "@mui/icons-material/Download";
 import { toast } from "react-toastify";
 import {
@@ -152,7 +161,7 @@ const DocsFolderTree = () => {
         fetchAccountDetails();
       }
     }, [accountId]);
-    
+
     console.log("folder structure of account is", accountId);
     const [expandedFolders, setExpandedFolders] = useState({});
     const [menuAnchorEl, setMenuAnchorEl] = useState(null);
@@ -254,23 +263,40 @@ const DocsFolderTree = () => {
         setShowBuilderFor(item); // important: must match the Dialog condition
         setOpenDialog(true);
         // esignRequestId = (data.esignRequestId);
-        // Cycle status (optional, keep your logic)
-        const currentStatus = item.meta?.signStatus || "sendForSignature";
-        const currentIndex = SIGN_STATUSES.indexOf(currentStatus);
-        const nextIndex = (currentIndex + 1) % SIGN_STATUSES.length;
-        const nextStatus = SIGN_STATUSES[nextIndex];
-        // await updateStatus(item, "signStatus", nextStatus,data.esignRequestId);
-        await updateStatus(
-          item,
-          "signStatus",
-          nextStatus,
-          null,
-          data.esignRequestId
-        );
+        // // Cycle status (optional, keep your logic)
+        // const currentStatus = item.meta?.signStatus || "sendForSignature";
+        // const currentIndex = SIGN_STATUSES.indexOf(currentStatus);
+        // const nextIndex = (currentIndex + 1) % SIGN_STATUSES.length;
+        // const nextStatus = SIGN_STATUSES[nextIndex];
+        // // await updateStatus(item, "signStatus", nextStatus,data.esignRequestId);
+        // await updateStatus(
+        //   item,
+        //   "signStatus",
+        //   nextStatus,
+        //   null,
+        //   data.esignRequestId
+        // );
       } catch (err) {
         console.error(err);
       }
     };
+    const cancelSignature = async (item) => {
+  try {
+    await axios.delete(`${SIGNATURE_API}/signature/cancel/${item.meta.esignRequestId}`, {
+      data: {
+        folder: item.meta.folder,    // EXACT value from meta file
+        name: item.meta.name         // "1.5MB.pdf"
+      }
+    });
+
+    alert("Signature request cancelled.");
+    fetchFolderTree(accountId);
+  } catch (err) {
+    console.error(err);
+    alert("Failed to cancel signature");
+  }
+};
+
 
     const APPROVAL_STATUSES = [
       "sendForApproval",
@@ -292,13 +318,41 @@ const DocsFolderTree = () => {
       setSelectedItem(item); // store the current item for later use
       setOpenApprovalDialog(true); // open the dialog
     };
+    // ========================
+    // Cancel Pending Approval
+    // ========================
+    const handleCancelApproval = async (item) => {
+      try {
+        const res = await fetch(
+          `https://www.snptaxes.com/api/accountsdoc/file/approval-toggle`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              approvalId: item.meta?.approvalId,
+              filePath: item.path,
+              action: "cancel",
+            }),
+          }
+        );
+
+        if (!res.ok) throw new Error("Cancel failed");
+
+        // await updateStatus(item, "authStatus", "canceledApproval", null, null);
+
+        alert("Approval Request Cancelled");
+        // fetchFiles?.();
+        fetchFolderTree(accountId);
+      } catch (err) {
+        alert("Cancel request failed");
+      }
+    };
     // 🔹 Step 2: Close dialog
     const handleCloseDialog = () => {
       setOpenApprovalDialog(false);
       setDescription("");
       setSelectedItem(null);
     };
-
     const handleRequestApproval = async () => {
       if (!selectedItem) return;
 
@@ -306,15 +360,17 @@ const DocsFolderTree = () => {
         const fileUrl = `https://snptaxes.com/uploads/accounts/${selectedItem.path}`;
 
         const payload = {
+          filePath: selectedItem.path, // required by backend
+          action: "send",
           accountId,
           filename: selectedItem.name,
           fileUrl,
           clientEmail,
-          description,
+          description, // auto saved inside approval.description
         };
 
         const res = await fetch(
-          `${DOCS_MANAGMENTS}/approvals/request-approval`,
+          `https://www.snptaxes.com/api/accountsdoc/file/approval-toggle`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -323,37 +379,76 @@ const DocsFolderTree = () => {
         );
 
         const result = await res.json();
+        if (!res.ok) throw new Error(result.error || "Failed to send approval");
 
-        if (!res.ok) throw new Error("Failed to send approval request.");
+        // const approvalId = result?.fileMeta?.approvalId;
 
-        // ⬅️ Backend must return approvalId
-        const approvalId = result.approvalId;
-
-        alert(`Approval request sent to ${payload.clientEmail}`);
-
-        // Calculate next status
-        const currentStatus =
-          selectedItem.meta?.authStatus || "sendForApproval";
-        const currentIndex = APPROVAL_STATUSES.indexOf(currentStatus);
-        const nextIndex = (currentIndex + 1) % APPROVAL_STATUSES.length;
-        const nextStatus = APPROVAL_STATUSES[nextIndex];
-
-        // ⬅️ Send approvalId into updateStatus()
-        // await updateStatus(selectedItem, "authStatus", nextStatus, approvalId);
-        await updateStatus(
-          selectedItem,
-          "authStatus",
-          nextStatus,
-          approvalId,
-          null
-        );
+        alert(`Approval request sent to ${clientEmail}`);
 
         handleCloseDialog();
-      } catch (err) {
-        console.error("Approval request failed:", err);
-        alert("Failed to send approval request.");
+        fetchFolderTree(accountId);
+        // fetchFiles?.(); // refresh listing after action (optional)
+      } catch (error) {
+        console.error("Approval request failed:", error);
+        alert("Failed to send approval.");
       }
     };
+
+    // const handleRequestApproval = async () => {
+    //   if (!selectedItem) return;
+
+    //   try {
+    //     const fileUrl = `https://snptaxes.com/uploads/accounts/${selectedItem.path}`;
+
+    //     const payload = {
+    //       accountId,
+    //       filename: selectedItem.name,
+    //       fileUrl,
+    //       clientEmail,
+    //       description,
+    //     };
+
+    //     const res = await fetch(
+    //       `${DOCS_MANAGMENTS}/approvals/request-approval`,
+    //       {
+    //         method: "POST",
+    //         headers: { "Content-Type": "application/json" },
+    //         body: JSON.stringify(payload),
+    //       }
+    //     );
+
+    //     const result = await res.json();
+
+    //     if (!res.ok) throw new Error("Failed to send approval request.");
+
+    //     // ⬅️ Backend must return approvalId
+    //     const approvalId = result.approvalId;
+
+    //     alert(`Approval request sent to ${payload.clientEmail}`);
+
+    //     // Calculate next status
+    //     const currentStatus =
+    //       selectedItem.meta?.authStatus || "sendForApproval";
+    //     const currentIndex = APPROVAL_STATUSES.indexOf(currentStatus);
+    //     const nextIndex = (currentIndex + 1) % APPROVAL_STATUSES.length;
+    //     const nextStatus = APPROVAL_STATUSES[nextIndex];
+
+    //     // ⬅️ Send approvalId into updateStatus()
+    //     // await updateStatus(selectedItem, "authStatus", nextStatus, approvalId);
+    //     await updateStatus(
+    //       selectedItem,
+    //       "authStatus",
+    //       nextStatus,
+    //       approvalId,
+    //       null
+    //     );
+
+    //     handleCloseDialog();
+    //   } catch (err) {
+    //     console.error("Approval request failed:", err);
+    //     alert("Failed to send approval request.");
+    //   }
+    // };
 
     // 🔹 Frontend: Update any status (read, sign, approval)
     const updateStatus = async (
@@ -400,83 +495,89 @@ const DocsFolderTree = () => {
       }
     };
     const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
-const [selectedDoc, setSelectedDoc] = useState(null);
-  const [invoiceList, setInvoiceList] = useState([]);
-   const [selectedInvoices, setSelectedInvoices] = useState([]);
- // Fetch invoices for invoice dialog
-  const fetchInvoices = async () => {
-    try {
-      const response = await fetch(
-        `https://www.snptaxes.com/workflow/invoices/invoice/pending/invoicelistby/accountid/${accountId}`
-      );
-      const data = await response.json();
-      setInvoiceList(data.invoice || []);
-    } catch (err) {
-      console.error("Error fetching invoices", err);
-    }
-  };
+    const [selectedDoc, setSelectedDoc] = useState(null);
+    const [invoiceList, setInvoiceList] = useState([]);
+    const [selectedInvoices, setSelectedInvoices] = useState([]);
+    // Fetch invoices for invoice dialog
+    const fetchInvoices = async () => {
+      try {
+        const response = await fetch(
+          `https://www.snptaxes.com/workflow/invoices/invoice/pending/invoicelistby/accountid/${accountId}`
+        );
+        const data = await response.json();
+        setInvoiceList(data.invoice || []);
+      } catch (err) {
+        console.error("Error fetching invoices", err);
+      }
+    };
 
-  useEffect(() => {
-    if (invoiceDialogOpen) fetchInvoices();
-  }, [invoiceDialogOpen]);
-  const handleSubmit = () => {
-    if (selectedInvoices.length === 0) {
-      toast.warning("Select at least one invoice");
-      return;
-    }
-    confirmInvoiceLock(selectedInvoices);
-  };
-  const confirmInvoiceLock = async (invoiceIds) => {
-  try {
-    const res = await axios.post(`https://www.snptaxes.com/api/accountsdoc/invoice/lock-unlock`, {
-      filePath: selectedDoc.path,
-      invoiceIds,
-      action: "lock"
-    });
+    useEffect(() => {
+      if (invoiceDialogOpen) fetchInvoices();
+    }, [invoiceDialogOpen]);
+    const handleSubmit = () => {
+      if (selectedInvoices.length === 0) {
+        toast.warning("Select at least one invoice");
+        return;
+      }
+      confirmInvoiceLock(selectedInvoices);
+    };
+    const confirmInvoiceLock = async (invoiceIds) => {
+      try {
+        const res = await axios.post(
+          `https://www.snptaxes.com/api/accountsdoc/invoice/lock-unlock`,
+          {
+            filePath: selectedDoc.path,
+            invoiceIds,
+            action: "lock",
+          }
+        );
 
-    toast.success("Invoice locked successfully");
-    setInvoiceDialogOpen(false);
-    // refreshTree();
-  } catch (err) {
-    toast.error("Lock failed");
-    console.log(err);
-  }
-};
+        toast.success("Invoice locked successfully");
+        setInvoiceDialogOpen(false);
+        // refreshTree();
+        fetchFolderTree(accountId);
+      } catch (err) {
+        toast.error("Lock failed");
+        console.log(err);
+      }
+    };
 
     const toggleInvoiceLock = async (item) => {
-  const filePath = item.path;
-  const invoiceIds = item.meta?.invoiceLock || []; // stored when locked
-  const isLocked = item.meta?.lockInvoiceStatus === "pendingpayment";
-console.log("invoice ids", invoiceIds);
-  // ---------------------------------- UNLOCK ----------------------------------
-  if (isLocked) {
-    if (!invoiceIds.length) {
-      toast.error("No invoice mapped!");
-      return;
-    }
+      const filePath = item.path;
+      const invoiceIds = item.meta?.invoiceLock || []; // stored when locked
+      const isLocked = item.meta?.lockInvoiceStatus === "pendingpayment";
+      console.log("invoice ids", invoiceIds);
+      // ---------------------------------- UNLOCK ----------------------------------
+      if (isLocked) {
+        if (!invoiceIds.length) {
+          toast.error("No invoice mapped!");
+          return;
+        }
 
-    try {
-      const res = await axios.post(`https://www.snptaxes.com/api/accountsdoc/invoice/lock-unlock`, {
-        filePath,
-        invoiceIds,
-        action: "unlock",
-      });
+        try {
+          const res = await axios.post(
+            `https://www.snptaxes.com/api/accountsdoc/invoice/lock-unlock`,
+            {
+              filePath,
+              invoiceIds,
+              action: "unlock",
+            }
+          );
 
-      toast.success("Invoice unlocked");
-      fetchFolderTree(); // your fetch tree function
-    } catch (err) {
-      toast.error("Unlock failed");
-      console.log(err);
-    }
-    return;
-  }
+          toast.success("Invoice unlocked");
+          fetchFolderTree(accountId); // your fetch tree function
+        } catch (err) {
+          toast.error("Unlock failed");
+          console.log(err);
+        }
+        return;
+      }
 
-  // ---------------------------------- LOCK ----------------------------------
-  // Open drawer or dialog to select invoiceIds
-  setSelectedDoc(item);
-  setInvoiceDialogOpen(true); // (open invoice selection popup)
-};
-
+      // ---------------------------------- LOCK ----------------------------------
+      // Open drawer or dialog to select invoiceIds
+      setSelectedDoc(item);
+      setInvoiceDialogOpen(true); // (open invoice selection popup)
+    };
 
     const toggleReadOnly = async (item) => {
       try {
@@ -1218,33 +1319,105 @@ console.log("invoice ids", invoiceIds);
                     action: () => deleteItem(item),
                   }
                 );
-              } else if (docType === "firm") {
+              }
+
+              // else if (docType === "firm") {
+              //   const currentStatus =
+              //     item.meta?.signStatus || "sendForSignature";
+              //   const currentApprovalStatus =
+              //     item.meta?.authStatus || "sendForApproval";
+
+              //   const isSignatureDisabled =
+              //     currentStatus === "pendingSignature" ||
+              //     currentStatus === "signatureCompleted";
+
+              //   const isApprovalDisabled =
+              //     currentApprovalStatus === "pendingApproval" ||
+              //     currentApprovalStatus === "cancledApproval" ||
+              //     currentApprovalStatus === "approvalCompleted";
+
+              //   const invoiceStatus = item.meta?.lockInvoiceStatus; // pendingPayment / paymentCompleted / null
+              //   console.log("invoiceStatus", invoiceStatus);
+              //   let invoiceLabel = "Lock with Invoice";
+              //   // If invoice is pending payment → show UNLOCK (enabled)
+              //   if (invoiceStatus === "pendingpayment") {
+              //     invoiceLabel = "Unlock Invoice";
+              //   }
+
+              //   // If invoice is completed or not locked → show LOCK (enabled)
+              //   if (invoiceStatus === "paymentcompleted" || !invoiceStatus) {
+              //     invoiceLabel = "Lock Invoice";
+              //   }
+              //   menuItems.push(
+              //     {
+              //       icon: <DriveFileMoveIcon />,
+              //       label: "Edit",
+              //       action: () => SetRenameDrawer(true),
+              //     },
+              //     {
+              //       icon: <DriveFileMoveIcon />,
+              //       label: "Move",
+              //       action: () => setMoveDrawerOpen(true),
+              //     },
+
+              //     {
+              //       icon: <PenTool size={16} />,
+              //       label: statusTextMap[currentStatus],
+              //       action: () => toggleSignStatus(item),
+              //       custom: true, // flag to handle differently
+              //       currentStatus, // pass for icon color
+              //       disabled: isSignatureDisabled,
+              //     },
+              //     {
+              //       icon: <Stamp size={16} />,
+              //       label: approvalStatusTextMap[currentApprovalStatus],
+              //       action: () => toggleApprovalStatus(item),
+              //       type: "approval",
+              //       currentApprovalStatus,
+              //       disabled: isApprovalDisabled,
+              //     },
+              //     {
+              //       icon:
+              //         invoiceStatus === "pendingpayment" ? (
+              //           <LockOpenIcon />
+              //         ) : (
+              //           <LockIcon />
+              //         ),
+              //       label: invoiceLabel,
+              //       action: () => toggleInvoiceLock(item),
+              //       disabled: false, // Unlock should NOT be disabled when pending
+              //     },
+
+              //     {
+              //       icon: <DeleteIcon />,
+              //       label: "Delete",
+              //       action: () => deleteItem(item),
+              //     }
+              //   );
+              // }
+              else if (docType === "firm") {
                 const currentStatus =
                   item.meta?.signStatus || "sendForSignature";
-                const currentApprovalStatus =
+                const approvalStatus =
                   item.meta?.authStatus || "sendForApproval";
+                const invoiceStatus = item.meta?.lockInvoiceStatus;
 
                 const isSignatureDisabled =
                   currentStatus === "pendingSignature" ||
                   currentStatus === "signatureCompleted";
 
-                const isApprovalDisabled =
-                  currentApprovalStatus === "pendingApproval" ||
-                  currentApprovalStatus === "cancledApproval" ||
-                  currentApprovalStatus === "approvalCompleted";
+                const isApprovalCompleted =
+                  approvalStatus === "approvalCompleted";
+                // const isApprovalPending = approvalStatus === "pendingApproval";
+                const isApprovalCanceled =
+                  approvalStatus === "canceledApproval";
 
-                const invoiceStatus = item.meta?.lockInvoiceStatus; // pendingPayment / paymentCompleted / null
-                console.log("invoiceStatus", invoiceStatus);
                 let invoiceLabel = "Lock Invoice";
-                // If invoice is pending payment → show UNLOCK (enabled)
-                if (invoiceStatus === "pendingpayment") {
+                if (invoiceStatus === "pendingpayment")
                   invoiceLabel = "Unlock Invoice";
-                }
-
-                // If invoice is completed or not locked → show LOCK (enabled)
-                if (invoiceStatus === "paymentcompleted" || !invoiceStatus) {
+                if (invoiceStatus === "paymentcompleted" || !invoiceStatus)
                   invoiceLabel = "Lock Invoice";
-                }
+
                 menuItems.push(
                   {
                     icon: <DriveFileMoveIcon />,
@@ -1257,40 +1430,82 @@ console.log("invoice ids", invoiceIds);
                     action: () => setMoveDrawerOpen(true),
                   },
 
-                  {
-                    icon: <PenTool size={16} />,
-                    label: statusTextMap[currentStatus],
-                    action: () => toggleSignStatus(item),
-                    custom: true, // flag to handle differently
-                    currentStatus, // pass for icon color
-                    disabled: isSignatureDisabled,
-                  },
-                  {
-                    icon: <Stamp size={16} />,
-                    label: approvalStatusTextMap[currentApprovalStatus],
-                    action: () => toggleApprovalStatus(item),
-                    type: "approval",
-                    currentApprovalStatus,
-                    disabled: isApprovalDisabled,
-                  },
-                  {
-                    icon:
-                      invoiceStatus === "pendingpayment" ? (
-                        <LockOpenIcon />
-                      ) : (
-                        <LockIcon />
-                      ),
-                    label: invoiceLabel,
-                    action: () => toggleInvoiceLock(item),
-                    disabled: false, // Unlock should NOT be disabled when pending
-                  },
-
-                  {
-                    icon: <DeleteIcon />,
-                    label: "Delete",
-                    action: () => deleteItem(item),
-                  }
+                  // ---------------- SIGNATURE BUTTON ----------------
+                  // {
+                  //   icon: <PenTool size={16} />,
+                  //   label: statusTextMap[currentStatus],
+                  //   action: () => toggleSignStatus(item),
+                  //   disabled: isSignatureDisabled,
+                  // }
                 );
+// SIGNATURE MENU
+if (currentStatus === "pendingSignature") {
+  menuItems.push({
+    icon: <CancelIcon />,
+    label: "Cancel Signature Request",
+    action: () => cancelSignature(item),
+  });
+} else {
+  menuItems.push({
+    icon: <PenTool size={16} />,
+    label: statusTextMap[currentStatus],
+    action: () => toggleSignStatus(item),
+    disabled: isSignatureDisabled,
+  });
+}
+
+                // ---------------- APPROVAL MENU LOGIC ----------------
+                if (approvalStatus === "sendForApproval") {
+                  menuItems.push({
+                    icon: <Stamp size={16} />,
+                    label: "Send For Approval",
+                    action: () => toggleApprovalStatus(item),
+                    // action: () => handleOpenApprovalDialog(item),
+                  });
+                }
+
+                if (approvalStatus === "pendingApproval") {
+                  menuItems.push({
+                    icon: <CancelIcon />,
+                    label: "Cancel Approval Request",
+                    action: () => handleCancelApproval(item),
+                  });
+                }
+
+                if (isApprovalCompleted) {
+                  menuItems.push({
+                    icon: <Stamp size={16} />,
+                    label: "Approved",
+                    disabled: true,
+                  });
+                }
+
+                if (isApprovalCanceled) {
+                  menuItems.push({
+                    icon: <Stamp size={16} />,
+                    label: "Approval Canceled",
+                    disabled: true,
+                  });
+                }
+
+                // ---------------- INVOICE LOCK ----------------
+                menuItems.push({
+                  icon:
+                    invoiceStatus === "pendingpayment" ? (
+                      <LockOpenIcon />
+                    ) : (
+                      <LockIcon />
+                    ),
+                  label: invoiceLabel,
+                  action: () => toggleInvoiceLock(item),
+                });
+
+                // ---------------- DELETE ----------------
+                menuItems.push({
+                  icon: <DeleteIcon />,
+                  label: "Delete",
+                  action: () => deleteItem(item),
+                });
               } else if (docType === "private") {
                 menuItems.push(
                   {
@@ -1324,79 +1539,87 @@ console.log("invoice ids", invoiceIds);
             ));
           })()}
         </Menu>
- <Dialog open={invoiceDialogOpen} onClose={() => setInvoiceDialogOpen(false)} fullWidth maxWidth="md">
-      <DialogTitle>Select Invoices To Lock</DialogTitle>
-
-      <DialogContent dividers>
-        {invoiceList.length === 0 && (
-          <Typography textAlign="center" color="text.secondary" p={2}>
-            No invoices found
-          </Typography>
-        )}
-
-           <Box sx={{ overflowX: "auto", mt: 1 }}>
-            <Table sx={{ minWidth: 650 }}>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Select</TableCell>
-                  <TableCell>Invoice #</TableCell>
-                  <TableCell>Description</TableCell>
-                  <TableCell>Created At</TableCell>
-                  <TableCell>Amount</TableCell>
-                </TableRow>
-              </TableHead>
-             
-              <TableBody>
-  {invoiceList.length === 0 ? (
-    <TableRow>
-      <TableCell colSpan={5}>No invoices found.</TableCell>
-    </TableRow>
-  ) : (
-    invoiceList.map((inv) => {
-      const id = inv._id;
-      const checked = selectedInvoices.includes(id);
-
-      return (
-        <TableRow
-          key={id}
-          hover
-          sx={{ cursor: "pointer", bgcolor: checked ? "#e3f2fd" : "inherit" }} // optional: highlight selected
-          onClick={() => {
-            setSelectedInvoices((prev) => {
-              const updated = prev.includes(id)
-                ? prev.filter((x) => x !== id)
-                : [...prev, id];
-              
-              console.log("Selected invoices:", updated); // <-- log here
-              return updated;
-            });
-          }}
+        <Dialog
+          open={invoiceDialogOpen}
+          onClose={() => setInvoiceDialogOpen(false)}
+          fullWidth
+          maxWidth="md"
         >
-          <TableCell>
-            <Checkbox checked={checked} />
-          </TableCell>
-          <TableCell>{inv.invoicenumber}</TableCell>
-          <TableCell>{inv.description || "—"}</TableCell>
-          <TableCell>
-            {new Date(inv.createdAt).toLocaleDateString()}
-          </TableCell>
-          <TableCell>₹{inv.summary?.total}</TableCell>
-        </TableRow>
-      );
-    })
-  )}
-</TableBody>
+          <DialogTitle>Select Invoices To Lock</DialogTitle>
 
-            </Table>
-          </Box>
-      </DialogContent>
+          <DialogContent dividers>
+            {invoiceList.length === 0 && (
+              <Typography textAlign="center" color="text.secondary" p={2}>
+                No invoices found
+              </Typography>
+            )}
 
-      <DialogActions>
-        <Button onClick={() => setInvoiceDialogOpen(false)}>Cancel</Button>
-        <Button variant="contained" onClick={handleSubmit}>Lock Invoice</Button>
-      </DialogActions>
-    </Dialog>
-        
+            <Box sx={{ overflowX: "auto", mt: 1 }}>
+              <Table sx={{ minWidth: 650 }}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Select</TableCell>
+                    <TableCell>Invoice #</TableCell>
+                    <TableCell>Description</TableCell>
+                    <TableCell>Created At</TableCell>
+                    <TableCell>Amount</TableCell>
+                  </TableRow>
+                </TableHead>
+
+                <TableBody>
+                  {invoiceList.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={5}>No invoices found.</TableCell>
+                    </TableRow>
+                  ) : (
+                    invoiceList.map((inv) => {
+                      const id = inv._id;
+                      const checked = selectedInvoices.includes(id);
+
+                      return (
+                        <TableRow
+                          key={id}
+                          hover
+                          sx={{
+                            cursor: "pointer",
+                            bgcolor: checked ? "#e3f2fd" : "inherit",
+                          }} // optional: highlight selected
+                          onClick={() => {
+                            setSelectedInvoices((prev) => {
+                              const updated = prev.includes(id)
+                                ? prev.filter((x) => x !== id)
+                                : [...prev, id];
+
+                              console.log("Selected invoices:", updated); // <-- log here
+                              return updated;
+                            });
+                          }}
+                        >
+                          <TableCell>
+                            <Checkbox checked={checked} />
+                          </TableCell>
+                          <TableCell>{inv.invoicenumber}</TableCell>
+                          <TableCell>{inv.description || "—"}</TableCell>
+                          <TableCell>
+                            {new Date(inv.createdAt).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell>₹{inv.summary?.total}</TableCell>
+                        </TableRow>
+                      );
+                    })
+                  )}
+                </TableBody>
+              </Table>
+            </Box>
+          </DialogContent>
+
+          <DialogActions>
+            <Button onClick={() => setInvoiceDialogOpen(false)}>Cancel</Button>
+            <Button variant="contained" onClick={handleSubmit}>
+              Lock Invoice
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     );
   };
@@ -1440,7 +1663,6 @@ console.log("invoice ids", invoiceIds);
       </Button>
 
       <FolderTreeView accountId={data} />
-
     </Box>
   );
 };
