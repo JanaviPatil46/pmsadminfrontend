@@ -360,10 +360,14 @@ useEffect(() => {
         console.log("Updated subtasks:", subtasks);
     }, [checkedSubtasks, subtasks]);
 
-    const handleAddSubtask = () => {
-        const newId = String(subtasks.length + 1);
-        setSubtasks([...subtasks, { id: newId, text: "" }]);
-    };
+    // const handleAddSubtask = () => {
+    //     const newId = String(subtasks.length + 1);
+    //     setSubtasks([...subtasks, { id: newId, text: "" }]);
+    // };
+const handleAddSubtask = () => {
+  const newId = subtasks.length + 1;   // this will be number
+  setSubtasks([...subtasks, { id: newId, text: "", checked: false }]);
+};
 
     const handleDragEnd = (result) => {
         // Ensure a valid drop location

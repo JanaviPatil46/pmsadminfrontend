@@ -287,6 +287,19 @@ const ChatDetails = ({
 
     setTasks([...tasks, newTaskItem]);
   };
+// const handleAddTask = () => {
+//   const maxId = tasks.length > 0
+//     ? Math.max(...tasks.map(task => Number(task.id)))
+//     : 0;
+
+//   const newTaskItem = {
+//     id: String(maxId + 1),  // <-- convert to string
+//     text: "",
+//     checked: false,
+//   };
+
+//   setTasks([...tasks, newTaskItem]);
+// };
 
   const handleDeleteTask = (id) => {
     const updated = tasks.filter((task) => task.id !== id);
@@ -314,7 +327,7 @@ const ChatDetails = ({
       body: raw,
       redirect: "follow",
     };
-
+console.log("resend task", raw);
     fetch(
       `${CHATTOCLIENT_API}/chats/chatsaccountwise/addclienttask`,
       requestOptions

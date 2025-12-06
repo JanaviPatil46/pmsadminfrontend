@@ -1,7 +1,4 @@
-
-
-
-import React, { useState, useEffect,useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Drawer,
   Box,
@@ -14,13 +11,21 @@ import {
   ListItemText,
   Collapse,
 } from "@mui/material";
+import JSZip from "jszip";
+import axios from "axios";
 import FolderIcon from "@mui/icons-material/Folder";
 import FolderOpenIcon from "@mui/icons-material/FolderOpen";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import { toast } from "react-toastify";
-import { FaFilePdf, FaFileWord, FaFileExcel, FaFileImage, FaFileAlt } from "react-icons/fa";
+import {
+  FaFilePdf,
+  FaFileWord,
+  FaFileExcel,
+  FaFileImage,
+  FaFileAlt,
+} from "react-icons/fa";
 import { AiFillFileUnknown } from "react-icons/ai";
 const FolderUploadDrawer = ({
   isOpen,
@@ -33,12 +38,11 @@ const FolderUploadDrawer = ({
   const [message, setMessage] = useState("");
   const [folderName, setFolderName] = useState("my-uploaded-folder");
   const [files, setFiles] = useState([]);
-    const hiddenFileInput = useRef(null);
-// open hidden input
+  const hiddenFileInput = useRef(null);
+  // open hidden input
   const handleClick = () => {
     hiddenFileInput.current.click();
   };
-
 
   useEffect(() => {
     if (isOpen && selectedFolderForMenu) {
@@ -54,85 +58,144 @@ const FolderUploadDrawer = ({
 
   const handleFolderSelect = (path) => setSelectedFolder(path);
 
- 
+  // const handleUploadFolderSelect = (e) => {
+  //   const selectedFiles = Array.from(e.target.files);
+  //   if (selectedFiles.length === 0) return;
+
+  //   // ✅ Calculate total folder size
+  //   const totalSize = selectedFiles.reduce((sum, file) => sum + file.size, 0);
+  //   const maxFolderSize = 100 * 1024 * 1024; // 100 MB
+
+  //   // 🚫 Restrict folder if total exceeds limit
+  //   if (totalSize > maxFolderSize) {
+  //     alert(
+  //       `❌ Folder size exceeds 100 MB limit.\nSelected folder size: ${(
+  //         totalSize /
+  //         (1024 * 1024)
+  //       ).toFixed(2)} MB`
+  //     );
+  //     e.target.value = null; // reset input
+  //     setFiles([]); // clear files state
+  //     return;
+  //   }
+
+  //   // ✅ Normal processing (unchanged)
+  //   setFiles(selectedFiles);
+
+  //   const firstPath = selectedFiles[0].webkitRelativePath;
+  //   const topLevelFolder = firstPath.split("/")[0];
+  //   setFolderName(topLevelFolder);
+  // };
   const handleUploadFolderSelect = (e) => {
     const selectedFiles = Array.from(e.target.files);
-    if (selectedFiles.length === 0) return;
-
-    // ✅ Calculate total folder size
-    const totalSize = selectedFiles.reduce((sum, file) => sum + file.size, 0);
-    const maxFolderSize = 100 * 1024 * 1024; // 100 MB
-
-    // 🚫 Restrict folder if total exceeds limit
-    if (totalSize > maxFolderSize) {
-      alert(
-        `❌ Folder size exceeds 100 MB limit.\nSelected folder size: ${(
-          totalSize /
-          (1024 * 1024)
-        ).toFixed(2)} MB`
-      );
-      e.target.value = null; // reset input
-      setFiles([]); // clear files state
-      return;
-    }
-
-    // ✅ Normal processing (unchanged)
     setFiles(selectedFiles);
 
-    const firstPath = selectedFiles[0].webkitRelativePath;
-    const topLevelFolder = firstPath.split("/")[0];
-    setFolderName(topLevelFolder);
+    if (selectedFiles.length > 0) {
+      const firstPath = selectedFiles[0].webkitRelativePath;
+      const topLevelFolder = firstPath.split("/")[0];
+      setFolderName(topLevelFolder);
+    }
   };
+  // const handleUpload = async () => {
+  //   if (files.length === 0) {
+  //     setMessage("Please select a folder first");
+  //     return;
+  //   }
+
+  //   let targetFolderPath = selectedFolder
+  //     ? `${selectedFolder}/${folderName}`
+  //     : folderName;
+
+  //   targetFolderPath = targetFolderPath.replace(/\/+/g, "/");
+
+  //   const formData = new FormData();
+  //   files.forEach((file) => {
+  //     formData.append("files", file, file.webkitRelativePath);
+  //   });
+
+  //   try {
+  //     const res = await fetch(
+  //       `https://www.snptaxes.com/api/accountsdoc/folder/upload?folderPath=${encodeURIComponent(
+  //         targetFolderPath
+  //       )}`,
+  //       { method: "POST", body: formData }
+  //     );
+  //     const data = await res.json();
+  //     if (res.ok) {
+  //       setMessage(`✅ Folder uploaded successfully: ${data.files.length} files`);
+  //       toast.success(`✅ Folder uploaded successfully: ${data.files.length} files`)
+  //       fetchFolderTree();
+  //       onClose()
+  //       setFiles([]);
+  //     } else {
+  //       setMessage(`❌ Error: ${data.error}`);
+  //     }
+  //   } catch (err) {
+  //     console.error(err);
+  //     setMessage("Upload failed");
+  //   }
+  // };
 
   const handleUpload = async () => {
-    if (files.length === 0) {
-      setMessage("Please select a folder first");
+    if (!files.length) {
+      alert("Please select a folder first!");
+      return;
+    }
+    // ⭐ Check target folder not selected
+    if (!selectedFolder || selectedFolder.trim() === "") {
+      alert("Please select target path first!");
       return;
     }
 
+    // ------------------------------
+    // ⭐ Use targetFolderPath logic
+    // ------------------------------
     let targetFolderPath = selectedFolder
       ? `${selectedFolder}/${folderName}`
       : folderName;
 
     targetFolderPath = targetFolderPath.replace(/\/+/g, "/");
+    console.log("Target Folder Path:", targetFolderPath);
+    setMessage("Zipping folder...");
 
-    const formData = new FormData();
+    const zip = new JSZip();
     files.forEach((file) => {
-      formData.append("files", file, file.webkitRelativePath);
+      zip.file(file.webkitRelativePath, file);
     });
 
+    const zipBlob = await zip.generateAsync({ type: "blob" });
+
+    const formData = new FormData();
+    formData.append("folderZip", zipBlob, `${folderName}.zip`);
+    formData.append("folderName", folderName);
+    formData.append("folderPath", targetFolderPath);
+
+    setMessage("Uploading...");
+
     try {
-      const res = await fetch(
-        `https://www.snptaxes.com/api/accountsdoc/folder/upload?folderPath=${encodeURIComponent(
-          targetFolderPath
-        )}`,
-        { method: "POST", body: formData }
+      const res = await axios.post(
+        "https://snptaxes.com/api/accountsdoc/upload-folder",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
       );
-      const data = await res.json();
-      if (res.ok) {
-        setMessage(`✅ Folder uploaded successfully: ${data.files.length} files`);
-        toast.success(`✅ Folder uploaded successfully: ${data.files.length} files`)
-        fetchFolderTree();
-        onClose()
-        setFiles([]);
-      } else {
-        setMessage(`❌ Error: ${data.error}`);
-      }
+      setMessage(res.data.message || "Uploaded successfully!");
+      console.log(res.data.message);
+      toast.success(`Folder uploaded successfully`);
+      fetchFolderTree();
+      onClose();
     } catch (err) {
       console.error(err);
-      setMessage("Upload failed");
+      setMessage("Upload failed!");
     }
   };
-  
-
   return (
     <Drawer anchor="right" open={isOpen} onClose={onClose}>
       <Box sx={{ width: 400, p: 3, bgcolor: "#f0f8ff", height: "100%" }}>
         <Typography variant="h6" gutterBottom>
           📁 Upload Folder
         </Typography>
-
-       
 
         {/* <Button
           variant="outlined"
@@ -151,26 +214,26 @@ const FolderUploadDrawer = ({
           />
         </Button> */}
 
-         {/* MUI Button instead of File Input */}
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleClick}
-        sx={{ mb: 2 }}
-      >
-        Select Folder
-      </Button>
+        {/* MUI Button instead of File Input */}
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleClick}
+          sx={{ mb: 2 }}
+        >
+          Select Folder
+        </Button>
 
-      {/* Hidden File Input */}
-      <input
-        type="file"
-        ref={hiddenFileInput}
-        onChange={handleUploadFolderSelect}
-        style={{ display: "none" }}
-        webkitdirectory="true"
-        directory="true"
-        multiple
-      />
+        {/* Hidden File Input */}
+        <input
+          type="file"
+          ref={hiddenFileInput}
+          onChange={handleUploadFolderSelect}
+          style={{ display: "none" }}
+          webkitdirectory="true"
+          directory="true"
+          multiple
+        />
 
         <Button
           variant="contained"
@@ -211,30 +274,30 @@ const FolderTreeSelector = ({ items, onSelect, selectedFolder, level = 0 }) => {
   const toggleExpand = (path) => {
     setExpanded((prev) => ({ ...prev, [path]: !prev[path] }));
   };
-const getFileIcon = (fileName) => {
-  const ext = fileName.split(".").pop().toLowerCase();
+  const getFileIcon = (fileName) => {
+    const ext = fileName.split(".").pop().toLowerCase();
 
-  switch (ext) {
-    case "pdf":
-      return <FaFilePdf color="#d32f2f" size={18} />;
-    case "jpg":
-    case "jpeg":
-    case "png":
-    case "gif":
-      return <FaFileImage color="#1976d2" size={18} />;
-    case "doc":
-    case "docx":
-      return <FaFileWord color="#1565c0" size={18} />;
-    case "xls":
-    case "xlsx":
-      return <FaFileExcel color="#2e7d32" size={18} />;
-    case "txt":
-    case "md":
-      return <FaFileAlt color="#616161" size={18} />;
-    default:
-      return <AiFillFileUnknown color="#757575" size={18} />;
-  }
-};
+    switch (ext) {
+      case "pdf":
+        return <FaFilePdf color="#d32f2f" size={18} />;
+      case "jpg":
+      case "jpeg":
+      case "png":
+      case "gif":
+        return <FaFileImage color="#1976d2" size={18} />;
+      case "doc":
+      case "docx":
+        return <FaFileWord color="#1565c0" size={18} />;
+      case "xls":
+      case "xlsx":
+        return <FaFileExcel color="#2e7d32" size={18} />;
+      case "txt":
+      case "md":
+        return <FaFileAlt color="#616161" size={18} />;
+      default:
+        return <AiFillFileUnknown color="#757575" size={18} />;
+    }
+  };
   return (
     <List disablePadding>
       {items?.map((item) => {
@@ -308,7 +371,7 @@ const getFileIcon = (fileName) => {
                   {item.meta.files.map((file) => (
                     <ListItem key={file.name} sx={{ pl: 2 }}>
                       <ListItemIcon>
-                     <Box sx={{ mr: 1 }}>{getFileIcon(file.name)}</Box>
+                        <Box sx={{ mr: 1 }}>{getFileIcon(file.name)}</Box>
                       </ListItemIcon>
                       <ListItemText
                         primary={`${file.name}${file.readOnly ? " (Read Only)" : ""}`}
@@ -326,4 +389,3 @@ const getFileIcon = (fileName) => {
 };
 
 export default FolderUploadDrawer;
-

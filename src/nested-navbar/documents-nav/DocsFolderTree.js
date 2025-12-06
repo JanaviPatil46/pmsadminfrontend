@@ -674,38 +674,80 @@ const DocsFolderTree = () => {
       handleMenuClose();
     };
     const handleFileClick = (fullPath, fileName, meta = {}) => {
-      try {
-        // 🔒 Prevent opening locked files
-        if (meta.readOnly) {
-          alert("This file is locked and cannot be opened.");
-          return;
-        }
+  try {
+    if (meta.readOnly) {
+      alert("This file is locked and cannot be opened.");
+      return;
+    }
 
-        // ✅ Construct full file URL
-        const fileUrl = `https://www.snptaxes.com/uploads/accounts/${data}/${fullPath}`;
+    const fileUrl = `https://www.snptaxes.com/uploads/accounts/${data}/${fullPath}`;
+    const ext = fileName.split(".").pop().toLowerCase();
 
-        // ✅ Detect file extension (case-insensitive)
-        const fileExt = fileName.split(".").pop().toLowerCase();
+    const viewable = ["pdf", "jpg", "jpeg", "png", "gif", "txt"];
+    const excel = ["xls", "xlsx"];
+    const word = ["doc", "docx"];
 
-        // ✅ Extensions that can open in browser
-        const viewableExtensions = ["pdf", "jpg", "jpeg", "png", "gif", "txt"];
+    if (viewable.includes(ext)) {
+      // Normal view in browser
+      window.open(fileUrl, "_blank");
+    } 
+    else if (excel.includes(ext)) {
+      // 📄 Open Excel online (Google Sheets Viewer)
+      const gsheetUrl = `https://docs.google.com/gview?url=${encodeURIComponent(fileUrl)}&embedded=true`;
+      window.open(gsheetUrl, "_blank");
+    } 
+    else if (word.includes(ext)) {
+      // 📄 Open Word using Google Docs Viewer
+      const gdocUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(fileUrl)}&embedded=true`;
+      window.open(gdocUrl, "_blank");
+    }
+    else {
+      // download anything else
+      const a = document.createElement("a");
+      a.href = fileUrl;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+  } catch (e) {
+    console.error("open error:", e);
+  }
+};
 
-        if (viewableExtensions.includes(fileExt)) {
-          // Open supported file types in a new tab
-          window.open(fileUrl, "_blank", "noopener,noreferrer");
-        } else {
-          // Force download for unsupported types (e.g., docx, xlsx, zip, etc.)
-          const link = document.createElement("a");
-          link.href = fileUrl;
-          link.download = fileName;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        }
-      } catch (error) {
-        console.error("Error opening/downloading file:", error);
-      }
-    };
+    // const handleFileClick = (fullPath, fileName, meta = {}) => {
+    //   try {
+    //     // 🔒 Prevent opening locked files
+    //     if (meta.readOnly) {
+    //       alert("This file is locked and cannot be opened.");
+    //       return;
+    //     }
+
+    //     // ✅ Construct full file URL
+    //     const fileUrl = `https://www.snptaxes.com/uploads/accounts/${data}/${fullPath}`;
+
+    //     // ✅ Detect file extension (case-insensitive)
+    //     const fileExt = fileName.split(".").pop().toLowerCase();
+
+    //     // ✅ Extensions that can open in browser
+    //     const viewableExtensions = ["pdf", "jpg", "jpeg", "png", "gif", "txt"];
+
+    //     if (viewableExtensions.includes(fileExt)) {
+    //       // Open supported file types in a new tab
+    //       window.open(fileUrl, "_blank", "noopener,noreferrer");
+    //     } else {
+    //       // Force download for unsupported types (e.g., docx, xlsx, zip, etc.)
+    //       const link = document.createElement("a");
+    //       link.href = fileUrl;
+    //       link.download = fileName;
+    //       document.body.appendChild(link);
+    //       link.click();
+    //       document.body.removeChild(link);
+    //     }
+    //   } catch (error) {
+    //     console.error("Error opening/downloading file:", error);
+    //   }
+    // };
     const getFileIcon = (fileName) => {
       const ext = fileName.split(".").pop().toLowerCase();
 
