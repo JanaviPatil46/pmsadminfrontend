@@ -62,7 +62,7 @@ const InvoiceDrawer = ({
   const INVOICE_API = process.env.REACT_APP_INVOICE_TEMP_URL;
   const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
   const CATEGORY_API = process.env.REACT_APP_CATEGORY_URL;
-  console.log("selectedAccount", selectedAccount);
+  //console.log("selectedAccount", selectedAccount);
   const [description, setDescription] = useState("");
   const [payInvoice, setIsPayInvoice] = useState(false);
   const [emailInvoice, setIsEmailInvoice] = useState(false);
@@ -78,8 +78,7 @@ const InvoiceDrawer = ({
    value: "Bank Debits", 
    label: "Bank Debits"
  });
-  const [selecteduser, setSelectedUser] = useState("");
-  const [userData, setUserData] = useState([]);
+ 
   const [invoiceTemplates, setInvoiceTemplates] = useState([]);
   const [selectInvoiceTemp, setSelectedInvoiceTemp] = useState("");
   const [startDate, setStartDate] = useState(dayjs());
@@ -390,13 +389,6 @@ const accountOptions = accountData.map((account) => ({
     fetchinvoicetempbyid(selectedOptions.value);
   };
 
-  // const handleServiceChange = (index, selectedOptions) => {
-  //   const newRows = [...rows];
-  //   newRows[index].productName = selectedOptions ? selectedOptions.label : "";
-  //   setRows(newRows);
-  //   setselectedService(selectedOptions);
-  //   fetchservicebyid(selectedOptions.value, index);
-  // };
  const handleServiceChange = (index, selectedOptions) => {
     const newRows = [...rows];
     newRows[index].productName = selectedOptions ? selectedOptions.label : "";
@@ -561,18 +553,18 @@ const accountOptions = accountData.map((account) => ({
       requestOptions
     )
       .then((response) => {
-        console.log("Response status:", response.status); // Debug log
+      //  console.log("Response status:", response.status); // Debug log
         return response.json();
       })
       .then((result) => {
-        console.log("API Result:", result); // Debug log
+        //console.log("API Result:", result); // Debug log
 
         // Check for `contacts` array
       if (Array.isArray(result.contacts) && result.contacts.length > 0) {
         const email = result.contacts[0]?.contact?.email;
 
         if (email) {
-          console.log("First Contact Email:", email);
+         // console.log("First Contact Email:", email);
           setFirstContactEmail(email);
         } else {
           console.error("First contact does not have an email.");
@@ -608,7 +600,7 @@ const accountOptions = accountData.map((account) => ({
 
   useEffect(() => {
     fetchServiceData();
-    fetchUserData();
+   // fetchUserData();
     fetchInvoiceTemplates();
   }, []);
 
@@ -655,21 +647,29 @@ const accountOptions = accountData.map((account) => ({
       .catch((error) => console.error(error));
   };
 const { logindata } = useContext(LoginContext);
- console.log("logindata", logindata);
-  const fetchUserData = async () => {
+//  console.log("logindata", logindata);
+ const [selecteduser, setSelectedUser] = useState("");
+  const [userData, setUserData] = useState([]);
+ const fetchUserData = async () => {
     try {
       const url = `${LOGIN_API}/common/users/roles?roles=TeamMember,Admin`;
       const response = await fetch(url);
       const data = await response.json();
       setUserData(data);
-        setDefaultTeamMember(data);
+       setDefaultTeamMember(data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
+ useEffect(() => {
+  if (isDrawerOpen) {
+    fetchUserData();      // Fetch only when drawer opens
+  }
+}, [isDrawerOpen]);        // Dependency
 
   // Function to set default team member based on logged-in user
 const setDefaultTeamMember = (users) => {
+  console.log('Setting default team member...');
   if (logindata && logindata.user && logindata.user.id && Array.isArray(users)) {
     // Find the user in the users array that matches the logged-in user ID
     const currentUser = users.find(user => user._id === logindata.user.id);
@@ -1494,20 +1494,20 @@ console.log("invoice raw",raw)
                     isClearable={true}
                   /> */}
                    <Autocomplete
-                                    options={useroptions}
-                                    sx={{ mt: 2, mb: 2, backgroundColor: "#fff" }}
-                                    size="small"
-                                    value={selecteduser}
-                                    onChange={handleuserChange}
-                                    isOptionEqualToValue={(option, value) =>
-                                      option.value === value.value
-                                    }
-                                    getOptionLabel={(option) => option.label || ""}
-                                    renderInput={(params) => (
-                                      <TextField {...params} placeholder="Team Member" />
-                                    )}
-                                    isClearable={true}
-                                  />
+                                                      options={useroptions}
+                                                      sx={{ mt: 2, mb: 2, backgroundColor: "#fff" }}
+                                                      size="small"
+                                                      value={selecteduser}
+                                                      onChange={handleuserChange}
+                                                      isOptionEqualToValue={(option, value) =>
+                                                        option.value === value.value
+                                                      }
+                                                      getOptionLabel={(option) => option.label || ""}
+                                                      renderInput={(params) => (
+                                                        <TextField {...params} placeholder="Team Member" />
+                                                      )}
+                                                      isClearable={true}
+                                                    />
                 </Box>
               </Grid>
             </Grid>

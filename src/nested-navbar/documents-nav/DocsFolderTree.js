@@ -355,7 +355,7 @@ const DocsFolderTree = () => {
     };
     const handleRequestApproval = async () => {
       if (!selectedItem) return;
-
+console.log("selected item for approval", selectedItem);
       try {
         const fileUrl = `https://snptaxes.com/uploads/accounts/${selectedItem.path}`;
 

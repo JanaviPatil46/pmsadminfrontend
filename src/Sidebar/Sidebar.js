@@ -491,7 +491,8 @@ function Sidebar() {
       } else {
         setIsDialogOpen(true);
       }
-    } else if (label === "Organizer") {
+    }
+     else if (label === "Organizer") {
       setIsOrganizerDialogOpen(true);
     }
   };

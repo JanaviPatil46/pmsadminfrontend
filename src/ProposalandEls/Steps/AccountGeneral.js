@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef,useContext } from "react";
 import {
   Box,
   TextField,
@@ -26,7 +26,8 @@ import {
 } from "@mui/material";
 import { InfoOutlined } from "@mui/icons-material";
 import { useParams } from "react-router-dom";
-
+import Cookies from "js-cookie";
+import { LoginContext } from "../../Sidebar/Context/Context";
 const GeneralStep = ({
   formData,
   updateFormData,
@@ -121,56 +122,112 @@ const GeneralStep = ({
     fetchTeamMembers();
   }, []);
 
-  // const fetchAccounts = async () => {
-  //   try {
-  //     const url =
-  //       "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true";
-  //     const response = await fetch(url);
-  //     const result = await response.json();
+  
+// const fetchAccounts = async () => {
+//   try {
+//     const storedUserRole = localStorage.getItem("userRole");
+//     const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
+//     const loginuserid = storedData?.teammember?.userid;
+//     const viewAllAccounts = storedData?.teammember?.viewallAccounts;
 
-  //     if (Array.isArray(result.accounts)) {
-  //       setAccounts(result.accounts);
-  //       console.log("All accounts:", result.accounts);
+//     let url = "";
 
-  //       // Auto-select account if data from useParams is available
-  //       console.log("Looking for account ID:", data);
-  //       const selectedAccountData = result.accounts.find(
-  //         (account) => account._id === data
-  //       );
-  //       console.log("Found account:", selectedAccountData);
+//     // === ROLE BASED ACCOUNT FETCH ===
+//     if (storedUserRole === "Admin") {
+//       url =
+//         "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true";
+//     } else {
+//       // Team Member
+//       url =
+//         viewAllAccounts === true
+//           ? "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true"
+//           : `https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=true`;
+//     }
 
-  //       if (selectedAccountData) {
-  //         const selectedAccount = {
-  //           label: selectedAccountData.accountName,
-  //           value: selectedAccountData._id,
-  //         };
+//     console.log("Fetching Accounts From:", url);
 
-  //         // ✅ wrap inside array
-  //         updateFormData("general", {
-  //           account: [selectedAccount],
-  //         });
+//     const response = await fetch(url);
+//     const result = await response.json();
 
-  //         if (stepErrors.account) {
-  //           setStepErrors((prev) => {
-  //             const newErrors = { ...prev };
-  //             delete newErrors.account;
-  //             return newErrors;
-  //           });
-  //         }
+//     // Handle both Admin & TeamMember API response formats
+//     const accountList = Array.isArray(result.accountlist)
+//       ? result.accountlist
+//       : Array.isArray(result.teamAccounts)
+//       ? result.teamAccounts
+//       : [];
 
-  //         console.log("Auto-selected account:", selectedAccount);
-  //       } else {
-  //         console.warn("No account found with ID:", data);
-  //       }
-  //     } else {
-  //       console.error("Account list is not an array", result.accounts);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching accounts:", error);
-  //   }
-  // };
+//     if (!Array.isArray(accountList)) {
+//       console.error("Account list is not an array:", accountList);
+//       return;
+//     }
+
+//     setAccounts(accountList);
+//     console.log("Fetched accounts:", accountList);
+
+//     // Auto-select account if useParams provides accountId
+//     console.log("Looking for account ID:", data);
+//     const selectedAccountData = accountList.find(
+//       (account) => account._id === data
+//     );
+
+//     console.log("Found matched account:", selectedAccountData);
+
+//     if (selectedAccountData) {
+//       const selectedAccount = {
+//         label: selectedAccountData.accountName,
+//         value: selectedAccountData._id,
+//       };
+
+//       updateFormData("general", {
+//         account: [selectedAccount], // wrap inside array
+//       });
+
+//       if (stepErrors.account) {
+//         setStepErrors((prev) => {
+//           const newErrors = { ...prev };
+//           delete newErrors.account;
+//           return newErrors;
+//         });
+//       }
+
+//       console.log("Auto-selected account:", selectedAccount);
+//     } else {
+//       console.warn("No account found with ID:", data);
+//     }
+//   } catch (error) {
+//     console.error("Error fetching accounts:", error);
+//   }
+// };
 const fetchAccounts = async () => {
   try {
+    // === 1. Check if account info is in cookies ===
+    const accountId = Cookies.get("accountId");
+    const accountName = Cookies.get("accountName");
+
+    if (accountId && accountName) {
+      // If cookies exist, set the account and skip fetching
+      const selectedAccount = {
+        label: accountName,
+        value: accountId,
+      };
+
+      updateFormData("general", {
+        account: [selectedAccount],
+      });
+
+      if (stepErrors.account) {
+        setStepErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors.account;
+          return newErrors;
+        });
+      }
+
+      console.log("Account set from cookies:", selectedAccount);
+      return; // skip rest of fetch logic
+    }
+
+    // === 2. Proceed with existing API fetch logic ===
     const storedUserRole = localStorage.getItem("userRole");
     const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
     const loginuserid = storedData?.teammember?.userid;
@@ -178,12 +235,10 @@ const fetchAccounts = async () => {
 
     let url = "";
 
-    // === ROLE BASED ACCOUNT FETCH ===
     if (storedUserRole === "Admin") {
       url =
         "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true";
     } else {
-      // Team Member
       url =
         viewAllAccounts === true
           ? "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true"
@@ -195,7 +250,6 @@ const fetchAccounts = async () => {
     const response = await fetch(url);
     const result = await response.json();
 
-    // Handle both Admin & TeamMember API response formats
     const accountList = Array.isArray(result.accountlist)
       ? result.accountlist
       : Array.isArray(result.teamAccounts)
@@ -210,13 +264,10 @@ const fetchAccounts = async () => {
     setAccounts(accountList);
     console.log("Fetched accounts:", accountList);
 
-    // Auto-select account if useParams provides accountId
-    console.log("Looking for account ID:", data);
+    // Auto-select account if useParams provides accountId (optional fallback)
     const selectedAccountData = accountList.find(
       (account) => account._id === data
     );
-
-    console.log("Found matched account:", selectedAccountData);
 
     if (selectedAccountData) {
       const selectedAccount = {
@@ -225,7 +276,7 @@ const fetchAccounts = async () => {
       };
 
       updateFormData("general", {
-        account: [selectedAccount], // wrap inside array
+        account: [selectedAccount],
       });
 
       if (stepErrors.account) {
@@ -244,7 +295,6 @@ const fetchAccounts = async () => {
     console.error("Error fetching accounts:", error);
   }
 };
-
   const fetchTemplates = async () => {
     try {
       setLoading(true);
@@ -289,6 +339,7 @@ const fetchAccounts = async () => {
       setLoading(false);
     }
   };
+    const { logindata } = useContext(LoginContext);
 
   // FIXED: Improved template data fetching and transformation
   const fetchTemplateData = async (templateId) => {
@@ -491,22 +542,36 @@ const fetchAccounts = async () => {
       clientNote: "",
     };
   }
-
+console.log("logindata",logindata);
   // Get selected users objects from stored IDs
-  const getSelectedUsers = () => {
-    if (
-      !formData.general.teamMembers ||
-      formData.general.teamMembers.length === 0
-    ) {
-      return [];
-    }
+  // const getSelectedUsers = () => {
+  //   if (
+  //     !formData.general.teamMembers ||
+  //     formData.general.teamMembers.length === 0
+  //   ) {
+  //     return [];
+  //   }
 
-    return formData.general.teamMembers.map((userId) => {
+  //   return formData.general.teamMembers.map((userId) => {
+  //     const user = internalOptions.find((opt) => opt.value === userId);
+  //     return user || { value: userId, label: `User ${userId}` };
+  //   });
+  // };
+ // Get selected users objects from stored IDs or default to logged-in user
+  const getSelectedUsers = () => {
+    let selectedIds = formData.general.teamMembers;
+
+    // If no teamMembers stored, default to logged-in user
+    // If no teamMembers stored, default to logged-in user
+  if (!selectedIds || selectedIds.length === 0) {
+    selectedIds = logindata?.user?.id ? [logindata.user.id] : [];
+  }
+
+    return selectedIds.map((userId) => {
       const user = internalOptions.find((opt) => opt.value === userId);
       return user || { value: userId, label: `User ${userId}` };
     });
   };
-
   // Handle team member selection
   const handleTeamMembersChange = (event, newSelectedUsers) => {
     const selectedValues = newSelectedUsers.map((user) => user.value);
@@ -809,7 +874,7 @@ const fetchAccounts = async () => {
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="Select Template (Optional)"
+                // label="Select Template (Optional)"
                 error={!!stepErrors.proposalTemp}
                 helperText={
                   stepErrors.proposalTemp ||

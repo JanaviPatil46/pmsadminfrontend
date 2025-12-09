@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect ,useContext} from "react";
 import {
   Box,
   Stepper,
@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import { ArrowBack, NavigateNext, NavigateBefore } from "@mui/icons-material";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-
+import { LoginContext } from "../../Sidebar/Context/Context";
 // Import your step components (make sure they're also converted to MUI)
 import GeneralStep from "../Steps/AccountGeneral";
 import IntroductionStep from "../Steps/IntroductionStep";
@@ -24,9 +24,11 @@ import TermsStep from "../Steps/TermsStep";
 import ServicesInvoicesStep from "../Steps/ServicesInvoicesStep";
 import PaymentStep from "../Steps/PaymentStep";
 import { toast } from "react-toastify";
+import Cookies from "js-cookie";
 
 const ProposalForm = () => {
   const { data } = useParams();
+
   console.log("accountid", data);
   const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -442,7 +444,8 @@ const ProposalForm = () => {
   };
 
   const handleBackToList = () => {
-    navigate(`/clients/accounts/accountsdash/proposals/${data}`);
+    const accountId = Cookies.get("accountId");
+    navigate(`/clients/accounts/accountsdash/proposals/${accountId}`);
   };
 
   const isLastStep = currentStep === availableSteps.length - 1;

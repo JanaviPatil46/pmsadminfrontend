@@ -558,7 +558,7 @@ if (handleDrawerClose) handleDrawerClose();
       </Stepper>
       <Box sx={{ mt: 4, p: 3, border: "1px solid #ddd", borderRadius: 2 }}>
         {activeStep === 0 && (
-          <AccountForm onContinue={() => setActiveStep(1)} />
+          <AccountForm onContinue={() => setActiveStep(1)} isEditing={isEditing}  />
         )}
         {activeStep === 1 && (
           <ContactForm
