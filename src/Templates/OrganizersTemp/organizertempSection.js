@@ -1,4 +1,4 @@
-import React, { useState, useEffect ,useRef} from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { HiOutlineDuplicate } from "react-icons/hi";
 import { RiDeleteBinLine } from "react-icons/ri";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
@@ -24,22 +24,20 @@ import "react-quill/dist/quill.snow.css"; // Quill Snow theme
 import "quill-emoji/dist/quill-emoji.css"; // Emoji styles
 import Quill from "quill";
 import "quill-emoji";
-import { useDrag, useDrop } from 'react-dnd';
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
+import { useDrag, useDrop } from "react-dnd";
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import { IoSettingsOutline } from "react-icons/io5";
 import { IoMdClose } from "react-icons/io";
 Quill.register("modules/emoji", require("quill-emoji"));
 
-
-
 const ItemTypes = {
-  QUESTION: 'question',
-  OPTION: 'option'
+  QUESTION: "question",
+  OPTION: "option",
 };
 
 const DraggableQuestion = ({ id, index, moveQuestion, children }) => {
   const ref = useRef(null);
-  
+
   const [{ isDragging }, drag] = useDrag({
     type: ItemTypes.QUESTION,
     item: { id, index },
@@ -58,7 +56,8 @@ const DraggableQuestion = ({ id, index, moveQuestion, children }) => {
       if (dragIndex === hoverIndex) return;
 
       const hoverBoundingRect = ref.current?.getBoundingClientRect();
-      const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+      const hoverMiddleY =
+        (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
       const clientOffset = monitor.getClientOffset();
       const hoverClientY = clientOffset.y - hoverBoundingRect.top;
 
@@ -77,17 +76,17 @@ const DraggableQuestion = ({ id, index, moveQuestion, children }) => {
       ref={ref}
       style={{
         opacity: isDragging ? 0.5 : 1,
-        cursor: 'move',
-        padding: '8px',
-        marginBottom: '8px',
-        backgroundColor: '#fff',
-        border: isDragging ? '2px dashed #1976d2' : '1px solid #ddd',
-        borderRadius: '4px',
-        display: 'flex',
+        cursor: "move",
+        padding: "8px",
+        marginBottom: "8px",
+        backgroundColor: "#fff",
+        border: isDragging ? "2px dashed #1976d2" : "1px solid #ddd",
+        borderRadius: "4px",
+        display: "flex",
         // alignItems: 'center'
       }}
     >
-      <DragIndicatorIcon style={{ cursor: 'move', marginRight: '8px' }} />
+      <DragIndicatorIcon style={{ cursor: "move", marginRight: "8px" }} />
       {children}
     </div>
   );
@@ -95,7 +94,7 @@ const DraggableQuestion = ({ id, index, moveQuestion, children }) => {
 
 const DraggableOption = ({ id, index, moveOption, children, elementId }) => {
   const ref = useRef(null);
-  
+
   const [{ isDragging }, drag] = useDrag({
     type: ItemTypes.OPTION,
     item: { id, index, elementId },
@@ -109,14 +108,15 @@ const DraggableOption = ({ id, index, moveOption, children, elementId }) => {
     hover(item, monitor) {
       if (!ref.current) return;
       if (item.elementId !== elementId) return;
-      
+
       const dragIndex = item.index;
       const hoverIndex = index;
 
       if (dragIndex === hoverIndex) return;
 
       const hoverBoundingRect = ref.current?.getBoundingClientRect();
-      const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+      const hoverMiddleY =
+        (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
       const clientOffset = monitor.getClientOffset();
       const hoverClientY = clientOffset.y - hoverBoundingRect.top;
 
@@ -135,19 +135,17 @@ const DraggableOption = ({ id, index, moveOption, children, elementId }) => {
       ref={ref}
       style={{
         opacity: isDragging ? 0.5 : 1,
-        cursor: 'move',
-        display: 'flex',
-        alignItems: 'center',
-        marginBottom: '8px',
+        cursor: "move",
+        display: "flex",
+        alignItems: "center",
+        marginBottom: "8px",
       }}
     >
-      <DragIndicatorIcon style={{ cursor: 'move', marginRight: '8px' }} />
+      <DragIndicatorIcon style={{ cursor: "move", marginRight: "8px" }} />
       {children}
     </div>
   );
 };
-
-
 
 const Section = ({
   sections,
@@ -183,31 +181,31 @@ const Section = ({
   ]);
   const [selectedElement, setSelectedElement] = useState(null);
   const [sectionConditionBadge, setSectionConditionBadge] = useState(false);
- const moveQuestion = (dragIndex, hoverIndex) => {
+  const moveQuestion = (dragIndex, hoverIndex) => {
     const draggedItem = formElements[dragIndex];
     const newFormElements = [...formElements];
-    
+
     newFormElements.splice(dragIndex, 1);
     newFormElements.splice(hoverIndex, 0, draggedItem);
-    
+
     setFormElements(newFormElements);
     onUpdate(section.id, text, newFormElements);
   };
 
   const moveOption = (elementId, dragIndex, hoverIndex) => {
-    const updatedFormElements = formElements.map(element => {
+    const updatedFormElements = formElements.map((element) => {
       if (element.id === elementId && element.options) {
         const draggedOption = element.options[dragIndex];
         const newOptions = [...element.options];
-        
+
         newOptions.splice(dragIndex, 1);
         newOptions.splice(hoverIndex, 0, draggedOption);
-        
+
         return { ...element, options: newOptions };
       }
       return element;
     });
-    
+
     setFormElements(updatedFormElements);
     onUpdate(section.id, text, updatedFormElements);
   };
@@ -220,7 +218,7 @@ const Section = ({
       buttonName: repeateButton ? repeatButtonName : "", // You can store the text input value instead of hardcoding it
       conditional: conditionButton,
       mode: sectionMode,
-      
+
       conditions: conditionButton
         ? sectionQuestionAnswers.map((qa, index) => ({
             question: selectedSectionQuestions[index]?.text || "",
@@ -228,19 +226,17 @@ const Section = ({
             answer: selectedSectionAnswers[index] || "",
             optionvalue: false,
           }))
-          
         : [],
 
-        
       // conditions: conditionButton ? questionAnswers : [], // assuming questionAnswers is an array of {question, answer} objects
     };
-    console.log("bnvfhgdsfhds section settings",sectionsettings)
+    console.log("bnvfhgdsfhds section settings", sectionsettings);
 
     if (onSaveSectionData) {
       onSaveSectionData(sectionsettings);
       console.log("updated Section Settings:", sectionsettings);
       setSectionConditionBadge(sectionsettings.conditional);
-      console.log(sectionsettings.conditional)
+      console.log(sectionsettings.conditional);
       toggleDrawer(false);
       setRepeateButton(false);
       setRepeatButtonName("");
@@ -264,7 +260,6 @@ const Section = ({
     setQuestionAnswers([]);
   };
   const [questionsAnswersMap, setQuestionsAnswersMap] = useState({});
-  
 
   const handleSave = () => {
     if (selectedElement) {
@@ -273,8 +268,8 @@ const Section = ({
         prefilled: prefilledButton,
         conditional: queConditionButton,
         mode: mode,
-      
-         conditions: queConditionButton
+
+        conditions: queConditionButton
           ? questionAnswers.map((qa, index) => ({
               question: selectedQuestions[index]?.text || "",
               questionId: selectedQuestions[index]?.id || null,
@@ -328,17 +323,15 @@ const Section = ({
       setDescriptionText(questionsectionsettings?.description || "");
       setMode(questionsectionsettings?.mode || "Any");
 
-    
-          const conditions = questionsectionsettings?.conditions || [];
-      const questions = conditions.map(cond => 
-        formElements.find(el => el.id === cond.questionId) || null
+      const conditions = questionsectionsettings?.conditions || [];
+      const questions = conditions.map(
+        (cond) => formElements.find((el) => el.id === cond.questionId) || null
       );
-      const answers = conditions.map(cond => cond.answer || null);
-      
+      const answers = conditions.map((cond) => cond.answer || null);
+
       setQuestionAnswers(conditions);
       setSelectedQuestions(questions);
       setSelectedAnswers(answers);
-
     }
   }, [selectedElement]);
 
@@ -352,7 +345,10 @@ const Section = ({
     setPrefilledButton(checked);
   };
   const handleAddQuestionAnswer = () => {
-    setQuestionAnswers([...questionAnswers, { question: "", questionId: null, answer: "", optionvalue: false }]);
+    setQuestionAnswers([
+      ...questionAnswers,
+      { question: "", questionId: null, answer: "", optionvalue: false },
+    ]);
   };
 
   const handleAddSectionQuestionAnswer = () => {
@@ -387,7 +383,6 @@ const Section = ({
 
   const [selectedSectionData, setSelectedSectionData] = useState(null);
 
-  
   //  Update the badge state when updatedSection changes
   useEffect(() => {
     setSectionConditionBadge(section?.sectionsettings?.conditional);
@@ -408,18 +403,22 @@ const Section = ({
       setConditionButton(updatedSection.sectionsettings.conditional || false);
       // setSectionConditionBadge(updatedSection.sectionsettings.conditional)
       setSectionMode(updatedSection.sectionsettings.mode || "Any");
-      console.log("updatedSection.sectionsettings",updatedSection.sectionsettings)
-        const conditions = updatedSection.sectionsettings.conditions || [];
+      console.log(
+        "updatedSection.sectionsettings",
+        updatedSection.sectionsettings
+      );
+      const conditions = updatedSection.sectionsettings.conditions || [];
       setSectionQuestionAnswers(conditions);
 
-      const questions = conditions.map(cond => 
-        getAllQuestions().find(q => q.id === cond.questionId) || null
+      const questions = conditions.map(
+        (cond) =>
+          getAllQuestions().find((q) => q.id === cond.questionId) || null
       );
-      const answers = conditions.map(cond => cond.answer || null);
+      const answers = conditions.map((cond) => cond.answer || null);
 
       setSelectedSectionQuestions(questions);
       setSelectedSectionAnswers(answers);
-      console.log("answers",answers)
+      console.log("answers", answers);
     }
   };
 
@@ -427,16 +426,38 @@ const Section = ({
     setDrawerOpen(open);
   };
   const getAllQuestions = () => {
-    return sections.flatMap(section => 
-      section.formElements
-        .filter(element => 
-          element.type === "Radio Buttons" || 
-          element.type === "Checkboxes" || 
+    return sections.flatMap((section) =>
+      section.formElements.filter(
+        (element) =>
+          element.type === "Radio Buttons" ||
+          element.type === "Checkboxes" ||
           element.type === "Dropdown"
-        )
+      )
     );
   };
-
+const getAllQuestionsGrouped = () => {
+  const allQuestions = [];
+  
+  sections.forEach((section) => {
+    const sectionQuestions = section.formElements.filter(
+      (element) =>
+        element.type === "Radio Buttons" ||
+        element.type === "Checkboxes" ||
+        element.type === "Dropdown"
+    );
+    
+    // Add section property to each question
+    sectionQuestions.forEach((question) => {
+      allQuestions.push({
+        ...question,
+        sectionName: section.text || `Section ${section.id}`,
+        sectionId: section.id
+      });
+    });
+  });
+  
+  return allQuestions;
+};
   const handleSettingsClick = (elementId) => {
     const updatedElement = formElements.find(
       (element) => element.id === elementId
@@ -485,7 +506,6 @@ const Section = ({
         conditional: false, // Set conditional to true
         mode: "",
         conditions: [
-          
           {
             question: "",
             questionId: null,
@@ -636,509 +656,7 @@ const Section = ({
     "emoji",
   ];
 
-  // const renderOptions = (element, type = "text") => {
-  //   return (
-  //     <Box>
-  //       {element.options &&
-  //         element.options.map((option) => (
-  //           <Box
-  //             key={option.id}
-  //             sx={{
-  //               display: "flex",
-  //               alignItems: "center",
-  //               marginBottom: "8px",
-  //             }}
-  //           >
-  //             {type === "radio" ? (
-  //               <Input
-  //                 type="radio"
-  //                 name={`radio-${element.id}`}
-  //                 sx={{ marginRight: "8px" }}
-  //               />
-  //             ) : type === "checkbox" ? (
-  //               <Input
-  //                 type="checkbox"
-  //                 name={`checkbox-${element.id}`}
-  //                 sx={{ marginRight: "8px" }}
-  //               />
-  //             ) : type === "Yes/No" ? (
-  //               <Input
-  //                 type="radio"
-  //                 name={`radio-${element.id}`}
-  //                 sx={{ marginRight: "8px" }}
-  //               />
-  //             ) : null}
-
-  //             <TextField
-  //               variant="outlined"
-  //               placeholder="Option"
-  //               value={option.text}
-  //               size="small"
-  //               margin="normal"
-  //               fullWidth
-  //               className="organizer-input-label"
-  //               onChange={(e) =>
-  //                 handleOptionChange(element.id, option.id, e.target.value)
-  //               }
-  //             />
-  //             <IconButton
-  //               onClick={() => handleDeleteOption(element.id, option.id)}
-  //             >
-  //               <RiDeleteBinLine />
-  //             </IconButton>
-  //           </Box>
-  //         ))}
-  //       <Button
-  //         variant="contained"
-  //         onClick={() => handleAddOption(element.id)}
-  //         sx={{
-  //           backgroundColor: "var(--color-save-btn)", // Normal background
-
-  //           "&:hover": {
-  //             backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-  //           },
-  //           borderRadius: "15px",
-  //         }}
-  //       >
-  //         Add Option
-  //       </Button>
-  //     </Box>
-  //   );
-  // };
-
-  // const renderFormElement = (element) => {
-  //   switch (element.type) {
-  //     case "Free Entry":
-  //       return (
-  //         <>
-  //           <Typography>Free Entry</Typography>
-  //           <Box
-  //             key={element.id}
-  //             sx={{
-  //               display: "flex",
-  //               alignItems: "center",
-  //               marginBottom: "8px",
-  //             }}
-  //           >
-  //             <TextField
-  //               variant="outlined"
-  //               placeholder="Free Entry"
-  //               value={element.text}
-  //               size="small"
-  //               margin="normal"
-  //               fullWidth
-  //               sx={{ backgroundColor: "#fff" }}
-  //               onChange={(e) =>
-  //                 handleElementTextChange(element.id, e.target.value)
-  //               }
-  //             />
-  //             {element.questionsectionsettings?.conditional && (
-  //               <Box
-  //                 style={{
-  //                   backgroundColor: "green",
-  //                   color: "white",
-  //                   borderRadius: "10px",
-  //                   padding: "4px 8px",
-  //                   fontSize: "12px",
-  //                   marginLeft: "8px",
-  //                 }}
-  //               >
-  //                 Conditional
-  //               </Box>
-  //             )}
-  //             <IconButton onClick={() => handleSettingsClick(element.id)}>
-  //               <IoSettingsOutline />
-  //             </IconButton>
-
-  //             <IconButton onClick={() => handleDeleteFormElement(element.id)}>
-  //               <RiDeleteBinLine />
-  //             </IconButton>
-  //           </Box>
-  //         </>
-  //       );
-  //     case "Email":
-  //       return (
-  //         <>
-  //           <Typography>Email</Typography>
-  //           <Box
-  //             key={element.id}
-  //             sx={{
-  //               display: "flex",
-  //               alignItems: "center",
-  //               marginBottom: "8px",
-  //             }}
-  //           >
-  //             <TextField
-  //               variant="outlined"
-  //               placeholder="Email"
-  //               value={element.text}
-  //               size="small"
-  //               margin="normal"
-  //               fullWidth
-  //               onChange={(e) =>
-  //                 handleElementTextChange(element.id, e.target.value)
-  //               }
-  //               sx={{ backgroundColor: "#fff" }}
-  //             />
-  //             <IconButton onClick={() => handleSettingsClick(element.id)}>
-  //               <IoSettingsOutline />
-  //             </IconButton>
-  //             {element.questionsectionsettings?.conditional && (
-  //               <span
-  //                 style={{
-  //                   backgroundColor: "green",
-  //                   color: "white",
-  //                   borderRadius: "10px",
-  //                   padding: "4px 8px",
-  //                   fontSize: "12px",
-  //                   marginLeft: "8px",
-  //                 }}
-  //               >
-  //                 Conditional
-  //               </span>
-  //             )}
-  //             <IconButton onClick={() => handleDeleteFormElement(element.id)}>
-  //               <RiDeleteBinLine />
-  //             </IconButton>
-  //           </Box>
-  //         </>
-  //       );
-  //     case "Number":
-  //       return (
-  //         <>
-  //           <Typography>Number</Typography>
-  //           <Box
-  //             key={element.id}
-  //             sx={{
-  //               display: "flex",
-  //               alignItems: "center",
-  //               marginBottom: "8px",
-  //             }}
-  //           >
-  //             <TextField
-  //               variant="outlined"
-  //               placeholder="Number"
-  //               value={element.text}
-  //               size="small"
-  //               margin="normal"
-  //               fullWidth
-  //               onChange={(e) =>
-  //                 handleElementTextChange(element.id, e.target.value)
-  //               }
-  //               sx={{ backgroundColor: "#fff" }}
-  //             />
-  //             <IconButton onClick={() => handleSettingsClick(element.id)}>
-  //               <IoSettingsOutline />
-  //             </IconButton>
-  //             {element.questionsectionsettings?.conditional && (
-  //               <span
-  //                 style={{
-  //                   backgroundColor: "green",
-  //                   color: "white",
-  //                   borderRadius: "10px",
-  //                   padding: "4px 8px",
-  //                   fontSize: "12px",
-  //                   marginLeft: "8px",
-  //                 }}
-  //               >
-  //                 Conditional
-  //               </span>
-  //             )}
-  //             <IconButton onClick={() => handleDeleteFormElement(element.id)}>
-  //               <RiDeleteBinLine />
-  //             </IconButton>
-  //           </Box>
-  //         </>
-  //       );
-  //     case "Date":
-  //       return (
-  //         <>
-  //           <Typography>Date</Typography>
-  //           <Box
-  //             key={element.id}
-  //             sx={{
-  //               display: "flex",
-  //               alignItems: "center",
-  //               marginBottom: "8px",
-  //             }}
-  //           >
-  //             <TextField
-  //               variant="outlined"
-  //               placeholder="Date"
-  //               value={element.text}
-  //               size="small"
-  //               margin="normal"
-  //               fullWidth
-  //               onChange={(e) =>
-  //                 handleElementTextChange(element.id, e.target.value)
-  //               }
-  //               sx={{ backgroundColor: "#fff" }}
-  //             />
-  //             <IconButton onClick={() => handleSettingsClick(element.id)}>
-  //               <IoSettingsOutline />
-  //             </IconButton>
-  //             {element.questionsectionsettings?.conditional && (
-  //               <span
-  //                 style={{
-  //                   backgroundColor: "green",
-  //                   color: "white",
-  //                   borderRadius: "10px",
-  //                   padding: "4px 8px",
-  //                   fontSize: "12px",
-  //                   marginLeft: "8px",
-  //                 }}
-  //               >
-  //                 Conditional
-  //               </span>
-  //             )}
-  //             <IconButton onClick={() => handleDeleteFormElement(element.id)}>
-  //               <RiDeleteBinLine />
-  //             </IconButton>
-  //           </Box>
-  //         </>
-  //       );
-  //     case "Radio Buttons":
-  //       return (
-  //         <Box key={element.id} sx={{ marginBottom: "8px" }}>
-  //           <Typography>Radio Button:</Typography>
-  //           <Box sx={{ display: "flex", alignItems: "center" }}>
-  //             {/* <Input type="radio" name={`radio-${element.id}`} sx={{ marginRight: "4px" }} /> */}
-  //             <TextField
-  //               variant="outlined"
-  //               placeholder="Radio Buttons"
-  //               value={element.text}
-  //               size="small"
-  //               margin="normal"
-  //               fullWidth
-  //               onChange={(e) =>
-  //                 handleElementTextChange(element.id, e.target.value)
-  //               }
-  //               sx={{ backgroundColor: "#fff" }}
-  //             />
-  //             <IconButton onClick={() => handleSettingsClick(element.id)}>
-  //               <IoSettingsOutline />
-  //             </IconButton>
-  //             {element.questionsectionsettings?.conditional && (
-  //               <span
-  //                 style={{
-  //                   backgroundColor: "green",
-  //                   color: "white",
-  //                   borderRadius: "10px",
-  //                   padding: "4px 8px",
-  //                   fontSize: "12px",
-  //                   marginLeft: "8px",
-  //                 }}
-  //               >
-  //                 Conditional
-  //               </span>
-  //             )}
-  //             <IconButton onClick={() => handleDeleteFormElement(element.id)}>
-  //               <RiDeleteBinLine />
-  //             </IconButton>
-  //           </Box>
-  //           {renderOptions(element, "radio")}
-  //         </Box>
-  //       );
-  //     case "Checkboxes":
-  //       return (
-  //         <Box key={element.id} sx={{ marginBottom: "8px" }}>
-  //           <Typography>Checkbox:</Typography>
-  //           <Box sx={{ display: "flex", alignItems: "center" }}>
-  //             {/* <Input type="checkbox" name={`checkbox-${element.id}`} sx={{ marginRight: "4px" }} /> */}
-  //             <TextField
-  //               variant="outlined"
-  //               placeholder="Checkboxes"
-  //               value={element.text}
-  //               size="small"
-  //               margin="normal"
-  //               fullWidth
-  //               onChange={(e) =>
-  //                 handleCheckboxTextChange(element.id, e.target.value)
-  //               }
-  //               sx={{ backgroundColor: "#fff" }}
-  //             />
-  //             <IconButton onClick={() => handleSettingsClick(element.id)}>
-  //               <IoSettingsOutline />
-  //             </IconButton>
-  //             {element.questionsectionsettings?.conditional && (
-  //               <span
-  //                 style={{
-  //                   backgroundColor: "green",
-  //                   color: "white",
-  //                   borderRadius: "10px",
-  //                   padding: "4px 8px",
-  //                   fontSize: "12px",
-  //                   marginLeft: "8px",
-  //                 }}
-  //               >
-  //                 Conditional
-  //               </span>
-  //             )}
-  //             <IconButton onClick={() => handleDeleteFormElement(element.id)}>
-  //               <RiDeleteBinLine />
-  //             </IconButton>
-  //           </Box>
-  //           {renderOptions(element, "checkbox")}
-  //         </Box>
-  //       );
-  //     case "Dropdown":
-  //       return (
-  //         <Box key={element.id} sx={{ marginBottom: "8px" }}>
-  //           <Typography>Dropdown:</Typography>
-  //           <Box sx={{ display: "flex", alignItems: "center" }}>
-  //             <TextField
-  //               variant="outlined"
-  //               placeholder="Dropdown"
-  //               value={element.text}
-  //               size="small"
-  //               margin="normal"
-  //               fullWidth
-  //               onChange={(e) =>
-  //                 handleCheckboxTextChange(element.id, e.target.value)
-  //               }
-  //               sx={{ backgroundColor: "#fff" }}
-  //             />
-  //             <IconButton onClick={() => handleSettingsClick(element.id)}>
-  //               <IoSettingsOutline />
-  //             </IconButton>
-  //             {element.questionsectionsettings?.conditional && (
-  //               <span
-  //                 style={{
-  //                   backgroundColor: "green",
-  //                   color: "white",
-  //                   borderRadius: "10px",
-  //                   padding: "4px 8px",
-  //                   fontSize: "12px",
-  //                   marginLeft: "8px",
-  //                 }}
-  //               >
-  //                 Conditional
-  //               </span>
-  //             )}
-  //             <IconButton onClick={() => handleDeleteFormElement(element.id)}>
-  //               <RiDeleteBinLine />
-  //             </IconButton>
-  //           </Box>
-  //           {renderOptions(element)}
-  //         </Box>
-  //       );
-
-  //     case "Yes/No":
-  //       return (
-  //         <Box key={element.id} sx={{ marginBottom: "8px" }}>
-  //           <Typography>Yes/No:</Typography>
-  //           <Box sx={{ display: "flex", alignItems: "center" }}>
-  //             <TextField
-  //               variant="outlined"
-  //               placeholder="Yes/No"
-  //               value={element.text}
-  //               size="small"
-  //               margin="normal"
-  //               fullWidth
-  //               onChange={(e) =>
-  //                 handleElementTextChange(element.id, e.target.value)
-  //               }
-  //               sx={{ backgroundColor: "#fff" }}
-  //             />
-  //             <IconButton onClick={() => handleSettingsClick(element.id)}>
-  //               <IoSettingsOutline />
-  //             </IconButton>
-  //             {element.questionsectionsettings?.conditional && (
-  //               <span
-  //                 style={{
-  //                   backgroundColor: "green",
-  //                   color: "white",
-  //                   borderRadius: "10px",
-  //                   padding: "4px 8px",
-  //                   fontSize: "12px",
-  //                   marginLeft: "8px",
-  //                 }}
-  //               >
-  //                 Conditional
-  //               </span>
-  //             )}
-  //             <IconButton onClick={() => handleDeleteFormElement(element.id)}>
-  //               <RiDeleteBinLine />
-  //             </IconButton>
-  //           </Box>
-  //           {renderOptions(element, "Yes/No")}
-  //         </Box>
-  //       );
-
-  //     case "File Upload":
-  //       return (
-  //         <Box key={element.id}>
-  //           <Typography>File Upload:</Typography>
-  //           <Box sx={{ display: "flex", alignItems: "center" }}>
-  //             <TextField
-  //               variant="outlined"
-  //               placeholder="File Upload"
-  //               value={element.text}
-  //               size="small"
-  //               margin="normal"
-  //               fullWidth
-  //               onChange={(e) =>
-  //                 handleElementTextChange(element.id, e.target.value)
-  //               }
-  //               sx={{ backgroundColor: "#fff" }}
-  //             />
-  //             <IconButton onClick={() => handleSettingsClick(element.id)}>
-  //               <IoSettingsOutline />
-  //             </IconButton>
-  //             {element.questionsectionsettings?.conditional && (
-  //               <span
-  //                 style={{
-  //                   backgroundColor: "green",
-  //                   color: "white",
-  //                   borderRadius: "10px",
-  //                   padding: "4px 8px",
-  //                   fontSize: "12px",
-  //                   marginLeft: "8px",
-  //                 }}
-  //               >
-  //                 Conditional
-  //               </span>
-  //             )}
-  //             <IconButton onClick={() => handleDeleteFormElement(element.id)}>
-  //               <RiDeleteBinLine />
-  //             </IconButton>
-  //           </Box>
-  //           <Button
-  //             component="label"
-  //             role={undefined}
-  //             variant="outlined"
-  //             disabled
-  //             tabIndex={-1}
-  //             startIcon={<CloudUploadIcon />}
-  //           >
-  //             Upload files
-  //           </Button>
-  //         </Box>
-  //       );
-  //     case "Text Editor":
-  //       return (
-  //         <Box
-  //           key={element.id}
-  //           sx={{ marginTop: "16px", display: "flex", alignItems: "center" }}
-  //         >
-  //           <ReactQuill
-  //             theme="snow"
-  //             value={element.text}
-  //             modules={modules} // Set the custom modules
-  //             formats={formats} // Set the allowed formats
-  //             onChange={(newText) => handleQuillChange(element.id, newText)}
-  //           />
-
-  //           <IconButton onClick={() => handleDeleteFormElement(element.id)}>
-  //             <RiDeleteBinLine />
-  //           </IconButton>
-  //         </Box>
-  //       );
-  //     default:
-  //       return null;
-  //   }
-  // };
-const renderOptions = (element, type = "text") => {
+  const renderOptions = (element, type = "text") => {
     return (
       <Box>
         {element.options &&
@@ -1213,7 +731,7 @@ const renderOptions = (element, type = "text") => {
         display: "flex",
         alignItems: "center",
         marginBottom: "8px",
-      }
+      },
     };
 
     const commonTextFieldProps = {
@@ -1223,7 +741,7 @@ const renderOptions = (element, type = "text") => {
       margin: "normal",
       fullWidth: true,
       sx: { backgroundColor: "#fff" },
-      onChange: (e) => handleElementTextChange(element.id, e.target.value)
+      onChange: (e) => handleElementTextChange(element.id, e.target.value),
     };
 
     const conditionalBadge = element.questionsectionsettings?.conditional && (
@@ -1241,11 +759,11 @@ const renderOptions = (element, type = "text") => {
       </Box>
     );
 
-   const requiredQuestion = element.questionsectionsettings?.required && (
-  <Box component="span" sx={{ color: "red", ml: 0.5 }}>
-    *
-  </Box>
-);
+    const requiredQuestion = element.questionsectionsettings?.required && (
+      <Box component="span" sx={{ color: "red", ml: 0.5 }}>
+        *
+      </Box>
+    );
 
     const settingsButton = (
       <IconButton onClick={() => handleSettingsClick(element.id)}>
@@ -1263,18 +781,15 @@ const renderOptions = (element, type = "text") => {
       case "Free Entry":
         return (
           <>
-           <Box sx={{ marginBottom: "8px" ,width:'100%'}}>
-            <Typography>Free Entry</Typography>
-            <Box {...commonElementProps}>
-              <TextField
-                {...commonTextFieldProps}
-                placeholder="Free Entry"
-              />
-              {conditionalBadge}
-              {requiredQuestion}
-              {settingsButton}
-              {deleteButton}
-            </Box>
+            <Box sx={{ marginBottom: "8px", width: "100%" }}>
+              <Typography>Free Entry</Typography>
+              <Box {...commonElementProps}>
+                <TextField {...commonTextFieldProps} placeholder="Free Entry" />
+                {conditionalBadge}
+                {requiredQuestion}
+                {settingsButton}
+                {deleteButton}
+              </Box>
             </Box>
           </>
         );
@@ -1282,18 +797,15 @@ const renderOptions = (element, type = "text") => {
       case "Email":
         return (
           <>
-           <Box sx={{ marginBottom: "8px" ,width:'100%'}}>
-            <Typography>Email</Typography>
-            <Box {...commonElementProps}>
-              <TextField
-                {...commonTextFieldProps}
-                placeholder="Email"
-              />
-              {conditionalBadge}
-               {requiredQuestion}
-              {settingsButton}
-              {deleteButton}
-            </Box>
+            <Box sx={{ marginBottom: "8px", width: "100%" }}>
+              <Typography>Email</Typography>
+              <Box {...commonElementProps}>
+                <TextField {...commonTextFieldProps} placeholder="Email" />
+                {conditionalBadge}
+                {requiredQuestion}
+                {settingsButton}
+                {deleteButton}
+              </Box>
             </Box>
           </>
         );
@@ -1301,18 +813,15 @@ const renderOptions = (element, type = "text") => {
       case "Number":
         return (
           <>
-           <Box sx={{ marginBottom: "8px" ,width:'100%'}}>
-            <Typography>Number</Typography>
-            <Box {...commonElementProps}>
-              <TextField
-                {...commonTextFieldProps}
-                placeholder="Number"
-              />
-              {conditionalBadge}
-               {requiredQuestion}
-              {settingsButton}
-              {deleteButton}
-            </Box>
+            <Box sx={{ marginBottom: "8px", width: "100%" }}>
+              <Typography>Number</Typography>
+              <Box {...commonElementProps}>
+                <TextField {...commonTextFieldProps} placeholder="Number" />
+                {conditionalBadge}
+                {requiredQuestion}
+                {settingsButton}
+                {deleteButton}
+              </Box>
             </Box>
           </>
         );
@@ -1320,25 +829,22 @@ const renderOptions = (element, type = "text") => {
       case "Date":
         return (
           <>
-          <Box sx={{ marginBottom: "8px" ,width:'100%'}}>
-            <Typography>Date</Typography>
-            <Box {...commonElementProps}>
-              <TextField
-                {...commonTextFieldProps}
-                placeholder="Date"
-              />
-              {conditionalBadge}
-               {requiredQuestion}
-              {settingsButton}
-              {deleteButton}
-            </Box>
+            <Box sx={{ marginBottom: "8px", width: "100%" }}>
+              <Typography>Date</Typography>
+              <Box {...commonElementProps}>
+                <TextField {...commonTextFieldProps} placeholder="Date" />
+                {conditionalBadge}
+                {requiredQuestion}
+                {settingsButton}
+                {deleteButton}
+              </Box>
             </Box>
           </>
         );
 
       case "Radio Buttons":
         return (
-         <Box sx={{ marginBottom: "8px" ,width:'100%'}}>
+          <Box sx={{ marginBottom: "8px", width: "100%" }}>
             <Typography>Radio Button:</Typography>
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <TextField
@@ -1346,7 +852,7 @@ const renderOptions = (element, type = "text") => {
                 placeholder="Radio Buttons"
               />
               {conditionalBadge}
-               {requiredQuestion}
+              {requiredQuestion}
               {settingsButton}
               {deleteButton}
             </Box>
@@ -1356,17 +862,19 @@ const renderOptions = (element, type = "text") => {
 
       case "Checkboxes":
         return (
-          <Box sx={{ marginBottom: "8px" ,width:'100%'}}>
+          <Box sx={{ marginBottom: "8px", width: "100%" }}>
             <Typography>Checkbox:</Typography>
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <TextField
-              fullWidth
+                fullWidth
                 {...commonTextFieldProps}
                 placeholder="Checkboxes"
-                onChange={(e) => handleCheckboxTextChange(element.id, e.target.value)}
+                onChange={(e) =>
+                  handleCheckboxTextChange(element.id, e.target.value)
+                }
               />
               {conditionalBadge}
-               {requiredQuestion}
+              {requiredQuestion}
               {settingsButton}
               {deleteButton}
             </Box>
@@ -1376,16 +884,18 @@ const renderOptions = (element, type = "text") => {
 
       case "Dropdown":
         return (
-          <Box sx={{ marginBottom: "8px" ,width:'100%'}}>
+          <Box sx={{ marginBottom: "8px", width: "100%" }}>
             <Typography>Dropdown:</Typography>
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <TextField
                 {...commonTextFieldProps}
                 placeholder="Dropdown"
-                onChange={(e) => handleCheckboxTextChange(element.id, e.target.value)}
+                onChange={(e) =>
+                  handleCheckboxTextChange(element.id, e.target.value)
+                }
               />
               {conditionalBadge}
-               {requiredQuestion}
+              {requiredQuestion}
               {settingsButton}
               {deleteButton}
             </Box>
@@ -1395,15 +905,12 @@ const renderOptions = (element, type = "text") => {
 
       case "Yes/No":
         return (
-         <Box sx={{ marginBottom: "8px" ,width:'100%'}}>
+          <Box sx={{ marginBottom: "8px", width: "100%" }}>
             <Typography>Yes/No:</Typography>
             <Box sx={{ display: "flex", alignItems: "center" }}>
-              <TextField
-                {...commonTextFieldProps}
-                placeholder="Yes/No"
-              />
+              <TextField {...commonTextFieldProps} placeholder="Yes/No" />
               {conditionalBadge}
-               {requiredQuestion}
+              {requiredQuestion}
               {settingsButton}
               {deleteButton}
             </Box>
@@ -1413,16 +920,12 @@ const renderOptions = (element, type = "text") => {
 
       case "File Upload":
         return (
-           <Box sx={{ marginBottom: "8px" ,width:'100%'}}>
-            
+          <Box sx={{ marginBottom: "8px", width: "100%" }}>
             <Typography>File Upload:</Typography>
             <Box sx={{ display: "flex", alignItems: "center" }}>
-              <TextField
-                {...commonTextFieldProps}
-                placeholder="File Upload"
-              />
+              <TextField {...commonTextFieldProps} placeholder="File Upload" />
               {conditionalBadge}
-               {requiredQuestion}
+              {requiredQuestion}
               {settingsButton}
               {deleteButton}
             </Box>
@@ -1460,22 +963,19 @@ const renderOptions = (element, type = "text") => {
     }
   };
   const getRadioButtonOptions = () => {
-    return sections.flatMap(
-      (section) =>
-        section.formElements
-          // .filter(element => element.type === 'Radio Buttons')
-          .filter(
-            (element) =>
-              element.type === "Radio Buttons" ||
-              element.type === "Checkboxes" ||
-              element.type === "Dropdown"
-          )
-          .map((element) => element.text)
-      
+    return sections.flatMap((section) =>
+      section.formElements
+        // .filter(element => element.type === 'Radio Buttons')
+        .filter(
+          (element) =>
+            element.type === "Radio Buttons" ||
+            element.type === "Checkboxes" ||
+            element.type === "Dropdown"
+        )
+        .map((element) => element.text)
     );
   };
 
-  
   const [selectedQuestions, setSelectedQuestions] = useState([]);
   const [selectedAnswers, setSelectedAnswers] = useState(
     Array(questionAnswers.length).fill(null)
@@ -1488,16 +988,15 @@ const renderOptions = (element, type = "text") => {
     Array(sectionQuestionAnswers.length).fill(null)
   );
 
-  
-   const getAnswerOptions = (questionElement) => {
+  const getAnswerOptions = (questionElement) => {
     if (!questionElement) return [];
-    return questionElement.options?.map(option => option.text) || [];
+    return questionElement.options?.map((option) => option.text) || [];
   };
-  
-const handleQuestionSelect = (value, index) => {
-    const allQuestions = getAllQuestions();
-    const selectedQuestion = allQuestions.find(q => q.id === value?.id);
-    
+
+  const handleQuestionSelect = (value, index) => {
+    const allQuestions = getAllQuestionsGrouped();
+    const selectedQuestion = allQuestions.find((q) => q.id === value?.id);
+
     const updatedQuestions = [...selectedQuestions];
     updatedQuestions[index] = selectedQuestion;
     setSelectedQuestions(updatedQuestions);
@@ -1508,10 +1007,9 @@ const handleQuestionSelect = (value, index) => {
   };
 
   const handleSectionQuestionSelect = (value, index) => {
-   
-     const allQuestions = getAllQuestions();
-    const selectedQuestion = allQuestions.find(q => q.id === value?.id);
-    
+    const allQuestions = getAllQuestionsGrouped();
+    const selectedQuestion = allQuestions.find((q) => q.id === value?.id);
+
     const updatedQuestions = [...selectedSectionQuestions];
     updatedQuestions[index] = selectedQuestion;
     setSelectedSectionQuestions(updatedQuestions);
@@ -1533,21 +1031,18 @@ const handleQuestionSelect = (value, index) => {
       setDescriptionText(questionsectionsettings?.description || "");
       setMode(questionsectionsettings?.mode || "Any");
 
-      
       const conditions = questionsectionsettings?.conditions || [];
-      const questions = conditions.map(cond => 
-        formElements.find(el => el.id === cond.questionId) || null
+      const questions = conditions.map(
+        (cond) => formElements.find((el) => el.id === cond.questionId) || null
       );
-      const answers = conditions.map(cond => cond.answer || null);
-      
+      const answers = conditions.map((cond) => cond.answer || null);
+
       setQuestionAnswers(conditions);
       setSelectedQuestions(questions);
-      console.log("selectedquestion",questions)
+      console.log("selectedquestion", questions);
       setSelectedAnswers(answers);
     }
   }, [selectedElement]);
-
-
 
   return (
     <Box
@@ -1634,21 +1129,16 @@ const handleQuestionSelect = (value, index) => {
         </Menu>
       </Box>
 
-      {/* {formElements.map((element) => (
-        <Box key={element.id} sx={{ marginTop: "16px" }}>
-          {renderFormElement(element)}
-        </Box>
-      ))} */}
       {formElements.map((element, index) => (
-      <DraggableQuestion
-        key={element.id}
-        id={element.id}
-        index={index}
-        moveQuestion={moveQuestion}
-      >
-        {renderFormElement(element)}
-      </DraggableQuestion>
-    ))}
+        <DraggableQuestion
+          key={element.id}
+          id={element.id}
+          index={index}
+          moveQuestion={moveQuestion}
+        >
+          {renderFormElement(element)}
+        </DraggableQuestion>
+      ))}
       <Box sx={{ display: "flex", alignItems: "center", gap: 3, mt: 3 }}>
         <Button
           variant="contained"
@@ -1816,8 +1306,10 @@ const handleQuestionSelect = (value, index) => {
                   >
                     <Box sx={{ width: "380px" }}>
                       <Typography>Question</Typography>
+
                       {/* <Autocomplete
-                        options={getRadioButtonOptions()}
+                        options={getAllQuestions()}
+                        getOptionLabel={(option) => option.text || ""}
                         value={selectedSectionQuestions[index] || null}
                         onChange={(event, newValue) =>
                           handleSectionQuestionSelect(newValue, index)
@@ -1836,37 +1328,61 @@ const handleQuestionSelect = (value, index) => {
                             {...props}
                             style={{ margin: "5px", cursor: "pointer" }}
                           >
-                            {option}
+                            {option.text}
                           </li>
                         )}
                       /> */}
                       <Autocomplete
-    options={getAllQuestions()}
-    getOptionLabel={(option) => option.text || ""}
-    value={selectedSectionQuestions[index] || null}
-    onChange={(event, newValue) => handleSectionQuestionSelect(newValue, index)}
-    renderInput={(params) => (
-      <TextField
-        {...params}
-        variant="outlined"
-        size="small"
-        margin="normal"
-        placeholder="Question"
-      />
-    )}
-    renderOption={(props, option) => (
-      <li {...props} style={{ margin: "5px", cursor: "pointer" }}>
-        {option.text}
-      </li>
-    )}
-  />
+  options={getAllQuestionsGrouped()}
+  getOptionLabel={(option) => option.text || ""}
+  groupBy={(option) => option.sectionName}
+  value={selectedSectionQuestions[index] || null}
+  onChange={(event, newValue) =>
+    handleSectionQuestionSelect(newValue, index)
+  }
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      variant="outlined"
+      size="small"
+      margin="normal"
+      placeholder="Question"
+    />
+  )}
+  renderOption={(props, option) => (
+    <li
+      {...props}
+      style={{ margin: "5px", cursor: "pointer", paddingLeft: "20px" }}
+    >
+      {option.text}
+    </li>
+  )}
+  renderGroup={(params) => (
+    <li key={params.key}>
+      <div
+        style={{
+          padding: "8px 16px",
+          // fontWeight: "bold",
+          // backgroundColor: "#f5f5f5",
+          color: "gray",
+          // fontWeight: "600",
+          // borderBottom: "1px solid #e0e0e0"
+        }}
+      >
+        {params.group}
+      </div>
+      <ul style={{ padding: 0, margin: 0 }}>{params.children}</ul>
+    </li>
+  )}
+/>
                     </Box>
                     <Box>
                       <Typography>sectionAnswer</Typography>
-                      {/* <Autocomplete
+
+                      <Autocomplete
                         options={getAnswerOptions(
                           selectedSectionQuestions[index]
-                        )} // Get options based on selected question
+                        )}
                         value={selectedSectionAnswers[index] || null}
                         onChange={(event, newValue) => {
                           const updatedAnswers = [...selectedSectionAnswers];
@@ -1890,30 +1406,7 @@ const handleQuestionSelect = (value, index) => {
                             {option}
                           </li>
                         )}
-                      /> */}
-                       <Autocomplete
-    options={getAnswerOptions(selectedSectionQuestions[index])}
-    value={selectedSectionAnswers[index] || null}
-    onChange={(event, newValue) => {
-      const updatedAnswers = [...selectedSectionAnswers];
-      updatedAnswers[index] = newValue;
-      setSelectedSectionAnswers(updatedAnswers);
-    }}
-    renderInput={(params) => (
-      <TextField
-        {...params}
-        variant="outlined"
-        size="small"
-        margin="normal"
-        placeholder="Answer"
-      />
-    )}
-    renderOption={(props, option) => (
-      <li {...props} style={{ margin: "5px", cursor: "pointer" }}>
-        {option}
-      </li>
-    )}
-  />
+                      />
                     </Box>
                     <Box mt={5}>
                       <IconButton
@@ -2112,8 +1605,10 @@ const handleQuestionSelect = (value, index) => {
                     >
                       <Box sx={{ width: "380px" }}>
                         <Typography>Question</Typography>
+
                         {/* <Autocomplete
-                          options={getRadioButtonOptions()}
+                          options={getAllQuestions()}
+                          getOptionLabel={(option) => option.text || ""}
                           value={selectedQuestions[index] || null}
                           onChange={(event, newValue) =>
                             handleQuestionSelect(newValue, index)
@@ -2132,37 +1627,57 @@ const handleQuestionSelect = (value, index) => {
                               {...props}
                               style={{ margin: "5px", cursor: "pointer" }}
                             >
-                              {option}
+                              {option.text}
                             </li>
                           )}
                         /> */}
-                       <Autocomplete
-    options={getAllQuestions()}
-    getOptionLabel={(option) => option.text || ""}
-    value={selectedQuestions[index] || null}
-    onChange={(event, newValue) => handleQuestionSelect(newValue, index)}
-    renderInput={(params) => (
-      <TextField
-        {...params}
-        variant="outlined"
-        size="small"
-        margin="normal"
-        placeholder="Question"
-      />
-    )}
-    renderOption={(props, option) => (
-      <li {...props} style={{ margin: "5px", cursor: "pointer" }}>
-        {option.text}
-      </li>
-    )}
-  />
-
-
+                        <Autocomplete
+  options={getAllQuestionsGrouped()}
+  getOptionLabel={(option) => option.text || ""}
+  groupBy={(option) => option.sectionName}
+  value={selectedQuestions[index] || null}
+  onChange={(event, newValue) =>
+    handleQuestionSelect(newValue, index)
+  }
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      variant="outlined"
+      size="small"
+      margin="normal"
+      placeholder="Question"
+    />
+  )}
+  renderOption={(props, option) => (
+    <li
+      {...props}
+      style={{ margin: "5px", cursor: "pointer", paddingLeft: "20px" }}
+    >
+      {option.text}
+    </li>
+  )}
+  renderGroup={(params) => (
+    <li key={params.key}>
+       <div
+        style={{
+          padding: "8px 16px",
+        
+          color: "gray",
+         
+        }}
+      >
+        {params.group}
+      </div>
+      <ul style={{ padding: 0, margin: 0 }}>{params.children}</ul>
+    </li>
+  )}
+/>
                       </Box>
                       <Box>
                         <Typography>Answer</Typography>
-                        {/* <Autocomplete
-                          options={getAnswerOptions(selectedQuestions[index])} // Get options based on selected question
+
+                        <Autocomplete
+                          options={getAnswerOptions(selectedQuestions[index])}
                           value={selectedAnswers[index] || null}
                           onChange={(event, newValue) => {
                             const updatedAnswers = [...selectedAnswers];
@@ -2186,30 +1701,7 @@ const handleQuestionSelect = (value, index) => {
                               {option}
                             </li>
                           )}
-                        /> */}
-                        <Autocomplete
-    options={getAnswerOptions(selectedQuestions[index])}
-    value={selectedAnswers[index] || null}
-    onChange={(event, newValue) => {
-      const updatedAnswers = [...selectedAnswers];
-      updatedAnswers[index] = newValue;
-      setSelectedAnswers(updatedAnswers);
-    }}
-    renderInput={(params) => (
-      <TextField
-        {...params}
-        variant="outlined"
-        size="small"
-        margin="normal"
-        placeholder="Answer"
-      />
-    )}
-    renderOption={(props, option) => (
-      <li {...props} style={{ margin: "5px", cursor: "pointer" }}>
-        {option}
-      </li>
-    )}
-  />
+                        />
                       </Box>
                       <Box mt={5}>
                         <IconButton
@@ -2301,4 +1793,505 @@ const handleQuestionSelect = (value, index) => {
 
 export default Section;
 
+// const renderOptions = (element, type = "text") => {
+//   return (
+//     <Box>
+//       {element.options &&
+//         element.options.map((option) => (
+//           <Box
+//             key={option.id}
+//             sx={{
+//               display: "flex",
+//               alignItems: "center",
+//               marginBottom: "8px",
+//             }}
+//           >
+//             {type === "radio" ? (
+//               <Input
+//                 type="radio"
+//                 name={`radio-${element.id}`}
+//                 sx={{ marginRight: "8px" }}
+//               />
+//             ) : type === "checkbox" ? (
+//               <Input
+//                 type="checkbox"
+//                 name={`checkbox-${element.id}`}
+//                 sx={{ marginRight: "8px" }}
+//               />
+//             ) : type === "Yes/No" ? (
+//               <Input
+//                 type="radio"
+//                 name={`radio-${element.id}`}
+//                 sx={{ marginRight: "8px" }}
+//               />
+//             ) : null}
 
+//             <TextField
+//               variant="outlined"
+//               placeholder="Option"
+//               value={option.text}
+//               size="small"
+//               margin="normal"
+//               fullWidth
+//               className="organizer-input-label"
+//               onChange={(e) =>
+//                 handleOptionChange(element.id, option.id, e.target.value)
+//               }
+//             />
+//             <IconButton
+//               onClick={() => handleDeleteOption(element.id, option.id)}
+//             >
+//               <RiDeleteBinLine />
+//             </IconButton>
+//           </Box>
+//         ))}
+//       <Button
+//         variant="contained"
+//         onClick={() => handleAddOption(element.id)}
+//         sx={{
+//           backgroundColor: "var(--color-save-btn)", // Normal background
+
+//           "&:hover": {
+//             backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+//           },
+//           borderRadius: "15px",
+//         }}
+//       >
+//         Add Option
+//       </Button>
+//     </Box>
+//   );
+// };
+
+// const renderFormElement = (element) => {
+//   switch (element.type) {
+//     case "Free Entry":
+//       return (
+//         <>
+//           <Typography>Free Entry</Typography>
+//           <Box
+//             key={element.id}
+//             sx={{
+//               display: "flex",
+//               alignItems: "center",
+//               marginBottom: "8px",
+//             }}
+//           >
+//             <TextField
+//               variant="outlined"
+//               placeholder="Free Entry"
+//               value={element.text}
+//               size="small"
+//               margin="normal"
+//               fullWidth
+//               sx={{ backgroundColor: "#fff" }}
+//               onChange={(e) =>
+//                 handleElementTextChange(element.id, e.target.value)
+//               }
+//             />
+//             {element.questionsectionsettings?.conditional && (
+//               <Box
+//                 style={{
+//                   backgroundColor: "green",
+//                   color: "white",
+//                   borderRadius: "10px",
+//                   padding: "4px 8px",
+//                   fontSize: "12px",
+//                   marginLeft: "8px",
+//                 }}
+//               >
+//                 Conditional
+//               </Box>
+//             )}
+//             <IconButton onClick={() => handleSettingsClick(element.id)}>
+//               <IoSettingsOutline />
+//             </IconButton>
+
+//             <IconButton onClick={() => handleDeleteFormElement(element.id)}>
+//               <RiDeleteBinLine />
+//             </IconButton>
+//           </Box>
+//         </>
+//       );
+//     case "Email":
+//       return (
+//         <>
+//           <Typography>Email</Typography>
+//           <Box
+//             key={element.id}
+//             sx={{
+//               display: "flex",
+//               alignItems: "center",
+//               marginBottom: "8px",
+//             }}
+//           >
+//             <TextField
+//               variant="outlined"
+//               placeholder="Email"
+//               value={element.text}
+//               size="small"
+//               margin="normal"
+//               fullWidth
+//               onChange={(e) =>
+//                 handleElementTextChange(element.id, e.target.value)
+//               }
+//               sx={{ backgroundColor: "#fff" }}
+//             />
+//             <IconButton onClick={() => handleSettingsClick(element.id)}>
+//               <IoSettingsOutline />
+//             </IconButton>
+//             {element.questionsectionsettings?.conditional && (
+//               <span
+//                 style={{
+//                   backgroundColor: "green",
+//                   color: "white",
+//                   borderRadius: "10px",
+//                   padding: "4px 8px",
+//                   fontSize: "12px",
+//                   marginLeft: "8px",
+//                 }}
+//               >
+//                 Conditional
+//               </span>
+//             )}
+//             <IconButton onClick={() => handleDeleteFormElement(element.id)}>
+//               <RiDeleteBinLine />
+//             </IconButton>
+//           </Box>
+//         </>
+//       );
+//     case "Number":
+//       return (
+//         <>
+//           <Typography>Number</Typography>
+//           <Box
+//             key={element.id}
+//             sx={{
+//               display: "flex",
+//               alignItems: "center",
+//               marginBottom: "8px",
+//             }}
+//           >
+//             <TextField
+//               variant="outlined"
+//               placeholder="Number"
+//               value={element.text}
+//               size="small"
+//               margin="normal"
+//               fullWidth
+//               onChange={(e) =>
+//                 handleElementTextChange(element.id, e.target.value)
+//               }
+//               sx={{ backgroundColor: "#fff" }}
+//             />
+//             <IconButton onClick={() => handleSettingsClick(element.id)}>
+//               <IoSettingsOutline />
+//             </IconButton>
+//             {element.questionsectionsettings?.conditional && (
+//               <span
+//                 style={{
+//                   backgroundColor: "green",
+//                   color: "white",
+//                   borderRadius: "10px",
+//                   padding: "4px 8px",
+//                   fontSize: "12px",
+//                   marginLeft: "8px",
+//                 }}
+//               >
+//                 Conditional
+//               </span>
+//             )}
+//             <IconButton onClick={() => handleDeleteFormElement(element.id)}>
+//               <RiDeleteBinLine />
+//             </IconButton>
+//           </Box>
+//         </>
+//       );
+//     case "Date":
+//       return (
+//         <>
+//           <Typography>Date</Typography>
+//           <Box
+//             key={element.id}
+//             sx={{
+//               display: "flex",
+//               alignItems: "center",
+//               marginBottom: "8px",
+//             }}
+//           >
+//             <TextField
+//               variant="outlined"
+//               placeholder="Date"
+//               value={element.text}
+//               size="small"
+//               margin="normal"
+//               fullWidth
+//               onChange={(e) =>
+//                 handleElementTextChange(element.id, e.target.value)
+//               }
+//               sx={{ backgroundColor: "#fff" }}
+//             />
+//             <IconButton onClick={() => handleSettingsClick(element.id)}>
+//               <IoSettingsOutline />
+//             </IconButton>
+//             {element.questionsectionsettings?.conditional && (
+//               <span
+//                 style={{
+//                   backgroundColor: "green",
+//                   color: "white",
+//                   borderRadius: "10px",
+//                   padding: "4px 8px",
+//                   fontSize: "12px",
+//                   marginLeft: "8px",
+//                 }}
+//               >
+//                 Conditional
+//               </span>
+//             )}
+//             <IconButton onClick={() => handleDeleteFormElement(element.id)}>
+//               <RiDeleteBinLine />
+//             </IconButton>
+//           </Box>
+//         </>
+//       );
+//     case "Radio Buttons":
+//       return (
+//         <Box key={element.id} sx={{ marginBottom: "8px" }}>
+//           <Typography>Radio Button:</Typography>
+//           <Box sx={{ display: "flex", alignItems: "center" }}>
+//             {/* <Input type="radio" name={`radio-${element.id}`} sx={{ marginRight: "4px" }} /> */}
+//             <TextField
+//               variant="outlined"
+//               placeholder="Radio Buttons"
+//               value={element.text}
+//               size="small"
+//               margin="normal"
+//               fullWidth
+//               onChange={(e) =>
+//                 handleElementTextChange(element.id, e.target.value)
+//               }
+//               sx={{ backgroundColor: "#fff" }}
+//             />
+//             <IconButton onClick={() => handleSettingsClick(element.id)}>
+//               <IoSettingsOutline />
+//             </IconButton>
+//             {element.questionsectionsettings?.conditional && (
+//               <span
+//                 style={{
+//                   backgroundColor: "green",
+//                   color: "white",
+//                   borderRadius: "10px",
+//                   padding: "4px 8px",
+//                   fontSize: "12px",
+//                   marginLeft: "8px",
+//                 }}
+//               >
+//                 Conditional
+//               </span>
+//             )}
+//             <IconButton onClick={() => handleDeleteFormElement(element.id)}>
+//               <RiDeleteBinLine />
+//             </IconButton>
+//           </Box>
+//           {renderOptions(element, "radio")}
+//         </Box>
+//       );
+//     case "Checkboxes":
+//       return (
+//         <Box key={element.id} sx={{ marginBottom: "8px" }}>
+//           <Typography>Checkbox:</Typography>
+//           <Box sx={{ display: "flex", alignItems: "center" }}>
+//             {/* <Input type="checkbox" name={`checkbox-${element.id}`} sx={{ marginRight: "4px" }} /> */}
+//             <TextField
+//               variant="outlined"
+//               placeholder="Checkboxes"
+//               value={element.text}
+//               size="small"
+//               margin="normal"
+//               fullWidth
+//               onChange={(e) =>
+//                 handleCheckboxTextChange(element.id, e.target.value)
+//               }
+//               sx={{ backgroundColor: "#fff" }}
+//             />
+//             <IconButton onClick={() => handleSettingsClick(element.id)}>
+//               <IoSettingsOutline />
+//             </IconButton>
+//             {element.questionsectionsettings?.conditional && (
+//               <span
+//                 style={{
+//                   backgroundColor: "green",
+//                   color: "white",
+//                   borderRadius: "10px",
+//                   padding: "4px 8px",
+//                   fontSize: "12px",
+//                   marginLeft: "8px",
+//                 }}
+//               >
+//                 Conditional
+//               </span>
+//             )}
+//             <IconButton onClick={() => handleDeleteFormElement(element.id)}>
+//               <RiDeleteBinLine />
+//             </IconButton>
+//           </Box>
+//           {renderOptions(element, "checkbox")}
+//         </Box>
+//       );
+//     case "Dropdown":
+//       return (
+//         <Box key={element.id} sx={{ marginBottom: "8px" }}>
+//           <Typography>Dropdown:</Typography>
+//           <Box sx={{ display: "flex", alignItems: "center" }}>
+//             <TextField
+//               variant="outlined"
+//               placeholder="Dropdown"
+//               value={element.text}
+//               size="small"
+//               margin="normal"
+//               fullWidth
+//               onChange={(e) =>
+//                 handleCheckboxTextChange(element.id, e.target.value)
+//               }
+//               sx={{ backgroundColor: "#fff" }}
+//             />
+//             <IconButton onClick={() => handleSettingsClick(element.id)}>
+//               <IoSettingsOutline />
+//             </IconButton>
+//             {element.questionsectionsettings?.conditional && (
+//               <span
+//                 style={{
+//                   backgroundColor: "green",
+//                   color: "white",
+//                   borderRadius: "10px",
+//                   padding: "4px 8px",
+//                   fontSize: "12px",
+//                   marginLeft: "8px",
+//                 }}
+//               >
+//                 Conditional
+//               </span>
+//             )}
+//             <IconButton onClick={() => handleDeleteFormElement(element.id)}>
+//               <RiDeleteBinLine />
+//             </IconButton>
+//           </Box>
+//           {renderOptions(element)}
+//         </Box>
+//       );
+
+//     case "Yes/No":
+//       return (
+//         <Box key={element.id} sx={{ marginBottom: "8px" }}>
+//           <Typography>Yes/No:</Typography>
+//           <Box sx={{ display: "flex", alignItems: "center" }}>
+//             <TextField
+//               variant="outlined"
+//               placeholder="Yes/No"
+//               value={element.text}
+//               size="small"
+//               margin="normal"
+//               fullWidth
+//               onChange={(e) =>
+//                 handleElementTextChange(element.id, e.target.value)
+//               }
+//               sx={{ backgroundColor: "#fff" }}
+//             />
+//             <IconButton onClick={() => handleSettingsClick(element.id)}>
+//               <IoSettingsOutline />
+//             </IconButton>
+//             {element.questionsectionsettings?.conditional && (
+//               <span
+//                 style={{
+//                   backgroundColor: "green",
+//                   color: "white",
+//                   borderRadius: "10px",
+//                   padding: "4px 8px",
+//                   fontSize: "12px",
+//                   marginLeft: "8px",
+//                 }}
+//               >
+//                 Conditional
+//               </span>
+//             )}
+//             <IconButton onClick={() => handleDeleteFormElement(element.id)}>
+//               <RiDeleteBinLine />
+//             </IconButton>
+//           </Box>
+//           {renderOptions(element, "Yes/No")}
+//         </Box>
+//       );
+
+//     case "File Upload":
+//       return (
+//         <Box key={element.id}>
+//           <Typography>File Upload:</Typography>
+//           <Box sx={{ display: "flex", alignItems: "center" }}>
+//             <TextField
+//               variant="outlined"
+//               placeholder="File Upload"
+//               value={element.text}
+//               size="small"
+//               margin="normal"
+//               fullWidth
+//               onChange={(e) =>
+//                 handleElementTextChange(element.id, e.target.value)
+//               }
+//               sx={{ backgroundColor: "#fff" }}
+//             />
+//             <IconButton onClick={() => handleSettingsClick(element.id)}>
+//               <IoSettingsOutline />
+//             </IconButton>
+//             {element.questionsectionsettings?.conditional && (
+//               <span
+//                 style={{
+//                   backgroundColor: "green",
+//                   color: "white",
+//                   borderRadius: "10px",
+//                   padding: "4px 8px",
+//                   fontSize: "12px",
+//                   marginLeft: "8px",
+//                 }}
+//               >
+//                 Conditional
+//               </span>
+//             )}
+//             <IconButton onClick={() => handleDeleteFormElement(element.id)}>
+//               <RiDeleteBinLine />
+//             </IconButton>
+//           </Box>
+//           <Button
+//             component="label"
+//             role={undefined}
+//             variant="outlined"
+//             disabled
+//             tabIndex={-1}
+//             startIcon={<CloudUploadIcon />}
+//           >
+//             Upload files
+//           </Button>
+//         </Box>
+//       );
+//     case "Text Editor":
+//       return (
+//         <Box
+//           key={element.id}
+//           sx={{ marginTop: "16px", display: "flex", alignItems: "center" }}
+//         >
+//           <ReactQuill
+//             theme="snow"
+//             value={element.text}
+//             modules={modules} // Set the custom modules
+//             formats={formats} // Set the allowed formats
+//             onChange={(newText) => handleQuillChange(element.id, newText)}
+//           />
+
+//           <IconButton onClick={() => handleDeleteFormElement(element.id)}>
+//             <RiDeleteBinLine />
+//           </IconButton>
+//         </Box>
+//       );
+//     default:
+//       return null;
+//   }
+// };
