@@ -1,34 +1,67 @@
-import React, { useState, useEffect, useRef } from 'react';
-import Section from './organizertempSection';
-import { toast } from 'react-toastify';
+import React, { useState, useEffect, useRef } from "react";
+import Section from "./organizertempSection";
+import { toast } from "react-toastify";
 import { CircularProgress, TableContainer } from "@mui/material";
-import 'react-toastify/dist/ReactToastify.css';
-import {ListItemText,ListItem,List,Popover,
-  Box, Button, TextField, IconButton, Typography, Alert, Table, TableBody, TableCell, TableHead, TableRow, Paper, Dialog,
-  DialogContent,Menu,
-  Drawer, InputLabel,
-  LinearProgress, Select, MenuItem, Tooltip,
-  FormControl, FormControlLabel, Switch, FormGroup,TablePagination,InputAdornment
-} from '@mui/material';
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
+import "react-toastify/dist/ReactToastify.css";
+import {
+  ListItemText,
+  ListItem,
+  List,
+  Popover,
+  Box,
+  Button,
+  TextField,
+  IconButton,
+  Typography,
+  Alert,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Paper,
+  Dialog,
+  DialogContent,
+  Menu,
+  Drawer,
+  InputLabel,
+  LinearProgress,
+  Select,
+  MenuItem,
+  Tooltip,
+  FormControl,
+  FormControlLabel,
+  Switch,
+  FormGroup,
+  TablePagination,
+  InputAdornment,
+} from "@mui/material";
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import { useNavigate } from "react-router-dom";
 import { CiMenuKebab } from "react-icons/ci";
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { useTheme } from '@mui/material/styles';
-import useMediaQuery from '@mui/material/useMediaQuery';
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { useTheme } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import { IoClose } from "react-icons/io5";
 import axios from "axios";
 import debounce from "lodash.debounce";
-import { useDrag, useDrop, DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
+import { useDrag, useDrop, DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 // Section Item Component (Draggable)
 // Section Item Component (Draggable)
-const SectionItem = ({ section, onClick, onDrop, index, truncateText, isSelected }) => {
+const SectionItem = ({
+  section,
+  onClick,
+  onDrop,
+  index,
+  truncateText,
+  isSelected,
+}) => {
   const [{ isDragging }, drag] = useDrag(() => ({
-    type: 'SECTION',
+    type: "SECTION",
     item: { id: section.id, index },
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
@@ -36,7 +69,7 @@ const SectionItem = ({ section, onClick, onDrop, index, truncateText, isSelected
   }));
 
   const [, drop] = useDrop({
-    accept: 'SECTION',
+    accept: "SECTION",
     hover: (item) => {
       if (item.index !== index) {
         onDrop(item.index, index);
@@ -46,35 +79,35 @@ const SectionItem = ({ section, onClick, onDrop, index, truncateText, isSelected
   });
 
   return (
-    <Box 
+    <Box
       ref={(node) => drag(drop(node))}
-      key={section.id} 
+      key={section.id}
       sx={{
         display: "flex",
         alignItems: "center",
         opacity: isDragging ? 0.5 : 1,
-        cursor: 'move',
+        cursor: "move",
         mb: 1,
       }}
     >
       <TextField
         placeholder={`Section Name`}
-        className='section-name'
+        className="section-name"
         size="small"
-        margin='normal'
+        margin="normal"
         value={truncateText(section.text, 5)}
         InputProps={{
           readOnly: true,
           startAdornment: (
             <InputAdornment position="start">
-              <DragIndicatorIcon sx={{ cursor: 'move' }} />
+              <DragIndicatorIcon sx={{ cursor: "move" }} />
             </InputAdornment>
           ),
         }}
-        sx={{ 
-          backgroundColor: isSelected ? "#E0F7FA" : "#fff", 
+        sx={{
+          backgroundColor: isSelected ? "#E0F7FA" : "#fff",
           cursor: "pointer",
-          width: '100%',
+          width: "100%",
         }}
         onClick={() => onClick(section)}
         fullWidth
@@ -83,23 +116,22 @@ const SectionItem = ({ section, onClick, onDrop, index, truncateText, isSelected
   );
 };
 const OrganizersTemp = () => {
-const moveSection = (fromIndex, toIndex) => {
+  const moveSection = (fromIndex, toIndex) => {
     const newSections = [...sections];
     const [movedSection] = newSections.splice(fromIndex, 1);
     newSections.splice(toIndex, 0, movedSection);
     setSections(newSections);
   };
-const truncateText = (text, maxWords) => {
-    const words = text.split(' ');
+  const truncateText = (text, maxWords) => {
+    const words = text.split(" ");
     if (words.length > maxWords) {
-      return words.slice(0, maxWords).join(' ') + ' ..';
+      return words.slice(0, maxWords).join(" ") + " ..";
     }
     return text;
   };
 
   const ORGANIZER_TEMP_API = process.env.REACT_APP_ORGANIZER_TEMP_URL;
   const navigate = useNavigate();
- 
 
   const [shortcuts, setShortcuts] = useState([]);
   const [filteredShortcuts, setFilteredShortcuts] = useState([]);
@@ -109,43 +141,77 @@ const truncateText = (text, maxWords) => {
   const [showDropdown, setShowDropdown] = useState(false);
   useEffect(() => {
     // Simulate filtered shortcuts based on some logic (e.g., search)
-    setFilteredShortcuts(shortcuts.filter((shortcut) => shortcut.title.toLowerCase().includes("")));
+    setFilteredShortcuts(
+      shortcuts.filter((shortcut) => shortcut.title.toLowerCase().includes(""))
+    );
   }, [shortcuts]);
-useEffect(() => {
-  if (selectedOption === "contacts" || selectedOption === "account") {
-    const accountShortcuts = [
-      { title: "Account Shortcodes", isBold: true },
-      { title: "Account Name", isBold: false, value: "ACCOUNT_NAME" },
-      // { title: "Custom field:Website", isBold: false, value: "ACCOUNT_CUSTOM_FIELD:Website" },
-      { title: "Date Shortcodes", isBold: true },
-      { title: "Current day full date", isBold: false, value: "CURRENT_DAY_FULL_DATE" },
-      { title: "Current day number", isBold: false, value: "CURRENT_DAY_NUMBER" },
-      { title: "Current day name", isBold: false, value: "CURRENT_DAY_NAME" },
-      { title: "Current week", isBold: false, value: "CURRENT_WEEK" },
-      { title: "Current month number", isBold: false, value: "CURRENT_MONTH_NUMBER" },
-      { title: "Current month name", isBold: false, value: "CURRENT_MONTH_NAME" },
-      { title: "Current quarter", isBold: false, value: "CURRENT_QUARTER" },
-      { title: "Current year", isBold: false, value: "CURRENT_YEAR" },
-      { title: "Last day full date", isBold: false, value: "LAST_DAY_FULL_DATE" },
-      { title: "Last day number", isBold: false, value: "LAST_DAY_NUMBER" },
-      { title: "Last day name", isBold: false, value: "LAST_DAY_NAME" },
-      { title: "Last week", isBold: false, value: "LAST_WEEK" },
-      { title: "Last month number", isBold: false, value: "LAST_MONTH_NUMBER" },
-      { title: "Last month name", isBold: false, value: "LAST_MONTH_NAME" },
-      { title: "Last quarter", isBold: false, value: "LAST_QUARTER" },
-      { title: "Last_year", isBold: false, value: "LAST_YEAR" },
-      { title: "Next day full date", isBold: false, value: "NEXT_DAY_FULL_DATE" },
-      { title: "Next day number", isBold: false, value: "NEXT_DAY_NUMBER" },
-      { title: "Next day name", isBold: false, value: "NEXT_DAY_NAME" },
-      { title: "Next week", isBold: false, value: "NEXT_WEEK" },
-      { title: "Next month number", isBold: false, value: "NEXT_MONTH_NUMBER" },
-      { title: "Next month name", isBold: false, value: "NEXT_MONTH_NAME" },
-      { title: "Next quarter", isBold: false, value: "NEXT_QUARTER" },
-      { title: "Next year", isBold: false, value: "NEXT_YEAR" },
-    ];
-    setShortcuts(accountShortcuts);
-  }
-}, [selectedOption]);
+  useEffect(() => {
+    if (selectedOption === "contacts" || selectedOption === "account") {
+      const accountShortcuts = [
+        { title: "Account Shortcodes", isBold: true },
+        { title: "Account Name", isBold: false, value: "ACCOUNT_NAME" },
+        // { title: "Custom field:Website", isBold: false, value: "ACCOUNT_CUSTOM_FIELD:Website" },
+        { title: "Date Shortcodes", isBold: true },
+        {
+          title: "Current day full date",
+          isBold: false,
+          value: "CURRENT_DAY_FULL_DATE",
+        },
+        {
+          title: "Current day number",
+          isBold: false,
+          value: "CURRENT_DAY_NUMBER",
+        },
+        { title: "Current day name", isBold: false, value: "CURRENT_DAY_NAME" },
+        { title: "Current week", isBold: false, value: "CURRENT_WEEK" },
+        {
+          title: "Current month number",
+          isBold: false,
+          value: "CURRENT_MONTH_NUMBER",
+        },
+        {
+          title: "Current month name",
+          isBold: false,
+          value: "CURRENT_MONTH_NAME",
+        },
+        { title: "Current quarter", isBold: false, value: "CURRENT_QUARTER" },
+        { title: "Current year", isBold: false, value: "CURRENT_YEAR" },
+        {
+          title: "Last day full date",
+          isBold: false,
+          value: "LAST_DAY_FULL_DATE",
+        },
+        { title: "Last day number", isBold: false, value: "LAST_DAY_NUMBER" },
+        { title: "Last day name", isBold: false, value: "LAST_DAY_NAME" },
+        { title: "Last week", isBold: false, value: "LAST_WEEK" },
+        {
+          title: "Last month number",
+          isBold: false,
+          value: "LAST_MONTH_NUMBER",
+        },
+        { title: "Last month name", isBold: false, value: "LAST_MONTH_NAME" },
+        { title: "Last quarter", isBold: false, value: "LAST_QUARTER" },
+        { title: "Last_year", isBold: false, value: "LAST_YEAR" },
+        {
+          title: "Next day full date",
+          isBold: false,
+          value: "NEXT_DAY_FULL_DATE",
+        },
+        { title: "Next day number", isBold: false, value: "NEXT_DAY_NUMBER" },
+        { title: "Next day name", isBold: false, value: "NEXT_DAY_NAME" },
+        { title: "Next week", isBold: false, value: "NEXT_WEEK" },
+        {
+          title: "Next month number",
+          isBold: false,
+          value: "NEXT_MONTH_NUMBER",
+        },
+        { title: "Next month name", isBold: false, value: "NEXT_MONTH_NAME" },
+        { title: "Next quarter", isBold: false, value: "NEXT_QUARTER" },
+        { title: "Next year", isBold: false, value: "NEXT_YEAR" },
+      ];
+      setShortcuts(accountShortcuts);
+    }
+  }, [selectedOption]);
 
   // useEffect(() => {
   //   // Set shortcuts based on selected option
@@ -235,7 +301,7 @@ useEffect(() => {
   const [cursorPosition, setCursorPosition] = useState(0);
   const textFieldRef = useRef(null);
   const handlejobName = (e) => {
-    const { value,selectionStart  } = e.target;
+    const { value, selectionStart } = e.target;
     setOrganizerName(value);
     setCursorPosition(selectionStart);
   };
@@ -246,55 +312,63 @@ useEffect(() => {
 
   const handleAddShortcut = (shortcut) => {
     setOrganizerName((prevText) => {
-        const newText =
-            prevText.slice(0, cursorPosition) + `[${shortcut}]` + prevText.slice(cursorPosition);
-        return newText;
+      const newText =
+        prevText.slice(0, cursorPosition) +
+        `[${shortcut}]` +
+        prevText.slice(cursorPosition);
+      return newText;
     });
 
     setTimeout(() => {
-        if (textFieldRef.current) {
-            textFieldRef.current.focus();
-            textFieldRef.current.setSelectionRange(cursorPosition + shortcut.length + 2, cursorPosition + shortcut.length + 2);
-        }
+      if (textFieldRef.current) {
+        textFieldRef.current.focus();
+        textFieldRef.current.setSelectionRange(
+          cursorPosition + shortcut.length + 2,
+          cursorPosition + shortcut.length + 2
+        );
+      }
     }, 0);
 
     setShowDropdown(false);
-};
-  const [templateName, setTemplateName] = useState('');
-  const [organizerName, setOrganizerName] = useState('');
+  };
+  const [templateName, setTemplateName] = useState("");
+  const [organizerName, setOrganizerName] = useState("");
   const [sections, setSections] = useState([]);
   const [selectedSection, setSelectedSection] = useState(null);
-  // const [sectionSettings, setSectionSettings] = useState({}); 
+  // const [sectionSettings, setSectionSettings] = useState({});
   const handleSectionSaveData = (settings) => {
     // Update the specific section with the new settings
     setSections((prevSections) =>
       prevSections.map((section) =>
         section.id === selectedSection.id
-    ? { ...section, sectionsettings: settings }
+          ? { ...section, sectionsettings: settings }
           : section
       )
     );
   };
   const addSection = () => {
     const newSection = {
-      id: Date.now(), name: `Section ${sections.length + 1}`, text: '', formElements: [], sectionSettings: {
+      id: Date.now(),
+      name: `Section ${sections.length + 1}`,
+      text: "",
+      formElements: [],
+      sectionSettings: {
         sectionRepeatingMode: false,
-        buttonName: '',
+        buttonName: "",
         conditional: false,
-        mode: '',
+        mode: "",
         conditions: [
           {
-            question: '',
-            answer: ''
-          }
-        ]
-      }
+            question: "",
+            answer: "",
+          },
+        ],
+      },
     };
     setSections([...sections, newSection]);
     setSelectedSection(newSection);
-
   };
-  console.log(sections)
+  console.log(sections);
   // console.log(selectedSection)
 
   const handleSectionClick = (section) => {
@@ -302,52 +376,64 @@ useEffect(() => {
   };
 
   const handleDeleteSection = (id) => {
-    const newSections = sections.filter(section => section.id !== id);
+    const newSections = sections.filter((section) => section.id !== id);
     setSections(newSections);
     if (selectedSection && selectedSection.id === id) {
       setSelectedSection(null);
     }
   };
-  const handleUpdateSection = (id, newText, newFormElements, newSectionSettings) => {
-    setSections(prevSections => prevSections.map(section =>
-      section.id === id
-        ? {
-          ...section,
-          text: newText,
-          formElements: newFormElements,
-          sectionSettings: {
-            ...section.sectionSettings, // retain existing settings
-            ...newSectionSettings // apply updates
-          }
-        }
-        : section
-    ));
+  const handleUpdateSection = (
+    id,
+    newText,
+    newFormElements,
+    newSectionSettings
+  ) => {
+    setSections((prevSections) =>
+      prevSections.map((section) =>
+        section.id === id
+          ? {
+              ...section,
+              text: newText,
+              formElements: newFormElements,
+              sectionSettings: {
+                ...section.sectionSettings, // retain existing settings
+                ...newSectionSettings, // apply updates
+              },
+            }
+          : section
+      )
+    );
   };
- 
+
   const handleDuplicateSection = (sectionId) => {
-  const sectionToDuplicate = sections.find(section => section.id === sectionId);
-  
-  if (sectionToDuplicate) {
-    const newSectionId = Date.now(); // Or use a UUID generator for better uniqueness
+    const sectionToDuplicate = sections.find(
+      (section) => section.id === sectionId
+    );
 
-    const duplicatedFormElements = sectionToDuplicate.formElements.map(element => ({
-      ...element,
-      id: Date.now() + Math.floor(Math.random() * 1000), // Ensure unique ID
-      sectionid: newSectionId,
-    }));
+    if (sectionToDuplicate) {
+      const newSectionId = Date.now(); // Or use a UUID generator for better uniqueness
 
-    const duplicatedSection = {
-      ...sectionToDuplicate,
-      id: newSectionId,
-      text: `${sectionToDuplicate.text} (Copy)`,
-      formElements: duplicatedFormElements,
-    };
+      const duplicatedFormElements = sectionToDuplicate.formElements.map(
+        (element) => ({
+          ...element,
+          id: Date.now() + Math.floor(Math.random() * 1000), // Ensure unique ID
+          sectionid: newSectionId,
+        })
+      );
 
-    setSections([...sections, duplicatedSection]);
-  }
-};
+      const duplicatedSection = {
+        ...sectionToDuplicate,
+        id: newSectionId,
+        text: `${sectionToDuplicate.text} (Copy)`,
+        formElements: duplicatedFormElements,
+      };
 
-  const [showOrganizerTemplateForm, setShowOrganizerTemplateForm] = useState(false);
+      setSections([...sections, duplicatedSection]);
+    }
+  };
+
+  const [showOrganizerTemplateForm, setShowOrganizerTemplateForm] =
+    useState(false);
 
   const handleCreateInvoiceClick = () => {
     setShowOrganizerTemplateForm(true);
@@ -360,18 +446,19 @@ useEffect(() => {
   //   return text;
   // }
   const handleFormSave = (elementId, formData) => {
-    setSections(prevSections =>
-      prevSections.map(section => ({
+    setSections((prevSections) =>
+      prevSections.map((section) => ({
         ...section,
-        formElements: section.formElements.map(el =>
-          el.id === elementId ? { ...el, questionsectionsettings: formData } : el
-        )
+        formElements: section.formElements.map((el) =>
+          el.id === elementId
+            ? { ...el, questionsectionsettings: formData }
+            : el
+        ),
       }))
     );
   };
   const saveandexitOrganizerTemp = () => {
-
-    console.log(sections)
+    console.log(sections);
     if (!validateForm()) {
       return; // Prevent form submission if validation fails
     }
@@ -380,59 +467,60 @@ useEffect(() => {
 
     const organizersettings = {
       notifyaboutdocumentupload: loginChecked, // Example state
-      organizerselfservice: notifyChecked,          // Example state
+      organizerselfservice: notifyChecked, // Example state
       automaticallysealaftersubmission: emailSyncChecked, // Example state
-      sendreminderstoclient: autoSaveChecked,        // Example state
-      daysuntilnextreminder: daysuntilNextReminder,        // Example state
-      numberofreminders: noOfReminder                 // Example state
+      sendreminderstoclient: autoSaveChecked, // Example state
+      daysuntilnextreminder: daysuntilNextReminder, // Example state
+      numberofreminders: noOfReminder, // Example state
     };
-
 
     const raw = JSON.stringify({
       templatename: templateName,
       organizerName: organizerName,
 
-      sections: sections.map(section => ({
+      sections: sections.map((section) => ({
         name: section.text,
         text: section.text,
         id: section.id.toString(),
         sectionsettings: section.sectionsettings || {},
-        formElements: section.formElements.map(element => ({
+        formElements: section.formElements.map((element) => ({
           type: element.type,
           id: element.id,
           sectionid: element.sectionid,
-          options: element.options.map(option => ({
+          options: element.options.map((option) => ({
             id: option.id,
-            text: option.text
+            text: option.text,
           })),
           text: element.text,
 
-          questionsectionsettings: element.questionsectionsettings || {}
+          questionsectionsettings: element.questionsectionsettings || {},
         })),
-
       })),
       organizersettings: organizersettings,
-      active: true
+      active: true,
     });
 
-    console.log(raw)
+    console.log(raw);
     const requestOptions = {
       method: "POST",
       headers: myHeaders,
       body: raw,
-      redirect: "follow"
+      redirect: "follow",
     };
     const url = `${ORGANIZER_TEMP_API}/workflow/organizers/organizertemplate`;
     fetch(url, requestOptions)
       .then((response) => response.json())
       .then((result) => {
-        console.log(result)
-        if (result && result.message === "Organizer Template created successfully") {
+        console.log(result);
+        if (
+          result &&
+          result.message === "Organizer Template created successfully"
+        ) {
           toast.success("Organizer Template created successfully");
-          handleMenuClose()
+          handleMenuClose();
           setShowOrganizerTemplateForm(false);
-          setTemplateName('');
-          setOrganizerName('');
+          setTemplateName("");
+          setOrganizerName("");
           setSections([]);
           setSelectedSection(null);
           fetchOrganizerTemplates();
@@ -442,16 +530,14 @@ useEffect(() => {
           setEmailSyncChecked(false);
           setNoOfReminder(1);
           setDaysuntilNextReminder(3);
-
         } else {
           toast.error(result.error || "Failed to create Organizer Template");
         }
       })
       .catch((error) => console.error(error));
-  }
+  };
   const saveOrganizerTemp = () => {
-
-    console.log(sections)
+    console.log(sections);
     if (!validateForm()) {
       return; // Prevent form submission if validation fails
     }
@@ -460,61 +546,61 @@ useEffect(() => {
 
     const organizersettings = {
       notifyaboutdocumentupload: loginChecked, // Example state
-      organizerselfservice: notifyChecked,          // Example state
+      organizerselfservice: notifyChecked, // Example state
       automaticallysealaftersubmission: emailSyncChecked, // Example state
-      sendreminderstoclient: autoSaveChecked,        // Example state
-      daysuntilnextreminder: daysuntilNextReminder,        // Example state
-      numberofreminders: noOfReminder                 // Example state
+      sendreminderstoclient: autoSaveChecked, // Example state
+      daysuntilnextreminder: daysuntilNextReminder, // Example state
+      numberofreminders: noOfReminder, // Example state
     };
 
     const raw = JSON.stringify({
       templatename: templateName,
       organizerName: organizerName,
-      sections: sections.map(section => ({
+      sections: sections.map((section) => ({
         name: section.text,
         text: section.text,
         id: section.id.toString(),
         sectionsettings: section.sectionsettings || {},
-        formElements: section.formElements.map(element => ({
+        formElements: section.formElements.map((element) => ({
           type: element.type,
           id: element.id,
           sectionid: element.sectionid,
-          options: element.options.map(option => ({
+          options: element.options.map((option) => ({
             id: option.id,
-            text: option.text
+            text: option.text,
           })),
           text: element.text,
-          questionsectionsettings: element.questionsectionsettings || {}
+          questionsectionsettings: element.questionsectionsettings || {},
         })),
-
       })),
       organizersettings: organizersettings,
-      active: true
+      active: true,
     });
 
-    console.log(raw)
+    console.log(raw);
     const requestOptions = {
       method: "POST",
       headers: myHeaders,
       body: raw,
-      redirect: "follow"
+      redirect: "follow",
     };
 
     const url = `${ORGANIZER_TEMP_API}/workflow/organizers/organizertemplate`;
     fetch(url, requestOptions)
       .then((response) => response.json())
       .then((result) => {
-        console.log(result)
-        if (result && result.message === "Organizer Template created successfully") {
+        console.log(result);
+        if (
+          result &&
+          result.message === "Organizer Template created successfully"
+        ) {
           toast.success("Organizer Template created successfully");
-
-
         } else {
           toast.error(result.error || "Failed to create Organizer Template");
         }
       })
       .catch((error) => console.error(error));
-  }
+  };
   const [organizerTemplatesData, setOrganizerTemplatesData] = useState([]);
   const [loading, setLoading] = useState(true);
   const fetchOrganizerTemplates = async () => {
@@ -524,54 +610,52 @@ useEffect(() => {
       const url = `${ORGANIZER_TEMP_API}/workflow/organizers/organizertemplate`;
       const response = await fetch(url);
       if (!response.ok) {
-        throw new Error('Failed to fetch email templates');
+        throw new Error("Failed to fetch email templates");
       }
       const data = await response.json();
 
       setOrganizerTemplatesData(data.OrganizerTemplates);
-
     } catch (error) {
-      console.error('Error fetching email templates:', error);
-
-    }
-    finally {
+      console.error("Error fetching email templates:", error);
+    } finally {
       await loaderDelay;
       setLoading(false); // Stop loader
     }
   };
   const handleEdit = (_id) => {
-    navigate('OrganizerTempUpdate/' + _id)
-
+    navigate("OrganizerTempUpdate/" + _id);
   };
   //delete template
   const handleDelete = (_id) => {
     // Show a confirmation prompt
-    const isConfirmed = window.confirm("Are you sure you want to delete this organizer template?");
+    const isConfirmed = window.confirm(
+      "Are you sure you want to delete this organizer template?"
+    );
 
     // Proceed with deletion if confirmed
     if (isConfirmed) {
       const requestOptions = {
         method: "DELETE",
-        redirect: "follow"
+        redirect: "follow",
       };
       const url = `${ORGANIZER_TEMP_API}/workflow/organizers/organizertemplate/`;
       fetch(url + _id, requestOptions)
         .then((response) => {
           if (!response.ok) {
-            throw new Error('Failed to delete item');
+            throw new Error("Failed to delete item");
           }
           return response.text();
         })
         .then((result) => {
           console.log(result);
-          toast.success('Item deleted successfully');
-          handleMenuClose()
+          toast.success("Item deleted successfully");
+          handleMenuClose();
           fetchOrganizerTemplates();
           // setshowOrganizerTemplateForm(false);
         })
         .catch((error) => {
           console.error(error);
-          toast.error('Failed to delete item');
+          toast.error("Failed to delete item");
         });
     }
   };
@@ -584,25 +668,23 @@ useEffect(() => {
   //   setOpenMenuId(openMenuId === _id ? null : _id);
   //   setTempIdGet(_id);
   // };
-   const toggleMenu = (event, _id) => {
+  const toggleMenu = (event, _id) => {
     setAnchorEl(event.currentTarget);
     setOpenMenuId(_id);
     setTempIdGet(_id);
   };
-    const handleMenuClose = () => {
+  const handleMenuClose = () => {
     setAnchorEl(null);
     setOpenMenuId(null);
     setTempIdGet(null);
   };
 
-    
-  
-  
   const [isFormDirty, setIsFormDirty] = useState(false);
   const handleCancel = () => {
-
     if (isFormDirty) {
-      const confirmClose = window.confirm('You have unsaved changes. Are you sure you want to cancel?');
+      const confirmClose = window.confirm(
+        "You have unsaved changes. Are you sure you want to cancel?"
+      );
       if (!confirmClose) {
         return;
       }
@@ -619,8 +701,8 @@ useEffect(() => {
     }
   }, [templateName, organizerName]);
 
-  const [templateNameError, setTemplateNameError] = useState('');
-  const [organizerError, setOrganizerError] = useState('');
+  const [templateNameError, setTemplateNameError] = useState("");
+  const [organizerError, setOrganizerError] = useState("");
 
   const validateForm = () => {
     let isValid = true;
@@ -629,48 +711,46 @@ useEffect(() => {
 
       isValid = false;
     } else {
-      setTemplateNameError('');
+      setTemplateNameError("");
     }
 
     if (!organizerName) {
-      setOrganizerError('Organizer name is required');
+      setOrganizerError("Organizer name is required");
       isValid = false;
     } else {
-      setOrganizerError('');
+      setOrganizerError("");
     }
     return isValid;
   };
 
-
   const handleDuplicateTemplate = async (templateId) => {
-  try {
-    const response = await fetch(
-      `${ORGANIZER_TEMP_API}/workflow/organizers/organizertemplate/duplicate/${templateId}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+    try {
+      const response = await fetch(
+        `${ORGANIZER_TEMP_API}/workflow/organizers/organizertemplate/duplicate/${templateId}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      const result = await response.json();
+
+      if (result.message === "Organizer Template duplicated successfully") {
+        toast.success("Template duplicated successfully");
+        fetchOrganizerTemplates(); // Refresh the list after duplication
+      } else {
+        toast.error(result.error || "Failed to duplicate template");
       }
-    );
-
-    const result = await response.json();
-
-    if (result.message === "Organizer Template duplicated successfully") {
-      toast.success("Template duplicated successfully");
-      fetchOrganizerTemplates(); // Refresh the list after duplication
-    } else {
-      toast.error(result.error || "Failed to duplicate template");
+    } catch (error) {
+      console.error(error);
+      toast.error("Error duplicating template");
     }
-  } catch (error) {
-    console.error(error);
-    toast.error("Error duplicating template");
-  }
-};
+  };
 
   const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
   const handlePreview = () => {
     setPreviewDialogOpen(true); // Open the dialog
     const data = {
-
       sections, // This contains all your sections and their elements
     };
 
@@ -736,8 +816,8 @@ useEffect(() => {
       [key]: true,
     }));
   };
-  
-const [selectedYesNoValues, setSelectedYesNoValues] = useState({});
+
+  const [selectedYesNoValues, setSelectedYesNoValues] = useState({});
   const handleYesNoChange = (value, elementText, sectionId) => {
     const key = `${sectionId}_${elementText}`;
     setSelectedYesNoValues((prevValues) => ({
@@ -751,7 +831,7 @@ const [selectedYesNoValues, setSelectedYesNoValues] = useState({});
   };
 
   const [inputValues, setInputValues] = useState({});
- const handleInputChange = (event, elementText, sectionId) => {
+  const handleInputChange = (event, elementText, sectionId) => {
     const key = `${sectionId}_${elementText}`;
     const { value } = event.target;
     setInputValues((prevValues) => ({
@@ -764,7 +844,7 @@ const [selectedYesNoValues, setSelectedYesNoValues] = useState({});
     }));
   };
   const [selectedDropdownValues, setSelectedDropdownValues] = useState({});
- const handleDropdownValueChange = (event, elementText, sectionId) => {
+  const handleDropdownValueChange = (event, elementText, sectionId) => {
     const key = `${sectionId}_${elementText}`;
     setSelectedDropdownValues((prevValues) => ({
       ...prevValues,
@@ -776,115 +856,307 @@ const [selectedYesNoValues, setSelectedYesNoValues] = useState({});
     }));
   };
   const stripHtmlTags = (html) => {
-    const tempDiv = document.createElement('div');
+    const tempDiv = document.createElement("div");
     tempDiv.innerHTML = html;
-    return tempDiv.innerText || tempDiv.textContent || '';
+    return tempDiv.innerText || tempDiv.textContent || "";
   };
-const shouldShowElement = (element, sectionId) => {
+  // const shouldShowElement = (element, sectionId) => {
+  //   const settings = element.questionsectionsettings;
+  //   if (!settings?.conditional) return true;
+  //   const conditions = settings?.conditions || [];
+
+  //   for (const condition of conditions) {
+  //     const { question, answer } = condition;
+  //     if (!question || !answer) continue;
+
+  //     // Check all possible sections for the answer
+  //     let conditionMet = false;
+
+  //     // Check radio values
+  //     for (const key in radioValues) {
+  //       if (key.endsWith(`_${question}`) && radioValues[key] === answer) {
+  //         conditionMet = true;
+  //         break;
+  //       }
+  //     }
+  //     if (conditionMet) continue;
+
+  //     // Check checkbox values
+  //     for (const key in checkboxValues) {
+  //       if (key.endsWith(`_${question}`) && checkboxValues[key]?.[answer]) {
+  //         conditionMet = true;
+  //         break;
+  //       }
+  //     }
+  //     if (conditionMet) continue;
+
+  //     // Check dropdown values
+  //     for (const key in selectedDropdownValues) {
+  //       if (
+  //         key.endsWith(`_${question}`) &&
+  //         selectedDropdownValues[key] === answer
+  //       ) {
+  //         conditionMet = true;
+  //         break;
+  //       }
+  //     }
+  //     if (conditionMet) continue;
+  //     // Check Yes/No values
+  //     for (const key in selectedYesNoValues) {
+  //       if (
+  //         key.endsWith(`_${question}`) &&
+  //         selectedYesNoValues[key] === answer
+  //       ) {
+  //         conditionMet = true;
+  //         break;
+  //       }
+  //     }
+  //     if (conditionMet) continue;
+  //     // If we get here, no condition was met
+  //     return false;
+  //   }
+
+  //   return true;
+  // };
+  // const shouldShowSection = (section) => {
+  //   console.log("Evaluating section:", section);
+  //   if (!section.sectionsettings?.conditional) return true;
+  //   const conditions = section.sectionsettings.conditions || [];
+
+  //   return conditions.every((condition) => {
+  //     if (!condition.question || !condition.answer) return false;
+
+  //     // Check all possible sections for the answer
+  //     for (const key in radioValues) {
+  //       if (
+  //         key.endsWith(`_${condition.question}`) &&
+  //         radioValues[key] === condition.answer
+  //       ) {
+  //         return true;
+  //       }
+  //     }
+
+  //     for (const key in checkboxValues) {
+  //       if (
+  //         key.endsWith(`_${condition.question}`) &&
+  //         checkboxValues[key]?.[condition.answer]
+  //       ) {
+  //         return true;
+  //       }
+  //     }
+
+  //     for (const key in selectedDropdownValues) {
+  //       if (
+  //         key.endsWith(`_${condition.question}`) &&
+  //         selectedDropdownValues[key] === condition.answer
+  //       ) {
+  //         return true;
+  //       }
+  //     }
+  //     // Check Yes/No values
+  //     for (const key in selectedYesNoValues) {
+  //       if (
+  //         key.endsWith(`_${condition.question}`) &&
+  //         selectedYesNoValues[key] === condition.answer
+  //       ) {
+  //         return true;
+  //       }
+  //     }
+  //     return false;
+  //   });
+  // };
+const [repeatedSections, setRepeatedSections] = useState({});
+
+ const shouldShowElement = (element, sectionId) => {
     const settings = element.questionsectionsettings;
     if (!settings?.conditional) return true;
+    
     const conditions = settings?.conditions || [];
+    const mode = settings?.mode || "All";
+
+    if (conditions.length === 0) return true;
+
+    let matchedConditions = 0;
 
     for (const condition of conditions) {
       const { question, answer } = condition;
       if (!question || !answer) continue;
 
-      // Check all possible sections for the answer
       let conditionMet = false;
 
-      // Check radio values
       for (const key in radioValues) {
-        if (key.endsWith(`_${question}`) && radioValues[key] === answer) {
+        const [keySectionId] = key.split('_');
+        const numericKeySectionId = Number(keySectionId);
+        const numericCurrentSectionId = typeof sectionId === 'string' ? Number(sectionId) : sectionId;
+        
+        if (numericKeySectionId === numericCurrentSectionId && key.endsWith(`_${question}`) && radioValues[key] === answer) {
           conditionMet = true;
           break;
         }
       }
-      if (conditionMet) continue;
+      if (conditionMet) {
+        matchedConditions++;
+        if (mode === "Any") continue;
+        else continue;
+      }
 
-      // Check checkbox values
       for (const key in checkboxValues) {
-        if (key.endsWith(`_${question}`) && checkboxValues[key]?.[answer]) {
+        const [keySectionId] = key.split('_');
+        const numericKeySectionId = Number(keySectionId);
+        const numericCurrentSectionId = typeof sectionId === 'string' ? Number(sectionId) : sectionId;
+        
+        if (numericKeySectionId === numericCurrentSectionId && key.endsWith(`_${question}`) && checkboxValues[key]?.[answer]) {
           conditionMet = true;
           break;
         }
       }
-      if (conditionMet) continue;
+      if (conditionMet) {
+        matchedConditions++;
+        if (mode === "Any") continue;
+        else continue;
+      }
 
-      // Check dropdown values
       for (const key in selectedDropdownValues) {
-        if (
-          key.endsWith(`_${question}`) &&
-          selectedDropdownValues[key] === answer
-        ) {
+        const [keySectionId] = key.split('_');
+        const numericKeySectionId = Number(keySectionId);
+        const numericCurrentSectionId = typeof sectionId === 'string' ? Number(sectionId) : sectionId;
+        
+        if (numericKeySectionId === numericCurrentSectionId && key.endsWith(`_${question}`) && selectedDropdownValues[key] === answer) {
           conditionMet = true;
           break;
         }
       }
-      if (conditionMet) continue;
-      // Check Yes/No values
+      if (conditionMet) {
+        matchedConditions++;
+        if (mode === "Any") continue;
+        else continue;
+      }
+
       for (const key in selectedYesNoValues) {
-        if (
-          key.endsWith(`_${question}`) &&
-          selectedYesNoValues[key] === answer
-        ) {
+        const [keySectionId] = key.split('_');
+        const numericKeySectionId = Number(keySectionId);
+        const numericCurrentSectionId = typeof sectionId === 'string' ? Number(sectionId) : sectionId;
+        
+        if (numericKeySectionId === numericCurrentSectionId && key.endsWith(`_${question}`) && selectedYesNoValues[key] === answer) {
           conditionMet = true;
           break;
         }
       }
-      if (conditionMet) continue;
-      // If we get here, no condition was met
-      return false;
+      if (conditionMet) {
+        matchedConditions++;
+        if (mode === "Any") continue;
+        else continue;
+      }
+
+      if (mode === "All" && !conditionMet) {
+        return false;
+      }
     }
 
-    return true;
+    if (mode === "Any") {
+      return matchedConditions > 0;
+    } else {
+      return matchedConditions === conditions.length;
+    }
   };
-const shouldShowSection = (section) => {
+
+  const shouldShowSection = (section) => {
     if (!section.sectionsettings?.conditional) return true;
+    
     const conditions = section.sectionsettings.conditions || [];
+    const mode = section.sectionsettings.mode || "All";
 
-    return conditions.every((condition) => {
-      if (!condition.question || !condition.answer) return false;
+    if (conditions.length === 0) return true;
 
-      // Check all possible sections for the answer
+    let matchedConditions = 0;
+
+    conditions.forEach((condition) => {
+      if (!condition.question || !condition.answer) return;
+
+      let conditionMet = false;
+
       for (const key in radioValues) {
-        if (
-          key.endsWith(`_${condition.question}`) &&
-          radioValues[key] === condition.answer
-        ) {
-          return true;
+        const [checkSectionId] = key.split('_');
+        const numericCheckSectionId = Number(checkSectionId);
+        if (!Object.values(repeatedSections).flat().includes(numericCheckSectionId)) {
+          if (
+            key.endsWith(`_${condition.question}`) &&
+            radioValues[key] === condition.answer
+          ) {
+            conditionMet = true;
+            break;
+          }
         }
+      }
+      if (conditionMet) {
+        matchedConditions++;
+        if (mode === "Any") return;
+        return;
       }
 
       for (const key in checkboxValues) {
-        if (
-          key.endsWith(`_${condition.question}`) &&
-          checkboxValues[key]?.[condition.answer]
-        ) {
-          return true;
+        const [checkSectionId] = key.split('_');
+        const numericCheckSectionId = Number(checkSectionId);
+        if (!Object.values(repeatedSections).flat().includes(numericCheckSectionId)) {
+          if (
+            key.endsWith(`_${condition.question}`) &&
+            checkboxValues[key]?.[condition.answer]
+          ) {
+            conditionMet = true;
+            break;
+          }
         }
+      }
+      if (conditionMet) {
+        matchedConditions++;
+        if (mode === "Any") return;
+        return;
       }
 
       for (const key in selectedDropdownValues) {
-        if (
-          key.endsWith(`_${condition.question}`) &&
-          selectedDropdownValues[key] === condition.answer
-        ) {
-          return true;
+        const [checkSectionId] = key.split('_');
+        const numericCheckSectionId = Number(checkSectionId);
+        if (!Object.values(repeatedSections).flat().includes(numericCheckSectionId)) {
+          if (
+            key.endsWith(`_${condition.question}`) &&
+            selectedDropdownValues[key] === condition.answer
+          ) {
+            conditionMet = true;
+            break;
+          }
         }
       }
-      // Check Yes/No values
-      for (const key in selectedYesNoValues) {
-        if (
-          key.endsWith(`_${condition.question}`) &&
-          selectedYesNoValues[key] === condition.answer
-        ) {
-          return true;
-        }
+      if (conditionMet) {
+        matchedConditions++;
+        if (mode === "Any") return;
+        return;
       }
-      return false;
-    });
-  };
 
+      for (const key in selectedYesNoValues) {
+        const [checkSectionId] = key.split('_');
+        const numericCheckSectionId = Number(checkSectionId);
+        if (!Object.values(repeatedSections).flat().includes(numericCheckSectionId)) {
+          if (
+            key.endsWith(`_${condition.question}`) &&
+            selectedYesNoValues[key] === condition.answer
+          ) {
+            conditionMet = true;
+            break;
+          }
+        }
+      }
+      if (conditionMet) {
+        matchedConditions++;
+        if (mode === "Any") return;
+      }
+    });
+
+    if (mode === "Any") {
+      return matchedConditions > 0;
+    } else {
+      return matchedConditions === conditions.length;
+    }
+  };
   const getVisibleSections = () => sections.filter(shouldShowSection);
 
   const visibleSections = getVisibleSections();
@@ -898,8 +1170,7 @@ const shouldShowSection = (section) => {
     setIsDrawerOpen(false);
   };
   const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
-
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [loginChecked, setLoginChecked] = useState(false);
   const [notifyChecked, setNotifyChecked] = useState(false);
@@ -922,120 +1193,152 @@ const shouldShowSection = (section) => {
   const handleAutoSaveToggle = (checked) => {
     setAutoSaveChecked(checked);
   };
-  const [daysuntilNextReminder, setDaysuntilNextReminder] = useState('3');
+  const [daysuntilNextReminder, setDaysuntilNextReminder] = useState("3");
   const [noOfReminder, setNoOfReminder] = useState(1);
-  
-  
-  
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(30);
-  
-  
-     const handleChangePage = (_, newPage) => {
-      setPage(newPage);
-    };
-  
-    const handleChangeRowsPerPage = (event) => {
-      setRowsPerPage(parseInt(event.target.value, 10));
-      setPage(0);
-    };
-     // Compute paginated tasks
-     const paginatedOrganizers = organizerTemplatesData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-  
-  
 
-     // Debounced function to check template name existence
-     const checkTemplateName = async (name) => {
-         try {
-           const res = await axios.get(`${ORGANIZER_TEMP_API}/workflow/organizers/check-name`, {
-             params: { name },
-           });
-           if (res.data.exists) {
-             setTemplateNameError('Template name already exists');
-           } else {
-             setTemplateNameError('');
-           }
-         } catch (err) {
-           console.error(err);
-           setTemplateNameError('');
-         }
-       };
-     
-      const debouncedCheck = debounce((name) => {
-         if (name.trim()) checkTemplateName(name);
-         else setTemplateNameError('');
-       }, 500);
-     
-       useEffect(() => {
-         debouncedCheck(templateName);
-         return debouncedCheck.cancel;
-       }, [templateName]);
-  
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(30);
+
+  const handleChangePage = (_, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+  // Compute paginated tasks
+  const paginatedOrganizers = organizerTemplatesData.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
+
+  // Debounced function to check template name existence
+  const checkTemplateName = async (name) => {
+    try {
+      const res = await axios.get(
+        `${ORGANIZER_TEMP_API}/workflow/organizers/check-name`,
+        {
+          params: { name },
+        }
+      );
+      if (res.data.exists) {
+        setTemplateNameError("Template name already exists");
+      } else {
+        setTemplateNameError("");
+      }
+    } catch (err) {
+      console.error(err);
+      setTemplateNameError("");
+    }
+  };
+
+  const debouncedCheck = debounce((name) => {
+    if (name.trim()) checkTemplateName(name);
+    else setTemplateNameError("");
+  }, 500);
+
+  useEffect(() => {
+    debouncedCheck(templateName);
+    return debouncedCheck.cancel;
+  }, [templateName]);
+
   return (
     <DndProvider backend={HTML5Backend}>
-    <Box p={3}>
-      {!showOrganizerTemplateForm && (
-        <Box >
-
-          <Button variant="contained" onClick={handleCreateInvoiceClick} sx={{
-              backgroundColor: 'var(--color-save-btn)',  // Normal background
-             
-              '&:hover': {
-                backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-              },
-              borderRadius:'15px', mb:2
-            }}>Create Template</Button>
-          {/* <MaterialReactTable columns={columns} table={table} /> */}
+      <Box p={3}>
+        {!showOrganizerTemplateForm && (
           <Box>
-            {loading ? (<Box sx={{display:'flex',alignItems:'center', justifyContent:'center'}}> <CircularProgress style={{fontSize:'300px', color:'blue'}}/></Box>
-          ):( 
-          <Box>
+            <Button
+              variant="contained"
+              onClick={handleCreateInvoiceClick}
+              sx={{
+                backgroundColor: "var(--color-save-btn)", // Normal background
 
-          <TableContainer component={Paper} sx={{ overflow: "visible" }}> 
-         
-          <Table sx={{ width:'100%' }} aria-label="simple table">
-              <TableHead>
-                <TableRow>
-                  <TableCell  style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="200">Template Name</TableCell>
-                  <TableCell  style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="100">Used in Pipelines</TableCell>
-                  <TableCell  style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="100">Settings</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {paginatedOrganizers.map((row) => (
-                  <TableRow key={row._id}>
-                    <TableCell>
-                      <Typography
-                       style={{
-                        fontSize: "12px",
-                        padding: "4px 8px",
-                        lineHeight: "1",
-                        cursor: "pointer",
-                        color: "#3f51b5",
-                      }}
-                        onClick={() => handleEdit(row._id)}
-                      >
-                        {row.templatename}
-                      </Typography>
-                    </TableCell>
-                    <TableCell></TableCell>
-                    
-                    {/* <TableCell
+                "&:hover": {
+                  backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+                },
+                borderRadius: "15px",
+                mb: 2,
+              }}
+            >
+              Create Template
+            </Button>
+            {/* <MaterialReactTable columns={columns} table={table} /> */}
+            <Box>
+              {loading ? (
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {" "}
+                  <CircularProgress
+                    style={{ fontSize: "300px", color: "blue" }}
+                  />
+                </Box>
+              ) : (
+                <Box>
+                  <TableContainer
+                    component={Paper}
+                    sx={{ overflow: "visible" }}
+                  >
+                    <Table sx={{ width: "100%" }} aria-label="simple table">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell
+                            style={{
+                              fontSize: "12px",
+                              fontWeight: "bold",
+                              padding: "16px",
+                            }}
+                            width="200"
+                          >
+                            Template Name
+                          </TableCell>
+                          <TableCell
+                            style={{
+                              fontSize: "12px",
+                              fontWeight: "bold",
+                              padding: "16px",
+                            }}
+                            width="100"
+                          >
+                            Used in Pipelines
+                          </TableCell>
+                          <TableCell
+                            style={{
+                              fontSize: "12px",
+                              fontWeight: "bold",
+                              padding: "16px",
+                            }}
+                            width="100"
+                          >
+                            Settings
+                          </TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {paginatedOrganizers.map((row) => (
+                          <TableRow key={row._id}>
+                            <TableCell>
+                              <Typography
+                                style={{
+                                  fontSize: "12px",
+                                  padding: "4px 8px",
+                                  lineHeight: "1",
+                                  cursor: "pointer",
+                                  color: "#3f51b5",
+                                }}
+                                onClick={() => handleEdit(row._id)}
+                              >
+                                {row.templatename}
+                              </Typography>
+                            </TableCell>
+                            <TableCell></TableCell>
+
+                            {/* <TableCell
                           style={{
                             fontSize: "12px",
                             padding: "4px 8px",
@@ -1096,40 +1399,39 @@ Duplicate
                             
                           </Menu>
                         </TableCell> */}
-                         <TableCell
-                                          style={{
-                                            fontSize: "12px",
-                                            padding: "4px 8px",
-                                            lineHeight: "1",
-                                          }}
-                                        >
-                                          <IconButton
-                                            onClick={(event) => toggleMenu(event, row._id)}
-                                            style={{ color: "#2c59fa" }}
-                                            size="small"
-                                          >
-                                            <CiMenuKebab />
-                                          </IconButton>
-                        
-                                          {/* MUI Menu */}
-                                        
-                                        </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            </TableContainer>
-             <Menu
+                            <TableCell
+                              style={{
+                                fontSize: "12px",
+                                padding: "4px 8px",
+                                lineHeight: "1",
+                              }}
+                            >
+                              <IconButton
+                                onClick={(event) => toggleMenu(event, row._id)}
+                                style={{ color: "#2c59fa" }}
+                                size="small"
+                              >
+                                <CiMenuKebab />
+                              </IconButton>
+
+                              {/* MUI Menu */}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                  <Menu
                     anchorEl={anchorEl}
                     open={Boolean(anchorEl)}
                     onClose={handleMenuClose}
                     anchorOrigin={{
-                      vertical: 'top',
-                      horizontal: 'right',
+                      vertical: "top",
+                      horizontal: "right",
                     }}
                     transformOrigin={{
-                      vertical: 'top',
-                      horizontal: 'left',
+                      vertical: "top",
+                      horizontal: "left",
                     }}
                     PaperProps={{
                       sx: {
@@ -1138,151 +1440,175 @@ Duplicate
                         boxShadow: 3,
                         borderRadius: 1,
                         minWidth: 120,
-                        '& .MuiMenuItem-root': {
-                          fontSize: '12px',
-                          padding: '8px 16px',
-                        }
-                      }
+                        "& .MuiMenuItem-root": {
+                          fontSize: "12px",
+                          padding: "8px 16px",
+                        },
+                      },
                     }}
                   >
-                    <MenuItem 
+                    <MenuItem
                       onClick={() => handleEdit(tempIdget)}
-                      sx={{ 
+                      sx={{
                         fontWeight: "bold",
-                        '&:hover': {
-                          backgroundColor: '#f5f5f5'
-                        }
+                        "&:hover": {
+                          backgroundColor: "#f5f5f5",
+                        },
                       }}
                     >
                       Edit
                     </MenuItem>
-                     <MenuItem 
-                             onClick={() => {
-                                handleDuplicateTemplate(tempIdget);
-                                handleMenuClose();
-                              }}
-                                sx={{ color: "blue" }}
-                           
-                            >
-Duplicate
-                            </MenuItem>
-                    <MenuItem 
+                    <MenuItem
+                      onClick={() => {
+                        handleDuplicateTemplate(tempIdget);
+                        handleMenuClose();
+                      }}
+                      sx={{ color: "blue" }}
+                    >
+                      Duplicate
+                    </MenuItem>
+                    <MenuItem
                       onClick={() => handleDelete(tempIdget)}
-                      sx={{ 
-                        color: "error.main", 
+                      sx={{
+                        color: "error.main",
                         fontWeight: "bold",
-                        '&:hover': {
-                          backgroundColor: '#ffebee'
-                        }
+                        "&:hover": {
+                          backgroundColor: "#ffebee",
+                        },
                       }}
                     >
                       Delete
                     </MenuItem>
                   </Menu>
-            <TablePagination
-rowsPerPageOptions={[30,40,50,60,100]}
-component="div"
-count={organizerTemplatesData.length}
-rowsPerPage={rowsPerPage}
-page={page}
-onPageChange={handleChangePage}
-onRowsPerPageChange={handleChangeRowsPerPage}
-/>
+                  <TablePagination
+                    rowsPerPageOptions={[30, 40, 50, 60, 100]}
+                    component="div"
+                    count={organizerTemplatesData.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                  />
+                </Box>
+              )}
             </Box>
-            )}
-            
-          
           </Box>
-
-        </Box>
-      )}
-      {showOrganizerTemplateForm && (
-        <>
-          <Box>
-            <Box sx={{ display: 'flex', alighItems: 'center', justifyContent: 'space-between', mb: 3 }}>
-              <Typography variant='h4'>Create Template</Typography>
-              <Box>
-                <Button variant="text" onClick={handlePreview} >Preview</Button>
-                <Button variant="text" onClick={handleDrawerOpen} >Setting</Button>
-              </Box>
-
-            </Box>
+        )}
+        {showOrganizerTemplateForm && (
+          <>
             <Box>
-              <InputLabel sx={{color:'black'}}>Template Name</InputLabel>
-              <TextField
-
-                value={templateName}
-                onChange={(e) => setTemplateName(e.target.value)}
-                fullWidth
-                size="small"
-
-                placeholder='Template name'
-                sx={{ backgroundColor: '#fff', mt: 2 }}
-                className='organizer-input-label'
-                error={!!templateNameError}
-              />
-              {(!!templateNameError) && <Alert sx={{
-                width: '96%',
-                p: '0', // Adjust padding to control the size
-                pl: '4%', height: '23px',
-                borderRadius: '10px',
-                borderTopLeftRadius: '0',
-                borderTopRightRadius: '0',
-                fontSize: '15px',
-                display: 'flex',
-                alignItems: 'center', // Center content vertically
-                '& .MuiAlert-icon': {
-                  fontSize: '16px', // Adjust the size of the icon
-                  mr: '8px', // Add margin to the right of the icon
-                },
-              }} variant="filled" severity="error" >
-                {templateNameError}
-              </Alert>}
-            </Box>
-            <Box mt={2}>
-              <label className='organizer-input-label'>Organizer name</label>
-              <TextField
-              inputRef={textFieldRef}
-              value={organizerName}
-              onChange={handlejobName}
-              onClick={(e) => setCursorPosition(e.target.selectionStart)}
-                // value={organizerName + selectedShortcut}
-                // onChange={handlejobName}
-                
-                fullWidth
-                size="small"
-                error={!!organizerError}
-                placeholder='Organizer name'
-                className='organizer-input-label'
-                sx={{ backgroundColor: '#fff', mt: 2 }}
-              />
-              {(!!organizerError) && <Alert sx={{
-                width: '96%',
-                p: '0', // Adjust padding to control the size
-                pl: '4%', height: '23px',
-                borderRadius: '10px',
-                borderTopLeftRadius: '0',
-                borderTopRightRadius: '0',
-                fontSize: '15px',
-                display: 'flex',
-                alignItems: 'center', // Center content vertically
-                '& .MuiAlert-icon': {
-                  fontSize: '16px', // Adjust the size of the icon
-                  mr: '8px', // Add margin to the right of the icon
-                },
-              }} variant="filled" severity="error" >
-                {organizerError}
-              </Alert>}
-
+              <Box
+                sx={{
+                  display: "flex",
+                  alighItems: "center",
+                  justifyContent: "space-between",
+                  mb: 3,
+                }}
+              >
+                <Typography variant="h4">Create Template</Typography>
+                <Box>
+                  <Button variant="text" onClick={handlePreview}>
+                    Preview
+                  </Button>
+                  <Button variant="text" onClick={handleDrawerOpen}>
+                    Setting
+                  </Button>
+                </Box>
+              </Box>
               <Box>
-                  <Button variant="contained" color="primary" onClick={toggleDropdown} sx={{
-                            backgroundColor: 'var(--color-save-btn)',  // Normal background
-                           
-                            '&:hover': {
-                              backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                            },
-                            borderRadius:'15px', mt: 2
-                          }}>
+                <InputLabel sx={{ color: "black" }}>Template Name</InputLabel>
+                <TextField
+                  value={templateName}
+                  onChange={(e) => setTemplateName(e.target.value)}
+                  fullWidth
+                  size="small"
+                  placeholder="Template name"
+                  sx={{ backgroundColor: "#fff", mt: 2 }}
+                  className="organizer-input-label"
+                  error={!!templateNameError}
+                />
+                {!!templateNameError && (
+                  <Alert
+                    sx={{
+                      width: "96%",
+                      p: "0", // Adjust padding to control the size
+                      pl: "4%",
+                      height: "23px",
+                      borderRadius: "10px",
+                      borderTopLeftRadius: "0",
+                      borderTopRightRadius: "0",
+                      fontSize: "15px",
+                      display: "flex",
+                      alignItems: "center", // Center content vertically
+                      "& .MuiAlert-icon": {
+                        fontSize: "16px", // Adjust the size of the icon
+                        mr: "8px", // Add margin to the right of the icon
+                      },
+                    }}
+                    variant="filled"
+                    severity="error"
+                  >
+                    {templateNameError}
+                  </Alert>
+                )}
+              </Box>
+              <Box mt={2}>
+                <label className="organizer-input-label">Organizer name</label>
+                <TextField
+                  inputRef={textFieldRef}
+                  value={organizerName}
+                  onChange={handlejobName}
+                  onClick={(e) => setCursorPosition(e.target.selectionStart)}
+                  // value={organizerName + selectedShortcut}
+                  // onChange={handlejobName}
+
+                  fullWidth
+                  size="small"
+                  error={!!organizerError}
+                  placeholder="Organizer name"
+                  className="organizer-input-label"
+                  sx={{ backgroundColor: "#fff", mt: 2 }}
+                />
+                {!!organizerError && (
+                  <Alert
+                    sx={{
+                      width: "96%",
+                      p: "0", // Adjust padding to control the size
+                      pl: "4%",
+                      height: "23px",
+                      borderRadius: "10px",
+                      borderTopLeftRadius: "0",
+                      borderTopRightRadius: "0",
+                      fontSize: "15px",
+                      display: "flex",
+                      alignItems: "center", // Center content vertically
+                      "& .MuiAlert-icon": {
+                        fontSize: "16px", // Adjust the size of the icon
+                        mr: "8px", // Add margin to the right of the icon
+                      },
+                    }}
+                    variant="filled"
+                    severity="error"
+                  >
+                    {organizerError}
+                  </Alert>
+                )}
+
+                <Box>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={toggleDropdown}
+                    sx={{
+                      backgroundColor: "var(--color-save-btn)", // Normal background
+
+                      "&:hover": {
+                        backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+                      },
+                      borderRadius: "15px",
+                      mt: 2,
+                    }}
+                  >
                     Add Shortcode
                   </Button>
 
@@ -1300,14 +1626,26 @@ onRowsPerPageChange={handleChangeRowsPerPage}
                     }}
                   >
                     <Box>
-                      <List className="dropdown-list" sx={{ width: "300px", height: "300px", cursor: "pointer" }}>
+                      <List
+                        className="dropdown-list"
+                        sx={{
+                          width: "300px",
+                          height: "300px",
+                          cursor: "pointer",
+                        }}
+                      >
                         {filteredShortcuts.map((shortcut, index) => (
-                          <ListItem key={index} onClick={() => handleAddShortcut(shortcut.value)}>
+                          <ListItem
+                            key={index}
+                            onClick={() => handleAddShortcut(shortcut.value)}
+                          >
                             <ListItemText
                               primary={shortcut.title}
                               primaryTypographyProps={{
                                 style: {
-                                  fontWeight: shortcut.isBold ? "bold" : "normal",
+                                  fontWeight: shortcut.isBold
+                                    ? "bold"
+                                    : "normal",
                                 },
                               }}
                             />
@@ -1317,12 +1655,23 @@ onRowsPerPageChange={handleChangeRowsPerPage}
                     </Box>
                   </Popover>
                 </Box>
+              </Box>
             </Box>
-
-          </Box>
-          <Box className="organizer-container" sx={{ display: "flex", marginTop: "40px", height: "auto", width: "100%", gap: 3 }}>
-            <Box className="left-org-container" sx={{ padding: '10px', width: "30%", height: "auto", p: 2 }}>
-              {/* <Box   border={"2px solid red"}>
+            <Box
+              className="organizer-container"
+              sx={{
+                display: "flex",
+                marginTop: "40px",
+                height: "auto",
+                width: "100%",
+                gap: 3,
+              }}
+            >
+              <Box
+                className="left-org-container"
+                sx={{ padding: "10px", width: "30%", height: "auto", p: 2 }}
+              >
+                {/* <Box   border={"2px solid red"}>
                 {sections.map((section) => (
                   <Box key={section.id} sx={{
                     display: "flex",
@@ -1346,666 +1695,796 @@ onRowsPerPageChange={handleChangeRowsPerPage}
                   </Box>
                 ))}
               </Box> */}
-              <Box >
-          {sections.map((section, index) => (
-            <SectionItem 
-              key={section.id}
-              section={section}
-              index={index}
-              onClick={handleSectionClick}
-              onDrop={moveSection}
-              truncateText={truncateText}
-              isSelected={selectedSection?.id === section.id}
-            />
-          ))}
-        </Box>
-              <Box sx={{ width: "50%", height: "25px", marginTop: "20px" }}>
-                <Button
-                  variant="contained"
-                  onClick={addSection}
-                  sx={{
-                    backgroundColor: 'var(--color-save-btn)',  // Normal background
-                   
-                    '&:hover': {
-                      backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                    },
-                    borderRadius:'15px', 
-                  }}
-                >
-                  New section
-                </Button>
-              </Box>
-            </Box>
-            <Box className="right-container" sx={{ borderRadius: '20px', width: "70%", height: "auto" }}>
-              {selectedSection && (
-                <DndProvider backend={HTML5Backend}>
-                <Section
-                  section={selectedSection}
-                  onDelete={handleDeleteSection}
-                  onUpdate={handleUpdateSection}
-                  onDuplicate={handleDuplicateSection}
-                  onSaveFormData={handleFormSave}
-                  onSaveSectionData={handleSectionSaveData}
-                  sections={sections}
-                />
-                </DndProvider>
-              )}
-            </Box>
-          </Box>
-          <Box sx={{ display: "flex", gap: "10px", marginLeft: "10px", marginBottom: "20px", marginTop: '20px' }}>
-            <Button type="submit"
-              variant="contained"
-              color="primary"
-              onClick={saveandexitOrganizerTemp}  sx={{
-                backgroundColor: 'var(--color-save-btn)',  // Normal background
-               
-                '&:hover': {
-                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                },
-                borderRadius:'15px', 
-              }}>Save & exit</Button>
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              onClick={saveOrganizerTemp}
-              sx={{
-                backgroundColor: 'var(--color-save-btn)',  // Normal background
-               
-                '&:hover': {
-                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                },
-                borderRadius:'15px', width:'80px'
-              }}
-            >
-              Save
-            </Button>
-            <Button
-              type="button"
-              variant="outlined"
-              color="primary"
-              onClick={handleCancel}
-              sx={{
-                borderColor: 'var(--color-border-cancel-btn)',  // Normal background
-               color:'var(--color-save-btn)',
-                '&:hover': {
-                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                  color:'#fff',
-                  border:"none"
-                },
-                width:'80px',borderRadius:'15px'
-              }}
-            >
-              Cancel
-            </Button>
-          </Box>
-
-
-          <Drawer
-            anchor='right'
-            open={isDrawerOpen}
-            onClose={handleDrawerClose}
-            PaperProps={{
-              id: 'tag-drawer',
-              sx: {
-                borderRadius: isSmallScreen ? '0' : '10px 0 0 10px',
-                width: isSmallScreen ? '100%' : 500,
-                maxWidth: '100%',
-                [theme.breakpoints.down('sm')]: {
-                  width: '100%',
-                },
-
-              }
-            }}
-          >
-            <Box sx={{ borderRadius: isSmallScreen ? '0' : '15px' }} role="presentation">
-              <Box>
-                <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '15px', background: "#EEEEEE" }}>
-                  <Typography variant="h6" >
-                    Organizer settings
-                  </Typography>
-                  <IoClose onClick={handleDrawerClose} style={{ cursor: 'pointer' }} />
+                <Box>
+                  {sections.map((section, index) => (
+                    <SectionItem
+                      key={section.id}
+                      section={section}
+                      index={index}
+                      onClick={handleSectionClick}
+                      onDrop={moveSection}
+                      truncateText={truncateText}
+                      isSelected={selectedSection?.id === section.id}
+                    />
+                  ))}
                 </Box>
-                <Box sx={{ pr: 2, pl: 2, pt: 2 }}>
-                  <FormGroup>
-                    {/* Switch for Login */}
-                    <FormControlLabel
-                      control={<Switch checked={loginChecked} onChange={(event) => handleLoginToggle(event.target.checked)} />}
-                      label="Notify about document upload"
-                    />
-                    {/* Switch for Notify */}
-                    <FormControlLabel
-                      control={<Switch checked={notifyChecked} onChange={(event) => handleNotifyToggle(event.target.checked)} />}
-                      label="Organizer self service"
-                    />
-                    {/* Switch for Email Sync */}
-                    <FormControlLabel
-                      control={<Switch checked={emailSyncChecked} onChange={(event) => handleEmailSyncToggle(event.target.checked)} />}
-                      label="Automatically seal after submission"
-                    />
-                    {/* Switch for Auto-Save */}
-                    <FormControlLabel
-                      control={<Switch checked={autoSaveChecked} onChange={(event) => handleAutoSaveToggle(event.target.checked)} />}
-                      label="Send reminders to clients"
-                    />
+                <Box sx={{ width: "50%", height: "25px", marginTop: "20px" }}>
+                  <Button
+                    variant="contained"
+                    onClick={addSection}
+                    sx={{
+                      backgroundColor: "var(--color-save-btn)", // Normal background
 
-                    {autoSaveChecked && (
-                      <Box mb={3}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, mt: 2 }}>
-
-                          <Box>
-                            <InputLabel sx={{ color: 'black' }}>Days until next reminder</InputLabel>
-                            <TextField
-                              // margin="normal"
-                              fullWidth
-                              name="Daysuntilnextreminder"
-                              value={daysuntilNextReminder}
-                              onChange={(e) => setDaysuntilNextReminder(e.target.value)}
-                              placeholder="Days until next reminder"
-                              size="small"
-                              sx={{ mt: 2 }}
-                            />
-                          </Box>
-
-                          <Box>
-                            <InputLabel sx={{ color: 'black' }}>No Of reminders</InputLabel>
-                            <TextField
-
-                              fullWidth
-                              name="No Of reminders"
-                              value={noOfReminder}
-                              onChange={(e) => setNoOfReminder(e.target.value)}
-
-                              placeholder="NoOfreminders"
-                              size="small"
-                              sx={{ mt: 2 }}
-                            />
-                          </Box>
-
-                        </Box>
-                      </Box>
-                    )}
-                  </FormGroup>
+                      "&:hover": {
+                        backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+                      },
+                      borderRadius: "15px",
+                    }}
+                  >
+                    New section
+                  </Button>
                 </Box>
               </Box>
+              <Box
+                className="right-container"
+                sx={{ borderRadius: "20px", width: "70%", height: "auto" }}
+              >
+                {selectedSection && (
+                  <DndProvider backend={HTML5Backend}>
+                    <Section
+                      section={selectedSection}
+                      onDelete={handleDeleteSection}
+                      onUpdate={handleUpdateSection}
+                      onDuplicate={handleDuplicateSection}
+                      onSaveFormData={handleFormSave}
+                      onSaveSectionData={handleSectionSaveData}
+                      sections={sections}
+                    />
+                  </DndProvider>
+                )}
+              </Box>
             </Box>
-          </Drawer>
+            <Box
+              sx={{
+                display: "flex",
+                gap: "10px",
+                marginLeft: "10px",
+                marginBottom: "20px",
+                marginTop: "20px",
+              }}
+            >
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                onClick={saveandexitOrganizerTemp}
+                sx={{
+                  backgroundColor: "var(--color-save-btn)", // Normal background
 
-          <Dialog open={previewDialogOpen} onClose={handleClosePreview} fullScreen >
+                  "&:hover": {
+                    backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+                  },
+                  borderRadius: "15px",
+                }}
+              >
+                Save & exit
+              </Button>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                onClick={saveOrganizerTemp}
+                sx={{
+                  backgroundColor: "var(--color-save-btn)", // Normal background
 
-            <DialogContent >
+                  "&:hover": {
+                    backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+                  },
+                  borderRadius: "15px",
+                  width: "80px",
+                }}
+              >
+                Save
+              </Button>
+              <Button
+                type="button"
+                variant="outlined"
+                color="primary"
+                onClick={handleCancel}
+                sx={{
+                  borderColor: "var(--color-border-cancel-btn)", // Normal background
+                  color: "var(--color-save-btn)",
+                  "&:hover": {
+                    backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+                    color: "#fff",
+                    border: "none",
+                  },
+                  width: "80px",
+                  borderRadius: "15px",
+                }}
+              >
+                Cancel
+              </Button>
+            </Box>
 
-
-              <Box>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '2px solid #3FA2F6', p: 2, mb: 3, borderRadius: '10px', backgroundColor: '#96C9F4' }}>
-                      <Box >
-                        <Typography fontWeight='bold'>Preview mode</Typography>
-                        <Typography>The client sees your organizer like this</Typography>
-                      </Box>
-                      <Button variant='text' onClick={handleClosePreview} >Back to edit</Button>
-                    </Box>
-                    <Typography variant='text' gutterBottom>
-                      {organizerName}
-                    </Typography>
-
-                    <FormControl fullWidth sx={{ marginBottom: '10px', marginTop: '10px' }}>
-                      
-
-                      <Select
-  value={activeStep}
-  onChange={handleDropdownChange}
-  size="small"
->
-  {visibleSections.map((section, index) => {
-    // Filter form elements that are actually visible
-    const visibleElements = section.formElements.filter((el) =>
-      shouldShowElement(el, section.id)
-    );
-
-    // Count answered visible elements
-    const answeredCount = visibleElements.reduce((count, element) => {
-      const key = `${section.id}_${element.text}`;
-      return count + (answeredElements[key] ? 1 : 0);
-    }, 0);
-
-    const totalVisibleElements = visibleElements.length;
-
-    return (
-      <MenuItem key={section.id} value={index}>
-        {section.text} ({answeredCount}/{totalVisibleElements})
-      </MenuItem>
-    );
-  })}
-</Select>
-
-                    </FormControl>
-
-                    <Box mt={2} mb={2}>
-                      <LinearProgress variant="determinate" value={(activeStep + 1) / totalSteps * 100} />
-                    </Box>
-
-                  
-                    <Box sx={{ pl: 20, pr: 20 }}>
-                     
- {visibleSections.map(
-                    (section, sectionIndex) =>
-                      sectionIndex === activeStep && (
-                        <Box key={section.id}>
-                          {section.formElements.map(
-                            (element) =>
-                              shouldShowElement(element, section.id) && (
-                                <Box key={`${section.id}_${element.id}`}>
-                                  {/* Text Editor */}
-                                  {element.type === "Text Editor" && (
-                                    <Box mt={2} mb={2}>
-                                      <Typography>
-                                        {stripHtmlTags(element.text)}
-                                      </Typography>
-                                    </Box>
-                                  )}
-
-                                  {/* Free Entry or Email */}
-                                  {(element.type === "Free Entry" ||
-                                    element.type === "Email") && (
-                                    <Box>
-                                      <Typography fontSize="18px" mb={1} mt={1}>
-                                        {element.text}
-                                      </Typography>
-                                      <TextField
-                                        variant="outlined"
-                                        size="small"
-                                        multiline
-                                        fullWidth
-                                        placeholder={`${element.type} Answer`}
-                                        inputProps={{
-                                          type:
-                                            element.type === "Free Entry"
-                                              ? "text"
-                                              : element.type.toLowerCase(),
-                                        }}
-                                        maxRows={8}
-                                        style={{ display: "block" }}
-                                        value={
-                                          inputValues[
-                                            `${section.id}_${element.text}`
-                                          ] || ""
-                                        }
-                                        onChange={(e) =>
-                                          handleInputChange(
-                                            e,
-                                            element.text,
-                                            section.id
-                                          )
-                                        }
-                                      />
-                                    </Box>
-                                  )}
-
-                                  {/* Number */}
-                                  {element.type === "Number" && (
-                                    <Box>
-                                      <Typography fontSize="18px" mb={1} mt={1}>
-                                        {element.text}
-                                      </Typography>
-                                      <TextField
-                                        variant="outlined"
-                                        size="small"
-                                        multiline
-                                        fullWidth
-                                        placeholder={`${element.type} Answer`}
-                                        inputProps={{
-                                          type: "text",
-                                          inputMode: "numeric",
-                                          pattern: "[0-9]*",
-                                        }}
-                                        maxRows={8}
-                                        style={{
-                                          display: "block",
-                                          marginTop: "15px",
-                                        }}
-                                        value={
-                                          inputValues[
-                                            `${section.id}_${element.text}`
-                                          ] || ""
-                                        }
-                                        onChange={(e) => {
-                                          const numericValue =
-                                            e.target.value.replace(/\D/g, "");
-                                          handleInputChange(
-                                            { target: { value: numericValue } },
-                                            element.text,
-                                            section.id
-                                          );
-                                        }}
-                                      />
-                                    </Box>
-                                  )}
-
-                                  {/* Radio Buttons */}
-                                  {element.type === "Radio Buttons" && (
-                                    <Box>
-                                      <Typography fontSize="18px" mb={1} mt={1}>
-                                        {element.text}
-                                      </Typography>
-                                      <Box
-                                        sx={{
-                                          display: "flex",
-                                          gap: 1,
-                                          flexWrap: "wrap",
-                                        }}
-                                      >
-                                        {element.options.map((option) => (
-                                          <Button
-                                            key={option.text}
-                                            variant={
-                                              radioValues[
-                                                `${section.id}_${element.text}`
-                                              ] === option.text
-                                                ? "contained"
-                                                : "outlined"
-                                            }
-                                            onClick={() =>
-                                              handleRadioChange(
-                                                option.text,
-                                                element.text,
-                                                section.id
-                                              )
-                                            }
-                                            sx={{
-                                              borderRadius: "15px",
-                                              ...(radioValues[
-                                                `${section.id}_${element.text}`
-                                              ] === option.text
-                                                ? {
-                                                    backgroundColor:
-                                                      "var(--color-save-btn)",
-                                                    "&:hover": {
-                                                      backgroundColor:
-                                                        "var(--color-save-hover-btn)",
-                                                    },
-                                                  }
-                                                : {
-                                                    borderColor:
-                                                      "var(--color-border-cancel-btn)",
-                                                    color:
-                                                      "var(--color-save-btn)",
-                                                    "&:hover": {
-                                                      backgroundColor:
-                                                        "var(--color-save-hover-btn)",
-                                                      color: "#fff",
-                                                      border: "none",
-                                                    },
-                                                  }),
-                                            }}
-                                          >
-                                            {option.text}
-                                          </Button>
-                                        ))}
-                                      </Box>
-                                    </Box>
-                                  )}
-
-                                  {/* Checkboxes */}
-                                  {element.type === "Checkboxes" && (
-                                    <Box>
-                                      <Typography fontSize="18px">
-                                        {element.text}
-                                      </Typography>
-                                      <Box
-                                        sx={{
-                                          display: "flex",
-                                          gap: 1,
-                                          flexWrap: "wrap",
-                                        }}
-                                      >
-                                        {element.options.map((option) => (
-                                          <Button
-                                            key={option.text}
-                                            variant={
-                                              checkboxValues[
-                                                `${section.id}_${element.text}`
-                                              ]?.[option.text]
-                                                ? "contained"
-                                                : "outlined"
-                                            }
-                                            onClick={() =>
-                                              handleCheckboxChange(
-                                                option.text,
-                                                element.text,
-                                                section.id
-                                              )
-                                            }
-                                            sx={{
-                                              borderRadius: "15px",
-                                              ...(checkboxValues[
-                                                `${section.id}_${element.text}`
-                                              ]?.[option.text]
-                                                ? {
-                                                    backgroundColor:
-                                                      "var(--color-save-btn)",
-                                                    "&:hover": {
-                                                      backgroundColor:
-                                                        "var(--color-save-hover-btn)",
-                                                    },
-                                                  }
-                                                : {
-                                                    borderColor:
-                                                      "var(--color-border-cancel-btn)",
-                                                    color:
-                                                      "var(--color-save-btn)",
-                                                    "&:hover": {
-                                                      backgroundColor:
-                                                        "var(--color-save-hover-btn)",
-                                                      color: "#fff",
-                                                      border: "none",
-                                                    },
-                                                  }),
-                                            }}
-                                          >
-                                            {option.text}
-                                          </Button>
-                                        ))}
-                                      </Box>
-                                    </Box>
-                                  )}
-
-                                  {/* Yes/No */}
-                                  {element.type === "Yes/No" && (
-                                    <Box>
-                                      <Typography fontSize="18px">
-                                        {element.text}
-                                      </Typography>
-                                      <Box sx={{ display: "flex", gap: 1 }}>
-                                        {element.options.map((option) => (
-                                          <Button
-                                            key={option.text}
-                                            variant={
-                                              selectedYesNoValues[
-                                                `${section.id}_${element.text}`
-                                              ] === option.text
-                                                ? "contained"
-                                                : "outlined"
-                                            }
-                                            onClick={() =>
-                                              handleYesNoChange(
-                                                option.text,
-                                                element.text,
-                                                section.id
-                                              )
-                                            }
-                                            sx={{
-                                              borderRadius: "15px",
-                                              ...(selectedYesNoValues[
-                                                `${section.id}_${element.text}`
-                                              ] === option.text
-                                                ? {
-                                                    backgroundColor:
-                                                      "var(--color-save-btn)",
-                                                    "&:hover": {
-                                                      backgroundColor:
-                                                        "var(--color-save-hover-btn)",
-                                                    },
-                                                  }
-                                                : {
-                                                    borderColor:
-                                                      "var(--color-border-cancel-btn)",
-                                                    color:
-                                                      "var(--color-save-btn)",
-                                                    "&:hover": {
-                                                      backgroundColor:
-                                                        "var(--color-save-hover-btn)",
-                                                      color: "#fff",
-                                                      border: "none",
-                                                    },
-                                                  }),
-                                            }}
-                                          >
-                                            {option.text}
-                                          </Button>
-                                        ))}
-                                      </Box>
-                                    </Box>
-                                  )}
-
-                                  {/* Dropdown */}
-                                  {element.type === "Dropdown" && (
-                                    <Box>
-                                      <Typography fontSize="18px">
-                                        {element.text}
-                                      </Typography>
-                                      <FormControl fullWidth>
-                                        <Select
-                                          value={
-                                            selectedDropdownValues[
-                                              `${section.id}_${element.text}`
-                                            ] || ""
-                                          }
-                                          onChange={(event) =>
-                                            handleDropdownValueChange(
-                                              event,
-                                              element.text,
-                                              section.id
-                                            )
-                                          }
-                                          size="small"
-                                        >
-                                          {element.options.map((option) => (
-                                            <MenuItem
-                                              key={option.text}
-                                              value={option.text}
-                                            >
-                                              {option.text}
-                                            </MenuItem>
-                                          ))}
-                                        </Select>
-                                      </FormControl>
-                                    </Box>
-                                  )}
-
-                                  {/* Date */}
-                                  {element.type === "Date" && (
-                                    <Box>
-                                      <Typography fontSize="18px">
-                                        {element.text}
-                                      </Typography>
-                                      <DatePicker
-                                         format="MM/DD/YYYY"
-                                        sx={{
-                                          width: "100%",
-                                          backgroundColor: "#fff",
-                                        }}
-                                        selected={startDate}
-                                        onChange={handleStartDateChange}
-                                        renderInput={(params) => (
-                                          <TextField {...params} size="small" />
-                                        )}
-                                        onOpen={() =>
-                                          setAnsweredElements(
-                                            (prevAnswered) => ({
-                                              ...prevAnswered,
-                                              [`${section.id}_${element.text}`]: true,
-                                            })
-                                          )
-                                        }
-                                      />
-                                    </Box>
-                                  )}
-
-                                  {/* File Upload */}
-                                  {element.type === "File Upload" && (
-                                    <Box>
-                                      <Typography fontSize="18px" mb={1} mt={2}>
-                                        {element.text}
-                                      </Typography>
-                                      <Tooltip
-                                        title="Unavailable in preview mode"
-                                        placement="top"
-                                      >
-                                        <Box
-                                          sx={{
-                                            position: "relative",
-                                            width: "100%",
-                                          }}
-                                        >
-                                          <TextField
-                                            variant="outlined"
-                                            size="small"
-                                            fullWidth
-                                            disabled
-                                            placeholder="Add Document"
-                                            sx={{
-                                              cursor: "not-allowed",
-                                              "& .MuiInputBase-input": {
-                                                pointerEvents: "none",
-                                                cursor: "not-allowed",
-                                              },
-                                            }}
-                                          />
-                                        </Box>
-                                      </Tooltip>
-                                    </Box>
-                                  )}
-                                </Box>
-                              )
-                          )}
-                        </Box>
-                      )
-                  )}
-                      <Box mt={3} display='flex' gap={3} alignItems='center'>
-                        <Button disabled={activeStep === 0} onClick={handleBack} variant='contained' sx={{
-                backgroundColor: 'var(--color-save-btn)',  // Normal background
-               
-                '&:hover': {
-                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
+            <Drawer
+              anchor="right"
+              open={isDrawerOpen}
+              onClose={handleDrawerClose}
+              PaperProps={{
+                id: "tag-drawer",
+                sx: {
+                  borderRadius: isSmallScreen ? "0" : "10px 0 0 10px",
+                  width: isSmallScreen ? "100%" : 500,
+                  maxWidth: "100%",
+                  [theme.breakpoints.down("sm")]: {
+                    width: "100%",
+                  },
                 },
-               width:'80px',borderRadius:'15px'
-              }}>
-                          Back
-                        </Button>
-                        <Button onClick={handleNext} disabled={activeStep === totalSteps - 1} variant='contained' sx={{
-                backgroundColor: 'var(--color-save-btn)',  // Normal background
-               
-                '&:hover': {
-                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                },
-               width:'80px',borderRadius:'15px'
-              }}>
-                          Next
-                        </Button>
-                      </Box>
-                    </Box>
+              }}
+            >
+              <Box
+                sx={{ borderRadius: isSmallScreen ? "0" : "15px" }}
+                role="presentation"
+              >
+                <Box>
+                  <Box
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      padding: "15px",
+                      background: "#EEEEEE",
+                    }}
+                  >
+                    <Typography variant="h6">Organizer settings</Typography>
+                    <IoClose
+                      onClick={handleDrawerClose}
+                      style={{ cursor: "pointer" }}
+                    />
                   </Box>
-                </LocalizationProvider>
+                  <Box sx={{ pr: 2, pl: 2, pt: 2 }}>
+                    <FormGroup>
+                      {/* Switch for Login */}
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={loginChecked}
+                            onChange={(event) =>
+                              handleLoginToggle(event.target.checked)
+                            }
+                          />
+                        }
+                        label="Notify about document upload"
+                      />
+                      {/* Switch for Notify */}
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={notifyChecked}
+                            onChange={(event) =>
+                              handleNotifyToggle(event.target.checked)
+                            }
+                          />
+                        }
+                        label="Organizer self service"
+                      />
+                      {/* Switch for Email Sync */}
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={emailSyncChecked}
+                            onChange={(event) =>
+                              handleEmailSyncToggle(event.target.checked)
+                            }
+                          />
+                        }
+                        label="Automatically seal after submission"
+                      />
+                      {/* Switch for Auto-Save */}
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={autoSaveChecked}
+                            onChange={(event) =>
+                              handleAutoSaveToggle(event.target.checked)
+                            }
+                          />
+                        }
+                        label="Send reminders to clients"
+                      />
+
+                      {autoSaveChecked && (
+                        <Box mb={3}>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 3,
+                              mt: 2,
+                            }}
+                          >
+                            <Box>
+                              <InputLabel sx={{ color: "black" }}>
+                                Days until next reminder
+                              </InputLabel>
+                              <TextField
+                                // margin="normal"
+                                fullWidth
+                                name="Daysuntilnextreminder"
+                                value={daysuntilNextReminder}
+                                onChange={(e) =>
+                                  setDaysuntilNextReminder(e.target.value)
+                                }
+                                placeholder="Days until next reminder"
+                                size="small"
+                                sx={{ mt: 2 }}
+                              />
+                            </Box>
+
+                            <Box>
+                              <InputLabel sx={{ color: "black" }}>
+                                No Of reminders
+                              </InputLabel>
+                              <TextField
+                                fullWidth
+                                name="No Of reminders"
+                                value={noOfReminder}
+                                onChange={(e) =>
+                                  setNoOfReminder(e.target.value)
+                                }
+                                placeholder="NoOfreminders"
+                                size="small"
+                                sx={{ mt: 2 }}
+                              />
+                            </Box>
+                          </Box>
+                        </Box>
+                      )}
+                    </FormGroup>
+                  </Box>
+                </Box>
               </Box>
-            </DialogContent>
+            </Drawer>
 
-          </Dialog>
-        </>
-      )}
+            <Dialog
+              open={previewDialogOpen}
+              onClose={handleClosePreview}
+              fullScreen
+            >
+              <DialogContent>
+                <Box>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <Box>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          border: "2px solid #3FA2F6",
+                          p: 2,
+                          mb: 3,
+                          borderRadius: "10px",
+                          backgroundColor: "#96C9F4",
+                        }}
+                      >
+                        <Box>
+                          <Typography fontWeight="bold">
+                            Preview mode
+                          </Typography>
+                          <Typography>
+                            The client sees your organizer like this
+                          </Typography>
+                        </Box>
+                        <Button variant="text" onClick={handleClosePreview}>
+                          Back to edit
+                        </Button>
+                      </Box>
+                      <Typography variant="text" gutterBottom>
+                        {organizerName}
+                      </Typography>
 
-    </Box>
+                      <FormControl
+                        fullWidth
+                        sx={{ marginBottom: "10px", marginTop: "10px" }}
+                      >
+                        <Select
+                          value={activeStep}
+                          onChange={handleDropdownChange}
+                          size="small"
+                        >
+                          {visibleSections.map((section, index) => {
+                            // Filter form elements that are actually visible
+                            const visibleElements = section.formElements.filter(
+                              (el) => shouldShowElement(el, section.id)
+                            );
+
+                            // Count answered visible elements
+                            const answeredCount = visibleElements.reduce(
+                              (count, element) => {
+                                const key = `${section.id}_${element.text}`;
+                                return count + (answeredElements[key] ? 1 : 0);
+                              },
+                              0
+                            );
+
+                            const totalVisibleElements = visibleElements.length;
+
+                            return (
+                              <MenuItem key={section.id} value={index}>
+                                {section.text} ({answeredCount}/
+                                {totalVisibleElements})
+                              </MenuItem>
+                            );
+                          })}
+                        </Select>
+                      </FormControl>
+
+                      <Box mt={2} mb={2}>
+                        <LinearProgress
+                          variant="determinate"
+                          value={((activeStep + 1) / totalSteps) * 100}
+                        />
+                      </Box>
+
+                      <Box sx={{ pl: 20, pr: 20 }}>
+                        {visibleSections.map(
+                          (section, sectionIndex) =>
+                            sectionIndex === activeStep && (
+                              <Box key={section.id}>
+                                {section.formElements.map(
+                                  (element) =>
+                                    shouldShowElement(element, section.id) && (
+                                      <Box key={`${section.id}_${element.id}`}>
+                                        {/* Text Editor */}
+                                        {element.type === "Text Editor" && (
+                                          <Box mt={2} mb={2}>
+                                            <Typography>
+                                              {stripHtmlTags(element.text)}
+                                            </Typography>
+                                          </Box>
+                                        )}
+
+                                        {/* Free Entry or Email */}
+                                        {(element.type === "Free Entry" ||
+                                          element.type === "Email") && (
+                                          <Box>
+                                            <Typography
+                                              fontSize="18px"
+                                              mb={1}
+                                              mt={1}
+                                            >
+                                              {element.text}
+                                            </Typography>
+                                            <TextField
+                                              variant="outlined"
+                                              size="small"
+                                              multiline
+                                              fullWidth
+                                              placeholder={`${element.type} Answer`}
+                                              inputProps={{
+                                                type:
+                                                  element.type === "Free Entry"
+                                                    ? "text"
+                                                    : element.type.toLowerCase(),
+                                              }}
+                                              maxRows={8}
+                                              style={{ display: "block" }}
+                                              value={
+                                                inputValues[
+                                                  `${section.id}_${element.text}`
+                                                ] || ""
+                                              }
+                                              onChange={(e) =>
+                                                handleInputChange(
+                                                  e,
+                                                  element.text,
+                                                  section.id
+                                                )
+                                              }
+                                            />
+                                          </Box>
+                                        )}
+
+                                        {/* Number */}
+                                        {element.type === "Number" && (
+                                          <Box>
+                                            <Typography
+                                              fontSize="18px"
+                                              mb={1}
+                                              mt={1}
+                                            >
+                                              {element.text}
+                                            </Typography>
+                                            <TextField
+                                              variant="outlined"
+                                              size="small"
+                                              multiline
+                                              fullWidth
+                                              placeholder={`${element.type} Answer`}
+                                              inputProps={{
+                                                type: "text",
+                                                inputMode: "numeric",
+                                                pattern: "[0-9]*",
+                                              }}
+                                              maxRows={8}
+                                              style={{
+                                                display: "block",
+                                                marginTop: "15px",
+                                              }}
+                                              value={
+                                                inputValues[
+                                                  `${section.id}_${element.text}`
+                                                ] || ""
+                                              }
+                                              onChange={(e) => {
+                                                const numericValue =
+                                                  e.target.value.replace(
+                                                    /\D/g,
+                                                    ""
+                                                  );
+                                                handleInputChange(
+                                                  {
+                                                    target: {
+                                                      value: numericValue,
+                                                    },
+                                                  },
+                                                  element.text,
+                                                  section.id
+                                                );
+                                              }}
+                                            />
+                                          </Box>
+                                        )}
+
+                                        {/* Radio Buttons */}
+                                        {element.type === "Radio Buttons" && (
+                                          <Box>
+                                            <Typography
+                                              fontSize="18px"
+                                              mb={1}
+                                              mt={1}
+                                            >
+                                              {element.text}
+                                            </Typography>
+                                            <Box
+                                              sx={{
+                                                display: "flex",
+                                                gap: 1,
+                                                flexWrap: "wrap",
+                                              }}
+                                            >
+                                              {element.options.map((option) => (
+                                                <Button
+                                                  key={option.text}
+                                                  variant={
+                                                    radioValues[
+                                                      `${section.id}_${element.text}`
+                                                    ] === option.text
+                                                      ? "contained"
+                                                      : "outlined"
+                                                  }
+                                                  onClick={() =>
+                                                    handleRadioChange(
+                                                      option.text,
+                                                      element.text,
+                                                      section.id
+                                                    )
+                                                  }
+                                                  sx={{
+                                                    borderRadius: "15px",
+                                                    ...(radioValues[
+                                                      `${section.id}_${element.text}`
+                                                    ] === option.text
+                                                      ? {
+                                                          backgroundColor:
+                                                            "var(--color-save-btn)",
+                                                          "&:hover": {
+                                                            backgroundColor:
+                                                              "var(--color-save-hover-btn)",
+                                                          },
+                                                        }
+                                                      : {
+                                                          borderColor:
+                                                            "var(--color-border-cancel-btn)",
+                                                          color:
+                                                            "var(--color-save-btn)",
+                                                          "&:hover": {
+                                                            backgroundColor:
+                                                              "var(--color-save-hover-btn)",
+                                                            color: "#fff",
+                                                            border: "none",
+                                                          },
+                                                        }),
+                                                  }}
+                                                >
+                                                  {option.text}
+                                                </Button>
+                                              ))}
+                                            </Box>
+                                          </Box>
+                                        )}
+
+                                        {/* Checkboxes */}
+                                        {element.type === "Checkboxes" && (
+                                          <Box>
+                                            <Typography fontSize="18px">
+                                              {element.text}
+                                            </Typography>
+                                            <Box
+                                              sx={{
+                                                display: "flex",
+                                                gap: 1,
+                                                flexWrap: "wrap",
+                                              }}
+                                            >
+                                              {element.options.map((option) => (
+                                                <Button
+                                                  key={option.text}
+                                                  variant={
+                                                    checkboxValues[
+                                                      `${section.id}_${element.text}`
+                                                    ]?.[option.text]
+                                                      ? "contained"
+                                                      : "outlined"
+                                                  }
+                                                  onClick={() =>
+                                                    handleCheckboxChange(
+                                                      option.text,
+                                                      element.text,
+                                                      section.id
+                                                    )
+                                                  }
+                                                  sx={{
+                                                    borderRadius: "15px",
+                                                    ...(checkboxValues[
+                                                      `${section.id}_${element.text}`
+                                                    ]?.[option.text]
+                                                      ? {
+                                                          backgroundColor:
+                                                            "var(--color-save-btn)",
+                                                          "&:hover": {
+                                                            backgroundColor:
+                                                              "var(--color-save-hover-btn)",
+                                                          },
+                                                        }
+                                                      : {
+                                                          borderColor:
+                                                            "var(--color-border-cancel-btn)",
+                                                          color:
+                                                            "var(--color-save-btn)",
+                                                          "&:hover": {
+                                                            backgroundColor:
+                                                              "var(--color-save-hover-btn)",
+                                                            color: "#fff",
+                                                            border: "none",
+                                                          },
+                                                        }),
+                                                  }}
+                                                >
+                                                  {option.text}
+                                                </Button>
+                                              ))}
+                                            </Box>
+                                          </Box>
+                                        )}
+
+                                        {/* Yes/No */}
+                                        {element.type === "Yes/No" && (
+                                          <Box>
+                                            <Typography fontSize="18px">
+                                              {element.text}
+                                            </Typography>
+                                            <Box
+                                              sx={{ display: "flex", gap: 1 }}
+                                            >
+                                              {element.options.map((option) => (
+                                                <Button
+                                                  key={option.text}
+                                                  variant={
+                                                    selectedYesNoValues[
+                                                      `${section.id}_${element.text}`
+                                                    ] === option.text
+                                                      ? "contained"
+                                                      : "outlined"
+                                                  }
+                                                  onClick={() =>
+                                                    handleYesNoChange(
+                                                      option.text,
+                                                      element.text,
+                                                      section.id
+                                                    )
+                                                  }
+                                                  sx={{
+                                                    borderRadius: "15px",
+                                                    ...(selectedYesNoValues[
+                                                      `${section.id}_${element.text}`
+                                                    ] === option.text
+                                                      ? {
+                                                          backgroundColor:
+                                                            "var(--color-save-btn)",
+                                                          "&:hover": {
+                                                            backgroundColor:
+                                                              "var(--color-save-hover-btn)",
+                                                          },
+                                                        }
+                                                      : {
+                                                          borderColor:
+                                                            "var(--color-border-cancel-btn)",
+                                                          color:
+                                                            "var(--color-save-btn)",
+                                                          "&:hover": {
+                                                            backgroundColor:
+                                                              "var(--color-save-hover-btn)",
+                                                            color: "#fff",
+                                                            border: "none",
+                                                          },
+                                                        }),
+                                                  }}
+                                                >
+                                                  {option.text}
+                                                </Button>
+                                              ))}
+                                            </Box>
+                                          </Box>
+                                        )}
+
+                                        {/* Dropdown */}
+                                        {element.type === "Dropdown" && (
+                                          <Box>
+                                            <Typography fontSize="18px">
+                                              {element.text}
+                                            </Typography>
+                                            <FormControl fullWidth>
+                                              <Select
+                                                value={
+                                                  selectedDropdownValues[
+                                                    `${section.id}_${element.text}`
+                                                  ] || ""
+                                                }
+                                                onChange={(event) =>
+                                                  handleDropdownValueChange(
+                                                    event,
+                                                    element.text,
+                                                    section.id
+                                                  )
+                                                }
+                                                size="small"
+                                              >
+                                                {element.options.map(
+                                                  (option) => (
+                                                    <MenuItem
+                                                      key={option.text}
+                                                      value={option.text}
+                                                    >
+                                                      {option.text}
+                                                    </MenuItem>
+                                                  )
+                                                )}
+                                              </Select>
+                                            </FormControl>
+                                          </Box>
+                                        )}
+
+                                        {/* Date */}
+                                        {element.type === "Date" && (
+                                          <Box>
+                                            <Typography fontSize="18px">
+                                              {element.text}
+                                            </Typography>
+                                            <DatePicker
+                                              format="MM/DD/YYYY"
+                                              sx={{
+                                                width: "100%",
+                                                backgroundColor: "#fff",
+                                              }}
+                                              selected={startDate}
+                                              onChange={handleStartDateChange}
+                                              renderInput={(params) => (
+                                                <TextField
+                                                  {...params}
+                                                  size="small"
+                                                />
+                                              )}
+                                              onOpen={() =>
+                                                setAnsweredElements(
+                                                  (prevAnswered) => ({
+                                                    ...prevAnswered,
+                                                    [`${section.id}_${element.text}`]: true,
+                                                  })
+                                                )
+                                              }
+                                            />
+                                          </Box>
+                                        )}
+
+                                        {/* File Upload */}
+                                        {element.type === "File Upload" && (
+                                          <Box>
+                                            <Typography
+                                              fontSize="18px"
+                                              mb={1}
+                                              mt={2}
+                                            >
+                                              {element.text}
+                                            </Typography>
+                                            <Tooltip
+                                              title="Unavailable in preview mode"
+                                              placement="top"
+                                            >
+                                              <Box
+                                                sx={{
+                                                  position: "relative",
+                                                  width: "100%",
+                                                }}
+                                              >
+                                                <TextField
+                                                  variant="outlined"
+                                                  size="small"
+                                                  fullWidth
+                                                  disabled
+                                                  placeholder="Add Document"
+                                                  sx={{
+                                                    cursor: "not-allowed",
+                                                    "& .MuiInputBase-input": {
+                                                      pointerEvents: "none",
+                                                      cursor: "not-allowed",
+                                                    },
+                                                  }}
+                                                />
+                                              </Box>
+                                            </Tooltip>
+                                          </Box>
+                                        )}
+                                      </Box>
+                                    )
+                                )}
+                              </Box>
+                            )
+                        )}
+                        <Box mt={3} display="flex" gap={3} alignItems="center">
+                          <Button
+                            disabled={activeStep === 0}
+                            onClick={handleBack}
+                            variant="contained"
+                            sx={{
+                              backgroundColor: "var(--color-save-btn)", // Normal background
+
+                              "&:hover": {
+                                backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+                              },
+                              width: "80px",
+                              borderRadius: "15px",
+                            }}
+                          >
+                            Back
+                          </Button>
+                          <Button
+                            onClick={handleNext}
+                            disabled={activeStep === totalSteps - 1}
+                            variant="contained"
+                            sx={{
+                              backgroundColor: "var(--color-save-btn)", // Normal background
+
+                              "&:hover": {
+                                backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+                              },
+                              width: "80px",
+                              borderRadius: "15px",
+                            }}
+                          >
+                            Next
+                          </Button>
+                        </Box>
+                      </Box>
+                    </Box>
+                  </LocalizationProvider>
+                </Box>
+              </DialogContent>
+            </Dialog>
+          </>
+        )}
+      </Box>
     </DndProvider>
   );
 };

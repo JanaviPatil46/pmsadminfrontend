@@ -646,119 +646,309 @@ useEffect(() => {
   };
 
   
-  const shouldShowElement = (element, sectionId) => {
+  // const shouldShowElement = (element, sectionId) => {
+  //   const settings = element.questionsectionsettings;
+  //   if (!settings?.conditional) return true;
+  //   const conditions = settings?.conditions || [];
+
+  //   for (const condition of conditions) {
+  //     const { question, answer } = condition;
+  //     if (!question || !answer) continue;
+
+  //     // Check all possible sections for the answer
+  //     let conditionMet = false;
+
+  //     // Check radio values
+  //     for (const key in radioValues) {
+  //       if (key.endsWith(`_${question}`) && radioValues[key] === answer) {
+  //         conditionMet = true;
+  //         break;
+  //       }
+  //     }
+  //     if (conditionMet) continue;
+
+  //     // Check checkbox values
+  //     for (const key in checkboxValues) {
+  //       if (key.endsWith(`_${question}`) && checkboxValues[key]?.[answer]) {
+  //         conditionMet = true;
+  //         break;
+  //       }
+  //     }
+  //     if (conditionMet) continue;
+
+  //     // Check dropdown values
+  //     for (const key in selectedDropdownValues) {
+  //       if (
+  //         key.endsWith(`_${question}`) &&
+  //         selectedDropdownValues[key] === answer
+  //       ) {
+  //         conditionMet = true;
+  //         break;
+  //       }
+  //     }
+  //     if (conditionMet) continue;
+  //     // Check Yes/No values
+  //     for (const key in selectedYesNoValues) {
+  //       if (
+  //         key.endsWith(`_${question}`) &&
+  //         selectedYesNoValues[key] === answer
+  //       ) {
+  //         conditionMet = true;
+  //         break;
+  //       }
+  //     }
+  //     if (conditionMet) continue;
+  //     // If we get here, no condition was met
+  //     return false;
+  //   }
+
+  //   return true;
+  // };
+ const shouldShowElement = (element, sectionId) => {
     const settings = element.questionsectionsettings;
     if (!settings?.conditional) return true;
+    
     const conditions = settings?.conditions || [];
+    const mode = settings?.mode || "All";
+
+    if (conditions.length === 0) return true;
+
+    let matchedConditions = 0;
 
     for (const condition of conditions) {
       const { question, answer } = condition;
       if (!question || !answer) continue;
 
-      // Check all possible sections for the answer
       let conditionMet = false;
 
-      // Check radio values
       for (const key in radioValues) {
-        if (key.endsWith(`_${question}`) && radioValues[key] === answer) {
+        const [keySectionId] = key.split('_');
+        const numericKeySectionId = Number(keySectionId);
+        const numericCurrentSectionId = typeof sectionId === 'string' ? Number(sectionId) : sectionId;
+        
+        if (numericKeySectionId === numericCurrentSectionId && key.endsWith(`_${question}`) && radioValues[key] === answer) {
           conditionMet = true;
           break;
         }
       }
-      if (conditionMet) continue;
+      if (conditionMet) {
+        matchedConditions++;
+        if (mode === "Any") continue;
+        else continue;
+      }
 
-      // Check checkbox values
       for (const key in checkboxValues) {
-        if (key.endsWith(`_${question}`) && checkboxValues[key]?.[answer]) {
+        const [keySectionId] = key.split('_');
+        const numericKeySectionId = Number(keySectionId);
+        const numericCurrentSectionId = typeof sectionId === 'string' ? Number(sectionId) : sectionId;
+        
+        if (numericKeySectionId === numericCurrentSectionId && key.endsWith(`_${question}`) && checkboxValues[key]?.[answer]) {
           conditionMet = true;
           break;
         }
       }
-      if (conditionMet) continue;
+      if (conditionMet) {
+        matchedConditions++;
+        if (mode === "Any") continue;
+        else continue;
+      }
 
-      // Check dropdown values
       for (const key in selectedDropdownValues) {
-        if (
-          key.endsWith(`_${question}`) &&
-          selectedDropdownValues[key] === answer
-        ) {
+        const [keySectionId] = key.split('_');
+        const numericKeySectionId = Number(keySectionId);
+        const numericCurrentSectionId = typeof sectionId === 'string' ? Number(sectionId) : sectionId;
+        
+        if (numericKeySectionId === numericCurrentSectionId && key.endsWith(`_${question}`) && selectedDropdownValues[key] === answer) {
           conditionMet = true;
           break;
         }
       }
-      if (conditionMet) continue;
-      // Check Yes/No values
+      if (conditionMet) {
+        matchedConditions++;
+        if (mode === "Any") continue;
+        else continue;
+      }
+
       for (const key in selectedYesNoValues) {
-        if (
-          key.endsWith(`_${question}`) &&
-          selectedYesNoValues[key] === answer
-        ) {
+        const [keySectionId] = key.split('_');
+        const numericKeySectionId = Number(keySectionId);
+        const numericCurrentSectionId = typeof sectionId === 'string' ? Number(sectionId) : sectionId;
+        
+        if (numericKeySectionId === numericCurrentSectionId && key.endsWith(`_${question}`) && selectedYesNoValues[key] === answer) {
           conditionMet = true;
           break;
         }
       }
-      if (conditionMet) continue;
-      // If we get here, no condition was met
-      return false;
+      if (conditionMet) {
+        matchedConditions++;
+        if (mode === "Any") continue;
+        else continue;
+      }
+
+      if (mode === "All" && !conditionMet) {
+        return false;
+      }
     }
 
-    return true;
+    if (mode === "Any") {
+      return matchedConditions > 0;
+    } else {
+      return matchedConditions === conditions.length;
+    }
   };
-
   const totalElements = sections[activeStep]?.formElements.length || 0;
   const answeredCount =
     sections[activeStep]?.formElements.filter(
       (element) => answeredElements[element.text]
     ).length || 0;
+ const [repeatedSections, setRepeatedSections] = useState({});
 
-  
+
 
   const shouldShowSection = (section) => {
     if (!section.sectionsettings?.conditional) return true;
+    
     const conditions = section.sectionsettings.conditions || [];
+    const mode = section.sectionsettings.mode || "All";
 
-    return conditions.every((condition) => {
-      if (!condition.question || !condition.answer) return false;
+    if (conditions.length === 0) return true;
 
-      // Check all possible sections for the answer
+    let matchedConditions = 0;
+
+    conditions.forEach((condition) => {
+      if (!condition.question || !condition.answer) return;
+
+      let conditionMet = false;
+
       for (const key in radioValues) {
-        if (
-          key.endsWith(`_${condition.question}`) &&
-          radioValues[key] === condition.answer
-        ) {
-          return true;
+        const [checkSectionId] = key.split('_');
+        const numericCheckSectionId = Number(checkSectionId);
+        if (!Object.values(repeatedSections).flat().includes(numericCheckSectionId)) {
+          if (
+            key.endsWith(`_${condition.question}`) &&
+            radioValues[key] === condition.answer
+          ) {
+            conditionMet = true;
+            break;
+          }
         }
+      }
+      if (conditionMet) {
+        matchedConditions++;
+        if (mode === "Any") return;
+        return;
       }
 
       for (const key in checkboxValues) {
-        if (
-          key.endsWith(`_${condition.question}`) &&
-          checkboxValues[key]?.[condition.answer]
-        ) {
-          return true;
+        const [checkSectionId] = key.split('_');
+        const numericCheckSectionId = Number(checkSectionId);
+        if (!Object.values(repeatedSections).flat().includes(numericCheckSectionId)) {
+          if (
+            key.endsWith(`_${condition.question}`) &&
+            checkboxValues[key]?.[condition.answer]
+          ) {
+            conditionMet = true;
+            break;
+          }
         }
+      }
+      if (conditionMet) {
+        matchedConditions++;
+        if (mode === "Any") return;
+        return;
       }
 
       for (const key in selectedDropdownValues) {
-        if (
-          key.endsWith(`_${condition.question}`) &&
-          selectedDropdownValues[key] === condition.answer
-        ) {
-          return true;
+        const [checkSectionId] = key.split('_');
+        const numericCheckSectionId = Number(checkSectionId);
+        if (!Object.values(repeatedSections).flat().includes(numericCheckSectionId)) {
+          if (
+            key.endsWith(`_${condition.question}`) &&
+            selectedDropdownValues[key] === condition.answer
+          ) {
+            conditionMet = true;
+            break;
+          }
         }
       }
-      // Check Yes/No values
+      if (conditionMet) {
+        matchedConditions++;
+        if (mode === "Any") return;
+        return;
+      }
+
       for (const key in selectedYesNoValues) {
-        if (
-          key.endsWith(`_${condition.question}`) &&
-          selectedYesNoValues[key] === condition.answer
-        ) {
-          return true;
+        const [checkSectionId] = key.split('_');
+        const numericCheckSectionId = Number(checkSectionId);
+        if (!Object.values(repeatedSections).flat().includes(numericCheckSectionId)) {
+          if (
+            key.endsWith(`_${condition.question}`) &&
+            selectedYesNoValues[key] === condition.answer
+          ) {
+            conditionMet = true;
+            break;
+          }
         }
       }
-      return false;
+      if (conditionMet) {
+        matchedConditions++;
+        if (mode === "Any") return;
+      }
     });
+
+    if (mode === "Any") {
+      return matchedConditions > 0;
+    } else {
+      return matchedConditions === conditions.length;
+    }
   };
+
+  // const shouldShowSection = (section) => {
+  //   if (!section.sectionsettings?.conditional) return true;
+  //   const conditions = section.sectionsettings.conditions || [];
+
+  //   return conditions.every((condition) => {
+  //     if (!condition.question || !condition.answer) return false;
+
+  //     // Check all possible sections for the answer
+  //     for (const key in radioValues) {
+  //       if (
+  //         key.endsWith(`_${condition.question}`) &&
+  //         radioValues[key] === condition.answer
+  //       ) {
+  //         return true;
+  //       }
+  //     }
+
+  //     for (const key in checkboxValues) {
+  //       if (
+  //         key.endsWith(`_${condition.question}`) &&
+  //         checkboxValues[key]?.[condition.answer]
+  //       ) {
+  //         return true;
+  //       }
+  //     }
+
+  //     for (const key in selectedDropdownValues) {
+  //       if (
+  //         key.endsWith(`_${condition.question}`) &&
+  //         selectedDropdownValues[key] === condition.answer
+  //       ) {
+  //         return true;
+  //       }
+  //     }
+  //     // Check Yes/No values
+  //     for (const key in selectedYesNoValues) {
+  //       if (
+  //         key.endsWith(`_${condition.question}`) &&
+  //         selectedYesNoValues[key] === condition.answer
+  //       ) {
+  //         return true;
+  //       }
+  //     }
+  //     return false;
+  //   });
+  // };
 
   const getVisibleSections = () => sections.filter(shouldShowSection);
 

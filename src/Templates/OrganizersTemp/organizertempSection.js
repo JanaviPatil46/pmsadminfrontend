@@ -1176,7 +1176,7 @@ const getAllQuestionsGrouped = () => {
         open={isDrawerOpen}
         onClose={() => toggleDrawer(false)}
       >
-        <Box sx={{ width: 500 }} role="presentation">
+        <Box sx={{ width: 800 }} role="presentation">
           <Box
             sx={{
               display: "flex",
@@ -1189,7 +1189,7 @@ const getAllQuestionsGrouped = () => {
               <Typography variant="h6" gutterBottom>
                 Section Settings
               </Typography>
-              <h2>Settings for Section ID: {selectedSectionId}</h2>
+              {/* <h2>Settings for Section ID: {selectedSectionId}</h2> */}
               <Typography gutterBottom>{text}</Typography>
             </Box>
 
