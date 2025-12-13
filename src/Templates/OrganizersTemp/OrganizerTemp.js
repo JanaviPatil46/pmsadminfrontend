@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef ,useCallback} from "react";
 import Section from "./organizertempSection";
 import { toast } from "react-toastify";
 import { CircularProgress, TableContainer } from "@mui/material";
@@ -1060,9 +1060,191 @@ const [repeatedSections, setRepeatedSections] = useState({});
     }
   };
 
-  const shouldShowSection = (section) => {
-    if (!section.sectionsettings?.conditional) return true;
+  // const shouldShowSection = (section) => {
+  //   if (!section.sectionsettings?.conditional) return true;
     
+  //   const conditions = section.sectionsettings.conditions || [];
+  //   const mode = section.sectionsettings.mode || "All";
+
+  //   if (conditions.length === 0) return true;
+
+  //   let matchedConditions = 0;
+
+  //   conditions.forEach((condition) => {
+  //     if (!condition.question || !condition.answer) return;
+
+  //     let conditionMet = false;
+
+  //     for (const key in radioValues) {
+  //       const [checkSectionId] = key.split('_');
+  //       const numericCheckSectionId = Number(checkSectionId);
+  //       if (!Object.values(repeatedSections).flat().includes(numericCheckSectionId)) {
+  //         if (
+  //           key.endsWith(`_${condition.question}`) &&
+  //           radioValues[key] === condition.answer
+  //         ) {
+  //           conditionMet = true;
+  //           break;
+  //         }
+  //       }
+  //     }
+  //     if (conditionMet) {
+  //       matchedConditions++;
+  //       if (mode === "Any") return;
+  //       return;
+  //     }
+
+  //     for (const key in checkboxValues) {
+  //       const [checkSectionId] = key.split('_');
+  //       const numericCheckSectionId = Number(checkSectionId);
+  //       if (!Object.values(repeatedSections).flat().includes(numericCheckSectionId)) {
+  //         if (
+  //           key.endsWith(`_${condition.question}`) &&
+  //           checkboxValues[key]?.[condition.answer]
+  //         ) {
+  //           conditionMet = true;
+  //           break;
+  //         }
+  //       }
+  //     }
+  //     if (conditionMet) {
+  //       matchedConditions++;
+  //       if (mode === "Any") return;
+  //       return;
+  //     }
+
+  //     for (const key in selectedDropdownValues) {
+  //       const [checkSectionId] = key.split('_');
+  //       const numericCheckSectionId = Number(checkSectionId);
+  //       if (!Object.values(repeatedSections).flat().includes(numericCheckSectionId)) {
+  //         if (
+  //           key.endsWith(`_${condition.question}`) &&
+  //           selectedDropdownValues[key] === condition.answer
+  //         ) {
+  //           conditionMet = true;
+  //           break;
+  //         }
+  //       }
+  //     }
+  //     if (conditionMet) {
+  //       matchedConditions++;
+  //       if (mode === "Any") return;
+  //       return;
+  //     }
+
+  //     for (const key in selectedYesNoValues) {
+  //       const [checkSectionId] = key.split('_');
+  //       const numericCheckSectionId = Number(checkSectionId);
+  //       if (!Object.values(repeatedSections).flat().includes(numericCheckSectionId)) {
+  //         if (
+  //           key.endsWith(`_${condition.question}`) &&
+  //           selectedYesNoValues[key] === condition.answer
+  //         ) {
+  //           conditionMet = true;
+  //           break;
+  //         }
+  //       }
+  //     }
+  //     if (conditionMet) {
+  //       matchedConditions++;
+  //       if (mode === "Any") return;
+  //     }
+  //   });
+
+  //   if (mode === "Any") {
+  //     return matchedConditions > 0;
+  //   } else {
+  //     return matchedConditions === conditions.length;
+  //   }
+  // };
+  // const getVisibleSections = () => sections.filter(shouldShowSection);
+
+  // const visibleSections = getVisibleSections();
+  // const totalSteps = visibleSections.length;
+// Track previous visible sections
+  const [previousVisibleSections, setPreviousVisibleSections] = useState([]);
+
+  // Helper function to clear all values for a specific section
+  const clearSectionValues = useCallback((sectionId) => {
+    console.log(`Clearing values for section ${sectionId}`);
+    
+    // Clear radio values for this section
+    setRadioValues(prev => {
+      const newValues = { ...prev };
+      Object.keys(newValues).forEach(key => {
+        const [keySectionId] = key.split('_');
+        if (keySectionId === sectionId.toString()) {
+          delete newValues[key];
+        }
+      });
+      return newValues;
+    });
+
+    // Clear checkbox values for this section
+    setCheckboxValues(prev => {
+      const newValues = { ...prev };
+      Object.keys(newValues).forEach(key => {
+        const [keySectionId] = key.split('_');
+        if (keySectionId === sectionId.toString()) {
+          delete newValues[key];
+        }
+      });
+      return newValues;
+    });
+
+    // Clear dropdown values for this section
+    setSelectedDropdownValues(prev => {
+      const newValues = { ...prev };
+      Object.keys(newValues).forEach(key => {
+        const [keySectionId] = key.split('_');
+        if (keySectionId === sectionId.toString()) {
+          delete newValues[key];
+        }
+      });
+      return newValues;
+    });
+
+    // Clear yes/no values for this section
+    setSelectedYesNoValues(prev => {
+      const newValues = { ...prev };
+      Object.keys(newValues).forEach(key => {
+        const [keySectionId] = key.split('_');
+        if (keySectionId === sectionId.toString()) {
+          delete newValues[key];
+        }
+      });
+      return newValues;
+    });
+
+    // Clear input values for this section
+    setInputValues(prev => {
+      const newValues = { ...prev };
+      Object.keys(newValues).forEach(key => {
+        const [keySectionId] = key.split('_');
+        if (keySectionId === sectionId.toString()) {
+          delete newValues[key];
+        }
+      });
+      return newValues;
+    });
+
+    // Clear answered elements for this section
+    setAnsweredElements(prev => {
+      const newValues = { ...prev };
+      Object.keys(newValues).forEach(key => {
+        const [keySectionId] = key.split('_');
+        if (keySectionId === sectionId.toString()) {
+          delete newValues[key];
+        }
+      });
+      return newValues;
+    });
+  }, []);
+
+  // Helper function to check section visibility
+  const checkSectionVisibility = useCallback((section) => {
+    if (!section.sectionsettings?.conditional) return true;
+
     const conditions = section.sectionsettings.conditions || [];
     const mode = section.sectionsettings.mode || "All";
 
@@ -1075,76 +1257,82 @@ const [repeatedSections, setRepeatedSections] = useState({});
 
       let conditionMet = false;
 
+      // Check radio values
       for (const key in radioValues) {
         const [checkSectionId] = key.split('_');
         const numericCheckSectionId = Number(checkSectionId);
-        if (!Object.values(repeatedSections).flat().includes(numericCheckSectionId)) {
-          if (
-            key.endsWith(`_${condition.question}`) &&
-            radioValues[key] === condition.answer
-          ) {
+        // Check if this section is a repeated section
+        const isRepeatedSection = Object.values(repeatedSections).flat().includes(numericCheckSectionId);
+        
+        // Only check non-repeated sections for conditions
+        if (!isRepeatedSection) {
+          if (key.endsWith(`_${condition.question}`) && radioValues[key] === condition.answer) {
             conditionMet = true;
             break;
           }
         }
       }
+      
       if (conditionMet) {
         matchedConditions++;
         if (mode === "Any") return;
         return;
       }
 
+      // Check checkbox values
       for (const key in checkboxValues) {
         const [checkSectionId] = key.split('_');
         const numericCheckSectionId = Number(checkSectionId);
-        if (!Object.values(repeatedSections).flat().includes(numericCheckSectionId)) {
-          if (
-            key.endsWith(`_${condition.question}`) &&
-            checkboxValues[key]?.[condition.answer]
-          ) {
+        const isRepeatedSection = Object.values(repeatedSections).flat().includes(numericCheckSectionId);
+        
+        if (!isRepeatedSection) {
+          if (key.endsWith(`_${condition.question}`) && checkboxValues[key]?.[condition.answer]) {
             conditionMet = true;
             break;
           }
         }
       }
+      
       if (conditionMet) {
         matchedConditions++;
         if (mode === "Any") return;
         return;
       }
 
+      // Check dropdown values
       for (const key in selectedDropdownValues) {
         const [checkSectionId] = key.split('_');
         const numericCheckSectionId = Number(checkSectionId);
-        if (!Object.values(repeatedSections).flat().includes(numericCheckSectionId)) {
-          if (
-            key.endsWith(`_${condition.question}`) &&
-            selectedDropdownValues[key] === condition.answer
-          ) {
+        const isRepeatedSection = Object.values(repeatedSections).flat().includes(numericCheckSectionId);
+        
+        if (!isRepeatedSection) {
+          if (key.endsWith(`_${condition.question}`) && selectedDropdownValues[key] === condition.answer) {
             conditionMet = true;
             break;
           }
         }
       }
+      
       if (conditionMet) {
         matchedConditions++;
         if (mode === "Any") return;
         return;
       }
 
+      // Check yes/no values
       for (const key in selectedYesNoValues) {
         const [checkSectionId] = key.split('_');
         const numericCheckSectionId = Number(checkSectionId);
-        if (!Object.values(repeatedSections).flat().includes(numericCheckSectionId)) {
-          if (
-            key.endsWith(`_${condition.question}`) &&
-            selectedYesNoValues[key] === condition.answer
-          ) {
+        const isRepeatedSection = Object.values(repeatedSections).flat().includes(numericCheckSectionId);
+        
+        if (!isRepeatedSection) {
+          if (key.endsWith(`_${condition.question}`) && selectedYesNoValues[key] === condition.answer) {
             conditionMet = true;
             break;
           }
         }
       }
+      
       if (conditionMet) {
         matchedConditions++;
         if (mode === "Any") return;
@@ -1156,12 +1344,42 @@ const [repeatedSections, setRepeatedSections] = useState({});
     } else {
       return matchedConditions === conditions.length;
     }
-  };
-  const getVisibleSections = () => sections.filter(shouldShowSection);
+  }, [radioValues, checkboxValues, selectedDropdownValues, selectedYesNoValues, repeatedSections]);
+
+  const shouldShowSection = useCallback((section) => {
+    console.log("Checking visibility for section:", section);
+    
+    // Check current visibility
+    const isCurrentlyVisible = checkSectionVisibility(section);
+    
+    return isCurrentlyVisible;
+  }, [checkSectionVisibility]);
+
+  // Use effect to update visible sections and clear hidden ones
+  useEffect(() => {
+    const currentlyVisible = sections.filter(section => shouldShowSection(section));
+    
+    // Find sections that were visible before but are not visible now
+    const sectionsToClear = previousVisibleSections.filter(
+      prevSection => !currentlyVisible.some(currSection => currSection.id === prevSection.id)
+    );
+    
+    // Clear values for sections that became hidden
+    sectionsToClear.forEach(section => {
+      clearSectionValues(section.id);
+    });
+    
+    // Update previous visible sections
+    setPreviousVisibleSections(currentlyVisible);
+  }, [sections, shouldShowSection, clearSectionValues, previousVisibleSections]);
+
+  // Get visible sections (without side effects)
+  const getVisibleSections = useCallback(() => {
+    return sections.filter(section => shouldShowSection(section));
+  }, [sections, shouldShowSection]);
 
   const visibleSections = getVisibleSections();
   const totalSteps = visibleSections.length;
-
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const handleDrawerOpen = () => {
     setIsDrawerOpen(true);
@@ -1671,30 +1889,7 @@ Duplicate
                 className="left-org-container"
                 sx={{ padding: "10px", width: "30%", height: "auto", p: 2 }}
               >
-                {/* <Box   border={"2px solid red"}>
-                {sections.map((section) => (
-                  <Box key={section.id} sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    
-                  }}>
-                    <TextField
-                      placeholder={`Section Name`}
-                      className='section-name'
-                      size="small"
-                      margin='normal'
-                      value={truncateText(section.text, 5)}
-                      InputProps={{
-                        readOnly: true
-                      }}
-                      sx={{ backgroundColor: selectedSection?.id === section.id ? "#E0F7FA" : "#fff", cursor: "pointer" }}
-                      onClick={() => handleSectionClick(section)}
-                      fullWidth
-                    />
-
-                  </Box>
-                ))}
-              </Box> */}
+                
                 <Box>
                   {sections.map((section, index) => (
                     <SectionItem

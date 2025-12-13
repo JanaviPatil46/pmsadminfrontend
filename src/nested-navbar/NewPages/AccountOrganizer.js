@@ -734,30 +734,7 @@ const handleCheckboxChange = (value, elementText, sectionId) => {
     // setloginsData(logindata.user.id)
     fetchUserData(logindata.user.id);
   }, []);
-  const organizerSendEmail=()=>{
-    const myHeaders = new Headers();
-myHeaders.append("Content-Type", "application/json");
-
-const raw = JSON.stringify({
-  accountid:data,
-  username: username,
-  organizerName:organizerName,
-  organizerLink:"http://localhost:3000/accountsdash/organizers/6718e47e1b7d40bc7d33611e"
-  });
-
-const requestOptions = {
-  method: "POST",
-  headers: myHeaders,
-  body: raw,
-  redirect: "follow"
-};
-console.log(raw)
-fetch(`${ORGANIZER_TEMP_API}/organizersendemail`, requestOptions)
-  .then((response) => response.text())
-  .then((result) => console.log(result))
-  .catch((error) => console.error(error));
-
-  }
+ 
 
   const handleDelete = (valueToDelete) => {
     setSelectedAccount((prevSelected) => prevSelected.filter((value) => value !== valueToDelete));

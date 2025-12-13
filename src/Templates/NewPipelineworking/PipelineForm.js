@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import StagesSection from "./StagesSection";
 import { toast } from "react-toastify";
+import MultiSelectDropdown from "../MultiSelectDropdown";
 import { useLocation, useNavigate } from "react-router-dom";
 const PipelineForm = () => {
   const JOBS_API = process.env.REACT_APP_JOBS_TEMP_URL;
@@ -110,9 +111,9 @@ const PipelineForm = () => {
     }
   };
 
-  const handleUserChange = (event, selectedOptions) => {
-    setSelectedUser(selectedOptions);
-    const selectedValues = selectedOptions.map((option) => option.value);
+  const handleUserChange = (newSelectedUsers) => {
+    setSelectedUser(newSelectedUsers);
+    const selectedValues = newSelectedUsers.map((option) => option.value);
     setCombinedValues(selectedValues);
   };
   const options = userData.map((user) => ({
@@ -485,124 +486,7 @@ const PipelineForm = () => {
       setLoading(false);
     }
   };
-  // const handleSavePipeline = async (exitAfterSave = false) => {
-  //     const errors = validateForm();
-
-  // if (Object.keys(errors).length > 0) {
-  //     // Show toast for pipeline name error
-  //     if (errors.pipelineName) {
-  //       toast.error("Pipeline name is required");
-  //     }
-
-  //     // Show toast for stages count error
-  //     if (errors.stages) {
-  //       toast.error("Please add at least 2 stages");
-  //     }
-
-  //     // Show toast for stage names error
-  //     if (errors.stageNames) {
-  //       setStageNameErrors(errors.stageNames);
-  //       const emptyStageCount = errors.stageNames.filter(error => error !== "").length;
-  //       if (emptyStageCount > 0) {
-  //         toast.error(`${emptyStageCount} stage name(s) are required`);
-  //       }
-  //     }
-
-  //     return;
-  //   }
-
-  //     setLoading(true);
-
-  //     try {
-  //       const pipelineData = {
-  //         pipelineName: pipelineName.trim(),
-  //         availableto: combinedValues,
-  //         sortjobsby: selectedSortByJob.value,
-  //         defaultjobtemplate: selectedJobtemp?.value,
-  //         accountId: Account_id,
-  //         description: Description,
-  //         duedate: Due_date,
-  //         accounttags: Account_tags,
-  //         priority: Priority,
-  //         days_on_Stage: Days_on_stage,
-  //         assignees: Assignees,
-  //         name: Name,
-  //         clientFacing_status: clientFacing_status,
-  //         startdate: startDate,
-  //         stages: stages.map((stage, index) => ({
-  //           ...(stage._id && { _id: stage._id }),
-  //           name: stage.name.trim(),
-  //           order: stage.order || index + 1,
-  //           conditions: stage.conditions || [],
-  //           automations: stage.automations ? stage.automations.map(auto => ({
-  //             type: auto.type,
-  //             index: auto.index,
-  //             selectedtemp: auto.selectedtemp ? auto.selectedtemp.value || auto.selectedtemp : null,
-  //             selectedTags: auto.selectedTags || [],
-  //             reminderChecked: auto.reminderChecked || false,
-  //             daysuntilNextReminder: auto.daysuntilNextReminder || "",
-  //             noOfReminder: auto.noOfReminder || "",
-  //             addTags: auto.addTags || [],
-  //             removeTags: auto.removeTags || [],
-  //             selectedAssignees: auto.selectedAssignees || [],
-  //             assigneesToRemove: auto.assigneesToRemove || [],
-  //             status: auto.status || null,
-  //             // FIX: Ensure selectedClientStatus is properly saved
-  //             selectedClientStatus: auto.selectedClientStatus ? auto.selectedClientStatus : null,
-  //             clientDescription: auto.clientDescription || "",
-  //             // Important: Save required ref models
-  //             refModel: auto.refModel || null,
-  //             templateRefModel: auto.templateRefModel || null
-  //           })) : [],
-  //           autoMove: stage.autoMove || false
-  //         })),
-  //         active: true
-  //       };
-
-  //       console.log("Pipeline data being sent:", JSON.stringify(pipelineData, null, 2));
-
-  //       let url, method;
-
-  //       if (isEditMode && pipelineId) {
-  //         // Update existing pipeline
-  //         url = `${PIPELINE_API}/workflow/pipeline/pipeline/${pipelineId}`;
-  //         method = "PATCH";
-  //       } else {
-  //         // Create new pipeline
-  //         url = `${PIPELINE_API}/workflow/pipeline/createpipeline`;
-  //         method = "POST";
-  //       }
-
-  //       const response = await fetch(url, {
-  //         method: method,
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify(pipelineData),
-  //       });
-
-  //       if (!response.ok) {
-  //         const errorData = await response.json();
-  //         throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
-  //       }
-
-  //       const result = await response.json();
-  //       console.log("Pipeline saved successfully:", result);
-
-  //       toast.success(`Pipeline ${isEditMode ? 'updated' : 'saved'} successfully!`);
-
-  //       if (exitAfterSave) {
-  //         navigate('/firmtemp/pipelines');
-  //       }
-
-  //     } catch (error) {
-  //       console.error("Error saving pipeline:", error);
-  //       console.log("Is Edit Mode:", error);
-  //       toast.error(error.message || `Failed to ${isEditMode ? 'update' : 'save'} pipeline. Please try again.`);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
+ 
   const navigate = useNavigate();
   // Update the cancel handler
   const handleCancel = () => {
@@ -645,7 +529,7 @@ const PipelineForm = () => {
 
               <Box mt={3}>
                 <label className="pipeline-lable">Available To</label>
-                <Autocomplete
+                {/* <Autocomplete
                   multiple
                   options={options}
                   value={selectedUser}
@@ -656,7 +540,12 @@ const PipelineForm = () => {
                   renderInput={(params) => (
                     <TextField {...params} placeholder="Available To" />
                   )}
-                />
+                /> */}
+                 <MultiSelectDropdown
+                                    value={selectedUser}
+                                    onChange={handleUserChange}
+                                    placeholder="Job Assignees"
+                                  />
               </Box>
 
               <Box mt={3}>
