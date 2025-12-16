@@ -347,22 +347,7 @@ const MultiSelectDropdown = ({
             </Typography>
           )}
         </Box>
-        {/* {value.length > 0 && (
-          <Box
-            sx={{
-              padding: "8px 12px",
-              color: "red",
-              cursor: "pointer",
-              "&:hover": { bgcolor: "action.hover" },
-            }}
-            onClick={clearSelection}
-          >
-            X Clear selected
-          </Box>
-        )}
-        <IconButton size="small" sx={{ p: 0 }}>
-          {anchorEl ? <FaCaretUp /> : <FaCaretDown />}
-        </IconButton> */}
+      
         <Box sx={{ display: "flex", alignItems: "center" }}>
         {value.length > 0 && (
           <IconButton

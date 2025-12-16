@@ -1,4 +1,4 @@
-import React, { useState, useEffect ,useMemo} from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   OutlinedInput,
   FormControl,
@@ -27,7 +27,7 @@ const ContactForm = ({
 }) => {
   const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
   const CONTACT_API = process.env.REACT_APP_CONTACTS_URL;
-console.log("selected contact in update form",selectedContact)
+  console.log("selected contact in update form", selectedContact);
   // State variables for form fields
   const [firstName, setFirstName] = useState("");
   const [middleName, setMiddleName] = useState("");
@@ -40,7 +40,7 @@ console.log("selected contact in update form",selectedContact)
   const [phoneNumbers, setPhoneNumbers] = useState([]);
   // const [selectedCountry, setSelectedCountry] = useState('');
   const [selectedCountry, setSelectedCountry] = useState(null);
-console.log("selectedcountry",selectedCountry)
+  console.log("selectedcountry", selectedCountry);
   const [streetAddress, setStreetAddress] = useState("");
   const [city, setCity] = useState("");
 
@@ -61,34 +61,31 @@ console.log("selectedcountry",selectedCountry)
       setNote(selectedContact.note || "");
       setSsn(selectedContact.ssn || "");
       setEmail(selectedContact.email || "");
-      
+
       setSelectedCountry({
-      value: selectedContact.country?.code,
-      label: selectedContact.country?.name,
-    });
+        value: selectedContact.country?.code,
+        label: selectedContact.country?.name,
+      });
       setStreetAddress(selectedContact.streetAddress || "");
       setCity(selectedContact.city || "");
       setState(selectedContact.state || "");
       setPostalCode(selectedContact.postalCode || "");
       setContactId(selectedContact._id || null); // Set contact ID
 
-     
+      const flatPhoneNumbers = selectedContact.phoneNumbers || [];
 
-const flatPhoneNumbers = selectedContact.phoneNumbers || [];
-
-setPhoneNumbers(
-  flatPhoneNumbers.map((phone) => ({
-    id: Date.now() + Math.random(),
-    phone: phone.toString().startsWith("+") ? phone.toString() : `+${phone}`,
-    isPrimary: false,
-    country: "us", // default since no country info in DB
-  }))
-);
-
-
+      setPhoneNumbers(
+        flatPhoneNumbers.map((phone) => ({
+          id: Date.now() + Math.random(),
+          phone: phone.toString().startsWith("+")
+            ? phone.toString()
+            : `+${phone}`,
+          isPrimary: false,
+          country: "us", // default since no country info in DB
+        }))
+      );
 
       console.log("phone numbers", flatPhoneNumbers);
-
 
       const tags = selectedContact.tags; // Since data is nested inside an array
       console.log("Tags with IDs:", tags);
@@ -106,7 +103,7 @@ setPhoneNumbers(
   }, [selectedContact]);
 
   const [countries, setCountries] = useState([]);
-  
+
   const options = useMemo(() => countryList().getData(), []);
 
   const handleCountryChange = (event) => {
@@ -122,34 +119,32 @@ setPhoneNumbers(
     });
   };
 
- 
+  const handlePhoneNumberChange = (phoneValue, countryData, id) => {
+    setPhoneNumbers((prevPhoneNumbers) =>
+      prevPhoneNumbers.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              phone: phoneValue,
+              countryCode: countryData.dialCode, // Store country dial code
+              country: countryData.countryCode.toLowerCase(), // Store country code (e.g., 'us')
+            }
+          : item
+      )
+    );
+  };
 
-   const handlePhoneNumberChange = (phoneValue, countryData, id) => {
-  setPhoneNumbers(prevPhoneNumbers =>
-    prevPhoneNumbers.map(item =>
-      item.id === id
-        ? {
-            ...item,
-            phone: phoneValue,
-            countryCode: countryData.dialCode, // Store country dial code
-            country: countryData.countryCode.toLowerCase() // Store country code (e.g., 'us')
-          }
-        : item
-    )
-  );
-};
- 
-    const handleAddPhoneNumber = () => {
-  setPhoneNumbers(prevPhoneNumbers => [
-    ...prevPhoneNumbers,
-    { 
-      id: Date.now(), 
-      phone: "", 
-      country: "us", // Default country
-      isPrimary: false 
-    },
-  ]);
-};
+  const handleAddPhoneNumber = () => {
+    setPhoneNumbers((prevPhoneNumbers) => [
+      ...prevPhoneNumbers,
+      {
+        id: Date.now(),
+        phone: "",
+        country: "us", // Default country
+        isPrimary: false,
+      },
+    ]);
+  };
 
   const handleDeletePhoneNumber = (id) => {
     setPhoneNumbers((prevPhoneNumbers) =>
@@ -165,61 +160,61 @@ setPhoneNumbers(
     console.log(selectedValues);
   };
 
-const handleSave = async (e) => {
-  e.preventDefault();
+  const handleSave = async (e) => {
+    e.preventDefault();
 
-  // if (!validateForm()) return;
+    // if (!validateForm()) return;
 
-  // handleNewDrawerClose();
-  // handleDrawerClose();
+    // handleNewDrawerClose();
+    // handleDrawerClose();
 
-  const formattedPhoneNumbers = phoneNumbers.map((item) => item.phone);
+    const formattedPhoneNumbers = phoneNumbers.map((item) => item.phone);
 
-  const countryPayload = selectedCountry
-    ? { name: selectedCountry.label, code: selectedCountry.value }
-    : null;
+    const countryPayload = selectedCountry
+      ? { name: selectedCountry.label, code: selectedCountry.value }
+      : null;
 
-  const payload = JSON.stringify({
-    firstName,
-    middleName,
-    lastName,
-    contactName,
-    companyName,
-    note,
-    ssn,
-    email,
-    tags: combinedTagsValues,
-    country: countryPayload,
-    streetAddress,
-    city,
-    state,
-    postalCode,
-    phoneNumbers: formattedPhoneNumbers,
-  });
-
-  const requestOptions = {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: payload,
-  };
-console.log("payload",requestOptions)
-  const url = `https://www.snptaxes.com/api/contacts/contact/${contactId}`; // <-- Update existing contact ID
-
-  fetch(url, requestOptions)
-    .then((res) => {
-      if (!res.ok) throw new Error("Request failed");
-      return res.json();
-    })
-    .then(() => {
-      toast.success("Contact updated successfully!");
-      handleClose()
-      onContactUpdated()
-      // navigate("/clients/contacts");
-    })
-    .catch(() => {
-      toast.error("Failed to update contact");
+    const payload = JSON.stringify({
+      firstName,
+      middleName,
+      lastName,
+      contactName,
+      companyName,
+      note,
+      ssn,
+      email,
+      tags: combinedTagsValues,
+      country: countryPayload,
+      streetAddress,
+      city,
+      state,
+      postalCode,
+      phoneNumbers: formattedPhoneNumbers,
     });
-};
+
+    const requestOptions = {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: payload,
+    };
+    console.log("payload", requestOptions);
+    const url = `https://www.snptaxes.com/api/contacts/contact/${contactId}`; // <-- Update existing contact ID
+
+    fetch(url, requestOptions)
+      .then((res) => {
+        if (!res.ok) throw new Error("Request failed");
+        return res.json();
+      })
+      .then(() => {
+        toast.success("Contact updated successfully!");
+        handleClose();
+        onContactUpdated();
+        // navigate("/clients/contacts");
+      })
+      .catch(() => {
+        toast.error("Failed to update contact");
+      });
+  };
 
   return (
     <form
@@ -231,7 +226,6 @@ console.log("payload",requestOptions)
       }}
       className="contact-form"
     >
-      
       <Box
         sx={{
           display: "flex",
@@ -340,7 +334,6 @@ console.log("payload",requestOptions)
         />
       </Box>
       <Box mt={1}>
-
         <InputLabel sx={{ color: "black", mb: 1 }}>Tags</InputLabel>
         <TagsMultiSelectDropDown
           value={tagsNew}
@@ -375,8 +368,8 @@ console.log("payload",requestOptions)
               sx={{ position: "absolute", mt: -3 }}
             />
           )}
-        
-             {/* <PhoneInput
+
+          {/* <PhoneInput
   country={phone.country || "us"}
   value={phone.phone}
   // onChange={(phoneValue) => handlePhoneNumberChange(phone.id, phoneValue)}
@@ -394,24 +387,26 @@ console.log("payload",requestOptions)
     gap: "8px",
   }}
 /> */}
-<PhoneInput
-country={"us"}
-  value={phone.phone}
-  // onChange={(phoneValue) => handlePhoneNumberChange(phone.id, phoneValue)}
-     onChange={(value, country) => handlePhoneNumberChange(value, country, phone.id)}
-  inputStyle={{
-    width: "100%",
-  }}
-  buttonStyle={{
-    borderTopLeftRadius: "8px",
-    borderBottomLeftRadius: "8px",
-  }}
-  containerStyle={{
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
-  }}
-/>
+          <PhoneInput
+            country={"us"}
+            value={phone.phone}
+            // onChange={(phoneValue) => handlePhoneNumberChange(phone.id, phoneValue)}
+            onChange={(value, country) =>
+              handlePhoneNumberChange(value, country, phone.id)
+            }
+            inputStyle={{
+              width: "100%",
+            }}
+            buttonStyle={{
+              borderTopLeftRadius: "8px",
+              borderBottomLeftRadius: "8px",
+            }}
+            containerStyle={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+            }}
+          />
           <AiOutlineDelete
             onClick={() => handleDeletePhoneNumber(phone.id)}
             style={{ cursor: "pointer", color: "red" }}
@@ -458,16 +453,19 @@ country={"us"}
           ))}
         </Select> */}
         <Autocomplete
-              options={options}
-              size="small"
-              getOptionLabel={(option) => option.label} // show country name
-              value={selectedCountry || ""}
-              onChange={(event, newValue) => setSelectedCountry(newValue)}
-              renderInput={(params) => (
-                <TextField {...params} placeholder="Select Country" variant="outlined" />
-              )}
-              
+          options={options}
+          size="small"
+          getOptionLabel={(option) => option.label} // show country name
+          value={selectedCountry || ""}
+          onChange={(event, newValue) => setSelectedCountry(newValue)}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              placeholder="Select Country"
+              variant="outlined"
             />
+          )}
+        />
       </Box>
       <Box mt={2}>
         <InputLabel sx={{ color: "black" }}>Street Address</InputLabel>

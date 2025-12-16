@@ -172,6 +172,9 @@ const SearchComponent = () => {
     setIsDrawerOpen(false);
     setSelectedContact(null);
   };
+    const handleContactUpdated = () => {
+    handleCloseDrawer();
+  };
 
   return (
     <Box sx={{ position: "relative", width: 300, margin: "0 auto" }}>
@@ -307,7 +310,7 @@ const SearchComponent = () => {
             justifyContent: "space-between",
             p: 2,
             alignItems: "center",
-            width: 420,
+            // width: 420,
           }}
         >
           <Typography variant="h6" sx={{ fontWeight: "bold" }}>
@@ -324,6 +327,7 @@ const SearchComponent = () => {
           <ContactForm
             selectedContact={selectedContact}
             handleClose={handleCloseDrawer}
+             onContactUpdated={handleContactUpdated}
           />
         )}
       </Drawer>

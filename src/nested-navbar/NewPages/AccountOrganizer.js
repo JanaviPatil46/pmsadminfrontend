@@ -1,19 +1,40 @@
-import { Box, Typography, Divider, Dialog, Tooltip, FormControlLabel, Switch, InputLabel, DialogContent, Select, LinearProgress, Autocomplete, TextField, MenuItem, Chip, Container, Button, Checkbox, FormControl } from "@mui/material";
-import { useState, useEffect,useContext } from "react";
+import {
+  Box,
+  Typography,
+  Divider,
+  Dialog,
+  Tooltip,
+  FormControlLabel,
+  Switch,
+  InputLabel,
+  DialogContent,
+  Select,
+  LinearProgress,
+  Autocomplete,
+  TextField,
+  MenuItem,
+  Chip,
+  Container,
+  Button,
+  Checkbox,
+  FormControl,
+} from "@mui/material";
+import { useState, useEffect, useContext } from "react";
 import { Navigate, useParams, useSearchParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { toast } from "react-toastify";
-import { LoginContext } from '../../Sidebar/Context/Context.js'
+import { LoginContext } from "../../Sidebar/Context/Context.js";
 const AccountOrganizer = () => {
   const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
   const ORGANIZER_TEMP_API = process.env.REACT_APP_ORGANIZER_TEMP_URL;
   const { data } = useParams();
 
   const [organizerTemplate, setOrganizerTemplate] = useState([]);
-  const [selectedOrganizerTemplate, setSelectedOrganizerTemplate] = useState("");
+  const [selectedOrganizerTemplate, setSelectedOrganizerTemplate] =
+    useState("");
   const [selectedAccount, setSelectedAccount] = useState([]);
   const [showOrganizerForm, setShowOrganizerForm] = useState(false);
   const [organizeraccountwise, setorganizeraccountwise] = useState();
@@ -37,113 +58,75 @@ const AccountOrganizer = () => {
   };
 
   const [accountData, setAccountData] = useState([]);
-//   const fetchAccountsData = async () => {
-//     try {
-//       // const url = `${ACCOUNT_API}/accounts/account/accountdetailslist/`;
-//        const response = await fetch("https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true")
-//       // const response = await fetch(url);
-//       const result = await response.json();
-// console.log("accounts result",result)
-//       if (Array.isArray(result.accounts)) {
-//         setAccountData(result.accounts);
-//         // console.log(result.accounts);
+ 
+  useEffect(() => {
+    fetchAccountsData();
+  }, []);
 
-//         // Assuming `data` contains the selected account ID(s) as a string or array of IDs
+  const fetchAccountsData = async () => {
+    try {
+      const storedUserRole = localStorage.getItem("userRole");
+      const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
+      const loginuserid = storedData?.teammember?.userid;
+      const viewAllAccounts = storedData?.teammember?.viewallAccounts;
 
-//         const selectedAccounts = result.accounts
-//           .filter((account) => (Array.isArray(data) ? data.includes(account._id) : account._id === data))
-//           .map((selectedAccount) => ({
-//             label: selectedAccount.accountName,
-//             value: selectedAccount._id,
-//           }));
+      let url = "";
 
-//         if (selectedAccounts.length > 0) {
-//           setSelectedAccount(selectedAccounts);
-//         } else {
-//           setSelectedAccount([]); // Clear if no matching accounts found
-//         }
-//       } else {
-//         console.error("Account list is not an array", result.accountlist);
-//       }
-//     } catch (error) {
-//       console.log("Error:", error);
-//     }
-//   };
-//  const AccountsOptions = (accountData || []).map((account) => ({
-//     value: account.id,
-//     label: account.Name,
-//   }));
-useEffect(() => {
-  fetchAccountsData();
-}, []);
-
-const fetchAccountsData = async () => {
-  try {
-    const storedUserRole = localStorage.getItem("userRole");
-    const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
-    const loginuserid = storedData?.teammember?.userid;
-    const viewAllAccounts = storedData?.teammember?.viewallAccounts;
-
-    let url = "";
-
-    // === ROLE-BASED URL LOGIC ===
-    if (storedUserRole === "Admin") {
-      url =
-        "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true";
-    } else {
-      url =
-        viewAllAccounts === true
-          ? "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true"
-          : `https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=true`;
-    }
-
-    console.log("Fetching accounts from:", url);
-
-    const response = await fetch(url);
-    const result = await response.json();
-
-    console.log("accounts result", result);
-
-    // Normalize for both API responses
-    const accounts =
-      result.accounts ||
-      result.accountlist ||
-      result.teamAccounts ||
-      [];
-
-    if (Array.isArray(accounts)) {
-      setAccountData(accounts);
-
-      // Handle selected data (account ID or multiple IDs)
-      const selectedAccounts = accounts
-        .filter((account) =>
-          Array.isArray(data)
-            ? data.includes(account._id)
-            : account._id === data
-        )
-        .map((selectedAccount) => ({
-          label: selectedAccount.accountName,
-          value: selectedAccount._id,
-        }));
-
-      if (selectedAccounts.length > 0) {
-        setSelectedAccount(selectedAccounts);
+      // === ROLE-BASED URL LOGIC ===
+      if (storedUserRole === "Admin") {
+        url =
+          "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true";
       } else {
-        setSelectedAccount([]); 
+        url =
+          viewAllAccounts === true
+            ? "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true"
+            : `https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=true`;
       }
-    } else {
-      console.error("Account list is not an array", result.accounts);
-    }
-  } catch (error) {
-    console.log("Error:", error);
-  }
-};
 
-// Dropdown Options
-const AccountsOptions = (accountData || []).map((account) => ({
-  value: account._id,
-  label: account.accountName,
-}));
+      console.log("Fetching accounts from:", url);
+
+      const response = await fetch(url);
+      const result = await response.json();
+
+      console.log("accounts result", result);
+
+      // Normalize for both API responses
+      const accounts =
+        result.accounts || result.accountlist || result.teamAccounts || [];
+
+      if (Array.isArray(accounts)) {
+        setAccountData(accounts);
+
+        // Handle selected data (account ID or multiple IDs)
+        const selectedAccounts = accounts
+          .filter((account) =>
+            Array.isArray(data)
+              ? data.includes(account._id)
+              : account._id === data
+          )
+          .map((selectedAccount) => ({
+            label: selectedAccount.accountName,
+            value: selectedAccount._id,
+          }));
+
+        if (selectedAccounts.length > 0) {
+          setSelectedAccount(selectedAccounts);
+        } else {
+          setSelectedAccount([]);
+        }
+      } else {
+        console.error("Account list is not an array", result.accounts);
+      }
+    } catch (error) {
+      console.log("Error:", error);
+    }
+  };
+
+  // Dropdown Options
+  const AccountsOptions = (accountData || []).map((account) => ({
+    value: account._id,
+    label: account.accountName,
+  }));
 
   const handleOrganizerTemplateChange = (event) => {
     const selectedValue = event.target.value;
@@ -154,10 +137,12 @@ const AccountsOptions = (accountData || []).map((account) => ({
   // const [sections, setSections] = useState([]);
   const [sections, setSections] = useState([]);
   const [organizerName, setOrganizerName] = useState("");
-const handleOrganizerNameChange = (e) => {
-  setOrganizerName(e.target.value);
-};
-  const fetchOrganizerTemplateDataByTempId = async (selectedOrganizerTempid) => {
+  const handleOrganizerNameChange = (e) => {
+    setOrganizerName(e.target.value);
+  };
+  const fetchOrganizerTemplateDataByTempId = async (
+    selectedOrganizerTempid
+  ) => {
     try {
       const url = `${ORGANIZER_TEMP_API}/workflow/organizers/organizertemplate/${selectedOrganizerTempid}`;
       const response = await fetch(url);
@@ -190,8 +175,6 @@ const handleOrganizerNameChange = (e) => {
   console.log(selectedAccount);
   console.log(selectedOrganizerTemplate);
 
- 
-
   const OrganizerTemplateOptions = organizerTemplate.map((organizertemp) => ({
     value: organizertemp._id,
     label: organizertemp.templatename,
@@ -212,61 +195,11 @@ const handleOrganizerNameChange = (e) => {
   const [selectedValue, setSelectedValue] = useState(null);
   const [selectedYesNoValues, setSelectedYesNoValues] = useState({});
 
-  
-  // const shouldShowSection = (section) => {
-  //   if (!section.sectionsettings?.conditional) return true;
-  //   const conditions = section.sectionsettings.conditions || [];
-
-  //   return conditions.every((condition) => {
-  //     if (!condition.question || !condition.answer) return false;
-
-  //     // Check all possible sections for the answer
-  //     for (const key in radioValues) {
-  //       if (
-  //         key.endsWith(`_${condition.question}`) &&
-  //         radioValues[key] === condition.answer
-  //       ) {
-  //         return true;
-  //       }
-  //     }
-
-  //     for (const key in checkboxValues) {
-  //       if (
-  //         key.endsWith(`_${condition.question}`) &&
-  //         checkboxValues[key]?.[condition.answer]
-  //       ) {
-  //         return true;
-  //       }
-  //     }
-
-  //     for (const key in selectedDropdownValues) {
-  //       if (
-  //         key.endsWith(`_${condition.question}`) &&
-  //         selectedDropdownValues[key] === condition.answer
-  //       ) {
-  //         return true;
-  //       }
-  //     }
-  //     // Check Yes/No values
-  //     for (const key in selectedYesNoValues) {
-  //       if (
-  //         key.endsWith(`_${condition.question}`) &&
-  //         selectedYesNoValues[key] === condition.answer
-  //       ) {
-  //         return true;
-  //       }
-  //     }
-  //     return false;
-  //   });
-  // };
-  
   const [repeatedSections, setRepeatedSections] = useState({});
-
-
 
   const shouldShowSection = (section) => {
     if (!section.sectionsettings?.conditional) return true;
-    
+
     const conditions = section.sectionsettings.conditions || [];
     const mode = section.sectionsettings.mode || "All";
 
@@ -280,9 +213,13 @@ const handleOrganizerNameChange = (e) => {
       let conditionMet = false;
 
       for (const key in radioValues) {
-        const [checkSectionId] = key.split('_');
+        const [checkSectionId] = key.split("_");
         const numericCheckSectionId = Number(checkSectionId);
-        if (!Object.values(repeatedSections).flat().includes(numericCheckSectionId)) {
+        if (
+          !Object.values(repeatedSections)
+            .flat()
+            .includes(numericCheckSectionId)
+        ) {
           if (
             key.endsWith(`_${condition.question}`) &&
             radioValues[key] === condition.answer
@@ -299,9 +236,13 @@ const handleOrganizerNameChange = (e) => {
       }
 
       for (const key in checkboxValues) {
-        const [checkSectionId] = key.split('_');
+        const [checkSectionId] = key.split("_");
         const numericCheckSectionId = Number(checkSectionId);
-        if (!Object.values(repeatedSections).flat().includes(numericCheckSectionId)) {
+        if (
+          !Object.values(repeatedSections)
+            .flat()
+            .includes(numericCheckSectionId)
+        ) {
           if (
             key.endsWith(`_${condition.question}`) &&
             checkboxValues[key]?.[condition.answer]
@@ -318,9 +259,13 @@ const handleOrganizerNameChange = (e) => {
       }
 
       for (const key in selectedDropdownValues) {
-        const [checkSectionId] = key.split('_');
+        const [checkSectionId] = key.split("_");
         const numericCheckSectionId = Number(checkSectionId);
-        if (!Object.values(repeatedSections).flat().includes(numericCheckSectionId)) {
+        if (
+          !Object.values(repeatedSections)
+            .flat()
+            .includes(numericCheckSectionId)
+        ) {
           if (
             key.endsWith(`_${condition.question}`) &&
             selectedDropdownValues[key] === condition.answer
@@ -337,9 +282,13 @@ const handleOrganizerNameChange = (e) => {
       }
 
       for (const key in selectedYesNoValues) {
-        const [checkSectionId] = key.split('_');
+        const [checkSectionId] = key.split("_");
         const numericCheckSectionId = Number(checkSectionId);
-        if (!Object.values(repeatedSections).flat().includes(numericCheckSectionId)) {
+        if (
+          !Object.values(repeatedSections)
+            .flat()
+            .includes(numericCheckSectionId)
+        ) {
           if (
             key.endsWith(`_${condition.question}`) &&
             selectedYesNoValues[key] === condition.answer
@@ -378,9 +327,6 @@ const handleOrganizerNameChange = (e) => {
   };
 
   const totalSteps = visibleSections.length;
-  const totalElements = sections[activeStep]?.formElements.length || 0;
-
-  const answeredCount = sections[activeStep]?.formElements.filter((element) => answeredElements[element.text]).length || 0;
 
   const handleClosePreview = () => {
     setPreviewDialogOpen(false); // Close the dialog
@@ -403,71 +349,10 @@ const handleOrganizerNameChange = (e) => {
     setActiveStep(selectedIndex);
   };
 
-
-
-// const shouldShowElement = (element, sectionId) => {
-//     const settings = element.questionsectionsettings;
-//     if (!settings?.conditional) return true;
-//     const conditions = settings?.conditions || [];
-
-//     for (const condition of conditions) {
-//       const { question, answer } = condition;
-//       if (!question || !answer) continue;
-
-//       // Check all possible sections for the answer
-//       let conditionMet = false;
-
-//       // Check radio values
-//       for (const key in radioValues) {
-//         if (key.endsWith(`_${question}`) && radioValues[key] === answer) {
-//           conditionMet = true;
-//           break;
-//         }
-//       }
-//       if (conditionMet) continue;
-
-//       // Check checkbox values
-//       for (const key in checkboxValues) {
-//         if (key.endsWith(`_${question}`) && checkboxValues[key]?.[answer]) {
-//           conditionMet = true;
-//           break;
-//         }
-//       }
-//       if (conditionMet) continue;
-
-//       // Check dropdown values
-//       for (const key in selectedDropdownValues) {
-//         if (
-//           key.endsWith(`_${question}`) &&
-//           selectedDropdownValues[key] === answer
-//         ) {
-//           conditionMet = true;
-//           break;
-//         }
-//       }
-//       if (conditionMet) continue;
-//       // Check Yes/No values
-//       for (const key in selectedYesNoValues) {
-//         if (
-//           key.endsWith(`_${question}`) &&
-//           selectedYesNoValues[key] === answer
-//         ) {
-//           conditionMet = true;
-//           break;
-//         }
-//       }
-//       if (conditionMet) continue;
-//       // If we get here, no condition was met
-//       return false;
-//     }
-
-//     return true;
-//   };
-  
- const shouldShowElement = (element, sectionId) => {
+  const shouldShowElement = (element, sectionId) => {
     const settings = element.questionsectionsettings;
     if (!settings?.conditional) return true;
-    
+
     const conditions = settings?.conditions || [];
     const mode = settings?.mode || "All";
 
@@ -482,11 +367,16 @@ const handleOrganizerNameChange = (e) => {
       let conditionMet = false;
 
       for (const key in radioValues) {
-        const [keySectionId] = key.split('_');
+        const [keySectionId] = key.split("_");
         const numericKeySectionId = Number(keySectionId);
-        const numericCurrentSectionId = typeof sectionId === 'string' ? Number(sectionId) : sectionId;
-        
-        if (numericKeySectionId === numericCurrentSectionId && key.endsWith(`_${question}`) && radioValues[key] === answer) {
+        const numericCurrentSectionId =
+          typeof sectionId === "string" ? Number(sectionId) : sectionId;
+
+        if (
+          numericKeySectionId === numericCurrentSectionId &&
+          key.endsWith(`_${question}`) &&
+          radioValues[key] === answer
+        ) {
           conditionMet = true;
           break;
         }
@@ -498,11 +388,16 @@ const handleOrganizerNameChange = (e) => {
       }
 
       for (const key in checkboxValues) {
-        const [keySectionId] = key.split('_');
+        const [keySectionId] = key.split("_");
         const numericKeySectionId = Number(keySectionId);
-        const numericCurrentSectionId = typeof sectionId === 'string' ? Number(sectionId) : sectionId;
-        
-        if (numericKeySectionId === numericCurrentSectionId && key.endsWith(`_${question}`) && checkboxValues[key]?.[answer]) {
+        const numericCurrentSectionId =
+          typeof sectionId === "string" ? Number(sectionId) : sectionId;
+
+        if (
+          numericKeySectionId === numericCurrentSectionId &&
+          key.endsWith(`_${question}`) &&
+          checkboxValues[key]?.[answer]
+        ) {
           conditionMet = true;
           break;
         }
@@ -514,11 +409,16 @@ const handleOrganizerNameChange = (e) => {
       }
 
       for (const key in selectedDropdownValues) {
-        const [keySectionId] = key.split('_');
+        const [keySectionId] = key.split("_");
         const numericKeySectionId = Number(keySectionId);
-        const numericCurrentSectionId = typeof sectionId === 'string' ? Number(sectionId) : sectionId;
-        
-        if (numericKeySectionId === numericCurrentSectionId && key.endsWith(`_${question}`) && selectedDropdownValues[key] === answer) {
+        const numericCurrentSectionId =
+          typeof sectionId === "string" ? Number(sectionId) : sectionId;
+
+        if (
+          numericKeySectionId === numericCurrentSectionId &&
+          key.endsWith(`_${question}`) &&
+          selectedDropdownValues[key] === answer
+        ) {
           conditionMet = true;
           break;
         }
@@ -530,11 +430,16 @@ const handleOrganizerNameChange = (e) => {
       }
 
       for (const key in selectedYesNoValues) {
-        const [keySectionId] = key.split('_');
+        const [keySectionId] = key.split("_");
         const numericKeySectionId = Number(keySectionId);
-        const numericCurrentSectionId = typeof sectionId === 'string' ? Number(sectionId) : sectionId;
-        
-        if (numericKeySectionId === numericCurrentSectionId && key.endsWith(`_${question}`) && selectedYesNoValues[key] === answer) {
+        const numericCurrentSectionId =
+          typeof sectionId === "string" ? Number(sectionId) : sectionId;
+
+        if (
+          numericKeySectionId === numericCurrentSectionId &&
+          key.endsWith(`_${question}`) &&
+          selectedYesNoValues[key] === answer
+        ) {
           conditionMet = true;
           break;
         }
@@ -567,8 +472,8 @@ const handleOrganizerNameChange = (e) => {
       [key]: true,
     }));
   };
-  
-const handleCheckboxChange = (value, elementText, sectionId) => {
+
+  const handleCheckboxChange = (value, elementText, sectionId) => {
     const key = `${sectionId}_${elementText}`;
     setCheckboxValues((prevValues) => ({
       ...prevValues,
@@ -582,7 +487,6 @@ const handleCheckboxChange = (value, elementText, sectionId) => {
       [key]: true,
     }));
   };
-  
 
   const handleYesNoChange = (value, elementText, sectionId) => {
     const key = `${sectionId}_${elementText}`;
@@ -595,7 +499,7 @@ const handleCheckboxChange = (value, elementText, sectionId) => {
       [key]: true,
     }));
   };
-  
+
   const handleDropdownValueChange = (event, elementText, sectionId) => {
     const key = `${sectionId}_${elementText}`;
     setSelectedDropdownValues((prevValues) => ({
@@ -632,18 +536,20 @@ const handleCheckboxChange = (value, elementText, sectionId) => {
       noofreminders: noOfReminder,
       daysuntilnextreminder: daysuntilNextReminder,
       jobid: ["661e495d11a097f731ccd6e8"],
-      fileUploadPath:'',
+      fileUploadPath: "",
       sections:
         selectedOrganizerTempData?.sections?.map((section) => ({
           name: section?.text || "",
           id: section?.id?.toString() || "",
           text: section?.text || "",
           sectionsettings: {
-            sectionRepeatingMode: section?.sectionsettings?.sectionRepeatingMode || false,
-            buttonName: section?.sectionsettings?.buttonName || "Repeat Section",
+            sectionRepeatingMode:
+              section?.sectionsettings?.sectionRepeatingMode || false,
+            buttonName:
+              section?.sectionsettings?.buttonName || "Repeat Section",
             conditional: section?.sectionsettings?.conditional || false,
             conditions: section?.sectionsettings?.conditions || [],
-             mode: section?.sectionsettings?.mode || "Any"  
+            mode: section?.sectionsettings?.mode || "Any",
           },
           formElements:
             section?.formElements?.map((question) => ({
@@ -660,19 +566,22 @@ const handleCheckboxChange = (value, elementText, sectionId) => {
               textvalue: question?.textvalue || "",
               questionsectionsettings: {
                 required: question?.questionsectionsettings?.required || false,
-                prefilled: question?.questionsectionsettings?.prefilled || false,
-                conditional: question?.questionsectionsettings?.conditional || false,
+                prefilled:
+                  question?.questionsectionsettings?.prefilled || false,
+                conditional:
+                  question?.questionsectionsettings?.conditional || false,
                 conditions: question?.questionsectionsettings?.conditions || [],
-                descriptionEnabled: question?.questionsectionsettings?.descriptionEnabled || false,
-                description: question?.questionsectionsettings?.description || "",
-                mode: question?.questionsectionsettings?.mode || "Any"  
-              }
-              
+                descriptionEnabled:
+                  question?.questionsectionsettings?.descriptionEnabled ||
+                  false,
+                description:
+                  question?.questionsectionsettings?.description || "",
+                mode: question?.questionsectionsettings?.mode || "Any",
+              },
             })) || [],
-           
         })) || [],
       status: "Pending",
-       
+
       active: true,
     });
 
@@ -691,27 +600,23 @@ const handleCheckboxChange = (value, elementText, sectionId) => {
       .then((result) => {
         console.log(result);
         console.log(result.newOrganizerAccountWise);
-        // const { _id } = result.newOrganizerAccountWise;
-
-        // console.log(_id); // "66f7e5d97114d8ad832c2d3e"
+        
         setorganizeraccountwise(result.newOrganizerAccountWise);
         setShowOrganizerForm(true);
         setSelectedOrganizerTemplate(selectedOrganizerTemplate);
         console.log(selectedOrganizerTemplate);
         toast.success("New organizer created successfully");
-        // organizerSendEmail()
+      
         navigate(`/clients/accounts/accountsdash/organizers/${data}`);
       })
       .catch((error) => console.error(error));
   };
   const { logindata, setLoginData } = useContext(LoginContext);
   const [loginsData, setloginsData] = useState("");
-  console.log(logindata)
+  console.log(logindata);
 
-
- 
   const [username, setUsername] = useState("");
- 
+
   const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
   const fetchUserData = async (id) => {
     const maxLength = 15;
@@ -726,7 +631,6 @@ const handleCheckboxChange = (value, elementText, sectionId) => {
     fetch(url + loginsData, requestOptions)
       .then((response) => response.json())
       .then((result) => {
-       
         setUsername(result.username);
       });
   };
@@ -734,10 +638,11 @@ const handleCheckboxChange = (value, elementText, sectionId) => {
     // setloginsData(logindata.user.id)
     fetchUserData(logindata.user.id);
   }, []);
- 
 
   const handleDelete = (valueToDelete) => {
-    setSelectedAccount((prevSelected) => prevSelected.filter((value) => value !== valueToDelete));
+    setSelectedAccount((prevSelected) =>
+      prevSelected.filter((value) => value !== valueToDelete)
+    );
   };
 
   return (
@@ -762,11 +667,31 @@ const handleCheckboxChange = (value, elementText, sectionId) => {
             setSelectedAccount(newValue); // Set the new objects directly
           }}
           disabled // This disables the Autocomplete component
-          renderTags={(selected, getTagProps) => selected.map((option, index) => <Chip key={option.value} label={option.label} {...getTagProps({ index })} onDelete={() => handleDelete(option.value)} />)}
-          renderInput={(params) => <TextField {...params} variant="outlined" placeholder="Select Accounts" />}
+          renderTags={(selected, getTagProps) =>
+            selected.map((option, index) => (
+              <Chip
+                key={option.value}
+                label={option.label}
+                {...getTagProps({ index })}
+                onDelete={() => handleDelete(option.value)}
+              />
+            ))
+          }
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              variant="outlined"
+              placeholder="Select Accounts"
+            />
+          )}
           renderOption={(props, option, { selected }) => (
             <li {...props}>
-              <Checkbox checked={selectedAccount.some((acc) => acc.value === option.value)} style={{ marginRight: 8 }} />
+              <Checkbox
+                checked={selectedAccount.some(
+                  (acc) => acc.value === option.value
+                )}
+                style={{ marginRight: 8 }}
+              />
               {option.label}
             </li>
           )}
@@ -780,11 +705,13 @@ const handleCheckboxChange = (value, elementText, sectionId) => {
           <Select
             value={selectedOrganizerTemplate}
             size="small"
-            sx={{mt:2}}
+            sx={{ mt: 2 }}
             // label="Age"
             onChange={handleOrganizerTemplateChange}
             renderValue={(selected) => {
-              const option = OrganizerTemplateOptions.find((opt) => opt.value === selected);
+              const option = OrganizerTemplateOptions.find(
+                (opt) => opt.value === selected
+              );
               return option ? option.label : ""; // Show the label of the selected option
             }}
           >
@@ -807,19 +734,23 @@ const handleCheckboxChange = (value, elementText, sectionId) => {
           value={organizerName || ""} // Replace 'someField' with the field you want to display/edit
           placeholder="Organizer Name"
           size="small"
-             onChange={handleOrganizerNameChange}
+          onChange={handleOrganizerNameChange}
         />
       </Box>
 
       <Box mt={2}>
-        <Button variant="contained" onClick={handlePreview} sx={{
-                backgroundColor: 'var(--color-save-btn)',  // Normal background
-               
-                '&:hover': {
-                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                },
-               borderRadius:'15px'
-              }}>
+        <Button
+          variant="contained"
+          onClick={handlePreview}
+          sx={{
+            backgroundColor: "var(--color-save-btn)", // Normal background
+
+            "&:hover": {
+              backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+            },
+            borderRadius: "15px",
+          }}
+        >
           Preview Mode
         </Button>
       </Box>
@@ -843,7 +774,9 @@ const handleCheckboxChange = (value, elementText, sectionId) => {
         {reminder && (
           <Box sx={{ display: "flex", alignItems: "center", gap: 3, mt: 2 }}>
             <Box>
-              <InputLabel sx={{ color: "black" }}>Days until next reminder</InputLabel>
+              <InputLabel sx={{ color: "black" }}>
+                Days until next reminder
+              </InputLabel>
               <TextField
                 // margin="normal"
                 fullWidth
@@ -858,7 +791,15 @@ const handleCheckboxChange = (value, elementText, sectionId) => {
 
             <Box>
               <InputLabel sx={{ color: "black" }}>No Of reminders</InputLabel>
-              <TextField fullWidth name="No Of reminders" value={noOfReminder} onChange={(e) => setNoOfReminder(e.target.value)} placeholder="NoOfreminders" size="small" sx={{ mt: 2 }} />
+              <TextField
+                fullWidth
+                name="No Of reminders"
+                value={noOfReminder}
+                onChange={(e) => setNoOfReminder(e.target.value)}
+                placeholder="NoOfreminders"
+                size="small"
+                sx={{ mt: 2 }}
+              />
             </Box>
           </Box>
         )}
@@ -866,29 +807,39 @@ const handleCheckboxChange = (value, elementText, sectionId) => {
 
       <Box display={"flex"} gap={2} alignItems={"center"} mt={2}>
         <Box>
-          <Button onClick={createOrganizerOfAccount} variant="contained" sx={{
-                backgroundColor: 'var(--color-save-btn)',  // Normal background
-               
-                '&:hover': {
-                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                },
-               width:'80px',borderRadius:'15px'
-              }}>
+          <Button
+            onClick={createOrganizerOfAccount}
+            variant="contained"
+            sx={{
+              backgroundColor: "var(--color-save-btn)", // Normal background
+
+              "&:hover": {
+                backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+              },
+              width: "80px",
+              borderRadius: "15px",
+            }}
+          >
             Create
           </Button>
         </Box>
 
         <Box>
-          <Button onClick={handleOrganizerFormClose} variant="outlined" sx={{
-                    borderColor: 'var(--color-border-cancel-btn)',  // Normal background
-                   color:'var(--color-save-btn)',
-                    '&:hover': {
-                      backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                      color:'#fff',
-                      border:"none"
-                    },
-                    width:'80px',borderRadius:'15px'
-                  }}>
+          <Button
+            onClick={handleOrganizerFormClose}
+            variant="outlined"
+            sx={{
+              borderColor: "var(--color-border-cancel-btn)", // Normal background
+              color: "var(--color-save-btn)",
+              "&:hover": {
+                backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+                color: "#fff",
+                border: "none",
+              },
+              width: "80px",
+              borderRadius: "15px",
+            }}
+          >
             Cancel
           </Button>
         </Box>
@@ -899,10 +850,23 @@ const handleCheckboxChange = (value, elementText, sectionId) => {
           <Box>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <Box>
-                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", border: "2px solid #3FA2F6", p: 2, mb: 3, borderRadius: "10px", backgroundColor: "#96C9F4" }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    border: "2px solid #3FA2F6",
+                    p: 2,
+                    mb: 3,
+                    borderRadius: "10px",
+                    backgroundColor: "#96C9F4",
+                  }}
+                >
                   <Box>
                     <Typography fontWeight="bold">Preview mode</Typography>
-                    <Typography>The client sees your organizer like this</Typography>
+                    <Typography>
+                      The client sees your organizer like this
+                    </Typography>
                   </Box>
                   <Button variant="text" onClick={handleClosePreview}>
                     Back to edit
@@ -912,7 +876,10 @@ const handleCheckboxChange = (value, elementText, sectionId) => {
                   {organizerName}
                 </Typography>
 
-                <FormControl fullWidth sx={{ marginBottom: "10px", marginTop: "10px" }}>
+                <FormControl
+                  fullWidth
+                  sx={{ marginBottom: "10px", marginTop: "10px" }}
+                >
                   {/* <Select value={activeStep} onChange={handleDropdownChange} size="small">
                    
                     {visibleSections.map((section, index) => {
@@ -935,36 +902,42 @@ const handleCheckboxChange = (value, elementText, sectionId) => {
                                                                 })}
                   </Select> */}
                   <Select
-  value={activeStep}
-  onChange={handleDropdownChange}
-  size="small"
->
-  {visibleSections.map((section, index) => {
-    // Filter form elements that are actually visible
-    const visibleElements = section.formElements.filter((el) =>
-      shouldShowElement(el, section.id)
-    );
+                    value={activeStep}
+                    onChange={handleDropdownChange}
+                    size="small"
+                  >
+                    {visibleSections.map((section, index) => {
+                      // Filter form elements that are actually visible
+                      const visibleElements = section.formElements.filter(
+                        (el) => shouldShowElement(el, section.id)
+                      );
 
-    // Count answered visible elements
-    const answeredCount = visibleElements.reduce((count, element) => {
-      const key = `${section.id}_${element.text}`;
-      return count + (answeredElements[key] ? 1 : 0);
-    }, 0);
+                      // Count answered visible elements
+                      const answeredCount = visibleElements.reduce(
+                        (count, element) => {
+                          const key = `${section.id}_${element.text}`;
+                          return count + (answeredElements[key] ? 1 : 0);
+                        },
+                        0
+                      );
 
-    const totalVisibleElements = visibleElements.length;
+                      const totalVisibleElements = visibleElements.length;
 
-    return (
-      <MenuItem key={section.id} value={index}>
-        {section.text} ({answeredCount}/{totalVisibleElements})
-      </MenuItem>
-    );
-  })}
-</Select>
-
+                      return (
+                        <MenuItem key={section.id} value={index}>
+                          {section.text} ({answeredCount}/{totalVisibleElements}
+                          )
+                        </MenuItem>
+                      );
+                    })}
+                  </Select>
                 </FormControl>
 
                 <Box mt={2} mb={2}>
-                  <LinearProgress variant="determinate" value={((activeStep + 1) / totalSteps) * 100} />
+                  <LinearProgress
+                    variant="determinate"
+                    value={((activeStep + 1) / totalSteps) * 100}
+                  />
                 </Box>
 
                 <Box sx={{ pl: 20, pr: 20 }}>
@@ -1169,7 +1142,7 @@ const handleCheckboxChange = (value, elementText, sectionId) => {
                         </Box>
                       )
                   )} */}
-{visibleSections.map(
+                  {visibleSections.map(
                     (section, sectionIndex) =>
                       sectionIndex === activeStep && (
                         <Box key={section.id}>
@@ -1491,7 +1464,7 @@ const handleCheckboxChange = (value, elementText, sectionId) => {
                                         {element.text}
                                       </Typography>
                                       <DatePicker
-                                         format="MM/DD/YYYY"
+                                        format="MM/DD/YYYY"
                                         sx={{
                                           width: "100%",
                                           backgroundColor: "#fff",
@@ -1554,24 +1527,36 @@ const handleCheckboxChange = (value, elementText, sectionId) => {
                       )
                   )}
                   <Box mt={3} display="flex" gap={3} alignItems="center">
-                    <Button disabled={activeStep === 0} onClick={handleBack} variant="contained" sx={{
-                backgroundColor: 'var(--color-save-btn)',  // Normal background
-               
-                '&:hover': {
-                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                },
-               width:'80px',borderRadius:'15px'
-              }}>
+                    <Button
+                      disabled={activeStep === 0}
+                      onClick={handleBack}
+                      variant="contained"
+                      sx={{
+                        backgroundColor: "var(--color-save-btn)", // Normal background
+
+                        "&:hover": {
+                          backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+                        },
+                        width: "80px",
+                        borderRadius: "15px",
+                      }}
+                    >
                       Back
                     </Button>
-                    <Button onClick={handleNext} disabled={activeStep === totalSteps - 1} variant="contained" sx={{
-                backgroundColor: 'var(--color-save-btn)',  // Normal background
-               
-                '&:hover': {
-                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                },
-               width:'80px',borderRadius:'15px'
-              }}>
+                    <Button
+                      onClick={handleNext}
+                      disabled={activeStep === totalSteps - 1}
+                      variant="contained"
+                      sx={{
+                        backgroundColor: "var(--color-save-btn)", // Normal background
+
+                        "&:hover": {
+                          backgroundColor: "var(--color-save-hover-btn)", // Hover background color
+                        },
+                        width: "80px",
+                        borderRadius: "15px",
+                      }}
+                    >
                       Next
                     </Button>
                   </Box>
