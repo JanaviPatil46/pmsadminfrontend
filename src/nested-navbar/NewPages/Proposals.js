@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from "react";
 import {
   Table,
@@ -14,23 +12,29 @@ import {
   Box,
   Alert,
   Chip,
-  Button,IconButton,MenuItem,Menu
+  Button,
+  IconButton,
+  MenuItem,
+  Menu,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { Link, useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import ProposalPreviewDialog from "./ProposalDialog"
+import ProposalPreviewDialog from "./ProposalDialog";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+
 const AccountProposalTable = () => {
-   const { data } = useParams();
+  const { data } = useParams();
   const [proposals, setProposals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const [openDialog, setOpenDialog] = useState(false);
   // const [selectedProposal, setSelectedProposal] = useState(null);
-const [anchorEl, setAnchorEl] = useState(null);
-const [selectedProposal, setSelectedProposal] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedProposal, setSelectedProposal] = useState(null);
 
   const handleProposalNameClick = (proposal) => {
     setSelectedProposal(proposal);
@@ -44,81 +48,295 @@ const [selectedProposal, setSelectedProposal] = useState(null);
   const handleCloseDialog = () => {
     setOpenDialog(false);
     setSelectedProposal(null);
-// fetchPrprosalsAllData(accountId);
+    // fetchPrprosalsAllData(accountId);
   };
-   useEffect(() => {
-      const fetchData = async () => {
-        try {
-          const requestOptions = {
-            method: "GET",
-            redirect: "follow"
-          };
-  
-          const response = await fetch(`https://www.snptaxes.com/account/proposals/byaccount/${data}`, requestOptions);
-          
-          
-          const result = await response.json();
-          console.log("Fetched Proposals:", result);
-          setProposals(result.proposallist || []);
-        } catch (err) {
-          setError(err.message);
-        } finally {
-          setLoading(false);
-        }
-      };
-  
-      fetchData();
-    }, []);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const requestOptions = {
+          method: "GET",
+          redirect: "follow",
+        };
+
+        const response = await fetch(
+          `https://www.snptaxes.com/account/proposals/byaccount/${data}`,
+          requestOptions
+        );
+
+        const result = await response.json();
+        console.log("Fetched Proposals:", result);
+        setProposals(result.proposallist || []);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+const handleDownload = async (proposal) => {
+  if (!proposal) return;
+
+  const {
+    general,
+    introduction,
+    terms,
+    services,
+    payments,
+    status,
+    signature,
+    signedAt,
+  } = proposal;
+
+  // ---------- INTRODUCTION ----------
+  const introHtml =
+    general?.introductionEnabled
+      ? `
+      <h2>Introduction</h2>
+      ${introduction?.description || ""}
+      <hr/>
+    `
+      : "";
+
+  // ---------- TERMS ----------
+  const termsHtml =
+    general?.termsEnabled
+      ? `
+      <h2>Terms & Conditions</h2>
+      ${terms?.description || ""}
+      <hr/>
+    `
+      : "";
+
+  // ---------- SERVICES (ITEMIZED) ----------
+  let servicesHtml = "";
+
+  if (general?.servicesEnabled && services?.option === "services") {
+    servicesHtml = `
+      <h2>Services</h2>
+      <table width="100%" border="1" cellspacing="0" cellpadding="6">
+        <thead>
+          <tr>
+            <th align="left">Service</th>
+            <th align="right">Rate</th>
+            <th align="right">Qty</th>
+            <th align="right">Tax</th>
+            <th align="right">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${services?.itemizedData?.lineItems
+            ?.map((item) => {
+              const rate = Number(item.rate || 0);
+              const qty = Number(item.quantity || 1);
+              const taxRate = services?.itemizedData?.taxRate || 0;
+              const base = rate * qty;
+              const tax = item.tax ? (base * taxRate) / 100 : 0;
+              const total = base + tax;
+
+              return `
+                <tr>
+                  <td>
+                    <b>${item.productorService}</b><br/>
+                    <small>${item.description || ""}</small>
+                  </td>
+                  <td align="right">$${rate.toFixed(2)}</td>
+                  <td align="right">${qty}</td>
+                  <td align="right">$${tax.toFixed(2)}</td>
+                  <td align="right">$${total.toFixed(2)}</td>
+                </tr>
+              `;
+            })
+            .join("")}
+        </tbody>
+      </table>
+
+      <p style="text-align:right; font-weight:bold; margin-top:10px;">
+        Total: $${services?.itemizedData?.totalAmount?.toFixed(2)}
+      </p>
+      <hr/>
+    `;
+  }
+
+  // ---------- SERVICES (INVOICE MODE) ----------
+  if (general?.servicesEnabled && services?.option === "invoice") {
+    const invoice = services?.invoices?.[0];
+
+    servicesHtml = `
+      <h2>Invoice</h2>
+
+      <p><b>Amount:</b> $${invoice?.totalAmount?.toFixed(2)}</p>
+      <p><b>Invoice will be issued:</b> ${invoice?.issueinvoice}</p>
+      <p><b>Description:</b> ${invoice?.description || ""}</p>
+
+      <h3>Invoice Details</h3>
+      <table width="100%" border="1" cellspacing="0" cellpadding="6">
+        <thead>
+          <tr>
+            <th align="left">Service</th>
+            <th align="right">Rate</th>
+            <th align="right">Qty</th>
+            <th align="right">Tax</th>
+            <th align="right">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${invoice?.lineItems
+            ?.map((item) => {
+              const rate = Number(item.rate || 0);
+              const qty = Number(item.quantity || 1);
+              const taxRate = invoice?.taxRate || 0;
+              const base = rate * qty;
+              const tax = item.tax ? (base * taxRate) / 100 : 0;
+              const total = base + tax;
+
+              return `
+                <tr>
+                  <td>
+                    <b>${item.productorService}</b><br/>
+                    <small>${item.description || ""}</small>
+                  </td>
+                  <td align="right">$${rate.toFixed(2)}</td>
+                  <td align="right">${qty}</td>
+                  <td align="right">$${tax.toFixed(2)}</td>
+                  <td align="right">$${total.toFixed(2)}</td>
+                </tr>
+              `;
+            })
+            .join("")}
+        </tbody>
+      </table>
+
+      <p style="text-align:right; font-weight:bold;">
+        Total: $${invoice?.totalAmount?.toFixed(2)}
+      </p>
+      <hr/>
+    `;
+  }
+
+  // ---------- PAYMENTS ----------
+  const paymentsHtml =
+    general?.paymentsEnabled
+      ? `
+      <h2>Payments</h2>
+      <p><b>Method:</b> ${payments?.method}</p>
+      <p><b>Amount:</b> $${payments?.amount}</p>
+      <hr/>
+    `
+      : "";
+
+  // ---------- SIGNATURE (ONLY IF SIGNED) ----------
+  let signatureHtml = `
+    <h2>Sign & Accept</h2>
+    <p style="color:red;">Proposal not signed yet.</p>
+  `;
+
+  if (status === "Signed") {
+    signatureHtml = `
+      <h2>Sign & Accept</h2>
+      <p><b>Signed on:</b> ${new Date(signedAt).toLocaleString()}</p>
+
+      <p><b>Signature:</b></p>
+      ${
+        signature?.startsWith("data:image")
+          ? `<img src="${signature}" style="max-width:300px; border:1px solid #ccc; padding:10px;" />`
+          : `<div style="font-family:cursive; font-size:24px; border:1px solid #ccc; padding:15px; width:fit-content;">
+              ${signature}
+            </div>`
+      }
+
+      
+    `;
+  }
+
+  // ---------- FULL HTML ----------
+  const fullHtml = `
+    <div style="font-family: Arial, sans-serif; font-size: 12px; padding: 20px;">
+      <h1 style="text-align:center;">
+        ${general?.proposalName || "Proposal"}
+      </h1>
+
+      ${introHtml}
+      ${termsHtml}
+      ${servicesHtml}
+      ${paymentsHtml}
+      ${signatureHtml}
+    </div>
+  `;
+
+  // ---------- RENDER ----------
+  const tempDiv = document.createElement("div");
+  tempDiv.innerHTML = fullHtml;
+  document.body.appendChild(tempDiv);
+
+  const canvas = await html2canvas(tempDiv, { scale: 2 });
+  const imgData = canvas.toDataURL("image/png");
+
+  document.body.removeChild(tempDiv);
+
+  const pdf = new jsPDF("p", "pt", "a4");
+  const pdfWidth = pdf.internal.pageSize.getWidth();
+  const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+  pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+  pdf.save(`${general?.proposalName || "Proposal"}.pdf`);
+};
+
+
 
   const handleTemplateClick = (proposal) => {
     console.log("proposal to edit", proposal);
     // Navigate to proposal form with the proposal ID
-    navigate(`/clients/accounts/accountsdash/proposals/${data}/account-proposal?edit=${proposal._id}`);
+    navigate(
+      `/clients/accounts/accountsdash/proposals/${data}/account-proposal?edit=${proposal._id}`
+    );
   };
 
   const handleCreateNew = () => {
     // Navigate to empty proposal form
-    navigate(`/clients/accounts/accountsdash/proposals/${data}/account-proposal`);
+    navigate(
+      `/clients/accounts/accountsdash/proposals/${data}/account-proposal`
+    );
   };
 
   const handleMenuOpen = (event, proposal) => {
-  setAnchorEl(event.currentTarget);
-  setSelectedProposal(proposal);
-};
+    setAnchorEl(event.currentTarget);
+    setSelectedProposal(proposal);
+  };
 
-const handleMenuClose = () => {
-  setAnchorEl(null);
-  setSelectedProposal(null);
-};
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setSelectedProposal(null);
+  };
 
-const handleDelete = async () => {
-  if (!selectedProposal) return;
-  if (!window.confirm("Are you sure you want to delete this proposal?")) {
-    handleMenuClose();
-    return;
-  }
-
-  try {
-    const response = await fetch(
-      `https://www.snptaxes.com/account/proposals/${selectedProposal._id}`,
-      { method: "DELETE" }
-    );
-
-    if (!response.ok) {
-      throw new Error("Failed to delete proposal");
+  const handleDelete = async () => {
+    if (!selectedProposal) return;
+    if (!window.confirm("Are you sure you want to delete this proposal?")) {
+      handleMenuClose();
+      return;
     }
-toast.success("Proposal Deleted Successfully")
-    // ✅ Remove from UI list instantly
-    setProposals((prev) =>
-      prev.filter((p) => p._id !== selectedProposal._id)
-    );
-  } catch (err) {
-    console.error(err);
-  } finally {
-    handleMenuClose();
-  }
-};
 
+    try {
+      const response = await fetch(
+        `https://www.snptaxes.com/account/proposals/${selectedProposal._id}`,
+        { method: "DELETE" }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete proposal");
+      }
+      toast.success("Proposal Deleted Successfully");
+      // ✅ Remove from UI list instantly
+      setProposals((prev) =>
+        prev.filter((p) => p._id !== selectedProposal._id)
+      );
+    } catch (err) {
+      console.error(err);
+    } finally {
+      handleMenuClose();
+    }
+  };
 
   if (loading) {
     return (
@@ -167,10 +385,10 @@ toast.success("Proposal Deleted Successfully")
               >
                 Proposal Name
               </TableCell>
- <TableCell
+              <TableCell
                 sx={{ color: "white", fontWeight: "bold", fontSize: "1rem" }}
               >
-               Status
+                Status
               </TableCell>
               <TableCell
                 sx={{ color: "white", fontWeight: "bold", fontSize: "1rem" }}
@@ -188,44 +406,77 @@ toast.success("Proposal Deleted Successfully")
                   "&:hover": { backgroundColor: "action.selected" },
                 }}
               >
-                <TableCell
-                
-                >
+                <TableCell>
                   {/* <Link  to={`/clients/accounts/accountsdash/proposals/${data}/account-proposal?edit=${proposal._id}`}  style={{
                         textDecoration: "none",
                         color: "blue",
                         fontWeight: 500,
                       }}> */}
-                    <Typography
+                  <Typography
                     variant="body1"
                     fontWeight="medium"
-                    sx={{cursor:'pointer'}}
+                    sx={{ cursor: "pointer" }}
                     color="primary"
-                      onClick={() => handleOpenDialog(proposal)}
+                    onClick={() => handleOpenDialog(proposal)}
                   >
                     {proposal.general.proposalName}
                   </Typography>
                   {/* </Link> */}
-                
                 </TableCell>
 
-                <TableCell>{proposal.status}</TableCell>
-                 <TableCell>
-            <IconButton onClick={(e) => handleMenuOpen(e, proposal)}>
-              <MoreVertIcon />
-            </IconButton>
-          </TableCell>
+                {/* <TableCell>{proposal.status}</TableCell> */}
+                <TableCell>
+  <Chip
+    label={proposal.status}
+    color={proposal.status === "Signed" ? "success" : "default"}
+    size="small"
+  />
+</TableCell>
+
+                <TableCell>
+                  <IconButton onClick={(e) => handleMenuOpen(e, proposal)}>
+                    <MoreVertIcon />
+                  </IconButton>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
-{/* ✅ Shared Menu */}
-  <Menu
-    anchorEl={anchorEl}
-    open={Boolean(anchorEl)}
-    onClose={handleMenuClose}
-  >
+      {/* ✅ Shared Menu */}
+      {/* <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+      >
+        <MenuItem
+          onClick={() => {
+            handleTemplateClick(selectedProposal);
+            handleMenuClose();
+          }}
+        >
+          Edit
+        </MenuItem>
+
+        <MenuItem sx={{ color: "red" }} onClick={handleDelete}>
+          Delete
+        </MenuItem>
+      </Menu> */}
+      <Menu
+  anchorEl={anchorEl}
+  open={Boolean(anchorEl)}
+  onClose={handleMenuClose}
+>
+  {selectedProposal?.status === "Signed" ? (
+    <MenuItem
+      onClick={() => {
+        handleDownload(selectedProposal);
+        handleMenuClose();
+      }}
+    >
+      Download
+    </MenuItem>
+  ) : (
     <MenuItem
       onClick={() => {
         handleTemplateClick(selectedProposal);
@@ -234,11 +485,13 @@ toast.success("Proposal Deleted Successfully")
     >
       Edit
     </MenuItem>
+  )}
 
-    <MenuItem sx={{ color: "red" }} onClick={handleDelete}>
-      Delete
-    </MenuItem>
-  </Menu>
+  <MenuItem sx={{ color: "red" }} onClick={handleDelete}>
+    Delete
+  </MenuItem>
+</Menu>
+
       {proposals.length === 0 && (
         <Box textAlign="center" sx={{ mt: 4 }}>
           <Typography variant="h6" color="text.secondary">
@@ -254,18 +507,12 @@ toast.success("Proposal Deleted Successfully")
           </Button>
         </Box>
       )}
-      {/* {openDialog && (
-  <ProposalPreviewDialog
-    open={openDialog}
-    handleClose={() => setOpenDialog(false)}
-    proposal={selectedProposal}
-  />
-)} */}
- <ProposalPreviewDialog
-    open={openDialog}
-    handleClose={handleCloseDialog}
-    proposal={selectedProposal}
-  />
+     
+      <ProposalPreviewDialog
+        open={openDialog}
+        handleClose={handleCloseDialog}
+        proposal={selectedProposal}
+      />
     </Box>
   );
 };

@@ -120,105 +120,253 @@ const ProposalForm = () => {
 
   const ACCOUNT_API =
     process.env.REACT_APP_ACCOUNTS_URL || "https://www.snptaxes.com";
-  const fetchProposalData = async () => {
-    try {
-      setLoading(true);
-      setError("");
-      const response = await fetch(
-        `https://www.snptaxes.com/account/proposals/${proposalId}`
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch proposal");
-      }
-      const data = await response.json();
-
-      // Fetch accounts and templates first, then transform data
-      const [accountsResponse, templatesResponse] = await Promise.all([
-        fetch(
-          "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true"
-        ),
-        fetch("https://www.snptaxes.com/api/proposals"),
-      ]);
-
-      const accountsData = await accountsResponse.json();
-      const templatesData = await templatesResponse.json();
-
-      const accounts = accountsData.accounts || accountsData || [];
-      const templates = templatesData.proposallist || templatesData || [];
-
-      // Transform the data with accounts and templates
-      const transformedData = transformDataForForm(data, accounts, templates);
-      setFormData(transformedData);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching proposal:", error);
-      setError("Error loading proposal: " + error.message);
-      setLoading(false);
+    const fetchProposalData = async () => {
+  try {
+    setLoading(true);
+    setError("");
+    const response = await fetch(
+      `https://www.snptaxes.com/account/proposals/${proposalId}`
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch proposal");
     }
+    const data = await response.json();
+
+    // Fetch accounts and templates first, then transform data
+    const [accountsResponse, templatesResponse] = await Promise.all([
+      fetch(
+        "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true"
+      ),
+      fetch("https://www.snptaxes.com/api/proposals"),
+    ]);
+
+    const accountsData = await accountsResponse.json();
+    const templatesData = await templatesResponse.json();
+
+    // FIXED: Handle different account response formats
+    let accounts = [];
+    if (Array.isArray(accountsData)) {
+      accounts = accountsData;
+    } else if (Array.isArray(accountsData.accounts)) {
+      accounts = accountsData.accounts;
+    } else if (Array.isArray(accountsData.accountlist)) {
+      accounts = accountsData.accountlist;
+    } else if (Array.isArray(accountsData.teamAccounts)) {
+      accounts = accountsData.teamAccounts;
+    }
+    
+    console.log("Accounts data for transform:", accounts);
+
+    // FIXED: Handle different template response formats
+    let templates = [];
+    if (Array.isArray(templatesData)) {
+      templates = templatesData;
+    } else if (Array.isArray(templatesData.proposallist)) {
+      templates = templatesData.proposallist;
+    } else if (Array.isArray(templatesData.templates)) {
+      templates = templatesData.templates;
+    }
+
+    // Transform the data with accounts and templates
+    const transformedData = transformDataForForm(data, accounts, templates);
+    setFormData(transformedData);
+    setLoading(false);
+  } catch (error) {
+    console.error("Error fetching proposal:", error);
+    setError("Error loading proposal: " + error.message);
+    setLoading(false);
+  }
+};
+// Transform API data back to form structure
+const transformDataForForm = (apiData, accounts = [], templates = []) => {
+  console.log("API Data received:", apiData);
+  console.log("Accounts for transform:", accounts);
+  console.log("Templates for transform:", templates);
+
+  // Ensure accounts is an array
+  if (!Array.isArray(accounts)) {
+    console.warn("Accounts is not an array, converting to array");
+    accounts = [];
+  }
+
+  // Ensure templates is an array
+  if (!Array.isArray(templates)) {
+    console.warn("Templates is not an array, converting to array");
+    templates = [];
+  }
+
+  // Find the account object based on IDs
+  let accountObj = null;
+  const accountId = apiData.general?.account;
+  
+  if (accountId && Array.isArray(accounts)) {
+    accountObj = accounts.find(
+      (acc) => acc.id === accountId || acc._id === accountId
+    );
+  }
+
+  // Find the template object based on IDs
+  let templateObj = null;
+  const templateId = apiData.general?.proposalTemp;
+  
+  if (templateId && Array.isArray(templates)) {
+    templateObj = templates.find(
+      (temp) => temp._id === templateId || temp.id === templateId
+    );
+  }
+
+  // Handle multiple accounts (if needed)
+  const accountArray = Array.isArray(accountId) ? accountId : [accountId];
+  const selectedAccounts = accountArray
+    .filter(id => id)
+    .map(id => {
+      const acc = accounts.find(a => a.id === id || a._id === id);
+      return {
+        value: id,
+        label: acc?.Name || acc?.accountName || "Account",
+      };
+    });
+
+  return {
+    general: {
+      skipStepper: apiData.general?.skipStepper || false,
+      introductionEnabled: apiData.general?.introductionEnabled ?? true,
+      termsEnabled: apiData.general?.termsEnabled ?? true,
+      servicesEnabled: apiData.general?.servicesEnabled ?? true,
+      paymentsEnabled: apiData.general?.paymentsEnabled ?? false,
+      proposalTemp: templateId || "",
+      proposalName: apiData.general?.proposalName || "",
+      // Use selectedAccounts array for multiple accounts
+      account: selectedAccounts,
+      // Template object for Autocomplete
+      template: templateId ? {
+        value: templateId,
+        label: templateObj?.general?.templateName || 
+               templateObj?.general?.proposalName || 
+               "Template"
+      } : null,
+      teamMembers: apiData.general?.teamMembers || [],
+    },
+    introduction: {
+      title: apiData.introduction?.title || "",
+      description: apiData.introduction?.description || "",
+    },
+    terms: {
+      title: apiData.terms?.title || "",
+      description: apiData.terms?.description || "",
+    },
+    services: {
+      option: apiData.services?.option || "",
+      invoices: transformInvoicesForForm(apiData.services?.invoices || []),
+      itemizedData: transformItemizedDataForForm(
+        apiData.services?.itemizedData
+      ),
+    },
+    payments: {
+      method: apiData.payments?.method || "",
+      amount: apiData.payments?.amount || 0,
+    },
   };
+};
+  // const fetchProposalData = async () => {
+  //   try {
+  //     setLoading(true);
+  //     setError("");
+  //     const response = await fetch(
+  //       `https://www.snptaxes.com/account/proposals/${proposalId}`
+  //     );
+  //     if (!response.ok) {
+  //       throw new Error("Failed to fetch proposal");
+  //     }
+  //     const data = await response.json();
+
+  //     // Fetch accounts and templates first, then transform data
+  //     const [accountsResponse, templatesResponse] = await Promise.all([
+  //       fetch(
+  //         "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true"
+  //       ),
+  //       fetch("https://www.snptaxes.com/api/proposals"),
+  //     ]);
+
+  //     const accountsData = await accountsResponse.json();
+  //     const templatesData = await templatesResponse.json();
+
+  //     const accounts = accountsData.accounts || accountsData || [];
+  //     const templates = templatesData.proposallist || templatesData || [];
+
+  //     // Transform the data with accounts and templates
+  //     const transformedData = transformDataForForm(data, accounts, templates);
+  //     setFormData(transformedData);
+  //     setLoading(false);
+  //   } catch (error) {
+  //     console.error("Error fetching proposal:", error);
+  //     setError("Error loading proposal: " + error.message);
+  //     setLoading(false);
+  //   }
+  // };
 
   // Transform API data back to form structure
-  const transformDataForForm = (apiData, accounts = [], templates = []) => {
-    console.log("API Data received:", apiData);
+  // const transformDataForForm = (apiData, accounts = [], templates = []) => {
+  //   console.log("API Data received:", apiData);
 
-    // Find the account and template objects based on IDs
-    const accountObj = accounts.find(
-      (acc) =>
-        acc.id === apiData.general?.account ||
-        acc._id === apiData.general?.account
-    );
-    const templateObj = templates.find(
-      (temp) => temp._id === apiData.general?.proposalTemp
-    );
+  //   // Find the account and template objects based on IDs
+  //   const accountObj = accounts.find(
+  //     (acc) =>
+  //       acc.id === apiData.general?.account ||
+  //       acc._id === apiData.general?.account
+  //   );
+  //   const templateObj = templates.find(
+  //     (temp) => temp._id === apiData.general?.proposalTemp
+  //   );
 
-    return {
-      general: {
-        skipStepper: apiData.general?.skipStepper || false,
-        introductionEnabled: apiData.general?.introductionEnabled ?? true,
-        termsEnabled: apiData.general?.termsEnabled ?? true,
-        servicesEnabled: apiData.general?.servicesEnabled ?? true,
-        paymentsEnabled: apiData.general?.paymentsEnabled ?? false,
-        proposalTemp: apiData.general?.proposalTemp || "",
-        proposalName: apiData.general?.proposalName || "",
-        // Transform account and template to Autocomplete format
-        account: apiData.general?.account
-          ? {
-              value: apiData.general.account,
-              label: accountObj?.Name || "Account",
-            }
-          : null,
-        template: apiData.general?.proposalTemp
-          ? {
-              value: apiData.general.proposalTemp,
-              label:
-                templateObj?.general?.proposalTemp ||
-                templateObj?.general?.proposalName ||
-                "Template",
-            }
-          : null,
-        teamMembers: apiData.general?.teamMembers || [],
-      },
-      introduction: {
-        title: apiData.introduction?.title || "",
-        description: apiData.introduction?.description || "",
-      },
-      terms: {
-        title: apiData.terms?.title || "",
-        description: apiData.terms?.description || "",
-      },
-      services: {
-        option: apiData.services?.option || "",
-        invoices: transformInvoicesForForm(apiData.services?.invoices || []),
-        itemizedData: transformItemizedDataForForm(
-          apiData.services?.itemizedData
-        ),
-      },
-      payments: {
-        method: apiData.payments?.method || "",
-        amount: apiData.payments?.amount || 0,
-      },
-    };
-  };
+  //   return {
+  //     general: {
+  //       skipStepper: apiData.general?.skipStepper || false,
+  //       introductionEnabled: apiData.general?.introductionEnabled ?? true,
+  //       termsEnabled: apiData.general?.termsEnabled ?? true,
+  //       servicesEnabled: apiData.general?.servicesEnabled ?? true,
+  //       paymentsEnabled: apiData.general?.paymentsEnabled ?? false,
+  //       proposalTemp: apiData.general?.proposalTemp || "",
+  //       proposalName: apiData.general?.proposalName || "",
+  //       // Transform account and template to Autocomplete format
+  //       account: apiData.general?.account
+  //         ? {
+  //             value: apiData.general.account,
+  //             label: accountObj?.Name || "Account",
+  //           }
+  //         : null,
+  //       template: apiData.general?.proposalTemp
+  //         ? {
+  //             value: apiData.general.proposalTemp,
+  //             label:
+  //               templateObj?.general?.proposalTemp ||
+  //               templateObj?.general?.proposalName ||
+  //               "Template",
+  //           }
+  //         : null,
+  //       teamMembers: apiData.general?.teamMembers || [],
+  //     },
+  //     introduction: {
+  //       title: apiData.introduction?.title || "",
+  //       description: apiData.introduction?.description || "",
+  //     },
+  //     terms: {
+  //       title: apiData.terms?.title || "",
+  //       description: apiData.terms?.description || "",
+  //     },
+  //     services: {
+  //       option: apiData.services?.option || "",
+  //       invoices: transformInvoicesForForm(apiData.services?.invoices || []),
+  //       itemizedData: transformItemizedDataForForm(
+  //         apiData.services?.itemizedData
+  //       ),
+  //     },
+  //     payments: {
+  //       method: apiData.payments?.method || "",
+  //       amount: apiData.payments?.amount || 0,
+  //     },
+  //   };
+  // };
   // Transform line items to rows format
   const transformLineItemsToRows = (lineItems) => {
     if (!lineItems || lineItems.length === 0) {
