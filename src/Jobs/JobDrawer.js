@@ -1,5 +1,3 @@
-
-
 import {
   Chip,
   Box,
@@ -296,7 +294,7 @@ const JobDrawer = ({
     }
     fetchPipelineDataByID(selectedOptions.value);
   };
-  
+
   const [selectedStage, setSelectedStage] = useState(null);
   const [stagesoptions, setStagesOptions] = useState([]);
   const handleStageChange = (event, newValue) => {
@@ -338,50 +336,50 @@ const JobDrawer = ({
   //   fetchPipelineData();
   // }, []);
   const [userRole, setUserRole] = useState("");
-// const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
 
-const fetchPipelineData = async () => {
-  setLoading(true);
-  try {
-    const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
-    const loginuserid = storedData?.teammember?.userid;
+  const fetchPipelineData = async () => {
+    setLoading(true);
+    try {
+      const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
+      const loginuserid = storedData?.teammember?.userid;
 
-    console.log("User role:", userRole);
-    console.log("TeamMember userId:", loginuserid);
+      console.log("User role:", userRole);
+      console.log("TeamMember userId:", loginuserid);
 
-    // If Admin → fetch all pipelines
-    // If Teammember → fetch only user's pipelines
-    const url =
-      userRole === "Admin"
-        ? `${PIPELINE_API}/workflow/pipeline/pipelines`
-        : `${PIPELINE_API}/workflow/pipeline/pipelines/${loginuserid}`;
+      // If Admin → fetch all pipelines
+      // If Teammember → fetch only user's pipelines
+      const url =
+        userRole === "Admin"
+          ? `${PIPELINE_API}/workflow/pipeline/pipelines`
+          : `${PIPELINE_API}/workflow/pipeline/pipelines/${loginuserid}`;
 
-    const response = await fetch(url);
-    const data = await response.json();
+      const response = await fetch(url);
+      const data = await response.json();
 
-    console.log("Pipeline data:", data);
+      console.log("Pipeline data:", data);
 
-    setPipelineData(data.pipeline || []);
-  } catch (error) {
-    console.error("Error fetching pipeline data:", error);
-  } finally {
-    setLoading(false);
-  }
-};
+      setPipelineData(data.pipeline || []);
+    } catch (error) {
+      console.error("Error fetching pipeline data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-// Fetch userRole first
-useEffect(() => {
-  const storedUserRole = localStorage.getItem("userRole") || "";
-  console.log("UserRole from localStorage:", storedUserRole);
-  setUserRole(storedUserRole);
-}, []);
+  // Fetch userRole first
+  useEffect(() => {
+    const storedUserRole = localStorage.getItem("userRole") || "";
+    console.log("UserRole from localStorage:", storedUserRole);
+    setUserRole(storedUserRole);
+  }, []);
 
-// After userRole is updated, fetch pipeline list
-useEffect(() => {
-  if (userRole) {
-    fetchPipelineData();
-  }
-}, [userRole]);
+  // After userRole is updated, fetch pipeline list
+  useEffect(() => {
+    if (userRole) {
+      fetchPipelineData();
+    }
+  }, [userRole]);
 
   const optionpipeline = pipelineData.map((pipelineData) => ({
     value: pipelineData._id,
@@ -897,142 +895,145 @@ useEffect(() => {
       return updatedAutomations;
     });
   };
-  const [filterStatus, setFilterStatus] = useState("active"); 
-   const [jobData, setJobData] = useState([]);
-     const [isActiveTrue, setIsActiveTrue] = useState(true);
-    const [loading, setLoading] = useState(false);
-    
-       useEffect(() => {
-          const storedUserRole = localStorage.getItem("userRole");
-          console.log("Fetched userRole from localStorage:", storedUserRole);
-          setUserRole(storedUserRole);
-        }, []);
-        useEffect(() => {
-          if (userRole) {
-            fetchjobData();
-          }
-        }, [userRole, isActiveTrue]);
-const fetchjobData = async () => {
-  setLoading(true);
-  const loaderDelay = new Promise((resolve) => setTimeout(resolve, 1000));
+  const [filterStatus, setFilterStatus] = useState("active");
+  const [jobData, setJobData] = useState([]);
+  const [isActiveTrue, setIsActiveTrue] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-  try {
-    const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
-    console.log("Received stored teamMemberData:", storedData);
+  useEffect(() => {
+    const storedUserRole = localStorage.getItem("userRole");
+    console.log("Fetched userRole from localStorage:", storedUserRole);
+    setUserRole(storedUserRole);
+  }, []);
+  useEffect(() => {
+    if (userRole) {
+      fetchjobData();
+    }
+  }, [userRole, isActiveTrue]);
+  const fetchjobData = async () => {
+    setLoading(true);
+    const loaderDelay = new Promise((resolve) => setTimeout(resolve, 1000));
 
-    const loginuserid = storedData?.teammember?.userid;
-    const viewAllAccounts = storedData?.teammember?.viewallAccounts;
+    try {
+      const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
+      console.log("Received stored teamMemberData:", storedData);
 
-    console.log("User role is:", userRole);
-    console.log("access:", viewAllAccounts);
+      const loginuserid = storedData?.teammember?.userid;
+      const viewAllAccounts = storedData?.teammember?.viewallAccounts;
 
-    let url = "";
+      console.log("User role is:", userRole);
+      console.log("access:", viewAllAccounts);
 
-    if (userRole === "Admin") {
-      // ✅ Fetch active accounts first
-      const accountsResponse = await axios.get(
-        `https://www.snptaxes.com/api/accounts/list?active=${filterStatus === "active"}`
-      );
-console.log("accountsResponse",accountsResponse)
-      const accountsData = accountsResponse.data.accountlist
-;
-      console.log("Admin accounts fetched:", accountsData);
+      let url = "";
 
-      if (!accountsData || accountsData.length === 0) {
-        console.warn("No active accounts found for Admin.");
-        setJobData([]);
-        await loaderDelay;
-        setLoading(false);
-        return;
-      }
-
-      const accountIds = accountsData.map((account) => account._id).join(",");
-      url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
-    } 
-    
-    else if (userRole === "TeamMember") {
-      if (viewAllAccounts) {
-        // TeamMember with full access gets all jobs
-        // url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}`;
+      if (userRole === "Admin") {
         // ✅ Fetch active accounts first
-      const accountsResponse = await axios.get(
-        `${ACCOUNT_API}/accounts/account/accountdetailslist/${isActiveTrue}`
-      );
-
-      const accountsData = accountsResponse.data.accountlist;
-      console.log("Admin accounts fetched:", accountsData);
-
-      if (!accountsData || accountsData.length === 0) {
-        console.warn("No active accounts found for Admin.");
-        setJobData([]);
-        await loaderDelay;
-        setLoading(false);
-        return;
-      }
-
-      const accountIds = accountsData.map((account) => account.id).join(",");
-      url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
-     console.log("url",url)
-    } else {
-        // TeamMember with restricted access → fetch user's accounts
         const accountsResponse = await axios.get(
-          `${ACCOUNT_API}/accounts/getaccounts/${loginuserid}/${isActiveTrue}`
+          `https://www.snptaxes.com/api/accounts/list?active=${filterStatus === "active"}`
         );
-
+        console.log("accountsResponse", accountsResponse);
         const accountsData = accountsResponse.data.accountlist;
-        console.log("Accounts fetched:", accountsData);
+        console.log("Admin accounts fetched:", accountsData);
 
         if (!accountsData || accountsData.length === 0) {
-          console.warn("No accounts found for user.");
+          console.warn("No active accounts found for Admin.");
           setJobData([]);
           await loaderDelay;
           setLoading(false);
           return;
         }
 
-        const accountIds = accountsData.map((account) => account.id).join(",");
+        const accountIds = accountsData.map((account) => account._id).join(",");
         url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
-   console.log("url",url);
-      }
-    }
+      } else if (userRole === "TeamMember") {
+        if (viewAllAccounts) {
+          // TeamMember with full access gets all jobs
+          // url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}`;
+          // ✅ Fetch active accounts first
+          const accountsResponse = await axios.get(
+            `${ACCOUNT_API}/accounts/account/accountdetailslist/${isActiveTrue}`
+          );
 
-    if (!url) {
+          const accountsData = accountsResponse.data.accountlist;
+          console.log("Admin accounts fetched:", accountsData);
+
+          if (!accountsData || accountsData.length === 0) {
+            console.warn("No active accounts found for Admin.");
+            setJobData([]);
+            await loaderDelay;
+            setLoading(false);
+            return;
+          }
+
+          const accountIds = accountsData
+            .map((account) => account.id)
+            .join(",");
+          url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
+          console.log("url", url);
+        } else {
+          // TeamMember with restricted access → fetch user's accounts
+          const accountsResponse = await axios.get(
+            `${ACCOUNT_API}/accounts/getaccounts/${loginuserid}/${isActiveTrue}`
+          );
+
+          const accountsData = accountsResponse.data.accountlist;
+          console.log("Accounts fetched:", accountsData);
+
+          if (!accountsData || accountsData.length === 0) {
+            console.warn("No accounts found for user.");
+            setJobData([]);
+            await loaderDelay;
+            setLoading(false);
+            return;
+          }
+
+          const accountIds = accountsData
+            .map((account) => account.id)
+            .join(",");
+          url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
+          console.log("url", url);
+        }
+      }
+
+      if (!url) {
+        await loaderDelay;
+        setLoading(false);
+        return;
+      }
+
+      console.log("Fetching jobs from URL:", url);
+
+      const jobListResponse = await axios.get(url);
+
+      const formattedData = jobListResponse.data.jobList.map((job) => ({
+        ...job,
+        StartDate: job.StartDate
+          ? format(new Date(job.StartDate), "MMMM dd, yyyy")
+          : "",
+        DueDate: job.DueDate
+          ? format(new Date(job.DueDate), "MMMM dd, yyyy")
+          : "",
+        updatedAt: formatDistanceToNow(new Date(job.updatedAt), {
+          addSuffix: true,
+        }),
+        JobAssignee: Array.isArray(job.JobAssignee)
+          ? job.JobAssignee.join(", ")
+          : job.JobAssignee,
+        clientfacingstatus: {
+          statusName: job.ClientFacingStatus?.statusName || "",
+          statusColor: job.ClientFacingStatus?.statusColor || "",
+        },
+      }));
+
+      setJobData(formattedData);
+      console.log("Formatted Job Data:", formattedData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
       await loaderDelay;
       setLoading(false);
-      return;
     }
-
-    console.log("Fetching jobs from URL:", url);
-
-    const jobListResponse = await axios.get(url);
-
-    const formattedData = jobListResponse.data.jobList.map((job) => ({
-      ...job,
-      StartDate: job.StartDate
-        ? format(new Date(job.StartDate), "MMMM dd, yyyy")
-        : "",
-      DueDate: job.DueDate
-        ? format(new Date(job.DueDate), "MMMM dd, yyyy")
-        : "",
-      updatedAt: formatDistanceToNow(new Date(job.updatedAt), { addSuffix: true }),
-      JobAssignee: Array.isArray(job.JobAssignee)
-        ? job.JobAssignee.join(", ")
-        : job.JobAssignee,
-      clientfacingstatus: {
-        statusName: job.ClientFacingStatus?.statusName || "",
-        statusColor: job.ClientFacingStatus?.statusColor || "",
-      },
-    }));
-
-    setJobData(formattedData);
-    console.log("Formatted Job Data:", formattedData);
-  } catch (error) {
-    console.error("Error fetching data:", error);
-  } finally {
-    await loaderDelay;
-    setLoading(false);
-  }
-};
+  };
   // Drawer Component
   //   const DrawerContent = () => {
   //     const ITEM_HEIGHT = 48;
@@ -2349,6 +2350,7 @@ console.log("accountsResponse",accountsResponse)
       })
       .flat();
     console.log("Account Tags:", accountTags);
+const [isProcessing, setIsProcessing] = useState(false);
 
     // API endpoints
     const ACCOUNT_TASKS_API = process.env.REACT_APP_TASKS_API;
@@ -2447,9 +2449,7 @@ console.log("accountsResponse",accountsResponse)
         const tagDetails = await Promise.all(
           tagIds.map(async (tagId) => {
             try {
-              const response = await fetch(
-                `${TAGS_API}/tags/${tagId}`
-              );
+              const response = await fetch(`${TAGS_API}/tags/${tagId}`);
               const result = await response.json();
               return result.tag;
             } catch (error) {
@@ -2464,31 +2464,31 @@ console.log("accountsResponse",accountsResponse)
         return [];
       }
     };
- const [clientFacingJobs, setClientFacingJobs] = useState([]);
-  const fetchClientFacingJobsData = async () => {
-    try {
-      const response = await fetch(
-        `${CLIENT_FACING_API}/workflow/clientfacingjobstatus/`
-      );
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
+    const [clientFacingJobs, setClientFacingJobs] = useState([]);
+    const fetchClientFacingJobsData = async () => {
+      try {
+        const response = await fetch(
+          `${CLIENT_FACING_API}/workflow/clientfacingjobstatus/`
+        );
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const data = await response.json();
+        setClientFacingJobs(data.clientFacingJobStatues);
+        console.log(data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
       }
-      const data = await response.json();
-      setClientFacingJobs(data.clientFacingJobStatues);
-      console.log(data);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
-  
-  const clientStatusOptions = clientFacingJobs.map((status) => ({
-    value: status._id,
-    label: status.clientfacingName,
-    clientfacingColour: status.clientfacingColour,
-  }));
-   useEffect(() => {
-    fetchClientFacingJobsData();
-  }, []);
+    };
+
+    const clientStatusOptions = clientFacingJobs.map((status) => ({
+      value: status._id,
+      label: status.clientfacingName,
+      clientfacingColour: status.clientfacingColour,
+    }));
+    useEffect(() => {
+      fetchClientFacingJobsData();
+    }, []);
     // Initialize template and tag data
     useEffect(() => {
       const initializeAutomationData = async () => {
@@ -2777,7 +2777,11 @@ console.log("accountsResponse",accountsResponse)
       automationTemp,
       automationAccountId
     ) => {
-      console.log("Assigning proposal to account:", automationTemp, automationAccountId);
+      console.log(
+        "Assigning proposal to account:",
+        automationTemp,
+        automationAccountId
+      );
       try {
         const response = await fetch(
           "https://www.snptaxes.com/account/proposals/automation",
@@ -2958,7 +2962,7 @@ console.log("accountsResponse",accountsResponse)
     // Account tags update handler
     const handleAccountTagsUpdate = async (accountId, automation) => {
       console.log(`Updating account tags for Account ID: ${accountId}`);
-console.log("Automation details:", automation);
+      console.log("Automation details:", automation);
       const res = await axios.get(
         `https://www.snptaxes.com/api/accounts/${accountId}`
       );
@@ -2967,14 +2971,14 @@ console.log("Automation details:", automation);
       let currentTags = accountsData.tags || [];
       const addTagIds = automation?.addTags || [];
       const removeTagIds = automation?.removeTags || [];
-console.log("Current Tags:", currentTags);
-console.log("Add Tag IDs:", addTagIds);
-console.log("Remove Tag IDs:", removeTagIds);
+      console.log("Current Tags:", currentTags);
+      console.log("Add Tag IDs:", addTagIds);
+      console.log("Remove Tag IDs:", removeTagIds);
       let updatedTags = currentTags.filter(
         (tagId) => !removeTagIds.includes(tagId)
       );
       updatedTags = [...new Set([...updatedTags, ...addTagIds])];
-console.log("Updated Tags:", updatedTags);
+      console.log("Updated Tags:", updatedTags);
       const updateResponse = await fetch(
         `https://www.snptaxes.com/api/accounts/accountdetails/updateaccounttags/${accountId}`,
         {
@@ -2996,67 +3000,74 @@ console.log("Updated Tags:", updatedTags);
           : [...prevSelected, index]
       );
     };
- const [accountsWithTags, setAccountsWithTags] = useState([]);
-  const [loading, setLoading] = useState(false);
+    const [accountsWithTags, setAccountsWithTags] = useState([]);
+    const [loading, setLoading] = useState(false);
 
-  // Fetch complete account data with tags using your API
-  useEffect(() => {
-    const fetchAccountsWithTags = async () => {
-      if (!combinedaccountValues || combinedaccountValues.length === 0) return;
-      
-      setLoading(true);
-      try {
-        const response = await fetch('https://www.snptaxes.com/api/accounts/multiple', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ ids: combinedaccountValues })
-        });
+    // Fetch complete account data with tags using your API
+    useEffect(() => {
+      const fetchAccountsWithTags = async () => {
+        if (!combinedaccountValues || combinedaccountValues.length === 0)
+          return;
 
-        if (!response.ok) throw new Error('Failed to fetch accounts');
-        
-        const accountsData = await response.json();
-        setAccountsWithTags(accountsData);
-        console.log('Fetched accounts with tags:', accountsData);
-      } catch (error) {
-        console.error('Error fetching accounts with tags:', error);
-      } finally {
-        setLoading(false);
-      }
+        setLoading(true);
+        try {
+          const response = await fetch(
+            "https://www.snptaxes.com/api/accounts/multiple",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ ids: combinedaccountValues }),
+            }
+          );
+
+          if (!response.ok) throw new Error("Failed to fetch accounts");
+
+          const accountsData = await response.json();
+          setAccountsWithTags(accountsData);
+          console.log("Fetched accounts with tags:", accountsData);
+        } catch (error) {
+          console.error("Error fetching accounts with tags:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchAccountsWithTags();
+    }, [combinedaccountValues]);
+
+    // Get tags for selected accounts from the properly fetched data
+    const getAccountTags = (accountId) => {
+      const account = accountsWithTags.find((acc) => acc._id === accountId);
+      return account ? account.tags || [] : [];
     };
 
-    fetchAccountsWithTags();
-  }, [combinedaccountValues]);
+    // Check if automation tags match account tags
+    const checkTagMatch = (automationSelectedTags, accountId) => {
+      if (!automationSelectedTags || automationSelectedTags.length === 0) {
+        return true; // No condition tags means always match
+      }
 
-  // Get tags for selected accounts from the properly fetched data
-  const getAccountTags = (accountId) => {
-    const account = accountsWithTags.find(acc => acc._id === accountId);
-    return account ? account.tags || [] : [];
-  };
+      const accountTags = getAccountTags(accountId);
+      console.log(`Checking tags for account ${accountId}:`, {
+        automationTags: automationSelectedTags,
+        accountTags: accountTags,
+      });
 
-  // Check if automation tags match account tags
-  const checkTagMatch = (automationSelectedTags, accountId) => {
-    if (!automationSelectedTags || automationSelectedTags.length === 0) {
-      return true; // No condition tags means always match
-    }
+      // Check if at least one automation tag exists in account tags
+      const hasMatch = automationSelectedTags.some((automationTagId) =>
+        accountTags.includes(automationTagId)
+      );
 
-    const accountTags = getAccountTags(accountId);
-    console.log(`Checking tags for account ${accountId}:`, {
-      automationTags: automationSelectedTags,
-      accountTags: accountTags
-    });
-
-    // Check if at least one automation tag exists in account tags
-    const hasMatch = automationSelectedTags.some(automationTagId => 
-      accountTags.includes(automationTagId)
-    );
-
-    console.log(`Tag match result for account ${accountId}:`, hasMatch);
-    return hasMatch;
-  };
+      console.log(`Tag match result for account ${accountId}:`, hasMatch);
+      return hasMatch;
+    };
     // Move handler
     const handleMove = async () => {
+        if (isProcessing) return; // safety guard
+
+  setIsProcessing(true);
       try {
         const { accountJobMap } = await createJob();
         console.log("Job mapping created:", accountJobMap);
@@ -3076,15 +3087,18 @@ console.log("Updated Tags:", updatedTags);
                   );
                 }
 
-                  // Check tag matching using the proper function
-              const hasMatchingTags = checkTagMatch(automation.selectedTags, accountId);
-              
-              if (!hasMatchingTags) {
-                console.warn(
-                  `Tags do not match for automation "${automation.type}" and account ID: ${accountId}. Skipping.`
+                // Check tag matching using the proper function
+                const hasMatchingTags = checkTagMatch(
+                  automation.selectedTags,
+                  accountId
                 );
-                return;
-              }
+
+                if (!hasMatchingTags) {
+                  console.warn(
+                    `Tags do not match for automation "${automation.type}" and account ID: ${accountId}. Skipping.`
+                  );
+                  return;
+                }
 
                 await selectAutomationApi(
                   automation.type,
@@ -3110,7 +3124,7 @@ console.log("Updated Tags:", updatedTags);
           toast.success("Job created successfully");
           handleDrawerClose();
           navigate("/jobs/activejob");
-fetchjobData();
+          fetchjobData();
         }
 
         setDrawerOpen(false);
@@ -3118,7 +3132,9 @@ fetchjobData();
       } catch (error) {
         console.error("Operation failed:", error);
         toast.error(`Operation failed: ${error.message}`);
-      }
+      }finally {
+    setIsProcessing(false); // 🔑 ENABLE BUTTONS AGAIN
+  }
     };
 
     // Create job function
@@ -3129,7 +3145,7 @@ fetchjobData();
       const clientStatusAutomation = automations.find(
         (automation) => automation.type === "Update client-facing job status"
       );
-console.log("clientStatusAutomation",clientStatusAutomation)
+      console.log("clientStatusAutomation", clientStatusAutomation);
       const assigneesAutomation = automations.find(
         (automation) => automation.type === "Update job assignees"
       );
@@ -3273,10 +3289,10 @@ console.log("clientStatusAutomation",clientStatusAutomation)
             //       )
             //     )
             //   : true;
-// Check if ALL selected accounts have matching tags for this automation
-          const allAccountsHaveMatchingTags = combinedaccountValues.every(accountId => 
-            checkTagMatch(automation.selectedTags, accountId)
-          );
+            // Check if ALL selected accounts have matching tags for this automation
+            const allAccountsHaveMatchingTags = combinedaccountValues.every(
+              (accountId) => checkTagMatch(automation.selectedTags, accountId)
+            );
             return (
               <Box
                 key={index}
@@ -3293,7 +3309,8 @@ console.log("clientStatusAutomation",clientStatusAutomation)
                       <Checkbox
                         checked={selectedAutomations.includes(index)}
                         onChange={() => handleCheckboxChange(index)}
- disabled={!allAccountsHaveMatchingTags}                      />
+                        disabled={!allAccountsHaveMatchingTags}
+                      />
                     }
                     label={
                       <Typography variant="h6" component="span">
@@ -3454,48 +3471,68 @@ console.log("clientStatusAutomation",clientStatusAutomation)
                     )}
                   </Box>
                 )} */}
-{automation.type === "Update client-facing job status" && (
-  <Box sx={{ mb: 2 }}>
-    <Typography variant="subtitle1" fontWeight="bold">
-      Client Status:
-    </Typography>
-    
-    {/* Display status with colored dot */}
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
-      {automation.selectedClientStatus && (
-        <>
-          <Box
-            sx={{
-              width: 12,
-              height: 12,
-              borderRadius: '50%',
-              backgroundColor: clientStatusOptions?.find(
-                opt => opt.value === automation.selectedClientStatus
-              )?.clientfacingColour || '#ccc'
-            }}
-          />
-          <Typography variant="body2">
-            {clientStatusOptions?.find(
-              opt => opt.value === automation.selectedClientStatus
-            )?.label || automation.selectedClientStatus || "Not set"}
-          </Typography>
-        </>
-      )}
-    </Box>
+                {automation.type === "Update client-facing job status" && (
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="subtitle1" fontWeight="bold">
+                      Client Status:
+                    </Typography>
 
-    {/* Display visibility setting */}
-    <Typography variant="body2" sx={{ mt: 1 }}>
-      Visibility: {automation.status ? "Visible to client" : "Hidden from client"}
-    </Typography>
+                    {/* Display status with colored dot */}
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        mt: 1,
+                      }}
+                    >
+                      {automation.selectedClientStatus && (
+                        <>
+                          <Box
+                            sx={{
+                              width: 12,
+                              height: 12,
+                              borderRadius: "50%",
+                              backgroundColor:
+                                clientStatusOptions?.find(
+                                  (opt) =>
+                                    opt.value ===
+                                    automation.selectedClientStatus
+                                )?.clientfacingColour || "#ccc",
+                            }}
+                          />
+                          <Typography variant="body2">
+                            {clientStatusOptions?.find(
+                              (opt) =>
+                                opt.value === automation.selectedClientStatus
+                            )?.label ||
+                              automation.selectedClientStatus ||
+                              "Not set"}
+                          </Typography>
+                        </>
+                      )}
+                    </Box>
 
-    {/* Display status description if available */}
-    {automation.statusDescription && (
-      <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
-        Description: {automation.statusDescription}
-      </Typography>
-    )}
-  </Box>
-)}
+                    {/* Display visibility setting */}
+                    <Typography variant="body2" sx={{ mt: 1 }}>
+                      Visibility:{" "}
+                      {automation.status
+                        ? "Visible to client"
+                        : "Hidden from client"}
+                    </Typography>
+
+                    {/* Display status description if available */}
+                    {automation.statusDescription && (
+                      <Typography
+                        variant="body2"
+                        color="textSecondary"
+                        sx={{ mt: 1 }}
+                      >
+                        Description: {automation.statusDescription}
+                      </Typography>
+                    )}
+                  </Box>
+                )}
                 {/* Warning for Account Tags Automation */}
                 {automation.type === "Update account tags" && (
                   <Alert severity="warning" sx={{ mt: 2 }}>
@@ -3511,6 +3548,7 @@ console.log("clientStatusAutomation",clientStatusAutomation)
           <Button
             variant="contained"
             onClick={handleMove}
+             disabled={isProcessing}
             sx={{
               backgroundColor: "var(--color-save-btn)",
               "&:hover": { backgroundColor: "var(--color-save-hover-btn)" },
@@ -3518,10 +3556,12 @@ console.log("clientStatusAutomation",clientStatusAutomation)
               width: "80px",
             }}
           >
+              {/* {isProcessing ? "Processing..." : "Move"} */}
             Move
           </Button>
           <Button
             variant="outlined"
+              disabled={isProcessing}
             onClick={() => setDrawerOpen(false)}
             sx={{
               borderColor: "var(--color-border-cancel-btn)",

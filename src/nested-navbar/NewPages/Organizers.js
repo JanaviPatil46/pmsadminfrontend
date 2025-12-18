@@ -121,8 +121,11 @@ const handleArchive = (_id, isActive) => {
 
     const raw = JSON.stringify({
       issealed: issealed,
+      // status: "In Progress"
+      
+    ...(issealed === false && { status: "In Progress" }),
     });
-
+console.log("raw",raw)
     const requestOptions = {
       method: "PATCH",
       headers: myHeaders,
