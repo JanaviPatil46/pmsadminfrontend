@@ -25,7 +25,6 @@ import {
   TableRow,
   TableBody,
   Table,
-  TableContainer,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import customCss from "./docuseal-dark-theme.css";
@@ -133,6 +132,10 @@ const DocsFolderTree = () => {
       });
   };
 
+  const handleApplyTemplate = async () => {
+    await applyTemplateToAccount();
+  };
+
   const FolderTreeView = ({ accountId }) => {
     const [clientEmail, setClientEmail] = useState(""); // store client email
     // const [approvedFiles, setApprovedFiles] = useState(new Set());
@@ -173,8 +176,7 @@ const DocsFolderTree = () => {
     const [folderTree, setFolderTree] = useState([]);
     const [selectedItem, setSelectedItem] = useState("");
     // console.log("hgjhg",data)
-    const [selectedItems, setSelectedItems] = useState(new Set());
-    const [selectAll, setSelectAll] = useState(false);
+
     useEffect(() => {
       fetchFolderTree(accountId);
     }, [accountId]);
@@ -213,6 +215,12 @@ const DocsFolderTree = () => {
     const handleMenuClose = () => {
       setMenuAnchorEl(null);
     };
+    // Toggle read/unread
+    const toggleReadStatus = (item) => {
+      const newValue = !(item.meta?.readStatus || false);
+      updateStatus(item, "readStatus", newValue);
+      // console.log("kujaki janavi", item.path);
+    };
 
     const SIGN_STATUSES = [
       "sendForSignature",
@@ -237,76 +245,7 @@ const DocsFolderTree = () => {
     const [token, setToken] = useState("");
     const [showBuilderFor, setShowBuilderFor] = useState(null);
     const [openDialog, setOpenDialog] = useState(false);
-    // Checkbox selection helpers
-    const getAllChildrenPaths = (item, parentPath = "") => {
-      const fullPath = parentPath ? `${parentPath}/${item.name}` : item.name;
-      const paths = [fullPath];
-
-      if (item.children && item.children.length > 0) {
-        item.children.forEach((child) => {
-          paths.push(...getAllChildrenPaths(child, fullPath));
-        });
-      }
-      return paths;
-    };
-
-    const handleSelectItem = (path) => {
-      setSelectedItems((prev) => {
-        const newSet = new Set(prev);
-        if (newSet.has(path)) {
-          newSet.delete(path);
-        } else {
-          newSet.add(path);
-        }
-        return newSet;
-      });
-    };
-
-    const handleFolderSelect = (item, parentPath = "") => {
-      const allChildPaths = getAllChildrenPaths(item, parentPath);
-
-      setSelectedItems((prev) => {
-        const newSet = new Set(prev);
-        const allSelected = allChildPaths.every((path) => newSet.has(path));
-
-        if (allSelected) {
-          allChildPaths.forEach((path) => newSet.delete(path));
-        } else {
-          allChildPaths.forEach((path) => newSet.add(path));
-        }
-        return newSet;
-      });
-    };
-
-    const isFolderPartiallySelected = (item, parentPath = "") => {
-      const allChildPaths = getAllChildrenPaths(item, parentPath);
-      const selectedCount = allChildPaths.filter((path) =>
-        selectedItems.has(path)
-      ).length;
-      return selectedCount > 0 && selectedCount < allChildPaths.length;
-    };
-
-    const handleSelectAll = () => {
-      if (selectAll) {
-        setSelectedItems(new Set());
-      } else {
-        const allPaths = new Set();
-        const collectPaths = (items, parentPath = "") => {
-          items.forEach((item) => {
-            const fullPath = parentPath
-              ? `${parentPath}/${item.name}`
-              : item.name;
-            allPaths.add(fullPath);
-            if (item.children && item.children.length > 0) {
-              collectPaths(item.children, fullPath);
-            }
-          });
-        };
-        collectPaths(folderTree);
-        setSelectedItems(allPaths);
-      }
-      setSelectAll(!selectAll);
-    };
+    // const [currentExternalId, setCurrentExternalId] = useState(null);
     // Toggle signature and request token
     const toggleSignStatus = async (item) => {
       try {
@@ -323,29 +262,41 @@ const DocsFolderTree = () => {
         setToken(data.token);
         setShowBuilderFor(item); // important: must match the Dialog condition
         setOpenDialog(true);
+        // esignRequestId = (data.esignRequestId);
+        // // Cycle status (optional, keep your logic)
+        // const currentStatus = item.meta?.signStatus || "sendForSignature";
+        // const currentIndex = SIGN_STATUSES.indexOf(currentStatus);
+        // const nextIndex = (currentIndex + 1) % SIGN_STATUSES.length;
+        // const nextStatus = SIGN_STATUSES[nextIndex];
+        // // await updateStatus(item, "signStatus", nextStatus,data.esignRequestId);
+        // await updateStatus(
+        //   item,
+        //   "signStatus",
+        //   nextStatus,
+        //   null,
+        //   data.esignRequestId
+        // );
       } catch (err) {
         console.error(err);
       }
     };
     const cancelSignature = async (item) => {
-      try {
-        await axios.delete(
-          `${SIGNATURE_API}/signature/cancel/${item.meta.esignRequestId}`,
-          {
-            data: {
-              folder: item.meta.folder, // EXACT value from meta file
-              name: item.meta.name, // "1.5MB.pdf"
-            },
-          }
-        );
-
-        alert("Signature request cancelled.");
-        fetchFolderTree(accountId);
-      } catch (err) {
-        console.error(err);
-        alert("Failed to cancel signature");
+  try {
+    await axios.delete(`${SIGNATURE_API}/signature/cancel/${item.meta.esignRequestId}`, {
+      data: {
+        folder: item.meta.folder,    // EXACT value from meta file
+        name: item.meta.name         // "1.5MB.pdf"
       }
-    };
+    });
+
+    alert("Signature request cancelled.");
+    fetchFolderTree(accountId);
+  } catch (err) {
+    console.error(err);
+    alert("Failed to cancel signature");
+  }
+};
+
 
     const APPROVAL_STATUSES = [
       "sendForApproval",
@@ -402,14 +353,10 @@ const DocsFolderTree = () => {
       setDescription("");
       setSelectedItem(null);
     };
-    const [sending, setSending] = useState(false);
-
     const handleRequestApproval = async () => {
       if (!selectedItem) return;
-      console.log("selected item for approval", selectedItem);
+console.log("selected item for approval", selectedItem);
       try {
-        setSending(true);
-
         const fileUrl = `https://snptaxes.com/uploads/accounts/${selectedItem.path}`;
 
         const payload = {
@@ -444,10 +391,64 @@ const DocsFolderTree = () => {
       } catch (error) {
         console.error("Approval request failed:", error);
         alert("Failed to send approval.");
-      } finally {
-        setSending(false);
       }
     };
+
+    // const handleRequestApproval = async () => {
+    //   if (!selectedItem) return;
+
+    //   try {
+    //     const fileUrl = `https://snptaxes.com/uploads/accounts/${selectedItem.path}`;
+
+    //     const payload = {
+    //       accountId,
+    //       filename: selectedItem.name,
+    //       fileUrl,
+    //       clientEmail,
+    //       description,
+    //     };
+
+    //     const res = await fetch(
+    //       `${DOCS_MANAGMENTS}/approvals/request-approval`,
+    //       {
+    //         method: "POST",
+    //         headers: { "Content-Type": "application/json" },
+    //         body: JSON.stringify(payload),
+    //       }
+    //     );
+
+    //     const result = await res.json();
+
+    //     if (!res.ok) throw new Error("Failed to send approval request.");
+
+    //     // ⬅️ Backend must return approvalId
+    //     const approvalId = result.approvalId;
+
+    //     alert(`Approval request sent to ${payload.clientEmail}`);
+
+    //     // Calculate next status
+    //     const currentStatus =
+    //       selectedItem.meta?.authStatus || "sendForApproval";
+    //     const currentIndex = APPROVAL_STATUSES.indexOf(currentStatus);
+    //     const nextIndex = (currentIndex + 1) % APPROVAL_STATUSES.length;
+    //     const nextStatus = APPROVAL_STATUSES[nextIndex];
+
+    //     // ⬅️ Send approvalId into updateStatus()
+    //     // await updateStatus(selectedItem, "authStatus", nextStatus, approvalId);
+    //     await updateStatus(
+    //       selectedItem,
+    //       "authStatus",
+    //       nextStatus,
+    //       approvalId,
+    //       null
+    //     );
+
+    //     handleCloseDialog();
+    //   } catch (err) {
+    //     console.error("Approval request failed:", err);
+    //     alert("Failed to send approval request.");
+    //   }
+    // };
 
     // 🔹 Frontend: Update any status (read, sign, approval)
     const updateStatus = async (
@@ -625,38 +626,6 @@ const DocsFolderTree = () => {
         alert("Failed to update read-only status");
       }
     };
-    const handleDownload = async (item) => {
-      try {
-        const res = await fetch(
-          "https://www.snptaxes.com/api/accountsdoc/download",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              paths: item.path, // backend already supports string or array
-            }),
-          }
-        );
-
-        if (!res.ok) {
-          const err = await res.json();
-          throw new Error(err.error || "Download failed");
-        }
-
-        const blob = await res.blob();
-        const url = window.URL.createObjectURL(blob);
-
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = item.name || "download";
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        window.URL.revokeObjectURL(url);
-      } catch (err) {
-        console.error("Download error:", err);
-      }
-    };
 
     // 🗑️ Delete File or Folder (Universal)
     const deleteItem = async (item) => {
@@ -704,6 +673,47 @@ const DocsFolderTree = () => {
       alert(`Move folder: ${folder.path}`); // implement backend
       handleMenuClose();
     };
+//     const handleFileClick = (fullPath, fileName, meta = {}) => {
+//   try {
+//     if (meta.readOnly) {
+//       alert("This file is locked and cannot be opened.");
+//       return;
+//     }
+
+//     const fileUrl = `https://www.snptaxes.com/uploads/accounts/${data}/${fullPath}`;
+//     const ext = fileName.split(".").pop().toLowerCase();
+
+//     const viewable = ["pdf", "jpg", "jpeg", "png", "gif", "txt"];
+//     const excel = ["xls", "xlsx"];
+//     const word = ["doc", "docx"];
+
+//     if (viewable.includes(ext)) {
+//       // Normal view in browser
+//       window.open(fileUrl, "_blank");
+//     } 
+//     else if (excel.includes(ext)) {
+//       // 📄 Open Excel online (Google Sheets Viewer)
+//       const gsheetUrl = `https://docs.google.com/gview?url=${encodeURIComponent(fileUrl)}&embedded=true`;
+//       window.open(gsheetUrl, "_blank");
+//     } 
+//     else if (word.includes(ext)) {
+//       // 📄 Open Word using Google Docs Viewer
+//       const gdocUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(fileUrl)}&embedded=true`;
+//       window.open(gdocUrl, "_blank");
+//     }
+//     else {
+//       // download anything else
+//       const a = document.createElement("a");
+//       a.href = fileUrl;
+//       a.download = fileName;
+//       document.body.appendChild(a);
+//       a.click();
+//       a.remove();
+//     }
+//   } catch (e) {
+//     console.error("open error:", e);
+//   }
+// };
 
     const handleFileClick = (fullPath, fileName, meta = {}) => {
       try {
@@ -763,16 +773,6 @@ const DocsFolderTree = () => {
       }
     };
     const renderTree = (items, level = 0, parentPath = "") => {
-      const UploadedInfo = ({ meta }) => {
-        if (!meta) return null;
-
-        return (
-          <Typography variant="caption" sx={{ fontWeight: "bold" }}>
-            {meta.uploadedAt}
-          </Typography>
-        );
-      };
-
       const getStatusChip = (meta) => {
         console.log("meta status", meta);
         const chips = [];
@@ -982,11 +982,12 @@ const DocsFolderTree = () => {
                           {item.name}
                         </Typography>
                       </Box>
+
                       <Box>
-                        {/* 🧾 Uploaded info */}
-                        <UploadedInfo meta={meta} />
+                        {" "}
+                        {/* ⬇️ Added the chips here */}
+                        {getStatusChip(meta)}
                       </Box>
-                      <Box>{getStatusChip(meta)}</Box>
 
                       <Box sx={{ display: "flex", alignItems: "center" }}>
                         <StatusIcons />
@@ -1087,8 +1088,7 @@ const DocsFolderTree = () => {
                 variant="contained"
                 color="primary"
                 onClick={handleRequestApproval}
-                // disabled={!description.trim()}
-                disabled={!description.trim() || sending}
+                disabled={!description.trim()}
               >
                 Send
               </Button>
@@ -1097,246 +1097,7 @@ const DocsFolderTree = () => {
         </>
       );
     };
-    const UploadedInfo = ({ meta }) => {
-      if (!meta) return null;
 
-      return (
-        <Typography variant="caption" sx={{ fontWeight: "bold" }}>
-          {meta.uploadedAt}
-        </Typography>
-      );
-    };
-    const getStatusChip = (meta, isFolder) => {
-      // Return null for folders - don't show status chips for folders
-      if (isFolder) return null;
-
-      const chips = [];
-
-      // ======= SIGNATURE STATUS =======
-      if (SIGN_STATUSES.includes(meta.signStatus)) {
-        let color = "default";
-
-        if (meta.signStatus === "pendingSignature") color = "warning";
-        if (meta.signStatus === "signatureCompleted") color = "success";
-
-        chips.push(
-          <Chip
-            key="signChip"
-            label={statusTextMap[meta.signStatus]}
-            size="small"
-            variant="outlined"
-            color={color}
-          />
-        );
-      }
-
-      // ======= APPROVAL STATUS =======
-      if (APPROVAL_STATUSES.includes(meta.authStatus)) {
-        let color = "default";
-        let chip;
-
-        if (meta.authStatus === "pendingApproval") color = "warning";
-        if (meta.authStatus === "approvalCompleted") color = "success";
-        if (meta.authStatus === "canceledApproval") color = "error";
-
-        if (meta.authStatus === "canceledApproval" && meta.cancelReason) {
-          chip = (
-            <Tooltip title={meta.cancelReason} placement="top-end">
-              <Chip
-                key="approvalCanceledChip"
-                label="Approval Canceled"
-                size="small"
-                variant="outlined"
-                color="error"
-                sx={{ cursor: "pointer" }}
-              />
-            </Tooltip>
-          );
-        } else {
-          chip = (
-            <Chip
-              key="approvalChip"
-              label={approvalStatusTextMap[meta.authStatus]}
-              size="small"
-              variant="outlined"
-              color={color}
-            />
-          );
-        }
-
-        chips.push(chip);
-      }
-
-      // ======= INVOICE LOCK STATUS =======
-      if (INVOICE_LOCK_STATUSES.includes(meta.lockInvoiceStatus)) {
-        let color = "default";
-        if (meta.lockInvoiceStatus === "pendingpayment") color = "warning";
-        if (meta.lockInvoiceStatus === "paymentcompleted") color = "success";
-
-        chips.push(
-          <Chip
-            key="invoiceLockChip"
-            label={invoiceStatusTextMap[meta.lockInvoiceStatus]}
-            size="small"
-            variant="outlined"
-            color={color}
-          />
-        );
-      }
-
-      // ======= SHOW NOTHING IF NO STATUS =======
-      if (chips.length === 0) return null;
-
-      return <Box sx={{ display: "flex", gap: 1 }}>{chips}</Box>;
-    };
-
-    // Render table rows recursively
-    const renderTableRows = (items, level = 0, parentPath = "") => {
-      return items.map((item) => {
-        const fullPath = parentPath ? `${parentPath}/${item.name}` : item.name;
-        const meta = item.meta || {};
-        const isFolder = item.type === "folder";
-        const isSelected = selectedItems.has(fullPath);
-        const isPartiallySelected = isFolder
-          ? isFolderPartiallySelected(item, parentPath)
-          : false;
-
-        const handleSafeFileClick = () => {
-          if (meta.readOnly) {
-            alert("This file is locked and cannot be opened.");
-            return;
-          }
-          if (!isFolder) {
-            handleFileClick(fullPath, item.name);
-          }
-        };
-
-        return (
-          <React.Fragment key={fullPath}>
-            <TableRow
-              sx={{
-                backgroundColor: level % 2 === 0 ? "#fafafa" : "white",
-                "&:hover": { backgroundColor: "#f5f5f5" },
-              }}
-            >
-              {/* Checkbox Column */}
-              <TableCell sx={{ pl: level * 4 + 2, width: "50px" }}>
-                {isFolder ? (
-                  <Checkbox
-                    checked={isSelected}
-                    indeterminate={isPartiallySelected}
-                    onChange={() => handleFolderSelect(item, parentPath)}
-                  />
-                ) : (
-                  <Checkbox
-                    checked={isSelected}
-                    onChange={() => handleSelectItem(fullPath)}
-                  />
-                )}
-              </TableCell>
-
-              {/* Name Column */}
-              <TableCell>
-                <Box sx={{ display: "flex", alignItems: "center" }}>
-                  {isFolder ? (
-                    <>
-                      <IconButton
-                        size="small"
-                        onClick={() => toggleFolder(fullPath, meta.readOnly)}
-                        disabled={meta.readOnly}
-                      >
-                        {expandedFolders[fullPath] ? (
-                          <FolderOpenIcon color="#1976d2" />
-                        ) : (
-                          <FolderClosedIcon color="#757575" />
-                        )}
-                      </IconButton>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          ml: 1,
-                          fontWeight: "medium",
-                          color: meta.readOnly ? "#999" : "inherit",
-                          cursor: "pointer",
-                        }}
-                        onClick={() => toggleFolder(fullPath, meta.readOnly)}
-                      >
-                        {item.name}
-                        {meta.readOnly && (
-                          <Typography
-                            component="span"
-                            variant="caption"
-                            sx={{ color: "error.main", ml: 1 }}
-                          >
-                            (Locked)
-                          </Typography>
-                        )}
-                      </Typography>
-                    </>
-                  ) : (
-                    <>
-                      <Box sx={{ mr: 1 }}>{getFileIcon(item.name)}</Box>
-                      <Box sx={{ display: "flex", flexDirection: "column" }}>
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            color: meta.readOnly ? "#999" : "#1976d2",
-                            textDecoration: meta.readOnly
-                              ? "none"
-                              : "underline",
-                            cursor: meta.readOnly ? "not-allowed" : "pointer",
-                          }}
-                          onClick={handleSafeFileClick}
-                        >
-                          {item.name}
-                        </Typography>
-                        {/* Status chips for files only */}
-                       
-                      </Box>
-
-                      
-                    </>
-                  )}
-                </Box>
-              </TableCell>
-
-             <TableCell> <Box sx={{ mt: 0.5 }}>
-                          {getStatusChip(meta, isFolder)}
-                        </Box></TableCell>
-
-              {/* Last Modified Column */}
-              <TableCell>
-                <UploadedInfo meta={meta} />
-              </TableCell>
-
-              {/* Actions Column */}
-              <TableCell align="right">
-                <IconButton
-                  size="small"
-                  onClick={(e) => handleMenuOpen(e, { ...item, fullPath })}
-                >
-                  <MoreVertIcon />
-                </IconButton>
-              </TableCell>
-
-             
-
-             
-
-
-             
-            </TableRow>
-
-            {/* Render children if folder is expanded */}
-            {isFolder &&
-              expandedFolders[fullPath] &&
-              item.children &&
-              item.children.length > 0 &&
-              renderTableRows(item.children, level + 1, fullPath)}
-          </React.Fragment>
-        );
-      });
-    };
     return (
       <Box sx={{ margin: "auto", p: 3 }}>
         {/* Action Buttons */}
@@ -1434,7 +1195,7 @@ const DocsFolderTree = () => {
         </Box>
 
         {/* Folder Explorer */}
-        {/* <Paper elevation={3} sx={{ p: 2 }}>
+        <Paper elevation={3} sx={{ p: 2 }}>
           <Typography variant="h6" gutterBottom>
             📜 Folder Explorer
           </Typography>
@@ -1443,113 +1204,8 @@ const DocsFolderTree = () => {
           ) : (
             <Typography>Loading folder data...</Typography>
           )}
-        </Paper> */}
-        <Paper elevation={3} sx={{ p: 2, mt: 3 }}>
-          <Typography variant="h6" gutterBottom>
-            📜 Folder Explorer
-          </Typography>
-
-          {folderTree && folderTree.length > 0 ? (
-            <>
-              <TableContainer>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell sx={{ width: "50px" }}>
-                        <Checkbox
-                          checked={selectAll}
-                          indeterminate={selectedItems.size > 0 && !selectAll}
-                          onChange={handleSelectAll}
-                        />
-                      </TableCell>
-                      <TableCell>Name</TableCell>
-                      <TableCell>Status</TableCell>
-                      <TableCell>Uploaded</TableCell>
-                      <TableCell align="right">Actions</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>{renderTableRows(folderTree)}</TableBody>
-                </Table>
-              </TableContainer>
-
-              {/* Selected Items Summary */}
-              {selectedItems.size > 0 && (
-                <Paper elevation={1} sx={{ p: 2, mt: 2, bgcolor: "#e3f2fd" }}>
-                  <Typography variant="body2">
-                    {selectedItems.size} item(s) selected
-                  </Typography>
-                </Paper>
-              )}
-            </>
-          ) : (
-            <Typography sx={{ p: 2, textAlign: "center" }}>
-              Loading folder data...
-            </Typography>
-          )}
         </Paper>
-        <Dialog
-          open={openDialog}
-          onClose={() => setOpenDialog(false)}
-          fullWidth
-          maxWidth="lg"
-        >
-          <DialogTitle>
-            {/* {items.name} */}
-            {selectedFolderForMenu?.name || "Document"}
-            <IconButton
-              aria-label="close"
-              onClick={() => setOpenDialog(false)}
-              style={{ position: "absolute", right: 8, top: 8 }}
-            >
-              <CloseIcon />
-            </IconButton>
-          </DialogTitle>
 
-          <DialogContent dividers>
-            {token && showBuilderFor && (
-              <DocusealBuilder
-                token={token}
-                customCss={customCss}
-                onComplete={() => {
-                  console.log("DocuSeal finished sending document");
-                  setShowBuilderFor(null);
-                  setOpenDialog(false);
-                }}
-              />
-            )}
-          </DialogContent>
-        </Dialog>
-
-        <Dialog
-          open={openApprovalDialog}
-          onClose={handleCloseDialog}
-          fullWidth
-          maxWidth="sm"
-        >
-          <DialogTitle>Request Approval</DialogTitle>
-          <DialogContent>
-            <TextField
-              multiline
-              rows={4}
-              fullWidth
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Type a short description or note..."
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseDialog}>Cancel</Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleRequestApproval}
-              // disabled={!description.trim()}
-              disabled={!description.trim() || sending}
-            >
-              Send
-            </Button>
-          </DialogActions>
-        </Dialog>
         <Menu
           anchorEl={menuAnchorEl}
           open={Boolean(menuAnchorEl)}
@@ -1599,11 +1255,6 @@ const DocsFolderTree = () => {
                     action: () => deleteItem(item),
                   },
                   {
-                    icon: <DownloadIcon />,
-                    label: "Download",
-                    action: () => handleDownload(item),
-                  },
-                  {
                     icon: <UploadFileIcon />,
                     label: "New File",
                     action: () => setFileUploadDrawerOpen(true),
@@ -1640,11 +1291,6 @@ const DocsFolderTree = () => {
                     icon: <UploadFileIcon />,
                     label: "New File",
                     action: () => setFileUploadDrawerOpen(true),
-                  },
-                  {
-                    icon: <DownloadIcon />,
-                    label: "Download",
-                    action: () => handleDownload(item),
                   },
                   {
                     icon: <DriveFolderUploadIcon />,
@@ -1683,11 +1329,6 @@ const DocsFolderTree = () => {
                     icon: <DeleteIcon />,
                     label: "Delete",
                     action: () => deleteItem(item),
-                  },
-                  {
-                    icon: <DownloadIcon />,
-                    label: "Download",
-                    action: () => handleDownload(item),
                   }
                 );
               }
@@ -1718,14 +1359,85 @@ const DocsFolderTree = () => {
                     icon: <DeleteIcon />,
                     label: "Delete",
                     action: () => deleteItem(item),
-                  },
-                  {
-                    icon: <DownloadIcon />,
-                    label: "Download",
-                    action: () => handleDownload(item),
                   }
                 );
-              } else if (docType === "firm") {
+              }
+
+              // else if (docType === "firm") {
+              //   const currentStatus =
+              //     item.meta?.signStatus || "sendForSignature";
+              //   const currentApprovalStatus =
+              //     item.meta?.authStatus || "sendForApproval";
+
+              //   const isSignatureDisabled =
+              //     currentStatus === "pendingSignature" ||
+              //     currentStatus === "signatureCompleted";
+
+              //   const isApprovalDisabled =
+              //     currentApprovalStatus === "pendingApproval" ||
+              //     currentApprovalStatus === "cancledApproval" ||
+              //     currentApprovalStatus === "approvalCompleted";
+
+              //   const invoiceStatus = item.meta?.lockInvoiceStatus; // pendingPayment / paymentCompleted / null
+              //   console.log("invoiceStatus", invoiceStatus);
+              //   let invoiceLabel = "Lock with Invoice";
+              //   // If invoice is pending payment → show UNLOCK (enabled)
+              //   if (invoiceStatus === "pendingpayment") {
+              //     invoiceLabel = "Unlock Invoice";
+              //   }
+
+              //   // If invoice is completed or not locked → show LOCK (enabled)
+              //   if (invoiceStatus === "paymentcompleted" || !invoiceStatus) {
+              //     invoiceLabel = "Lock Invoice";
+              //   }
+              //   menuItems.push(
+              //     {
+              //       icon: <DriveFileMoveIcon />,
+              //       label: "Edit",
+              //       action: () => SetRenameDrawer(true),
+              //     },
+              //     {
+              //       icon: <DriveFileMoveIcon />,
+              //       label: "Move",
+              //       action: () => setMoveDrawerOpen(true),
+              //     },
+
+              //     {
+              //       icon: <PenTool size={16} />,
+              //       label: statusTextMap[currentStatus],
+              //       action: () => toggleSignStatus(item),
+              //       custom: true, // flag to handle differently
+              //       currentStatus, // pass for icon color
+              //       disabled: isSignatureDisabled,
+              //     },
+              //     {
+              //       icon: <Stamp size={16} />,
+              //       label: approvalStatusTextMap[currentApprovalStatus],
+              //       action: () => toggleApprovalStatus(item),
+              //       type: "approval",
+              //       currentApprovalStatus,
+              //       disabled: isApprovalDisabled,
+              //     },
+              //     {
+              //       icon:
+              //         invoiceStatus === "pendingpayment" ? (
+              //           <LockOpenIcon />
+              //         ) : (
+              //           <LockIcon />
+              //         ),
+              //       label: invoiceLabel,
+              //       action: () => toggleInvoiceLock(item),
+              //       disabled: false, // Unlock should NOT be disabled when pending
+              //     },
+
+              //     {
+              //       icon: <DeleteIcon />,
+              //       label: "Delete",
+              //       action: () => deleteItem(item),
+              //     }
+              //   );
+              // }
+              else if (docType === "firm") {
                 const currentStatus =
                   item.meta?.signStatus || "sendForSignature";
                 const approvalStatus =
@@ -1758,23 +1470,31 @@ const DocsFolderTree = () => {
                     icon: <DriveFileMoveIcon />,
                     label: "Move",
                     action: () => setMoveDrawerOpen(true),
-                  }
+                  },
+
+                  // ---------------- SIGNATURE BUTTON ----------------
+                  // {
+                  //   icon: <PenTool size={16} />,
+                  //   label: statusTextMap[currentStatus],
+                  //   action: () => toggleSignStatus(item),
+                  //   disabled: isSignatureDisabled,
+                  // }
                 );
-                // SIGNATURE MENU
-                if (currentStatus === "pendingSignature") {
-                  menuItems.push({
-                    icon: <CancelIcon />,
-                    label: "Cancel Signature Request",
-                    action: () => cancelSignature(item),
-                  });
-                } else {
-                  menuItems.push({
-                    icon: <PenTool size={16} />,
-                    label: statusTextMap[currentStatus],
-                    action: () => toggleSignStatus(item),
-                    disabled: isSignatureDisabled,
-                  });
-                }
+// SIGNATURE MENU
+if (currentStatus === "pendingSignature") {
+  menuItems.push({
+    icon: <CancelIcon />,
+    label: "Cancel Signature Request",
+    action: () => cancelSignature(item),
+  });
+} else {
+  menuItems.push({
+    icon: <PenTool size={16} />,
+    label: statusTextMap[currentStatus],
+    action: () => toggleSignStatus(item),
+    disabled: isSignatureDisabled,
+  });
+}
 
                 // ---------------- APPROVAL MENU LOGIC ----------------
                 if (approvalStatus === "sendForApproval") {
@@ -1828,11 +1548,6 @@ const DocsFolderTree = () => {
                   label: "Delete",
                   action: () => deleteItem(item),
                 });
-                menuItems.push({
-                  icon: <DownloadIcon />,
-                  label: "Download",
-                  action: () => handleDownload(item),
-                });
               } else if (docType === "private") {
                 menuItems.push(
                   {
@@ -1844,11 +1559,6 @@ const DocsFolderTree = () => {
                     icon: <DeleteIcon />,
                     label: "Delete",
                     action: () => deleteItem(item),
-                  },
-                  {
-                    icon: <DownloadIcon />,
-                    label: "Download",
-                    action: () => handleDownload(item),
                   }
                 );
               }
@@ -2000,78 +1710,3 @@ const DocsFolderTree = () => {
 };
 
 export default DocsFolderTree;
-
-// else if (docType === "firm") {
-//   const currentStatus =
-//     item.meta?.signStatus || "sendForSignature";
-//   const currentApprovalStatus =
-//     item.meta?.authStatus || "sendForApproval";
-
-//   const isSignatureDisabled =
-//     currentStatus === "pendingSignature" ||
-//     currentStatus === "signatureCompleted";
-
-//   const isApprovalDisabled =
-//     currentApprovalStatus === "pendingApproval" ||
-//     currentApprovalStatus === "cancledApproval" ||
-//     currentApprovalStatus === "approvalCompleted";
-
-//   const invoiceStatus = item.meta?.lockInvoiceStatus; // pendingPayment / paymentCompleted / null
-//   console.log("invoiceStatus", invoiceStatus);
-//   let invoiceLabel = "Lock with Invoice";
-//   // If invoice is pending payment → show UNLOCK (enabled)
-//   if (invoiceStatus === "pendingpayment") {
-//     invoiceLabel = "Unlock Invoice";
-//   }
-
-//   // If invoice is completed or not locked → show LOCK (enabled)
-//   if (invoiceStatus === "paymentcompleted" || !invoiceStatus) {
-//     invoiceLabel = "Lock Invoice";
-//   }
-//   menuItems.push(
-//     {
-//       icon: <DriveFileMoveIcon />,
-//       label: "Edit",
-//       action: () => SetRenameDrawer(true),
-//     },
-//     {
-//       icon: <DriveFileMoveIcon />,
-//       label: "Move",
-//       action: () => setMoveDrawerOpen(true),
-//     },
-
-//     {
-//       icon: <PenTool size={16} />,
-//       label: statusTextMap[currentStatus],
-//       action: () => toggleSignStatus(item),
-//       custom: true, // flag to handle differently
-//       currentStatus, // pass for icon color
-//       disabled: isSignatureDisabled,
-//     },
-//     {
-//       icon: <Stamp size={16} />,
-//       label: approvalStatusTextMap[currentApprovalStatus],
-//       action: () => toggleApprovalStatus(item),
-//       type: "approval",
-//       currentApprovalStatus,
-//       disabled: isApprovalDisabled,
-//     },
-//     {
-//       icon:
-//         invoiceStatus === "pendingpayment" ? (
-//           <LockOpenIcon />
-//         ) : (
-//           <LockIcon />
-//         ),
-//       label: invoiceLabel,
-//       action: () => toggleInvoiceLock(item),
-//       disabled: false, // Unlock should NOT be disabled when pending
-//     },
-
-//     {
-//       icon: <DeleteIcon />,
-//       label: "Delete",
-//       action: () => deleteItem(item),
-//     }
-//   );
-// }
