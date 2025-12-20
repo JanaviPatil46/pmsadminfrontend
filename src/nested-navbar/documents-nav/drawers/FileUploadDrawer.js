@@ -684,7 +684,6 @@
 
 // export default FileUploadDrawer;
 
-
 import React, { useState, useEffect } from "react";
 import {
   FaFilePdf,
@@ -794,18 +793,54 @@ const FileUploadDrawer = ({
   const handleFolderSelect = (path) => setSelectedFolder(path);
 
   // 🔹 Step 1: Open confirmation dialog
-  const handleUpload = () => {
-    if (files.length === 0 || !selectedFolder) {
-      setMessage("Please select files and a folder.");
-      return;
+  // const handleUpload = () => {
+  //   if (files.length === 0 || !selectedFolder) {
+  //     setMessage("Please select files and a folder.");
+  //     return;
+  //   }
+  //   // setInvoiceConfirmOpen(true);
+  //   // Check if folder contains "Firm Documents Shared with Client"
+  //   if (selectedFolder.includes("Firm Documents Shared with Client")) {
+  //     setInvoiceConfirmOpen(true); // ask user Yes/No
+  //   } else {
+  //     performUpload(); // directly upload without invoice dialog
+  //   }
+  // };
+const handleUpload = async () => {
+  if (files.length === 0 || !selectedFolder) {
+    setMessage("Please select files and a folder.");
+    return;
+  }
+
+  // Check if folder contains "Firm Documents Shared with Client"
+  if (selectedFolder.includes("Firm Documents Shared with Client")) {
+    try {
+      // 🔹 Check pending invoices first
+      const res = await fetch(
+        `https://www.snptaxes.com/workflow/invoices/invoice/pending/invoicelistby/accountid/${accountId}`
+      );
+      const data = await res.json();
+      const pendingInvoices = data.invoice || [];
+
+      if (pendingInvoices.length === 0) {
+        // ❌ No pending invoices → upload directly
+        performUpload();
+        return;
+      }
+
+      // ✅ Pending invoices exist → ask confirmation
+      setInvoiceConfirmOpen(true);
+
+    } catch (error) {
+      console.error("Error checking pending invoices", error);
+      // Fail-safe: upload directly
+      performUpload();
     }
-    // setInvoiceConfirmOpen(true);
-    // Check if folder contains "Firm Documents Shared with Client"
- if (selectedFolder.includes("Firm Documents Shared with Client")) {
-  setInvoiceConfirmOpen(true);          // ask user Yes/No
-} else {   performUpload();                      // directly upload without invoice dialog
- }
-  };
+  } else {
+    // Not a shared folder → upload directly
+    performUpload();
+  }
+};
 
   // 🔹 Step 2: Upload files (direct or after invoice selection)
   const performUpload = async () => {
@@ -895,9 +930,7 @@ const FileUploadDrawer = ({
       >
         <DialogTitle>Invoice Lock</DialogTitle>
         <DialogContent>
-          <Typography>
-            Do you want to lock this file to an invoice?
-          </Typography>
+          <Typography>Do you want to lock this file to an invoice?</Typography>
         </DialogContent>
         <DialogActions>
           <Button
@@ -913,12 +946,14 @@ const FileUploadDrawer = ({
             onClick={() => {
               setInvoiceConfirmOpen(false);
               // setInvoiceDialogOpen(true); // Open invoice selection
-                // open invoice dialog only if path matches
-  if (selectedFolder.includes("Firm Documents Shared with Client")) {
-    setInvoiceDialogOpen(true);
-  } else {
-    performUpload();
-  }
+              // open invoice dialog only if path matches
+              if (
+                selectedFolder.includes("Firm Documents Shared with Client")
+              ) {
+                setInvoiceDialogOpen(true);
+              } else {
+                performUpload();
+              }
             }}
           >
             Yes
@@ -987,46 +1022,48 @@ const FileUploadDrawer = ({
                 )}
               </TableBody> */}
               <TableBody>
-  {invoiceList.length === 0 ? (
-    <TableRow>
-      <TableCell colSpan={5}>No invoices found.</TableCell>
-    </TableRow>
-  ) : (
-    invoiceList.map((inv) => {
-      const id = inv._id;
-      const checked = selectedInvoices.includes(id);
+                {invoiceList.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5}>No invoices found.</TableCell>
+                  </TableRow>
+                ) : (
+                  invoiceList.map((inv) => {
+                    const id = inv._id;
+                    const checked = selectedInvoices.includes(id);
 
-      return (
-        <TableRow
-          key={id}
-          hover
-          sx={{ cursor: "pointer", bgcolor: checked ? "#e3f2fd" : "inherit" }} // optional: highlight selected
-          onClick={() => {
-            setSelectedInvoices((prev) => {
-              const updated = prev.includes(id)
-                ? prev.filter((x) => x !== id)
-                : [...prev, id];
-              
-              console.log("Selected invoices:", updated); // <-- log here
-              return updated;
-            });
-          }}
-        >
-          <TableCell>
-            <Checkbox checked={checked} />
-          </TableCell>
-          <TableCell>{inv.invoicenumber}</TableCell>
-          <TableCell>{inv.description || "—"}</TableCell>
-          <TableCell>
-            {new Date(inv.createdAt).toLocaleDateString()}
-          </TableCell>
-          <TableCell>₹{inv.summary?.total}</TableCell>
-        </TableRow>
-      );
-    })
-  )}
-</TableBody>
+                    return (
+                      <TableRow
+                        key={id}
+                        hover
+                        sx={{
+                          cursor: "pointer",
+                          bgcolor: checked ? "#e3f2fd" : "inherit",
+                        }} // optional: highlight selected
+                        onClick={() => {
+                          setSelectedInvoices((prev) => {
+                            const updated = prev.includes(id)
+                              ? prev.filter((x) => x !== id)
+                              : [...prev, id];
 
+                            console.log("Selected invoices:", updated); // <-- log here
+                            return updated;
+                          });
+                        }}
+                      >
+                        <TableCell>
+                          <Checkbox checked={checked} />
+                        </TableCell>
+                        <TableCell>{inv.invoicenumber}</TableCell>
+                        <TableCell>{inv.description || "—"}</TableCell>
+                        <TableCell>
+                          {new Date(inv.createdAt).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>₹{inv.summary?.total}</TableCell>
+                      </TableRow>
+                    );
+                  })
+                )}
+              </TableBody>
             </Table>
           </Box>
         </DialogContent>

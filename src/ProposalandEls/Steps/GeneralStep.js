@@ -26,7 +26,7 @@ import {
 } from "@mui/material";
 import { FaCaretUp, FaCaretDown, FaTimes, FaSearch } from "react-icons/fa";
 import { InfoOutlined } from "@mui/icons-material";
-
+import MultiSelectDropdown from "../../Templates/MultiSelectDropdown"
 const GeneralStep = ({
   formData,
   updateFormData,
@@ -144,7 +144,7 @@ const GeneralStep = ({
   };
 
   // Handle team member selection
-  const handleTeamMembersChange = (event, newSelectedUsers) => {
+  const handleTeamMembersChange = ( newSelectedUsers) => {
     const selectedValues = newSelectedUsers.map((user) => user.value);
 
     // Update form data
@@ -299,18 +299,7 @@ const GeneralStep = ({
           required
           sx={{ mb: 2 }}
         />
-        {/* <TextField
-          fullWidth
-          label="Proposal Name"
-          value={formData.general.proposalName || ''}
-          onChange={(e) => handleInputChange('proposalName', e.target.value)}
-          onBlur={() => handleBlur('proposalName')}
-          error={!!stepErrors.proposalName}
-          helperText={stepErrors.proposalName}
-          margin="normal"
-          required
-          sx={{ mb: 2 }}
-        /> */}
+       
         <TextField
           fullWidth
           // label="Proposal Name"
@@ -394,7 +383,7 @@ const GeneralStep = ({
             Team Members *
           </Typography>
 
-          <Autocomplete
+          {/* <Autocomplete
             multiple
             options={internalOptions}
             value={getSelectedUsers()}
@@ -467,7 +456,12 @@ const GeneralStep = ({
                 minHeight: "40px",
               },
             }}
-          />
+          /> */}
+           <MultiSelectDropdown
+                          value={getSelectedUsers()}
+                          onChange={handleTeamMembersChange}
+                          placeholder="Team Member"
+                        />
         </Box>
       </Paper>
 

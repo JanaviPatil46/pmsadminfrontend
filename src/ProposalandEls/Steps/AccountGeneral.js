@@ -27,6 +27,8 @@ import {
 import { InfoOutlined } from "@mui/icons-material";
 import { useParams } from "react-router-dom";
 import Cookies from "js-cookie";
+import MultiSelectDropdown from "../../Templates/MultiSelectDropdown"
+
 import { LoginContext } from "../../Sidebar/Context/Context";
 const GeneralStep = ({
   formData,
@@ -573,7 +575,7 @@ console.log("logindata",logindata);
     });
   };
   // Handle team member selection
-  const handleTeamMembersChange = (event, newSelectedUsers) => {
+  const handleTeamMembersChange = ( newSelectedUsers) => {
     const selectedValues = newSelectedUsers.map((user) => user.value);
 
     updateFormData("general", {
@@ -887,21 +889,7 @@ console.log("logindata",logindata);
           />
         </FormControl>
 
-        {/* Proposal Name */}
-        {/* <TextField
-          fullWidth
-          label="Proposal Name *"
-          value={formData.general.proposalName || ""}
-          onChange={(e) => handleInputChange("proposalName", e.target.value)}
-          onBlur={() => handleBlur("proposalName")}
-          error={!!stepErrors.proposalName}
-          helperText={
-            stepErrors.proposalName || "Enter a name for this proposal"
-          }
-          margin="normal"
-          required
-          sx={{ mb: 2 }}
-        /> */}
+       
         <TextField
           fullWidth
           // label="Proposal Name"
@@ -983,7 +971,7 @@ console.log("logindata",logindata);
           <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
             Team Members *
           </Typography>
-          <Autocomplete
+          {/* <Autocomplete
             multiple
             options={internalOptions}
             value={getSelectedUsers()}
@@ -1012,7 +1000,12 @@ console.log("logindata",logindata);
                 <Typography variant="body2">{option.label}</Typography>
               </li>
             )}
-          />
+          /> */}
+           <MultiSelectDropdown
+                          value={getSelectedUsers()}
+                          onChange={handleTeamMembersChange}
+                          placeholder="Team Member"
+                        />
         </Box>
       </Paper>
 
