@@ -28,16 +28,16 @@ import {
   TableContainer,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import customCss from "./docuseal-dark-theme.css";
-import { DocusealBuilder } from "@docuseal/react";
+// import customCss from "./docuseal-dark-theme.css";
+// import { DocusealBuilder } from "@docuseal/react";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DriveFileMoveIcon from "@mui/icons-material/DriveFileMove";
-import FileUploadDrawer from "./drawers/FileUploadDrawer";
-import CreteFolderDrawer from "./drawers/CreteFolderDrawer";
-import FolderUploadDrawer from "./drawers/FolderUploadDrawer";
-import RenameDrawer from "./drawers/RenameDrawer";
-import MoveDrawer from "./drawers/MoveDrawer";
+// import FileUploadDrawer from "./drawers/FileUploadDrawer";
+// import CreteFolderDrawer from "./drawers/CreteFolderDrawer";
+// import FolderUploadDrawer from "./drawers/FolderUploadDrawer";
+// import RenameDrawer from "./drawers/RenameDrawer";
+// import MoveDrawer from "./drawers/MoveDrawer";
 import {
   Folder as FolderIcon,
   InsertDriveFile as FileIcon,
@@ -66,9 +66,16 @@ import {
   FaFileAlt,
 } from "react-icons/fa";
 import { AiFillFileUnknown } from "react-icons/ai";
+import FileUploadDrawer from "../nested-navbar/documents-nav/drawers/FileUploadDrawer";
+import CreteFolderDrawer from "../nested-navbar/documents-nav/drawers/CreteFolderDrawer";
+import MoveDrawer from "../nested-navbar/documents-nav/drawers/MoveDrawer";
+import RenameDrawer from "../nested-navbar/documents-nav/drawers/RenameDrawer";
+import FolderUploadDrawer from "../nested-navbar/documents-nav/drawers/FolderUploadDrawer";
 
 const DOCS_MANAGMENTS = process.env.REACT_APP_CLIENT_DOCS_MANAGE;
-const DocsFolderTree = () => {
+const AccountsDocsTree = () => {
+     const { accountId } = useParams();
+    console.log("account id", accountId)
   const { data } = useParams();
   console.log("acount id for the documentation", data);
   const [templates, setTemplates] = useState([]);
@@ -372,7 +379,7 @@ const handleSelectAll = () => {
         //
 
         // Request token
-        const fileUrl = `https://snptaxes.com/uploads/accounts/${item.path}`;
+        const fileUrl = `https://www.snptaxes.com/uploads/accounts/${item.path}`;
         const fileName = item.name;
         const res = await fetch(
           `${SIGNATURE_API}/api/generate-token?url=${encodeURIComponent(fileUrl)}&name=${encodeURIComponent(fileName)}&accountId=${accountId}`
@@ -469,7 +476,7 @@ const handleSelectAll = () => {
       try {
         setSending(true);
 
-        const fileUrl = `https://snptaxes.com/uploads/accounts/${selectedItem.path}`;
+        const fileUrl = `https://www.snptaxes.com/uploads/accounts/${selectedItem.path}`;
 
         const payload = {
           filePath: selectedItem.path, // required by backend
@@ -1042,7 +1049,7 @@ const handleBulkMove = async (targetPath) => {
         }
 
         // ✅ Construct full file URL
-        const fileUrl = `https://www.snptaxes.com/uploads/accounts/${data}/${fullPath}`;
+        const fileUrl = `https://www.snptaxes.com/uploads/accounts/${fullPath}`;
 
         // ✅ Detect file extension (case-insensitive)
         const fileExt = fileName.split(".").pop().toLowerCase();
@@ -1379,7 +1386,7 @@ const handleBulkMove = async (targetPath) => {
               </IconButton>
             </DialogTitle>
 
-            <DialogContent dividers>
+            {/* <DialogContent dividers>
               {token && showBuilderFor && (
                 <DocusealBuilder
                   token={token}
@@ -1391,7 +1398,7 @@ const handleBulkMove = async (targetPath) => {
                   }}
                 />
               )}
-            </DialogContent>
+            </DialogContent> */}
           </Dialog>
 
           <Dialog
@@ -1427,45 +1434,15 @@ const handleBulkMove = async (targetPath) => {
         </>
       );
     };
-      const formatUploadedAt = (dateValue) => {
-  if (!dateValue) return "";
+    const UploadedInfo = ({ meta }) => {
+      if (!meta) return null;
 
-  // If already in "DEC-19 2025" format
-  if (typeof dateValue === "string" && /^[A-Z]{3}-\d{2} \d{4}$/.test(dateValue)) {
-    return dateValue;
-  }
-
-  const date = new Date(dateValue);
-  if (isNaN(date)) return dateValue;
-
-  return date
-    .toLocaleDateString("en-US", {
-      month: "short",
-      day: "2-digit",
-      year: "numeric",
-    })
-    .toUpperCase()
-    .replace(",", "")      // remove comma
-    .replace(" ", "-");    // replace first space with dash
-};
-const UploadedInfo = ({ meta }) => {
-  if (!meta?.uploadedAt) return null;
-
-  return (
-    <Typography variant="caption" sx={{ fontWeight: "bold" }}>
-      {formatUploadedAt(meta.uploadedAt)}
-    </Typography>
-  );
-};
-    // const UploadedInfo = ({ meta }) => {
-    //   if (!meta) return null;
-
-    //   return (
-    //     <Typography variant="caption" sx={{ fontWeight: "bold" }}>
-    //       {meta.uploadedAt}
-    //     </Typography>
-    //   );
-    // };
+      return (
+        <Typography variant="caption" sx={{ fontWeight: "bold" }}>
+          {meta.uploadedAt}
+        </Typography>
+      );
+    };
     const getStatusChip = (meta, isFolder) => {
       // Return null for folders - don't show status chips for folders
       if (isFolder) return null;
@@ -1555,6 +1532,7 @@ const UploadedInfo = ({ meta }) => {
         console.log("itemlist",item)
         // const fullPath = parentPath ? `${parentPath}/${item.name}` : item.name;
          const fullPath = item.path;
+         console.log("full path",fullPath)
         const meta = item.meta || {};
         const isFolder = item.type === "folder";
         const isSelected = selectedItems.has(fullPath);
@@ -1870,7 +1848,7 @@ const UploadedInfo = ({ meta }) => {
             fetchFolderTree={() => fetchFolderTree(data)}
             selectedFolderForMenu={selectedFolderForMenu}
           />
-             {/* 🔴 Bulk Move Drawer */}
+             
          <MoveDrawer
   isOpen={bulkMoveDrawerOpen}
   onClose={() => setBulkMoveDrawerOpen(false)}
@@ -1974,38 +1952,7 @@ const UploadedInfo = ({ meta }) => {
           </DialogActions>
         </Dialog>
 
-        <Dialog
-          open={openDialog}
-          onClose={() => setOpenDialog(false)}
-          fullWidth
-          maxWidth="lg"
-        >
-          <DialogTitle>
-            {/* {items.name} */}
-            {selectedFolderForMenu?.name || "Document"}
-            <IconButton
-              aria-label="close"
-              onClick={() => setOpenDialog(false)}
-              style={{ position: "absolute", right: 8, top: 8 }}
-            >
-              <CloseIcon />
-            </IconButton>
-          </DialogTitle>
-
-          <DialogContent dividers>
-            {token && showBuilderFor && (
-              <DocusealBuilder
-                token={token}
-                customCss={customCss}
-                onComplete={() => {
-                  console.log("DocuSeal finished sending document");
-                  setShowBuilderFor(null);
-                  setOpenDialog(false);
-                }}
-              />
-            )}
-          </DialogContent>
-        </Dialog>
+       
 
         <Dialog
           open={openApprovalDialog}
@@ -2486,79 +2433,4 @@ const UploadedInfo = ({ meta }) => {
   );
 };
 
-export default DocsFolderTree;
-
-// else if (docType === "firm") {
-//   const currentStatus =
-//     item.meta?.signStatus || "sendForSignature";
-//   const currentApprovalStatus =
-//     item.meta?.authStatus || "sendForApproval";
-
-//   const isSignatureDisabled =
-//     currentStatus === "pendingSignature" ||
-//     currentStatus === "signatureCompleted";
-
-//   const isApprovalDisabled =
-//     currentApprovalStatus === "pendingApproval" ||
-//     currentApprovalStatus === "cancledApproval" ||
-//     currentApprovalStatus === "approvalCompleted";
-
-//   const invoiceStatus = item.meta?.lockInvoiceStatus; // pendingPayment / paymentCompleted / null
-//   console.log("invoiceStatus", invoiceStatus);
-//   let invoiceLabel = "Lock with Invoice";
-//   // If invoice is pending payment → show UNLOCK (enabled)
-//   if (invoiceStatus === "pendingpayment") {
-//     invoiceLabel = "Unlock Invoice";
-//   }
-
-//   // If invoice is completed or not locked → show LOCK (enabled)
-//   if (invoiceStatus === "paymentcompleted" || !invoiceStatus) {
-//     invoiceLabel = "Lock Invoice";
-//   }
-//   menuItems.push(
-//     {
-//       icon: <DriveFileMoveIcon />,
-//       label: "Edit",
-//       action: () => SetRenameDrawer(true),
-//     },
-//     {
-//       icon: <DriveFileMoveIcon />,
-//       label: "Move",
-//       action: () => setMoveDrawerOpen(true),
-//     },
-
-//     {
-//       icon: <PenTool size={16} />,
-//       label: statusTextMap[currentStatus],
-//       action: () => toggleSignStatus(item),
-//       custom: true, // flag to handle differently
-//       currentStatus, // pass for icon color
-//       disabled: isSignatureDisabled,
-//     },
-//     {
-//       icon: <Stamp size={16} />,
-//       label: approvalStatusTextMap[currentApprovalStatus],
-//       action: () => toggleApprovalStatus(item),
-//       type: "approval",
-//       currentApprovalStatus,
-//       disabled: isApprovalDisabled,
-//     },
-//     {
-//       icon:
-//         invoiceStatus === "pendingpayment" ? (
-//           <LockOpenIcon />
-//         ) : (
-//           <LockIcon />
-//         ),
-//       label: invoiceLabel,
-//       action: () => toggleInvoiceLock(item),
-//       disabled: false, // Unlock should NOT be disabled when pending
-//     },
-
-//     {
-//       icon: <DeleteIcon />,
-//       label: "Delete",
-//       action: () => deleteItem(item),
-//     }
-//   );
-// }
+export default AccountsDocsTree;

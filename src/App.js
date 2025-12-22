@@ -94,8 +94,9 @@ import CreateProposals from "./Billing/Proposals&ELS/CreateProposals.js";
 import NewTag from "./Templates/Tags/Tags";
 import MarketPlaces from "./Pages/MarketPlaces.js";
 import TimeEntry from "./Pages/TimeEntry.js";
-import AccountImport from "./Import/AccountImport.js";
-import ContactImport from "./Import/ContactImport.js";
+import AccountImport from "./Import/CSVImportAccounts.js";
+import ContactImport from "./Import/CSVImportContacts.js";
+import UploadFolderToAccount from "./Import/UploadFolderToAccount.js"
 import TagsImport from "./Import/TagsImport.js";
 import SetPassword from "./nested-navbar/NewPages/setPassword.js";
 import ActiveJob from "./Pages/Jobs/ActiveJob.js";
@@ -118,6 +119,8 @@ import ProposalForm from "./ProposalandEls/components/ProposalForm.js";
 import AccountProposalForm from "./ProposalandEls/components/AccountProposalForm.js";
 import PipelineTable from "./Templates/NewPipelineworking/PipelineTable.js";
 import PipelineForm from "./Templates/NewPipelineworking/PipelineForm.js";
+import ImportedIncompleteAccountsTable from "./Import/ImportedIncompleteAccountsTable.js";
+import AccountsDocsTree from "./Import/AccountsDocsTree.js";
 const App = () => {
   return (
     <BrowserRouter>
@@ -179,6 +182,9 @@ const App = () => {
           <Route path="/organizerpreview" element={<PreviewOrganizer />} />
           <Route path="/import/accounts" element={<AccountImport />} />
           <Route path="/import/contacts" element={<ContactImport />} />
+          <Route path="/upload-docs" element={<UploadFolderToAccount/>}/>
+          <Route path="/accountslist" element={<ImportedIncompleteAccountsTable/>}/>
+          <Route path="/importedaccounts/:data/docs" element={<AccountsDocsTree/>}/>
           <Route path="/import/tags" element={<TagsImport />} />
           <Route path="firmtemp/templates" element={<Templates />}>
             {/* <Route path="tags" element={<Tags />} /> */}
