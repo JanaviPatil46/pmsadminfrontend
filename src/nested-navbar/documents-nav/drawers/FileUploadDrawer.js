@@ -792,20 +792,7 @@ const FileUploadDrawer = ({
 
   const handleFolderSelect = (path) => setSelectedFolder(path);
 
-  // 🔹 Step 1: Open confirmation dialog
-  // const handleUpload = () => {
-  //   if (files.length === 0 || !selectedFolder) {
-  //     setMessage("Please select files and a folder.");
-  //     return;
-  //   }
-  //   // setInvoiceConfirmOpen(true);
-  //   // Check if folder contains "Firm Documents Shared with Client"
-  //   if (selectedFolder.includes("Firm Documents Shared with Client")) {
-  //     setInvoiceConfirmOpen(true); // ask user Yes/No
-  //   } else {
-  //     performUpload(); // directly upload without invoice dialog
-  //   }
-  // };
+ 
 const handleUpload = async () => {
   if (files.length === 0 || !selectedFolder) {
     setMessage("Please select files and a folder.");

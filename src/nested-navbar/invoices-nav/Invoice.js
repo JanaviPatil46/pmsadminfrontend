@@ -215,7 +215,8 @@ const Invoice = () => {
     // Create a new template object (with new ID and modified template name)
     const duplicatedInvoice = {
       ...InvoiceToDuplicate,
-      invoicenumber: `${InvoiceToDuplicate.invoicenumber} (Copy)`, // Indicate it's a duplicate
+       invoiceLabel: "Copy",
+      // invoicenumber: `${InvoiceToDuplicate.invoicenumber} (Copy)`, // Indicate it's a duplicate
     };
     console.log(duplicatedInvoice);
     try {
@@ -599,7 +600,14 @@ const Invoice = () => {
                   >
                     {/* <Typography sx={{ cursor: "pointer",
                       color: "#3f51b5", }} > */}
-                    {row.invoicenumber}
+                    {row.invoicenumber} {row.invoiceLabel && (
+    <Chip
+      label={row.invoiceLabel}
+      size="small"
+      color="warning"
+      sx={{ ml: 1 }}
+    />
+  )}
                     {/* </Typography> */}
                   </TableCell>
                   <TableCell

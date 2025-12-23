@@ -326,15 +326,19 @@ const MoveDrawer = ({
 
   // Function to get item name from path
   const getItemNameFromPath = (path) => {
+    console.log("Getting item name from path:", path);
     return path.split('/').pop() || path;
   };
 
   // Check if destination is a subfolder of any source (to prevent circular moves)
   const isInvalidDestination = (destPath) => {
+    // console.log("Checking invalid destination:", destPath, sourcePaths);
     return sourcePaths.some(sourcePath => {
       return destPath.startsWith(sourcePath + '/') || destPath === sourcePath;
     });
   };
+
+
 
   return (
     <Drawer anchor="right" open={isOpen} onClose={onClose}>
@@ -456,13 +460,17 @@ const FolderTreeSelector = ({
   };
 
   // Check if a folder should be disabled (is a source path or contains a source path)
+  // const isFolderDisabled = (itemPath) => {
+  //   return disabledPaths.some(disabledPath => 
+  //     disabledPath === itemPath || 
+  //     itemPath.startsWith(disabledPath + '/') ||
+  //     disabledPath.startsWith(itemPath + '/')
+  //   );
+  // };
   const isFolderDisabled = (itemPath) => {
-    return disabledPaths.some(disabledPath => 
-      disabledPath === itemPath || 
-      itemPath.startsWith(disabledPath + '/') ||
-      disabledPath.startsWith(itemPath + '/')
-    );
-  };
+  return disabledPaths.includes(itemPath);
+};
+
 
   return (
     <List disablePadding>
