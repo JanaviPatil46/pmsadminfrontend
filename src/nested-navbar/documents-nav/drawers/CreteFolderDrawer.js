@@ -452,7 +452,7 @@ const FolderTreeSelector = ({ items, onSelect, selectedFolder, level = 0 }) => {
 
         return (
           <React.Fragment key={item.path}>
-            <ListItem
+            {/* <ListItem
               sx={{
                 pl: 2 + level * 2,
                 bgcolor: isSelected ? "#b2d8ff" : "transparent",
@@ -464,6 +464,24 @@ const FolderTreeSelector = ({ items, onSelect, selectedFolder, level = 0 }) => {
               onClick={() => {
                 if (!item.meta?.readOnly) onSelect(item.path);
               }}
+            > */}
+             <ListItem
+              sx={{
+                pl: 2 + level * 2,
+                bgcolor: isSelected ? "#b2d8ff" : "transparent",
+                borderRadius: 1,
+                mb: 0.5,
+            
+                cursor: item.meta?.readOnly ? "not-allowed" : "pointer",
+                opacity: item.meta?.readOnly ? 0.6 : 1,
+            
+                "&:hover": {
+                  bgcolor: item.meta?.readOnly ? "transparent" : "#dbefff",
+                },
+            
+                pointerEvents: item.meta?.readOnly ? "none" : "auto",
+              }}
+              onClick={() => onSelect(item.path)}
             >
               <ListItemIcon onClick={(e) => { e.stopPropagation(); toggleExpand(item.path); }}>
                 {isExpanded ? <FolderOpenIcon /> : <FolderIcon />}

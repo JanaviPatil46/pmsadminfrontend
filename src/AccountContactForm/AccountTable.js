@@ -1545,7 +1545,8 @@ const AccountTable = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [accountsToDelete, setAccountsToDelete] = useState([]);
-  
+  const [confirmText, setConfirmText] = useState("");
+
   // New state for the edit settings drawer
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [settings, setSettings] = useState({
@@ -2098,6 +2099,13 @@ const AccountTable = () => {
     setIsDeleteDialogOpen(false);
     setAccountsToDelete([]);
   };
+const handleConfirmDelete = async () => {
+  if (confirmText === "DELETE") {
+    await handleDeleteAccount(); // your existing delete logic
+    setConfirmText("");
+    handleCloseDeleteDialog();
+  }
+};
 
   return (
     <Box sx={{ p: 2 }}>
@@ -2692,7 +2700,44 @@ const AccountTable = () => {
         <DialogTitle id="delete-dialog-title">
           Confirm Delete
         </DialogTitle>
-        <DialogContent>
+        {/* Content */}
+    <DialogContent>
+      <DialogContentText id="delete-dialog-description">
+        Are you sure you want to delete{" "}
+        <strong>{accountsToDelete.length}</strong>{" "}
+        {accountsToDelete.length === 1 ? "account" : "accounts"}?
+        This action cannot be undone.
+      </DialogContentText>
+
+      <Box sx={{ mt: 2 }}>
+        <Typography variant="subtitle2" gutterBottom>
+          Accounts to be deleted:
+        </Typography>
+        <List dense>
+          {accountsToDelete.map((accountName, index) => (
+            <ListItem key={index}>
+              <ListItemText primary={accountName} />
+            </ListItem>
+          ))}
+        </List>
+      </Box>
+
+      <DialogContentText sx={{ mt: 2 }}>
+        If you want to proceed, please type{" "}
+        <strong>DELETE</strong> below.
+      </DialogContentText>
+
+      <TextField
+        fullWidth
+        margin="normal"
+        size="small"
+        variant="outlined"
+        value={confirmText}
+        onChange={(e) => setConfirmText(e.target.value)}
+        placeholder="Please enter the word DELETE"
+      />
+    </DialogContent>
+        {/* <DialogContent>
           <DialogContentText id="delete-dialog-description">
             Are you sure you want to delete the following account(s)? This action cannot be undone.
           </DialogContentText>
@@ -2708,9 +2753,9 @@ const AccountTable = () => {
               ))}
             </List>
           </Box>
-        </DialogContent>
+        </DialogContent> */}
         <DialogActions>
-          <Button onClick={handleCloseDeleteDialog} color="primary">
+          {/* <Button onClick={handleCloseDeleteDialog} color="primary">
             Cancel
           </Button>
           <Button 
@@ -2720,7 +2765,21 @@ const AccountTable = () => {
             autoFocus
           >
             Delete
-          </Button>
+          </Button> */}
+           <Button
+        onClick={handleConfirmDelete}
+        color="error"
+        variant="contained"
+        disabled={confirmText !== "DELETE"}
+      >
+        Delete
+      </Button>
+      <Button
+        onClick={handleCloseDeleteDialog}
+        variant="outlined"
+      >
+        Cancel
+      </Button>
         </DialogActions>
       </Dialog>
       

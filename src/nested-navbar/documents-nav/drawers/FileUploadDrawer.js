@@ -684,7 +684,7 @@
 
 // export default FileUploadDrawer;
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   FaFilePdf,
   FaFileWord,
@@ -723,7 +723,7 @@ import ExpandMore from "@mui/icons-material/ExpandMore";
 
 import axios from "axios";
 import { toast } from "react-toastify";
-
+import { LoginContext } from "../../../Sidebar/Context/Context";
 const FileUploadDrawer = ({
   isOpen,
   onClose,
@@ -735,13 +735,39 @@ const FileUploadDrawer = ({
   const [files, setFiles] = useState([]);
   const [selectedFolder, setSelectedFolder] = useState("");
   const [message, setMessage] = useState("");
-
+  const { logindata } = useContext(LoginContext);
+  const [loginUserId, setLoginUserId] = useState();
   // 🔹 Invoice dialogs & selection
   const [invoiceConfirmOpen, setInvoiceConfirmOpen] = useState(false);
   const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
   const [invoiceList, setInvoiceList] = useState([]);
   const [selectedInvoices, setSelectedInvoices] = useState([]);
-
+  useEffect(() => {
+    if (logindata?.user?.id) {
+      const id = logindata.user.id;
+      setLoginUserId(id);
+      fetchUserData(id);
+    }
+  }, [logindata]);
+  const [senderName, setSenderName] = useState("");
+  const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
+  const fetchUserData = async (id) => {
+    const myHeaders = new Headers();
+    const requestOptions = {
+      method: "GET",
+      headers: myHeaders,
+      redirect: "follow",
+    };
+    const url = `${LOGIN_API}/common/user/${id}`;
+    fetch(url, requestOptions)
+      .then((response) => response.json())
+      .then((result) => {
+        console.log("id", result);
+        // setSenderEmail(result.email);
+        setSenderName(result.username);
+        console.log("senderName", result.username);
+      });
+  };
   // Reset on drawer open/close
   useEffect(() => {
     if (isOpen && selectedFolderForMenu) {
@@ -792,42 +818,40 @@ const FileUploadDrawer = ({
 
   const handleFolderSelect = (path) => setSelectedFolder(path);
 
- 
-const handleUpload = async () => {
-  if (files.length === 0 || !selectedFolder) {
-    setMessage("Please select files and a folder.");
-    return;
-  }
+  const handleUpload = async () => {
+    if (files.length === 0 || !selectedFolder) {
+      setMessage("Please select files and a folder.");
+      return;
+    }
 
-  // Check if folder contains "Firm Documents Shared with Client"
-  if (selectedFolder.includes("Firm Documents Shared with Client")) {
-    try {
-      // 🔹 Check pending invoices first
-      const res = await fetch(
-        `https://www.snptaxes.com/workflow/invoices/invoice/pending/invoicelistby/accountid/${accountId}`
-      );
-      const data = await res.json();
-      const pendingInvoices = data.invoice || [];
+    // Check if folder contains "Firm Documents Shared with Client"
+    if (selectedFolder.includes("Firm Documents Shared with Client")) {
+      try {
+        // 🔹 Check pending invoices first
+        const res = await fetch(
+          `https://www.snptaxes.com/workflow/invoices/invoice/pending/invoicelistby/accountid/${accountId}`
+        );
+        const data = await res.json();
+        const pendingInvoices = data.invoice || [];
 
-      if (pendingInvoices.length === 0) {
-        // ❌ No pending invoices → upload directly
+        if (pendingInvoices.length === 0) {
+          // ❌ No pending invoices → upload directly
+          performUpload();
+          return;
+        }
+
+        // ✅ Pending invoices exist → ask confirmation
+        setInvoiceConfirmOpen(true);
+      } catch (error) {
+        console.error("Error checking pending invoices", error);
+        // Fail-safe: upload directly
         performUpload();
-        return;
       }
-
-      // ✅ Pending invoices exist → ask confirmation
-      setInvoiceConfirmOpen(true);
-
-    } catch (error) {
-      console.error("Error checking pending invoices", error);
-      // Fail-safe: upload directly
+    } else {
+      // Not a shared folder → upload directly
       performUpload();
     }
-  } else {
-    // Not a shared folder → upload directly
-    performUpload();
-  }
-};
+  };
 
   // 🔹 Step 2: Upload files (direct or after invoice selection)
   const performUpload = async () => {
@@ -836,7 +860,7 @@ const handleUpload = async () => {
       files.forEach((file) => formData.append("files", file));
 
       formData.append("invoices", JSON.stringify(selectedInvoices));
-
+      formData.append("adminUserName", senderName);
       const res = await axios.post(
         `https://www.snptaxes.com/api/accountsdoc/file/upload?folderPath=${encodeURIComponent(
           selectedFolder
@@ -844,7 +868,7 @@ const handleUpload = async () => {
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
-
+      console.log("formData", formData);
       toast.success(res.data.message || "Files uploaded successfully");
 
       setInvoiceDialogOpen(false);
@@ -972,42 +996,7 @@ const handleUpload = async () => {
                   <TableCell>Amount</TableCell>
                 </TableRow>
               </TableHead>
-              {/* <TableBody>
-                {invoiceList.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5}>No invoices found.</TableCell>
-                  </TableRow>
-                ) : (
-                  invoiceList.map((inv) => {
-                    const id = inv._id;
-                    const checked = selectedInvoices.includes(id);
-                    return (
-                      <TableRow
-                        key={id}
-                        hover
-                        sx={{ cursor: "pointer" }}
-                        onClick={() =>
-                          setSelectedInvoices((prev) =>
-                            prev.includes(id)
-                              ? prev.filter((x) => x !== id)
-                              : [...prev, id]
-                          )
-                        }
-                      >
-                        <TableCell>
-                          <Checkbox checked={checked} />
-                        </TableCell>
-                        <TableCell>{inv.invoicenumber}</TableCell>
-                        <TableCell>{inv.description || "—"}</TableCell>
-                        <TableCell>
-                          {new Date(inv.createdAt).toLocaleDateString()}
-                        </TableCell>
-                        <TableCell>₹{inv.summary?.total}</TableCell>
-                      </TableRow>
-                    );
-                  })
-                )}
-              </TableBody> */}
+
               <TableBody>
                 {invoiceList.length === 0 ? (
                   <TableRow>
@@ -1116,7 +1105,7 @@ const FolderTreeSelector = ({ items, onSelect, selectedFolder, level = 0 }) => {
 
         return (
           <React.Fragment key={item.path}>
-            <ListItem
+            {/* <ListItem
               sx={{
                 pl: 2 + level * 2,
                 bgcolor: isSelected ? "#b2d8ff" : "transparent",
@@ -1126,7 +1115,26 @@ const FolderTreeSelector = ({ items, onSelect, selectedFolder, level = 0 }) => {
                 cursor: item.meta?.readOnly ? "not-allowed" : "pointer",
               }}
               onClick={() => !item.meta?.readOnly && onSelect(item.path)}
-            >
+            > */}
+            <ListItem
+  sx={{
+    pl: 2 + level * 2,
+    bgcolor: isSelected ? "#b2d8ff" : "transparent",
+    borderRadius: 1,
+    mb: 0.5,
+
+    cursor: item.meta?.readOnly ? "not-allowed" : "pointer",
+    opacity: item.meta?.readOnly ? 0.6 : 1,
+
+    "&:hover": {
+      bgcolor: item.meta?.readOnly ? "transparent" : "#dbefff",
+    },
+
+    pointerEvents: item.meta?.readOnly ? "none" : "auto",
+  }}
+  onClick={() => onSelect(item.path)}
+>
+
               <ListItemIcon
                 onClick={(e) => {
                   e.stopPropagation();

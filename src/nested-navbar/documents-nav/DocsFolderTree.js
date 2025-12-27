@@ -176,7 +176,7 @@ const DocsFolderTree = () => {
     const [selectedItems, setSelectedItems] = useState(new Set());
     const [selectAll, setSelectAll] = useState(false);
 
-      // State for bulk operations
+    // State for bulk operations
     const [bulkMoveDrawerOpen, setBulkMoveDrawerOpen] = useState(false);
     const [bulkLockDialogOpen, setBulkLockDialogOpen] = useState(false);
     const [bulkOperationLoading, setBulkOperationLoading] = useState(false);
@@ -203,7 +203,7 @@ const DocsFolderTree = () => {
       }
     };
     const toggleFolder = (path, isReadOnly) => {
-      if (isReadOnly) return;
+      // if (isReadOnly) return;
       setExpandedFolders((prev) => ({
         ...prev,
         [path]: !prev[path],
@@ -256,15 +256,15 @@ const DocsFolderTree = () => {
     //   return paths;
     // };
     // Update getAllChildrenPaths to work with item.path
-const getAllChildrenPaths = (item) => {
-  const paths = [item.path];
-  if (item.children && item.children.length > 0) {
-    item.children.forEach((child) => {
-      paths.push(...getAllChildrenPaths(child));
-    });
-  }
-  return paths;
-};
+    const getAllChildrenPaths = (item) => {
+      const paths = [item.path];
+      if (item.children && item.children.length > 0) {
+        item.children.forEach((child) => {
+          paths.push(...getAllChildrenPaths(child));
+        });
+      }
+      return paths;
+    };
 
     const handleSelectItem = (path) => {
       setSelectedItems((prev) => {
@@ -277,50 +277,50 @@ const getAllChildrenPaths = (item) => {
         return newSet;
       });
     };
-// Update handleFolderSelect
-const handleFolderSelect = (item) => {
-  const allChildPaths = getAllChildrenPaths(item);
+    // Update handleFolderSelect
+    const handleFolderSelect = (item) => {
+      const allChildPaths = getAllChildrenPaths(item);
 
-  setSelectedItems((prev) => {
-    const newSet = new Set(prev);
-    const allSelected = allChildPaths.every((path) => newSet.has(path));
+      setSelectedItems((prev) => {
+        const newSet = new Set(prev);
+        const allSelected = allChildPaths.every((path) => newSet.has(path));
 
-    if (allSelected) {
-      allChildPaths.forEach((path) => newSet.delete(path));
-    } else {
-      allChildPaths.forEach((path) => newSet.add(path));
-    }
-    return newSet;
-  });
-};
-
-// Update isFolderPartiallySelected
-const isFolderPartiallySelected = (item) => {
-  const allChildPaths = getAllChildrenPaths(item);
-  const selectedCount = allChildPaths.filter((path) =>
-    selectedItems.has(path)
-  ).length;
-  return selectedCount > 0 && selectedCount < allChildPaths.length;
-};
-// Update handleSelectAll
-const handleSelectAll = () => {
-  if (selectAll) {
-    setSelectedItems(new Set());
-  } else {
-    const allPaths = new Set();
-    const collectPaths = (items) => {
-      items.forEach((item) => {
-        allPaths.add(item.path);
-        if (item.children && item.children.length > 0) {
-          collectPaths(item.children);
+        if (allSelected) {
+          allChildPaths.forEach((path) => newSet.delete(path));
+        } else {
+          allChildPaths.forEach((path) => newSet.add(path));
         }
+        return newSet;
       });
     };
-    collectPaths(folderTree);
-    setSelectedItems(allPaths);
-  }
-  setSelectAll(!selectAll);
-};
+
+    // Update isFolderPartiallySelected
+    const isFolderPartiallySelected = (item) => {
+      const allChildPaths = getAllChildrenPaths(item);
+      const selectedCount = allChildPaths.filter((path) =>
+        selectedItems.has(path)
+      ).length;
+      return selectedCount > 0 && selectedCount < allChildPaths.length;
+    };
+    // Update handleSelectAll
+    const handleSelectAll = () => {
+      if (selectAll) {
+        setSelectedItems(new Set());
+      } else {
+        const allPaths = new Set();
+        const collectPaths = (items) => {
+          items.forEach((item) => {
+            allPaths.add(item.path);
+            if (item.children && item.children.length > 0) {
+              collectPaths(item.children);
+            }
+          });
+        };
+        collectPaths(folderTree);
+        setSelectedItems(allPaths);
+      }
+      setSelectAll(!selectAll);
+    };
     // const handleFolderSelect = (item, parentPath = "") => {
     //   const allChildPaths = getAllChildrenPaths(item, parentPath);
 
@@ -508,8 +508,6 @@ const handleSelectAll = () => {
       }
     };
 
-    
-
     // 🔹 Frontend: Update any status (read, sign, approval)
     const updateStatus = async (
       item,
@@ -638,61 +636,60 @@ const handleSelectAll = () => {
     //   setSelectedDoc(item);
     //   setInvoiceDialogOpen(true); // (open invoice selection popup)
     // };
-const toggleInvoiceLock = async (item) => {
-  const filePath = item.path;
-  const invoiceIds = item.meta?.invoiceLock || [];
-  const isLocked = item.meta?.lockInvoiceStatus === "pendingpayment";
+    const toggleInvoiceLock = async (item) => {
+      const filePath = item.path;
+      const invoiceIds = item.meta?.invoiceLock || [];
+      const isLocked = item.meta?.lockInvoiceStatus === "pendingpayment";
 
-  // ---------------------------------- UNLOCK ----------------------------------
-  if (isLocked) {
-    if (!invoiceIds.length) {
-      toast.error("No invoice mapped!");
-      return;
-    }
-
-    try {
-      await axios.post(
-        `https://www.snptaxes.com/api/accountsdoc/invoice/lock-unlock`,
-        {
-          filePath,
-          invoiceIds,
-          action: "unlock",
+      // ---------------------------------- UNLOCK ----------------------------------
+      if (isLocked) {
+        if (!invoiceIds.length) {
+          toast.error("No invoice mapped!");
+          return;
         }
-      );
 
-      toast.success("Invoice unlocked");
-      fetchFolderTree(accountId);
-    } catch (err) {
-      toast.error("Unlock failed");
-      console.log(err);
-    }
-    return;
-  }
+        try {
+          await axios.post(
+            `https://www.snptaxes.com/api/accountsdoc/invoice/lock-unlock`,
+            {
+              filePath,
+              invoiceIds,
+              action: "unlock",
+            }
+          );
 
-  // ---------------------------------- LOCK ----------------------------------
-  try {
-    // 🔹 Check pending invoices first
-    const res = await fetch(
-      `https://www.snptaxes.com/workflow/invoices/invoice/pending/invoicelistby/accountid/${accountId}`
-    );
-    const data = await res.json();
-    const pendingInvoices = data.invoice || [];
+          toast.success("Invoice unlocked");
+          fetchFolderTree(accountId);
+        } catch (err) {
+          toast.error("Unlock failed");
+          console.log(err);
+        }
+        return;
+      }
 
-    if (pendingInvoices.length === 0) {
-      toast.info("No pending invoices available");
-      return; // ❌ do NOT open dialog
-    }
+      // ---------------------------------- LOCK ----------------------------------
+      try {
+        // 🔹 Check pending invoices first
+        const res = await fetch(
+          `https://www.snptaxes.com/workflow/invoices/invoice/pending/invoicelistby/accountid/${accountId}`
+        );
+        const data = await res.json();
+        const pendingInvoices = data.invoice || [];
 
-    // ✅ Open dialog only if invoices exist
-    setInvoiceList(pendingInvoices);
-    setSelectedDoc(item);
-    setInvoiceDialogOpen(true);
+        if (pendingInvoices.length === 0) {
+          toast.info("No pending invoices available");
+          return; // ❌ do NOT open dialog
+        }
 
-  } catch (error) {
-    toast.error("Failed to fetch invoices");
-    console.error(error);
-  }
-};
+        // ✅ Open dialog only if invoices exist
+        setInvoiceList(pendingInvoices);
+        setSelectedDoc(item);
+        setInvoiceDialogOpen(true);
+      } catch (error) {
+        toast.error("Failed to fetch invoices");
+        console.error(error);
+      }
+    };
 
     const toggleReadOnly = async (item) => {
       try {
@@ -777,8 +774,8 @@ const toggleInvoiceLock = async (item) => {
     // 🗑️ Delete File or Folder (Universal)
     const deleteItem = async (item) => {
       if (!item?.path) return alert("Invalid path");
-      console.log("delete path", item.path);
-      console.log("delete item", item);
+      // console.log("delete path", item.path);
+      // console.log("delete item", item);
       const confirmDelete = window.confirm(
         `Are you sure you want to delete "${item.name}"? This cannot be undone!`
       );
@@ -815,178 +812,142 @@ const toggleInvoiceLock = async (item) => {
 
       handleMenuClose();
     };
-// In your frontend code, update the bulk functions:
-
-// Bulk delete
-// const handleBulkDelete = async () => {
-//   if (selectedItems.size === 0) {
-//     toast.warning("Please select items to delete");
-//     return;
-//   }
-// console.log("selectedItems",selectedItems)
-//   const confirmDelete = window.confirm(
-//     `Are you sure you want to delete ${selectedItems.size} item(s)? This cannot be undone!`
-//   );
-//   if (!confirmDelete) return;
-
-//   setBulkOperationLoading(true);
-//   try {
-//     const paths = Array.from(selectedItems);
-//     const response = await fetch(
-//       "https://www.snptaxes.com/api/accountsdoc/bulk-delete",
-//       {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({ paths }),
-//       }
-//     );
-
-//     const data = await response.json();
-//     if (response.ok && data.success) {
-//       toast.success(`${data.summary.success} item(s) deleted successfully`);
-//       setSelectedItems(new Set());
-//       fetchFolderTree(accountId);
-//     } else {
-//       toast.error(data.message || "Failed to delete items");
-//     }
-//   } catch (err) {
-//     console.error("Bulk delete error:", err);
-//     toast.error("Error deleting items");
-//   } finally {
-//     setBulkOperationLoading(false);
-//   }
-// };
-const handleBulkDelete = async () => {
-  if (selectedItems.size === 0) {
-    toast.warning("Please select items to delete");
-    return;
-  }
-
-  const confirmDelete = window.confirm(
-    `Are you sure you want to delete ${selectedItems.size} item(s)? This cannot be undone!`
-  );
-  if (!confirmDelete) return;
-
-  setBulkOperationLoading(true);
-  try {
-    const paths = Array.from(selectedItems);
-    
-    console.log("Deleting paths:", paths); // Debug log
-    
-    const response = await fetch(
-      "https://www.snptaxes.com/api/accountsdoc/bulk-delete",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ paths }),
+    // Bulk delete
+    const handleBulkDelete = async () => {
+      if (selectedItems.size === 0) {
+        toast.warning("Please select items to delete");
+        return;
       }
-    );
 
-    const data = await response.json();
-    console.log("Bulk delete response:", data); // Debug log
-    
-    if (response.ok) {
-      if (data.success) {
-        toast.success(`${data.summary.success} item(s) deleted successfully`);
-        if (data.errors && data.errors.length > 0) {
-          toast.warning(`${data.errors.length} item(s) failed to delete`);
-          console.log("Failed deletions:", data.errors);
+      const confirmDelete = window.confirm(
+        `Are you sure you want to delete ${selectedItems.size} item(s)? This cannot be undone!`
+      );
+      if (!confirmDelete) return;
+
+      setBulkOperationLoading(true);
+      try {
+        const paths = Array.from(selectedItems);
+
+        console.log("Deleting paths:", paths); // Debug log
+
+        const response = await fetch(
+          "https://www.snptaxes.com/api/accountsdoc/bulk-delete",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ paths }),
+          }
+        );
+
+        const data = await response.json();
+        console.log("Bulk delete response:", data); // Debug log
+
+        if (response.ok) {
+          if (data.success) {
+            toast.success(
+              `${data.summary.success} item(s) deleted successfully`
+            );
+            if (data.errors && data.errors.length > 0) {
+              toast.warning(`${data.errors.length} item(s) failed to delete`);
+              console.log("Failed deletions:", data.errors);
+            }
+          } else {
+            toast.error(data.message || "Failed to delete some items");
+          }
+
+          // Clear selection regardless of partial success
+          setSelectedItems(new Set());
+          fetchFolderTree(accountId);
+        } else {
+          toast.error(data.message || "Failed to delete items");
         }
-      } else {
-        toast.error(data.message || "Failed to delete some items");
+      } catch (err) {
+        console.error("Bulk delete error:", err);
+        toast.error("Error deleting items: " + err.message);
+      } finally {
+        setBulkOperationLoading(false);
       }
-      
-      // Clear selection regardless of partial success
-      setSelectedItems(new Set());
-      fetchFolderTree(accountId);
-    } else {
-      toast.error(data.message || "Failed to delete items");
-    }
-  } catch (err) {
-    console.error("Bulk delete error:", err);
-    toast.error("Error deleting items: " + err.message);
-  } finally {
-    setBulkOperationLoading(false);
-  }
-};
+    };
 
-// Bulk lock/unlock
-const handleBulkLock = async (lockStatus) => {
-  if (selectedItems.size === 0) {
-    toast.warning("Please select items to lock/unlock");
-    return;
-  }
-
-  setBulkOperationLoading(true);
-  try {
-    const paths = Array.from(selectedItems);
-    const response = await fetch(
-      "https://www.snptaxes.com/api/accountsdoc/bulk-lock",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          paths, 
-          readOnly: lockStatus === "lock" 
-        }),
+    // Bulk lock/unlock
+    const handleBulkLock = async (lockStatus) => {
+      if (selectedItems.size === 0) {
+        toast.warning("Please select items to lock/unlock");
+        return;
       }
-    );
 
-    const data = await response.json();
-    if (response.ok) {
-      toast.success(`${data.summary.success} item(s) ${lockStatus === "lock" ? "locked" : "unlocked"} successfully`);
-      setSelectedItems(new Set());
-      fetchFolderTree(accountId);
-      setBulkLockDialogOpen(false);
-    } else {
-      toast.error(data.message || `Failed to ${lockStatus} items`);
-    }
-  } catch (err) {
-    console.error("Bulk lock error:", err);
-    toast.error(`Error ${lockStatus}ing items`);
-  } finally {
-    setBulkOperationLoading(false);
-  }
-};
+      setBulkOperationLoading(true);
+      try {
+        const paths = Array.from(selectedItems);
+        const response = await fetch(
+          "https://www.snptaxes.com/api/accountsdoc/bulk-lock",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              paths,
+              readOnly: lockStatus === "lock",
+            }),
+          }
+        );
 
-// Bulk move
-const handleBulkMove = async (targetPath) => {
-  if (selectedItems.size === 0) {
-    toast.warning("Please select items to move");
-    return;
-  }
-
-  setBulkOperationLoading(true);
-  try {
-    const paths = Array.from(selectedItems);
-    const response = await fetch(
-      "https://www.snptaxes.com/api/accountsdoc/bulk-move",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          paths, 
-          targetPath 
-        }),
+        const data = await response.json();
+        if (response.ok) {
+          toast.success(
+            `${data.summary.success} item(s) ${lockStatus === "lock" ? "locked" : "unlocked"} successfully`
+          );
+          setSelectedItems(new Set());
+          fetchFolderTree(accountId);
+          setBulkLockDialogOpen(false);
+        } else {
+          toast.error(data.message || `Failed to ${lockStatus} items`);
+        }
+      } catch (err) {
+        console.error("Bulk lock error:", err);
+        toast.error(`Error ${lockStatus}ing items`);
+      } finally {
+        setBulkOperationLoading(false);
       }
-    );
+    };
 
-    const data = await response.json();
-    if (response.ok) {
-      toast.success(`${data.summary.success} item(s) moved successfully`);
-      setSelectedItems(new Set());
-      fetchFolderTree(accountId);
-      setBulkMoveDrawerOpen(false);
-    } else {
-      toast.error(data.message || "Failed to move items");
-    }
-  } catch (err) {
-    console.error("Bulk move error:", err);
-    toast.error("Error moving items");
-  } finally {
-    setBulkOperationLoading(false);
-  }
-};
+    // Bulk move
+    const handleBulkMove = async (targetPath) => {
+      if (selectedItems.size === 0) {
+        toast.warning("Please select items to move");
+        return;
+      }
+
+      setBulkOperationLoading(true);
+      try {
+        const paths = Array.from(selectedItems);
+        const response = await fetch(
+          "https://www.snptaxes.com/api/accountsdoc/bulk-move",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              paths,
+              targetPath,
+            }),
+          }
+        );
+
+        const data = await response.json();
+        if (response.ok) {
+          toast.success(`${data.summary.success} item(s) moved successfully`);
+          setSelectedItems(new Set());
+          fetchFolderTree(accountId);
+          setBulkMoveDrawerOpen(false);
+        } else {
+          toast.error(data.message || "Failed to move items");
+        }
+      } catch (err) {
+        console.error("Bulk move error:", err);
+        toast.error("Error moving items");
+      } finally {
+        setBulkOperationLoading(false);
+      }
+    };
     const handleBulkDownload = async () => {
       if (selectedItems.size === 0) {
         toast.warning("Please select items to download");
@@ -1032,40 +993,90 @@ const handleBulkMove = async (targetPath) => {
       alert(`Move folder: ${folder.path}`); // implement backend
       handleMenuClose();
     };
+const handleFileClick = async (fullPath, fileName, meta = {}) => {
+  try {
+    // 🔒 Prevent opening locked files
+    if (meta.readOnly) {
+      alert("This file is locked and cannot be opened.");
+      return;
+    }
+console.log("filepath",fullPath)
+console.log("meta",meta)
+    // 🔔 Remove "New" tag (fire-and-forget)
+   // 🔔 Remove "New" tag & refetch tree
+    if (meta.tags?.some(tag => tag.isSystemTag && tag.tagName === "New")) {
+      await fetch("https://www.snptaxes.com/api/accountsdoc/remove-new-tag", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ filePath: fullPath }),
+      });
 
-    const handleFileClick = (fullPath, fileName, meta = {}) => {
-      try {
-        // 🔒 Prevent opening locked files
-        if (meta.readOnly) {
-          alert("This file is locked and cannot be opened.");
-          return;
-        }
+      // 🔄 REFRESH folder tree so parent tags update
+      await fetchFolderTree(accountId);
+    }
 
-        // ✅ Construct full file URL
-        const fileUrl = `https://www.snptaxes.com/uploads/accounts/${data}/${fullPath}`;
 
-        // ✅ Detect file extension (case-insensitive)
-        const fileExt = fileName.split(".").pop().toLowerCase();
+    // ✅ Construct file URL
+    const fileUrl = `https://www.snptaxes.com/uploads/accounts/${fullPath}`;
 
-        // ✅ Extensions that can open in browser
-        const viewableExtensions = ["pdf", "jpg", "jpeg", "png", "gif", "txt"];
+    // ✅ Detect file extension
+    const fileExt = fileName.split(".").pop().toLowerCase();
 
-        if (viewableExtensions.includes(fileExt)) {
-          // Open supported file types in a new tab
-          window.open(fileUrl, "_blank", "noopener,noreferrer");
-        } else {
-          // Force download for unsupported types (e.g., docx, xlsx, zip, etc.)
-          const link = document.createElement("a");
-          link.href = fileUrl;
-          link.download = fileName;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        }
-      } catch (error) {
-        console.error("Error opening/downloading file:", error);
-      }
-    };
+    // ✅ Browser-viewable files
+    const viewableExtensions = ["pdf", "jpg", "jpeg", "png", "gif", "txt"];
+
+    if (viewableExtensions.includes(fileExt)) {
+      // Open in new tab
+      window.open(fileUrl, "_blank", "noopener,noreferrer");
+    } else {
+      // Force download
+      const link = document.createElement("a");
+      link.href = fileUrl;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  } catch (error) {
+    console.error("Error opening/downloading file:", error);
+  }
+};
+
+    // const handleFileClick = (fullPath, fileName, meta = {}) => {
+    //   try {
+    //     // 🔒 Prevent opening locked files
+    //     if (meta.readOnly) {
+    //       alert("This file is locked and cannot be opened.");
+    //       return;
+    //     }
+
+    //     // ✅ Construct full file URL
+    //     const fileUrl = `https://www.snptaxes.com/uploads/accounts/${fullPath}`;
+
+    //     // ✅ Detect file extension (case-insensitive)
+    //     const fileExt = fileName.split(".").pop().toLowerCase();
+
+    //     // ✅ Extensions that can open in browser
+    //     const viewableExtensions = ["pdf", "jpg", "jpeg", "png", "gif", "txt"];
+
+    //     if (viewableExtensions.includes(fileExt)) {
+    //       // Open supported file types in a new tab
+    //       window.open(fileUrl, "_blank", "noopener,noreferrer");
+    //     } else {
+    //       // Force download for unsupported types (e.g., docx, xlsx, zip, etc.)
+    //       const link = document.createElement("a");
+    //       link.href = fileUrl;
+    //       link.download = fileName;
+    //       document.body.appendChild(link);
+    //       link.click();
+    //       document.body.removeChild(link);
+    //     }
+    //   } catch (error) {
+    //     console.error("Error opening/downloading file:", error);
+    //   }
+    // };
     const getFileIcon = (fileName) => {
       const ext = fileName.split(".").pop().toLowerCase();
 
@@ -1091,9 +1102,8 @@ const handleBulkMove = async (targetPath) => {
       }
     };
     const renderTree = (items, level = 0, parentPath = "") => {
-      
       const UploadedInfo = ({ meta }) => {
-        console.log("uploaded meta", meta)
+        // console.log("uploaded meta", meta);
         if (!meta) return null;
 
         return (
@@ -1104,7 +1114,7 @@ const handleBulkMove = async (targetPath) => {
       };
 
       const getStatusChip = (meta) => {
-        console.log("meta status", meta);
+        // console.log("meta status", meta);
         const chips = [];
 
         // ======= SIGNATURE STATUS =======
@@ -1222,7 +1232,7 @@ const handleBulkMove = async (targetPath) => {
                   alert("This file is locked and cannot be opened.");
                   return;
                 }
-                handleFileClick(fullPath, item.name);
+                handleFileClick(fullPath, item.name,meta);
               };
 
               return (
@@ -1427,36 +1437,39 @@ const handleBulkMove = async (targetPath) => {
         </>
       );
     };
-      const formatUploadedAt = (dateValue) => {
-  if (!dateValue) return "";
+    const formatUploadedAt = (dateValue) => {
+      if (!dateValue) return "";
 
-  // If already in "DEC-19 2025" format
-  if (typeof dateValue === "string" && /^[A-Z]{3}-\d{2} \d{4}$/.test(dateValue)) {
-    return dateValue;
-  }
+      // If already in "DEC-19 2025" format
+      if (
+        typeof dateValue === "string" &&
+        /^[A-Z]{3}-\d{2} \d{4}$/.test(dateValue)
+      ) {
+        return dateValue;
+      }
 
-  const date = new Date(dateValue);
-  if (isNaN(date)) return dateValue;
+      const date = new Date(dateValue);
+      if (isNaN(date)) return dateValue;
 
-  return date
-    .toLocaleDateString("en-US", {
-      month: "short",
-      day: "2-digit",
-      year: "numeric",
-    })
-    .toUpperCase()
-    .replace(",", "")      // remove comma
-    .replace(" ", "-");    // replace first space with dash
-};
-const UploadedInfo = ({ meta }) => {
-  if (!meta?.uploadedAt) return null;
+      return date
+        .toLocaleDateString("en-US", {
+          month: "short",
+          day: "2-digit",
+          year: "numeric",
+        })
+        .toUpperCase()
+        .replace(",", "") // remove comma
+        .replace(" ", "-"); // replace first space with dash
+    };
+    const UploadedInfo = ({ meta }) => {
+      if (!meta?.uploadedAt) return null;
 
-  return (
-    <Typography variant="caption" sx={{ fontWeight: "bold" }}>
-      {formatUploadedAt(meta.uploadedAt)}
-    </Typography>
-  );
-};
+      return (
+        <Typography variant="caption" sx={{ fontWeight: "bold" }}>
+          {formatUploadedAt(meta.uploadedAt)}
+        </Typography>
+      );
+    };
     // const UploadedInfo = ({ meta }) => {
     //   if (!meta) return null;
 
@@ -1549,39 +1562,62 @@ const UploadedInfo = ({ meta }) => {
 
       return <Box sx={{ display: "flex", gap: 1 }}>{chips}</Box>;
     };
+    const findNewSystemTag = (item) => {
+      console.log("Finding 'New' tag in item:", item);
+      // Check current item
+      const newTag = item.meta?.tags?.find(
+        (tag) => tag.isSystemTag && tag.tagName === "New"
+      );
+
+      if (newTag) return newTag;
+
+      // Check children recursively
+      if (item.children && item.children.length > 0) {
+        for (const child of item.children) {
+          const childTag = findNewSystemTag(child);
+          if (childTag) return childTag;
+        }
+      }
+
+      return null;
+    };
+
+   
 
     const renderTableRows = (items, level = 0, parentPath = "") => {
       return items.map((item) => {
-        console.log("itemlist",item)
+        // console.log("itemlist", item);
         // const fullPath = parentPath ? `${parentPath}/${item.name}` : item.name;
-         const fullPath = item.path;
+        const fullPath = item.path;
         const meta = item.meta || {};
         const isFolder = item.type === "folder";
         const isSelected = selectedItems.has(fullPath);
-         // Update the helper function to use item.path for children
-    const getAllChildrenPaths = (item) => {
-      const paths = [item.path];
-      if (item.children && item.children.length > 0) {
-        item.children.forEach((child) => {
-          paths.push(...getAllChildrenPaths(child));
-        });
-      }
-      return paths;
-    };
+        // Update the helper function to use item.path for children
+        const getAllChildrenPaths = (item) => {
+          const paths = [item.path];
+          if (item.children && item.children.length > 0) {
+            item.children.forEach((child) => {
+              paths.push(...getAllChildrenPaths(child));
+            });
+          }
+          return paths;
+        };
 
-    // Update isFolderPartiallySelected to use item.path
-    const isPartiallySelected = isFolder
-      ? isFolderPartiallySelected(item)
-      : false;
+        // Update isFolderPartiallySelected to use item.path
+        const isPartiallySelected = isFolder
+          ? isFolderPartiallySelected(item)
+          : false;
         const handleSafeFileClick = () => {
           if (meta.readOnly) {
             alert("This file is locked and cannot be opened.");
             return;
           }
           if (!isFolder) {
-            handleFileClick(fullPath, item.name);
+            handleFileClick(fullPath, item.name,meta);
           }
         };
+       
+        const inheritedNewTag = isFolder ? findNewSystemTag(item) : null;
 
         return (
           <React.Fragment key={fullPath}>
@@ -1636,7 +1672,21 @@ const UploadedInfo = ({ meta }) => {
                         }}
                         onClick={() => toggleFolder(fullPath, meta.readOnly)}
                       >
-                        {item.name}
+                        {item.name} {/* 🔴 NEW TAG for folder */}
+                        {/* 🔥 Inherited "New" system tag */}
+                        {inheritedNewTag && (
+                          <Chip
+                            label={inheritedNewTag.tagName}
+                            size="small"
+                            sx={{
+                              backgroundColor: inheritedNewTag.tagColour,
+                              color: "#fff",
+                              height: 18,
+                              fontSize: "0.7rem",
+                              ml: 0.8,
+                            }}
+                          />
+                        )}
                         {meta.readOnly && (
                           <Typography
                             component="span"
@@ -1663,7 +1713,30 @@ const UploadedInfo = ({ meta }) => {
                           }}
                           onClick={handleSafeFileClick}
                         >
-                          {item.name}
+                          {item.name}{" "}
+                           {meta.readOnly && (
+                          <Typography
+                            component="span"
+                            variant="caption"
+                            sx={{ color: "error.main", ml: 1 }}
+                          >
+                            (Locked)
+                          </Typography>
+                        )}
+                          {meta.tags?.map((tag, index) => (
+                            <Chip
+                              key={index}
+                              label={tag.tagName}
+                              size="small"
+                              sx={{
+                                backgroundColor: tag.tagColour || "#e0e0e0",
+                                color: "#fff",
+                                height: 18,
+                                fontSize: "0.7rem",
+                                ml: 0.5,
+                              }}
+                            />
+                          ))}
                         </Typography>
                         {/* Status chips for files only */}
                       </Box>
@@ -1679,7 +1752,11 @@ const UploadedInfo = ({ meta }) => {
               <TableCell>
                 <UploadedInfo meta={meta} />
               </TableCell>
-
+              <TableCell>
+                <Typography variant="caption" sx={{ fontWeight: "bold" }}>
+                  {meta.uploadedBy}
+                </Typography>
+              </TableCell>
               {/* Actions Column */}
               <TableCell align="right">
                 <IconButton
@@ -1748,25 +1825,25 @@ const UploadedInfo = ({ meta }) => {
             </Button>
           </Box>
 
-{/* 🔴 BULK OPERATIONS TOOLBAR - Shows when items are selected */}
+          {/* 🔴 BULK OPERATIONS TOOLBAR - Shows when items are selected */}
           {selectedItems.size > 0 && (
-            <Paper 
-              elevation={2} 
-              sx={{ 
-                p: 2, 
-                mb: 3, 
+            <Paper
+              elevation={2}
+              sx={{
+                p: 2,
+                mb: 3,
                 bgcolor: "#e3f2fd",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
                 flexWrap: "wrap",
-                gap: 1
+                gap: 1,
               }}
             >
               <Typography variant="subtitle1" fontWeight="bold">
                 {selectedItems.size} item(s) selected
               </Typography>
-              
+
               <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
                 <Button
                   variant="contained"
@@ -1777,7 +1854,7 @@ const UploadedInfo = ({ meta }) => {
                 >
                   Move
                 </Button>
-                
+
                 <Button
                   variant="contained"
                   size="small"
@@ -1787,7 +1864,7 @@ const UploadedInfo = ({ meta }) => {
                 >
                   Lock/Unlock
                 </Button>
-                
+
                 <Button
                   variant="contained"
                   color="secondary"
@@ -1798,7 +1875,7 @@ const UploadedInfo = ({ meta }) => {
                 >
                   Delete
                 </Button>
-                
+
                 <Button
                   variant="contained"
                   color="primary"
@@ -1809,7 +1886,7 @@ const UploadedInfo = ({ meta }) => {
                 >
                   Download
                 </Button>
-                
+
                 <Button
                   variant="outlined"
                   size="small"
@@ -1870,21 +1947,21 @@ const UploadedInfo = ({ meta }) => {
             fetchFolderTree={() => fetchFolderTree(data)}
             selectedFolderForMenu={selectedFolderForMenu}
           />
-             {/* 🔴 Bulk Move Drawer */}
-         <MoveDrawer
-  isOpen={bulkMoveDrawerOpen}
-  onClose={() => setBulkMoveDrawerOpen(false)}
-  folderTree={folderTree}
-  fetchFolderTree={fetchFolderTree}
-  // Bulk mode props
-  isBulkOperation={true}
-  selectedPaths={Array.from(selectedItems)} // Array of selected paths
-  onMoveComplete={(targetPath) => {
-    // Optional callback after successful move
-    console.log("Bulk move completed to:", targetPath);
-    setSelectedItems(new Set()); // Clear selection
-  }}
-/>
+          {/* 🔴 Bulk Move Drawer */}
+          <MoveDrawer
+            isOpen={bulkMoveDrawerOpen}
+            onClose={() => setBulkMoveDrawerOpen(false)}
+            folderTree={folderTree}
+            fetchFolderTree={fetchFolderTree}
+            // Bulk mode props
+            isBulkOperation={true}
+            selectedPaths={Array.from(selectedItems)} // Array of selected paths
+            onMoveComplete={(targetPath) => {
+              // Optional callback after successful move
+              console.log("Bulk move completed to:", targetPath);
+              setSelectedItems(new Set()); // Clear selection
+            }}
+          />
         </Box>
 
         {/* Folder Explorer */}
@@ -1919,6 +1996,7 @@ const UploadedInfo = ({ meta }) => {
                       <TableCell>Name</TableCell>
                       <TableCell>Status</TableCell>
                       <TableCell>Uploaded</TableCell>
+                      <TableCell>User</TableCell>
                       <TableCell align="right">Actions</TableCell>
                     </TableRow>
                   </TableHead>
@@ -1941,7 +2019,7 @@ const UploadedInfo = ({ meta }) => {
             </Typography>
           )}
         </Paper>
-         {/* 🔴 Bulk Lock Dialog */}
+        {/* 🔴 Bulk Lock Dialog */}
         <Dialog
           open={bulkLockDialogOpen}
           onClose={() => setBulkLockDialogOpen(false)}
@@ -1949,21 +2027,20 @@ const UploadedInfo = ({ meta }) => {
           <DialogTitle>Lock/Unlock Selected Items</DialogTitle>
           <DialogContent>
             <Typography>
-              Do you want to lock or unlock the {selectedItems.size} selected item(s)?
+              Do you want to lock or unlock the {selectedItems.size} selected
+              item(s)?
             </Typography>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setBulkLockDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button 
+            <Button onClick={() => setBulkLockDialogOpen(false)}>Cancel</Button>
+            <Button
               onClick={() => handleBulkLock("unlock")}
               color="primary"
               disabled={bulkOperationLoading}
             >
               Unlock
             </Button>
-            <Button 
+            <Button
               onClick={() => handleBulkLock("lock")}
               color="warning"
               variant="contained"
