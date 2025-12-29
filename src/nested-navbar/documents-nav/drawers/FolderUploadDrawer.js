@@ -68,7 +68,6 @@ const FolderUploadDrawer = ({
       setFolderName(topLevelFolder);
     }
   };
-  
 
   const handleUpload = async () => {
     if (!files.length) {
@@ -131,8 +130,6 @@ const FolderUploadDrawer = ({
           📁 Upload Folder
         </Typography>
 
-      
-
         {/* MUI Button instead of File Input */}
         <Button
           variant="contained"
@@ -188,6 +185,7 @@ const FolderUploadDrawer = ({
 
 // Recursive folder tree
 const FolderTreeSelector = ({ items, onSelect, selectedFolder, level = 0 }) => {
+  console.log("FolderTreeSelector items:", items);  
   const [expanded, setExpanded] = useState({});
 
   const toggleExpand = (path) => {
@@ -240,20 +238,20 @@ const FolderTreeSelector = ({ items, onSelect, selectedFolder, level = 0 }) => {
                 if (!item.meta?.readOnly) onSelect(item.path);
               }}
             > */}
-             <ListItem
+            <ListItem
               sx={{
                 pl: 2 + level * 2,
                 bgcolor: isSelected ? "#b2d8ff" : "transparent",
                 borderRadius: 1,
                 mb: 0.5,
-            
+
                 cursor: item.meta?.readOnly ? "not-allowed" : "pointer",
                 opacity: item.meta?.readOnly ? 0.6 : 1,
-            
+
                 "&:hover": {
                   bgcolor: item.meta?.readOnly ? "transparent" : "#dbefff",
                 },
-            
+
                 pointerEvents: item.meta?.readOnly ? "none" : "auto",
               }}
               onClick={() => onSelect(item.path)}
@@ -303,7 +301,7 @@ const FolderTreeSelector = ({ items, onSelect, selectedFolder, level = 0 }) => {
               />
 
               {/* Files inside folder */}
-              {item.meta?.files?.length > 0 && (
+              {/* {item.meta?.files?.length > 0 && (
                 <List sx={{ pl: 4 }}>
                   {item.meta.files.map((file) => (
                     <ListItem key={file.name} sx={{ pl: 2 }}>
@@ -316,7 +314,7 @@ const FolderTreeSelector = ({ items, onSelect, selectedFolder, level = 0 }) => {
                     </ListItem>
                   ))}
                 </List>
-              )}
+              )} */}
             </Collapse>
           </React.Fragment>
         );
