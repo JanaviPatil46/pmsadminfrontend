@@ -247,25 +247,56 @@ const Trash = () => {
         .replace(",", "") // remove comma
         .replace(" ", "-"); // replace first space with dash
     };
-    // const TrashedInfo = ({ meta }) => {
-    //   console.log("TrashedInfo meta:", meta);
-    //   if (!meta?.trash.trashedAt) return null;
+  
+// const TrashedInfo = ({ meta }) => {
+//   if (!meta?.trash?.trashedAt) return null;
 
-    //   return (
-    //     <Typography variant="caption" sx={{ fontWeight: "bold" }}>
-    //       {formatUploadedAt(meta.trash.trashedAt)}
-    //     </Typography>
-    //   );
-    // };
+//   const trashedAt = new Date(meta.trash.trashedAt);
+//   const now = new Date();
+
+//   // Calculate remaining time until 60 days
+//   const diffTime = trashedAt.getTime() + 60 * 24 * 60 * 60 * 1000 - now.getTime(); // 60 days in ms
+//   const remainingDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+//   // Format trashed date
+//   const formattedDate = trashedAt
+//     .toLocaleDateString("en-US", {
+//       month: "short",
+//       day: "2-digit",
+//       year: "numeric",
+//     })
+//     .toUpperCase()
+//     .replace(",", ""); // e.g., DEC-29 2025
+
+//   return (
+//     <Typography variant="caption" sx={{ fontWeight: "bold" }}>
+//       {formattedDate} ({remainingDays > 0 ? `${remainingDays} day${remainingDays > 1 ? "s" : ""} left` : "Deleting soon"})
+//     </Typography>
+//   );
+// };
+
 const TrashedInfo = ({ meta }) => {
   if (!meta?.trash?.trashedAt) return null;
 
   const trashedAt = new Date(meta.trash.trashedAt);
   const now = new Date();
 
-  // Calculate remaining time until 60 days
-  const diffTime = trashedAt.getTime() + 60 * 24 * 60 * 60 * 1000 - now.getTime(); // 60 days in ms
-  const remainingDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  const TWO_HOURS_MS = 2 * 60 * 60 * 1000;
+
+  // Remaining time
+  const diffTime = trashedAt.getTime() + TWO_HOURS_MS - now.getTime();
+
+  if (diffTime <= 0) {
+    return (
+      <Typography variant="caption" sx={{ fontWeight: "bold", color: "error.main" }}>
+        Deleting soon
+      </Typography>
+    );
+  }
+
+  const remainingMinutes = Math.ceil(diffTime / (1000 * 60));
+  const hours = Math.floor(remainingMinutes / 60);
+  const minutes = remainingMinutes % 60;
 
   // Format trashed date
   const formattedDate = trashedAt
@@ -275,15 +306,16 @@ const TrashedInfo = ({ meta }) => {
       year: "numeric",
     })
     .toUpperCase()
-    .replace(",", ""); // e.g., DEC-29 2025
+    .replace(",", "");
 
   return (
     <Typography variant="caption" sx={{ fontWeight: "bold" }}>
-      {formattedDate} ({remainingDays > 0 ? `${remainingDays} day${remainingDays > 1 ? "s" : ""} left` : "Deleting soon"})
+      {formattedDate} (
+      {hours > 0 && `${hours} hr${hours > 1 ? "s" : ""} `}
+      {minutes > 0 && `${minutes} min${minutes > 1 ? "s" : ""}`} left)
     </Typography>
   );
 };
-
 
     const findNewSystemTag = (item) => {
       // console.log("Finding 'New' tag in item:", item);
