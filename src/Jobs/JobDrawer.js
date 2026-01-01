@@ -2632,7 +2632,7 @@ const [isProcessing, setIsProcessing] = useState(false);
     const assignInvoiceToAccount = (invoiceData, automationTemp, accountId) => {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
-
+console.log("invoiceData", invoiceData);
       const raw = JSON.stringify({
         account: accountId,
         invoicenumber: "",
@@ -2660,10 +2660,10 @@ const [isProcessing, setIsProcessing] = useState(false);
           tax: item.tax || false,
         })),
         summary: {
-          subtotal: invoiceData.summary.subtotal || "",
-          taxRate: invoiceData.summary.taxRate || "",
-          taxTotal: invoiceData.summary.taxTotal || "",
-          total: invoiceData.summary.total || "",
+          subtotal: invoiceData.summary.subtotal || 0,
+          taxRate: invoiceData.summary.taxRate || 0,
+          taxTotal: invoiceData.summary.taxTotal || 0,
+          total: invoiceData.summary.total || 0,
         },
         paidAmount: "",
         invoiceStatus: "Pending",
@@ -2678,7 +2678,9 @@ const [isProcessing, setIsProcessing] = useState(false);
       };
 
       fetch(`${INVOICE_NEW}/workflow/invoices/invoice`, requestOptions)
-        .then((response) => response.json())
+        .then((response) => {response.json()
+          console.log("Response status:", response);
+        })
         .then((result) => console.log("Invoice assigned successfully:", result))
         .catch((error) => console.error("Error assigning invoice:", error));
     };

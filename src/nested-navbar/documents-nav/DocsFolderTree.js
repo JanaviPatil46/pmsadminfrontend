@@ -695,7 +695,7 @@ const trashItem = async (item) => {
       {
         method: "PATCH", // ✅ trash = PATCH
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ targetPath: item.path }),
+        body: JSON.stringify({ targetPath: item.path, trashedBy: "Admin" }),
       }
     );
 
@@ -782,7 +782,7 @@ const handleBulkTrash = async () => {
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ targetPaths: paths }),
+        body: JSON.stringify({ targetPaths: paths, trashedBy: "Admin" }),
       }
     );
 

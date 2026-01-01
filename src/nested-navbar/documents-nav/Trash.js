@@ -63,7 +63,7 @@ const Trash = () => {
         const data = await res.json();
         console.log("janavi patil", data);
         if (res.ok) {
-          setFolderTree(data.contents);
+          setFolderTree(data.contents.Admin || []);
         } else {
           setError("Failed to fetch folder tree");
         }
