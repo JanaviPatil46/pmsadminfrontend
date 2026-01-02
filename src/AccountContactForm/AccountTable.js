@@ -1471,7 +1471,7 @@ import {
   Typography,
   Chip,
   Stack,
-  Link,
+  // Link,
   Button,
   Checkbox,
   TablePagination,
@@ -1501,7 +1501,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import PersonIcon from "@mui/icons-material/Person";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import EmailIcon from "@mui/icons-material/Email";
-
+import { Link } from "react-router-dom";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import SendAccountEmail from "../../src/Pages/BulkActions/SendAccountEmail";
 import AddJobs from "../../src/Pages/BulkActions/AddJobs";
@@ -2615,11 +2615,12 @@ const handleConfirmDelete = async () => {
                       <Checkbox
                         color="primary"
                         checked={isSelected(account._id)}
+                          onClick={(e) => e.stopPropagation()}
                         onChange={() => handleClick(account)}
                       />
                     </TableCell>
                     <TableCell>
-                      <Link
+                      {/* <Link
                         component="button"
                         underline="hover"
                         color="primary"
@@ -2628,7 +2629,13 @@ const handleConfirmDelete = async () => {
                         }
                       >
                         {account.accountName}
-                      </Link>
+                      </Link> */}
+                       <Link
+                                                  to={`/clients/accounts/accountsdash/overview/${account._id}`}
+                                                  style={{ textDecoration: "none", color: "#3f51b5",cursor: "pointer" }}
+                                                >
+                                                  {account.accountName}
+                                                </Link>
                     </TableCell>
                     <TableCell>{account.clientType}</TableCell>
                     <TableCell>{account.companyName || "—"}</TableCell>

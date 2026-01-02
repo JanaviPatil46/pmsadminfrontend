@@ -431,11 +431,18 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios";
 import { LoginContext } from "../Sidebar/Context/Context";
+import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined";
+import UnarchiveOutlinedIcon from "@mui/icons-material/UnarchiveOutlined";
+
+import Divider from "@mui/material/Divider";
+import Tooltip from "@mui/material/Tooltip";
+import { toast } from "react-toastify";
 
 const Inboxplus = () => {
   const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
   const EMAIL_SYNC = process.env.REACT_APP_EMAILSYNC_API;
   const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
+const [tab, setTab] = useState("active"); // active | archived
 
   const { logindata } = useContext(LoginContext);
   const [loginuserid, setLoginUserId] = useState();
@@ -522,7 +529,7 @@ const Inboxplus = () => {
       setFetchError("");
       try {
         const res = await axios.get(
-          `${EMAIL_SYNC}/emailsync/user/login-with-token/${emailSyncEmail}`
+          `${EMAIL_SYNC}/emailsync/user/login-with-token/${emailSyncEmail}?type=${tab}`
         );
         let emails = res.data.emails || [];
 
@@ -546,7 +553,7 @@ const Inboxplus = () => {
     };
 
     fetchEmails();
-  }, [userRole, accountIds, emailSyncEmail]);
+  }, [userRole, accountIds, emailSyncEmail, tab]);
 
   const toggleFilterDrawer = (open) => () => {
     setFilterDrawerOpen(open);
@@ -566,22 +573,76 @@ const Inboxplus = () => {
     }, {});
     setCheckedItems(cleared);
   };
+const removeMongoIdFromSubject = (subject = "") => {
+  // Matches MongoDB ObjectId at the beginning followed by space
+  return subject.replace(/^[a-fA-F0-9]{24}\s*/, "");
+};
+const getCleanSubject = (subject = "") => {
+  let clean = subject.startsWith("#") ? subject.slice(1).trim() : subject;
+  clean = removeMongoIdFromSubject(clean);
+  return clean;
+};
 
-  // Filter logic
-  const filteredEmails = emailList.filter((email) => {
-    if (!email.subject?.startsWith("#")) return false;
-    if (userRole === "TeamMember" && accountIds.length > 0) {
-      const hasAccountId = accountIds.some((id) => email.subject.includes(id));
-      if (!hasAccountId) return false;
-    }
+const filteredEmails = emailList.filter((email) => {
+  if (!email.subject?.startsWith("#")) return false;
 
-    const activeFilters = Object.values(checkedItems).some(Boolean);
-    if (activeFilters) {
-      const type = getEmailType(email.subject);
-      if (!type || !checkedItems[type]) return false;
-    }
-    return true;
+  if (userRole === "TeamMember" && accountIds.length > 0) {
+    const hasAccountId = accountIds.some((id) =>
+      email.subject.includes(id)
+    );
+    if (!hasAccountId) return false;
+  }
+
+  const activeFilters = Object.values(checkedItems).some(Boolean);
+  if (activeFilters) {
+    const type = getEmailType(email.subject);
+    if (!type || !checkedItems[type]) return false;
+  }
+
+  return true;
+});
+
+
+  // // Filter logic
+  // const filteredEmails = emailList.filter((email) => {
+  //   if (!email.subject?.startsWith("#")) return false;
+  //   if (userRole === "TeamMember" && accountIds.length > 0) {
+  //     const hasAccountId = accountIds.some((id) => email.subject.includes(id));
+  //     if (!hasAccountId) return false;
+  //   }
+
+  //   const activeFilters = Object.values(checkedItems).some(Boolean);
+  //   if (activeFilters) {
+  //     const type = getEmailType(email.subject);
+  //     if (!type || !checkedItems[type]) return false;
+  //   }
+  //   return true;
+  // });
+const handleArchiveToggle = async () => {
+  if (!selectedEmail) return;
+
+  const endpoint =
+    tab === "active"
+      ? `${EMAIL_SYNC}/emailsync/user/archive`
+      : `${EMAIL_SYNC}/emailsync/user/unarchive`;
+
+  await axios.post(endpoint, {
+    email: emailSyncEmail,
+    messageId: selectedEmail.id,
   });
+
+  // Remove from current list instantly
+  setEmailList((prev) =>
+    prev.filter((e) => e.id !== selectedEmail.id)
+  );
+
+  setSelectedEmail(null);
+  toast.success(
+    tab === "active"
+      ? "Email archived successfully"
+      : "Email moved to Inbox successfully"
+  );
+};
 
   return (
     <>
@@ -598,7 +659,32 @@ const Inboxplus = () => {
           </Button>
         </Box>
       ) : (
+<>
+        <Box display="flex" gap={2} mb={2}>
+  <Button
+    variant={tab === "active" ? "contained" : "outlined"}
+    onClick={() => {
+      setSelectedEmail(null);
+      setTab("active");
+    }}
+  >
+    Active
+  </Button>
+
+  <Button
+    variant={tab === "archived" ? "contained" : "outlined"}
+    onClick={() => {
+      setSelectedEmail(null);
+      setTab("archived");
+    }}
+  >
+    Archived
+  </Button>
+</Box>
+
         <Box display="flex" height="80vh" mt={3}>
+
+          
           {/* Left side — Email Cards */}
           <Box width="45%" borderRight="1px solid #ddd" overflow="auto" p={2}>
             <Box display="flex" justifyContent="space-between" mb={2}>
@@ -634,32 +720,22 @@ const Inboxplus = () => {
                     onClick={() => setSelectedEmail(email)}
                   >
                     <CardContent>
-                      <Typography variant="subtitle1" fontWeight="bold">
+                      {/* <Typography variant="subtitle1" fontWeight="bold">
                         {email.subject?.slice(1).trim() || "(No Subject)"}
-                      </Typography>
-                      <Typography
+                      </Typography> */}
+                      <Typography variant="subtitle1" fontWeight="bold">
+  {getCleanSubject(email.subject) || "(No Subject)"}
+</Typography>
+
+                      {/* <Typography
                         variant="body2"
                         color="textSecondary"
                         sx={{ mt: 0.5 }}
                       >
                         From: {email.from || "Unknown"}
-                      </Typography>
+                      </Typography> */}
                       
-                      {/* {emailType && (
-                        <Typography
-                          variant="caption"
-                          sx={{
-                            px: 1.5,
-                            py: 0.3,
-                            borderRadius: 1,
-                            bgcolor: "#e3f2fd",
-                            color: "#1565c0",
-                            fontWeight: 500,
-                          }}
-                        >
-                          {emailType.toUpperCase()}
-                        </Typography>
-                      )} */}
+                      
                     </CardContent>
                   </Card>
                 );
@@ -668,39 +744,129 @@ const Inboxplus = () => {
           </Box>
 
           {/* Right side — Email Viewer */}
-          <Box width="55%" p={3} overflow="auto">
-            {selectedEmail ? (
-              <Card variant="outlined">
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    {selectedEmail.subject?.slice(1).trim()}
-                  </Typography>
-                  <Typography marginBottom={3} variant="body2" color="textSecondary" gutterBottom>
-                    From: {selectedEmail.from}
-                  </Typography>
-                  
-                  <Box
-                    sx={{
-                      borderTop: "1px solid #ddd",
-                      pt: 2,
-                      whiteSpace: "pre-wrap",
-                    }}
-                    dangerouslySetInnerHTML={{
-                      __html:
-                        typeof selectedEmail.body === "string"
-                          ? selectedEmail.body
-                          : "No content available",
-                    }}
-                  />
-                </CardContent>
-              </Card>
+          
+          <Box width="55%" p={0} overflow="auto">
+  {selectedEmail ? (
+    <Card variant="outlined" sx={{ height: "100%" }}>
+      {/* HEADER */}
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        px={3}
+        py={2}
+        sx={{ backgroundColor: "#f9fafb" }}
+      >
+        <Box>
+          {/* <Typography variant="h6">
+            {selectedEmail.subject?.slice(1).trim()}
+          </Typography> */}
+          <Typography variant="h6">
+  {getCleanSubject(selectedEmail.subject)}
+</Typography>
+
+          {/* <Typography variant="body2" color="text.secondary">
+            From: {selectedEmail.from}
+          </Typography> */}
+        </Box>
+
+        <Tooltip title={tab === "active" ? "Archive" : "Move to Inbox"}>
+          <IconButton onClick={handleArchiveToggle}>
+            {tab === "active" ? (
+              <ArchiveOutlinedIcon />
             ) : (
-              <Typography color="textSecondary" mt={3}>
-                Select an email to view details.
-              </Typography>
+              <UnarchiveOutlinedIcon />
             )}
+          </IconButton>
+        </Tooltip>
+      </Box>
+
+      <Divider />
+
+      {/* BODY */}
+      <CardContent>
+        
+        <Box
+          sx={{
+            whiteSpace: "pre-wrap",
+            lineHeight: 1.7,
+          }}
+          dangerouslySetInnerHTML={{
+            __html:
+              typeof selectedEmail.body === "string"
+                ? selectedEmail.body
+                : "No content available",
+          }}
+        />
+         {/* ATTACHMENTS */}
+{selectedEmail.attachments?.length > 0 && (
+  <>
+    <Divider sx={{ my: 3 }} />
+
+    <Typography variant="subtitle2" color="text.secondary" mb={1}>
+      {selectedEmail.attachments.length} attachment · Scanned by Gmail
+    </Typography>
+
+    <Box display="flex" gap={2} flexWrap="wrap">
+      {selectedEmail.attachments.map((file, index) => (
+        <Box
+          key={index}
+          onClick={() =>
+            window.open(
+              `${EMAIL_SYNC}/user/emailsync/attachment/${emailSyncEmail}/${selectedEmail.id}/${file.attachmentId}`,
+              "_blank"
+            )
+          }
+          sx={{
+            width: 200,
+            border: "1px solid #ddd",
+            borderRadius: 1,
+            cursor: "pointer",
+            overflow: "hidden",
+            "&:hover": { boxShadow: 3 },
+          }}
+        >
+          {/* PDF PREVIEW PLACEHOLDER */}
+          <Box
+            height={120}
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            sx={{ backgroundColor: "#f5f5f5" }}
+          >
+            <Typography fontSize={42}>📄</Typography>
+          </Box>
+
+          {/* FILE NAME */}
+          <Box p={1}>
+            <Typography variant="body2" noWrap title={file.filename}>
+              {file.filename}
+            </Typography>
           </Box>
         </Box>
+      ))}
+    </Box>
+  </>
+)}
+
+      </CardContent>
+    </Card>
+  ) : (
+    <Box
+      height="100%"
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+    >
+      <Typography color="text.secondary">
+        Select an email to read
+      </Typography>
+    </Box>
+  )}
+</Box>
+
+        </Box>
+        </>
       )}
 
       {/* Drawer — Filters */}
@@ -752,6 +918,38 @@ export default Inboxplus;
 
 
 
+{/* <Box width="55%" p={3} overflow="auto">
+            {selectedEmail ? (
+              <Card variant="outlined">
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>
+                    {selectedEmail.subject?.slice(1).trim()}
+                  </Typography>
+                  <Typography marginBottom={3} variant="body2" color="textSecondary" gutterBottom>
+                    From: {selectedEmail.from}
+                  </Typography>
+                  
+                  <Box
+                    sx={{
+                      borderTop: "1px solid #ddd",
+                      pt: 2,
+                      whiteSpace: "pre-wrap",
+                    }}
+                    dangerouslySetInnerHTML={{
+                      __html:
+                        typeof selectedEmail.body === "string"
+                          ? selectedEmail.body
+                          : "No content available",
+                    }}
+                  />
+                </CardContent>
+              </Card>
+            ) : (
+              <Typography color="textSecondary" mt={3}>
+                Select an email to view details.
+              </Typography>
+            )}
+          </Box> */}
 
 
 
