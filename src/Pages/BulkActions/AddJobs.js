@@ -1322,7 +1322,7 @@ const [clientFacingJobs, setClientFacingJobs] = useState([]);
           taxTotal: invoiceData.summary.taxTotal || "",
           total: invoiceData.summary.total || "",
         },
-        paidAmount: "",
+      paidAmount: 0,
         invoiceStatus: "Pending",
         balanceDueAmount: "",
       });

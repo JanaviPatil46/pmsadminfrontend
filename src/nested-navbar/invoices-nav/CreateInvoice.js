@@ -656,7 +656,7 @@ const setDefaultTeamMember = (users) => {
         total: totalAmount,
       },
       active: "true",
-      paidAmount: "",
+      paidAmount: 0,
       invoiceStatus: "Pending",
       balanceDueAmount: "",
     });

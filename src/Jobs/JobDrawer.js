@@ -2665,7 +2665,7 @@ console.log("invoiceData", invoiceData);
           taxTotal: invoiceData.summary.taxTotal || 0,
           total: invoiceData.summary.total || 0,
         },
-        paidAmount: "",
+      paidAmount: 0,
         invoiceStatus: "Pending",
         balanceDueAmount: "",
       });

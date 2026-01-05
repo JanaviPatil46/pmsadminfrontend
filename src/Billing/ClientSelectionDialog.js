@@ -24,33 +24,11 @@ const ClientSelectionDialog = ({ open, onClose, handleDrawerClose }) => {
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState(null);
 
-  // const fetchAccountData = async () => {
-  //   try {
-  //     // const response = await fetch(
-  //     //   `${ACCOUNT_API}/accounts/account/accountdetailslist/true`
-  //     // );
-  //     // const data = await response.json();
-  //        const url = "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true"
-  //         const response = await fetch(url);
-  //         const data = await response.json();
-  //     setAccountData(data.accounts);
-  //   } catch (error) {
-  //     console.error("Error fetching data:", error);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   fetchAccountData();
-  // }, []);
-
-  // const accountOptions = accountData.map((account) => ({
-  //   value: account._id,
-  //   label: account.accountName,
-  // }));
+ 
 
   useEffect(() => {
   fetchAccountData();
-}, []);
+}, [open]);
 
 const fetchAccountData = async () => {
   try {

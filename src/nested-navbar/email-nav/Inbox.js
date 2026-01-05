@@ -11,7 +11,7 @@ import {
   Drawer,
   Checkbox,
   FormGroup,
-  FormControlLabel,
+  FormControlLabel,Dialog, DialogTitle, DialogContent,
 } from "@mui/material";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import CloseIcon from "@mui/icons-material/Close";
@@ -23,6 +23,11 @@ import { useParams } from "react-router-dom";
 import Divider from "@mui/material/Divider";
 import Tooltip from "@mui/material/Tooltip";
 import { toast } from "react-toastify";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import ImageIcon from "@mui/icons-material/Image";
+import DescriptionIcon from "@mui/icons-material/Description";
+import TableChartIcon from "@mui/icons-material/TableChart";
+import FolderZipIcon from "@mui/icons-material/FolderZip";
 
 const Inboxplus = () => {
   const { data } = useParams();
@@ -31,7 +36,8 @@ const Inboxplus = () => {
   const EMAIL_SYNC = process.env.REACT_APP_EMAILSYNC_API;
   const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
   const [tab, setTab] = useState("active"); // active | archived
-
+ const [openPdf, setOpenPdf] = useState(false);
+  const [activeAttachment, setActiveAttachment] = useState(null);
   const { logindata } = useContext(LoginContext);
   const [loginuserid, setLoginUserId] = useState();
   const [userdata, setuserdata] = useState();
@@ -89,26 +95,7 @@ const Inboxplus = () => {
     return null;
   };
 
-  useEffect(() => {
-    const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
-    const role = localStorage.getItem("userRole");
-    setUserRole(role);
-    if (role === "TeamMember") {
-      fetchTeamMemberAccounts(storedData?.teammember?.userid);
-    }
-  }, []);
 
-  const fetchTeamMemberAccounts = async (userId) => {
-    try {
-      const response = await axios.get(
-        `${ACCOUNT_API}/accounts/getaccounts/${userId}/true`
-      );
-      const ids = response.data.accountlist?.map((a) => a.id) || [];
-      setAccountIds(ids);
-    } catch (error) {
-      console.error("Error fetching team member accounts:", error);
-    }
-  };
 
   useEffect(() => {
     const fetchEmails = async () => {
@@ -121,11 +108,7 @@ const Inboxplus = () => {
         );
         let emails = res.data.emails || [];
 
-        if (userRole === "TeamMember" && accountIds.length > 0) {
-          emails = emails.filter((email) =>
-            accountIds.some((id) => email.subject?.includes(id))
-          );
-        }
+      
 
         setEmailList(emails);
         console.log("Fetched emails:", emails);
@@ -176,22 +159,7 @@ const extractMongoIdFromSubject = (subject = "") => {
   return match ? match[0] : null;
 };
 
-  // const filteredEmails = emailList.filter((email) => {
-  //   if (!email.subject?.startsWith("#")) return false;
-
-  //   if (userRole === "TeamMember" && accountIds.length > 0) {
-  //     const hasAccountId = accountIds.some((id) => email.subject.includes(id));
-  //     if (!hasAccountId) return false;
-  //   }
-
-  //   const activeFilters = Object.values(checkedItems).some(Boolean);
-  //   if (activeFilters) {
-  //     const type = getEmailType(email.subject);
-  //     if (!type || !checkedItems[type]) return false;
-  //   }
-
-  //   return true;
-  // });
+ 
 const filteredEmails = emailList.filter((email) => {
   if (!email.subject) return false;
 
@@ -201,13 +169,13 @@ const filteredEmails = emailList.filter((email) => {
   // 2. If route param exists, strictly match it
   if (data && subjectMongoId !== data) return false;
 
-  // 3. TeamMember account restriction (keep your logic)
-  if (userRole === "TeamMember" && accountIds.length > 0) {
-    const hasAccountId = accountIds.some((id) =>
-      email.subject.includes(id)
-    );
-    if (!hasAccountId) return false;
-  }
+  // // 3. TeamMember account restriction (keep your logic)
+  // if (userRole === "TeamMember" && accountIds.length > 0) {
+  //   const hasAccountId = accountIds.some((id) =>
+  //     email.subject.includes(id)
+  //   );
+  //   if (!hasAccountId) return false;
+  // }
 
   // 4. Apply checkbox filters
   const activeFilters = Object.values(checkedItems).some(Boolean);
@@ -242,6 +210,71 @@ const filteredEmails = emailList.filter((email) => {
         : "Email moved to Inbox successfully"
     );
   };
+const getAttachmentType = (att) => {
+  const name = att?.filename?.toLowerCase() || "";
+  const mime = att?.mimeType || "";
+
+  if (mime.includes("pdf") || name.endsWith(".pdf")) return "pdf";
+  if (mime.includes("image") || /\.(jpg|jpeg|png|gif|webp)$/.test(name))
+    return "image";
+  if (mime.includes("word") || /\.(doc|docx)$/.test(name)) return "word";
+  if (mime.includes("excel") || /\.(xls|xlsx)$/.test(name)) return "excel";
+  if (mime.includes("zip") || /\.(zip|rar)$/.test(name)) return "zip";
+
+  return "file";
+};
+const getAttachmentIcon = (type) => {
+  switch (type) {
+    case "pdf":
+      return <PictureAsPdfIcon color="error" />;
+    case "image":
+      return <ImageIcon color="primary" />;
+    case "word":
+      return <DescriptionIcon color="info" />;
+    case "excel":
+      return <TableChartIcon color="success" />;
+    case "zip":
+      return <FolderZipIcon color="warning" />;
+    default:
+      return <DescriptionIcon />;
+  }
+};
+const handleAttachmentClick = (att) => {
+  const type = getAttachmentType(att);
+
+  const fileUrl = `${EMAIL_SYNC}/emailsync/user/attachment/${emailSyncEmail}/${selectedEmail.id}/${att.attachmentId}`;
+
+  // Preview only image & PDF
+  if (type === "image" || type === "pdf") {
+    setActiveAttachment(att);
+    setOpenPdf(true);
+    return;
+  }
+
+  // Excel / Word / others → download
+  downloadFile(fileUrl, att.filename);
+};
+
+const downloadFile = async (url, filename) => {
+  try {
+    const response = await fetch(url);
+    const blob = await response.blob();
+
+    const blobUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = blobUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+
+    link.remove();
+    window.URL.revokeObjectURL(blobUrl);
+  } catch (err) {
+    console.error("Download failed", err);
+  }
+};
+
 
   return (
     <>
@@ -317,20 +350,11 @@ const filteredEmails = emailList.filter((email) => {
                       onClick={() => setSelectedEmail(email)}
                     >
                       <CardContent>
-                        {/* <Typography variant="subtitle1" fontWeight="bold">
-                        {email.subject?.slice(1).trim() || "(No Subject)"}
-                      </Typography> */}
+                        
                         <Typography variant="subtitle1" fontWeight="bold">
                           {getCleanSubject(email.subject) || "(No Subject)"}
                         </Typography>
 
-                        {/* <Typography
-                        variant="body2"
-                        color="textSecondary"
-                        sx={{ mt: 0.5 }}
-                      >
-                        From: {email.from || "Unknown"}
-                      </Typography> */}
                       </CardContent>
                     </Card>
                   );
@@ -353,16 +377,12 @@ const filteredEmails = emailList.filter((email) => {
                     sx={{ backgroundColor: "#f9fafb" }}
                   >
                     <Box>
-                      {/* <Typography variant="h6">
-            {selectedEmail.subject?.slice(1).trim()}
-          </Typography> */}
+                    
                       <Typography variant="h6">
                         {getCleanSubject(selectedEmail.subject)}
                       </Typography>
 
-                      {/* <Typography variant="body2" color="text.secondary">
-            From: {selectedEmail.from}
-          </Typography> */}
+                    
                     </Box>
 
                     <Tooltip
@@ -394,52 +414,101 @@ const filteredEmails = emailList.filter((email) => {
                             : "No content available",
                       }}
                     />
-                     {/* ATTACHMENTS */}
-  {selectedEmail.attachments?.length > 0 && (
-    <>
-      <Divider sx={{ my: 3 }} />
+  {/* ATTACHMENTS */}
+                    {selectedEmail.attachments?.length > 0 && (
+                      <>
+                        <Divider sx={{ my: 3 }} />
 
-      <Typography variant="subtitle1" fontWeight="bold">
-        📎 Attachments ({selectedEmail.attachments.length})
-      </Typography>
+                        <Typography
+                          variant="subtitle2"
+                          color="text.secondary"
+                          mb={1}
+                        >
+                          {selectedEmail.attachments.length} attachment ·
+                          Scanned by Gmail
+                        </Typography>
 
-      {selectedEmail.attachments.map((file, index) => (
-        <Box
-          key={index}
-          mt={1.5}
-          p={1.5}
-          display="flex"
-          alignItems="center"
-          justifyContent="space-between"
-          sx={{
-            border: "1px solid #e0e0e0",
-            borderRadius: 1,
-            backgroundColor: "#fafafa",
-          }}
-        >
-          <Box>
-            <Typography fontWeight={500}>{file.filename}</Typography>
-            <Typography variant="caption" color="text.secondary">
-              {file.mimeType}
-            </Typography>
-          </Box>
+                  <Box display="flex" gap={2} flexWrap="wrap">
+  {selectedEmail.attachments.map((att, i) => {
+    const type = getAttachmentType(att);
+    const isImage = type === "image";
 
-          <Button
-            size="small"
-            variant="outlined"
-            onClick={() => {
-              const link = document.createElement("a");
-              link.href = `data:${file.mimeType};base64,${file.data}`;
-              link.download = file.filename;
-              link.click();
+    const previewUrl = isImage
+      ? `${EMAIL_SYNC}/emailsync/user/attachment/${emailSyncEmail}/${selectedEmail.id}/${att.attachmentId}`
+      : null;
+
+    return (
+      <Card
+        key={i}
+        sx={{
+          width: 160,
+          cursor: "pointer",
+          border: "1px solid #e0e0e0",
+          overflow: "hidden",
+        }}
+        // onClick={() => {
+        //   setActiveAttachment(att);
+        //   setOpenPdf(true);
+        // }}
+         onClick={() => handleAttachmentClick(att)}
+      >
+        {/* IMAGE PREVIEW */}
+        {isImage ? (
+          <Box
+            sx={{
+              height: 110,
+              backgroundColor: "#f5f5f5",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            Download
-          </Button>
-        </Box>
-      ))}
-    </>
-  )}
+            <img
+              src={previewUrl}
+              alt={att.filename}
+              style={{
+                maxWidth: "100%",
+                maxHeight: "100%",
+                objectFit: "cover",
+              }}
+            />
+          </Box>
+        ) : (
+          <Box
+            sx={{
+              height: 110,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "#fafafa",
+            }}
+          >
+            {getAttachmentIcon(type)}
+          </Box>
+        )}
+
+        {/* FOOTER */}
+        <CardContent sx={{ p: 1.5 }}>
+          <Typography variant="body2" noWrap>
+            {att.filename}
+          </Typography>
+
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ textTransform: "uppercase" }}
+          >
+            {type}
+          </Typography>
+        </CardContent>
+      </Card>
+    );
+  })}
+</Box>
+
+
+                      </>
+                    )}
                   </CardContent>
                 </Card>
               ) : (
@@ -458,7 +527,29 @@ const filteredEmails = emailList.filter((email) => {
           </Box>
         </>
       )}
+      <Dialog
+        open={openPdf}
+        onClose={() => setOpenPdf(false)}
+        fullWidth
+        maxWidth="lg"
+      >
+        <DialogTitle sx={{ display: "flex", justifyContent: "space-between" }}>
+          {activeAttachment?.filename}
+          <IconButton onClick={() => setOpenPdf(false)}>✕</IconButton>
+        </DialogTitle>
 
+        <DialogContent sx={{ height: "80vh", p: 0 }}>
+          {activeAttachment && (
+            <iframe
+              src={`${EMAIL_SYNC}/emailsync/user/attachment/${emailSyncEmail}/${selectedEmail.id}/${activeAttachment.attachmentId}`}
+              title="PDF Viewer"
+              width="100%"
+              height="100%"
+              style={{ border: "none" }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
       {/* Drawer — Filters */}
       <Drawer
         anchor="right"
