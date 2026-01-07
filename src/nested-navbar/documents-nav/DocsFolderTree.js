@@ -310,7 +310,24 @@ const DocsFolderTree = () => {
       }
       setSelectAll(!selectAll);
     };
-   
+    const [emails, setEmails] = useState([]);
+     useEffect(() => {
+    const fetchEmails = async () => {
+      try {
+        const res = await axios.get(
+          `https://snptaxes.com/api/accounts/contacts-emails/${accountId}`
+        );
+        setEmails(res.data.emails);
+        console.log("Fetched emails:", res.data.emails);
+      } catch (err) {
+        console.error("Error fetching emails:", err);
+      }
+    };
+
+    if (accountId) {
+      fetchEmails();
+    }
+  }, [accountId]);
     // Toggle signature and request token
     const toggleSignStatus = async (item) => {
       try {
@@ -683,7 +700,7 @@ const DocsFolderTree = () => {
 // 🗑️ Move File or Folder to Trash (Soft delete)
 const trashItem = async (item) => {
   if (!item?.path) return alert("Invalid path");
-
+console.log("trash path", item.path);
   const confirmTrash = window.confirm(
     `Are you sure you want to move "${item.name}" to Trash?`
   );
