@@ -219,7 +219,7 @@ useEffect(() => {
   };
 
   const options = useMemo(() => countryList().getData(), []);
-
+console.log("country options", options);
   return (
     <Box>
       <FormControl component="fieldset" margin="normal" fullWidth>
@@ -320,7 +320,8 @@ useEffect(() => {
             fullWidth
             options={options}
             getOptionLabel={(option) => option.label}
-            value={accountData.country || null}
+            // value={accountData.country || null}
+              value={options.find(opt => opt.label === accountData.country?.name) || null} 
             onChange={(event, newValue) =>
               dispatch(setAccountData({ country: newValue }))
             }
