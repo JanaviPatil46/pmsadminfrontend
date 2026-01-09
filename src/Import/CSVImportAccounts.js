@@ -74,7 +74,7 @@ const AccountCSVImport = () => {
             r["Linked Contact #4"],
           ],
           tags: ["69425a8af7dd56fe66fd8538","69425aacf7dd56fe66fd853a"], // optional
-          adminUserId: "691d3b4c76f4e9c00c44f388", // pass from auth/user context
+          adminUserId: "6879ebab22b8b2db5c5bb0fc", // pass from auth/user context
         };
 
         await axios.post(

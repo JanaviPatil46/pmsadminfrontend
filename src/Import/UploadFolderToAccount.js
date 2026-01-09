@@ -666,7 +666,7 @@ console.log("targetFolderPath",targetFolderPath)
     formData.append("folderZip", selectedZip);
     formData.append("folderName", folderName);
     formData.append("folderPath", targetFolderPath);
-
+formData.append("accountId", selectedAccount._id);
     try {
       await axios.post(
         "https://www.snptaxes.com/api/accountsdoc/account-upload-folder",
@@ -677,6 +677,7 @@ console.log("targetFolderPath",targetFolderPath)
       toast.success("ZIP uploaded successfully");
       setSelectedZip(null);
       setFolderName("");
+      fetchAccounts();
     } catch (err) {
       console.error(err);
       toast.error("Upload failed");
