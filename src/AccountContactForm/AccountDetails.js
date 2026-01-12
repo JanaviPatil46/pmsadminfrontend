@@ -228,7 +228,7 @@ const assignedMembers = teamMemberList.filter(user =>
                       checked={c.canLogin}
                       onClick={() => handleSwitchClick(c)}
                       color="primary"
-                      disabled
+                   
                     />
                   }
                   label="Login"
@@ -239,7 +239,7 @@ const assignedMembers = teamMemberList.filter(user =>
                       checked={c.canNotify}
                       onClick={() => handleNotifyToggle(c)} // ✅ no dialog
                       color="primary"
-                      disabled
+                     
                     />
                   }
                   label="Notify"
@@ -251,7 +251,7 @@ const assignedMembers = teamMemberList.filter(user =>
                       checked={c.canEmailSync}
                       onClick={() => handleEmailSyncToggle(c)} // ✅ no dialog
                       color="primary"
-                      disabled
+                      
                     />
                   }
                   label="EmailSync"

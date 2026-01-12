@@ -2811,7 +2811,7 @@ const handleConfirmDelete = async () => {
           <DialogTitle>
             Bulk-edit login, notify, email sync
             <Typography variant="subtitle1">
-              For a selected account
+              For a selected  {selected.length} accounts
             </Typography>
             <IconButton
               onClick={handleCloseSidebar}

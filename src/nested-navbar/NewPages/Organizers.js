@@ -248,68 +248,226 @@ const handleRenameConfirm = async (id, newName) => {
   const handleClosePreview = () => {
        setShowForm(false);
   };
-const handleDownload = async (organizer) => {
+  const handleDownload = async (organizer) => {
   if (!organizer) return;
 
-  // Construct sections HTML (only answered questions)
-  const sectionsHtml = (organizer.sections || [])
-    .map((section) => {
-      const answeredElements = (section.formElements || []).filter(
-        (el) => el.textvalue && el.textvalue.trim() !== ""
-      );
+  // ------------------ CLEAN TEXT FUNCTION ------------------
+  const stripHtml = (html) => {
+    if (!html) return "";
 
-      if (answeredElements.length === 0) return "";
+    let text = html;
 
-      const formElementsHtml = answeredElements
-        .map(
-          (element) => `
-        <div style="margin-bottom: 10px;">
-          <strong>${element.text}</strong>
-          <div style="margin-left: 10px; margin-top: 5px;">
-            <strong>Answer:</strong> ${element.textvalue}
-          </div>
-        </div>
-      `
-        )
-        .join("");
+    // remove spaced-out html tags:  < p > , < / b r >
+    text = text.replace(/<\s*\/?\s*[^>]*\s*>/g, " ");
 
-      return `
-        <div style="margin-bottom: 15px;">
-          <h3 style="margin-bottom: 5px;">${section.name}</h3>
-          ${formElementsHtml}
-        </div>
-      `;
-    })
-    .join("");
+    // remove normal html tags
+    text = text.replace(/<[^>]+>/g, " ");
 
-  // Wrap in a container
-  const containerHtml = `
-    <div style="font-family: Arial, sans-serif; font-size: 12px; padding: 20px;">
-      <h2>${organizer.organizerName}</h2>
-      ${sectionsHtml || "<p>No answered questions available.</p>"}
-    </div>
-  `;
+    // decode html entities
+    const textarea = document.createElement("textarea");
+    textarea.innerHTML = text;
+    text = textarea.value;
 
-  // Create a temporary container in DOM
-  const tempDiv = document.createElement("div");
-  tempDiv.innerHTML = containerHtml;
-  document.body.appendChild(tempDiv);
+    // remove weird MS Word / non-ASCII garbage characters
+    text = text.replace(/[^\x00-\x7F]+/g, " ");
 
-  // Render HTML to canvas
-  const canvas = await html2canvas(tempDiv, { scale: 2 });
-  const imgData = canvas.toDataURL("image/png");
+    // remove control characters
+    text = text.replace(/[\u0000-\u001F\u007F-\u009F]/g, " ");
 
-  // Remove temporary container
-  document.body.removeChild(tempDiv);
+    // fix letter separated text like: W e l c o m e
+    text = text.replace(/(\w)\s(?=\w)/g, "$1");
 
-  // Generate PDF
+    // collapse extra spaces and line breaks
+    text = text.replace(/\s+/g, " ").trim();
+
+    return text;
+  };
+
+  // ------------------ PDF INIT ------------------
   const pdf = new jsPDF("p", "pt", "a4");
-  const pdfWidth = pdf.internal.pageSize.getWidth();
-  const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
 
-  pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-  pdf.save(`${organizer.organizerName}_answered.pdf`);
+  let y = 40;
+
+  // ------------------ TITLE ------------------
+  pdf.setFontSize(16);
+  pdf.text(organizer?.organizerName || "Organizer", 40, y);
+  y += 25;
+
+  // ------------------ LOOP SECTIONS ------------------
+  for (const section of organizer?.sections || []) {
+    if (!section) continue;
+
+    // add new page if needed
+    if (y > pageHeight - 80) {
+      pdf.addPage();
+      y = 40;
+    }
+
+    // section title
+    pdf.setFontSize(14);
+    pdf.text(section?.name || "Section", 40, y);
+    y += 20;
+
+    // ------------------ LOOP FORM ELEMENTS ------------------
+    for (const el of section?.formElements || []) {
+      if (!el) continue;
+
+      // skip unanswered elements
+      if (
+        !el.textvalue &&
+        !el.files?.length &&
+        !el.imageUrl &&
+        !el.images?.length
+      ) {
+        continue;
+      }
+
+      // page break protection
+      if (y > pageHeight - 120) {
+        pdf.addPage();
+        y = 40;
+      }
+
+      // question
+      pdf.setFontSize(12);
+      pdf.text(`Q: ${stripHtml(el.text || "")}`, 40, y);
+      y += 16;
+
+      // ------------------ TEXT ANSWER ------------------
+      if (el.textvalue) {
+        const cleanAnswer = stripHtml(el.textvalue);
+
+        const textLines = pdf.splitTextToSize(
+          `A: ${cleanAnswer}`,
+          pageWidth - 80
+        );
+        pdf.text(textLines, 40, y);
+        y += textLines.length * 14;
+      }
+
+      // ------------------ IMAGES ------------------
+      if (el.imageUrl || el.images?.length) {
+        const images = el.images || [el.imageUrl];
+
+        for (const img of images) {
+          try {
+            const res = await fetch(img, { mode: "cors" });
+            const blob = await res.blob();
+
+            const reader = new FileReader();
+            await new Promise((resolve) => {
+              reader.onloadend = resolve;
+              reader.readAsDataURL(blob);
+            });
+
+            const imgWidth = 180;
+            const imgHeight = 130;
+
+            if (y > pageHeight - 180) {
+              pdf.addPage();
+              y = 40;
+            }
+
+            pdf.addImage(reader.result, "JPEG", 40, y, imgWidth, imgHeight);
+            y += imgHeight + 10;
+          } catch (e) {
+            pdf.text("Image could not be loaded", 40, y);
+            y += 14;
+          }
+        }
+      }
+
+      // ------------------ FILE LIST ------------------
+      if (el.files?.length) {
+        pdf.setFontSize(11);
+
+        for (const f of el.files) {
+          const fname = f?.name || "File";
+
+          const line = pdf.splitTextToSize(
+            `Attached File: ${fname}`,
+            pageWidth - 80
+          );
+
+          pdf.text(line, 40, y);
+          y += line.length * 14;
+        }
+      }
+
+      y += 6;
+    }
+
+    y += 10;
+  }
+
+  // ------------------ SAVE PDF ------------------
+  pdf.save(`${organizer?.organizerName || "organizer"}_answers.pdf`);
 };
+
+// const handleDownload = async (organizer) => {
+//   if (!organizer) return;
+// console.log("download organizer",organizer)
+//   // Construct sections HTML (only answered questions)
+//   const sectionsHtml = (organizer.sections || [])
+//     .map((section) => {
+//       const answeredElements = (section.formElements || []).filter(
+//         (el) => el.textvalue && el.textvalue.trim() !== ""
+//       );
+
+//       if (answeredElements.length === 0) return "";
+
+//       const formElementsHtml = answeredElements
+//         .map(
+//           (element) => `
+//         <div style="margin-bottom: 10px;">
+//           <strong>${element.text}</strong>
+//           <div style="margin-left: 10px; margin-top: 5px;">
+//             <strong>Answer:</strong> ${element.textvalue}
+//           </div>
+//         </div>
+//       `
+//         )
+//         .join("");
+
+//       return `
+//         <div style="margin-bottom: 15px;">
+//           <h3 style="margin-bottom: 5px;">${section.name}</h3>
+//           ${formElementsHtml}
+//         </div>
+//       `;
+//     })
+//     .join("");
+
+//   // Wrap in a container
+//   const containerHtml = `
+//     <div style="font-family: Arial, sans-serif; font-size: 12px; padding: 20px;">
+//       <h2>${organizer.organizerName}</h2>
+//       ${sectionsHtml || "<p>No answered questions available.</p>"}
+//     </div>
+//   `;
+
+//   // Create a temporary container in DOM
+//   const tempDiv = document.createElement("div");
+//   tempDiv.innerHTML = containerHtml;
+//   document.body.appendChild(tempDiv);
+
+//   // Render HTML to canvas
+//   const canvas = await html2canvas(tempDiv, { scale: 2 });
+//   const imgData = canvas.toDataURL("image/png");
+
+//   // Remove temporary container
+//   document.body.removeChild(tempDiv);
+
+//   // Generate PDF
+//   const pdf = new jsPDF("p", "pt", "a4");
+//   const pdfWidth = pdf.internal.pageSize.getWidth();
+//   const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+//   pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+//   pdf.save(`${organizer.organizerName}_answered.pdf`);
+// };
   
   // const printOrganizerData = (id) => {
   //   const organizer = organizerTemplatesData.find((org) => org._id === id);
@@ -374,6 +532,73 @@ const handleDownload = async (organizer) => {
   //     toast.error("Organizer not found.");
   //   }
   // };
+// const handleDownload = async (organizer) => {
+//   if (!organizer) return;
+
+//   const pdf = new jsPDF("p", "pt", "a4");
+//   const pageWidth = pdf.internal.pageSize.getWidth();
+//   const pageHeight = pdf.internal.pageSize.getHeight();
+
+//   let y = 40;
+
+//   // Title
+//   pdf.setFontSize(16);
+//   pdf.text(organizer.organizerName || "Organizer", 40, y);
+//   y += 30;
+
+//   (organizer.sections || []).forEach((section) => {
+//     if (!section) return;
+
+//     // Section title
+//     pdf.setFontSize(14);
+//     pdf.text(section.name || "Section", 40, y);
+//     y += 25;
+
+//     (section.formElements || []).forEach((el) => {
+//       if (!el) return;
+
+//       // Skip unanswered
+//       if (!el.textvalue && !el.files && !el.imageUrl) return;
+
+//       // Page break if required
+//       if (y > pageHeight - 80) {
+//         pdf.addPage();
+//         y = 40;
+//       }
+
+//       // Question text
+//       pdf.setFontSize(12);
+//       pdf.text(`Q: ${el.text || ""}`, 40, y);
+//       y += 20;
+
+//       // Text answer
+//       if (el.textvalue) {
+//         const textLines = pdf.splitTextToSize(`A: ${el.textvalue}`, pageWidth - 80);
+//         pdf.text(textLines, 40, y);
+//         y += textLines.length * 15;
+//       }
+
+     
+     
+
+//       // FILE answers (pdf/doc/xls etc)
+//       if (el.files && el.files.length > 0) {
+//         pdf.setFontSize(11);
+//         el.files.forEach((f) => {
+//           const textLines = pdf.splitTextToSize(`Attached File: ${f.name}`, pageWidth - 80);
+//           pdf.text(textLines, 40, y);
+//           y += textLines.length * 15;
+//         });
+//       }
+
+//       y += 10;
+//     });
+
+//     y += 20;
+//   });
+
+//   pdf.save(`${organizer.organizerName || "organizer"}_full.pdf`);
+// };
 
 const printOrganizerData = (id) => {
   const organizer = organizerTemplatesData.find((org) => org._id === id);

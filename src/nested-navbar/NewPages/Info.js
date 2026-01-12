@@ -146,18 +146,18 @@ const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
         { canLogin: newCanLoginValue }
       );
       // If enabling login access, send activation email
-      if (newCanLoginValue) {
-        const emailSent = await sendActivationEmail(selectedContact);
+      // if (newCanLoginValue) {
+      //   const emailSent = await sendActivationEmail(selectedContact);
 
-        if (emailSent) {
-          // Show success message
-          alert(`Activation email sent to ${selectedContact.contact.email}`);
-        } else {
-          alert(
-            `Failed to send activation email to ${selectedContact.contact.email}`
-          );
-        }
-      }
+      //   if (emailSent) {
+      //     // Show success message
+      //     alert(`Activation email sent to ${selectedContact.contact.email}`);
+      //   } else {
+      //     alert(
+      //       `Failed to send activation email to ${selectedContact.contact.email}`
+      //     );
+      //   }
+      // }
       setAccount((prev) => ({
         ...prev,
         contacts: prev.contacts.map((c) =>
@@ -529,16 +529,19 @@ const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
                         checked={c.canLogin}
                         onChange={() => handleSwitchClick(c)}
                         color="primary"
+                        disabled
                       />
                       <Switch
                         checked={c.canNotify}
                         onChange={() => handleNotifyToggle(c)}
                         color="primary"
+                        disabled
                       />
                       <Switch
                         checked={c.canEmailSync}
                         onChange={() => handleEmailSyncToggle(c)}
                         color="primary"
+                        disabled
                       />
                       <MenuDropdown
                         contact={c}
