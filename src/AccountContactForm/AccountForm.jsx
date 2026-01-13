@@ -316,7 +316,7 @@ console.log("country options", options);
             Address
           </FormLabel>
 
-          <Autocomplete
+          {/* <Autocomplete
             fullWidth
             options={options}
             getOptionLabel={(option) => option.label}
@@ -334,7 +334,23 @@ console.log("country options", options);
               />
             )}
             sx={{ mt: 1 }}
-          />
+          /> */}
+<Autocomplete
+  fullWidth
+  options={options}
+  getOptionLabel={(option) => option.label}
+  value={options.find(opt => opt.label === accountData?.country?.label) || null}
+  onChange={(event, newValue) =>
+    dispatch(setAccountData({ country: newValue }))
+  }
+  isOptionEqualToValue={(option, value) =>
+    option.label === value?.label
+  }
+  renderInput={(params) => (
+    <TextField {...params} margin="normal" label="Select Country" size="small" />
+  )}
+  sx={{ mt: 1 }}
+/>
 
           <TextField
             fullWidth

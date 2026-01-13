@@ -1311,16 +1311,16 @@ const [clientFacingJobs, setClientFacingJobs] = useState([]);
         lineItems: invoiceData.lineItems.map((item) => ({
           productorService: item.productorService || "",
           description: item.description || "",
-          rate: item.rate || "",
-          quantity: item.quantity || "",
-          amount: item.amount || "",
+          rate: item.rate || 0,
+          quantity: item.quantity || 0,
+          amount: item.amount || 0,
           tax: item.tax || false,
         })),
         summary: {
-          subtotal: invoiceData.summary.subtotal || "",
-          taxRate: invoiceData.summary.taxRate || "",
-          taxTotal: invoiceData.summary.taxTotal || "",
-          total: invoiceData.summary.total || "",
+          subtotal: invoiceData.summary.subtotal || 0,
+          taxRate: invoiceData.summary.taxRate || 0,
+          taxTotal: invoiceData.summary.taxTotal || 0,
+          total: invoiceData.summary.total || 0,
         },
       paidAmount: 0,
         invoiceStatus: "Pending",
@@ -1710,8 +1710,12 @@ const [clientFacingJobs, setClientFacingJobs] = useState([]);
     console.log(`Tag match result for account ${accountId}:`, hasMatch);
     return hasMatch;
   };
+  const [isProcessing, setIsProcessing] = useState(false);
     // Move handler
     const handleMove = async () => {
+        if (isProcessing) return; // safety guard
+
+  setIsProcessing(true);
       try {
         const { accountJobMap } = await createJob();
         console.log("Job mapping created:", accountJobMap);
@@ -2149,6 +2153,7 @@ const [clientFacingJobs, setClientFacingJobs] = useState([]);
           <Button
             variant="contained"
             onClick={handleMove}
+              disabled={isProcessing}
             sx={{
               backgroundColor: "var(--color-save-btn)",
               "&:hover": { backgroundColor: "var(--color-save-hover-btn)" },

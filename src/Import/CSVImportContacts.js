@@ -56,13 +56,14 @@ const CSVImportContacts = () => {
     }
     setSelectedRows(updated);
   };
-
+const [isSaving, setIsSaving] = useState(false);
   // 📌 Save Selected Contacts (POST API)
   const handleSaveContacts = async () => {
     if (selectedRows.length === 0) {
       alert("Please select at least one contact.");
       return;
     }
+     setIsSaving(true);  
 
     try {
       for (let index of selectedRows) {
@@ -102,7 +103,19 @@ const CSVImportContacts = () => {
       console.log("Error saving contacts:", error.response?.data || error.message);
       alert("Error saving contacts");
     }
+    finally {
+    setIsSaving(false);   // ✅ re-enable button
+  }
   };
+   const handleSelectAll = () => {
+  if (selectedRows.length === rows.length) {
+    // unselect all
+    setSelectedRows([]);
+  } else {
+    // select all
+    setSelectedRows(rows.map((_, index) => index));
+  }
+};
 
   return (
     <Box p={3}>
@@ -128,8 +141,13 @@ const CSVImportContacts = () => {
           color="success"
           sx={{ ml: 2 }}
           onClick={handleSaveContacts}
+            disabled={isSaving}  
         >
-          Save Contacts ({selectedRows.length})
+          {/* Save Contacts ({selectedRows.length}) */}
+            {isSaving
+    ? "Saving..."            // show loading text
+    : `Save Contacts (${selectedRows.length})`}
+
         </Button>
       )}
 
@@ -139,7 +157,15 @@ const CSVImportContacts = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell />
+               <TableCell>
+      <Checkbox
+        checked={selectedRows.length === rows.length && rows.length > 0}
+        indeterminate={
+          selectedRows.length > 0 && selectedRows.length < rows.length
+        }
+        onChange={handleSelectAll}
+      />
+    </TableCell>
                 {tableHeaders.map((header, idx) => (
                   <TableCell key={idx} sx={{ fontWeight: "bold" }}>
                     {header}

@@ -2384,7 +2384,7 @@ const [loading, setLoading] = useState(false);
       })
       .flat();
     console.log("Account Tags:", accountTags);
-
+const [isProcessing, setIsProcessing] = useState(false);
     // API endpoints
     const ACCOUNT_TASKS_API = process.env.REACT_APP_TASKS_API;
     const CHAT_API = process.env.REACT_APP_CHAT_TEMP_URL;
@@ -2689,16 +2689,16 @@ const [loading, setLoading] = useState(false);
         lineItems: invoiceData.lineItems.map((item) => ({
           productorService: item.productorService || "",
           description: item.description || "",
-          rate: item.rate || "",
-          quantity: item.quantity || "",
-          amount: item.amount || "",
+          rate: item.rate || 0,
+          quantity: item.quantity || 0,
+          amount: item.amount || 0,
           tax: item.tax || false,
         })),
         summary: {
-          subtotal: invoiceData.summary.subtotal || "",
-          taxRate: invoiceData.summary.taxRate || "",
-          taxTotal: invoiceData.summary.taxTotal || "",
-          total: invoiceData.summary.total || "",
+          subtotal: invoiceData.summary.subtotal || 0,
+          taxRate: invoiceData.summary.taxRate || 0,
+          taxTotal: invoiceData.summary.taxTotal || 0,
+          total: invoiceData.summary.total || 0,
         },
       paidAmount: 0,
         invoiceStatus: "Pending",
@@ -3098,6 +3098,9 @@ const [loading, setLoading] = useState(false);
     };
     // Move handler
     const handleMove = async () => {
+       if (isProcessing) return; // safety guard
+
+  setIsProcessing(true);
       try {
         const { accountJobMap } = await createJob();
         console.log("Job mapping created:", accountJobMap);
@@ -3162,6 +3165,9 @@ const [loading, setLoading] = useState(false);
         console.error("Operation failed:", error);
         toast.error(`Operation failed: ${error.message}`);
       }
+      finally {
+    setIsProcessing(false); // 🔑 ENABLE BUTTONS AGAIN
+  }
     };
 
     // Create job function
@@ -3559,6 +3565,7 @@ const [loading, setLoading] = useState(false);
           <Button
             variant="contained"
             onClick={handleMove}
+            disabled={isProcessing}
             sx={{
               backgroundColor: "var(--color-save-btn)",
               "&:hover": { backgroundColor: "var(--color-save-hover-btn)" },

@@ -19,6 +19,7 @@ import {
 const AccountCSVImport = () => {
   const [rows, setRows] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
+const [isSaving, setIsSaving] = useState(false);
 
   const tableHeaders = [
     "id",
@@ -58,7 +59,7 @@ const AccountCSVImport = () => {
       alert("Please select at least one account");
       return;
     }
-
+ setIsSaving(true);  
     try {
       for (let index of selectedRows) {
         const r = rows[index];
@@ -96,7 +97,21 @@ const AccountCSVImport = () => {
       console.error("Account Save Error:", error);
       alert("Error saving accounts");
     }
+    finally {
+    setIsSaving(false);   // ✅ re-enable button
+  }
   };
+
+  const handleSelectAll = () => {
+  if (selectedRows.length === rows.length) {
+    // unselect all
+    setSelectedRows([]);
+  } else {
+    // select all
+    setSelectedRows(rows.map((_, index) => index));
+  }
+};
+
 
   return (
     <Box p={3}>
@@ -115,8 +130,13 @@ const AccountCSVImport = () => {
           color="success"
           sx={{ ml: 2 }}
           onClick={handleSaveAccounts}
+            disabled={isSaving}  
         >
-          Save Accounts ({selectedRows.length})
+          {/* Save Accounts ({selectedRows.length}) */}
+            {isSaving
+    ? "Saving..."            // show loading text
+    : `Save Accounts (${selectedRows.length})`}
+
         </Button>
       )}
 
@@ -125,7 +145,16 @@ const AccountCSVImport = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell />
+                {/* <TableCell /> */}
+                <TableCell>
+      <Checkbox
+        checked={selectedRows.length === rows.length && rows.length > 0}
+        indeterminate={
+          selectedRows.length > 0 && selectedRows.length < rows.length
+        }
+        onChange={handleSelectAll}
+      />
+    </TableCell>
                 {tableHeaders.map((h, i) => (
                   <TableCell key={i} sx={{ fontWeight: "bold" }}>
                     {h}

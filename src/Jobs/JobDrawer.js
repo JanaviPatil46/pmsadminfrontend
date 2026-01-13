@@ -76,7 +76,7 @@ const JobDrawer = ({
   }, [logindata]);
   useEffect(() => {
     fetchUserData(loginuserid);
-  }, []);
+  }, [loginuserid]);
   const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
   const JOBS_API = process.env.REACT_APP_ADD_JOBS_URL;
   const JOBS_TEMP_API = process.env.REACT_APP_JOBS_TEMP_URL;
@@ -2654,9 +2654,9 @@ console.log("invoiceData", invoiceData);
         lineItems: invoiceData.lineItems.map((item) => ({
           productorService: item.productorService || "",
           description: item.description || "",
-          rate: item.rate || "",
-          quantity: item.quantity || "",
-          amount: item.amount || "",
+          rate: item.rate || 0,
+          quantity: item.quantity || 0,
+          amount: item.amount || 0,
           tax: item.tax || false,
         })),
         summary: {
