@@ -2761,7 +2761,7 @@ const [isProcessing, setIsProcessing] = useState(false);
         body: raw,
         redirect: "follow",
       };
-
+console.log("Sending chat to account...", raw);
       fetch(`${CHATTOCLIENT_API}/chats/chatsaccountwise`, requestOptions)
         .then((response) => response.json())
         .then((result) =>

@@ -455,6 +455,7 @@ const setDefaultTeamMember = (users) => {
       setCharCount(updatedTextValue.length);
     }
     setShowDropdown(false);
+    setAnchorEl(null);
   };
 
   const toggleDropdown = (event) => {
@@ -538,6 +539,7 @@ const setDefaultTeamMember = (users) => {
 
   const handleCloseDropdown = () => {
     setAnchorEl(null);
+       setShowDropdown(false);
   };
 
   const handlePayInvoiceChange = (event) => {

@@ -1538,7 +1538,7 @@ const fetchInvoiceData = async () => {
                     <TableCell>${row.summary.total}</TableCell>
                     <TableCell>${row.paidAmount}</TableCell>
                     <TableCell>${row.summary.total - row.paidAmount}</TableCell>
-                    <TableCell></TableCell>
+                    <TableCell>{row.lastPaid}</TableCell>
                     <TableCell>{row.description}</TableCell>
                     <TableCell
                       style={{

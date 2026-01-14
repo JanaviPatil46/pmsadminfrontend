@@ -673,7 +673,7 @@ const Invoice = () => {
                       cursor: "pointer",
                     }}
                   >
-                    {" "}
+                    {row.lastPaid}
                   </TableCell>
                   <TableCell>{row.description}</TableCell>
                   {/* <TableCell style={{
