@@ -82,6 +82,59 @@ const AddBulkOrganizer = ({ selectedAccounts, onClose }) => {
 //       console.log("Error:", error);
 //     }
 //   };
+// const fetchAccountsData = async () => {
+//   setLoading(true);
+//   try {
+//     const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
+//     const loginuserid = storedData?.teammember?.userid;
+//     const viewAllAccounts = storedData?.teammember?.viewallAccounts;
+
+//     console.log("UserRole:", userRole);
+//     console.log("Team Member userId:", loginuserid);
+//     console.log("viewAllAccounts:", viewAllAccounts);
+
+//     let url = "";
+
+//     // --- Same logic pattern as pipeline data ---
+//     if (userRole === "Admin") {
+//       url = `https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true`;
+//     } else {
+//       // TeamMember
+//       url =
+//         viewAllAccounts === true
+//           ? `https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true`
+//           : `https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=${filterStatus === "active"}`;
+//     }
+
+//     console.log("Fetching accounts from:", url);
+
+//     const response = await fetch(url);
+//     const data = await response.json();
+
+//     const accounts = data.accountlist || data.teamAccounts || [];
+
+//     setaccountdata(accounts);
+
+//     // Convert to dropdown options
+//     const options = accounts.map((acc) => ({
+//       value: acc._id,
+//       label: acc.accountName,
+//     }));
+//     setAccountOptions(options);
+
+//     // Pre-select previously chosen accounts
+//     const selectedOptions = options.filter((option) =>
+//       selectedAccounts.includes(option.value)
+//     );
+//     setSelectedaccount(selectedOptions);
+//     setCombinedaccountValues(selectedOptions.map((opt) => opt.value));
+
+//   } catch (error) {
+//     console.error("Error fetching account data:", error);
+//   } finally {
+//     setLoading(false);
+//   }
+// };
 const fetchAccountsData = async () => {
   setLoading(true);
   try {
@@ -135,7 +188,6 @@ const fetchAccountsData = async () => {
     setLoading(false);
   }
 };
-
 // STEP 1 — Fetch userRole first
 useEffect(() => {
   const storedUserRole = localStorage.getItem("userRole") || "";

@@ -159,74 +159,7 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
     }
     return isValid;
   };
-  //   const sendingData = async (e) => {
-  //     e.preventDefault();
-
-  //     // Validate form before proceeding
-  //     if (!validateForm()) {
-  //       return; // Stop execution if validation fails
-  //     }
-
-  //     handleNewDrawerClose();
-  //     handleDrawerClose();
-
-  //   const formattedPhoneNumbers = phoneNumbers.map(phone => phone.phone);
-
-  // console.log("formattedPhoneNumbers",formattedPhoneNumbers)
-  //     const raw = JSON.stringify([
-  //       {
-  //         firstName: firstName,
-  //         middleName: middleName,
-  //         lastName: lastName,
-  //         contactName: contactName,
-  //         companyName: companyName,
-  //         note: note,
-  //         ssn: ssn,
-  //         email: email,
-  //         // login: false,
-  //         // notify: false,
-  //         // emailSync: false,
-  //         tags: combinedValues,
-
-  //         country: selectedCountry,
-  //         streetAddress: streetAddress,
-  //         city: city,
-  //         state: state,
-  //         postalCode: postalCode,
-  //         phoneNumbers: formattedPhoneNumbers,
-  //       },
-  //     ]);
-  //     console.log(raw);
-  //     const requestOptions = {
-  //       method: "POST",
-
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: raw,
-  //       redirect: "follow",
-  //     };
-  //     const url = "https://www.snptaxes.com/api/contacts";
-  //     fetch(url, requestOptions)
-  //       .then((response) => {
-  //         if (!response.ok) {
-  //           throw new Error("Network response was not ok");
-  //         }
-  //         return response.json();
-  //       })
-  //       .then((result) => {
-  //         // Handle success
-  //         toast.success("Contact created successfully!");
-  //         //console.log('Contact ID:', result);  // Log the contactId
-  //         navigate("/clients/contacts");
-  //         // Additional logic after successful creation if needed
-  //       })
-  //       .catch((error) => {
-  //         // Handle errors
-  //         console.error(error);
-  //         toast.error("Failed to create contact");
-  //       });
-  //   };
+  
   const sendingData = async (e) => {
     e.preventDefault();
 
@@ -265,18 +198,40 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
       body: payload,
     };
 
+    // fetch("https://www.snptaxes.com/api/contacts", requestOptions)
+    //   .then((res) => {
+    //     if (!res.ok) throw new Error("Request failed");
+    //     return res.json();
+    //   })
+    //   .then(() => {
+    //     toast.success("Contact created successfully!");
+    //     navigate("/clients/contacts");
+    //   })
+    //   .catch(() => {
+    //     toast.error("Failed to create contact");
+    //   });
     fetch("https://www.snptaxes.com/api/contacts", requestOptions)
-      .then((res) => {
-        if (!res.ok) throw new Error("Request failed");
-        return res.json();
-      })
-      .then(() => {
-        toast.success("Contact created successfully!");
-        navigate("/clients/contacts");
-      })
-      .catch(() => {
-        toast.error("Failed to create contact");
-      });
+  .then(async (res) => {
+    const data = await res.json();
+
+    if (!res.ok) {
+      // Email already exists
+      if (res.status === 409) {
+        setEmaileError(data.error); // show error under email field
+        toast.warning("Entered email is already used");
+        return;
+      }
+
+      throw new Error(data.error || "Request failed");
+    }
+
+    toast.success("Contact created successfully!");
+    navigate("/clients/contacts");
+  })
+  .catch((error) => {
+    toast.error(error.message || "Failed to create contact");
+  });
+
   };
 
   const handleClose = () => {

@@ -45,6 +45,7 @@ dayjs.extend(customParseFormat);
 
 const CreateBulkJob = ({ selectedAccounts, onClose, charLimit = 4000 }) => {
   const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
+  console.log("selectedAccounts in create bulk job:", selectedAccounts);
   const JOBS_API = process.env.REACT_APP_ADD_JOBS_URL;
   const JOBS_TEMP_API = process.env.REACT_APP_JOBS_TEMP_URL;
   const USER_API = process.env.REACT_APP_USER_URL;

@@ -17,6 +17,7 @@ import {
   TextField,
   CircularProgress,
   Popover,
+  Chip,
 } from "@mui/material";
 import {
   ChevronLeft,
@@ -77,6 +78,8 @@ import {
 } from "../redux/accountContactSlice";
 import AccountDrawer from "../components/AccountContactForm/Drawer";
 import AccountContactDrawer from "../AccountContactForm/AccountContactDrawer";
+import { use } from "react";
+
 function Sidebar() {
   const StyledBadge = styled(Badge)(({ theme }) => ({
     "& .MuiBadge-badge": {
@@ -132,6 +135,27 @@ function Sidebar() {
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
+  }, []);
+const [inboxCount, setInboxCount]=useState(0);
+  useEffect(() => { 
+   
+
+let config = {
+  method: 'get',
+  maxBodyLength: Infinity,
+  url: 'http://127.0.0.1:8015/emailsync/messagesList/messages/unread-count',
+  headers: { }
+};
+
+axios.request(config)
+.then((response) => {
+  console.log(JSON.stringify(response.data));
+  setInboxCount(response.data.unreadCount);
+})
+.catch((error) => {
+  console.log(error);
+});
+
   }, []);
 
   const fetchSidebarData = async () => {
@@ -363,7 +387,6 @@ function Sidebar() {
   const handleDrawerClose = () => {
     setIsDrawerOpen(false);
     setIsOrganizerDialogOpen(false);
- 
   };
 
   const handleNewDrawerClose = () => {
@@ -381,55 +404,55 @@ function Sidebar() {
   const [isAccountDrawerOpen, setIsAccountDrawerOpen] = useState(false);
   const [selectedAccountId, setSelectedAccountId] = useState(null);
   const [isInvoiceDrawerOpen, setIsInvoiceDrawerOpen] = useState(false);
-   const [userRole, setUserRole] = useState("");
-    const [accountList, setAccountList] = useState([]);
-    const [filterStatus, setFilterStatus] = useState("active");
-    const [viewAllAccounts, setViewAllAccounts] = useState(false);
-    // const [loading, setLoading] = useState(false);
-    useEffect(() => {
-      const storedUserRole = localStorage.getItem("userRole");
-      console.log("Fetched userRole from localStorage:", storedUserRole);
-      setUserRole(storedUserRole);
-    }, []);
-    const fetchAccountsList = async () => {
-      setLoading(true);
-      try {
-        const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
-        console.log("Received stored teamMemberData:", storedData);
-  
-        const loginuserid = storedData?.teammember?.userid;
-        // const userRole = storedData?.teammember?.userrole || "Admin";
-        console.log("User role is:", userRole);
-  
-        let url;
-  
-        if (userRole === "Admin") {
+  const [userRole, setUserRole] = useState("");
+  const [accountList, setAccountList] = useState([]);
+  const [filterStatus, setFilterStatus] = useState("active");
+  const [viewAllAccounts, setViewAllAccounts] = useState(false);
+  // const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    const storedUserRole = localStorage.getItem("userRole");
+    console.log("Fetched userRole from localStorage:", storedUserRole);
+    setUserRole(storedUserRole);
+  }, []);
+  const fetchAccountsList = async () => {
+    setLoading(true);
+    try {
+      const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
+      console.log("Received stored teamMemberData:", storedData);
+
+      const loginuserid = storedData?.teammember?.userid;
+      // const userRole = storedData?.teammember?.userrole || "Admin";
+      console.log("User role is:", userRole);
+
+      let url;
+
+      if (userRole === "Admin") {
+        url = `https://www.snptaxes.com/api/accounts/list?active=${filterStatus === "active"}`;
+      } else if (userRole === "TeamMember") {
+        const viewAll = storedData?.teammember?.viewallAccounts || false;
+        setViewAllAccounts(viewAll);
+
+        if (viewAll) {
           url = `https://www.snptaxes.com/api/accounts/list?active=${filterStatus === "active"}`;
-        } else if (userRole === "TeamMember") {
-          const viewAll = storedData?.teammember?.viewallAccounts || false;
-          setViewAllAccounts(viewAll);
-  
-          if (viewAll) {
-            url = `https://www.snptaxes.com/api/accounts/list?active=${filterStatus === "active"}`;
-          } else {
-            url = `https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=${filterStatus === "active"}`;
-          }
+        } else {
+          url = `https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=${filterStatus === "active"}`;
         }
-  
-        console.log("Fetching from URL:", url);
-        const response = await axios.get(url);
-        setAccountList(response.data.accountlist || []);
-      } catch (err) {
-        console.error("Error loading accounts:", err);
-        setAccountList([]);
-      } finally {
-        setLoading(false);
       }
-    };
-  
-    useEffect(() => {
-      fetchAccountsList();
-    }, [filterStatus, userRole]);
+
+      console.log("Fetching from URL:", url);
+      const response = await axios.get(url);
+      setAccountList(response.data.accountlist || []);
+    } catch (err) {
+      console.error("Error loading accounts:", err);
+      setAccountList([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAccountsList();
+  }, [filterStatus, userRole]);
   // const [selectedAccount, setSelectedAccount] = useState(null);
   // const handleNewItemClick = (label) => {
   //   console.log("menu", label);
@@ -491,8 +514,7 @@ function Sidebar() {
       } else {
         setIsDialogOpen(true);
       }
-    }
-     else if (label === "Organizer") {
+    } else if (label === "Organizer") {
       setIsOrganizerDialogOpen(true);
     }
   };
@@ -990,7 +1012,7 @@ function Sidebar() {
             )}
           </Box>
 
-          <Box
+          {/* <Box
             className="sidebar-contents"
             sx={{ mt: 2, height: "85vh", overflowY: "auto" }}
           >
@@ -1106,6 +1128,295 @@ function Sidebar() {
                                     primaryTypographyProps={{
                                       fontSize: "0.9rem", // Adjust size for submenu text
                                       fontWeight: 400, // Optional: control weight
+                                    }}
+                                    sx={{ ml: -2 }}
+                                    className="menu-text"
+                                  />
+                                )}
+                              </ListItem>
+                            );
+                          })}
+                        </List>
+                      </Collapse>
+                    )}
+                  </Box>
+                );
+              })}
+            </List>
+          </Box> */}
+
+          {/* inbox with badge */}
+
+          {/* <Box
+            className="sidebar-contents"
+            sx={{ mt: 2, height: "85vh", overflowY: "auto" }}
+          >
+            <List sx={{ cursor: "pointer" }}>
+              {sidebarItems.map((item) => {
+                const isActiveMenu =
+                  (item.path !== "/" &&
+                    location.pathname.startsWith(item.path)) ||
+                  (item.path === "/" && location.pathname === "/") ||
+                  item.submenu.some((subItem) =>
+                    location.pathname.startsWith(subItem.path)
+                  );
+
+                return (
+                  <Box key={item._id}>
+                    <ListItem
+                      onClick={() => handleToggleSubmenu(item._id, item.label)}
+                      component={Link}
+                      to={item.path}
+                      className="menu-item"
+                      sx={{
+                        mt: 1,
+                        borderRadius: "10px",
+                        padding: "4px 6px",
+                        // border:'1px solid red',
+                        backgroundColor: isActiveMenu
+                          ? "#E0F7FA"
+                          : "transparent",
+                        transition: "background-color 0.3s, color 0.3s",
+                        "&:hover": {
+                          color: "#fff",
+                          backgroundColor: "#00ACC1",
+                          ".menu-icon": { color: "#fff" },
+                          ".menu-text": { color: "#fff" },
+                        },
+                      }}
+                    >
+                      <ListItemIcon
+                        sx={{ fontSize: "1.2rem" }}
+                        className="menu-icon"
+                      >
+                        {iconMapping[item.icon]
+                          ? React.createElement(iconMapping[item.icon])
+                          : null}
+                      </ListItemIcon>
+                      {!isCollapsed && (
+                        <ListItemText
+                          primary={item.label}
+                          primaryTypographyProps={{
+                            fontSize: "0.9rem", // Adjust size for submenu text
+                            fontWeight: 400, // Optional: control weight
+                          }}
+                          sx={{ ml: -3 }}
+                          className="menu-text"
+                        />
+                      )}
+                      {!isCollapsed && item.submenu.length > 0 && (
+                        <ListItemIcon sx={{ justifyContent: "end" }}>
+                          {openMenu === item._id ? (
+                            <ExpandLess className="menu-icon" />
+                          ) : (
+                            <ExpandMore className="menu-icon" />
+                          )}
+                        </ListItemIcon>
+                      )}
+                    </ListItem>
+
+                    {item.submenu.length > 0 && (
+                      <Collapse in={openMenu === item._id}>
+                        <List component="div" disablePadding>
+                          {item.submenu.map((subItem) => {
+                            const isActiveSubmenu =
+                              location.pathname.startsWith(subItem.path);
+
+                            return (
+                              <ListItem
+                                key={subItem.path}
+                                component={Link}
+                                to={subItem.path}
+                                className="menu-item"
+                                sx={{
+                                  mt: 1,
+                                  padding: "4px 6px",
+                                  borderRadius: "10px",
+                                  backgroundColor: isActiveSubmenu
+                                    ? "#E0F7FA"
+                                    : "transparent",
+                                  color: "black",
+                                  pl: 4,
+                                  transition:
+                                    "background-color 0.3s, color 0.3s",
+                                  "&:hover": {
+                                    color: "#fff",
+                                    backgroundColor: "#00ACC1",
+                                    ".menu-icon": { color: "#fff" },
+                                    ".menu-text": { color: "#fff" },
+                                  },
+                                }}
+                              >
+                                <ListItemIcon
+                                  sx={{ fontSize: "1.2rem" }}
+                                  className="menu-icon"
+                                >
+                                  {iconMapping[subItem.icon]
+                                    ? React.createElement(
+                                        iconMapping[subItem.icon]
+                                      )
+                                    : null}
+                                </ListItemIcon>
+                                {!isCollapsed && (
+                                  <ListItemText
+                                    primary={subItem.label}
+                                    primaryTypographyProps={{
+                                      fontSize: "0.9rem", // Adjust size for submenu text
+                                      fontWeight: 400, // Optional: control weight
+                                    }}
+                                    sx={{ ml: -2 }}
+                                    className="menu-text"
+                                  />
+                                )}
+                              </ListItem>
+                            );
+                          })}
+                        </List>
+                      </Collapse>
+                    )}
+                  </Box>
+                );
+              })}
+            </List>
+          </Box>  */}
+
+          <Box
+            className="sidebar-contents"
+            sx={{ mt: 2, height: "85vh", overflowY: "auto" }}
+          >
+            <List sx={{ cursor: "pointer" }}>
+              {sidebarItems.map((item) => {
+                const isActiveMenu =
+                  (item.path !== "/" &&
+                    location.pathname.startsWith(item.path)) ||
+                  (item.path === "/" && location.pathname === "/") ||
+                  item.submenu.some((subItem) =>
+                    location.pathname.startsWith(subItem.path)
+                  );
+
+                return (
+                  <Box key={item._id}>
+                    <ListItem
+                      onClick={() => handleToggleSubmenu(item._id, item.label)}
+                      component={Link}
+                      to={item.path}
+                      className="menu-item"
+                      sx={{
+                        mt: 1,
+                        borderRadius: "10px",
+                        padding: "4px 6px",
+                        backgroundColor: isActiveMenu
+                          ? "#E0F7FA"
+                          : "transparent",
+                        transition: "background-color 0.3s, color 0.3s",
+                        "&:hover": {
+                          color: "#fff",
+                          backgroundColor: "#00ACC1",
+                          ".menu-icon": { color: "#fff" },
+                          ".menu-text": { color: "#fff" },
+                        },
+                      }}
+                    >
+                      <ListItemIcon
+                        sx={{ fontSize: "1.2rem" }}
+                        className="menu-icon"
+                      >
+                        {iconMapping[item.icon]
+                          ? React.createElement(iconMapping[item.icon])
+                          : null}
+                      </ListItemIcon>
+
+                      {!isCollapsed && (
+                        <ListItemText
+                          primary={
+                            item.label === "Inbox +" ? (
+                              <>
+                                {item.label}
+                                <Chip
+                                  label={inboxCount}
+                                  size="small"
+                                  color="success"
+                                  sx={{
+                                    ml: 10,
+                                    height: "20px",
+                                    fontSize: "12px",
+                                    
+                                  }}
+                                />
+                              </>
+                            ) : (
+                              item.label
+                            )
+                          }
+                          primaryTypographyProps={{
+                            fontSize: "0.9rem",
+                            fontWeight: 400,
+                          }}
+                          sx={{ ml: -3 }}
+                          className="menu-text"
+                        />
+                      )}
+
+                      {!isCollapsed && item.submenu.length > 0 && (
+                        <ListItemIcon sx={{ justifyContent: "end" }}>
+                          {openMenu === item._id ? (
+                            <ExpandLess className="menu-icon" />
+                          ) : (
+                            <ExpandMore className="menu-icon" />
+                          )}
+                        </ListItemIcon>
+                      )}
+                    </ListItem>
+
+                    {item.submenu.length > 0 && (
+                      <Collapse in={openMenu === item._id}>
+                        <List component="div" disablePadding>
+                          {item.submenu.map((subItem) => {
+                            const isActiveSubmenu =
+                              location.pathname.startsWith(subItem.path);
+
+                            return (
+                              <ListItem
+                                key={subItem.path}
+                                component={Link}
+                                to={subItem.path}
+                                className="menu-item"
+                                sx={{
+                                  mt: 1,
+                                  padding: "4px 6px",
+                                  borderRadius: "10px",
+                                  backgroundColor: isActiveSubmenu
+                                    ? "#E0F7FA"
+                                    : "transparent",
+                                  color: "black",
+                                  pl: 4,
+                                  transition:
+                                    "background-color 0.3s, color 0.3s",
+                                  "&:hover": {
+                                    color: "#fff",
+                                    backgroundColor: "#00ACC1",
+                                    ".menu-icon": { color: "#fff" },
+                                    ".menu-text": { color: "#fff" },
+                                  },
+                                }}
+                              >
+                                <ListItemIcon
+                                  sx={{ fontSize: "1.2rem" }}
+                                  className="menu-icon"
+                                >
+                                  {iconMapping[subItem.icon]
+                                    ? React.createElement(
+                                        iconMapping[subItem.icon]
+                                      )
+                                    : null}
+                                </ListItemIcon>
+
+                                {!isCollapsed && (
+                                  <ListItemText
+                                    primary={subItem.label}
+                                    primaryTypographyProps={{
+                                      fontSize: "0.9rem",
+                                      fontWeight: 400,
                                     }}
                                     sx={{ ml: -2 }}
                                     className="menu-text"
@@ -1278,10 +1589,8 @@ function Sidebar() {
         open={isAccountDrawerOpen}
         onClose={() => setIsAccountDrawerOpen(false)}
         accountId={selectedAccountId} // null → Create, ID → Update
-
         fetchAccountsList={fetchAccountsList}
         handleDrawerClose={handleDrawerClose}
-        
       />
     </div>
   );

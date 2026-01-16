@@ -483,6 +483,7 @@ const handleCancelPersonalization = () => {
                   control={
                     <Checkbox
                       checked={contact.login || false}
+                      disabled
                       onChange={(e) =>
                         dispatch(
                           updateContactField({
@@ -500,6 +501,7 @@ const handleCancelPersonalization = () => {
                   control={
                     <Checkbox
                       checked={contact.notify || false}
+                      disabled
                       onChange={(e) =>
                         dispatch(
                           updateContactField({
@@ -517,6 +519,7 @@ const handleCancelPersonalization = () => {
                   control={
                     <Checkbox
                       checked={contact.emailSync || false}
+                      disabled
                       onChange={(e) =>
                         dispatch(
                           updateContactField({

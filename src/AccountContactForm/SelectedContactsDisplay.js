@@ -25,6 +25,7 @@ export default function SelectedContactsDisplay({ contacts, onRemove, onUpdateFi
                     control={
                       <Checkbox
                         checked={contact.login || false}
+                        disabled
                         onChange={e => onUpdateField(index, "login", e.target.checked)}
                       />
                     }
@@ -35,6 +36,7 @@ export default function SelectedContactsDisplay({ contacts, onRemove, onUpdateFi
                       <Checkbox
                         checked={contact.notify || false}
                         onChange={e => onUpdateField(index, "notify", e.target.checked)}
+                        disabled
                       />
                     }
                     label="Notify"
@@ -43,6 +45,7 @@ export default function SelectedContactsDisplay({ contacts, onRemove, onUpdateFi
                     control={
                       <Checkbox
                         checked={contact.emailSync || false}
+                        disabled
                         onChange={e => onUpdateField(index, "emailSync", e.target.checked)}
                       />
                     }

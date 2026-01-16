@@ -1,5 +1,3 @@
-
-
 // import React, { useContext, useEffect, useState } from "react";
 // import {
 //   Box,
@@ -254,14 +252,14 @@
 //   const getAttachmentType = (att) => {
 //     const name = att?.filename?.toLowerCase() || "";
 //     const mime = att?.mimeType || "";
-  
+
 //     if (mime.includes("pdf") || name.endsWith(".pdf")) return "pdf";
 //     if (mime.includes("image") || /\.(jpg|jpeg|png|gif|webp)$/.test(name))
 //       return "image";
 //     if (mime.includes("word") || /\.(doc|docx)$/.test(name)) return "word";
 //     if (mime.includes("excel") || /\.(xls|xlsx)$/.test(name)) return "excel";
 //     if (mime.includes("zip") || /\.(zip|rar)$/.test(name)) return "zip";
-  
+
 //     return "file";
 //   };
 //   const getAttachmentIcon = (type) => {
@@ -282,33 +280,33 @@
 //   };
 //   const handleAttachmentClick = (att) => {
 //     const type = getAttachmentType(att);
-  
+
 //     const fileUrl = `${EMAIL_SYNC}/emailsync/user/attachment/${emailSyncEmail}/${selectedEmail.id}/${att.attachmentId}`;
-  
+
 //     // Preview only image & PDF
 //     if (type === "image" || type === "pdf") {
 //       setActiveAttachment(att);
 //       setOpenPdf(true);
 //       return;
 //     }
-  
+
 //     // Excel / Word / others → download
 //     downloadFile(fileUrl, att.filename);
 //   };
-  
+
 //   const downloadFile = async (url, filename) => {
 //     try {
 //       const response = await fetch(url);
 //       const blob = await response.blob();
-  
+
 //       const blobUrl = window.URL.createObjectURL(blob);
 //       const link = document.createElement("a");
-  
+
 //       link.href = blobUrl;
 //       link.download = filename;
 //       document.body.appendChild(link);
 //       link.click();
-  
+
 //       link.remove();
 //       window.URL.revokeObjectURL(blobUrl);
 //     } catch (err) {
@@ -449,7 +447,7 @@
 //                         )}
 //                       </IconButton>
 //                     </Tooltip>
-                    
+
 //                   </Box>
 
 //                   <Divider />
@@ -603,7 +601,6 @@
 //   })}
 // </Box>
 
-
 //                       </>
 //                     )}
 //                   </CardContent>
@@ -707,9 +704,9 @@ import {
   ListItemText,
   Typography,
   Collapse,
-  Chip,
+ 
   Divider,
-  IconButton,
+ 
 } from "@mui/material";
 import { ExpandLess, ExpandMore, AttachFile } from "@mui/icons-material";
 import { Button, TextField } from "@mui/material";
@@ -800,12 +797,548 @@ import { Button, TextField } from "@mui/material";
 //     </Box>
 //   );
 // };
+const hasMongoIdTag = (subject = "") => {
+  return /#([a-f0-9]{24})#/i.test(subject);
+};
+
+// const EmailViewer = () => {
+//   const [threads, setThreads] = useState([]);
+//   const [expandedThreadId, setExpandedThreadId] = useState(null);
+//   const [expandedMessageId, setExpandedMessageId] = useState(null);
+//   const [replyBox, setReplyBox] = useState(null);
+//   const [replyText, setReplyText] = useState("");
+
+//   useEffect(() => {
+//     fetchEmails();
+//   }, []);
+
+//   const fetchEmails = async () => {
+//     try {
+//       const response = await axios.get(
+//         "http://127.0.0.1:8015/emailsync/messagesList/messagesnotification"
+//       );
+//       setThreads(response.data.threads || []);
+//     } catch (err) {
+//       console.error("Error fetching emails:", err);
+//     }
+//   };
+
+//   const handleExpandThread = (threadId) => {
+//     setExpandedThreadId(expandedThreadId === threadId ? null : threadId);
+//     setExpandedMessageId(null); // reset message expansion
+//   };
+
+//   const handleExpandMessage = (messageId) => {
+//     setExpandedMessageId(expandedMessageId === messageId ? null : messageId);
+//   };
+
+//   const getPreview = (html, length = 120) => {
+//     const text = html.replace(/<[^>]*>?/gm, "");
+//     return text.length > length ? text.slice(0, length) + "..." : text;
+//   };
+//   const extractEmail = (from) => {
+//     const match = from.match(/<(.+?)>/);
+//     return match ? match[1] : from;
+//   };
+
+//   return (
+//     <Box
+//       sx={{
+//         maxWidth: 900,
+//         margin: "20px auto",
+//         bgcolor: "#f9f9f9",
+//         p: 2,
+//         borderRadius: 2,
+//       }}
+//     >
+//       <Typography variant="h5" sx={{ mb: 2 }}>
+//         Email Inbox
+//       </Typography>
+
+//       <List>
+//         {threads.map((thread) => {
+//           const latest = thread.latest;
+
+//           return (
+//             <React.Fragment key={thread._id}>
+//               {/* Thread Header */}
+//               <ListItemButton onClick={() => handleExpandThread(thread._id)}>
+//                 <ListItemText
+//                   primary={
+//                     <Typography
+//                       variant="subtitle1"
+//                       sx={{ fontWeight: latest.read ? "normal" : "bold" }}
+//                     >
+//                       {latest.subject || "(No Subject)"}
+//                     </Typography>
+//                   }
+//                   secondary={
+//                     <>
+//                       <Typography variant="body2">
+//                         From: {latest.from}
+//                       </Typography>
+//                       <Typography variant="caption" color="text.secondary">
+//                         {new Date(latest.createdAt).toLocaleString()}
+//                       </Typography>
+//                     </>
+//                   }
+//                 />
+//                 {expandedThreadId === thread._id ? (
+//                   <ExpandLess />
+//                 ) : (
+//                   <ExpandMore />
+//                 )}
+//               </ListItemButton>
+
+//               {/* Thread Messages */}
+//               <Collapse
+//                 in={expandedThreadId === thread._id}
+//                 timeout="auto"
+//                 unmountOnExit
+//               >
+//                 <Box sx={{ p: 2, bgcolor: "#fff", borderRadius: 1, mb: 1 }}>
+//                   {thread.messages.map((email) => {
+//                     const isExpanded = expandedMessageId === email.messageId;
+
+//                     return (
+//                       <Box
+//                         key={email.messageId}
+//                         sx={{
+//                           mb: 2,
+//                           p: 1.5,
+//                           border: "1px solid #eee",
+//                           borderRadius: 1,
+//                           cursor: "pointer",
+//                         }}
+//                         onClick={() => handleExpandMessage(email.messageId)}
+//                       >
+//                         <Typography variant="subtitle2">
+//                           {email.from}
+//                         </Typography>
+
+//                         <Typography variant="caption" color="text.secondary">
+//                           {new Date(email.createdAt).toLocaleString()}
+//                         </Typography>
+
+//                         <Typography
+//                           variant="body2"
+//                           sx={{ mt: 1 }}
+//                           dangerouslySetInnerHTML={{
+//                             __html: isExpanded
+//                               ? email.body
+//                               : getPreview(email.body),
+//                           }}
+//                         />
+
+//                         {email.attachments?.length > 0 && isExpanded && (
+//                           <Box sx={{ mt: 1 }}>
+//                             {email.attachments.map((att, idx) => (
+//                               <Box
+//                                 key={idx}
+//                                 sx={{
+//                                   display: "flex",
+//                                   alignItems: "center",
+//                                   mb: 0.5,
+//                                 }}
+//                               >
+//                                 <AttachFile fontSize="small" sx={{ mr: 0.5 }} />
+//                                 <Typography variant="body2">
+//                                   {att.filename}
+//                                 </Typography>
+//                               </Box>
+//                             ))}
+//                           </Box>
+//                         )}
+
+//                         {/* <Typography
+//                           variant="caption"
+//                           color="primary"
+//                           sx={{ display: "block", mt: 1 }}
+//                         >
+//                           {isExpanded ? "Click to collapse" : "Click to expand"}
+//                         </Typography> */}
+//                         <Typography
+//                           variant="caption"
+//                           color="primary"
+//                           sx={{ display: "block", mt: 1 }}
+//                         >
+//                           {isExpanded ? "Click to collapse" : "Click to expand"}
+//                         </Typography>
+
+//                         {/* REPLY SECTION */}
+//                         {isExpanded && (
+//                           <Box sx={{ mt: 2 }}>
+//                             <Button
+//                               size="small"
+//                               variant="outlined"
+//                               onClick={(e) => {
+//                                 e.stopPropagation();
+//                                 setReplyBox(email.messageId);
+//                               }}
+//                             >
+//                               Reply
+//                             </Button>
+
+//                             {replyBox === email.messageId && (
+//                               <Box sx={{ mt: 1 }}>
+//                                 <TextField
+//                                   fullWidth
+//                                   multiline
+//                                   rows={3}
+//                                   placeholder="Type your reply..."
+//                                   value={replyText}
+//                                   onChange={(e) => setReplyText(e.target.value)}
+//                                   onClick={(e) => e.stopPropagation()} // 👈 IMPORTANT
+//                                 />
+
+//                                 <Button
+//                                   variant="contained"
+//                                   size="small"
+//                                   sx={{ mt: 1 }}
+//                                   onClick={async (e) => {
+//                                     e.stopPropagation(); // 👈 IMPORTANT
+
+//                                     try {
+//                                       await axios.post(
+//                                         "http://127.0.0.1:8015/emailsync/user/reply",
+//                                         {
+//                                           to: extractEmail(email.from),
+
+//                                           subject:
+//                                             email.subject || "No Subject",
+//                                           message: replyText,
+//                                         }
+//                                       );
+
+//                                       setReplyText("");
+//                                       setReplyBox(null);
+//                                       alert("Reply Sent Successfully!");
+//                                     } catch (err) {
+//                                       console.error("Reply failed", err);
+//                                       alert("Failed to send reply");
+//                                     }
+//                                   }}
+//                                 >
+//                                   Send Reply
+//                                 </Button>
+//                               </Box>
+//                             )}
+//                           </Box>
+//                         )}
+//                       </Box>
+//                     );
+//                   })}
+//                 </Box>
+//               </Collapse>
+
+//               <Divider />
+//             </React.Fragment>
+//           );
+//         })}
+//       </List>
+//     </Box>
+//   );
+// };
+
+// const EmailViewer = () => {
+//   const [threads, setThreads] = useState([]);
+//   const [expandedThreadId, setExpandedThreadId] = useState(null);
+//   const [expandedMessageId, setExpandedMessageId] = useState(null);
+//   const [replyBox, setReplyBox] = useState(null);
+//   const [replyText, setReplyText] = useState("");
+
+//   useEffect(() => {
+//     fetchEmails();
+//   }, []);
+
+//   const fetchEmails = async () => {
+//     try {
+//       const response = await axios.get(
+//         "http://127.0.0.1:8015/emailsync/messagesList/messagesnotification"
+//       );
+//       setThreads(response.data.threads || []);
+//     } catch (err) {
+//       console.error("Error fetching emails:", err);
+//     }
+//   };
+
+//   const handleExpandThread = (threadId) => {
+//     setExpandedThreadId(expandedThreadId === threadId ? null : threadId);
+//     setExpandedMessageId(null);
+//   };
+
+//   const handleExpandMessage = (messageId) => {
+//     setExpandedMessageId(expandedMessageId === messageId ? null : messageId);
+//   };
+
+//   const getPreview = (html, length = 120) => {
+//     const text = html.replace(/<[^>]*>?/gm, "");
+//     return text.length > length ? text.slice(0, length) + "..." : text;
+//   };
+
+//   const extractEmail = (from) => {
+//     const match = from.match(/<(.+?)>/);
+//     return match ? match[1] : from;
+//   };
+
+//   // ✅ Detect MongoDB ID tag in subject
+//   const hasMongoIdTag = (subject = "") => {
+//     return subject.startsWith("#") && /#[a-f0-9]{24}#/i.test(subject);
+//   };
+
+//   return (
+//     <Box
+//       sx={{
+//         maxWidth: 900,
+//         margin: "20px auto",
+//         bgcolor: "#f9f9f9",
+//         p: 2,
+//         borderRadius: 2,
+//       }}
+//     >
+//       <Typography variant="h5" sx={{ mb: 2 }}>
+//         Email Inbox
+//       </Typography>
+
+//       <List>
+//         {threads.map((thread) => {
+//           const latest = thread.latest;
+
+//           return (
+//             <React.Fragment key={thread._id}>
+//               {/* Thread Header */}
+//               <ListItemButton onClick={() => handleExpandThread(thread._id)}>
+//                 <ListItemText
+//                   primary={
+//                     <Typography
+//                       variant="subtitle1"
+//                       sx={{ fontWeight: latest.read ? "normal" : "bold" }}
+//                     >
+//                       {latest.subject || "(No Subject)"}
+//                     </Typography>
+//                   }
+//                   secondary={
+//                     <>
+//                       <Typography variant="body2">
+//                         From: {latest.from}
+//                       </Typography>
+//                       <Typography variant="caption" color="text.secondary">
+//                         {new Date(latest.createdAt).toLocaleString()}
+//                       </Typography>
+//                     </>
+//                   }
+//                 />
+//                 {expandedThreadId === thread._id ? (
+//                   <ExpandLess />
+//                 ) : (
+//                   <ExpandMore />
+//                 )}
+//               </ListItemButton>
+
+//               {/* Thread Messages */}
+//               <Collapse
+//                 in={expandedThreadId === thread._id}
+//                 timeout="auto"
+//                 unmountOnExit
+//               >
+//                 <Box sx={{ p: 2, bgcolor: "#fff", borderRadius: 1, mb: 1 }}>
+//                   {[...thread.messages]
+//                     .sort((a, b) => {
+//                       const aTagged = hasMongoIdTag(a.subject);
+//                       const bTagged = hasMongoIdTag(b.subject);
+
+//                       if (aTagged && !bTagged) return -1;
+//                       if (!aTagged && bTagged) return 1;
+//                       return 0;
+//                     })
+//                     .map((email) => {
+//                       const isExpanded =
+//                         expandedMessageId === email.messageId;
+
+//                       return (
+//                         <Box
+//                           key={email.messageId}
+//                           sx={{
+//                             mb: 2,
+//                             p: 1.5,
+//                             border: "1px solid #eee",
+//                             borderRadius: 1,
+//                             cursor: "pointer",
+//                           }}
+//                           onClick={() =>
+//                             handleExpandMessage(email.messageId)
+//                           }
+//                         >
+//                           {/* 🔴 Highlight ONLY the subject */}
+//                           {email.subject && (
+//                             <Typography
+//                               variant="subtitle2"
+//                               sx={{
+//                                 fontWeight: "bold",
+//                                 color: hasMongoIdTag(email.subject)
+//                                   ? "#D32F2F"
+//                                   : "inherit",
+//                                 backgroundColor: hasMongoIdTag(email.subject)
+//                                   ? "#FFEBEE"
+//                                   : "transparent",
+//                                 px: hasMongoIdTag(email.subject) ? 1 : 0,
+//                                 borderRadius: 1,
+//                                 display: "inline-block",
+//                               }}
+//                             >
+//                               {email.subject}
+//                             </Typography>
+//                           )}
+
+//                           <Typography variant="body2" sx={{ mt: 0.5 }}>
+//                             From: {email.from}
+//                           </Typography>
+
+//                           <Typography
+//                             variant="caption"
+//                             color="text.secondary"
+//                           >
+//                             {new Date(email.createdAt).toLocaleString()}
+//                           </Typography>
+
+//                           <Typography
+//                             variant="body2"
+//                             sx={{ mt: 1 }}
+//                             dangerouslySetInnerHTML={{
+//                               __html: isExpanded
+//                                 ? email.body
+//                                 : getPreview(email.body),
+//                             }}
+//                           />
+
+//                           {email.attachments?.length > 0 &&
+//                             isExpanded && (
+//                               <Box sx={{ mt: 1 }}>
+//                                 {email.attachments.map((att, idx) => (
+//                                   <Box
+//                                     key={idx}
+//                                     sx={{
+//                                       display: "flex",
+//                                       alignItems: "center",
+//                                       mb: 0.5,
+//                                     }}
+//                                   >
+//                                     <AttachFile
+//                                       fontSize="small"
+//                                       sx={{ mr: 0.5 }}
+//                                     />
+//                                     <Typography variant="body2">
+//                                       {att.filename}
+//                                     </Typography>
+//                                   </Box>
+//                                 ))}
+//                               </Box>
+//                             )}
+
+//                           <Typography
+//                             variant="caption"
+//                             color="primary"
+//                             sx={{ display: "block", mt: 1 }}
+//                           >
+//                             {isExpanded
+//                               ? "Click to collapse"
+//                               : "Click to expand"}
+//                           </Typography>
+
+//                           {/* REPLY SECTION */}
+//                           {isExpanded && (
+//                             <Box sx={{ mt: 2 }}>
+//                               <Button
+//                                 size="small"
+//                                 variant="outlined"
+//                                 onClick={(e) => {
+//                                   e.stopPropagation();
+//                                   setReplyBox(email.messageId);
+//                                 }}
+//                               >
+//                                 Reply
+//                               </Button>
+
+//                               {replyBox === email.messageId && (
+//                                 <Box sx={{ mt: 1 }}>
+//                                   <TextField
+//                                     fullWidth
+//                                     multiline
+//                                     rows={3}
+//                                     placeholder="Type your reply..."
+//                                     value={replyText}
+//                                     onChange={(e) =>
+//                                       setReplyText(e.target.value)
+//                                     }
+//                                     onClick={(e) =>
+//                                       e.stopPropagation()
+//                                     }
+//                                   />
+
+//                                   <Button
+//                                     variant="contained"
+//                                     size="small"
+//                                     sx={{ mt: 1 }}
+//                                     onClick={async (e) => {
+//                                       e.stopPropagation();
+
+//                                       try {
+//                                         await axios.post(
+//                                           "http://127.0.0.1:8015/emailsync/user/reply",
+//                                           {
+//                                             to: extractEmail(
+//                                               email.from
+//                                             ),
+//                                             subject:
+//                                               email.subject ||
+//                                               "No Subject",
+//                                             message: replyText,
+//                                           }
+//                                         );
+
+//                                         setReplyText("");
+//                                         setReplyBox(null);
+//                                         alert(
+//                                           "Reply Sent Successfully!"
+//                                         );
+//                                       } catch (err) {
+//                                         console.error(
+//                                           "Reply failed",
+//                                           err
+//                                         );
+//                                         alert(
+//                                           "Failed to send reply"
+//                                         );
+//                                       }
+//                                     }}
+//                                   >
+//                                     Send Reply
+//                                   </Button>
+//                                 </Box>
+//                               )}
+//                             </Box>
+//                           )}
+//                         </Box>
+//                       );
+//                     })}
+//                 </Box>
+//               </Collapse>
+
+//               <Divider />
+//             </React.Fragment>
+//           );
+//         })}
+//       </List>
+//     </Box>
+//   );
+// };
+
 const EmailViewer = () => {
   const [threads, setThreads] = useState([]);
   const [expandedThreadId, setExpandedThreadId] = useState(null);
   const [expandedMessageId, setExpandedMessageId] = useState(null);
-const [replyBox, setReplyBox] = useState(null);
-const [replyText, setReplyText] = useState("");
+  const [replyBox, setReplyBox] = useState(null);
+  const [replyText, setReplyText] = useState("");
 
   useEffect(() => {
     fetchEmails();
@@ -814,7 +1347,7 @@ const [replyText, setReplyText] = useState("");
   const fetchEmails = async () => {
     try {
       const response = await axios.get(
-        "http://127.0.0.1:8015/emailsync/messagesList/messages"
+        "http://127.0.0.1:8015/emailsync/messagesList/messagesnotification"
       );
       setThreads(response.data.threads || []);
     } catch (err) {
@@ -824,7 +1357,7 @@ const [replyText, setReplyText] = useState("");
 
   const handleExpandThread = (threadId) => {
     setExpandedThreadId(expandedThreadId === threadId ? null : threadId);
-    setExpandedMessageId(null); // reset message expansion
+    setExpandedMessageId(null);
   };
 
   const handleExpandMessage = (messageId) => {
@@ -835,13 +1368,61 @@ const [replyText, setReplyText] = useState("");
     const text = html.replace(/<[^>]*>?/gm, "");
     return text.length > length ? text.slice(0, length) + "..." : text;
   };
-const extractEmail = (from) => {
-  const match = from.match(/<(.+?)>/);
-  return match ? match[1] : from;
-};
+
+  const extractEmail = (from) => {
+    const match = from.match(/<(.+?)>/);
+    return match ? match[1] : from;
+  };
+
+  const hasMongoIdTag = (subject = "") => {
+    return subject.startsWith("#") && /#[a-f0-9]{24}#/i.test(subject);
+  };
+
+  const extractMongoId = (subject = "") => {
+    const match = subject.match(/#([a-f0-9]{24})#/i);
+    return match ? match[1] : null;
+  };
+
+  const cleanSubjectText = (subject = "") => {
+    return subject.replace(/#[a-f0-9]{24}#/i, "").trim();
+  };
+
+  const buildAccountLink = (mongoId) => {
+    return `http://localhost:3000/clients/accounts/accountsdash/overview/${mongoId}`;
+  };
+
+  const renderLinkedSubject = (subject, isBold = false) => {
+    const mongoId = extractMongoId(subject);
+    const text = cleanSubjectText(subject) || "linktext";
+
+    if (!mongoId) return subject || "(No Subject)";
+
+    return (
+      <a
+        href={buildAccountLink(mongoId)}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          color: "#D32F2F",
+          fontWeight: isBold ? "bold" : "normal",
+          textDecoration: "none",
+        }}
+      >
+        {text}
+      </a>
+    );
+  };
 
   return (
-    <Box sx={{ maxWidth: 900, margin: "20px auto", bgcolor: "#f9f9f9", p: 2, borderRadius: 2 }}>
+    <Box
+      sx={{
+        maxWidth: 900,
+        margin: "20px auto",
+        bgcolor: "#f9f9f9",
+        p: 2,
+        borderRadius: 2,
+      }}
+    >
       <Typography variant="h5" sx={{ mb: 2 }}>
         Email Inbox
       </Typography>
@@ -858,9 +1439,17 @@ const extractEmail = (from) => {
                   primary={
                     <Typography
                       variant="subtitle1"
-                      sx={{ fontWeight: latest.read ? "normal" : "bold" }}
+                      sx={{
+                        fontWeight: latest.read ? "normal" : "bold",
+                        color: hasMongoIdTag(latest.subject)
+                          ? "#D32F2F"
+                          : "inherit",
+                      }}
                     >
-                      {latest.subject || "(No Subject)"}
+                      {renderLinkedSubject(
+                        latest.subject,
+                        !latest.read
+                      )}
                     </Typography>
                   }
                   secondary={
@@ -874,136 +1463,94 @@ const extractEmail = (from) => {
                     </>
                   }
                 />
-                {expandedThreadId === thread._id ? <ExpandLess /> : <ExpandMore />}
+                {expandedThreadId === thread._id ? (
+                  <ExpandLess />
+                ) : (
+                  <ExpandMore />
+                )}
               </ListItemButton>
 
               {/* Thread Messages */}
-              <Collapse in={expandedThreadId === thread._id} timeout="auto" unmountOnExit>
+              <Collapse
+                in={expandedThreadId === thread._id}
+                timeout="auto"
+                unmountOnExit
+              >
                 <Box sx={{ p: 2, bgcolor: "#fff", borderRadius: 1, mb: 1 }}>
-                  {thread.messages.map((email) => {
-                    const isExpanded = expandedMessageId === email.messageId;
+                  {[...thread.messages]
+                    .sort((a, b) => {
+                      const aTagged = hasMongoIdTag(a.subject);
+                      const bTagged = hasMongoIdTag(b.subject);
 
-                    return (
-                      <Box
-                        key={email.messageId}
-                        sx={{
-                          mb: 2,
-                          p: 1.5,
-                          border: "1px solid #eee",
-                          borderRadius: 1,
-                          cursor: "pointer"
-                        }}
-                        onClick={() => handleExpandMessage(email.messageId)}
-                      >
-                        <Typography variant="subtitle2">
-                          {email.from}
-                        </Typography>
+                      if (aTagged && !bTagged) return -1;
+                      if (!aTagged && bTagged) return 1;
+                      return 0;
+                    })
+                    .map((email) => {
+                      const isExpanded =
+                        expandedMessageId === email.messageId;
 
-                        <Typography variant="caption" color="text.secondary">
-                          {new Date(email.createdAt).toLocaleString()}
-                        </Typography>
-
-                        <Typography
-                          variant="body2"
-                          sx={{ mt: 1 }}
-                          dangerouslySetInnerHTML={{
-                            __html: isExpanded
-                              ? email.body
-                              : getPreview(email.body)
+                      return (
+                        <Box
+                          key={email.messageId}
+                          sx={{
+                            mb: 2,
+                            p: 1.5,
+                            border: "1px solid #eee",
+                            borderRadius: 1,
+                            cursor: "pointer",
                           }}
-                        />
-
-                        {email.attachments?.length > 0 && isExpanded && (
-                          <Box sx={{ mt: 1 }}>
-                            {email.attachments.map((att, idx) => (
-                              <Box
-                                key={idx}
-                                sx={{ display: "flex", alignItems: "center", mb: 0.5 }}
-                              >
-                                <AttachFile fontSize="small" sx={{ mr: 0.5 }} />
-                                <Typography variant="body2">{att.filename}</Typography>
-                              </Box>
-                            ))}
-                          </Box>
-                        )}
-
-                        {/* <Typography
-                          variant="caption"
-                          color="primary"
-                          sx={{ display: "block", mt: 1 }}
+                          onClick={() =>
+                            handleExpandMessage(email.messageId)
+                          }
                         >
-                          {isExpanded ? "Click to collapse" : "Click to expand"}
-                        </Typography> */}
-                        <Typography
-  variant="caption"
-  color="primary"
-  sx={{ display: "block", mt: 1 }}
->
-  {isExpanded ? "Click to collapse" : "Click to expand"}
-</Typography>
+                          {email.subject && (
+                            <Typography
+                              variant="subtitle2"
+                              sx={{
+                                fontWeight: "bold",
+                                color: hasMongoIdTag(email.subject)
+                                  ? "#D32F2F"
+                                  : "inherit",
+                              }}
+                            >
+                              {renderLinkedSubject(email.subject, true)}
+                            </Typography>
+                          )}
 
-{/* REPLY SECTION */}
-{isExpanded && (
-  <Box sx={{ mt: 2 }}>
-    <Button
-      size="small"
-      variant="outlined"
-      onClick={(e) => {
-        e.stopPropagation();
-        setReplyBox(email.messageId);
-      }}
-    >
-      Reply
-    </Button>
+                          <Typography variant="body2" sx={{ mt: 0.5 }}>
+                            From: {email.from}
+                          </Typography>
 
-    {replyBox === email.messageId && (
-      <Box sx={{ mt: 1 }}>
-       <TextField
-  fullWidth
-  multiline
-  rows={3}
-  placeholder="Type your reply..."
-  value={replyText}
-  onChange={(e) => setReplyText(e.target.value)}
-  onClick={(e) => e.stopPropagation()}   // 👈 IMPORTANT
-/>
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                          >
+                            {new Date(email.createdAt).toLocaleString()}
+                          </Typography>
 
+                          <Typography
+                            variant="body2"
+                            sx={{ mt: 1 }}
+                            dangerouslySetInnerHTML={{
+                              __html: isExpanded
+                                ? email.body
+                                : getPreview(email.body),
+                            }}
+                          />
 
-       <Button
-  variant="contained"
-  size="small"
-  sx={{ mt: 1 }}
-  onClick={async (e) => {
-    e.stopPropagation();  // 👈 IMPORTANT
-
-    try {
-      await axios.post("http://127.0.0.1:8015/emailsync/user/reply", {
-       to: extractEmail(email.from),
-
-        subject: email.subject || "No Subject",
-        message: replyText
-      });
-
-      setReplyText("");
-      setReplyBox(null);
-      alert("Reply Sent Successfully!");
-    } catch (err) {
-      console.error("Reply failed", err);
-      alert("Failed to send reply");
-    }
-  }}
->
-  Send Reply
-</Button>
-
-      </Box>
-    )}
-  </Box>
-)}
-
-                      </Box>
-                    );
-                  })}
+                          <Typography
+                            variant="caption"
+                            color="primary"
+                            sx={{ display: "block", mt: 1 }}
+                          >
+                            {isExpanded
+                              ? "Click to collapse"
+                              : "Click to expand"}
+                          </Typography>
+                        </Box>
+                      );
+                    })}
                 </Box>
               </Collapse>
 
@@ -1017,7 +1564,7 @@ const extractEmail = (from) => {
 };
 
 
+
+
+
 export default EmailViewer;
-
-
-
