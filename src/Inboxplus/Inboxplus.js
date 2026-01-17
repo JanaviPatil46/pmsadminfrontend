@@ -1379,7 +1379,7 @@ const EmailViewer = () => {
   };
 
   const extractMongoId = (subject = "") => {
-    const match = subject.match(/#([a-f0-9]{24})#/i);
+    const match = subject.match(/#([a-f0-9]{24})/i);
     return match ? match[1] : null;
   };
 
@@ -1388,7 +1388,7 @@ const EmailViewer = () => {
   };
 
   const buildAccountLink = (mongoId) => {
-    return `http://localhost:3000/clients/accounts/accountsdash/overview/${mongoId}`;
+    return `/clients/accounts/accountsdash/overview/${mongoId}`;
   };
 
   const renderLinkedSubject = (subject, isBold = false) => {
@@ -1539,7 +1539,7 @@ const EmailViewer = () => {
                             }}
                           />
 
-                          <Typography
+                          {/* <Typography
                             variant="caption"
                             color="primary"
                             sx={{ display: "block", mt: 1 }}
@@ -1547,7 +1547,7 @@ const EmailViewer = () => {
                             {isExpanded
                               ? "Click to collapse"
                               : "Click to expand"}
-                          </Typography>
+                          </Typography> */}
                         </Box>
                       );
                     })}
