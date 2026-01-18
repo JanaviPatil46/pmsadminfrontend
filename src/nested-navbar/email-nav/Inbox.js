@@ -665,6 +665,7 @@ const fetchEmailSyncedContactsAndEmails = async () => {
 
     // 4️⃣ Set threads
     setThreads(emailsRes.data.threads || []);
+    console.log("Fetched threads:", emailsRes.data.threads || []);
   } catch (error) {
     console.error(
       "Error fetching synced emails or messages",

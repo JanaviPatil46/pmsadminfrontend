@@ -704,7 +704,7 @@ import {
   ListItemText,
   Typography,
   Collapse,
- 
+ Tabs,Tab,
   Divider,
  
 } from "@mui/material";
@@ -1339,6 +1339,7 @@ const EmailViewer = () => {
   const [expandedMessageId, setExpandedMessageId] = useState(null);
   const [replyBox, setReplyBox] = useState(null);
   const [replyText, setReplyText] = useState("");
+const [tab, setTab] = useState(0); // 0 = Inbox, 1 = Archived
 
   useEffect(() => {
     fetchEmails();
@@ -1364,10 +1365,15 @@ const EmailViewer = () => {
     setExpandedMessageId(expandedMessageId === messageId ? null : messageId);
   };
 
-  const getPreview = (html, length = 120) => {
-    const text = html.replace(/<[^>]*>?/gm, "");
-    return text.length > length ? text.slice(0, length) + "..." : text;
-  };
+  // const getPreview = (html, length = 120) => {
+  //   const text = html.replace(/<[^>]*>?/gm, "");
+  //   return text.length > length ? text.slice(0, length) + "..." : text;
+  // };
+
+  const getPreview = (html) => {
+  return html.replace(/<[^>]*>?/gm, "");
+};
+
 
   const extractEmail = (from) => {
     const match = from.match(/<(.+?)>/);
@@ -1384,12 +1390,40 @@ const EmailViewer = () => {
   };
 
   const cleanSubjectText = (subject = "") => {
-    return subject.replace(/#[a-f0-9]{24}#/i, "").trim();
+    return subject.replace(/#[a-f0-9]{24} /i, "").trim();
   };
 
   const buildAccountLink = (mongoId) => {
     return `/clients/accounts/accountsdash/overview/${mongoId}`;
   };
+const markThreadAsRead = async (threadId) => {
+  try {
+    await axios.patch("http://127.0.0.1:8015/emailsync/messagesList/threads/mark-read", {
+      threadId,
+    });
+    fetchEmails(); // refresh UI
+  } catch (err) {
+    console.error("Mark read failed", err);
+  }
+};
+
+const archiveThread = async (threadId, archived) => {
+  try {
+    await axios.patch("http://127.0.0.1:8015/emailsync/messagesList/threads/archive", {
+      threadId,
+      archived,
+    });
+    fetchEmails(); // refresh UI
+  } catch (err) {
+    console.error("Archive failed", err);
+  }
+};
+
+const filteredThreads = threads.filter(thread => {
+  const isArchived = thread.latest?.archived;
+  return tab === 0 ? !isArchived : isArchived;
+});
+
 
   const renderLinkedSubject = (subject, isBold = false) => {
     const mongoId = extractMongoId(subject);
@@ -1403,7 +1437,7 @@ const EmailViewer = () => {
         target="_blank"
         rel="noopener noreferrer"
         style={{
-          color: "#D32F2F",
+          color: "#2f3fd3",
           fontWeight: isBold ? "bold" : "normal",
           textDecoration: "none",
         }}
@@ -1426,9 +1460,13 @@ const EmailViewer = () => {
       <Typography variant="h5" sx={{ mb: 2 }}>
         Email Inbox
       </Typography>
+<Tabs value={tab} onChange={(e, v) => setTab(v)} sx={{ mb: 2 }}>
+  <Tab label="Inbox" />
+  <Tab label="Archived" />
+</Tabs>
 
       <List>
-        {threads.map((thread) => {
+        {filteredThreads.map((thread) => {
           const latest = thread.latest;
 
           return (
@@ -1437,32 +1475,66 @@ const EmailViewer = () => {
               <ListItemButton onClick={() => handleExpandThread(thread._id)}>
                 <ListItemText
                   primary={
+                    // <Typography
+                    //   variant="subtitle1"
+                    //   sx={{
+                    //     fontWeight: latest.read ? "normal" : "bold",
+                    //     color: hasMongoIdTag(latest.subject)
+                    //       ? "#D32F2F"
+                    //       : "inherit",
+                    //   }}
+                    // >
+                    //   {/* {renderLinkedSubject(
+                    //     latest.subject,
+                    //     !latest.read
+                    //   )} */}
+                    //   {renderLinkedSubject(cleanSubjectText(latest.subject), !latest.read)}
+
+                    // </Typography>
                     <Typography
-                      variant="subtitle1"
-                      sx={{
-                        fontWeight: latest.read ? "normal" : "bold",
-                        color: hasMongoIdTag(latest.subject)
-                          ? "#D32F2F"
-                          : "inherit",
-                      }}
-                    >
-                      {renderLinkedSubject(
-                        latest.subject,
-                        !latest.read
-                      )}
-                    </Typography>
+                              variant="subtitle2"
+                              sx={{
+                                fontWeight: "bold",
+                                color: hasMongoIdTag(latest.subject)
+                                  ? "#2f3fd3"
+                                  : "inherit",
+                              }}
+                            >
+                              {renderLinkedSubject(latest.subject, true)}
+                            </Typography>
                   }
-                  secondary={
-                    <>
-                      <Typography variant="body2">
-                        From: {latest.from}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {new Date(latest.createdAt).toLocaleString()}
-                      </Typography>
-                    </>
-                  }
+                  // secondary={
+                  //   <>
+                  //     <Typography variant="body2">
+                  //       From: {latest.from}
+                  //     </Typography>
+                  //     <Typography variant="caption" color="text.secondary">
+                  //       {new Date(latest.createdAt).toLocaleString()}
+                  //     </Typography>
+                  //   </>
+                  // }
                 />
+                <Box sx={{ display: "flex", gap: 2, mb: 1 }}>
+  {!latest.read && (
+    <Button
+      size="small"
+      variant="outlined"
+      onClick={() => markThreadAsRead(thread._id)}
+    >
+      Mark as Read
+    </Button>
+  )}
+
+  <Button
+    size="small"
+    variant="outlined"
+    color={latest.archived ? "success" : "warning"}
+    onClick={() => archiveThread(thread._id, !latest.archived)}
+  >
+    {latest.archived ? "Unarchive" : "Archive"}
+  </Button>
+</Box>
+
                 {expandedThreadId === thread._id ? (
                   <ExpandLess />
                 ) : (
@@ -1504,7 +1576,7 @@ const EmailViewer = () => {
                             handleExpandMessage(email.messageId)
                           }
                         >
-                          {email.subject && (
+                          {/* {email.subject && (
                             <Typography
                               variant="subtitle2"
                               sx={{
@@ -1516,11 +1588,11 @@ const EmailViewer = () => {
                             >
                               {renderLinkedSubject(email.subject, true)}
                             </Typography>
-                          )}
+                          )} */}
 
-                          <Typography variant="body2" sx={{ mt: 0.5 }}>
+                          {/* <Typography variant="body2" sx={{ mt: 0.5 }}>
                             From: {email.from}
-                          </Typography>
+                          </Typography> */}
 
                           <Typography
                             variant="caption"
