@@ -704,9 +704,9 @@ import {
   ListItemText,
   Typography,
   Collapse,
- Tabs,Tab,
+  Tabs,
+  Tab,
   Divider,
- 
 } from "@mui/material";
 import { ExpandLess, ExpandMore, AttachFile } from "@mui/icons-material";
 import { Button, TextField } from "@mui/material";
@@ -1339,7 +1339,44 @@ const EmailViewer = () => {
   const [expandedMessageId, setExpandedMessageId] = useState(null);
   const [replyBox, setReplyBox] = useState(null);
   const [replyText, setReplyText] = useState("");
-const [tab, setTab] = useState(0); // 0 = Inbox, 1 = Archived
+  const [tab, setTab] = useState(0); // 0 = Inbox, 1 = Archived
+  const [previewFile, setPreviewFile] = useState(null);
+  // const openAttachment = (attachment) => {
+  //   const byteCharacters = atob(attachment.data);
+  //   const byteNumbers = new Array(byteCharacters.length);
+
+  //   for (let i = 0; i < byteCharacters.length; i++) {
+  //     byteNumbers[i] = byteCharacters.charCodeAt(i);
+  //   }
+
+  //   const byteArray = new Uint8Array(byteNumbers);
+  //   const blob = new Blob([byteArray], { type: attachment.mimeType });
+
+  //   const url = URL.createObjectURL(blob);
+
+  //   setPreviewFile({
+  //     ...attachment,
+  //     url
+  //   });
+  // };
+  const openAttachment = (attachment) => {
+    const byteCharacters = atob(attachment.data);
+    const byteNumbers = new Array(byteCharacters.length);
+
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: attachment.mimeType });
+
+    const url = URL.createObjectURL(blob);
+
+    setPreviewFile({
+      ...attachment,
+      url,
+    });
+  };
 
   useEffect(() => {
     fetchEmails();
@@ -1348,9 +1385,10 @@ const [tab, setTab] = useState(0); // 0 = Inbox, 1 = Archived
   const fetchEmails = async () => {
     try {
       const response = await axios.get(
-        "http://127.0.0.1:8015/emailsync/messagesList/messagesnotification"
+        "http://127.0.0.1:8015/emailsync/messagesList/messagesnotification",
       );
       setThreads(response.data.threads || []);
+      console.log("Fetched threads:", response.data.threads);
     } catch (err) {
       console.error("Error fetching emails:", err);
     }
@@ -1371,9 +1409,8 @@ const [tab, setTab] = useState(0); // 0 = Inbox, 1 = Archived
   // };
 
   const getPreview = (html) => {
-  return html.replace(/<[^>]*>?/gm, "");
-};
-
+    return html.replace(/<[^>]*>?/gm, "");
+  };
 
   const extractEmail = (from) => {
     const match = from.match(/<(.+?)>/);
@@ -1396,34 +1433,39 @@ const [tab, setTab] = useState(0); // 0 = Inbox, 1 = Archived
   const buildAccountLink = (mongoId) => {
     return `/clients/accounts/accountsdash/overview/${mongoId}`;
   };
-const markThreadAsRead = async (threadId) => {
-  try {
-    await axios.patch("http://127.0.0.1:8015/emailsync/messagesList/threads/mark-read", {
-      threadId,
-    });
-    fetchEmails(); // refresh UI
-  } catch (err) {
-    console.error("Mark read failed", err);
-  }
-};
+  const markThreadAsRead = async (threadId) => {
+    try {
+      await axios.patch(
+        "http://127.0.0.1:8015/emailsync/messagesList/threads/mark-read",
+        {
+          threadId,
+        },
+      );
+      fetchEmails(); // refresh UI
+    } catch (err) {
+      console.error("Mark read failed", err);
+    }
+  };
 
-const archiveThread = async (threadId, archived) => {
-  try {
-    await axios.patch("http://127.0.0.1:8015/emailsync/messagesList/threads/archive", {
-      threadId,
-      archived,
-    });
-    fetchEmails(); // refresh UI
-  } catch (err) {
-    console.error("Archive failed", err);
-  }
-};
+  const archiveThread = async (threadId, archived) => {
+    try {
+      await axios.patch(
+        "http://127.0.0.1:8015/emailsync/messagesList/threads/archive",
+        {
+          threadId,
+          archived,
+        },
+      );
+      fetchEmails(); // refresh UI
+    } catch (err) {
+      console.error("Archive failed", err);
+    }
+  };
 
-const filteredThreads = threads.filter(thread => {
-  const isArchived = thread.latest?.archived;
-  return tab === 0 ? !isArchived : isArchived;
-});
-
+  const filteredThreads = threads.filter((thread) => {
+    const isArchived = thread.latest?.archived;
+    return tab === 0 ? !isArchived : isArchived;
+  });
 
   const renderLinkedSubject = (subject, isBold = false) => {
     const mongoId = extractMongoId(subject);
@@ -1460,10 +1502,10 @@ const filteredThreads = threads.filter(thread => {
       <Typography variant="h5" sx={{ mb: 2 }}>
         Email Inbox
       </Typography>
-<Tabs value={tab} onChange={(e, v) => setTab(v)} sx={{ mb: 2 }}>
-  <Tab label="Inbox" />
-  <Tab label="Archived" />
-</Tabs>
+      <Tabs value={tab} onChange={(e, v) => setTab(v)} sx={{ mb: 2 }}>
+        <Tab label="Inbox" />
+        <Tab label="Archived" />
+      </Tabs>
 
       <List>
         {filteredThreads.map((thread) => {
@@ -1492,16 +1534,16 @@ const filteredThreads = threads.filter(thread => {
 
                     // </Typography>
                     <Typography
-                              variant="subtitle2"
-                              sx={{
-                                fontWeight: "bold",
-                                color: hasMongoIdTag(latest.subject)
-                                  ? "#2f3fd3"
-                                  : "inherit",
-                              }}
-                            >
-                              {renderLinkedSubject(latest.subject, true)}
-                            </Typography>
+                      variant="subtitle2"
+                      sx={{
+                        fontWeight: "bold",
+                        color: hasMongoIdTag(latest.subject)
+                          ? "#2f3fd3"
+                          : "inherit",
+                      }}
+                    >
+                      {renderLinkedSubject(latest.subject, true)}
+                    </Typography>
                   }
                   // secondary={
                   //   <>
@@ -1515,25 +1557,25 @@ const filteredThreads = threads.filter(thread => {
                   // }
                 />
                 <Box sx={{ display: "flex", gap: 2, mb: 1 }}>
-  {!latest.read && (
-    <Button
-      size="small"
-      variant="outlined"
-      onClick={() => markThreadAsRead(thread._id)}
-    >
-      Mark as Read
-    </Button>
-  )}
+                  {!latest.read && (
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      onClick={() => markThreadAsRead(thread._id)}
+                    >
+                      Mark as Read
+                    </Button>
+                  )}
 
-  <Button
-    size="small"
-    variant="outlined"
-    color={latest.archived ? "success" : "warning"}
-    onClick={() => archiveThread(thread._id, !latest.archived)}
-  >
-    {latest.archived ? "Unarchive" : "Archive"}
-  </Button>
-</Box>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    color={latest.archived ? "success" : "warning"}
+                    onClick={() => archiveThread(thread._id, !latest.archived)}
+                  >
+                    {latest.archived ? "Unarchive" : "Archive"}
+                  </Button>
+                </Box>
 
                 {expandedThreadId === thread._id ? (
                   <ExpandLess />
@@ -1559,8 +1601,7 @@ const filteredThreads = threads.filter(thread => {
                       return 0;
                     })
                     .map((email) => {
-                      const isExpanded =
-                        expandedMessageId === email.messageId;
+                      const isExpanded = expandedMessageId === email.messageId;
 
                       return (
                         <Box
@@ -1572,9 +1613,7 @@ const filteredThreads = threads.filter(thread => {
                             borderRadius: 1,
                             cursor: "pointer",
                           }}
-                          onClick={() =>
-                            handleExpandMessage(email.messageId)
-                          }
+                          onClick={() => handleExpandMessage(email.messageId)}
                         >
                           {/* {email.subject && (
                             <Typography
@@ -1594,10 +1633,7 @@ const filteredThreads = threads.filter(thread => {
                             From: {email.from}
                           </Typography> */}
 
-                          <Typography
-                            variant="caption"
-                            color="text.secondary"
-                          >
+                          <Typography variant="caption" color="text.secondary">
                             {new Date(email.createdAt).toLocaleString()}
                           </Typography>
 
@@ -1620,6 +1656,151 @@ const filteredThreads = threads.filter(thread => {
                               ? "Click to collapse"
                               : "Click to expand"}
                           </Typography> */}
+
+                          {email.attachments?.length > 0 && (
+                            <Box sx={{ mt: 2 }}>
+                              <Typography variant="subtitle2">
+                                Attachments({email.attachments.length})
+                              </Typography>
+                              <Divider sx={{ my: 1 }} />
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  gap: 2,
+                                  flexWrap: "wrap",
+                                }}
+                              >
+                                {email.attachments.map((att, idx) => (
+                                  <Box
+                                    key={idx}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      openAttachment(att);
+                                    }}
+                                    sx={{
+                                      border: "1px solid #ddd",
+                                      borderRadius: 2,
+                                      p: 1.5,
+                                      minWidth: 180,
+                                      cursor: "pointer",
+                                      bgcolor: "#fafafa",
+                                      "&:hover": { bgcolor: "#f0f0f0" },
+                                    }}
+                                  >
+                                    <Typography fontWeight="bold">
+                                      {att.filename}
+                                    </Typography>
+
+                                    <Typography variant="caption">
+                                      {Math.round(
+                                        (att.data.length * 3) / 4 / 1024,
+                                      )}{" "}
+                                      KB
+                                    </Typography>
+                                  </Box>
+                                ))}
+                              </Box>
+                              {previewFile && (
+                                <Box
+                                  sx={{
+                                    position: "fixed",
+                                    top: 0,
+                                    left: 0,
+                                    width: "100vw",
+                                    height: "100vh",
+                                    bgcolor: "rgba(0,0,0,0.7)",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    zIndex: 9999,
+                                  }}
+                                  onClick={() => setPreviewFile(null)}
+                                >
+                                  <Box
+                                    sx={{
+                                      width: "85%",
+                                      height: "90%",
+                                      bgcolor: "#fff",
+                                      borderRadius: 2,
+                                      overflow: "hidden",
+                                      position: "relative",
+                                    }}
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    {/* Header */}
+                                    <Box
+                                      sx={{
+                                        p: 1,
+                                        borderBottom: "1px solid #ddd",
+                                        display: "flex",
+                                        justifyContent: "space-between",
+                                        alignItems: "center",
+                                      }}
+                                    >
+                                      <Typography fontWeight="bold">
+                                        {previewFile.filename}
+                                      </Typography>
+
+                                      <Button
+                                        onClick={() => setPreviewFile(null)}
+                                      >
+                                        Close
+                                      </Button>
+                                    </Box>
+
+                                    {/* Preview Area */}
+                                    <Box sx={{ height: "100%" }}>
+                                      {/* Images */}
+                                      {previewFile.mimeType.startsWith(
+                                        "image/",
+                                      ) && (
+                                        <img
+                                          src={previewFile.url}
+                                          alt={previewFile.filename}
+                                          style={{
+                                            width: "100%",
+                                            height: "100%",
+                                            objectFit: "contain",
+                                          }}
+                                        />
+                                      )}
+
+                                      {/* PDF */}
+                                      {previewFile.mimeType ===
+                                        "application/pdf" && (
+                                        <iframe
+                                          src={previewFile.url}
+                                          style={{
+                                            width: "100%",
+                                            height: "100%",
+                                            border: "none",
+                                          }}
+                                          title="PDF Preview"
+                                        />
+                                      )}
+
+                                      {/* Excel / Word / Others */}
+                                      {!previewFile.mimeType.startsWith(
+                                        "image/",
+                                      ) &&
+                                        previewFile.mimeType !==
+                                          "application/pdf" && (
+                                          <iframe
+                                            src={previewFile.url}
+                                            style={{
+                                              width: "100%",
+                                              height: "100%",
+                                              border: "none",
+                                            }}
+                                            title="File Preview"
+                                          />
+                                        )}
+                                    </Box>
+                                  </Box>
+                                </Box>
+                              )}
+                            </Box>
+                          )}
                         </Box>
                       );
                     })}
@@ -1634,9 +1815,5 @@ const filteredThreads = threads.filter(thread => {
     </Box>
   );
 };
-
-
-
-
 
 export default EmailViewer;

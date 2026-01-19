@@ -11,10 +11,14 @@ import {
   Drawer,
   Checkbox,
   FormGroup,
-  FormControlLabel,Dialog, DialogTitle, DialogContent,
+  FormControlLabel,
+  Dialog,
+  DialogTitle,
+  DialogContent,
   List,
   ListItemButton,
-  ListItemText,TextField
+  ListItemText,
+  TextField,
 } from "@mui/material";
 import { ExpandLess, ExpandMore, AttachFile } from "@mui/icons-material";
 import FilterListIcon from "@mui/icons-material/FilterList";
@@ -100,8 +104,6 @@ import FolderZipIcon from "@mui/icons-material/FolderZip";
 //     return null;
 //   };
 
-
-
 //   useEffect(() => {
 //     const fetchEmails = async () => {
 //       if (!emailSyncEmail) return;
@@ -113,8 +115,6 @@ import FolderZipIcon from "@mui/icons-material/FolderZip";
 //           `http://127.0.0.1:8015/emailsync/user/login-with-token/${emailSyncEmail}?type=${tab}`
 //         );
 //         let emails = res.data.emails || [];
-
-      
 
 //         setEmailList(emails);
 //         console.log("Fetched emails:", emails);
@@ -165,7 +165,6 @@ import FolderZipIcon from "@mui/icons-material/FolderZip";
 //   return match ? match[0] : null;
 // };
 
- 
 // const filteredEmails = emailList.filter((email) => {
 //   if (!email.subject) return false;
 
@@ -281,7 +280,6 @@ import FolderZipIcon from "@mui/icons-material/FolderZip";
 //   }
 // };
 
-
 //   return (
 //     <>
 //       {loadingEmails ? (
@@ -356,7 +354,7 @@ import FolderZipIcon from "@mui/icons-material/FolderZip";
 //                       onClick={() => setSelectedEmail(email)}
 //                     >
 //                       <CardContent>
-                        
+
 //                         <Typography variant="subtitle1" fontWeight="bold">
 //                           {getCleanSubject(email.subject) || "(No Subject)"}
 //                         </Typography>
@@ -383,12 +381,11 @@ import FolderZipIcon from "@mui/icons-material/FolderZip";
 //                     sx={{ backgroundColor: "#f9fafb" }}
 //                   >
 //                     <Box>
-                    
+
 //                       <Typography variant="h6">
 //                         {getCleanSubject(selectedEmail.subject)}
 //                       </Typography>
 
-                    
 //                     </Box>
 
 //                     <Tooltip
@@ -512,7 +509,6 @@ import FolderZipIcon from "@mui/icons-material/FolderZip";
 //   })}
 // </Box>
 
-
 //                       </>
 //                     )}
 //                   </CardContent>
@@ -604,328 +600,1167 @@ import FolderZipIcon from "@mui/icons-material/FolderZip";
 //   );
 // };
 
+// const EmailViewer = () => {
+//   const { data } = useParams();
+//    const [contacts, setContacts] = useState([]);
+//   const [threads, setThreads] = useState([]);
+//   const [expandedThreadId, setExpandedThreadId] = useState(null);
+//   const [expandedMessageId, setExpandedMessageId] = useState(null);
+//   const [replyBox, setReplyBox] = useState(null);
+//   const [replyText, setReplyText] = useState("");
+//   const [previewFile, setPreviewFile] = useState(null);
+//   const openAttachment = (attachment) => {
+//   const byteCharacters = atob(attachment.data);
+//   const byteNumbers = new Array(byteCharacters.length);
 
-const EmailViewer = () => {
-  const { data } = useParams();
-   const [contacts, setContacts] = useState([]);
-  const [threads, setThreads] = useState([]);
-  const [expandedThreadId, setExpandedThreadId] = useState(null);
-  const [expandedMessageId, setExpandedMessageId] = useState(null);
-  const [replyBox, setReplyBox] = useState(null);
-  const [replyText, setReplyText] = useState("");
-//  const fetchAccountContacts = async () => {
-//     try {
-//       const response = await axios.get(
-//         `https://www.snptaxes.com/api/accounts/${data}/contacts`,
-//         {
-//           maxBodyLength: Infinity,
-//         }
-//       );
+//   for (let i = 0; i < byteCharacters.length; i++) {
+//     byteNumbers[i] = byteCharacters.charCodeAt(i);
+//   }
 
-//       setContacts(response.data);
-//       console.log("Contacts fetched:", response.data.data);
-//     } catch (error) {
-//       console.error(
-//         "Failed to fetch contacts",
-//         error.response?.data || error.message
-//       );
-//     }
-//   };
+//   const byteArray = new Uint8Array(byteNumbers);
+//   const blob = new Blob([byteArray], { type: attachment.mimeType });
 
-useEffect(() => {
-  fetchEmailSyncedContactsAndEmails();
-}, []);
+//   const url = URL.createObjectURL(blob);
 
-const fetchEmailSyncedContactsAndEmails = async () => {
-  try {
-    // 1️⃣ Fetch account contacts
-    const contactsRes = await axios.get(
-      `https://www.snptaxes.com/api/accounts/${data}/contacts`
-    );
+//   setPreviewFile({
+//     ...attachment,
+//     url
+//   });
+// };
+// //  const fetchAccountContacts = async () => {
+// //     try {
+// //       const response = await axios.get(
+// //         `https://www.snptaxes.com/api/accounts/${data}/contacts`,
+// //         {
+// //           maxBodyLength: Infinity,
+// //         }
+// //       );
 
-    // 2️⃣ Filter email sync contacts
-    const syncedEmails = (contactsRes.data.data || [])
-      .filter(item => item.canEmailSync && item.contact?.email)
-      .map(item => item.contact.email);
+// //       setContacts(response.data);
+// //       console.log("Contacts fetched:", response.data.data);
+// //     } catch (error) {
+// //       console.error(
+// //         "Failed to fetch contacts",
+// //         error.response?.data || error.message
+// //       );
+// //     }
+// //   };
 
-    console.log("Filtered emails sent to backend:", syncedEmails);
+// useEffect(() => {
+//   fetchEmailSyncedContactsAndEmails();
+// }, []);
 
-    if (syncedEmails.length === 0) {
-      console.warn("No email-synced contacts found");
-      return;
-    }
-
-    // 3️⃣ Call emails API with filtered emails
-    const emailsRes = await axios.post(
-      "http://127.0.0.1:8015/emailsync/messagesList/messages",
-      {
-        emails: syncedEmails, // 👈 backend filters using this
-      }
-    );
-
-    // 4️⃣ Set threads
-    setThreads(emailsRes.data.threads || []);
-    console.log("Fetched threads:", emailsRes.data.threads || []);
-  } catch (error) {
-    console.error(
-      "Error fetching synced emails or messages",
-      error.response?.data || error.message
-    );
-  }
-};
-
-// const fetchEmailSyncedContacts = async () => {
+// const fetchEmailSyncedContactsAndEmails = async () => {
 //   try {
-//     const response = await axios.get(
-//       `https://www.snptaxes.com/api/accounts/${data}/contacts`,
-//       { maxBodyLength: Infinity }
+//     // 1️⃣ Fetch account contacts
+//     const contactsRes = await axios.get(
+//       `https://www.snptaxes.com/api/accounts/${data}/contacts`
 //     );
 
-//     const emailSyncedContacts = response.data.data.filter(
-//       item => item.canEmailSync === true
+//     // 2️⃣ Filter email sync contacts
+//     const syncedEmails = (contactsRes.data.data || [])
+//       .filter(item => item.canEmailSync && item.contact?.email)
+//       .map(item => item.contact.email);
+
+//     console.log("Filtered emails sent to backend:", syncedEmails);
+
+//     if (syncedEmails.length === 0) {
+//       console.warn("No email-synced contacts found");
+//       return;
+//     }
+
+//     // 3️⃣ Call emails API with filtered emails
+//     const emailsRes = await axios.post(
+//       "http://127.0.0.1:8015/emailsync/messagesList/messages",
+//       {
+//         emails: syncedEmails, // 👈 backend filters using this
+//       }
 //     );
 
-//     console.log("Email synced contacts:", emailSyncedContacts);
+//     // 4️⃣ Set threads
+//     setThreads(emailsRes.data.threads || []);
+//     console.log("Fetched threads:", emailsRes.data.threads || []);
 //   } catch (error) {
 //     console.error(
-//       "Failed to fetch email synced contacts",
+//       "Error fetching synced emails or messages",
 //       error.response?.data || error.message
 //     );
 //   }
 // };
 
+// // const fetchEmailSyncedContacts = async () => {
+// //   try {
+// //     const response = await axios.get(
+// //       `https://www.snptaxes.com/api/accounts/${data}/contacts`,
+// //       { maxBodyLength: Infinity }
+// //     );
+
+// //     const emailSyncedContacts = response.data.data.filter(
+// //       item => item.canEmailSync === true
+// //     );
+
+// //     console.log("Email synced contacts:", emailSyncedContacts);
+// //   } catch (error) {
+// //     console.error(
+// //       "Failed to fetch email synced contacts",
+// //       error.response?.data || error.message
+// //     );
+// //   }
+// // };
+
+// //   useEffect(() => {
+// //     fetchAccountContacts();
+// //   }, []);
+// //   useEffect(() => {
+// //     fetchEmails();
+// //   }, []);
+
+// //   const fetchEmails = async () => {
+// //     try {
+// //       const response = await axios.get(
+// //         "http://127.0.0.1:8015/emailsync/messagesList/messages"
+// //       );
+// //       setThreads(response.data.threads || []);
+// //     } catch (err) {
+// //       console.error("Error fetching emails:", err);
+// //     }
+// //   };
+
+//   const handleExpandThread = (threadId) => {
+//     setExpandedThreadId(expandedThreadId === threadId ? null : threadId);
+//     setExpandedMessageId(null); // reset message expansion
+//   };
+
+//   const handleExpandMessage = (messageId) => {
+//     setExpandedMessageId(expandedMessageId === messageId ? null : messageId);
+//   };
+
+//   const getPreview = (html, length = 120) => {
+//     const text = html.replace(/<[^>]*>?/gm, "");
+//     return text.length > length ? text.slice(0, length) + "..." : text;
+//   };
+//   const extractEmail = (from) => {
+//     const match = from.match(/<(.+?)>/);
+//     return match ? match[1] : from;
+//   };
+
+//   return (
+//     <Box
+//       sx={{
+//         maxWidth: 900,
+//         margin: "20px auto",
+//         bgcolor: "#f9f9f9",
+//         p: 2,
+//         borderRadius: 2,
+//       }}
+//     >
+//       <Typography variant="h5" sx={{ mb: 2 }}>
+//         Email Inbox
+//       </Typography>
+
+//       <List>
+//         {threads.map((thread) => {
+//           const latest = thread.latest;
+
+//           return (
+//             <React.Fragment key={thread._id}>
+//               {/* Thread Header */}
+//               <ListItemButton onClick={() => handleExpandThread(thread._id)}>
+//                 <ListItemText
+//                   primary={
+//                     <Typography
+//                       variant="subtitle1"
+//                       sx={{ fontWeight: latest.read ? "normal" : "bold" }}
+//                     >
+//                       {latest.subject || "(No Subject)"}
+//                     </Typography>
+//                   }
+
+//                 />
+//                 {expandedThreadId === thread._id ? (
+//                   <ExpandLess />
+//                 ) : (
+//                   <ExpandMore />
+//                 )}
+//               </ListItemButton>
+
+//               {/* Thread Messages */}
+//               <Collapse
+//                 in={expandedThreadId === thread._id}
+//                 timeout="auto"
+//                 unmountOnExit
+//               >
+//                 <Box sx={{ p: 2, bgcolor: "#fff", borderRadius: 1, mb: 1 }}>
+//                   {thread.messages.map((email) => {
+//                     const isExpanded = expandedMessageId === email.messageId;
+
+//                     return (
+//                       <Box
+//                         key={email.messageId}
+//                         sx={{
+//                           mb: 2,
+//                           p: 1.5,
+//                           border: "1px solid #eee",
+//                           borderRadius: 1,
+//                           cursor: "pointer",
+//                         }}
+//                         onClick={() => handleExpandMessage(email.messageId)}
+//                       >
+
+//                         <Typography variant="caption" color="text.secondary">
+//                           {new Date(email.createdAt).toLocaleString()}
+//                         </Typography>
+
+//                         <Typography
+//                           variant="body2"
+//                           sx={{ mt: 1 }}
+//                           dangerouslySetInnerHTML={{
+//                             __html: isExpanded
+//                               ? email.body
+//                               : getPreview(email.body),
+//                           }}
+//                         />
+
+//                         {email.attachments?.length > 0 && (
+//                             <Box sx={{ mt: 2 }}>
+//                               <Typography variant="subtitle2">
+//                                 Attachments({email.attachments.length})
+//                               </Typography>
+//                               <Divider sx={{ my: 1 }} />
+//                               <Box
+//                                 sx={{
+//                                   display: "flex",
+//                                   gap: 2,
+//                                   flexWrap: "wrap",
+//                                 }}
+//                               >
+//                                 {email.attachments.map((att, idx) => (
+//                                   <Box
+//                                     key={idx}
+//                                     onClick={(e) => {
+//                                       e.stopPropagation();
+//                                       openAttachment(att);
+//                                     }}
+//                                     sx={{
+//                                       border: "1px solid #ddd",
+//                                       borderRadius: 2,
+//                                       p: 1.5,
+//                                       minWidth: 180,
+//                                       cursor: "pointer",
+//                                       bgcolor: "#fafafa",
+//                                       "&:hover": { bgcolor: "#f0f0f0" },
+//                                     }}
+//                                   >
+//                                     <Typography fontWeight="bold">
+//                                       {att.filename}
+//                                     </Typography>
+
+//                                     <Typography variant="caption">
+//                                       {Math.round(
+//                                         (att.data.length * 3) / 4 / 1024,
+//                                       )}{" "}
+//                                       KB
+//                                     </Typography>
+//                                   </Box>
+//                                 ))}
+//                               </Box>
+//                               {previewFile && (
+//                                 <Box
+//                                   sx={{
+//                                     position: "fixed",
+//                                     top: 0,
+//                                     left: 0,
+//                                     width: "100vw",
+//                                     height: "100vh",
+//                                     bgcolor: "rgba(0,0,0,0.7)",
+//                                     display: "flex",
+//                                     alignItems: "center",
+//                                     justifyContent: "center",
+//                                     zIndex: 9999,
+//                                   }}
+//                                   onClick={() => setPreviewFile(null)}
+//                                 >
+//                                   <Box
+//                                     sx={{
+//                                       width: "85%",
+//                                       height: "90%",
+//                                       bgcolor: "#fff",
+//                                       borderRadius: 2,
+//                                       overflow: "hidden",
+//                                       position: "relative",
+//                                     }}
+//                                     onClick={(e) => e.stopPropagation()}
+//                                   >
+//                                     {/* Header */}
+//                                     <Box
+//                                       sx={{
+//                                         p: 1,
+//                                         borderBottom: "1px solid #ddd",
+//                                         display: "flex",
+//                                         justifyContent: "space-between",
+//                                         alignItems: "center",
+//                                       }}
+//                                     >
+//                                       <Typography fontWeight="bold">
+//                                         {previewFile.filename}
+//                                       </Typography>
+
+//                                       <Button
+//                                         onClick={() => setPreviewFile(null)}
+//                                       >
+//                                         Close
+//                                       </Button>
+//                                     </Box>
+
+//                                     {/* Preview Area */}
+//                                     <Box sx={{ height: "100%" }}>
+//                                       {/* Images */}
+//                                       {previewFile.mimeType.startsWith(
+//                                         "image/",
+//                                       ) && (
+//                                         <img
+//                                           src={previewFile.url}
+//                                           alt={previewFile.filename}
+//                                           style={{
+//                                             width: "100%",
+//                                             height: "100%",
+//                                             objectFit: "contain",
+//                                           }}
+//                                         />
+//                                       )}
+
+//                                       {/* PDF */}
+//                                       {previewFile.mimeType ===
+//                                         "application/pdf" && (
+//                                         <iframe
+//                                           src={previewFile.url}
+//                                           style={{
+//                                             width: "100%",
+//                                             height: "100%",
+//                                             border: "none",
+//                                           }}
+//                                           title="PDF Preview"
+//                                         />
+//                                       )}
+
+//                                       {/* Excel / Word / Others */}
+//                                       {!previewFile.mimeType.startsWith(
+//                                         "image/",
+//                                       ) &&
+//                                         previewFile.mimeType !==
+//                                           "application/pdf" && (
+//                                           <iframe
+//                                             src={previewFile.url}
+//                                             style={{
+//                                               width: "100%",
+//                                               height: "100%",
+//                                               border: "none",
+//                                             }}
+//                                             title="File Preview"
+//                                           />
+//                                         )}
+//                                     </Box>
+//                                   </Box>
+//                                 </Box>
+//                               )}
+//                             </Box>
+//                           )}
+
+//                         {/* <Typography
+//                           variant="caption"
+//                           color="primary"
+//                           sx={{ display: "block", mt: 1 }}
+//                         >
+//                           {isExpanded ? "Click to collapse" : "Click to expand"}
+//                         </Typography> */}
+//                         {/* <Typography
+//                           variant="caption"
+//                           color="primary"
+//                           sx={{ display: "block", mt: 1 }}
+//                         >
+//                           {isExpanded ? "Click to collapse" : "Click to expand"}
+//                         </Typography> */}
+
+//                         {/* REPLY SECTION */}
+//                         {/* {isExpanded && ( */}
+//                           <Box sx={{ mt: 2 }}>
+//                             <Button
+//                               size="small"
+//                               variant="outlined"
+//                               onClick={(e) => {
+//                                 e.stopPropagation();
+//                                 setReplyBox(email.messageId);
+//                               }}
+//                             >
+//                               Reply
+//                             </Button>
+
+//                             {replyBox === email.messageId && (
+//                               <Box sx={{ mt: 1 }}>
+//                                 <TextField
+//                                   fullWidth
+//                                   multiline
+//                                   rows={3}
+//                                   placeholder="Type your reply..."
+//                                   value={replyText}
+//                                   onChange={(e) => setReplyText(e.target.value)}
+//                                   onClick={(e) => e.stopPropagation()} // 👈 IMPORTANT
+//                                 />
+
+//                                 <Button
+//                                   variant="contained"
+//                                   size="small"
+//                                   sx={{ mt: 1 }}
+//                                   onClick={async (e) => {
+//                                     e.stopPropagation(); // 👈 IMPORTANT
+
+//                                     try {
+//                                       await axios.post(
+//                                         "http://127.0.0.1:8015/emailsync/user/reply",
+//                                         {
+//                                           to: extractEmail(email.from),
+
+//                                           subject:
+//                                             email.subject || "No Subject",
+//                                           message: replyText,
+//                                         }
+//                                       );
+
+//                                       setReplyText("");
+//                                       setReplyBox(null);
+//                                       alert("Reply Sent Successfully!");
+//                                     } catch (err) {
+//                                       console.error("Reply failed", err);
+//                                       alert("Failed to send reply");
+//                                     }
+//                                   }}
+//                                 >
+//                                   Send Reply
+//                                 </Button>
+//                               </Box>
+//                             )}
+//                           </Box>
+//                         {/* )} */}
+//                       </Box>
+//                     );
+//                   })}
+//                 </Box>
+//               </Collapse>
+
+//               <Divider />
+//             </React.Fragment>
+//           );
+//         })}
+//       </List>
+//     </Box>
+//   );
+// };
+
+// const EmailViewer = () => {
+//   const { data } = useParams();
+
+//   const [threads, setThreads] = useState([]);
+//   const [selectedThreadId, setSelectedThreadId] = useState(null);
+//   const [replyText, setReplyText] = useState("");
+//   const [previewFile, setPreviewFile] = useState(null);
+
 //   useEffect(() => {
-//     fetchAccountContacts();
-//   }, []);
-//   useEffect(() => {
-//     fetchEmails();
+//     fetchEmailSyncedContactsAndEmails();
 //   }, []);
 
-//   const fetchEmails = async () => {
+//   const fetchEmailSyncedContactsAndEmails = async () => {
 //     try {
-//       const response = await axios.get(
-//         "http://127.0.0.1:8015/emailsync/messagesList/messages"
+//       const contactsRes = await axios.get(
+//         `https://www.snptaxes.com/api/accounts/${data}/contacts`
 //       );
-//       setThreads(response.data.threads || []);
-//     } catch (err) {
-//       console.error("Error fetching emails:", err);
+
+//       const syncedEmails = (contactsRes.data.data || [])
+//         .filter(item => item.canEmailSync && item.contact?.email)
+//         .map(item => item.contact.email);
+
+//       if (!syncedEmails.length) return;
+
+//       const emailsRes = await axios.post(
+//         "http://127.0.0.1:8015/emailsync/messagesList/messages",
+//         { emails: syncedEmails }
+//       );
+
+//       setThreads(emailsRes.data.threads || []);
+//     } catch (error) {
+//       console.error("Error fetching emails", error);
 //     }
 //   };
 
-  const handleExpandThread = (threadId) => {
-    setExpandedThreadId(expandedThreadId === threadId ? null : threadId);
-    setExpandedMessageId(null); // reset message expansion
+//   const extractEmail = (from) => {
+//     const match = from?.match(/<(.+?)>/);
+//     return match ? match[1] : from;
+//   };
+
+//   const getPreview = (html, length = 80) => {
+//     const text = html.replace(/<[^>]*>?/gm, "");
+//     return text.length > length ? text.slice(0, length) + "..." : text;
+//   };
+
+//   const openAttachment = (attachment) => {
+//     const byteCharacters = atob(attachment.data);
+//     const byteNumbers = new Array(byteCharacters.length);
+
+//     for (let i = 0; i < byteCharacters.length; i++) {
+//       byteNumbers[i] = byteCharacters.charCodeAt(i);
+//     }
+
+//     const blob = new Blob([new Uint8Array(byteNumbers)], {
+//       type: attachment.mimeType,
+//     });
+
+//     setPreviewFile({
+//       ...attachment,
+//       url: URL.createObjectURL(blob),
+//     });
+//   };
+
+//   const sendReply = async () => {
+//     const thread = threads.find(t => t._id === selectedThreadId);
+//     if (!thread) return;
+
+//     const lastEmail = thread.messages[thread.messages.length - 1];
+
+//     await axios.post(
+//       "http://127.0.0.1:8015/emailsync/user/reply",
+//       {
+//         to: extractEmail(lastEmail.from),
+//         subject: lastEmail.subject || "No Subject",
+//         message: replyText,
+//       }
+//     );
+
+//     setReplyText("");
+//     alert("Reply sent!");
+//   };
+
+//   const selectedThread = threads.find(t => t._id === selectedThreadId);
+
+//   return (
+//     <Box sx={{ display: "flex", height: "90vh", bgcolor: "#fff" }}>
+
+//       {/* LEFT: Inbox */}
+//       <Box sx={{ width: "35%", borderRight: "1px solid #ddd", overflowY: "auto" }}>
+//         <Typography variant="h6" sx={{ p: 2, borderBottom: "1px solid #ddd" }}>
+//           Inbox
+//         </Typography>
+
+//         <List>
+//           {threads.map((thread) => {
+//             const latest = thread.latest;
+
+//             return (
+//               <ListItemButton
+//                 key={thread._id}
+//                 onClick={() => setSelectedThreadId(thread._id)}
+//                 sx={{
+//                   borderBottom: "1px solid #eee",
+//                   "&:hover": { bgcolor: "#f5f5f5" },
+//                   bgcolor:
+//                     selectedThreadId === thread._id ? "#f0f4ff" : "transparent",
+//                 }}
+//               >
+//                 <Box>
+//                   {/* <Typography fontWeight={latest.read ? 400 : 700}>
+//                     {latest.from}
+//                   </Typography> */}
+//                   <Typography fontWeight={latest.read ? 400 : 700}>
+//   {latest.from?.replace(/<.*?>/g, "").trim()}
+// </Typography>
+
+//                   <Typography fontWeight={latest.read ? 400 : 600}>
+//                     {latest.subject || "(No Subject)"}
+//                   </Typography>
+
+//                   <Typography variant="caption" color="text.secondary">
+//                     {getPreview(latest.body)}
+//                   </Typography>
+//                 </Box>
+//               </ListItemButton>
+//             );
+//           })}
+//         </List>
+//       </Box>
+
+//       {/* RIGHT: Email Viewer */}
+//       <Box sx={{ width: "65%", p: 2, overflowY: "auto" }}>
+//         {selectedThread ? (
+//           <>
+//             <Typography variant="h6" sx={{ mb: 2 }}>
+//               {selectedThread.latest.subject}
+//             </Typography>
+
+//             {selectedThread.messages.map((email) => (
+//               <Box
+//                 key={email.messageId}
+//                 sx={{ borderBottom: "1px solid #ddd", mb: 2, pb: 2 }}
+//               >
+//                 <Typography fontWeight="bold">{email.from}</Typography>
+
+//                 <Typography variant="caption" color="text.secondary">
+//                   {new Date(email.createdAt).toLocaleString()}
+//                 </Typography>
+
+//                 <Box
+//                   sx={{ mt: 1 }}
+//                   dangerouslySetInnerHTML={{ __html: email.body }}
+//                 />
+
+//                 {/* Attachments */}
+//                 {email.attachments?.length > 0 && (
+//                   <Box sx={{ mt: 2 }}>
+//                     <Typography fontWeight="bold">Attachments</Typography>
+
+//                     <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+//                       {email.attachments.map((att, i) => (
+//                         <Box
+//                           key={i}
+//                           onClick={() => openAttachment(att)}
+//                           sx={{
+//                             border: "1px solid #ddd",
+//                             borderRadius: 2,
+//                             p: 1,
+//                             cursor: "pointer",
+//                             bgcolor: "#fff",
+//                             "&:hover": { bgcolor: "#f0f0f0" },
+//                           }}
+//                         >
+//                           <Typography fontSize={13}>
+//                             {att.filename}
+//                           </Typography>
+//                         </Box>
+//                       ))}
+//                     </Box>
+//                   </Box>
+//                 )}
+//               </Box>
+//             ))}
+
+//             {/* Reply Box */}
+//             <Box sx={{ mt: 3 }}>
+//               <TextField
+//                 fullWidth
+//                 multiline
+//                 rows={4}
+//                 placeholder="Reply..."
+//                 value={replyText}
+//                 onChange={(e) => setReplyText(e.target.value)}
+//               />
+
+//               <Button variant="contained" sx={{ mt: 1 }} onClick={sendReply}>
+//                 Send
+//               </Button>
+//             </Box>
+//           </>
+//         ) : (
+//           <Typography color="text.secondary">
+//             Select an email to read
+//           </Typography>
+//         )}
+//       </Box>
+
+//       {/* Attachment Preview */}
+//       {previewFile && (
+//         <Box
+//           onClick={() => setPreviewFile(null)}
+//           sx={{
+//             position: "fixed",
+//             top: 0,
+//             left: 0,
+//             width: "100vw",
+//             height: "100vh",
+//             bgcolor: "rgba(0,0,0,0.7)",
+//             display: "flex",
+//             alignItems: "center",
+//             justifyContent: "center",
+//             zIndex: 9999,
+//           }}
+//         >
+//           <Box
+//             onClick={(e) => e.stopPropagation()}
+//             sx={{
+//               width: "85%",
+//               height: "90%",
+//               bgcolor: "#fff",
+//               borderRadius: 2,
+//               overflow: "hidden",
+//             }}
+//           >
+//             <Box
+//               sx={{
+//                 p: 1,
+//                 borderBottom: "1px solid #ddd",
+//                 display: "flex",
+//                 justifyContent: "space-between",
+//               }}
+//             >
+//               <Typography fontWeight="bold">
+//                 {previewFile.filename}
+//               </Typography>
+//               <Button onClick={() => setPreviewFile(null)}>Close</Button>
+//             </Box>
+
+//             <Box sx={{ height: "100%" }}>
+//               {previewFile.mimeType.startsWith("image/") && (
+//                 <img
+//                   src={previewFile.url}
+//                   alt=""
+//                   style={{ width: "100%", height: "100%", objectFit: "contain" }}
+//                 />
+//               )}
+
+//               {previewFile.mimeType === "application/pdf" && (
+//                 <iframe
+//                   src={previewFile.url}
+//                   style={{ width: "100%", height: "100%", border: "none" }}
+//                   title="PDF"
+//                 />
+//               )}
+
+//               {!previewFile.mimeType.startsWith("image/") &&
+//                 previewFile.mimeType !== "application/pdf" && (
+//                   <iframe
+//                     src={previewFile.url}
+//                     style={{ width: "100%", height: "100%", border: "none" }}
+//                     title="File"
+//                   />
+//                 )}
+//             </Box>
+//           </Box>
+//         </Box>
+//       )}
+//     </Box>
+//   );
+// };
+const EmailViewer = () => {
+  const { data } = useParams();
+
+  const [threads, setThreads] = useState([]);
+  const [selectedThreadId, setSelectedThreadId] = useState(null);
+  const [replyText, setReplyText] = useState("");
+  const [previewFile, setPreviewFile] = useState(null);
+
+  useEffect(() => {
+    fetchEmailSyncedContactsAndEmails();
+  }, []);
+
+  // 🔹 Fetch Emails
+  const fetchEmailSyncedContactsAndEmails = async () => {
+    try {
+      const contactsRes = await axios.get(
+        `https://www.snptaxes.com/api/accounts/${data}/contacts`,
+      );
+
+      const syncedEmails = (contactsRes.data.data || [])
+        .filter((item) => item.canEmailSync && item.contact?.email)
+        .map((item) => item.contact.email);
+
+      if (!syncedEmails.length) return;
+
+      const emailsRes = await axios.post(
+        "http://127.0.0.1:8015/emailsync/messagesList/messages",
+        { emails: syncedEmails },
+      );
+
+      setThreads(emailsRes.data.threads || []);
+    } catch (error) {
+      console.error("Error fetching emails", error);
+    }
   };
 
-  const handleExpandMessage = (messageId) => {
-    setExpandedMessageId(expandedMessageId === messageId ? null : messageId);
+  // 🔹 Extract only name
+  const getName = (from) => from?.replace(/<.*?>/g, "").trim();
+
+  // 🔹 Gmail-style thread title: "vinayak, me 2"
+  const formatThreadTitle = (thread) => {
+    const names = new Set();
+
+    thread.messages.forEach((msg) => {
+      const name = getName(msg.from);
+
+      if (name?.toLowerCase().includes("janavijpatil0406@gmail.com")) {
+        names.add("me");
+      } else {
+        names.add(name?.split(" ")[0].toLowerCase());
+      }
+    });
+
+    // return `${[...names].join(", ")} ${thread.messages.length}`;
+    const count = thread.messages.length;
+
+    return count > 1
+      ? `${[...names].join(", ")} ${count}`
+      : `${[...names].join(", ")}`;
   };
 
-  const getPreview = (html, length = 120) => {
+  // 🔹 Preview text
+  const getPreview = (html, length = 80) => {
     const text = html.replace(/<[^>]*>?/gm, "");
     return text.length > length ? text.slice(0, length) + "..." : text;
   };
-  const extractEmail = (from) => {
-    const match = from.match(/<(.+?)>/);
-    return match ? match[1] : from;
+
+  // 🔹 Attachment Preview
+  const openAttachment = (attachment) => {
+    const byteCharacters = atob(attachment.data);
+    const byteNumbers = new Array(byteCharacters.length);
+
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+
+    const blob = new Blob([new Uint8Array(byteNumbers)], {
+      type: attachment.mimeType,
+    });
+
+    setPreviewFile({
+      ...attachment,
+      url: URL.createObjectURL(blob),
+    });
   };
 
+  // 🔹 Send Reply
+  const sendReply = async () => {
+    const thread = threads.find((t) => t._id === selectedThreadId);
+    if (!thread) return;
+
+    const lastEmail = thread.messages[thread.messages.length - 1];
+
+    await axios.post("http://127.0.0.1:8015/emailsync/user/reply", {
+      to: lastEmail.from,
+      subject: lastEmail.subject || "No Subject",
+      message: replyText,
+    });
+
+    setReplyText("");
+    alert("Reply sent!");
+  };
+
+  const selectedThread = threads.find((t) => t._id === selectedThreadId);
+  const markThreadAsRead = async (threadId) => {
+    try {
+      await axios.patch(
+        "http://127.0.0.1:8015/emailsync/messagesList/threads/mark-read",
+        { threadId },
+      );
+
+      fetchEmailSyncedContactsAndEmails(); // refresh inbox UI
+    } catch (err) {
+      console.error("Mark read failed", err);
+    }
+  };
+const [openDrawer, setOpenDrawer] = useState(false);
   return (
-    <Box
-      sx={{
-        maxWidth: 900,
-        margin: "20px auto",
-        bgcolor: "#f9f9f9",
-        p: 2,
-        borderRadius: 2,
-      }}
-    >
-      <Typography variant="h5" sx={{ mb: 2 }}>
-        Email Inbox
-      </Typography>
+    <>
+        <Box
+        sx={{
+          height: "60px",
+          border: "1px solid #ddd",
+          borderRadius: 2,
+          mb: 3,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "flex-end", // 👈 move button to right
+          px: 2,
+        }}
+      >
+        <Button
+          variant="contained"
+          onClick={() => setOpenDrawer(true)}
+        >
+          New Email
+        </Button>
+      </Box>
+      <Box
+        sx={{
+          display: "flex",
+          height: "90vh",
+          bgcolor: "#fff",
+          border: "1px solid #ddd",
+          borderRadius: 2,
+        }}
+      >
+        {/* LEFT: Inbox */}
+        <Box
+          sx={{
+            width: "35%",
+            borderRight: "1px solid #ddd",
+            overflowY: "auto",
+          }}
+        >
+          {/* <Typography variant="h6" sx={{ p: 2, borderBottom: "1px solid #ddd" }}>
+          Inbox
+        </Typography> */}
 
-      <List>
-        {threads.map((thread) => {
-          const latest = thread.latest;
+          <List>
+            {threads.map((thread) => {
+              const latest = thread.latest;
 
-          return (
-            <React.Fragment key={thread._id}>
-              {/* Thread Header */}
-              <ListItemButton onClick={() => handleExpandThread(thread._id)}>
-                <ListItemText
-                  primary={
-                    <Typography
-                      variant="subtitle1"
-                      sx={{ fontWeight: latest.read ? "normal" : "bold" }}
-                    >
+              return (
+                // <ListItemButton
+                //   key={thread._id}
+                //   onClick={() => setSelectedThreadId(thread._id)}
+                //   sx={{
+                //     borderBottom: "1px solid #eee",
+                //     "&:hover": { bgcolor: "#f5f5f5" },
+                //     bgcolor:
+                //       selectedThreadId === thread._id ? "#f0f4ff" : "transparent",
+                //   }}
+                // >
+                //   <Box>
+                //     <Typography fontWeight={latest.read ? 400 : 700}>
+                //       {formatThreadTitle(thread)}
+                //     </Typography>
+
+                //     <Typography fontWeight={latest.read ? 400 : 600}>
+                //       {latest.subject || "(No Subject)"}
+                //     </Typography>
+
+                //     <Typography variant="caption" color="text.secondary">
+                //       {getPreview(latest.body)}
+                //     </Typography>
+                //   </Box>
+                // </ListItemButton>
+                <ListItemButton
+                  key={thread._id}
+                  onClick={() => {
+                    setSelectedThreadId(thread._id);
+                    markThreadAsRead(thread._id);
+                  }}
+                  sx={{
+                    borderBottom: "1px solid #eee",
+                    "&:hover": { bgcolor: "#f5f5f5" },
+                    bgcolor:
+                      selectedThreadId === thread._id
+                        ? "#f0f4ff"
+                        : "transparent",
+                  }}
+                >
+                  <Box>
+                    <Typography fontWeight={latest.read ? 400 : 700}>
+                      {formatThreadTitle(thread)}
+                    </Typography>
+
+                    <Typography fontWeight={latest.read ? 400 : 600}>
                       {latest.subject || "(No Subject)"}
                     </Typography>
-                  }
-                  secondary={
-                    <>
-                      <Typography variant="body2">
-                        From: {latest.from}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {new Date(latest.createdAt).toLocaleString()}
-                      </Typography>
-                    </>
-                  }
-                />
-                {expandedThreadId === thread._id ? (
-                  <ExpandLess />
-                ) : (
-                  <ExpandMore />
-                )}
-              </ListItemButton>
 
-              {/* Thread Messages */}
-              <Collapse
-                in={expandedThreadId === thread._id}
-                timeout="auto"
-                unmountOnExit
+                    <Typography variant="caption" color="text.secondary">
+                      {getPreview(latest.body)}
+                    </Typography>
+                  </Box>
+                </ListItemButton>
+              );
+            })}
+          </List>
+        </Box>
+
+        {/* RIGHT: Email Viewer */}
+        <Box sx={{ width: "65%", p: 2, overflowY: "auto" }}>
+          {selectedThread ? (
+            <>
+              {/* <Typography variant="h6" sx={{ mb: 2 }}>
+              {selectedThread.latest.subject}
+            </Typography> */}
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  mb: 2,
+                  borderBottom: "1px solid #ddd",
+                  pb: 1,
+                }}
               >
-                <Box sx={{ p: 2, bgcolor: "#fff", borderRadius: 1, mb: 1 }}>
-                  {thread.messages.map((email) => {
-                    const isExpanded = expandedMessageId === email.messageId;
+                <Typography variant="h6">
+                  {selectedThread.latest.subject}
+                </Typography>
 
-                    return (
-                      <Box
-                        key={email.messageId}
-                        sx={{
-                          mb: 2,
-                          p: 1.5,
-                          border: "1px solid #eee",
-                          borderRadius: 1,
-                          cursor: "pointer",
-                        }}
-                        onClick={() => handleExpandMessage(email.messageId)}
-                      >
-                        <Typography variant="subtitle2">
-                          {email.from}
-                        </Typography>
+                <CloseIcon
+                  sx={{ cursor: "pointer", color: "#555" }}
+                  onClick={() => setSelectedThreadId(null)}
+                />
+              </Box>
 
-                        <Typography variant="caption" color="text.secondary">
-                          {new Date(email.createdAt).toLocaleString()}
-                        </Typography>
+              {selectedThread.messages.map((email) => (
+                <Box
+                  key={email.messageId}
+                  sx={{ borderBottom: "1px solid #ddd", mb: 2, pb: 2 }}
+                >
+                  <Typography fontWeight="bold">
+                    {getName(email.from)}
+                  </Typography>
 
-                        <Typography
-                          variant="body2"
-                          sx={{ mt: 1 }}
-                          dangerouslySetInnerHTML={{
-                            __html: isExpanded
-                              ? email.body
-                              : getPreview(email.body),
-                          }}
-                        />
+                  <Typography variant="caption" color="text.secondary">
+                    {new Date(email.createdAt).toLocaleString()}
+                  </Typography>
 
-                        {email.attachments?.length > 0 && isExpanded && (
-                          <Box sx={{ mt: 1 }}>
-                            {email.attachments.map((att, idx) => (
-                              <Box
-                                key={idx}
-                                sx={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  mb: 0.5,
-                                }}
-                              >
-                                <AttachFile fontSize="small" sx={{ mr: 0.5 }} />
-                                <Typography variant="body2">
-                                  {att.filename}
-                                </Typography>
-                              </Box>
-                            ))}
+                  <Box
+                    sx={{ mt: 1 }}
+                    dangerouslySetInnerHTML={{ __html: email.body }}
+                  />
+
+                  {/* Attachments */}
+                  {email.attachments?.length > 0 && (
+                    <Box sx={{ mt: 2 }}>
+                      <Typography fontWeight="bold">Attachments</Typography>
+
+                      <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+                        {email.attachments.map((att, i) => (
+                          <Box
+                            key={i}
+                            onClick={() => openAttachment(att)}
+                            sx={{
+                              border: "1px solid #ddd",
+                              borderRadius: 2,
+                              p: 1,
+                              cursor: "pointer",
+                              bgcolor: "#fff",
+                              "&:hover": { bgcolor: "#f0f0f0" },
+                            }}
+                          >
+                            <Typography fontSize={13}>
+                              {att.filename}
+                            </Typography>
                           </Box>
-                        )}
-
-                        {/* <Typography
-                          variant="caption"
-                          color="primary"
-                          sx={{ display: "block", mt: 1 }}
-                        >
-                          {isExpanded ? "Click to collapse" : "Click to expand"}
-                        </Typography> */}
-                        <Typography
-                          variant="caption"
-                          color="primary"
-                          sx={{ display: "block", mt: 1 }}
-                        >
-                          {isExpanded ? "Click to collapse" : "Click to expand"}
-                        </Typography>
-
-                        {/* REPLY SECTION */}
-                        {isExpanded && (
-                          <Box sx={{ mt: 2 }}>
-                            <Button
-                              size="small"
-                              variant="outlined"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setReplyBox(email.messageId);
-                              }}
-                            >
-                              Reply
-                            </Button>
-
-                            {replyBox === email.messageId && (
-                              <Box sx={{ mt: 1 }}>
-                                <TextField
-                                  fullWidth
-                                  multiline
-                                  rows={3}
-                                  placeholder="Type your reply..."
-                                  value={replyText}
-                                  onChange={(e) => setReplyText(e.target.value)}
-                                  onClick={(e) => e.stopPropagation()} // 👈 IMPORTANT
-                                />
-
-                                <Button
-                                  variant="contained"
-                                  size="small"
-                                  sx={{ mt: 1 }}
-                                  onClick={async (e) => {
-                                    e.stopPropagation(); // 👈 IMPORTANT
-
-                                    try {
-                                      await axios.post(
-                                        "http://127.0.0.1:8015/emailsync/user/reply",
-                                        {
-                                          to: extractEmail(email.from),
-
-                                          subject:
-                                            email.subject || "No Subject",
-                                          message: replyText,
-                                        }
-                                      );
-
-                                      setReplyText("");
-                                      setReplyBox(null);
-                                      alert("Reply Sent Successfully!");
-                                    } catch (err) {
-                                      console.error("Reply failed", err);
-                                      alert("Failed to send reply");
-                                    }
-                                  }}
-                                >
-                                  Send Reply
-                                </Button>
-                              </Box>
-                            )}
-                          </Box>
-                        )}
+                        ))}
                       </Box>
-                    );
-                  })}
+                    </Box>
+                  )}
                 </Box>
-              </Collapse>
+              ))}
 
-              <Divider />
-            </React.Fragment>
-          );
-        })}
-      </List>
-    </Box>
+              {/* Reply Box */}
+              <Box sx={{ mt: 3 }}>
+                <TextField
+                  fullWidth
+                  multiline
+                  rows={4}
+                  placeholder="Reply..."
+                  value={replyText}
+                  onChange={(e) => setReplyText(e.target.value)}
+                />
+
+                <Button variant="contained" sx={{ mt: 1 }} onClick={sendReply}>
+                  Send
+                </Button>
+              </Box>
+            </>
+          ) : (
+            <Typography color="text.secondary">
+              Select an email to read
+            </Typography>
+          )}
+        </Box>
+
+        {/* Attachment Preview */}
+        {previewFile && (
+          <Box
+            onClick={() => setPreviewFile(null)}
+            sx={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "100vw",
+              height: "100vh",
+              bgcolor: "rgba(0,0,0,0.7)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 9999,
+            }}
+          >
+            <Box
+              onClick={(e) => e.stopPropagation()}
+              sx={{
+                width: "85%",
+                height: "90%",
+                bgcolor: "#fff",
+                borderRadius: 2,
+                overflow: "hidden",
+              }}
+            >
+              <Box
+                sx={{
+                  p: 1,
+                  borderBottom: "1px solid #ddd",
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Typography fontWeight="bold">
+                  {previewFile.filename}
+                </Typography>
+                <Button onClick={() => setPreviewFile(null)}>Close</Button>
+              </Box>
+
+              <Box sx={{ height: "100%" }}>
+                {previewFile.mimeType.startsWith("image/") && (
+                  <img
+                    src={previewFile.url}
+                    alt=""
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "contain",
+                    }}
+                  />
+                )}
+
+                {previewFile.mimeType === "application/pdf" && (
+                  <iframe
+                    src={previewFile.url}
+                    style={{ width: "100%", height: "100%", border: "none" }}
+                    title="PDF"
+                  />
+                )}
+
+                {!previewFile.mimeType.startsWith("image/") &&
+                  previewFile.mimeType !== "application/pdf" && (
+                    <iframe
+                      src={previewFile.url}
+                      style={{ width: "100%", height: "100%", border: "none" }}
+                      title="File"
+                    />
+                  )}
+              </Box>
+            </Box>
+          </Box>
+        )}
+      </Box>
+
+       {/* Drawer */}
+      <Drawer
+        anchor="right"
+        open={openDrawer}
+        onClose={() => setOpenDrawer(false)}
+      >
+        <Box sx={{ width: 400, p: 3 }}>
+          {/* Header */}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 2,
+            }}
+          >
+            <Typography variant="h6">Compose Email</Typography>
+            <IconButton onClick={() => setOpenDrawer(false)}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+
+          {/* Content */}
+          <Typography variant="body2">
+            Email draft form goes here…
+          </Typography>
+        </Box>
+      </Drawer>
+    </>
   );
 };
 
