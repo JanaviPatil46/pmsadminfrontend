@@ -106,7 +106,7 @@ const AccountsDash = () => {
           <NavLink to={`/clients/accounts/accountsdash/communication/${data}`}> Communication</NavLink>
           <NavLink to={`/clients/accounts/accountsdash/organizers/${data}`}> Organizers</NavLink>
           <NavLink to={`/clients/accounts/accountsdash/invoices/${data}/invoice`}> Invoices</NavLink>
-          <NavLink to={`/clients/accounts/accountsdash/email/${data}`}>Email</NavLink>
+          <NavLink to={`/clients/accounts/accountsdash/email/${data}/inbox`}>Email</NavLink>
           <NavLink to={`/clients/accounts/accountsdash/proposals/${data}`}> Proposals & ELs</NavLink>
           <NavLink to={`/clients/accounts/accountsdash/notes/${data}`}> Notes</NavLink>
           <NavLink to={`/clients/accounts/accountsdash/workflow/${data}/pipelines`}> Workflow</NavLink>
