@@ -136,7 +136,6 @@
 
 // export default ComposeEmailDrawer;
 
-
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -161,12 +160,64 @@ const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 const ComposeEmailDrawer = ({ open, onClose }) => {
   const { data } = useParams();
+const [sending, setSending] = useState(false);
 
   const [contacts, setContacts] = useState([]);
   const [selectedContacts, setSelectedContacts] = useState([]);
   const [subject, setSubject] = useState("");
-   const [description, setDescription] = useState("");
-   const handleEditorChange = (content) => {
+  const [description, setDescription] = useState("");
+   const [emailTemplate, setEmailTemplate] = useState("");
+    const [emailTemplatedata, setEmailTemplateData] = useState([]);
+  const EMAIL_API = process.env.REACT_APP_EMAIL_TEMP_URL;
+    const fetchemailTemplateData = async () => {
+      try {
+        // const url = `${API_KEY}/workflow/emailtemplate/`;
+        const url = `${EMAIL_API}/workflow/emailtemplate`;
+        const response = await fetch(url);
+        const data = await response.json();
+        console.log(data);
+        setEmailTemplateData(data.emailTemplate);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+   useEffect(() => {
+      // fetchData();
+      fetchemailTemplateData();
+    }, []);
+    const emailoptions = emailTemplatedata.map((emailtemplate) => ({
+      value: emailtemplate._id,
+      label: emailtemplate.templatename,
+    }));
+  
+    const handleEmailtemp = (event, selectedOption) => {
+      console.log(selectedOption);
+      if (selectedOption && selectedOption.value) {
+        setEmailTemplate(selectedOption);
+        fetchDataemaildetails(selectedOption.value);
+      } else {
+        console.error("Invalid selected option:", selectedOption);
+      }
+    };
+  
+    const fetchDataemaildetails = async (selecttempId) => {
+      try {
+        const url = `${EMAIL_API}/workflow/emailtemplate/${selecttempId}`;
+        const response = await fetch(url);
+        const data = await response.json();
+  
+        console.log("data email templates",data);
+  
+        setDescription(data.emailTemplate.emailbody);
+      
+  
+        setSubject(data.emailTemplate.emailsubject);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+  
+  const handleEditorChange = (content) => {
     setDescription(content);
   };
 
@@ -175,19 +226,19 @@ const ComposeEmailDrawer = ({ open, onClose }) => {
     fetchContacts();
   }, []);
 
-const fetchContacts = async () => {
+  const fetchContacts = async () => {
     try {
       const res = await axios.get(
-        `https://www.snptaxes.com/api/accounts/${data}/contacts`
+        `https://www.snptaxes.com/api/accounts/${data}/contacts`,
       );
 
       const formatted = (res.data.data || [])
-      
+
         .filter((c) => c.canEmailSync && c.contact?.email)
         .map((c) => ({
           label: c.contact.contactName || c.contact.email,
           email: c.contact.email,
-         // accountId: c._id, // used for selectedAccounts
+          // accountId: c._id, // used for selectedAccounts
         }));
 
       setContacts(formatted);
@@ -198,42 +249,77 @@ const fetchContacts = async () => {
   };
 
   // 🔹 Send Email using YOUR payload
-  const handleSend = async () => {
-    if (!selectedContacts.length) {
-      alert("Please select at least one contact");
-      return;
-    }
+  // const handleSend = async () => {
+  //   if (!selectedContacts.length) {
+  //     alert("Please select at least one contact");
+  //     return;
+  //   }
 
-    
+  //   const payload = {
+  //     clientEmail: selectedContacts.map((c) => c.email),
+  //     accountId: data,
+  //     emailsubject: subject,
+  //     emailbody: description,
+  //   };
+  //   console.log("Sending email with payload:", payload);
+  //   try {
+  //     await fetch("https://www.snptaxes.com/api/accounts/sendComposeEmail", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(payload),
+  //     });
 
-    const payload = {
+  //     alert("Email sent successfully!");
+
+  //     setSelectedContacts([]);
+  //     setDescription("");
+  //     //   setHtmlContent("");
+  //     onClose();
+  //   } catch (err) {
+  //     console.error("Send failed", err);
+  //     alert("Failed to send email");
+  //   }
+  // };
+const handleSend = async () => {
+  if (!selectedContacts.length) {
+    alert("Please select at least one contact");
+    return;
+  }
+
+  const payload = {
     clientEmail: selectedContacts.map((c) => c.email),
-     accountId: data,  
-      emailsubject: subject,
-      emailbody: description,
-   
-    };
-console.log("Sending email with payload:", payload);
-    try {
-      await fetch("https://www.snptaxes.com/api/accounts/sendComposeEmail", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      alert("Email sent successfully!");
-
-      setSelectedContacts([]);
-      setDescription("");
-    //   setHtmlContent("");
-      onClose();
-    } catch (err) {
-      console.error("Send failed", err);
-      alert("Failed to send email");
-    }
+    accountId: data,
+    emailsubject: subject,
+    emailbody: description,
   };
+
+  try {
+    setSending(true); // 🔒 disable button
+
+    await fetch("https://www.snptaxes.com/api/accounts/sendComposeEmail", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    alert("Email sent successfully!");
+
+    setSelectedContacts([]);
+    setDescription("");
+    setSubject("");
+    setEmailTemplate("");
+    onClose();
+  } catch (err) {
+    console.error("Send failed", err);
+    alert("Failed to send email");
+  } finally {
+    setSending(false); // 🔓 enable button again
+  }
+};
 
   return (
     <Drawer anchor="right" open={open} onClose={onClose}>
@@ -253,49 +339,53 @@ console.log("Sending email with payload:", payload);
           </IconButton>
         </Box>
 
+        <Autocomplete
+          options={emailoptions}
+          sx={{ mt: 2, mb: 2, backgroundColor: "#fff" }}
+          size="small"
+          value={emailTemplate}
+          onChange={handleEmailtemp}
+          isOptionEqualToValue={(option, value) => option.value === value.value}
+          getOptionLabel={(option) => option.label || ""}
+          renderInput={(params) => (
+            <TextField {...params} placeholder="Email Template" />
+          )}
+        />
         {/* To Field */}
-       <Autocomplete
-  multiple
-  options={contacts}
-  value={selectedContacts}
-  onChange={(e, newValue) => setSelectedContacts(newValue)}
-  disableCloseOnSelect
-
-  // 🔥 IMPORTANT FIX
-  isOptionEqualToValue={(option, value) =>
-    option.email === value.email
-  }
-
-  getOptionLabel={(option) => `${option.label} (${option.email})`}
-
-  renderOption={(props, option, { selected }) => (
-    <li {...props}>
-      <Checkbox
-        icon={icon}
-        checkedIcon={checkedIcon}
-        checked={selected}
-        sx={{ mr: 1 }}
-      />
-      {option.label} ({option.email})
-    </li>
-  )}
-
-  renderTags={(value, getTagProps) =>
-    value.map((option, index) => (
-      <Chip
-        label={option.label}
-        {...getTagProps({ index })}
-        key={option.email}
-      />
-    ))
-  }
-
-  renderInput={(params) => (
-    <TextField {...params} label="To" placeholder="Select contacts" />
-  )}
-  sx={{ mb: 2 }}
-/>
-
+        <Autocomplete
+          multiple
+          options={contacts}
+          value={selectedContacts}
+          onChange={(e, newValue) => setSelectedContacts(newValue)}
+          disableCloseOnSelect
+          // 🔥 IMPORTANT FIX
+          isOptionEqualToValue={(option, value) => option.email === value.email}
+          getOptionLabel={(option) => `${option.label} (${option.email})`}
+          renderOption={(props, option, { selected }) => (
+            <li {...props}>
+              <Checkbox
+                icon={icon}
+                checkedIcon={checkedIcon}
+                checked={selected}
+                sx={{ mr: 1 }}
+              />
+              {option.label} ({option.email})
+            </li>
+          )}
+          renderTags={(value, getTagProps) =>
+            value.map((option, index) => (
+              <Chip
+                label={option.label}
+                {...getTagProps({ index })}
+                key={option.email}
+              />
+            ))
+          }
+          renderInput={(params) => (
+            <TextField {...params} placeholder="Select contacts" />
+          )}
+          sx={{ mb: 2 }}
+        />
 
         {/* Subject */}
         <TextField
@@ -306,16 +396,21 @@ console.log("Sending email with payload:", payload);
           sx={{ mb: 2 }}
         />
 
-       <Editor
-                               onChange={handleEditorChange}
-                               content={description}
-                             />
+        <Editor onChange={handleEditorChange} initialContent={description} />
 
         {/* Send Button */}
-        <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-          <Button variant="contained" onClick={handleSend}>
+        <Box sx={{ display: "flex", justifyContent: "flex-end" ,mt:2}}>
+          {/* <Button variant="contained" onClick={handleSend}>
             Send
-          </Button>
+          </Button> */}
+          <Button
+  variant="contained"
+  onClick={handleSend}
+  disabled={sending}
+>
+  {sending ? "Sending..." : "Send"}
+</Button>
+
         </Box>
       </Box>
     </Drawer>

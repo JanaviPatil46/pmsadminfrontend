@@ -51,14 +51,14 @@
 //   const [openPdf, setOpenPdf] = useState(false);
 //   const [activeAttachment, setActiveAttachment] = useState(null);
 
-//   const [checkedItems, setCheckedItems] = useState({
-//     invoice: false,
-//     proposal: false,
-//     document: false,
-//     documentSigned: false,
-//     message: false,
-//     organizer: false,
-//   });
+// const [checkedItems, setCheckedItems] = useState({
+//   invoice: false,
+//   proposal: false,
+//   document: false,
+//   documentSigned: false,
+//   message: false,
+//   organizer: false,
+// });
 
 //   // Redirect to Google login if needed
 //   const handleGoogleLogin = () => {
@@ -707,7 +707,15 @@ import {
   Tabs,
   Tab,
   Divider,
+  Drawer,
+  Chip,
+  IconButton,
+  Checkbox,
+  FormGroup,
+  FormControlLabel,
 } from "@mui/material";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import CloseIcon from "@mui/icons-material/Close";
 import { ExpandLess, ExpandMore, AttachFile } from "@mui/icons-material";
 import { Button, TextField } from "@mui/material";
 
@@ -1337,10 +1345,60 @@ const EmailViewer = () => {
   const [threads, setThreads] = useState([]);
   const [expandedThreadId, setExpandedThreadId] = useState(null);
   const [expandedMessageId, setExpandedMessageId] = useState(null);
-  const [replyBox, setReplyBox] = useState(null);
-  const [replyText, setReplyText] = useState("");
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const [tab, setTab] = useState(0); // 0 = Inbox, 1 = Archived
   const [previewFile, setPreviewFile] = useState(null);
+  const [checkedItems, setCheckedItems] = useState({
+    invoice: false,
+    proposal: false,
+    document: false,
+    documentSigned: false,
+    message: false,
+    organizer: false,
+  });
+ /* ================= FILTER CONFIG ================= */
+
+  const FILTER_KEYWORDS = {
+    invoice: ["invoice"],
+    proposal: ["proposal"],
+    document: ["document"],
+    documentSigned: ["signed", "document signed"],
+    message: ["message"],
+    organizer: ["organizer"],
+  };
+
+  const matchesSelectedFilters = (subject = "") => {
+    const activeFilters = Object.keys(checkedItems).filter(
+      (key) => checkedItems[key]
+    );
+
+    if (activeFilters.length === 0) return true;
+
+    const lowerSubject = subject.toLowerCase();
+
+    return activeFilters.some((filterKey) =>
+      FILTER_KEYWORDS[filterKey]?.some((keyword) =>
+        lowerSubject.includes(keyword)
+      )
+    );
+  };
+  const toggleFilterDrawer = (open) => () => {
+    setFilterDrawerOpen(open);
+  };
+
+  const handleCheckboxChange = (e) => {
+    setCheckedItems({
+      ...checkedItems,
+      [e.target.name]: e.target.checked,
+    });
+  };
+  const handleClearAll = () => {
+    const cleared = Object.keys(checkedItems).reduce((acc, key) => {
+      acc[key] = false;
+      return acc;
+    }, {});
+    setCheckedItems(cleared);
+  };
   // const openAttachment = (attachment) => {
   //   const byteCharacters = atob(attachment.data);
   //   const byteNumbers = new Array(byteCharacters.length);
@@ -1462,11 +1520,23 @@ const EmailViewer = () => {
     }
   };
 
-  const filteredThreads = threads.filter((thread) => {
-    const isArchived = thread.latest?.archived;
-    return tab === 0 ? !isArchived : isArchived;
-  });
+  // const filteredThreads = threads.filter((thread) => {
+  //   const isArchived = thread.latest?.archived;
+  //   return tab === 0 ? !isArchived : isArchived;
+  // });
 
+   const filteredThreads = threads
+    .filter((thread) => {
+      const isArchived = thread.latest?.archived;
+      return tab === 0 ? !isArchived : isArchived;
+    })
+    .filter((thread) => {
+      if (matchesSelectedFilters(thread.latest?.subject)) return true;
+
+      return thread.messages?.some((msg) =>
+        matchesSelectedFilters(msg.subject)
+      );
+    });
   const renderLinkedSubject = (subject, isBold = false) => {
     const mongoId = extractMongoId(subject);
     const text = cleanSubjectText(subject) || "linktext";
@@ -1502,11 +1572,23 @@ const EmailViewer = () => {
       <Typography variant="h5" sx={{ mb: 2 }}>
         Email Inbox
       </Typography>
-      <Tabs value={tab} onChange={(e, v) => setTab(v)} sx={{ mb: 2 }}>
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+<Tabs value={tab} onChange={(e, v) => setTab(v)} sx={{ mb: 2 }}>
         <Tab label="Inbox" />
         <Tab label="Archived" />
       </Tabs>
-
+      <Box sx={{ display: "flex", justifyContent: "right" }}>
+        {" "}
+        <Button
+          variant="contained"
+          startIcon={<FilterListIcon />}
+          onClick={toggleFilterDrawer(true)}
+        >
+          Filter
+        </Button>
+      </Box>
+      </Box>
+      
       <List>
         {filteredThreads.map((thread) => {
           const latest = thread.latest;
@@ -1812,6 +1894,50 @@ const EmailViewer = () => {
           );
         })}
       </List>
+
+      <Drawer
+        anchor="right"
+        open={filterDrawerOpen}
+        onClose={toggleFilterDrawer(false)}
+      >
+        <Box sx={{ width: 400, p: 3 }}>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Typography variant="h6">Filters</Typography>
+            <IconButton onClick={toggleFilterDrawer(false)}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+
+          <FormGroup>
+            {Object.keys(checkedItems).map((key) => (
+              <FormControlLabel
+                key={key}
+                control={
+                  <Checkbox
+                    checked={checkedItems[key]}
+                    onChange={handleCheckboxChange}
+                    name={key}
+                  />
+                }
+                label={key.charAt(0).toUpperCase() + key.slice(1)}
+              />
+            ))}
+          </FormGroup>
+
+          <Box mt={3} display="flex" justifyContent="flex-end" gap={2}>
+            <Button variant="contained" onClick={toggleFilterDrawer(false)}>
+              Apply
+            </Button>
+            <Button variant="outlined" onClick={handleClearAll}>
+              Clear
+            </Button>
+          </Box>
+        </Box>
+      </Drawer>
     </Box>
   );
 };
