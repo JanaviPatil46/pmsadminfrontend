@@ -58,55 +58,111 @@ const CSVImportContacts = () => {
   };
 const [isSaving, setIsSaving] = useState(false);
   // 📌 Save Selected Contacts (POST API)
-  const handleSaveContacts = async () => {
-    if (selectedRows.length === 0) {
-      alert("Please select at least one contact.");
-      return;
-    }
-     setIsSaving(true);  
+//   const handleSaveContacts = async () => {
+//     if (selectedRows.length === 0) {
+//       alert("Please select at least one contact.");
+//       return;
+//     }
+//      setIsSaving(true);  
 
-    try {
-      for (let index of selectedRows) {
-        const r = rows[index];
+//     try {
+//       for (let index of selectedRows) {
+//         const r = rows[index];
 
-        const payload = {
-          firstName: r["First Name"] || "",
-          middleName: r["Middle Name"] || "",
-          lastName: r["Last Name"] || "",
-          email: r["Email"] || "",
-          contactName:
-            r["Contact Name"] ||
-            `${r["First Name"] ?? ""} ${r["Last Name"] ?? ""}`,
-          companyName: r["Company Name"] || "",
-        };
+//         const payload = {
+//           firstName: r["First Name"] || "",
+//           middleName: r["Middle Name"] || "",
+//           lastName: r["Last Name"] || "",
+//           email: r["Email"] || "",
+//           contactName:
+//             r["Contact Name"] ||
+//             `${r["First Name"] ?? ""} ${r["Last Name"] ?? ""}`,
+//           companyName: r["Company Name"] || "",
+//         };
 
-        await axios.post(
-          "https://www.snptaxes.com/api/contacts/",
-          payload,
-          {
-            headers: { "Content-Type": "application/json" },
-          }
-        );
+//         await axios.post(
+//           "https://www.snptaxes.com/api/contacts/",
+//           payload,
+//           {
+//             headers: { "Content-Type": "application/json" },
+//           }
+//         );
+//       }
+//  // 🔥 Remove saved rows from table
+//     const remainingRows = rows.filter(
+//       (_, idx) => !selectedRows.includes(idx)
+//     );
+
+//     setRows(remainingRows);
+//     setSelectedRows([]); // Clear selection
+//       alert("Contacts saved successfully!");
+//       // setSelectedRows([]);
+
+//     } catch (error) {
+//       console.error(error);
+//       console.log("Error saving contacts:", error.response?.data || error.message);
+//       alert("Error saving contacts");
+//     }
+//     finally {
+//     setIsSaving(false);   // ✅ re-enable button
+//   }
+//   };
+const handleSaveContacts = async () => {
+  if (selectedRows.length === 0) {
+    alert("Please select at least one contact.");
+    return;
+  }
+
+  setIsSaving(true);
+
+  try {
+    // Build bulk contacts payload
+    const contacts = selectedRows.map((index) => {
+      const r = rows[index];
+
+      return {
+        firstName: r["First Name"] || "",
+        middleName: r["Middle Name"] || "",
+        lastName: r["Last Name"] || "",
+        email: r["Email"] || "",
+        contactName:
+          r["Contact Name"] ||
+          `${r["First Name"] ?? ""} ${r["Last Name"] ?? ""}`,
+        companyName: r["Company Name"] || "",
+        login: false // 🔒 save only, no activation mail
+      };
+    });
+
+    const response = await axios.post(
+      "https://www.snptaxes.com/api/contacts/bulk-save",
+      { contacts },
+      {
+        headers: { "Content-Type": "application/json" }
       }
- // 🔥 Remove saved rows from table
+    );
+
+    console.log("Bulk save response:", response.data);
+
+    // 🔥 Remove saved + skipped rows from table
     const remainingRows = rows.filter(
       (_, idx) => !selectedRows.includes(idx)
     );
 
     setRows(remainingRows);
-    setSelectedRows([]); // Clear selection
-      alert("Contacts saved successfully!");
-      // setSelectedRows([]);
+    setSelectedRows([]);
 
-    } catch (error) {
-      console.error(error);
-      console.log("Error saving contacts:", error.response?.data || error.message);
-      alert("Error saving contacts");
-    }
-    finally {
-    setIsSaving(false);   // ✅ re-enable button
+    alert(
+      `Contacts processed successfully!\nSaved: ${response.data.savedCount}\nSkipped: ${response.data.skippedCount}`
+    );
+
+  } catch (error) {
+    console.error("Error saving contacts:", error.response?.data || error.message);
+    alert("Error saving contacts");
+  } finally {
+    setIsSaving(false);
   }
-  };
+};
+
    const handleSelectAll = () => {
   if (selectedRows.length === rows.length) {
     // unselect all

@@ -520,7 +520,7 @@ const EmailViewer = ({ type }) => {
       if (!syncedEmails.length) return;
 
       const emailsRes = await axios.post(
-        "http://127.0.0.1:8015/emailsync/messagesList/messages",
+        "https://www.snptaxes.com/emailsync/messagesList/messages",
         { emails: syncedEmails, folder: type }
       );
 

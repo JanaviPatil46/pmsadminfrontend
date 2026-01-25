@@ -1398,6 +1398,7 @@ const EmailViewer = () => {
       return acc;
     }, {});
     setCheckedItems(cleared);
+    setFilterDrawerOpen(false);
   };
   // const openAttachment = (attachment) => {
   //   const byteCharacters = atob(attachment.data);
@@ -1443,7 +1444,7 @@ const EmailViewer = () => {
   const fetchEmails = async () => {
     try {
       const response = await axios.get(
-        "http://127.0.0.1:8015/emailsync/messagesList/messagesnotification",
+        "https://www.snptaxes.com/emailsync/messagesList/messagesnotification",
       );
       setThreads(response.data.threads || []);
       console.log("Fetched threads:", response.data.threads);

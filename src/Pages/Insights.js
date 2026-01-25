@@ -537,3 +537,46 @@ export default Insights;
 
 // export default CountryAutocomplete;
 
+// import React, { useState } from "react";
+
+// function App() {
+//   const [message, setMessage] = useState("");
+
+//   const loginWithGoogle = () => {
+//     window.location.href = "http://127.0.0.1:8015/emailsync/auth/google";
+//   };
+
+//   return (
+//     <div style={styles.container}>
+//       <h1>Google Login Demo</h1>
+
+//       <button style={styles.button} onClick={loginWithGoogle}>
+//         Login with Google
+//       </button>
+
+//       {message && <p>{message}</p>}
+//     </div>
+//   );
+// }
+
+// const styles = {
+//   container: {
+//     height: "100vh",
+//     display: "flex",
+//     flexDirection: "column",
+//     justifyContent: "center",
+//     alignItems: "center",
+//     fontFamily: "Arial"
+//   },
+//   button: {
+//     padding: "12px 20px",
+//     fontSize: "16px",
+//     cursor: "pointer",
+//     background: "#4285F4",
+//     color: "#fff",
+//     border: "none",
+//     borderRadius: "5px"
+//   }
+// };
+
+// export default App;
