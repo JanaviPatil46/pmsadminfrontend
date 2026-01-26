@@ -490,7 +490,8 @@ const EmailViewer = ({ type }) => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [contactMap, setContactMap] = useState({});
 
-  const SUPPORT_EMAIL = "support@snptaxandfinancials.com";
+  // const SUPPORT_EMAIL = "support@snptaxandfinancials.com";
+  const SUPPORT_EMAIL = "silpa@snptaxandfinancials.com";
 
   useEffect(() => {
     fetchEmailSyncedContactsAndEmails();
@@ -543,6 +544,7 @@ const EmailViewer = ({ type }) => {
       );
 
       setThreads(filteredThreads);
+      console.log("Filtered threads:", filteredThreads);
     } catch (error) {
       console.error("Error fetching emails", error);
     }
@@ -701,7 +703,7 @@ const formatThreadTitle = (thread) => {
 
   console.log("Sending reply to:", replyTo);
 
-  await axios.post("http://127.0.0.1:8015/emailsync/user/reply", {
+  await axios.post("https://www.snptaxes.com/emailsync/user/reply", {
     to: replyTo,
     subject: `Re: ${lastEmail.subject || "No Subject"}`,
     message: replyText,
@@ -716,7 +718,7 @@ const formatThreadTitle = (thread) => {
   const markThreadAsRead = async (threadId) => {
     try {
       await axios.patch(
-        "http://127.0.0.1:8015/emailsync/messagesList/threads/mark-read",
+        "https://www.snptaxes.com/emailsync/messagesList/threads/mark-read",
         { threadId }
       );
       fetchEmailSyncedContactsAndEmails();

@@ -129,6 +129,7 @@ const handleSaveContacts = async () => {
           r["Contact Name"] ||
           `${r["First Name"] ?? ""} ${r["Last Name"] ?? ""}`,
         companyName: r["Company Name"] || "",
+        phoneNumbers: r["Phone Numbers"] || r["Phone"] || "",
         login: false // 🔒 save only, no activation mail
       };
     });

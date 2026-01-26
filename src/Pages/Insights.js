@@ -543,7 +543,7 @@ export default Insights;
 //   const [message, setMessage] = useState("");
 
 //   const loginWithGoogle = () => {
-//     window.location.href = "http://127.0.0.1:8015/emailsync/auth/google";
+//    window.location.href = "https://www.snptaxes.com/emailsync/auth/google";
 //   };
 
 //   return (
