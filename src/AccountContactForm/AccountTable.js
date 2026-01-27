@@ -1494,7 +1494,8 @@ import {
   List,
   ListItem,
   ListItemText,
-  DialogContentText
+  DialogContentText,
+  Tab
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CloseIcon from "@mui/icons-material/Close";
@@ -2567,6 +2568,7 @@ const handleConfirmDelete = async () => {
                     onChange={handleSelectAllClick}
                   />
                 </TableCell>
+                <TableCell>Account Code</TableCell>
                 <TableCell
                   sortDirection={orderBy === "accountName" ? order : false}
                   width={"500px"}
@@ -2619,6 +2621,7 @@ const handleConfirmDelete = async () => {
                         onChange={() => handleClick(account)}
                       />
                     </TableCell>
+                    <TableCell>{account.importId}</TableCell>
                     <TableCell>
                       {/* <Link
                         component="button"
@@ -2665,10 +2668,17 @@ const handleConfirmDelete = async () => {
                     </TableCell>
 
                     <TableCell>
-                      {renderLimitedChips(
+                      {/* {renderLimitedChips(
                         account.contacts?.map((c) => c.contact),
                         (c) => c.email
-                      )}
+                      )} */}
+                      {renderLimitedChips(
+  account.contacts
+    ?.map((c) => c.contact)
+    ?.filter((c) => c?.email?.trim()),
+  (c) => c.email
+)}
+
                     </TableCell>
                   </TableRow>
                 ))

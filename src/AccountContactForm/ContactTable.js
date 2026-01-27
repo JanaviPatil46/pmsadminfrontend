@@ -20,7 +20,12 @@ import {
   Divider,
   Typography,
   Drawer,
-  Tooltip,Dialog,DialogTitle,DialogContent,DialogContentText,DialogActions  
+  Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { FaTimes } from "react-icons/fa";
@@ -32,42 +37,41 @@ import ContactForm from "../Pages/UpdateContact"; // adjust path
 const ContactsTable = () => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [selectedContact, setSelectedContact] = useState(null);
-const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-const [userRole, setUserRole] = useState("");
-const [canManageContacts, setCanManageContacts] = useState(true);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [userRole, setUserRole] = useState("");
+  const [canManageContacts, setCanManageContacts] = useState(true);
 
-const [page, setPage] = useState(0);
-const [rowsPerPage, setRowsPerPage] = useState(25); // default 25 per page
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(25); // default 25 per page
   // const handleOpenDrawer = (contact) => {
   //   console.log("Opening drawer for contact:", contact);
   //   setSelectedContact(contact);
   //   setOpenDrawer(true);
   // };
-const handleOpenDrawer = (contact) => {
-  if (!canManageContacts) {
-    toast.info("You do not have permission to edit contacts");
-    return;
-  }
-  setSelectedContact(contact);
-  setOpenDrawer(true);
-};
+  const handleOpenDrawer = (contact) => {
+    if (!canManageContacts) {
+      toast.info("You do not have permission to edit contacts");
+      return;
+    }
+    setSelectedContact(contact);
+    setOpenDrawer(true);
+  };
 
- useEffect(() => {
-  const storedUserRole = localStorage.getItem("userRole");
-  setUserRole(storedUserRole);
+  useEffect(() => {
+    const storedUserRole = localStorage.getItem("userRole");
+    setUserRole(storedUserRole);
 
-  const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
-  const manage = storedData?.teammember?.manageContacts;
+    const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
+    const manage = storedData?.teammember?.manageContacts;
 
-  // If teamMember → use manageContacts
-  if (storedUserRole === "TeamMember") {
-    setCanManageContacts(Boolean(manage)); 
-  } else {
-    // Admin always has permission
-    setCanManageContacts(true);
-  }
-}, []);
-
+    // If teamMember → use manageContacts
+    if (storedUserRole === "TeamMember") {
+      setCanManageContacts(Boolean(manage));
+    } else {
+      // Admin always has permission
+      setCanManageContacts(true);
+    }
+  }, []);
 
   const [contacts, setContacts] = useState([]);
   const [filteredContacts, setFilteredContacts] = useState([]);
@@ -100,7 +104,6 @@ const handleOpenDrawer = (contact) => {
     setFilters({ ...filters, [filter]: filter === "tags" ? [] : "" });
   };
 
-  
   // ✅ central fetch function
   const fetchContacts = async () => {
     try {
@@ -123,22 +126,24 @@ const handleOpenDrawer = (contact) => {
 
     if (filters.contactName)
       result = result.filter((c) =>
-        c.contactName?.toLowerCase().includes(filters.contactName.toLowerCase())
+        c.contactName
+          ?.toLowerCase()
+          .includes(filters.contactName.toLowerCase()),
       );
 
     if (filters.email)
       result = result.filter((c) =>
-        c.email?.toLowerCase().includes(filters.email.toLowerCase())
+        c.email?.toLowerCase().includes(filters.email.toLowerCase()),
       );
 
     if (filters.company)
       result = result.filter((c) =>
-        c.companyName?.toLowerCase().includes(filters.company.toLowerCase())
+        c.companyName?.toLowerCase().includes(filters.company.toLowerCase()),
       );
 
     if (filters.tags.length > 0) {
       result = result.filter((c) =>
-        c.tags?.some((t) => filters.tags.some((sel) => sel.value === t._id))
+        c.tags?.some((t) => filters.tags.some((sel) => sel.value === t._id)),
       );
     }
 
@@ -149,7 +154,7 @@ const handleOpenDrawer = (contact) => {
   // ✅ Toggle individual row
   const handleSelectOne = (id) => {
     setSelectedContacts((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
   };
 
@@ -172,12 +177,12 @@ const handleOpenDrawer = (contact) => {
         "https://www.snptaxes.com/api/contacts/delete-multiple",
         {
           data: { ids: selectedContacts },
-        }
+        },
       );
       toast.success("Contact Deleted Successfully");
       // ✅ Remove from UI after backend success
       const remaining = contacts.filter(
-        (c) => !selectedContacts.includes(c._id)
+        (c) => !selectedContacts.includes(c._id),
       );
       setContacts(remaining);
       setSelectedContacts([]);
@@ -276,7 +281,7 @@ const handleOpenDrawer = (contact) => {
                           label: tag.tagName,
                           colour: tag.tagColour,
                         },
-                      ])
+                      ]),
                   ).values(),
                 ]}
                 width="250px"
@@ -299,21 +304,21 @@ const handleOpenDrawer = (contact) => {
       >
         Delete Selected ({selectedContacts.length})
       </Button> */}
-<Button
-  variant="contained"
-  color="error"
-  disabled={selectedContacts.length === 0 || !canManageContacts}
-  onClick={() => {
-    if (!canManageContacts) {
-      toast.error("You do not have permission to delete contacts");
-      return;
-    }
-    setOpenDeleteDialog(true);
-  }}
-  sx={{ mb: 2 }}
->
-  Delete Selected ({selectedContacts.length})
-</Button>
+      <Button
+        variant="contained"
+        color="error"
+        disabled={selectedContacts.length === 0 || !canManageContacts}
+        onClick={() => {
+          if (!canManageContacts) {
+            toast.error("You do not have permission to delete contacts");
+            return;
+          }
+          setOpenDeleteDialog(true);
+        }}
+        sx={{ mb: 2 }}
+      >
+        Delete Selected ({selectedContacts.length})
+      </Button>
 
       <TableContainer component={Paper}>
         <Table>
@@ -329,19 +334,19 @@ const handleOpenDrawer = (contact) => {
                   onChange={handleSelectAll}
                 /> */}
                 <input
-  type="checkbox"
-  disabled={!canManageContacts}
-  checked={
-    selectedContacts.length > 0 &&
-    selectedContacts.length === filteredContacts.length
-  }
-  onChange={() => {
-    if (!canManageContacts) return;
-    handleSelectAll();
-  }}
-/>
-
+                  type="checkbox"
+                  disabled={!canManageContacts}
+                  checked={
+                    selectedContacts.length > 0 &&
+                    selectedContacts.length === filteredContacts.length
+                  }
+                  onChange={() => {
+                    if (!canManageContacts) return;
+                    handleSelectAll();
+                  }}
+                />
               </TableCell>
+              <TableCell>Contact Code</TableCell>
               <TableCell>Contact Name</TableCell>
               <TableCell>Email</TableCell>
               <TableCell>Company</TableCell>
@@ -351,107 +356,109 @@ const handleOpenDrawer = (contact) => {
           </TableHead>
 
           <TableBody>
-            {filteredContacts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((c) => (
-              <TableRow key={c._id}>
-                <TableCell padding="checkbox">
-                  {/* <input
+            {filteredContacts
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((c) => (
+                <TableRow key={c._id}>
+                  <TableCell padding="checkbox">
+                    {/* <input
                     type="checkbox"
                     checked={selectedContacts.includes(c._id)}
                     onChange={() => handleSelectOne(c._id)}
                   /> */}
-                  <input
-  type="checkbox"
-  disabled={!canManageContacts}
-  checked={selectedContacts.includes(c._id)}
-  onChange={() => {
-    if (!canManageContacts) return;
-    handleSelectOne(c._id);
-  }}
-/>
+                    <input
+                      type="checkbox"
+                      disabled={!canManageContacts}
+                      checked={selectedContacts.includes(c._id)}
+                      onChange={() => {
+                        if (!canManageContacts) return;
+                        handleSelectOne(c._id);
+                      }}
+                    />
+                  </TableCell>
+                  <TableCell>{c.contactCode || "—"}</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="text"
+                      onClick={() => handleOpenDrawer(c)}
+                      style={{ textTransform: "none" }}
+                    >
+                      {c.contactName || "—"}
+                    </Button>
+                  </TableCell>
 
-                </TableCell>
+                  <TableCell>{c.email || "—"}</TableCell>
+                  <TableCell>{c.companyName || "—"}</TableCell>
+                  {/* <TableCell>{c.phoneNumbers}</TableCell> */}
+                  <TableCell>
+                    {Array.isArray(c.phoneNumbers) && c.phoneNumbers.length > 0
+                      ? c.phoneNumbers.join(", ")
+                      : "—"}
+                  </TableCell>
 
-                <TableCell>
-                  <Button
-                    variant="text"
-                    onClick={() => handleOpenDrawer(c)}
-                    style={{ textTransform: "none" }}
-                  >
-                    {c.contactName || "—"}
-                  </Button>
-                </TableCell>
-
-                <TableCell>{c.email || "—"}</TableCell>
-                <TableCell>{c.companyName || "—"}</TableCell>
-                {/* <TableCell>{c.phoneNumbers}</TableCell> */}
-                <TableCell>
-                  {Array.isArray(c.phoneNumbers) && c.phoneNumbers.length > 0
-                    ? c.phoneNumbers.join(", ")
-                    : "—"}
-                </TableCell>
-               
-                <TableCell>
-                  {c.tags && c.tags.length > 0 ? (
-                    <>
-                      {c.tags.slice(0, 2).map((t) => (
-                        <Chip
-                          key={t._id}
-                          label={t.tagName}
-                          size="small"
-                          style={{
-                            backgroundColor: t.tagColour,
-                            color: "#fff",
-                            marginRight: "4px",
-                            marginBottom: "4px",
-                          }}
-                        />
-                      ))}
-
-                      {c.tags.length > 2 && (
-                        <Tooltip
-                          title={
-                            <Box>
-                              {c.tags.slice(2).map((t) => (
-                                <Box key={t._id} sx={{ mb: 0.5 }}>
-                                  • {t.tagName}
-                                </Box>
-                              ))}
-                            </Box>
-                          }
-                          arrow
-                          placement="top"
-                        >
+                  <TableCell>
+                    {c.tags && c.tags.length > 0 ? (
+                      <>
+                        {c.tags.slice(0, 2).map((t) => (
                           <Chip
-                            label={`+${c.tags.length - 2} more`}
+                            key={t._id}
+                            label={t.tagName}
                             size="small"
-                            style={{ backgroundColor: "#999", color: "white" }}
+                            style={{
+                              backgroundColor: t.tagColour,
+                              color: "#fff",
+                              marginRight: "4px",
+                              marginBottom: "4px",
+                            }}
                           />
-                        </Tooltip>
-                      )}
-                    </>
-                  ) : (
-                    "—"
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
+                        ))}
+
+                        {c.tags.length > 2 && (
+                          <Tooltip
+                            title={
+                              <Box>
+                                {c.tags.slice(2).map((t) => (
+                                  <Box key={t._id} sx={{ mb: 0.5 }}>
+                                    • {t.tagName}
+                                  </Box>
+                                ))}
+                              </Box>
+                            }
+                            arrow
+                            placement="top"
+                          >
+                            <Chip
+                              label={`+${c.tags.length - 2} more`}
+                              size="small"
+                              style={{
+                                backgroundColor: "#999",
+                                color: "white",
+                              }}
+                            />
+                          </Tooltip>
+                        )}
+                      </>
+                    ) : (
+                      "—"
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
 
-        
         <TablePagination
-  component="div"
-  count={filteredContacts.length}
-  page={page}
-  onPageChange={(e, newPage) => setPage(newPage)}
-  rowsPerPage={rowsPerPage}
-  onRowsPerPageChange={(e) => {
-    setRowsPerPage(parseInt(e.target.value, 10));
-    setPage(0); // reset to first page on rows change
-  }}
-  rowsPerPageOptions={[25,30, 50, 80,100,200]}
-/>
-
+          component="div"
+          count={filteredContacts.length}
+          page={page}
+          onPageChange={(e, newPage) => setPage(newPage)}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={(e) => {
+            setRowsPerPage(parseInt(e.target.value, 10));
+            setPage(0); // reset to first page on rows change
+          }}
+          rowsPerPageOptions={[25, 30, 50, 80, 100, 200]}
+        />
       </TableContainer>
 
       <Drawer
@@ -486,35 +493,32 @@ const handleOpenDrawer = (contact) => {
         )}
       </Drawer>
       <Dialog
-  open={openDeleteDialog}
-  onClose={() => setOpenDeleteDialog(false)}
->
-  <DialogTitle>Delete Contacts?</DialogTitle>
+        open={openDeleteDialog}
+        onClose={() => setOpenDeleteDialog(false)}
+      >
+        <DialogTitle>Delete Contacts?</DialogTitle>
 
-  <DialogContent>
-    <DialogContentText>
-      Are you sure you want to delete 
-      <strong> {selectedContacts.length} </strong>
-      selected {selectedContacts.length === 1 ? "contact" : "contacts"}?
-      This action cannot be undone.
-    </DialogContentText>
-  </DialogContent>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete
+            <strong> {selectedContacts.length} </strong>
+            selected {selectedContacts.length === 1 ? "contact" : "contacts"}?
+            This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
 
-  <DialogActions>
-    <Button onClick={() => setOpenDeleteDialog(false)}>
-      Cancel
-    </Button>
+        <DialogActions>
+          <Button onClick={() => setOpenDeleteDialog(false)}>Cancel</Button>
 
-    <Button 
-      onClick={handleDeleteSelected} 
-      color="error" 
-      variant="contained"
-    >
-      Delete
-    </Button>
-  </DialogActions>
-</Dialog>
-
+          <Button
+            onClick={handleDeleteSelected}
+            color="error"
+            variant="contained"
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
