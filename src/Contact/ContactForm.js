@@ -35,7 +35,7 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [phoneNumbers, setPhoneNumbers] = useState([]);
-  const [countries, setCountries] = useState([]);
+ 
   const [selectedCountry, setSelectedCountry] = useState(null);
 
   // Individual state hooks for form fields
@@ -146,17 +146,41 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
     }
 
     // Email
-    if (!email?.trim()) {
-      setEmaileError("Email is required.");
-      isValid = false;
-    } else if (
+    // if (!email?.trim()) {
+    //   setEmaileError("Email is required.");
+    //   isValid = false;
+    // } else if (
+    //   !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)
+    // ) {
+    //   setEmaileError("Please enter a valid email address.");
+    //   isValid = false;
+    // } else {
+    //   setEmaileError("");
+    // }
+    
+  // ✅ Check: At least Email OR Phone Number
+  const hasEmail = email?.trim();
+  const hasPhone = phoneNumbers.some(
+    (p) => p.phone && p.phone.trim() !== ""
+  );
+
+  if (!hasEmail && !hasPhone) {
+    toast.info("At least Email or Phone Number is required");
+    // setEmaileError("Email or Phone Number is required");
+    isValid = false;
+  } else {
+    setEmaileError("");
+  }
+
+  // ✅ If email exists, validate format
+  if (hasEmail) {
+    if (
       !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)
     ) {
       setEmaileError("Please enter a valid email address.");
       isValid = false;
-    } else {
-      setEmaileError("");
     }
+  }
     return isValid;
   };
   
@@ -198,18 +222,6 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
       body: payload,
     };
 
-    // fetch("https://www.snptaxes.com/api/contacts", requestOptions)
-    //   .then((res) => {
-    //     if (!res.ok) throw new Error("Request failed");
-    //     return res.json();
-    //   })
-    //   .then(() => {
-    //     toast.success("Contact created successfully!");
-    //     navigate("/clients/contacts");
-    //   })
-    //   .catch(() => {
-    //     toast.error("Failed to create contact");
-    //   });
     fetch("https://www.snptaxes.com/api/contacts", requestOptions)
   .then(async (res) => {
     const data = await res.json();

@@ -376,7 +376,12 @@ const ContactsTable = () => {
                       }}
                     />
                   </TableCell>
-                  <TableCell>{c.contactCode || "—"}</TableCell>
+                  {/* <TableCell>{c.contactCode || "—"}</TableCell> */}
+                  <TableCell><Chip
+                      label={c.contactCode || "—"}
+                      size="small"
+                      color="success"
+                    /></TableCell>
                   <TableCell>
                     <Button
                       variant="text"

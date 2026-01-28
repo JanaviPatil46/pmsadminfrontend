@@ -2621,7 +2621,14 @@ const handleConfirmDelete = async () => {
                         onChange={() => handleClick(account)}
                       />
                     </TableCell>
-                    <TableCell>{account.importId}</TableCell>
+                    <TableCell>
+  <Chip
+    label={account.importId}
+    size="small"
+    color="success"
+  />
+</TableCell>
+
                     <TableCell>
                       {/* <Link
                         component="button"
