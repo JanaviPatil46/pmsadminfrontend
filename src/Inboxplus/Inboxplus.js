@@ -1476,18 +1476,27 @@ const EmailViewer = () => {
     return match ? match[1] : from;
   };
 
-  const hasMongoIdTag = (subject = "") => {
-    return subject.startsWith("#") && /#[a-f0-9]{24}#/i.test(subject);
-  };
+  // const hasMongoIdTag = (subject = "") => {
+  //   return subject.startsWith("#") && /#[a-f0-9]{24}#/i.test(subject);
+  // };
+const hasMongoIdTag = (subject = "") => {
+  return /#[a-f0-9]{24}\b/i.test(subject);
+};
+  // const extractMongoId = (subject = "") => {
+  //   const match = subject.match(/#([a-f0-9]{24})/i);
+  //   return match ? match[1] : null;
+  // };
+const extractMongoId = (subject = "") => {
+  const match = subject.match(/#([a-f0-9]{24})\b/i);
+  return match ? match[1] : null;
+};
 
-  const extractMongoId = (subject = "") => {
-    const match = subject.match(/#([a-f0-9]{24})/i);
-    return match ? match[1] : null;
-  };
-
-  const cleanSubjectText = (subject = "") => {
-    return subject.replace(/#[a-f0-9]{24} /i, "").trim();
-  };
+  // const cleanSubjectText = (subject = "") => {
+  //   return subject.replace(/#[a-f0-9]{24} /i, "").trim();
+  // };
+const cleanSubjectText = (subject = "") => {
+  return subject.replace(/#[a-f0-9]{24}\b/i, "").trim();
+};
 
   const buildAccountLink = (mongoId) => {
     return `/clients/accounts/accountsdash/overview/${mongoId}`;

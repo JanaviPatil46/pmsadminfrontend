@@ -1618,55 +1618,124 @@ const AccountTable = () => {
   };
 
   // Handler for saving the settings (API call)
-  const handleupdatecontacts = async () => {
-    try {
-      // Prepare data for API call
-      const updates = [];
-      selected.forEach(accountId => {
-        const account = accountList.find(acc => acc._id === accountId);
-        if (account && account.contacts) {
-          account.contacts.forEach(contact => {
-            const contactId = contact.contact?._id || contact.contact;
-            if (contactId) {
-              const updateData = {
-                accountId,
-                contactId,
-                canLogin: settings.login === "Assign to all" ? true : settings.login === "Remove from all" ? false : undefined,
-                canNotify: settings.notify === "Assign to all" ? true : settings.notify === "Remove from all" ? false : undefined,
-                canEmailSync: settings.emailSync === "Assign to all" ? true : settings.emailSync === "Remove from all" ? false : undefined
-              };
+  // const handleupdatecontacts = async () => {
+  //   try {
+  //     // Prepare data for API call
+  //     const updates = [];
+  //     selected.forEach(accountId => {
+  //       const account = accountList.find(acc => acc._id === accountId);
+  //       if (account && account.contacts) {
+  //         account.contacts.forEach(contact => {
+  //           const contactId = contact.contact?._id || contact.contact;
+  //           if (contactId) {
+  //             const updateData = {
+  //               accountId,
+  //               contactId,
+  //               canLogin: settings.login === "Assign to all" ? true : settings.login === "Remove from all" ? false : undefined,
+  //               canNotify: settings.notify === "Assign to all" ? true : settings.notify === "Remove from all" ? false : undefined,
+  //               canEmailSync: settings.emailSync === "Assign to all" ? true : settings.emailSync === "Remove from all" ? false : undefined
+  //             };
               
-              // Remove undefined values
-              Object.keys(updateData).forEach(key => {
-                if (updateData[key] === undefined) {
-                  delete updateData[key];
-                }
-              });
+  //             // Remove undefined values
+  //             Object.keys(updateData).forEach(key => {
+  //               if (updateData[key] === undefined) {
+  //                 delete updateData[key];
+  //               }
+  //             });
               
-              updates.push(updateData);
+  //             updates.push(updateData);
+  //           }
+  //         });
+  //       }
+  //     });
+
+  //     // Make API calls for each contact
+  //     const promises = updates.map(update => 
+  //       axios.patch(
+  //         `https://www.snptaxes.com/api/accounts/${update.accountId}/contact/${update.contactId}`,
+  //         update
+  //       )
+  //     );
+
+  //     await Promise.all(promises);
+      
+  //     toast.success("Contact permissions updated successfully");
+  //     handleCloseSidebar();
+  //     fetchAccountsList(); // Refresh the account list
+  //   } catch (error) {
+  //     console.error("Failed to update contact permissions", error);
+  //     toast.error("Failed to update contact permissions");
+  //   }
+  // };
+const handleupdatecontacts = async () => {
+  try {
+    const updates = [];
+
+    // Prepare update payloads
+    selected.forEach(accountId => {
+      const account = accountList.find(acc => acc._id === accountId);
+
+      if (account?.contacts?.length) {
+        account.contacts.forEach(contact => {
+          const contactId = contact.contact?._id || contact.contact;
+          if (!contactId) return;
+
+          const updateData = {
+            accountId,
+            contactId,
+            canLogin:
+              settings.login === "Assign to all"
+                ? true
+                : settings.login === "Remove from all"
+                ? false
+                : undefined,
+            canNotify:
+              settings.notify === "Assign to all"
+                ? true
+                : settings.notify === "Remove from all"
+                ? false
+                : undefined,
+            canEmailSync:
+              settings.emailSync === "Assign to all"
+                ? true
+                : settings.emailSync === "Remove from all"
+                ? false
+                : undefined
+          };
+
+          // Remove undefined fields
+          Object.keys(updateData).forEach(key => {
+            if (updateData[key] === undefined) {
+              delete updateData[key];
             }
           });
+
+          updates.push(updateData);
+        });
+      }
+    });
+
+    // Sequential API calls (prevents network errors)
+    for (const update of updates) {
+      await axios.patch(
+        `https://www.snptaxes.com/api/accounts/${update.accountId}/contact/${update.contactId}`,
+        update,
+        {
+          headers: {
+            "Content-Type": "application/json"
+          }
         }
-      });
-
-      // Make API calls for each contact
-      const promises = updates.map(update => 
-        axios.patch(
-          `https://www.snptaxes.com/api/accounts/${update.accountId}/contact/${update.contactId}`,
-          update
-        )
       );
-
-      await Promise.all(promises);
-      
-      toast.success("Contact permissions updated successfully");
-      handleCloseSidebar();
-      fetchAccountsList(); // Refresh the account list
-    } catch (error) {
-      console.error("Failed to update contact permissions", error);
-      toast.error("Failed to update contact permissions");
     }
-  };
+
+    toast.success("Contact permissions updated successfully");
+    handleCloseSidebar();
+    fetchAccountsList();
+  } catch (error) {
+    console.error("Failed to update contact permissions", error);
+    toast.error("Failed to update contact permissions");
+  }
+};
 
   const handleFilterButtonClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -2704,7 +2773,7 @@ const handleConfirmDelete = async () => {
             page={page}
             onPageChange={(e, newPage) => setPage(newPage)}
             rowsPerPage={rowsPerPage}
-            rowsPerPageOptions={[5, 10, 25, 30, 50, 100]}
+            rowsPerPageOptions={[5, 10, 25, 30, 50, 100,500]}
             onRowsPerPageChange={(e) => {
               setRowsPerPage(parseInt(e.target.value));
               setPage(0);
