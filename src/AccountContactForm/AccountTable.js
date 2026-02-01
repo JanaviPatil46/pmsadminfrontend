@@ -1889,24 +1889,57 @@ const handleupdatecontacts = async () => {
     setOrderBy(property);
   };
 
-  const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const allSelectedIds = accountList.map((n) => n._id);
-      setSelected(allSelectedIds);
+  // const handleSelectAllClick = (event) => {
+  //   if (event.target.checked) {
+  //     const allSelectedIds = accountList.map((n) => n._id);
+  //     setSelected(allSelectedIds);
 
-      console.log(
-        "Selected all accounts:",
-        accountList.map(({ _id, accountName }) => ({
-          value: _id,
-          label: accountName,
-        }))
-      );
-      return;
-    }
+  //     console.log(
+  //       "Selected all accounts:",
+  //       accountList.map(({ _id, accountName }) => ({
+  //         value: _id,
+  //         label: accountName,
+  //       }))
+  //     );
+  //     return;
+  //   }
 
-    setSelected([]);
-    console.log("Deselected all accounts");
-  };
+  //   setSelected([]);
+  //   console.log("Deselected all accounts");
+  // };
+// Select ALL accounts (ignores filters & pagination)
+
+
+const handleSelectAllClick = (event) => {
+  if (event.target.checked) {
+    const newSelected = Array.from(
+      new Set([...selected, ...pageIds])
+    );
+    setSelected(newSelected);
+  } else {
+    const newSelected = selected.filter(
+      id => !pageIds.includes(id)
+    );
+    setSelected(newSelected);
+  }
+};
+
+const handleSelectAllAccounts = () => {
+  setSelected(accountList.map(a => a._id));
+};
+
+// Select ALL FILTERED accounts (all pages)
+const handleSelectAllFiltered = () => {
+  setSelected(sortedList.map(a => a._id));
+};
+
+// Clear selection
+const handleClearSelection = () => {
+  setSelected([]);
+  Cookies.remove("selectedAccounts", { path: "/" });
+  Cookies.remove("accountId", { path: "/" });
+  Cookies.remove("accountName", { path: "/" });
+};
 
   const handleClick = (account) => {
     const selectedIndex = selected.indexOf(account._id);
@@ -2032,6 +2065,13 @@ const handleupdatecontacts = async () => {
 
     return filtered;
   };
+  const isAnyFilterApplied =
+  filters.accountName.trim() !== "" ||
+  filters.email.trim() !== "" ||
+  filters.type !== "" ||
+  filters.teamMember.length > 0 ||
+  filters.tags.length > 0;
+
   
   const filteredList = applyFilters();
   const sortedList =
@@ -2043,6 +2083,17 @@ const handleupdatecontacts = async () => {
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
   );
+// ================== SELECTION HELPERS ==================
+
+// IDs on current page
+const pageIds = paginatedList.map(a => a._id);
+
+// Header checkbox state (CURRENT PAGE)
+const isPageAllSelected =
+  pageIds.length > 0 && pageIds.every(id => selected.includes(id));
+
+const isPageIndeterminate =
+  pageIds.some(id => selected.includes(id)) && !isPageAllSelected;
 
   const isSelected = (id) => selected.indexOf(id) !== -1;
   
@@ -2339,6 +2390,7 @@ const handleConfirmDelete = async () => {
               <MenuItem value="">All</MenuItem>
               <MenuItem value="Individual">Individual</MenuItem>
               <MenuItem value="Company">Company</MenuItem>
+               <MenuItem value="Other">Other</MenuItem>
             </Select>
           </FormControl>
           <DeleteIcon
@@ -2402,6 +2454,49 @@ const handleConfirmDelete = async () => {
           />
         </div>
       )}
+{/* {selected.length === 0 && (
+  <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
+    <Button variant="outlined" onClick={handleSelectAllAccounts}>
+      Select All Accounts
+    </Button>
+
+    <Button variant="outlined" onClick={handleSelectAllFiltered}>
+      Select Filtered Accounts
+    </Button>
+  </Box>
+)}
+
+{selected.length > 0 && (
+  <Button
+    variant="outlined"
+    color="secondary"
+    onClick={handleClearSelection}
+    sx={{ mb: 2 }}
+  >
+    Clear Selection ({selected.length})
+  </Button>
+)} */}
+{selected.length > 0 && (
+  <Box sx={{ display: "flex", gap: 1, mb: 2,mt:2 }}>
+    {isAnyFilterApplied ? (
+      <Button variant="outlined" onClick={handleSelectAllFiltered}>
+        Select Filtered Accounts
+      </Button>
+    ) : (
+      <Button variant="outlined" onClick={handleSelectAllAccounts}>
+        Select All Accounts
+      </Button>
+    )}
+
+    <Button
+      variant="outlined"
+      color="secondary"
+      onClick={handleClearSelection}
+    >
+      Clear Selection ({selected.length})
+    </Button>
+  </Box>
+)}
 
       {selected.length > 0 && (
         <Box data-test="clients-bulk-actions-panel" sx={{ mb: 2 }}>
@@ -2593,7 +2688,7 @@ const handleConfirmDelete = async () => {
               )}
 
               {/* NEW: Edit login, notify, email sync menu item */}
-              <Tooltip
+              {/* <Tooltip
                 title={
                   storedData?.teammember?.manageAccounts === false
                     ? "You don't have permission to edit account settings"
@@ -2609,7 +2704,7 @@ const handleConfirmDelete = async () => {
                     Edit login, notify, email sync
                   </MenuItem>
                 </span>
-              </Tooltip>
+              </Tooltip> */}
             </Menu>
           </div>
         </Box>
@@ -2620,12 +2715,23 @@ const handleConfirmDelete = async () => {
           Loading accounts...
         </Typography>
       ) : (
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} sx={{mt:2}}>
           <Table>
             <TableHead>
               <TableRow>
                 <TableCell padding="checkbox">
-                  <Checkbox
+                  {/* <Checkbox
+                    color="primary"
+                    indeterminate={
+                      selected.length > 0 && selected.length < accountList.length
+                    }
+                    checked={
+                      accountList.length > 0 &&
+                      selected.length === accountList.length
+                    }
+                    onChange={handleSelectAllClick}
+                  /> */}
+                   <Checkbox
                     color="primary"
                     indeterminate={
                       selected.length > 0 && selected.length < accountList.length
@@ -2769,7 +2875,8 @@ const handleConfirmDelete = async () => {
           </Table>
           <TablePagination
             component="div"
-            count={accountList.length}
+            // count={accountList.length}
+             count={sortedList.length}
             page={page}
             onPageChange={(e, newPage) => setPage(newPage)}
             rowsPerPage={rowsPerPage}
