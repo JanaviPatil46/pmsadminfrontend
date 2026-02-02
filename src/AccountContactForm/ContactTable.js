@@ -43,11 +43,7 @@ const ContactsTable = () => {
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25); // default 25 per page
-  // const handleOpenDrawer = (contact) => {
-  //   console.log("Opening drawer for contact:", contact);
-  //   setSelectedContact(contact);
-  //   setOpenDrawer(true);
-  // };
+  
   const handleOpenDrawer = (contact) => {
     if (!canManageContacts) {
       toast.info("You do not have permission to edit contacts");
@@ -81,6 +77,7 @@ const ContactsTable = () => {
     email: "",
     company: "",
     tags: [],
+    contactCode: "",
   });
 
   // ✅ Which filters are visible
@@ -146,6 +143,12 @@ const ContactsTable = () => {
         c.tags?.some((t) => filters.tags.some((sel) => sel.value === t._id)),
       );
     }
+    if (filters.contactCode)
+      result = result.filter((c) =>
+        c.contactCode
+          ?.toLowerCase()
+          .includes(filters.contactCode.toLowerCase()),
+      );
 
     setFilteredContacts(result);
   }, [filters, contacts]);
@@ -211,6 +214,7 @@ const ContactsTable = () => {
           <MenuItem onClick={() => addFilter("email")}>Email</MenuItem>
           <MenuItem onClick={() => addFilter("company")}>Company Name</MenuItem>
           <MenuItem onClick={() => addFilter("tags")}>Tags</MenuItem>
+          <MenuItem onClick={() => addFilter("contactCode")}>Contact Code</MenuItem>
         </Menu>
 
         {/* ✅ Show only selected filters */}
@@ -246,6 +250,24 @@ const ContactsTable = () => {
               </IconButton>
             </Box>
           )}
+{activeFilters.includes("contactCode") && (
+            <Box display="flex" alignItems="center">
+              <TextField
+                label="Search Contact Code"
+                size="small"
+                value={filters.contactCode}
+                onChange={(e) =>
+                  setFilters({ ...filters, contactCode: e.target.value })
+                }
+              />
+              <IconButton onClick={() => removeFilter("contactCode")}>
+                <FaTimes />
+              </IconButton>
+            </Box>
+          )}
+
+
+
 
           {activeFilters.includes("company") && (
             <Box display="flex" alignItems="center">

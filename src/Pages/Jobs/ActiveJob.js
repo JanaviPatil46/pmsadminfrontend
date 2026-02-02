@@ -201,138 +201,189 @@ const Example = ({ charLimit = 4000 }) => {
 // };
 
 const [filterStatus, setFilterStatus] = useState("active"); 
+// const fetchData = async () => {
+//   setLoading(true);
+//   const loaderDelay = new Promise((resolve) => setTimeout(resolve, 1000));
+
+//   try {
+//     const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
+//     console.log("Received stored teamMemberData:", storedData);
+
+//     const loginuserid = storedData?.teammember?.userid;
+//     const viewAllAccounts = storedData?.teammember?.viewallAccounts;
+
+//     console.log("User role is:", userRole);
+//     console.log("access:", viewAllAccounts);
+
+//     let url = "";
+
+//     if (userRole === "Admin") {
+//       // ✅ Fetch active accounts first
+//       const accountsResponse = await axios.get(
+//         `https://www.snptaxes.com/api/accounts/list?active=${filterStatus === "active"}`
+//       );
+// console.log("accountsResponse",accountsResponse)
+//       const accountsData = accountsResponse.data.accountlist
+// ;
+//       console.log("Admin accounts fetched:", accountsData);
+
+//       if (!accountsData || accountsData.length === 0) {
+//         console.warn("No active accounts found for Admin.");
+//         setJobData([]);
+//         await loaderDelay;
+//         setLoading(false);
+//         return;
+//       }
+
+//       const accountIds = accountsData.map((account) => account._id).join(",");
+//       url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
+//     } 
+    
+ 
+// else if (userRole === "TeamMember") {
+
+//   let accountsData = [];
+
+//   if (viewAllAccounts) {
+//     // 🔹 TeamMember WITH view all access → fetch ALL active accounts
+//     const accountsResponse = await axios.get(
+//       `https://www.snptaxes.com/api/accounts/list?active=${filterStatus === "active"}`
+//     );
+
+//     accountsData = accountsResponse.data.accountlist;
+//     console.log("TeamMember (view all) accounts:", accountsData);
+
+//   } else {
+//     // 🔹 TeamMember WITHOUT view all access → fetch assigned accounts only
+//     const accountsResponse = await axios.get(
+//       `https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=${filterStatus === "active"}`
+//     );
+
+//     accountsData = accountsResponse.data.accountlist;
+//     console.log("TeamMember assigned accounts:", accountsData);
+//   }
+
+//   // 🔹 Validate accounts
+//   if (!accountsData || accountsData.length === 0) {
+//     console.warn("No accounts found for TeamMember.");
+//     setJobData([]);
+//     await loaderDelay;
+//     setLoading(false);
+//     return;
+//   }
+
+//   // 🔹 Map account IDs
+//   const accountIds = accountsData.map((account) => account._id).join(",");
+
+//   // 🔹 Prepare URL for jobs
+//   url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
+
+//   console.log("TeamMember Job Fetch URL:", url);
+// }
+
+//     if (!url) {
+//       await loaderDelay;
+//       setLoading(false);
+//       return;
+//     }
+
+//     console.log("Fetching jobs from URL:", url);
+
+//     const jobListResponse = await axios.get(url);
+
+//     const formattedData = jobListResponse.data.jobList.map((job) => ({
+//       ...job,
+//       StartDate: job.StartDate
+//         ? format(new Date(job.StartDate), "MMMM dd, yyyy")
+//         : "",
+//       DueDate: job.DueDate
+//         ? format(new Date(job.DueDate), "MMMM dd, yyyy")
+//         : "",
+//       updatedAt: formatDistanceToNow(new Date(job.updatedAt), { addSuffix: true }),
+//       JobAssignee: Array.isArray(job.JobAssignee)
+//         ? job.JobAssignee.join(", ")
+//         : job.JobAssignee,
+//       clientfacingstatus: {
+//         statusName: job.ClientFacingStatus?.statusName || "",
+//         statusColor: job.ClientFacingStatus?.statusColor || "",
+//       },
+//     }));
+
+//     setJobData(formattedData);
+//     console.log("Formatted Job Data:", formattedData);
+//   } catch (error) {
+//     console.error("Error fetching data:", error);
+//   } finally {
+//     await loaderDelay;
+//     setLoading(false);
+//   }
+// };
 const fetchData = async () => {
   setLoading(true);
   const loaderDelay = new Promise((resolve) => setTimeout(resolve, 1000));
 
   try {
     const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
-    console.log("Received stored teamMemberData:", storedData);
 
     const loginuserid = storedData?.teammember?.userid;
     const viewAllAccounts = storedData?.teammember?.viewallAccounts;
 
-    console.log("User role is:", userRole);
-    console.log("access:", viewAllAccounts);
+    console.log("User role:", userRole);
+    console.log("View all accounts:", viewAllAccounts);
 
-    let url = "";
+    // ✅ Declare once (IMPORTANT)
+    let accountsData = [];
+
+    /* =======================
+       FETCH ACCOUNTS
+    ======================= */
 
     if (userRole === "Admin") {
-      // ✅ Fetch active accounts first
       const accountsResponse = await axios.get(
         `https://www.snptaxes.com/api/accounts/list?active=${filterStatus === "active"}`
       );
-console.log("accountsResponse",accountsResponse)
-      const accountsData = accountsResponse.data.accountlist
-;
-      console.log("Admin accounts fetched:", accountsData);
 
-      if (!accountsData || accountsData.length === 0) {
-        console.warn("No active accounts found for Admin.");
-        setJobData([]);
-        await loaderDelay;
-        setLoading(false);
-        return;
+      accountsData = accountsResponse.data.accountlist || [];
+      console.log("Admin accounts:", accountsData);
+
+    } else if (userRole === "TeamMember") {
+
+      if (viewAllAccounts) {
+        const accountsResponse = await axios.get(
+          `https://www.snptaxes.com/api/accounts/list?active=${filterStatus === "active"}`
+        );
+
+        accountsData = accountsResponse.data.accountlist || [];
+        console.log("TeamMember (view all) accounts:", accountsData);
+
+      } else {
+        const accountsResponse = await axios.get(
+          `https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=${filterStatus === "active"}`
+        );
+
+        accountsData = accountsResponse.data.accountlist || [];
+        console.log("TeamMember assigned accounts:", accountsData);
       }
+    }
 
-      const accountIds = accountsData.map((account) => account._id).join(",");
-      url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
-    } 
-    
-  //   else if (userRole === "TeamMember") {
-  //     if (viewAllAccounts) {
-        
-
-  //     // const accountsData = accountsResponse.data.accountlist;
-  //      const accountsResponse = await axios.get(`https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=${filterStatus === "active"}`);
-  //             const accountsData = accountsResponse.data.accountlist;
-  //     console.log("Admin accounts fetched:", accountsData);
-
-  //     if (!accountsData || accountsData.length === 0) {
-  //       console.warn("No active accounts found for Admin.");
-  //       setJobData([]);
-  //       await loaderDelay;
-  //       setLoading(false);
-  //       return;
-  //     }
-
-  //     const accountIds = accountsData.map((account) => account._id).join(",");
-
-  //     url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
-  //    console.log("url",url)
-  //   } else {
-  //       // TeamMember with restricted access → fetch user's accounts
-  //       const accountsResponse = await axios.get(
-  //         `${ACCOUNT_API}/accounts/getaccounts/${loginuserid}/${isActiveTrue}`
-  //       );
-
-  //       const accountsData = accountsResponse.data.accountlist;
-  //       console.log("Accounts fetched:", accountsData);
-
-  //       if (!accountsData || accountsData.length === 0) {
-  //         console.warn("No accounts found for user.");
-  //         setJobData([]);
-  //         await loaderDelay;
-  //         setLoading(false);
-  //         return;
-  //       }
-
-  //       const accountIds = accountsData.map((account) => account.id).join(",");
-   
-  //       url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
-  //  console.log("url",url);
-  //     }
-  //   }
-else if (userRole === "TeamMember") {
-
-  let accountsData = [];
-
-  if (viewAllAccounts) {
-    // 🔹 TeamMember WITH view all access → fetch ALL active accounts
-    const accountsResponse = await axios.get(
-      `https://www.snptaxes.com/api/accounts/list?active=${filterStatus === "active"}`
-    );
-
-    accountsData = accountsResponse.data.accountlist;
-    console.log("TeamMember (view all) accounts:", accountsData);
-
-  } else {
-    // 🔹 TeamMember WITHOUT view all access → fetch assigned accounts only
-    const accountsResponse = await axios.get(
-      `https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=${filterStatus === "active"}`
-    );
-
-    accountsData = accountsResponse.data.accountlist;
-    console.log("TeamMember assigned accounts:", accountsData);
-  }
-
-  // 🔹 Validate accounts
-  if (!accountsData || accountsData.length === 0) {
-    console.warn("No accounts found for TeamMember.");
-    setJobData([]);
-    await loaderDelay;
-    setLoading(false);
-    return;
-  }
-
-  // 🔹 Map account IDs
-  const accountIds = accountsData.map((account) => account._id).join(",");
-
-  // 🔹 Prepare URL for jobs
-  url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
-
-  console.log("TeamMember Job Fetch URL:", url);
-}
-
-    if (!url) {
-      await loaderDelay;
-      setLoading(false);
+    // 🔒 Safety check
+    if (!accountsData.length) {
+      console.warn("No accounts found.");
+      setJobData([]);
       return;
     }
 
-    console.log("Fetching jobs from URL:", url);
+    /* =======================
+       FETCH JOBS (POST ✅)
+    ======================= */
 
-    const jobListResponse = await axios.get(url);
+    const jobListResponse = await axios.post(
+      `${JOBS_API}/workflow/jobs/job/joblist/list`,
+      {
+        isActive: isActiveTrue,
+        accountIds: accountsData.map(acc => acc._id),
+      }
+    );
 
     const formattedData = jobListResponse.data.jobList.map((job) => ({
       ...job,
@@ -342,7 +393,9 @@ else if (userRole === "TeamMember") {
       DueDate: job.DueDate
         ? format(new Date(job.DueDate), "MMMM dd, yyyy")
         : "",
-      updatedAt: formatDistanceToNow(new Date(job.updatedAt), { addSuffix: true }),
+      updatedAt: formatDistanceToNow(new Date(job.updatedAt), {
+        addSuffix: true,
+      }),
       JobAssignee: Array.isArray(job.JobAssignee)
         ? job.JobAssignee.join(", ")
         : job.JobAssignee,
@@ -353,9 +406,10 @@ else if (userRole === "TeamMember") {
     }));
 
     setJobData(formattedData);
-    console.log("Formatted Job Data:", formattedData);
+    console.log("Final job data:", formattedData);
+
   } catch (error) {
-    console.error("Error fetching data:", error);
+    console.error("Error fetching jobs:", error);
   } finally {
     await loaderDelay;
     setLoading(false);
@@ -1997,7 +2051,7 @@ const getPriorityStyle = (priority) => {
                         }}
                       >
                         {/* {.Stage} */}
-                        {row.Stages?.map(stage => stage.name).join(", ")}
+                        {row.Stages?.name || "-"}
                       </TableCell>
                       <TableCell
                         style={{
@@ -2035,7 +2089,7 @@ const getPriorityStyle = (priority) => {
                           </span>
                         )}</>
                         ) : (
-                          <>       No Status</>
+                          <> -</>
                    
                         )}
                        
