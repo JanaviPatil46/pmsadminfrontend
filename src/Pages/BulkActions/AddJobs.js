@@ -1713,73 +1713,141 @@ const [clientFacingJobs, setClientFacingJobs] = useState([]);
   };
   const [isProcessing, setIsProcessing] = useState(false);
     // Move handler
+  //   const handleMove = async () => {
+  //       if (isProcessing) return; // safety guard
+
+  // setIsProcessing(true);
+  //     try {
+  //       const { accountJobMap } = await createJob();
+  //       console.log("Job mapping created:", accountJobMap);
+
+  //       const automationResults = await Promise.allSettled(
+  //         combinedaccountValues.map(async (accountId) => {
+  //           const jobId = accountJobMap[accountId];
+  //           if (!jobId)
+  //             throw new Error(`No job ID found for account ${accountId}`);
+
+  //           await Promise.all(
+  //             selectedAutomations.map(async (automationIndex) => {
+  //               const automation = automations[automationIndex];
+  //               if (!automation || !automation.type) {
+  //                 throw new Error(
+  //                   `Invalid automation at index ${automationIndex}`
+  //                 );
+  //               }
+
+  //                 // Check tag matching using the proper function
+  //             const hasMatchingTags = checkTagMatch(automation.selectedTags, accountId);
+              
+  //             if (!hasMatchingTags) {
+  //               console.warn(
+  //                 `Tags do not match for automation "${automation.type}" and account ID: ${accountId}. Skipping.`
+  //               );
+  //               return;
+  //             }
+
+  //               await selectAutomationApi(
+  //                 automation.type,
+  //                 automation.selectedtemp,
+  //                 accountId,
+  //                 automation,
+  //                 automation.type === "Create Task" ? jobId : null
+  //               );
+  //             })
+  //           );
+  //         })
+  //       );
+
+  //       const failedResults = automationResults.filter(
+  //         (r) => r.status === "rejected"
+  //       );
+  //       if (failedResults.length > 0) {
+  //         console.error("Some automations failed:", failedResults);
+  //         toast.error(
+  //           `${failedResults.length} automations failed (job was created)`
+  //         );
+  //       } else {
+  //         toast.success("Job created successfully");
+  //         // handleDrawerClose();
+  //         navigate("/jobs/activejob");
+  //       }
+
+  //       setDrawerOpen(false);
+  //       // handleNewDrawerClose();
+  //     } catch (error) {
+  //       console.error("Operation failed:", error);
+  //       toast.error(`Operation failed: ${error.message}`);
+  //     }
+  //   };
     const handleMove = async () => {
-        if (isProcessing) return; // safety guard
+  if (isProcessing) return;
 
   setIsProcessing(true);
-      try {
-        const { accountJobMap } = await createJob();
-        console.log("Job mapping created:", accountJobMap);
 
-        const automationResults = await Promise.allSettled(
-          combinedaccountValues.map(async (accountId) => {
-            const jobId = accountJobMap[accountId];
-            if (!jobId)
-              throw new Error(`No job ID found for account ${accountId}`);
+  try {
+    // 🔹 Extract data for API
+    const accounts = combinedaccountValues;
+    const autos = selectedAutomations
+      .map((index) => automations[index])
+      .filter(Boolean);
 
-            await Promise.all(
-              selectedAutomations.map(async (automationIndex) => {
-                const automation = automations[automationIndex];
-                if (!automation || !automation.type) {
-                  throw new Error(
-                    `Invalid automation at index ${automationIndex}`
-                  );
-                }
+    // if (!accounts.length || !autos.length) {
+    //   alert("Select accounts & automations");
+    //   return;
+    // }
+// console.log("Selected accounts:", accounts);
+console.log("Selected automations:", autos);
+const payload = {
+  // accounts,
+  // automations: autos,
+  // stageid: selectedStage.value,
+  // pipeline: selectedPipeline.value,
+  // jobTemplate: selectedtemp.value,
+  // jobname: jobName,
+  //  description: description,
+  //  username,
 
-                  // Check tag matching using the proper function
-              const hasMatchingTags = checkTagMatch(automation.selectedTags, accountId);
-              
-              if (!hasMatchingTags) {
-                console.warn(
-                  `Tags do not match for automation "${automation.type}" and account ID: ${accountId}. Skipping.`
-                );
-                return;
-              }
+  accounts,
+          automations: autos,
+          stageid: selectedStage.value,
+          pipeline: selectedPipeline.value,
+          jobTemplate: selectedtemp.value,
+          jobname: jobName,
+          description: description,
+          username,
+          jobassignees: combinedAssigneesValues,
+          priority: priority,
+          absolutedates: absoluteDate,
+          startsin: startsin,
+          startsinduration: startsInDuration,
+          duein: duein,
+          dueinduration: dueinduration,
+          showinclientportal: clientFacingStatus,
+          jobnameforclient: inputText,
+          clientfacingstatus: selectedJob,
+          clientfacingDescription: clientDescription,
+          startdate: startDate,
+          enddate: dueDate,
+};
+console.log("📤 Sending JSON:", JSON.stringify(payload));
+    // 🔹 Call backend API
+    await fetch("https://www.snptaxes.com/workflow/jobs/create-job", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+     
+       body: JSON.stringify(payload),
+    });
 
-                await selectAutomationApi(
-                  automation.type,
-                  automation.selectedtemp,
-                  accountId,
-                  automation,
-                  automation.type === "Create Task" ? jobId : null
-                );
-              })
-            );
-          })
-        );
+    alert("Jobs started");
 
-        const failedResults = automationResults.filter(
-          (r) => r.status === "rejected"
-        );
-        if (failedResults.length > 0) {
-          console.error("Some automations failed:", failedResults);
-          toast.error(
-            `${failedResults.length} automations failed (job was created)`
-          );
-        } else {
-          toast.success("Job created successfully");
-          // handleDrawerClose();
-          navigate("/jobs/activejob");
-        }
-
-        setDrawerOpen(false);
-        // handleNewDrawerClose();
-      } catch (error) {
-        console.error("Operation failed:", error);
-        toast.error(`Operation failed: ${error.message}`);
-      }
-    };
-
+  
+    setDrawerOpen(false);
+  } catch (error) {
+    console.error("Operation failed:", error);
+  } finally {
+    setIsProcessing(false);
+  }
+};
     // Create job function
     const createJob = async () => {
       const myHeaders = new Headers();

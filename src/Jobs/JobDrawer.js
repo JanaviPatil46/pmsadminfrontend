@@ -149,7 +149,7 @@ const JobDrawer = ({
   const fetchAccountData = async () => {
     try {
       const response = await fetch(
-        "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true"
+        "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true",
       );
       const data = await response.json();
       setaccountdata(data.accountlist);
@@ -205,7 +205,7 @@ const JobDrawer = ({
       const templateId = newValue.value;
       try {
         const response = await fetch(
-          `${JOBS_TEMP_API}/workflow/jobtemplate/jobtemplate/jobtemplatelist/${templateId}`
+          `${JOBS_TEMP_API}/workflow/jobtemplate/jobtemplate/jobtemplatelist/${templateId}`,
         );
         const data = await response.json();
         const template = data.jobTemplate;
@@ -391,7 +391,7 @@ const JobDrawer = ({
     // Find the details of the selected stage
     const selectedStageDetails =
       selectedPipelineDetails?.pipeline?.stages?.find(
-        (stage) => stage._id === selectedStage?.value
+        (stage) => stage._id === selectedStage?.value,
       );
 
     // Check if the selected stage contains automations
@@ -470,7 +470,7 @@ const JobDrawer = ({
   useEffect(() => {
     // Simulate filtered shortcuts based on some logic (e.g., search)
     setFilteredShortcuts(
-      shortcuts.filter((shortcut) => shortcut.title.toLowerCase().includes(""))
+      shortcuts.filter((shortcut) => shortcut.title.toLowerCase().includes("")),
     );
   }, [shortcuts]);
 
@@ -649,7 +649,7 @@ const JobDrawer = ({
   const fetchClientFacingJobsData = async () => {
     try {
       const response = await fetch(
-        `${CLIENT_FACING_API}/workflow/clientfacingjobstatus/`
+        `${CLIENT_FACING_API}/workflow/clientfacingjobstatus/`,
       );
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -679,7 +679,7 @@ const JobDrawer = ({
       const clientjobId = newValue.value;
       try {
         const response = await fetch(
-          `${CLIENT_FACING_API}/workflow/clientfacingjobstatus/${clientjobId}`
+          `${CLIENT_FACING_API}/workflow/clientfacingjobstatus/${clientjobId}`,
         );
         if (!response.ok) {
           throw new Error("Network response was not ok");
@@ -688,7 +688,7 @@ const JobDrawer = ({
 
         console.log(data);
         setClientDescription(
-          data.clientfacingjobstatuses.clientfacingdescription
+          data.clientfacingjobstatuses.clientfacingdescription,
         );
         console.log(data.clientfacingjobstatuses.clientfacingdescription);
       } catch (error) {
@@ -804,7 +804,7 @@ const JobDrawer = ({
 
       // Prevent duplicate selections
       const uniqueTags = selectedTags.filter(
-        (tag, idx, self) => self.findIndex((t) => t._id === tag._id) === idx
+        (tag, idx, self) => self.findIndex((t) => t._id === tag._id) === idx,
       );
 
       // Ensure the tag is removed from the opposite category
@@ -812,7 +812,7 @@ const JobDrawer = ({
         updatedAutomations[index].removeTags = updatedAutomations[
           index
         ].removeTags.filter(
-          (tag) => !uniqueTags.some((t) => t._id === tag._id)
+          (tag) => !uniqueTags.some((t) => t._id === tag._id),
         );
       } else if (type === "removeTags") {
         updatedAutomations[index].addTags = updatedAutomations[
@@ -835,7 +835,7 @@ const JobDrawer = ({
     const fetchAssignees = async () => {
       try {
         const response = await axios.get(
-          `${LOGIN_API}/common/users/roles?roles=TeamMember,Admin`
+          `${LOGIN_API}/common/users/roles?roles=TeamMember,Admin`,
         );
         console.log("assigness data", response.data);
         setAssignee(response.data);
@@ -869,7 +869,7 @@ const JobDrawer = ({
 
       // Prevent duplicate selections
       const uniqueTags = selectedTags.filter(
-        (ass, idx, self) => self.findIndex((t) => t._id === ass._id) === idx
+        (ass, idx, self) => self.findIndex((t) => t._id === ass._id) === idx,
       );
 
       // Ensure the tag is removed from the opposite category
@@ -877,13 +877,13 @@ const JobDrawer = ({
         updatedAutomations[index].removeAssignees = updatedAutomations[
           index
         ].removeAssignees.filter(
-          (ass) => !uniqueTags.some((t) => t._id === ass._id)
+          (ass) => !uniqueTags.some((t) => t._id === ass._id),
         );
       } else if (type === "removeAssignees") {
         updatedAutomations[index].addAssignees = updatedAutomations[
           index
         ].addAssignees.filter(
-          (tag) => !uniqueTags.some((t) => t._id === tag._id)
+          (tag) => !uniqueTags.some((t) => t._id === tag._id),
         );
       }
 
@@ -929,7 +929,7 @@ const JobDrawer = ({
       if (userRole === "Admin") {
         // ✅ Fetch active accounts first
         const accountsResponse = await axios.get(
-          `https://www.snptaxes.com/api/accounts/list?active=${filterStatus === "active"}`
+          `https://www.snptaxes.com/api/accounts/list?active=${filterStatus === "active"}`,
         );
         console.log("accountsResponse", accountsResponse);
         const accountsData = accountsResponse.data.accountlist;
@@ -951,7 +951,7 @@ const JobDrawer = ({
           // url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}`;
           // ✅ Fetch active accounts first
           const accountsResponse = await axios.get(
-            `${ACCOUNT_API}/accounts/account/accountdetailslist/${isActiveTrue}`
+            `${ACCOUNT_API}/accounts/account/accountdetailslist/${isActiveTrue}`,
           );
 
           const accountsData = accountsResponse.data.accountlist;
@@ -973,7 +973,7 @@ const JobDrawer = ({
         } else {
           // TeamMember with restricted access → fetch user's accounts
           const accountsResponse = await axios.get(
-            `${ACCOUNT_API}/accounts/getaccounts/${loginuserid}/${isActiveTrue}`
+            `${ACCOUNT_API}/accounts/getaccounts/${loginuserid}/${isActiveTrue}`,
           );
 
           const accountsData = accountsResponse.data.accountlist;
@@ -2344,13 +2344,13 @@ const JobDrawer = ({
       .map((accountId) => {
         console.log("combinedaccountValues", combinedaccountValues);
         const account = accountdata.find(
-          (account) => account._id === accountId
+          (account) => account._id === accountId,
         );
         return account ? account.tags || [] : [];
       })
       .flat();
     console.log("Account Tags:", accountTags);
-const [isProcessing, setIsProcessing] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
 
     // API endpoints
     const ACCOUNT_TASKS_API = process.env.REACT_APP_TASKS_API;
@@ -2456,7 +2456,7 @@ const [isProcessing, setIsProcessing] = useState(false);
               console.error(`Error fetching tag ${tagId}:`, error);
               return null;
             }
-          })
+          }),
         );
         return tagDetails.filter((tag) => tag !== null);
       } catch (error) {
@@ -2468,7 +2468,7 @@ const [isProcessing, setIsProcessing] = useState(false);
     const fetchClientFacingJobsData = async () => {
       try {
         const response = await fetch(
-          `${CLIENT_FACING_API}/workflow/clientfacingjobstatus/`
+          `${CLIENT_FACING_API}/workflow/clientfacingjobstatus/`,
         );
         if (!response.ok) {
           throw new Error("Network response was not ok");
@@ -2496,7 +2496,7 @@ const [isProcessing, setIsProcessing] = useState(false);
           if (automation.selectedtemp && automation.refModel) {
             const templateName = await fetchTemplateData(
               automation.selectedtemp,
-              automation.refModel
+              automation.refModel,
             );
             return { index, templateName };
           }
@@ -2597,7 +2597,7 @@ const [isProcessing, setIsProcessing] = useState(false);
         const result = await response.json();
         console.log(
           "Fetched proposal template:",
-          result.proposalesAndElsTemplate
+          result.proposalesAndElsTemplate,
         );
         return result.proposalesAndElsTemplate;
       } catch (error) {
@@ -2632,7 +2632,7 @@ const [isProcessing, setIsProcessing] = useState(false);
     const assignInvoiceToAccount = (invoiceData, automationTemp, accountId) => {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
-console.log("invoiceData", invoiceData);
+      console.log("invoiceData", invoiceData);
       const raw = JSON.stringify({
         account: accountId,
         invoicenumber: "",
@@ -2665,7 +2665,7 @@ console.log("invoiceData", invoiceData);
           taxTotal: invoiceData.summary.taxTotal || 0,
           total: invoiceData.summary.total || 0,
         },
-      paidAmount: 0,
+        paidAmount: 0,
         invoiceStatus: "Pending",
         balanceDueAmount: "",
       });
@@ -2678,7 +2678,8 @@ console.log("invoiceData", invoiceData);
       };
 
       fetch(`${INVOICE_NEW}/workflow/invoices/invoice`, requestOptions)
-        .then((response) => {response.json()
+        .then((response) => {
+          response.json();
           console.log("Response status:", response);
         })
         .then((result) => console.log("Invoice assigned successfully:", result))
@@ -2688,7 +2689,7 @@ console.log("invoiceData", invoiceData);
     const sendChatToAccount = (
       chatData,
       automationTemp,
-      automationAccountId
+      automationAccountId,
     ) => {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
@@ -2728,11 +2729,11 @@ console.log("invoiceData", invoiceData);
         body: raw,
         redirect: "follow",
       };
-console.log("Sending chat to account...", raw);
+      console.log("Sending chat to account...", raw);
       fetch(`${CHATTOCLIENT_API}/chats/chatsaccountwise`, requestOptions)
         .then((response) => response.json())
         .then((result) =>
-          console.log("Send chat to account successfully:", result)
+          console.log("Send chat to account successfully:", result),
         )
         .catch((error) => console.error("Error assigning chat:", error));
     };
@@ -2741,7 +2742,7 @@ console.log("Sending chat to account...", raw);
       taskData,
       automationTemp,
       automationAccountId,
-      jobId
+      jobId,
     ) => {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
@@ -2777,12 +2778,12 @@ console.log("Sending chat to account...", raw);
 
     const assignProposalToAccount = async (
       automationTemp,
-      automationAccountId
+      automationAccountId,
     ) => {
       console.log(
         "Assigning proposal to account:",
         automationTemp,
-        automationAccountId
+        automationAccountId,
       );
       try {
         const response = await fetch(
@@ -2794,7 +2795,7 @@ console.log("Sending chat to account...", raw);
               proposalTemp: automationTemp,
               account: [automationAccountId],
             }),
-          }
+          },
         );
 
         if (!response.ok)
@@ -2809,7 +2810,7 @@ console.log("Sending chat to account...", raw);
     const assignOrganizerToAccount = (
       organizerData,
       automationTemp,
-      accountId
+      accountId,
     ) => {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
@@ -2835,7 +2836,7 @@ console.log("Sending chat to account...", raw);
 
       fetch(
         `${ORGANIZER_TEMP_API}/workflow/orgaccwise/organizeraccountwise/org`,
-        requestOptions
+        requestOptions,
       )
         .then((response) => response.json())
         .then((result) => console.log("Organizer assigned:", result))
@@ -2860,12 +2861,12 @@ console.log("Sending chat to account...", raw);
 
       fetch(
         `https://www.snptaxes.com/api/docManagement/apply-template`,
-        requestOptions
+        requestOptions,
       )
         .then((response) => response.json())
         .then((result) => console.log("Folder template applied:", result))
         .catch((error) =>
-          console.error("Error applying folder template:", error)
+          console.error("Error applying folder template:", error),
         );
     };
 
@@ -2875,7 +2876,7 @@ console.log("Sending chat to account...", raw);
       automationTemp,
       automationAccountId,
       automation,
-      jobId = null
+      jobId = null,
     ) => {
       console.log("Processing automation:", automationType, automation);
 
@@ -2895,7 +2896,7 @@ console.log("Sending chat to account...", raw);
             assignInvoiceToAccount(
               invoiceData,
               automationTemp,
-              automationAccountId
+              automationAccountId,
             );
             break;
 
@@ -2910,7 +2911,7 @@ console.log("Sending chat to account...", raw);
               taskData,
               automationTemp,
               automationAccountId,
-              jobId
+              jobId,
             );
             break;
 
@@ -2923,7 +2924,7 @@ console.log("Sending chat to account...", raw);
             assignOrganizerToAccount(
               organizerData,
               automationTemp,
-              automationAccountId
+              automationAccountId,
             );
             break;
 
@@ -2966,7 +2967,7 @@ console.log("Sending chat to account...", raw);
       console.log(`Updating account tags for Account ID: ${accountId}`);
       console.log("Automation details:", automation);
       const res = await axios.get(
-        `https://www.snptaxes.com/api/accounts/${accountId}`
+        `https://www.snptaxes.com/api/accounts/${accountId}`,
       );
       const accountsData = res.data;
 
@@ -2977,7 +2978,7 @@ console.log("Sending chat to account...", raw);
       console.log("Add Tag IDs:", addTagIds);
       console.log("Remove Tag IDs:", removeTagIds);
       let updatedTags = currentTags.filter(
-        (tagId) => !removeTagIds.includes(tagId)
+        (tagId) => !removeTagIds.includes(tagId),
       );
       updatedTags = [...new Set([...updatedTags, ...addTagIds])];
       console.log("Updated Tags:", updatedTags);
@@ -2987,7 +2988,7 @@ console.log("Sending chat to account...", raw);
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ tags: updatedTags }),
-        }
+        },
       );
 
       if (!updateResponse.ok) throw new Error("Failed to update account tags");
@@ -2999,7 +3000,7 @@ console.log("Sending chat to account...", raw);
       setSelectedAutomations((prevSelected) =>
         prevSelected.includes(index)
           ? prevSelected.filter((i) => i !== index)
-          : [...prevSelected, index]
+          : [...prevSelected, index],
       );
     };
     const [accountsWithTags, setAccountsWithTags] = useState([]);
@@ -3021,7 +3022,7 @@ console.log("Sending chat to account...", raw);
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({ ids: combinedaccountValues }),
-            }
+            },
           );
 
           if (!response.ok) throw new Error("Failed to fetch accounts");
@@ -3059,84 +3060,144 @@ console.log("Sending chat to account...", raw);
 
       // Check if at least one automation tag exists in account tags
       const hasMatch = automationSelectedTags.some((automationTagId) =>
-        accountTags.includes(automationTagId)
+        accountTags.includes(automationTagId),
       );
 
       console.log(`Tag match result for account ${accountId}:`, hasMatch);
       return hasMatch;
     };
     // Move handler
+    // const handleMove = async () => {
+    //   if (isProcessing) return; // safety guard
+
+    //   setIsProcessing(true);
+    //   try {
+    //     const { accountJobMap } = await createJob();
+    //     console.log("Job mapping created:", accountJobMap);
+
+    //     const automationResults = await Promise.allSettled(
+    //       combinedaccountValues.map(async (accountId) => {
+    //         const jobId = accountJobMap[accountId];
+    //         if (!jobId)
+    //           throw new Error(`No job ID found for account ${accountId}`);
+
+    //         await Promise.all(
+    //           selectedAutomations.map(async (automationIndex) => {
+    //             const automation = automations[automationIndex];
+    //             if (!automation || !automation.type) {
+    //               throw new Error(
+    //                 `Invalid automation at index ${automationIndex}`,
+    //               );
+    //             }
+
+    //             // Check tag matching using the proper function
+    //             const hasMatchingTags = checkTagMatch(
+    //               automation.selectedTags,
+    //               accountId,
+    //             );
+
+    //             if (!hasMatchingTags) {
+    //               console.warn(
+    //                 `Tags do not match for automation "${automation.type}" and account ID: ${accountId}. Skipping.`,
+    //               );
+    //               return;
+    //             }
+
+    //             await selectAutomationApi(
+    //               automation.type,
+    //               automation.selectedtemp,
+    //               accountId,
+    //               automation,
+    //               automation.type === "Create Task" ? jobId : null,
+    //             );
+    //           }),
+    //         );
+    //       }),
+    //     );
+
+    //     const failedResults = automationResults.filter(
+    //       (r) => r.status === "rejected",
+    //     );
+    //     if (failedResults.length > 0) {
+    //       console.error("Some automations failed:", failedResults);
+    //       toast.error(
+    //         `${failedResults.length} automations failed (job was created)`,
+    //       );
+    //     } else {
+    //       toast.success("Job created successfully");
+    //       handleDrawerClose();
+    //       navigate("/jobs/activejob");
+    //       fetchjobData();
+    //     }
+
+    //     setDrawerOpen(false);
+    //     handleNewDrawerClose();
+    //   } catch (error) {
+    //     console.error("Operation failed:", error);
+    //     toast.error(`Operation failed: ${error.message}`);
+    //   } finally {
+    //     setIsProcessing(false); // 🔑 ENABLE BUTTONS AGAIN
+    //   }
+    // };
+
     const handleMove = async () => {
-        if (isProcessing) return; // safety guard
+      if (isProcessing) return;
 
-  setIsProcessing(true);
+      setIsProcessing(true);
+
       try {
-        const { accountJobMap } = await createJob();
-        console.log("Job mapping created:", accountJobMap);
+        // 🔹 Extract data for API
+        const accounts = combinedaccountValues;
+        const autos = selectedAutomations
+          .map((index) => automations[index])
+          .filter(Boolean);
 
-        const automationResults = await Promise.allSettled(
-          combinedaccountValues.map(async (accountId) => {
-            const jobId = accountJobMap[accountId];
-            if (!jobId)
-              throw new Error(`No job ID found for account ${accountId}`);
+        // if (!accounts.length || !autos.length) {
+        //   alert("Select accounts & automations");
+        //   return;
+        // }
+        // console.log("Selected accounts:", accounts);
+        console.log("Selected automations:", autos);
+        const payload = {
+          accounts,
+          automations: autos,
+          stageid: selectedStage.value,
+          pipeline: selectedPipeline.value,
+          jobTemplate: selectedtemp.value,
+          jobname: jobName,
+          description: description,
+          username,
+          jobassignees: combinedValues,
+          priority: priority,
+          absolutedates: absoluteDate,
+          startsin: startsin,
+          startsinduration: startsInDuration,
+          duein: duein,
+          dueinduration: dueinduration,
+          showinclientportal: clientFacingStatus,
+          jobnameforclient: inputText,
+          clientfacingstatus: selectedJob,
+          clientfacingDescription: clientDescription,
+          startdate: startDate,
+          enddate: dueDate,
+        };
+        console.log("📤 Sending JSON:", JSON.stringify(payload));
+        // 🔹 Call backend API
+        await fetch("https://www.snptaxes.com/workflow/jobs/create-job", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          
+          body: JSON.stringify(payload),
+        });
 
-            await Promise.all(
-              selectedAutomations.map(async (automationIndex) => {
-                const automation = automations[automationIndex];
-                if (!automation || !automation.type) {
-                  throw new Error(
-                    `Invalid automation at index ${automationIndex}`
-                  );
-                }
-
-                // Check tag matching using the proper function
-                const hasMatchingTags = checkTagMatch(
-                  automation.selectedTags,
-                  accountId
-                );
-
-                if (!hasMatchingTags) {
-                  console.warn(
-                    `Tags do not match for automation "${automation.type}" and account ID: ${accountId}. Skipping.`
-                  );
-                  return;
-                }
-
-                await selectAutomationApi(
-                  automation.type,
-                  automation.selectedtemp,
-                  accountId,
-                  automation,
-                  automation.type === "Create Task" ? jobId : null
-                );
-              })
-            );
-          })
-        );
-
-        const failedResults = automationResults.filter(
-          (r) => r.status === "rejected"
-        );
-        if (failedResults.length > 0) {
-          console.error("Some automations failed:", failedResults);
-          toast.error(
-            `${failedResults.length} automations failed (job was created)`
-          );
-        } else {
-          toast.success("Job created successfully");
-          handleDrawerClose();
-          navigate("/jobs/activejob");
-          fetchjobData();
-        }
+        alert("Jobs started");
 
         setDrawerOpen(false);
-        handleNewDrawerClose();
       } catch (error) {
         console.error("Operation failed:", error);
-        toast.error(`Operation failed: ${error.message}`);
-      }finally {
-    setIsProcessing(false); // 🔑 ENABLE BUTTONS AGAIN
-  }
+      } finally {
+        setIsProcessing(false);
+      }
     };
 
     // Create job function
@@ -3145,11 +3206,11 @@ console.log("Sending chat to account...", raw);
       myHeaders.append("Content-Type", "application/json");
 
       const clientStatusAutomation = automations.find(
-        (automation) => automation.type === "Update client-facing job status"
+        (automation) => automation.type === "Update client-facing job status",
       );
       console.log("clientStatusAutomation", clientStatusAutomation);
       const assigneesAutomation = automations.find(
-        (automation) => automation.type === "Update job assignees"
+        (automation) => automation.type === "Update job assignees",
       );
 
       const jobCreationPromises = combinedaccountValues.map(
@@ -3166,8 +3227,8 @@ console.log("Sending chat to account...", raw);
             finalAssignees = finalAssignees.filter(
               (assigneeId) =>
                 !assigneesAutomation.removeAssignees?.some(
-                  (removeAssignee) => removeAssignee._id === assigneeId
-                )
+                  (removeAssignee) => removeAssignee._id === assigneeId,
+                ),
             );
           }
 
@@ -3208,7 +3269,7 @@ console.log("Sending chat to account...", raw);
           if (!response.ok) {
             const error = await response.json();
             throw new Error(
-              `Failed to create job for account ${accountId}: ${error.message}`
+              `Failed to create job for account ${accountId}: ${error.message}`,
             );
           }
 
@@ -3222,7 +3283,7 @@ console.log("Sending chat to account...", raw);
             jobId: result.createdJobs[0]._id,
             jobData: result.createdJobs[0],
           };
-        }
+        },
       );
 
       try {
@@ -3271,7 +3332,7 @@ console.log("Sending chat to account...", raw);
             {combinedaccountValues
               .map((accountId) => {
                 const account = accountdata.find(
-                  (account) => account._id === accountId
+                  (account) => account._id === accountId,
                 );
                 return account ? account.accountName : null;
               })
@@ -3293,7 +3354,7 @@ console.log("Sending chat to account...", raw);
             //   : true;
             // Check if ALL selected accounts have matching tags for this automation
             const allAccountsHaveMatchingTags = combinedaccountValues.every(
-              (accountId) => checkTagMatch(automation.selectedTags, accountId)
+              (accountId) => checkTagMatch(automation.selectedTags, accountId),
             );
             return (
               <Box
@@ -3311,7 +3372,7 @@ console.log("Sending chat to account...", raw);
                       <Checkbox
                         checked={selectedAutomations.includes(index)}
                         onChange={() => handleCheckboxChange(index)}
-                        disabled={!allAccountsHaveMatchingTags}
+                     
                       />
                     }
                     label={
@@ -3320,15 +3381,7 @@ console.log("Sending chat to account...", raw);
                       </Typography>
                     }
                   />
-                  {!allAccountsHaveMatchingTags && (
-                    <Typography
-                      variant="body2"
-                      color="error"
-                      sx={{ fontStyle: "italic", ml: 2 }}
-                    >
-                      The tags do not match the account
-                    </Typography>
-                  )}
+                 
                 </Box>
 
                 {/* Template Information */}
@@ -3476,7 +3529,7 @@ console.log("Sending chat to account...", raw);
                 {automation.type === "Update client-facing job status" && (
                   <Box sx={{ mb: 2 }}>
                     <Typography variant="subtitle1" fontWeight="bold">
-                      Client Status:
+                      Client Status 22:
                     </Typography>
 
                     {/* Display status with colored dot */}
@@ -3499,14 +3552,14 @@ console.log("Sending chat to account...", raw);
                                 clientStatusOptions?.find(
                                   (opt) =>
                                     opt.value ===
-                                    automation.selectedClientStatus
+                                    automation.selectedClientStatus,
                                 )?.clientfacingColour || "#ccc",
                             }}
                           />
                           <Typography variant="body2">
                             {clientStatusOptions?.find(
                               (opt) =>
-                                opt.value === automation.selectedClientStatus
+                                opt.value === automation.selectedClientStatus,
                             )?.label ||
                               automation.selectedClientStatus ||
                               "Not set"}
@@ -3550,7 +3603,7 @@ console.log("Sending chat to account...", raw);
           <Button
             variant="contained"
             onClick={handleMove}
-             disabled={isProcessing}
+            disabled={isProcessing}
             sx={{
               backgroundColor: "var(--color-save-btn)",
               "&:hover": { backgroundColor: "var(--color-save-hover-btn)" },
@@ -3558,12 +3611,12 @@ console.log("Sending chat to account...", raw);
               width: "80px",
             }}
           >
-              {/* {isProcessing ? "Processing..." : "Move"} */}
+            {/* {isProcessing ? "Processing..." : "Move"} */}
             Move
           </Button>
           <Button
             variant="outlined"
-              disabled={isProcessing}
+            disabled={isProcessing}
             onClick={() => setDrawerOpen(false)}
             sx={{
               borderColor: "var(--color-border-cancel-btn)",
@@ -3808,7 +3861,7 @@ console.log("Sending chat to account...", raw);
                     value={
                       startsInDuration
                         ? dayOptions.find(
-                            (option) => option.value === startsInDuration
+                            (option) => option.value === startsInDuration,
                           )
                         : null
                     }
@@ -3856,7 +3909,7 @@ console.log("Sending chat to account...", raw);
                     value={
                       dueinduration
                         ? dayOptions.find(
-                            (option) => option.value === dueinduration
+                            (option) => option.value === dueinduration,
                           )
                         : null
                     }
@@ -3981,7 +4034,7 @@ console.log("Sending chat to account...", raw);
                                               clientFacingJobs.find(
                                                 (job) =>
                                                   job.clientfacingName ===
-                                                  params.inputProps.value
+                                                  params.inputProps.value,
                                               )?.clientfacingColour, // Set color from selection
                                             marginRight: 8,
                                             marginLeft: 2,
