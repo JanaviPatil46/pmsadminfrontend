@@ -308,12 +308,7 @@ const fetchJobData = async () => {
       DueDate: job.DueDate
         ? format(new Date(job.DueDate), "MMMM dd, yyyy")
         : "",
-      updatedAt: formatDistanceToNow(new Date(job.updatedAt), {
-        addSuffix: true,
-      }),
-      // JobAssignee: Array.isArray(job.JobAssignee)
-      //   ? job.JobAssignee.join(", ")
-      //   : job.JobAssignee,
+      
        jobAssigneeText: Array.isArray(job.JobAssignee)
   ? job.JobAssignee.join(", ")
   : typeof job.JobAssignee === "string"
@@ -336,149 +331,7 @@ const fetchJobData = async () => {
     setLoading(false);
   }
 };
-//   const fetchJobData = async () => {
-//     setLoading(true);
-//     const loaderDelay = new Promise((resolve) => setTimeout(resolve, 1000));
 
-//     try {
-//       const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
-//       console.log("Received stored teamMemberData:", storedData);
-
-//       const loginuserid = storedData?.teammember?.userid;
-//       const viewAllAccounts = storedData?.teammember?.viewallAccounts;
-
-//       console.log("User role is:", userRole);
-//       console.log("access:", viewAllAccounts);
-
-//       let url = "";
-
-//       if (userRole === "Admin") {
-//         // ✅ Fetch active accounts first
-//         const accountsResponse = await axios.get(
-//           `https://www.snptaxes.com/api/accounts/list?active=${filterStatus === "active"}`
-//         );
-
-//         const accountsData = accountsResponse.data.accountlist;
-//         console.log("Admin accounts fetched:", accountsData);
-
-//         if (!accountsData || accountsData.length === 0) {
-//           console.warn("No active accounts found for Admin.");
-//           setJobs([]);
-//           await loaderDelay;
-//           setLoading(false);
-//           return;
-//         }
-
-//         const accountIds = accountsData.map((account) => account._id).join(",");
-//         url = `${JOBS_API}/workflow/jobs/job/joblist/list/true/${accountIds}`;
-//       } 
-      
-//       // else if (userRole === "TeamMember") {
-//       //   if (viewAllAccounts) {
-//       //     // TeamMember with full access gets all jobs
-//       //     // url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}`;
-//       //     // ✅ Fetch active accounts first
-//       //     const accountsResponse = await axios.get(`https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=${filterStatus === "active"}`);
-//       //         const accountsData = accountsResponse.data.accountlist;
-//       //     console.log("Admin accounts fetched:", accountsData);
-
-//       //     if (!accountsData || accountsData.length === 0) {
-//       //       console.warn("No active accounts found for Admin.");
-//       //       setJobs([]);
-//       //       await loaderDelay;
-//       //       setLoading(false);
-//       //       return;
-//       //     }
-
-//       //     const accountIds = accountsData
-//       //       .map((account) => account._id)
-//       //       .join(",");
-//       //     url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
-//       //   } else {
-//       //     // TeamMember with restricted access → fetch user's accounts
-//       //     const accountsResponse = await axios.get(
-//       //       `${ACCOUNT_API}/accounts/getaccounts/${loginuserid}/${isActiveTrue}`
-//       //     );
-
-//       //     const accountsData = accountsResponse.data.accountlist;
-//       //     console.log("Accounts fetched:", accountsData);
-
-//       //     if (!accountsData || accountsData.length === 0) {
-//       //       console.warn("No accounts found for user.");
-//       //       setJobs([]);
-//       //       await loaderDelay;
-//       //       setLoading(false);
-//       //       return;
-//       //     }
-
-//       //     const accountIds = accountsData
-//       //       .map((account) => account.id)
-//       //       .join(",");
-//       //     url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
-//       //   }
-//       // }
-// else if (userRole === "TeamMember") {
-
-//   let accountsData = [];
-
-//   if (viewAllAccounts) {
-//     // 🔹 TeamMember WITH view all access → fetch ALL active accounts
-//     const accountsResponse = await axios.get(
-//       `https://www.snptaxes.com/api/accounts/list?active=${filterStatus === "active"}`
-//     );
-
-//     accountsData = accountsResponse.data.accountlist;
-//     console.log("TeamMember (view all) accounts:", accountsData);
-
-//   } else {
-//     // 🔹 TeamMember WITHOUT view all access → fetch assigned accounts only
-//     const accountsResponse = await axios.get(
-//       `https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=${filterStatus === "active"}`
-//     );
-
-//     accountsData = accountsResponse.data.accountlist;
-//     console.log("TeamMember assigned accounts:", accountsData);
-//   }
-
-//   // 🔹 Validate accounts
-//   if (!accountsData || accountsData.length === 0) {
-//     console.warn("No accounts found for TeamMember.");
-//     setJobs([]);
-//     await loaderDelay;
-//     setLoading(false);
-//     return;
-//   }
-
-//   // 🔹 Map account IDs
-//   const accountIds = accountsData.map((account) => account._id).join(",");
-
-//   // 🔹 Prepare URL for jobs
-//   url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
-
-//   console.log("TeamMember Job Fetch URL:", url);
-// }
-
-//       if (!url) {
-//         await loaderDelay;
-//         setLoading(false);
-//         return;
-//       }
-
-//       console.log("Fetching jobs from URL:", url);
-
-//       const jobListResponse = await axios.get(url);
-//       // const data = await response.json();
-//       console.log("joblistss", jobListResponse.data.jobList);
-//       setJobs(jobListResponse.data.jobList);
-
-//       console.log("Formatted Job Data:", jobListResponse.data.jobList);
-//     } catch (error) {
-//       console.error("Error fetching data:", error);
-//     } finally {
-//       await loaderDelay;
-//       setLoading(false);
-//     }
-//   };
   const fetchStages = async (pipelineId) => {
     try {
       const url = `${PIPELINE_API}/workflow/pipeline/pipeline/${pipelineId}`;
@@ -631,7 +484,7 @@ const fetchJobData = async () => {
       console.log("accountId for tags", accountId);
       try {
         const response = await fetch(
-          `${ACCOUNT_API}/accounts/accountdetails/accountdetailslist/listbyid/${accountId}`
+          `https://www.snptaxes.com/api/accounts/${accountId}`
         );
         const result = await response.json();
         console.log(result);
@@ -939,22 +792,7 @@ const fetchJobData = async () => {
       }
     };
 
-    const fetchproposalbyid = async (automationTemp) => {
-      const requestOptions = { method: "GET", redirect: "follow" };
-      const url = `${PROPOSAL_API}/workflow/proposalesandels/proposalesandels/${automationTemp}`;
-      try {
-        const response = await fetch(url, requestOptions);
-        const result = await response.json();
-        console.log(
-          "Fetched proposal template:",
-          result.proposalesAndElsTemplate
-        );
-        return result.proposalesAndElsTemplate;
-      } catch (error) {
-        console.error("Error fetching proposal template:", error);
-        throw error;
-      }
-    };
+    
 
     const fetchorganizertempbyid = async (automationTemp) => {
       const requestOptions = { method: "GET", redirect: "follow" };
@@ -1340,50 +1178,52 @@ const fetchJobData = async () => {
     // Handle move action
     const handleMove = async () => {
       try {
-        const selectedAutomationsList = selectedAutomationIndices
-          .map((index) => automations[index])
-          .filter((automation) => {
-            // Filter based on tags if applicable
-            if (!automation.tags || automation.tags.length === 0) {
-              return true;
-            }
-            return checkTagMatch(automation.selectedTags, accountId);
-          });
+        // const selectedAutomationsList = selectedAutomationIndices
+        //   .map((index) => automations[index])
+        //   .filter((automation) => {
+        //     // Filter based on tags if applicable
+        //     if (!automation.tags || automation.tags.length === 0) {
+        //       return true;
+        //     }
+        //     return checkTagMatch(automation.selectedTags, accountId);
+        //   });
 
-        // Find specific automations if needed
-        const clientStatusAutomation = selectedAutomationsList.find(
-          (a) => a.type === "Update client-facing job status"
-        );
-        const assigneeAutomation = selectedAutomationsList.find(
-          (a) => a.type === "Update job assignees"
-        );
+        // // Find specific automations if needed
+        // const clientStatusAutomation = selectedAutomationsList.find(
+        //   (a) => a.type === "Update client-facing job status"
+        // );
+        // const assigneeAutomation = selectedAutomationsList.find(
+        //   (a) => a.type === "Update job assignees"
+        // );
 
-        // Process all selected automations
-        if (selectedAutomationsList.length > 0) {
-          for (const automation of selectedAutomationsList) {
-            const { type, selectedtemp } = automation;
+        // // Process all selected automations
+        // if (selectedAutomationsList.length > 0) {
+        //   for (const automation of selectedAutomationsList) {
+        //     const { type, selectedtemp } = automation;
 
-            if (type && accountId) {
-              try {
-                await selectAutomationApi(
-                  type,
-                  selectedtemp,
-                  accountId,
-                  automation,
-                  jobId
-                );
-              } catch (error) {
-                console.error("Error processing automation:", error);
-              }
-            }
-          }
-        }
+        //     if (type && accountId) {
+        //       try {
+        //         await selectAutomationApi(
+        //           type,
+        //           selectedtemp,
+        //           accountId,
+        //           automation,
+        //           jobId
+        //         );
+        //       } catch (error) {
+        //         console.error("Error processing automation:", error);
+        //       }
+        //     }
+        //   }
+        // }
 
         // Move the job with any relevant automations
-        onMoveJob(jobId, targetStage, {
-          clientStatus: clientStatusAutomation,
-          assignees: assigneeAutomation,
-        });
+        onMoveJob(jobId, targetStage, 
+        //   {
+        //   clientStatus: clientStatusAutomation,
+        //   assignees: assigneeAutomation,
+        // }
+      );
 
         onClose();
       } catch (error) {
@@ -1780,7 +1620,7 @@ const fetchJobData = async () => {
     );
   };
   const JobCard = ({ job }) => {
-    // console.log("nbfhjsg",job)
+    console.log("nbfhjsg",job)
     const [{ isDragging }, drag] = useDrag({
       type: "JOB_CARD",
       item: { id: job.id },
@@ -1808,7 +1648,7 @@ const fetchJobData = async () => {
 
     const updateLastUpdatedTime = () => {
       setLastUpdatedTime(new Date());
-      console.log(new Date());
+      console.log("job dataes",new Date());
     };
 
     const timeAgo = () => {
@@ -3167,11 +3007,38 @@ const fetchJobData = async () => {
   //   }
   //   setTempJobData({ jobId, targetStageName });
   // };
+const moveJobWithAutomations = async ({
+  jobId,
+  stageId,
+  automations = [],
+}) => {
+  const res = await fetch(
+    `${JOBS_API}/workflow/jobs/update-stage`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        jobId,
+        stageId: stageId,
+        automations,
+      }),
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error("Failed to move job");
+  }
+
+  return res.json();
+};
 
   const handleDrop = (jobId, targetStageId, targetStageName) => {
     const targetStage = stages.find(
       (stage) => stage._id === targetStageId || stage.name === targetStageName
     );
+    console.log("target stage for drop", targetStageId);
 
     const job = jobs.find((job) => job.id === jobId);
 
@@ -3186,39 +3053,57 @@ const fetchJobData = async () => {
       setCurrentJobId(jobId);
       setCurrentTargetStage(targetStage);
       setAutomationDrawerOpen(true);
-    } else {
-      // If no automations, immediately update the job's stage
-      const updatedJobs = jobs.map((job) => {
-        if (job.id === jobId) {
-          // Update both stage ID and name in the job
-          return {
-            ...job,
-            Stage: [targetStageName],
-            // Also update the Stages array to include the new stage
-            Stages: [
-              ...(job.Stages || []),
-              {
-                _id: targetStageId,
-                name: targetStageName,
-              },
-            ],
-          };
-        }
-        return job;
-      });
+    } 
+    // else {
+    //   // If no automations, immediately update the job's stage
+    //   const updatedJobs = jobs.map((job) => {
+    //     console.log("updating job", jobId, targetStageId, targetStageName);
+    //     if (job.id === jobId) {
+    //       // Update both stage ID and name in the job
+    //       return {
+    //         ...job,
+    //         Stage: [targetStageName],
+    //         // Also update the Stages array to include the new stage
+    //         Stages: [
+    //           ...(job.Stages || []),
+    //           {
+    //             _id: targetStageId,
+    //             name: targetStageName,
+    //           },
+    //         ],
+    //       };
+    //     }
+    //     return job;
+    //   });
 
-      setJobs(updatedJobs);
+    
+    //   setJobs(updatedJobs);
 
-      setTimeout(() => {
-        fetchJobData();
-      }, 1000);
+    //   setTimeout(() => {
+    //     fetchJobData();
+    //   }, 1000);
 
-      updateJobStage(jobId, targetStage);
-    }
+    //   updateJobStage(jobId, targetStage);
+    // }
+    else {
+  moveJobWithAutomations({
+    jobId,
+    stageId: targetStageId,
+    automations: [], // no automations
+  })
+    .then(() => {
+      toast.success("Job moved successfully");
+      fetchJobData(); // refresh board
+    })
+    .catch(() => {
+      toast.error("Failed to move job");
+    });
+}
+
     setTempJobData({ jobId, targetStageId, targetStageName });
   };
 
-  const handleMoveJob = async (jobId, targetStage, automations = {}) => {
+  const handleMoveJob = async (jobId, targetStage, automations = []) => {
     try {
       // First, get the current job data to work with the existing assignees
       const currentJobResponse = await axios.get(

@@ -1791,21 +1791,9 @@ const [clientFacingJobs, setClientFacingJobs] = useState([]);
       .map((index) => automations[index])
       .filter(Boolean);
 
-    // if (!accounts.length || !autos.length) {
-    //   alert("Select accounts & automations");
-    //   return;
-    // }
-// console.log("Selected accounts:", accounts);
 console.log("Selected automations:", autos);
 const payload = {
-  // accounts,
-  // automations: autos,
-  // stageid: selectedStage.value,
-  // pipeline: selectedPipeline.value,
-  // jobTemplate: selectedtemp.value,
-  // jobname: jobName,
-  //  description: description,
-  //  username,
+
 
   accounts,
           automations: autos,
@@ -1993,17 +1981,7 @@ console.log("📤 Sending JSON:", JSON.stringify(payload));
             const currentTagData = tagData[index] || {};
             const templateName = templateData[index] || "Loading...";
 
-            // const hasMatchingTags = automation.selectedTags?.length
-            //   ? automation.selectedTags.some((automationTagId) =>
-            //       accountTags.some(
-            //         (accountTag) => accountTag._id === automationTagId
-            //       )
-            //     )
-            //   : true;
-// Check if ALL selected accounts have matching tags for this automation
-          const allAccountsHaveMatchingTags = combinedaccountValues.every(accountId => 
-            checkTagMatch(automation.selectedTags, accountId)
-          );
+           
             return (
               <Box
                 key={index}
@@ -2020,7 +1998,7 @@ console.log("📤 Sending JSON:", JSON.stringify(payload));
                       <Checkbox
                         checked={selectedAutomations.includes(index)}
                         onChange={() => handleCheckboxChange(index)}
- disabled={!allAccountsHaveMatchingTags}                      />
+                    />
                     }
                     label={
                       <Typography variant="h6" component="span">
@@ -2028,15 +2006,7 @@ console.log("📤 Sending JSON:", JSON.stringify(payload));
                       </Typography>
                     }
                   />
-                  {!allAccountsHaveMatchingTags && (
-                    <Typography
-                      variant="body2"
-                      color="error"
-                      sx={{ fontStyle: "italic", ml: 2 }}
-                    >
-                      The tags do not match the account
-                    </Typography>
-                  )}
+                  
                 </Box>
 
                 {/* Template Information */}
@@ -2048,9 +2018,7 @@ console.log("📤 Sending JSON:", JSON.stringify(payload));
                     <Typography variant="body2" color="textSecondary">
                       {templateName}
                     </Typography>
-                    {/* <Typography variant="caption" color="textSecondary">
-                    Type: {automation.refModel}
-                  </Typography> */}
+                   
                   </Box>
                 )}
 

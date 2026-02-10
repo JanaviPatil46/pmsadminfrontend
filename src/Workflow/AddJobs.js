@@ -96,8 +96,8 @@ const AddJobs = ({
   const [accountdata, setaccountdata] = useState([]);
   const [selectedaccount, setSelectedaccount] = useState();
   const [combinedaccountValues, setCombinedaccountValues] = useState();
-const [userRole, setUserRole] = useState("");
-const [loading, setLoading] = useState(false);
+  const [userRole, setUserRole] = useState("");
+  const [loading, setLoading] = useState(false);
   // const handleAccountChange = (event, newValue) => {
   //   setSelectedaccount(newValue.map((option) => option.value));
   //   // Map selected options to their values and send as an array
@@ -114,22 +114,22 @@ const [loading, setLoading] = useState(false);
     setCombinedaccountValues(selectedValues);
     console.log(selectedValues);
   };
-    const [filterStatus, setFilterStatus] = useState("active"); 
-      const [accountoptions, setAccountOptions] = useState([]);
-    const [accountData, setAccountData] = useState([]);
+  const [filterStatus, setFilterStatus] = useState("active");
+  const [accountoptions, setAccountOptions] = useState([]);
+  const [accountData, setAccountData] = useState([]);
   const fetchAccountData = async () => {
     setLoading(true);
     try {
       const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
       const loginuserid = storedData?.teammember?.userid;
       const viewAllAccounts = storedData?.teammember?.viewallAccounts;
-  
+
       console.log("UserRole:", userRole);
       console.log("Team Member userId:", loginuserid);
       console.log("viewAllAccounts:", viewAllAccounts);
-  
+
       let url = "";
-  
+
       // --- Same logic pattern as pipeline data ---
       if (userRole === "Admin") {
         url = `https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true`;
@@ -140,44 +140,43 @@ const [loading, setLoading] = useState(false);
             ? `https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true`
             : `https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=${filterStatus === "active"}`;
       }
-  
+
       console.log("Fetching accounts from:", url);
-  
+
       const response = await fetch(url);
       const data = await response.json();
-  
+
       const accounts = data.accountlist || data.teamAccounts || [];
-  
+
       setaccountdata(accounts);
-  
+
       // Convert to dropdown options
       const options = accounts.map((acc) => ({
         value: acc._id,
         label: acc.accountName,
       }));
       setAccountOptions(options);
-  
+
       // // Pre-select previously chosen accounts
       // const selectedOptions = options.filter((option) =>
       //   selectedAccounts.includes(option.value)
       // );
       // setSelectedaccount(selectedOptions);
       // setCombinedaccountValues(selectedOptions.map((opt) => opt.value));
-  
     } catch (error) {
       console.error("Error fetching account data:", error);
     } finally {
       setLoading(false);
     }
   };
-  
+
   // STEP 1 — Fetch userRole first
   useEffect(() => {
     const storedUserRole = localStorage.getItem("userRole") || "";
     console.log("UserRole from localStorage:", storedUserRole);
     setUserRole(storedUserRole);
   }, []);
-  
+
   // STEP 2 — After userRole is loaded, fetch account list
   useEffect(() => {
     if (userRole) {
@@ -282,7 +281,7 @@ const [loading, setLoading] = useState(false);
   const fetchClientFacingJobsData = async () => {
     try {
       const response = await fetch(
-        `${CLIENT_FACING_API}/workflow/clientfacingjobstatus/`
+        `${CLIENT_FACING_API}/workflow/clientfacingjobstatus/`,
       );
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -311,7 +310,7 @@ const [loading, setLoading] = useState(false);
       const clientjobId = newValue.value;
       try {
         const response = await fetch(
-          `${CLIENT_FACING_API}/workflow/clientfacingjobstatus/${clientjobId}`
+          `${CLIENT_FACING_API}/workflow/clientfacingjobstatus/${clientjobId}`,
         );
         if (!response.ok) {
           throw new Error("Network response was not ok");
@@ -320,7 +319,7 @@ const [loading, setLoading] = useState(false);
 
         console.log(data);
         setClientDescription(
-          data.clientfacingjobstatuses.clientfacingdescription
+          data.clientfacingjobstatuses.clientfacingdescription,
         );
         console.log(data.clientfacingjobstatuses.clientfacingdescription);
       } catch (error) {
@@ -334,7 +333,7 @@ const [loading, setLoading] = useState(false);
       const templateId = newValue.value;
       try {
         const response = await fetch(
-          `${JOBS_TEMP_API}/workflow/jobtemplate/jobtemplate/jobtemplatelist/${templateId}`
+          `${JOBS_TEMP_API}/workflow/jobtemplate/jobtemplate/jobtemplatelist/${templateId}`,
         );
         const data = await response.json();
         const template = data.jobTemplate;
@@ -482,34 +481,102 @@ const [loading, setLoading] = useState(false);
   const [stageAutomations, setStageAutomations] = useState([]);
 
   // Function to handle creating a job
-  const createjob = () => {
-    if (!selectedStage) {
-      toast.error("Please select a stage");
-      return;
-    }
+  // const createjob = () => {
+  //   if (!selectedStage) {
+  //     toast.error("Please select a stage");
+  //     return;
+  //   }
 
-    // Check if selected stage has automations
-    const stage = stages.find((stage) => stage._id === selectedStage.value);
-    if (stage?.automations?.length) {
-      setStageAutomations(stage.automations); // Store automations in state
-      setIsDrawerOpen(true); // Open the drawer
-      return;
-    }
+  //   // Check if selected stage has automations
+  //   const stage = stages.find((stage) => stage._id === selectedStage.value);
+  //   if (stage?.automations?.length) {
+  //     setStageAutomations(stage.automations); // Store automations in state
+  //     setIsDrawerOpen(true); // Open the drawer
+  //     return;
+  //   }
 
-    // If no automations, proceed with job creation
-    const myHeaders = {
-      "Content-Type": "application/json",
-    };
+  //   // If no automations, proceed with job creation
+  //   const myHeaders = {
+  //     "Content-Type": "application/json",
+  //   };
 
-    const data = {
+  //   const data = {
+  //     accounts: combinedaccountValues,
+  //     stageid: selectedStage.value,
+  //     pipeline: pipelineId,
+  //     templatename: selectedtemp.value,
+  //     jobname: jobName,
+  //     jobassignees: combinedValues,
+  //     priority: priority,
+  //     description: description,
+  //     absolutedates: absoluteDate,
+  //     startsin: startsin,
+  //     startsinduration: startsInDuration,
+  //     duein: duein,
+  //     dueinduration: dueinduration,
+  //     showinclientportal: clientFacingStatus,
+  //     jobnameforclient: inputText,
+  //     clientfacingstatus: selectedJob?.value,
+  //     clientfacingDescription: clientDescription,
+  //     startdate: startDate,
+  //     enddate: dueDate,
+  //   };
+
+  //   const config = {
+  //     method: "post",
+  //     maxBodyLength: Infinity,
+  //     url: `${JOBS_API}/workflow/jobs/newjob`,
+  //     headers: myHeaders,
+  //     data: JSON.stringify(data),
+  //   };
+
+  //   // console.log(data);
+
+  //   axios
+  //     .request(config)
+  //     .then((response) => {
+  //       console.log("Job created successfully");
+  //       console.log("");
+  //       toast.success("Job created successfully");
+  //       handleDrawerClose();
+  //       fetchJobData();
+  //     })
+  //     .catch((error) => {
+  //       console.error("Failed to create Job Template:", error);
+  //       toast.error("Failed to create Job");
+  //     });
+  // };
+  const createjob = async () => {
+  if (!selectedStage) {
+    toast.error("Please select a stage");
+    return;
+  }
+
+  // 🔹 Find selected stage
+  const stage = stages.find(
+    (stage) => stage._id === selectedStage.value
+  );
+
+  // 🔹 IF automations exist → open drawer
+  if (stage?.automations?.length > 0) {
+    setStageAutomations(stage.automations);
+    setIsDrawerOpen(true);
+    return;
+  }
+
+  // 🔹 IF NO automations → directly create job via handleMove API
+  try {
+    const payload = {
       accounts: combinedaccountValues,
+      automations: [], // ❗ no automations
       stageid: selectedStage.value,
       pipeline: pipelineId,
-      templatename: selectedtemp.value,
+      jobTemplate: selectedtemp.value,
       jobname: jobName,
+      description: description,
+      username,
       jobassignees: combinedValues,
       priority: priority,
-      description: description,
       absolutedates: absoluteDate,
       startsin: startsin,
       startsinduration: startsInDuration,
@@ -517,36 +584,29 @@ const [loading, setLoading] = useState(false);
       dueinduration: dueinduration,
       showinclientportal: clientFacingStatus,
       jobnameforclient: inputText,
-      clientfacingstatus: selectedJob?.value,
+      clientfacingstatus: selectedJob,
       clientfacingDescription: clientDescription,
       startdate: startDate,
       enddate: dueDate,
     };
 
-    const config = {
-      method: "post",
-      maxBodyLength: Infinity,
-      url: `${JOBS_API}/workflow/jobs/newjob`,
-      headers: myHeaders,
-      data: JSON.stringify(data),
-    };
+    console.log("📤 Sending payload (no automations):", payload);
 
-    // console.log(data);
+    await fetch("https://www.snptaxes.com/workflow/jobs/create-job", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
 
-    axios
-      .request(config)
-      .then((response) => {
-        console.log("Job created successfully");
-        console.log("");
-        toast.success("Job created successfully");
-        handleDrawerClose();
-        fetchJobData();
-      })
-      .catch((error) => {
-        console.error("Failed to create Job Template:", error);
-        toast.error("Failed to create Job");
-      });
-  };
+    toast.success("Job created successfully");
+    handleDrawerClose();
+    fetchJobData();
+  } catch (error) {
+    console.error("Failed to create job:", error);
+    toast.error("Failed to create Job");
+  }
+};
+
   // const [selectedAutomations, setSelectedAutomations] = useState([]);
   const [selectedAutomations, setSelectedAutomations] = useState([]);
 
@@ -559,7 +619,7 @@ const [loading, setLoading] = useState(false);
     setSelectedAutomations((prevSelected) =>
       prevSelected.includes(index)
         ? prevSelected.filter((i) => i !== index)
-        : [...prevSelected, index]
+        : [...prevSelected, index],
     );
   };
   const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
@@ -632,7 +692,7 @@ const [loading, setLoading] = useState(false);
 
       // Prevent duplicate selections
       const uniqueTags = selectedTags.filter(
-        (tag, idx, self) => self.findIndex((t) => t._id === tag._id) === idx
+        (tag, idx, self) => self.findIndex((t) => t._id === tag._id) === idx,
       );
 
       // Ensure the tag is removed from the opposite category
@@ -640,7 +700,7 @@ const [loading, setLoading] = useState(false);
         updatedAutomations[index].removeTags = updatedAutomations[
           index
         ].removeTags.filter(
-          (tag) => !uniqueTags.some((t) => t._id === tag._id)
+          (tag) => !uniqueTags.some((t) => t._id === tag._id),
         );
       } else if (type === "removeTags") {
         updatedAutomations[index].addTags = updatedAutomations[
@@ -663,7 +723,7 @@ const [loading, setLoading] = useState(false);
     const fetchAssignees = async () => {
       try {
         const response = await axios.get(
-          `${LOGIN_API}/common/users/roles?roles=TeamMember,Admin`
+          `${LOGIN_API}/common/users/roles?roles=TeamMember,Admin`,
         );
         console.log("assigness data", response.data);
         setAssignee(response.data);
@@ -697,7 +757,7 @@ const [loading, setLoading] = useState(false);
 
       // Prevent duplicate selections
       const uniqueTags = selectedTags.filter(
-        (ass, idx, self) => self.findIndex((t) => t._id === ass._id) === idx
+        (ass, idx, self) => self.findIndex((t) => t._id === ass._id) === idx,
       );
 
       // Ensure the tag is removed from the opposite category
@@ -705,13 +765,13 @@ const [loading, setLoading] = useState(false);
         updatedAutomations[index].removeAssignees = updatedAutomations[
           index
         ].removeAssignees.filter(
-          (ass) => !uniqueTags.some((t) => t._id === ass._id)
+          (ass) => !uniqueTags.some((t) => t._id === ass._id),
         );
       } else if (type === "removeAssignees") {
         updatedAutomations[index].addAssignees = updatedAutomations[
           index
         ].addAssignees.filter(
-          (tag) => !uniqueTags.some((t) => t._id === tag._id)
+          (tag) => !uniqueTags.some((t) => t._id === tag._id),
         );
       }
 
@@ -741,13 +801,13 @@ const [loading, setLoading] = useState(false);
       .map((accountId) => {
         console.log("combinedaccountValues", combinedaccountValues);
         const account = accountdata.find(
-          (account) => account._id === accountId
+          (account) => account._id === accountId,
         );
         return account ? account.tags || [] : [];
       })
       .flat();
     console.log("Account Tags:", accountTags);
-const [isProcessing, setIsProcessing] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
     // API endpoints
     const ACCOUNT_TASKS_API = process.env.REACT_APP_TASKS_API;
     const CHAT_API = process.env.REACT_APP_CHAT_TEMP_URL;
@@ -852,7 +912,7 @@ const [isProcessing, setIsProcessing] = useState(false);
               console.error(`Error fetching tag ${tagId}:`, error);
               return null;
             }
-          })
+          }),
         );
         return tagDetails.filter((tag) => tag !== null);
       } catch (error) {
@@ -864,7 +924,7 @@ const [isProcessing, setIsProcessing] = useState(false);
     const fetchClientFacingJobsData = async () => {
       try {
         const response = await fetch(
-          `${CLIENT_FACING_API}/workflow/clientfacingjobstatus/`
+          `${CLIENT_FACING_API}/workflow/clientfacingjobstatus/`,
         );
         if (!response.ok) {
           throw new Error("Network response was not ok");
@@ -893,12 +953,12 @@ const [isProcessing, setIsProcessing] = useState(false);
             if (automation.selectedtemp && automation.refModel) {
               const templateName = await fetchTemplateData(
                 automation.selectedtemp,
-                automation.refModel
+                automation.refModel,
               );
               return { index, templateName };
             }
             return { index, templateName: null };
-          }
+          },
         );
 
         const tagPromises = stageAutomations.map(async (automation, index) => {
@@ -995,7 +1055,7 @@ const [isProcessing, setIsProcessing] = useState(false);
         const result = await response.json();
         console.log(
           "Fetched proposal template:",
-          result.proposalesAndElsTemplate
+          result.proposalesAndElsTemplate,
         );
         return result.proposalesAndElsTemplate;
       } catch (error) {
@@ -1063,7 +1123,7 @@ const [isProcessing, setIsProcessing] = useState(false);
           taxTotal: invoiceData.summary.taxTotal || 0,
           total: invoiceData.summary.total || 0,
         },
-      paidAmount: 0,
+        paidAmount: 0,
         invoiceStatus: "Pending",
         balanceDueAmount: "",
       });
@@ -1084,7 +1144,7 @@ const [isProcessing, setIsProcessing] = useState(false);
     const sendChatToAccount = (
       chatData,
       automationTemp,
-      automationAccountId
+      automationAccountId,
     ) => {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
@@ -1124,11 +1184,11 @@ const [isProcessing, setIsProcessing] = useState(false);
         body: raw,
         redirect: "follow",
       };
-console.log("Sending chat to account...", raw);
+      console.log("Sending chat to account...", raw);
       fetch(`${CHATTOCLIENT_API}/chats/chatsaccountwise`, requestOptions)
         .then((response) => response.json())
         .then((result) =>
-          console.log("Send chat to account successfully:", result)
+          console.log("Send chat to account successfully:", result),
         )
         .catch((error) => console.error("Error assigning chat:", error));
     };
@@ -1137,7 +1197,7 @@ console.log("Sending chat to account...", raw);
       taskData,
       automationTemp,
       automationAccountId,
-      jobId
+      jobId,
     ) => {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
@@ -1173,12 +1233,12 @@ console.log("Sending chat to account...", raw);
 
     const assignProposalToAccount = async (
       automationTemp,
-      automationAccountId
+      automationAccountId,
     ) => {
       console.log(
         "Assigning proposal to account:",
         automationTemp,
-        automationAccountId
+        automationAccountId,
       );
       try {
         const response = await fetch(
@@ -1190,7 +1250,7 @@ console.log("Sending chat to account...", raw);
               proposalTemp: automationTemp,
               account: [automationAccountId],
             }),
-          }
+          },
         );
 
         if (!response.ok)
@@ -1205,7 +1265,7 @@ console.log("Sending chat to account...", raw);
     const assignOrganizerToAccount = (
       organizerData,
       automationTemp,
-      accountId
+      accountId,
     ) => {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
@@ -1231,7 +1291,7 @@ console.log("Sending chat to account...", raw);
 
       fetch(
         `${ORGANIZER_TEMP_API}/workflow/orgaccwise/organizeraccountwise/org`,
-        requestOptions
+        requestOptions,
       )
         .then((response) => response.json())
         .then((result) => console.log("Organizer assigned:", result))
@@ -1256,12 +1316,12 @@ console.log("Sending chat to account...", raw);
 
       fetch(
         `https://www.snptaxes.com/api/docManagement/apply-template`,
-        requestOptions
+        requestOptions,
       )
         .then((response) => response.json())
         .then((result) => console.log("Folder template applied:", result))
         .catch((error) =>
-          console.error("Error applying folder template:", error)
+          console.error("Error applying folder template:", error),
         );
     };
 
@@ -1271,7 +1331,7 @@ console.log("Sending chat to account...", raw);
       automationTemp,
       automationAccountId,
       automation,
-      jobId = null
+      jobId = null,
     ) => {
       console.log("Processing automation:", automationType, automation);
 
@@ -1291,7 +1351,7 @@ console.log("Sending chat to account...", raw);
             assignInvoiceToAccount(
               invoiceData,
               automationTemp,
-              automationAccountId
+              automationAccountId,
             );
             break;
 
@@ -1306,7 +1366,7 @@ console.log("Sending chat to account...", raw);
               taskData,
               automationTemp,
               automationAccountId,
-              jobId
+              jobId,
             );
             break;
 
@@ -1319,7 +1379,7 @@ console.log("Sending chat to account...", raw);
             assignOrganizerToAccount(
               organizerData,
               automationTemp,
-              automationAccountId
+              automationAccountId,
             );
             break;
 
@@ -1362,7 +1422,7 @@ console.log("Sending chat to account...", raw);
       console.log(`Updating account tags for Account ID: ${accountId}`);
 
       const res = await axios.get(
-        `https://www.snptaxes.com/api/accounts/${accountId}`
+        `https://www.snptaxes.com/api/accounts/${accountId}`,
       );
       const accountsData = res.data;
 
@@ -1371,7 +1431,7 @@ console.log("Sending chat to account...", raw);
       const removeTagIds = automation?.removeTags || [];
 
       let updatedTags = currentTags.filter(
-        (tagId) => !removeTagIds.includes(tagId)
+        (tagId) => !removeTagIds.includes(tagId),
       );
       updatedTags = [...new Set([...updatedTags, ...addTagIds])];
 
@@ -1381,7 +1441,7 @@ console.log("Sending chat to account...", raw);
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ tags: updatedTags }),
-        }
+        },
       );
 
       if (!updateResponse.ok) throw new Error("Failed to update account tags");
@@ -1393,7 +1453,7 @@ console.log("Sending chat to account...", raw);
       setSelectedAutomations((prevSelected) =>
         prevSelected.includes(index)
           ? prevSelected.filter((i) => i !== index)
-          : [...prevSelected, index]
+          : [...prevSelected, index],
       );
     };
     const [accountsWithTags, setAccountsWithTags] = useState([]);
@@ -1415,7 +1475,7 @@ console.log("Sending chat to account...", raw);
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({ ids: combinedaccountValues }),
-            }
+            },
           );
 
           if (!response.ok) throw new Error("Failed to fetch accounts");
@@ -1453,117 +1513,117 @@ console.log("Sending chat to account...", raw);
 
       // Check if at least one automation tag exists in account tags
       const hasMatch = automationSelectedTags.some((automationTagId) =>
-        accountTags.includes(automationTagId)
+        accountTags.includes(automationTagId),
       );
 
       console.log(`Tag match result for account ${accountId}:`, hasMatch);
       return hasMatch;
     };
     // Move handler
-  //   const handleMove = async () => {
-  //      if (isProcessing) return; // safety guard
+    //   const handleMove = async () => {
+    //      if (isProcessing) return; // safety guard
 
-  // setIsProcessing(true);
-  //     try {
-  //       const { accountJobMap } = await createJob();
-  //       console.log("Job mapping created:", accountJobMap);
+    // setIsProcessing(true);
+    //     try {
+    //       const { accountJobMap } = await createJob();
+    //       console.log("Job mapping created:", accountJobMap);
 
-  //       const automationResults = await Promise.allSettled(
-  //         combinedaccountValues.map(async (accountId) => {
-  //           const jobId = accountJobMap[accountId];
-  //           if (!jobId)
-  //             throw new Error(`No job ID found for account ${accountId}`);
+    //       const automationResults = await Promise.allSettled(
+    //         combinedaccountValues.map(async (accountId) => {
+    //           const jobId = accountJobMap[accountId];
+    //           if (!jobId)
+    //             throw new Error(`No job ID found for account ${accountId}`);
 
-  //           await Promise.all(
-  //             selectedAutomations.map(async (automationIndex) => {
-  //               const automation = stageAutomations[automationIndex];
-  //               if (!automation || !automation.type) {
-  //                 throw new Error(
-  //                   `Invalid automation at index ${automationIndex}`
-  //                 );
-  //               }
+    //           await Promise.all(
+    //             selectedAutomations.map(async (automationIndex) => {
+    //               const automation = stageAutomations[automationIndex];
+    //               if (!automation || !automation.type) {
+    //                 throw new Error(
+    //                   `Invalid automation at index ${automationIndex}`
+    //                 );
+    //               }
 
-  //               // Check tag matching using the proper function
-  //               const hasMatchingTags = checkTagMatch(
-  //                 automation.selectedTags,
-  //                 accountId
-  //               );
+    //               // Check tag matching using the proper function
+    //               const hasMatchingTags = checkTagMatch(
+    //                 automation.selectedTags,
+    //                 accountId
+    //               );
 
-  //               if (!hasMatchingTags) {
-  //                 console.warn(
-  //                   `Tags do not match for automation "${automation.type}" and account ID: ${accountId}. Skipping.`
-  //                 );
-  //                 return;
-  //               }
+    //               if (!hasMatchingTags) {
+    //                 console.warn(
+    //                   `Tags do not match for automation "${automation.type}" and account ID: ${accountId}. Skipping.`
+    //                 );
+    //                 return;
+    //               }
 
-  //               await selectAutomationApi(
-  //                 automation.type,
-  //                 automation.selectedtemp,
-  //                 accountId,
-  //                 automation,
-  //                 automation.type === "Create Task" ? jobId : null
-  //               );
-  //             })
-  //           );
-  //         })
-  //       );
+    //               await selectAutomationApi(
+    //                 automation.type,
+    //                 automation.selectedtemp,
+    //                 accountId,
+    //                 automation,
+    //                 automation.type === "Create Task" ? jobId : null
+    //               );
+    //             })
+    //           );
+    //         })
+    //       );
 
-  //       const failedResults = automationResults.filter(
-  //         (r) => r.status === "rejected"
-  //       );
-  //       if (failedResults.length > 0) {
-  //         console.error("Some automations failed:", failedResults);
-  //         toast.error(
-  //           `${failedResults.length} automations failed (job was created)`
-  //         );
-  //       } else {
-  //         toast.success("Job created successfully");
-  //         handleDrawerClose();
-  //         // navigate("/jobs/activejob");
-  //       }
+    //       const failedResults = automationResults.filter(
+    //         (r) => r.status === "rejected"
+    //       );
+    //       if (failedResults.length > 0) {
+    //         console.error("Some automations failed:", failedResults);
+    //         toast.error(
+    //           `${failedResults.length} automations failed (job was created)`
+    //         );
+    //       } else {
+    //         toast.success("Job created successfully");
+    //         handleDrawerClose();
+    //         // navigate("/jobs/activejob");
+    //       }
 
-  //       setIsDrawerOpen(false);
-  //       // handleNewDrawerClose();
-  //     } catch (error) {
-  //       console.error("Operation failed:", error);
-  //       toast.error(`Operation failed: ${error.message}`);
-  //     }
-  //     finally {
-  //   setIsProcessing(false); // 🔑 ENABLE BUTTONS AGAIN
-  // }
-  //   };
-
-      const handleMove = async () => {
-  if (isProcessing) return;
-
-  setIsProcessing(true);
-
-  try {
-    // 🔹 Extract data for API
-    const accounts = combinedaccountValues;
-    const autos = selectedAutomations
-      .map((index) => stageAutomations[index])
-      .filter(Boolean);
-
-    // if (!accounts.length || !autos.length) {
-    //   alert("Select accounts & automations");
-    //   return;
+    //       setIsDrawerOpen(false);
+    //       // handleNewDrawerClose();
+    //     } catch (error) {
+    //       console.error("Operation failed:", error);
+    //       toast.error(`Operation failed: ${error.message}`);
+    //     }
+    //     finally {
+    //   setIsProcessing(false); // 🔑 ENABLE BUTTONS AGAIN
     // }
-// console.log("Selected accounts:", accounts);
-console.log("Selected automations:", autos);
-const payload = {
-  // accounts,
-  // automations: autos,
-  // stageid: selectedStage.value,
-  // pipeline: pipelineId,
-  // jobTemplate: selectedtemp.value,
-  // jobname: jobName,
-  //  description: description,
-  //  username,
-  accounts,
+    //   };
+
+    const handleMove = async () => {
+      if (isProcessing) return;
+
+      setIsProcessing(true);
+
+      try {
+        // 🔹 Extract data for API
+        const accounts = combinedaccountValues;
+        const autos = selectedAutomations
+          .map((index) => stageAutomations[index])
+          .filter(Boolean);
+
+        // if (!accounts.length || !autos.length) {
+        //   alert("Select accounts & automations");
+        //   return;
+        // }
+        // console.log("Selected accounts:", accounts);
+        console.log("Selected automations:", autos);
+        const payload = {
+          // accounts,
+          // automations: autos,
+          // stageid: selectedStage.value,
+          // pipeline: pipelineId,
+          // jobTemplate: selectedtemp.value,
+          // jobname: jobName,
+          //  description: description,
+          //  username,
+          accounts,
           automations: autos,
           stageid: selectedStage.value,
-          pipeline: selectedPipeline.value,
+          pipeline: pipelineId,
           jobTemplate: selectedtemp.value,
           jobname: jobName,
           description: description,
@@ -1581,163 +1641,60 @@ const payload = {
           clientfacingDescription: clientDescription,
           startdate: startDate,
           enddate: dueDate,
-};
-console.log("📤 Sending JSON:", JSON.stringify(payload));
-    // 🔹 Call backend API
-    await fetch("https://www.snptaxes.com/workflow/jobs/create-job", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      // body: JSON.stringify({
-      //   accounts,
-      //   automations: autos,
-      //    stageid: selectedStage.value,
-      //       pipeline: selectedPipeline.value,
-      //       jobTemplate: selectedtemp.value,
-      //       jobname: jobName,
-      // }),
-       body: JSON.stringify(payload),
-    });
-
-    alert("Jobs started");
-
-    // // 🔹 Your existing logic
-    // const { accountJobMap } = await createJob();
-
-    // const automationResults = await Promise.allSettled(
-    //   accounts.map(async (accountId) => {
-    //     const jobId = accountJobMap[accountId];
-    //     if (!jobId) return;
-
-    //     await Promise.all(
-    //       autos.map(async (automation) => {
-    //         const hasMatchingTags = checkTagMatch(
-    //           automation.selectedTags,
-    //           accountId
-    //         );
-
-    //         if (!hasMatchingTags) return;
-
-    //         await selectAutomationApi(
-    //           automation.type,
-    //           automation.selectedtemp,
-    //           accountId,
-    //           automation,
-    //           automation.type === "Create Task" ? jobId : null
-    //         );
-    //       })
-    //     );
-    //   })
-    // );
-
-    // console.log("Automation results:", automationResults);
-    setIsDrawerOpen(false);
-  } catch (error) {
-    console.error("Operation failed:", error);
-  } finally {
-    setIsProcessing(false);
-  }
-};
-    // Create job function
-    const createJob = async () => {
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-
-      const clientStatusAutomation = stageAutomations.find(
-        (automation) => automation.type === "Update client-facing job status"
-      );
-
-      const assigneesAutomation = stageAutomations.find(
-        (automation) => automation.type === "Update job assignees"
-      );
-
-      const jobCreationPromises = combinedaccountValues.map(
-        async (accountId) => {
-          let finalAssignees = [...combinedAssigneesValues];
-
-          if (assigneesAutomation) {
-            assigneesAutomation.addAssignees?.forEach((assignee) => {
-              if (!finalAssignees.includes(assignee._id)) {
-                finalAssignees.push(assignee._id);
-              }
-            });
-
-            finalAssignees = finalAssignees.filter(
-              (assigneeId) =>
-                !assigneesAutomation.removeAssignees?.some(
-                  (removeAssignee) => removeAssignee._id === assigneeId
-                )
-            );
-          }
-
-          const jobData = {
-            accounts: [accountId],
-            stageid: selectedStage.value,
-            pipeline: pipelineId,
-            templatename: selectedtemp.value,
-            jobname: jobName,
-            jobassignees: finalAssignees,
-            priority: priority,
-            description: description,
-            absolutedates: absoluteDate,
-            startsin: startsin,
-            startsinduration: startsInDuration,
-            duein: duein,
-            dueinduration: dueinduration,
-            showinclientportal: clientStatusAutomation
-              ? clientStatusAutomation.status
-              : false,
-            jobnameforclient: inputText,
-            clientfacingstatus: clientStatusAutomation
-              ? clientStatusAutomation.selectedClientStatus
-              : null,
-            clientfacingDescription: clientStatusAutomation
-              ? clientStatusAutomation.clientDescription
-              : clientDescription,
-            startdate: startDate,
-            enddate: dueDate,
-          };
-
-          const response = await fetch(`${JOBS_API}/workflow/jobs/newjob`, {
-            method: "POST",
-            headers: myHeaders,
-            body: JSON.stringify(jobData),
-          });
-
-          if (!response.ok) {
-            const error = await response.json();
-            throw new Error(
-              `Failed to create job for account ${accountId}: ${error.message}`
-            );
-          }
-
-          const result = await response.json();
-          if (!result.createdJobs || result.createdJobs.length === 0) {
-            throw new Error(`No job created for account ${accountId}`);
-          }
-
-          return {
-            accountId,
-            jobId: result.createdJobs[0]._id,
-            jobData: result.createdJobs[0],
-          };
-        }
-      );
-
-      try {
-        const jobResults = await Promise.all(jobCreationPromises);
-        const accountJobMap = {};
-        jobResults.forEach((result) => {
-          accountJobMap[result.accountId] = result.jobId;
+        };
+        console.log("📤 Sending JSON:", JSON.stringify(payload));
+        // 🔹 Call backend API
+        await fetch("https://www.snptaxes.com/workflow/jobs/create-job", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          // body: JSON.stringify({
+          //   accounts,
+          //   automations: autos,
+          //    stageid: selectedStage.value,
+          //       pipeline: selectedPipeline.value,
+          //       jobTemplate: selectedtemp.value,
+          //       jobname: jobName,
+          // }),
+          body: JSON.stringify(payload),
         });
 
-        return {
-          success: true,
-          accountJobMap,
-          jobs: jobResults.map((r) => r.jobData),
-        };
+        alert("Jobs started");
+
+        // // 🔹 Your existing logic
+        // const { accountJobMap } = await createJob();
+
+        // const automationResults = await Promise.allSettled(
+        //   accounts.map(async (accountId) => {
+        //     const jobId = accountJobMap[accountId];
+        //     if (!jobId) return;
+
+        //     await Promise.all(
+        //       autos.map(async (automation) => {
+        //         const hasMatchingTags = checkTagMatch(
+        //           automation.selectedTags,
+        //           accountId
+        //         );
+
+        //         if (!hasMatchingTags) return;
+
+        //         await selectAutomationApi(
+        //           automation.type,
+        //           automation.selectedtemp,
+        //           accountId,
+        //           automation,
+        //           automation.type === "Create Task" ? jobId : null
+        //         );
+        //       })
+        //     );
+        //   })
+        // );
+
+        // console.log("Automation results:", automationResults);
+        setIsDrawerOpen(false);
       } catch (error) {
-        console.error("Job creation failed:", error);
-        throw error;
+        console.error("Operation failed:", error);
+      } finally {
+        setIsProcessing(false);
       }
     };
 
@@ -1769,7 +1726,7 @@ console.log("📤 Sending JSON:", JSON.stringify(payload));
             {combinedaccountValues
               .map((accountId) => {
                 const account = accountdata.find(
-                  (account) => account._id === accountId
+                  (account) => account._id === accountId,
                 );
                 return account ? account.accountName : null;
               })
@@ -1782,17 +1739,7 @@ console.log("📤 Sending JSON:", JSON.stringify(payload));
             const currentTagData = tagData[index] || {};
             const templateName = templateData[index] || "Loading...";
 
-            // const hasMatchingTags = automation.selectedTags?.length
-            //   ? automation.selectedTags.some((automationTagId) =>
-            //       accountTags.some(
-            //         (accountTag) => accountTag._id === automationTagId
-            //       )
-            //     )
-            //   : true;
-            // Check if ALL selected accounts have matching tags for this automation
-            const allAccountsHaveMatchingTags = combinedaccountValues.every(
-              (accountId) => checkTagMatch(automation.selectedTags, accountId)
-            );
+            
             return (
               <Box
                 key={index}
@@ -1809,7 +1756,7 @@ console.log("📤 Sending JSON:", JSON.stringify(payload));
                       <Checkbox
                         checked={selectedAutomations.includes(index)}
                         onChange={() => handleCheckboxChange(index)}
-                        disabled={!allAccountsHaveMatchingTags}
+                      
                       />
                     }
                     label={
@@ -1818,15 +1765,7 @@ console.log("📤 Sending JSON:", JSON.stringify(payload));
                       </Typography>
                     }
                   />
-                  {!allAccountsHaveMatchingTags && (
-                    <Typography
-                      variant="body2"
-                      color="error"
-                      sx={{ fontStyle: "italic", ml: 2 }}
-                    >
-                      The tags do not match the account
-                    </Typography>
-                  )}
+                 
                 </Box>
 
                 {/* Template Information */}
@@ -1838,9 +1777,7 @@ console.log("📤 Sending JSON:", JSON.stringify(payload));
                     <Typography variant="body2" color="textSecondary">
                       {templateName}
                     </Typography>
-                    {/* <Typography variant="caption" color="textSecondary">
-                    Type: {automation.refModel}
-                  </Typography> */}
+                   
                   </Box>
                 )}
 
@@ -1980,14 +1917,14 @@ console.log("📤 Sending JSON:", JSON.stringify(payload));
                                 clientStatusOptions?.find(
                                   (opt) =>
                                     opt.value ===
-                                    automation.selectedClientStatus
+                                    automation.selectedClientStatus,
                                 )?.clientfacingColour || "#ccc",
                             }}
                           />
                           <Typography variant="body2">
                             {clientStatusOptions?.find(
                               (opt) =>
-                                opt.value === automation.selectedClientStatus
+                                opt.value === automation.selectedClientStatus,
                             )?.label ||
                               automation.selectedClientStatus ||
                               "Not set"}
@@ -2077,7 +2014,7 @@ console.log("📤 Sending JSON:", JSON.stringify(payload));
               value={selectedaccount}
               onChange={handleAccountChange}
               placeholder="Assignees"
-               options={accountoptions}
+              options={accountoptions}
             />
           </Box>
           <Box mt={2}>
@@ -2240,7 +2177,7 @@ console.log("📤 Sending JSON:", JSON.stringify(payload));
                   value={
                     startsInDuration
                       ? dayOptions.find(
-                          (option) => option.value === startsInDuration
+                          (option) => option.value === startsInDuration,
                         )
                       : null
                   }
@@ -2287,7 +2224,7 @@ console.log("📤 Sending JSON:", JSON.stringify(payload));
                   value={
                     dueinduration
                       ? dayOptions.find(
-                          (option) => option.value === dueinduration
+                          (option) => option.value === dueinduration,
                         )
                       : null
                   }
@@ -2412,7 +2349,7 @@ console.log("📤 Sending JSON:", JSON.stringify(payload));
                                             clientFacingJobs.find(
                                               (job) =>
                                                 job.clientfacingName ===
-                                                params.inputProps.value
+                                                params.inputProps.value,
                                             )?.clientfacingColour, // Set color from selection
                                           marginRight: 8,
                                           marginLeft: 2,

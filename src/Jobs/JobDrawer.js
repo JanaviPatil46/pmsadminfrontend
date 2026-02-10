@@ -3152,10 +3152,7 @@ const JobDrawer = ({
           .map((index) => automations[index])
           .filter(Boolean);
 
-        // if (!accounts.length || !autos.length) {
-        //   alert("Select accounts & automations");
-        //   return;
-        // }
+       
         // console.log("Selected accounts:", accounts);
         console.log("Selected automations:", autos);
         const payload = {

@@ -1258,7 +1258,7 @@ case "Update client-facing job status":
           <Autocomplete
             options={statusOptions}
             getOptionLabel={(option) => option.label}
-            value={automation.status || status}
+            value={automation.status }
             onChange={(event, newValue) => updateAutomationState(automationIndex, { status: newValue })}
             renderInput={(params) => (
               <TextField
@@ -1271,7 +1271,8 @@ case "Update client-facing job status":
             fullWidth
           />
          
-          {(automation.status?.value === true || status?.value === true) && (
+          {/* {(automation.status?.value === true || status?.value === true) && ( */}
+          {automation.status?.value === true && (
             <Box>
               <Box>
                 <InputLabel sx={{ color: "black", mb: 1, mt: 1 }}>
