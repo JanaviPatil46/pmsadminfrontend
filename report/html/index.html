@@ -1,0 +1,1411 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Copy/Paste Detector Report</title><link href="styles/tailwind.css" rel="stylesheet"><link href="styles/prism.css" rel="stylesheet"></head><body class="bg-gray-100"><header class="bg-white shadow py-4"><div class="container mx-auto px-4"><h1 class="text-3xl font-semibold text-gray-800">jscpd - copy/paste report</h1></div></header><main class="container mx-auto my-8 p-4 bg-white shadow rounded"><section class="mb-8" id="dashboard"><h2 class="text-2xl font-semibold text-gray-700 mb-4">Dashboard</h2><div class="grid grid-cols-4 gap-4"><div class="bg-blue-200 p-4 rounded text-center"><h3 class="text-lg font-semibold text-blue-800 mb-2">Total Files</h3><span class="text-4xl font-bold text-blue-800">41</span></div><div class="bg-green-200 p-4 rounded text-center"><h3 class="text-lg font-semibold text-green-800 mb-2">Total Lines of Code</h3><span class="text-4xl font-bold text-green-800">12335</span></div><div class="bg-yellow-200 p-4 rounded text-center"><h3 class="text-lg font-semibold text-yellow-800 mb-2">Number of Clones</h3><span class="text-4xl font-bold text-yellow-800">76</span></div><div class="bg-red-200 p-4 rounded text-center"><h3 class="text-lg font-semibold text-red-800 mb-2">Duplicated Lines</h3><span class="text-4xl font-bold text-red-800">1402 (11.37%)</span></div></div></section><section class="mb-8" id="formats"><h2 class="text-2xl font-semibold text-gray-700 mb-4">Formats with Duplications</h2><table class="w-full table-auto"><thead><tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal"><th class="py-3 px-6 text-left">Format</th><th class="py-3 px-6 text-left">Files</th><th class="py-3 px-6 text-left">Lines</th><th class="py-3 px-6 text-left">Clones</th><th class="py-3 px-6 text-left">Duplicated Lines</th><th class="py-3 px-6 text-left">Duplicated Tokens</th></tr></thead><tbody><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#javascript-clones">javascript</a></td><td class="py-3 px-6">41</td><td class="py-3 px-6">12335</td><td class="py-3 px-6">76</td><td class="py-3 px-6">1402</td><td class="py-3 px-6">13302</td></tr></tbody></table></section><section class="mb-8" id="txt-clones"><a name="javascript-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">javascript</h2><div class="divide-y divide-gray-200 border-b-2"><div class="py-4"><p class="text-gray-600">src\Pages\Organizers\AccountOrganizers.js (Line 73:7 - Line 85:9), src\Pages\Organizers\AccountOrganizers.js (Line 57:7 - Line 69:7)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn0" onclick="toggleCodeBlock('cloneGroup0', 'expandBtn0', 'collapseBtn0')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn0" onclick="toggleCodeBlock('cloneGroup0', 'expandBtn0', 'collapseBtn0')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup0"><code class="language-javascript text-sm text-gray-800">style={({ isActive }) =&gt; ({
+        padding: &quot;8px 16px&quot;,
+        borderRadius: &quot;10px&quot;,
+        fontSize: &quot;15px&quot;,
+        cursor: &quot;pointer&quot;,
+        textDecoration: &quot;none&quot;,
+        fontWeight: isActive ? &quot;bold&quot; : &quot;normal&quot;,
+        color: isActive ? &quot;var(--color-save-btn)&quot; : &quot;#333&quot;,
+        backgroundColor: isActive ? &quot;#fff&quot; : &quot;transparent&quot;,
+        transition: &quot;all 0.3s ease&quot;,
+      })}
+    &gt;
+      Archived</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\old account\ContactForm.js (Line 40:5 - Line 48:8), src\Pages\old account\UpdateContact.js (Line 15:5 - Line 23:13)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn1" onclick="toggleCodeBlock('cloneGroup1', 'expandBtn1', 'collapseBtn1')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn1" onclick="toggleCodeBlock('cloneGroup1', 'expandBtn1', 'collapseBtn1')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup1"><code class="language-javascript text-sm text-gray-800">const [firstName, setFirstName] = useState('');
+    const [middleName, setMiddleName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [contactName, setContactName] = useState('');
+    const [companyName, setCompanyName] = useState('');
+    const [note, setNote] = useState('');
+    const [ssn, setSsn] = useState('');
+    const [email, setEmail] = useState('');
+    const [country</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\old account\ContactForm.js (Line 48:11 - Line 53:15), src\Pages\old account\UpdateContact.js (Line 24:19 - Line 30:8)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn2" onclick="toggleCodeBlock('cloneGroup2', 'expandBtn2', 'collapseBtn2')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn2" onclick="toggleCodeBlock('cloneGroup2', 'expandBtn2', 'collapseBtn2')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup2"><code class="language-javascript text-sm text-gray-800">] = useState('');
+    const [streetAddress, setStreetAddress] = useState('');
+    const [city, setCity] = useState('');
+    const [state, setState] = useState('');
+    const [postalCode, setPostalCode] = useState('');
+    const [combinedValues</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\old account\ContactForm.js (Line 53:18 - Line 69:24), src\Pages\old account\UpdateContact.js (Line 82:13 - Line 97:20)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn3" onclick="toggleCodeBlock('cloneGroup3', 'expandBtn3', 'collapseBtn3')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn3" onclick="toggleCodeBlock('cloneGroup3', 'expandBtn3', 'collapseBtn3')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup3"><code class="language-javascript text-sm text-gray-800">] = useState([]);
+    useEffect(() =&gt; {
+        axios
+            .get('https://restcountries.com/v3.1/all')
+            .then((response) =&gt; {
+                const countryData = response.data.map((country) =&gt; ({
+                    name: country.name.common,
+                    code: country.cca2,
+                }));
+                setCountries(countryData);
+            })
+            .catch((error) =&gt;
+                console.error('Error fetching country data:', error)
+            );
+    }, []);
+
+    const handlePhoneNumberChange</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\old account\ContactForm.js (Line 80:2 - Line 95:20), src\Pages\old account\UpdateContact.js (Line 108:2 - Line 124:16)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn4" onclick="toggleCodeBlock('cloneGroup4', 'expandBtn4', 'collapseBtn4')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn4" onclick="toggleCodeBlock('cloneGroup4', 'expandBtn4', 'collapseBtn4')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup4"><code class="language-javascript text-sm text-gray-800">;
+
+    const handleAddPhoneNumber = () =&gt; {
+        setPhoneNumbers((prevPhoneNumbers) =&gt; [
+            ...prevPhoneNumbers,
+            { id: Date.now(), phone: '', isPrimary: false },
+        ]);
+    };
+
+    const handleDeletePhoneNumber = (id) =&gt; {
+        setPhoneNumbers((prevPhoneNumbers) =&gt;
+            prevPhoneNumbers.filter((item) =&gt; item.id !== id)
+        );
+    };
+
+    const handleCountryChange</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\old account\ContactForm.js (Line 198:2 - Line 215:13), src\Pages\old account\UpdateContact.js (Line 133:2 - Line 150:6)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn5" onclick="toggleCodeBlock('cloneGroup5', 'expandBtn5', 'collapseBtn5')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn5" onclick="toggleCodeBlock('cloneGroup5', 'expandBtn5', 'collapseBtn5')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup5"><code class="language-javascript text-sm text-gray-800">;
+    useEffect(() =&gt; {
+        fetchData();
+    }, []);
+
+    const fetchData = async () =&gt; {
+        try {
+
+            const url = `${TAGS_API}/tags/`;
+
+            const response = await fetch(url);
+            const data = await response.json();
+            setTags(data.tags);
+        } catch (error) {
+            console.error(&quot;Error fetching data:&quot;, error);
+        }
+    };
+    //  for tags</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\old account\ContactForm.js (Line 221:9 - Line 254:7), src\Pages\old account\UpdateContact.js (Line 154:9 - Line 185:6)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn6" onclick="toggleCodeBlock('cloneGroup6', 'expandBtn6', 'collapseBtn6')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn6" onclick="toggleCodeBlock('cloneGroup6', 'expandBtn6', 'collapseBtn6')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup6"><code class="language-javascript text-sm text-gray-800">return baseWidth + (charWidth * tagName.length) + padding;
+    };
+
+
+    const options = tags.map((tag) =&gt; ({
+        value: tag._id,
+        label: tag.tagName,
+        colour: tag.tagColour,
+
+        customStyle: {
+            backgroundColor: tag.tagColour,
+            color: &quot;#fff&quot;,
+            borderRadius: &quot;8px&quot;,
+            alignItems: &quot;center&quot;,
+            textAlign: &quot;center&quot;,
+            marginBottom: &quot;5px&quot;,
+            padding: &quot;2px,8px&quot;,
+            fontSize: '10px',
+            width: `${calculateWidth(tag.tagName)}px`,
+            margin: '7px',
+            cursor: 'pointer',
+        },
+        customTagStyle: {
+            backgroundColor: tag.tagColour,
+            color: &quot;#fff&quot;,
+            alignItems: &quot;center&quot;,
+            textAlign: &quot;center&quot;,
+            padding: &quot;2px,8px&quot;,
+            fontSize: '15px',
+            cursor: 'pointer',
+        },
+    }));
+
+    return</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\old account\ContactForm.js (Line 260:13 - Line 269:2), src\Pages\old account\UpdateContact.js (Line 233:9 - Line 237:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn7" onclick="toggleCodeBlock('cloneGroup7', 'expandBtn7', 'collapseBtn7')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn7" onclick="toggleCodeBlock('cloneGroup7', 'expandBtn7', 'collapseBtn7')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup7"><code class="language-javascript text-sm text-gray-800">&lt;form style={{ paddingRight: '3%', paddingLeft: '3%', height: '90vh', overflowY: 'auto' }} className='contact-form'&gt;
+                &lt;Typography variant=&quot;h6&quot; gutterBottom sx={{ ml: 1, fontWeight: 'bold', mt: 2 }}&gt;
+                    Contact info
+                &lt;/Typography&gt;
+                &lt;Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: isSmallScreen ? 'column' : 'row',
+                        gap: isSmallScreen ? 2 : 5,
+                        padding: '1px 5px 0 5px',</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\old account\ContactForm.js (Line 271:21 - Line 361:10), src\Pages\old account\UpdateContact.js (Line 237:2 - Line 305:9)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn8" onclick="toggleCodeBlock('cloneGroup8', 'expandBtn8', 'collapseBtn8')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn8" onclick="toggleCodeBlock('cloneGroup8', 'expandBtn8', 'collapseBtn8')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup8"><code class="language-javascript text-sm text-gray-800">}}
+                &gt;
+                    &lt;Box&gt;
+
+
+                        &lt;InputLabel sx={{ color: 'black' }}&gt;First name&lt;/InputLabel&gt;
+
+                        &lt;TextField
+                            margin=&quot;normal&quot;
+                            fullWidth
+                            name=&quot;firstName&quot;
+                            value={firstName}
+                            onChange={(e) =&gt; setFirstName(e.target.value)}
+                            placeholder=&quot;First Name&quot;
+                            size=&quot;small&quot;
+                        /&gt;
+
+                    &lt;/Box&gt;
+                    &lt;Box&gt;
+
+
+                        &lt;InputLabel sx={{ color: 'black' }}&gt;Middle Name&lt;/InputLabel&gt;
+
+                        &lt;TextField
+                            margin=&quot;normal&quot;
+                            fullWidth
+                            name=&quot;middleName&quot;
+                            value={middleName}
+                            onChange={(e) =&gt; setMiddleName(e.target.value)}
+                            placeholder=&quot;Middle Name&quot;
+                            size=&quot;small&quot;
+                        /&gt;
+
+                    &lt;/Box&gt;
+                    &lt;Box&gt;
+
+
+                        &lt;InputLabel sx={{ color: 'black' }}&gt;Last Name&lt;/InputLabel&gt;
+
+                        &lt;TextField
+                            fullWidth
+                            name=&quot;lastName&quot;
+                            value={lastName}
+                            onChange={(e) =&gt; setLastName(e.target.value)}
+                            margin=&quot;normal&quot;
+                            placeholder=&quot;Last name&quot;
+                            size=&quot;small&quot;
+                        /&gt;
+
+                    &lt;/Box&gt;
+                &lt;/Box&gt;
+                &lt;Box &gt;
+
+
+                    &lt;InputLabel sx={{ color: 'black' }}&gt;Contact Name&lt;/InputLabel&gt;
+
+                    &lt;TextField
+                        name=&quot;contactName&quot;
+                        value={contactName}
+                        onChange={(e) =&gt; setContactName(e.target.value)}
+                        fullWidth
+                        placeholder=&quot;Contact Name&quot;
+                        margin=&quot;normal&quot;
+
+                        size=&quot;small&quot;
+                    /&gt;
+
+                &lt;/Box&gt;
+                &lt;Box &gt;
+
+                    &lt;InputLabel sx={{ color: 'black' }}&gt;Company Name&lt;/InputLabel&gt;
+
+                    &lt;TextField
+                        fullWidth
+                        name=&quot;companyName&quot;
+                        value={companyName}
+                        onChange={(e) =&gt; setCompanyName(e.target.value)}
+                        margin=&quot;normal&quot;
+                        placeholder=&quot;Company Name&quot;
+                        size=&quot;small&quot;
+                    /&gt;
+                &lt;/Box&gt;
+                &lt;Box &gt;
+
+                    &lt;InputLabel sx={{ color: 'black' }}&gt;Note&lt;/InputLabel&gt;
+
+                    &lt;TextField
+                        fullWidth
+                        name=&quot;note&quot;
+                        value={note}
+                        multiline</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\old account\ContactForm.js (Line 362:25 - Line 406:8), src\Pages\old account\UpdateContact.js (Line 305:21 - Line 343:8)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn9" onclick="toggleCodeBlock('cloneGroup9', 'expandBtn9', 'collapseBtn9')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn9" onclick="toggleCodeBlock('cloneGroup9', 'expandBtn9', 'collapseBtn9')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup9"><code class="language-javascript text-sm text-gray-800">onChange={(e) =&gt; setNote(e.target.value)}
+                        margin=&quot;normal&quot;
+                        placeholder=&quot;Note&quot;
+                        size=&quot;small&quot;
+                    /&gt;
+                &lt;/Box&gt;
+                &lt;Box &gt;
+
+                    &lt;InputLabel sx={{ color: 'black' }}&gt;SSN&lt;/InputLabel&gt;
+
+                    &lt;TextField
+                        fullWidth
+                        name=&quot;ssn&quot;
+                        value={ssn}
+                        onChange={(e) =&gt; setSsn(e.target.value)}
+                        margin=&quot;normal&quot;
+                        placeholder=&quot;SSN&quot;
+                        size=&quot;small&quot;
+                    /&gt;
+                &lt;/Box&gt;
+                &lt;Box &gt;
+
+                    &lt;InputLabel sx={{ color: 'black' }}&gt;Email&lt;/InputLabel&gt;
+
+                    &lt;TextField
+                        fullWidth
+                        name=&quot;email&quot;
+                        value={email}
+                        onChange={(e) =&gt; setEmail(e.target.value)}
+                        margin=&quot;normal&quot;
+                        placeholder=&quot;Email&quot;
+                        size=&quot;small&quot;
+                    /&gt;
+                &lt;/Box&gt;
+                &lt;Box &gt;
+
+                    &lt;InputLabel sx={{ color: 'black' }}&gt;Tags&lt;/InputLabel&gt;
+
+                    &lt;Autocomplete
+                        multiple
+                        size='small'
+                        id=&quot;tags-outlined&quot;
+                        options={options}
+                        getOptionLabel={(option) =&gt; option.label}
+                        value={options</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\old account\ContactForm.js (Line 406:2 - Line 504:2), src\Pages\old account\UpdateContact.js (Line 343:8 - Line 436:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn10" onclick="toggleCodeBlock('cloneGroup10', 'expandBtn10', 'collapseBtn10')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn10" onclick="toggleCodeBlock('cloneGroup10', 'expandBtn10', 'collapseBtn10')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup10"><code class="language-javascript text-sm text-gray-800">}
+                        onChange={handleTagChange}
+                        renderTags={(selected, getTagProps) =&gt;
+                            selected.map((option, index) =&gt; (
+                                &lt;Chip
+                                    key={option.value}
+                                    label={option.label}
+                                    style={option.customTagStyle}
+                                    {...getTagProps({ index })}
+                                /&gt;
+                            ))
+                        }
+                        renderInput={(params) =&gt; (
+                            &lt;TextField
+                                {...params}
+                                variant=&quot;outlined&quot;
+
+                                placeholder=&quot;Tags&quot;
+                                sx={{ width: '100%', marginTop: '8px' }}
+                            /&gt;
+                        )}
+                        renderOption={(props, option) =&gt; (
+                            &lt;Box component=&quot;li&quot; {...props} style={option.customStyle}&gt;
+                                {option.label}
+                            &lt;/Box&gt;
+                        )}
+                    /&gt;
+
+                &lt;/Box&gt;
+                &lt;Typography variant=&quot;h6&quot; gutterBottom sx={{ ml: 1, fontWeight: 'bold', mt: 3 }}&gt;
+                    Phone Numbers
+                &lt;/Typography&gt;
+                {phoneNumbers.map((phone) =&gt; (
+                    &lt;Box
+                        key={phone.id}
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            gap: 2,
+                            ml: 1,
+                            mb: 2,
+                        }}
+                    &gt;
+                        {phone.isPrimary &amp;&amp; (
+                            &lt;Chip
+                                label=&quot;Primary phone&quot;
+                                color=&quot;primary&quot;
+                                size=&quot;small&quot;
+                                sx={{ position: 'absolute', mt: -3 }}
+                            /&gt;
+                        )}
+                        &lt;PhoneInput
+                            country={'us'}
+                            value={phone.phone}
+                            onChange={(phoneValue) =&gt;
+                                handlePhoneNumberChange(phone.id, phoneValue)
+                            }
+                            inputStyle={{
+                                width: '100%',
+                            }}
+                            buttonStyle={{
+                                borderTopLeftRadius: '8px',
+                                borderBottomLeftRadius: '8px',
+                            }}
+                            containerStyle={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                            }}
+                        /&gt;
+                        &lt;AiOutlineDelete
+                            onClick={() =&gt; handleDeletePhoneNumber(phone.id)}
+                            style={{ cursor: 'pointer', color: 'red' }}
+                        /&gt;
+                    &lt;/Box&gt;
+                ))}
+                &lt;Box
+                    sx={{
+                        display: 'flex',
+                        gap: 2,
+                        alignItems: isSmallScreen ? 'center' : 'flex-start',
+                        ml: 1,
+                        cursor: 'pointer',
+                        color: 'blue',
+                        fontWeight: 600,
+                    }}
+                    onClick={handleAddPhoneNumber}
+                &gt;
+                    &lt;AiOutlinePlusCircle style={{ marginTop: '20px' }} /&gt;
+                    &lt;p&gt;Add phone number&lt;/p&gt;
+                &lt;/Box&gt;
+                &lt;Typography variant=&quot;h6&quot; gutterBottom sx={{ ml: 1, fontWeight: 'bold', mt: 3 }}&gt;
+                    Address
+                &lt;/Typography&gt;
+                &lt;Box&gt;
+
+                    &lt;InputLabel sx={{ color: 'black' }}&gt;Country&lt;/InputLabel&gt;
+                    {</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\old account\Account.js (Line 182:4 - Line 192:10), src\Pages\old account\ContactForm.js (Line 210:8 - Line 221:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn11" onclick="toggleCodeBlock('cloneGroup11', 'expandBtn11', 'collapseBtn11')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn11" onclick="toggleCodeBlock('cloneGroup11', 'expandBtn11', 'collapseBtn11')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup11"><code class="language-javascript text-sm text-gray-800">(data.tags);
+    } catch (error) {
+      console.error(&quot;Error fetching data:&quot;, error);
+    }
+  };
+  //  for tags
+  const calculateWidth = (tagName) =&gt; {
+    const baseWidth = 10; // base width for each tag
+    const charWidth = 8; // approximate width of each character
+    const padding = 10; // padding on either side
+    return baseWidth + charWidth</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\old account\Account.js (Line 195:2 - Line 208:7), src\Pages\old account\UpdateContact.js (Line 157:2 - Line 169:7)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn12" onclick="toggleCodeBlock('cloneGroup12', 'expandBtn12', 'collapseBtn12')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn12" onclick="toggleCodeBlock('cloneGroup12', 'expandBtn12', 'collapseBtn12')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup12"><code class="language-javascript text-sm text-gray-800">= tags.map((tag) =&gt; ({
+    value: tag._id,
+    label: tag.tagName,
+    colour: tag.tagColour,
+
+    customStyle: {
+      backgroundColor: tag.tagColour,
+      color: &quot;#fff&quot;,
+      borderRadius: &quot;8px&quot;,
+      alignItems: &quot;center&quot;,
+      textAlign: &quot;center&quot;,
+      marginBottom: &quot;5px&quot;,
+      padding: &quot;2px,8px&quot;,
+      fontSize: &quot;10px&quot;</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\old account\Account.js (Line 470:2 - Line 482:3), src\Pages\old account\Contact.js (Line 420:12 - Line 432:3)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn13" onclick="toggleCodeBlock('cloneGroup13', 'expandBtn13', 'collapseBtn13')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn13" onclick="toggleCodeBlock('cloneGroup13', 'expandBtn13', 'collapseBtn13')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup13"><code class="language-javascript text-sm text-gray-800">// Store the index as the value
+              }))}
+              value={columns[selectedFilterIndex] ? { label: columns[selectedFilterIndex].header, value: selectedFilterIndex } : null}
+              onChange={(event, newValue) =&gt; {
+                if (newValue) {
+                  setSelectedFilterIndex(newValue.value);
+                  handleFilterChange({ target: { value: newValue.value } });
+                } else {
+                  setSelectedFilterIndex(null);
+                  handleFilterChange({ target: { value: null } });
+                }
+              }}
+              getOptionLabel={(option) =&gt; option.label || &quot;&quot;</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\old account\Account.js (Line 504:19 - Line 518:2), src\Pages\old account\Contact.js (Line 454:19 - Line 471:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn14" onclick="toggleCodeBlock('cloneGroup14', 'expandBtn14', 'collapseBtn14')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn14" onclick="toggleCodeBlock('cloneGroup14', 'expandBtn14', 'collapseBtn14')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup14"><code class="language-javascript text-sm text-gray-800">}}
+                &gt;
+                  {option.label}
+                &lt;/li&gt;
+              )}
+            /&gt;
+            &lt;Stack direction=&quot;row&quot; gap=&quot;8px&quot;&gt;
+              {renderFilterContainers()}
+            &lt;/Stack&gt;
+          &lt;/&gt;
+        &lt;/Stack&gt;
+      &lt;/Paper&gt;
+      &lt;MaterialReactTable columns={columns} table={table} /&gt;
+    &lt;/Stack&gt;
+  )</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\Jobs\Jobs.js (Line 23:19 - Line 38:20), src\Pages\Organizers\AccountOrganizers.js (Line 57:7 - Line 72:23)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn15" onclick="toggleCodeBlock('cloneGroup15', 'expandBtn15', 'collapseBtn15')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn15" onclick="toggleCodeBlock('cloneGroup15', 'expandBtn15', 'collapseBtn15')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup15"><code class="language-javascript text-sm text-gray-800">style={({ isActive }) =&gt; ({
+                    padding: &quot;8px 16px&quot;,
+                    borderRadius: &quot;10px&quot;,
+                    fontSize: &quot;15px&quot;,
+                    cursor: &quot;pointer&quot;,
+                    textDecoration: &quot;none&quot;,
+                    fontWeight: isActive ? &quot;bold&quot; : &quot;normal&quot;,
+                    color: isActive ? &quot;var(--color-save-btn)&quot; : &quot;#333&quot;,
+                    backgroundColor: isActive ? &quot;#fff&quot; : &quot;transparent&quot;,
+                    transition: &quot;all 0.3s ease&quot;,
+                  })}
+                &gt;
+                  Active
+                &lt;/NavLink&gt;
+                &lt;NavLink
+                  to=&quot;/jobs/archivedjob&quot;</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\Jobs\Jobs.js (Line 39:19 - Line 60:4), src\Pages\Organizers\AccountOrganizers.js (Line 57:7 - Line 94:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn16" onclick="toggleCodeBlock('cloneGroup16', 'expandBtn16', 'collapseBtn16')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn16" onclick="toggleCodeBlock('cloneGroup16', 'expandBtn16', 'collapseBtn16')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup16"><code class="language-javascript text-sm text-gray-800">style={({ isActive }) =&gt; ({
+                    padding: &quot;8px 16px&quot;,
+                    borderRadius: &quot;10px&quot;,
+                    fontSize: &quot;15px&quot;,
+                    cursor: &quot;pointer&quot;,
+                    textDecoration: &quot;none&quot;,
+                    fontWeight: isActive ? &quot;bold&quot; : &quot;normal&quot;,
+                    color: isActive ? &quot;var(--color-save-btn)&quot; : &quot;#333&quot;,
+                    backgroundColor: isActive ? &quot;#fff&quot; : &quot;transparent&quot;,
+                    transition: &quot;all 0.3s ease&quot;,
+                  })}
+                &gt;
+                  Archived
+                &lt;/NavLink&gt;
+                
+              &lt;/Box&gt;
+           
+          
+                &lt;Box mt={2}&gt;
+                  &lt;Outlet /&gt;
+                &lt;/Box&gt;
+   &lt;/Box</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\internalChat\internalCommunication.js (Line 276:3 - Line 285:13), src\Pages\internalChat\NewChat.js (Line 9:5 - Line 18:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn17" onclick="toggleCodeBlock('cloneGroup17', 'expandBtn17', 'collapseBtn17')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn17" onclick="toggleCodeBlock('cloneGroup17', 'expandBtn17', 'collapseBtn17')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup17"><code class="language-javascript text-sm text-gray-800">const { logindata } = useContext(LoginContext);
+  const [loginUserId, setLoginUserId] = useState();
+
+  useEffect(() =&gt; {
+    if (logindata?.user?.id) {
+      setLoginUserId(logindata.user.id);
+    }
+  }, [logindata]);
+
+  const getsChatlist</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\BulkActions\SendAccountEmail.js (Line 159:2 - Line 186:17), src\Pages\BulkActions\SendAccountEmail.js (Line 125:2 - Line 153:17)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn18" onclick="toggleCodeBlock('cloneGroup18', 'expandBtn18', 'collapseBtn18')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn18" onclick="toggleCodeBlock('cloneGroup18', 'expandBtn18', 'collapseBtn18')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup18"><code class="language-javascript text-sm text-gray-800">},
+        { title: &quot;Date Shortcodes&quot;, isBold: true },
+        { title: &quot;Current day full date&quot;, isBold: false, value: &quot;CURRENT_DAY_FULL_DATE&quot; },
+        { title: &quot;Current day number&quot;, isBold: false, value: &quot;CURRENT_DAY_NUMBER&quot; },
+        { title: &quot;Current day name&quot;, isBold: false, value: &quot;CURRENT_DAY_NAME&quot; },
+        { title: &quot;Current week&quot;, isBold: false, value: &quot;CURRENT_WEEK&quot; },
+        { title: &quot;Current month number&quot;, isBold: false, value: &quot;CURRENT_MONTH_NUMBER&quot; },
+        { title: &quot;Current month name&quot;, isBold: false, value: &quot;CURRENT_MONTH_NAME&quot; },
+        { title: &quot;Current quarter&quot;, isBold: false, value: &quot;CURRENT_QUARTER&quot; },
+        { title: &quot;Current year&quot;, isBold: false, value: &quot;CURRENT_YEAR&quot; },
+        { title: &quot;Last day full date&quot;, isBold: false, value: &quot;LAST_DAY_FULL_DATE&quot; },
+        { title: &quot;Last day number&quot;, isBold: false, value: &quot;LAST_DAY_NUMBER&quot; },
+        { title: &quot;Last day name&quot;, isBold: false, value: &quot;LAST_DAY_NAME&quot; },
+        { title: &quot;Last week&quot;, isBold: false, value: &quot;LAST_WEEK&quot; },
+        { title: &quot;Last month number&quot;, isBold: false, value: &quot;LAST_MONTH_NUMBER&quot; },
+        { title: &quot;Last month name&quot;, isBold: false, value: &quot;LAST_MONTH_NAME&quot; },
+        { title: &quot;Last quarter&quot;, isBold: false, value: &quot;LAST_QUARTER&quot; },
+        { title: &quot;Last_year&quot;, isBold: false, value: &quot;LAST_YEAR&quot; },
+        { title: &quot;Next day full date&quot;, isBold: false, value: &quot;NEXT_DAY_FULL_DATE&quot; },
+        { title: &quot;Next day number&quot;, isBold: false, value: &quot;NEXT_DAY_NUMBER&quot; },
+        { title: &quot;Next day name&quot;, isBold: false, value: &quot;NEXT_DAY_NAME&quot; },
+        { title: &quot;Next week&quot;, isBold: false, value: &quot;NEXT_WEEK&quot; },
+        { title: &quot;Next month number&quot;, isBold: false, value: &quot;NEXT_MONTH_NUMBER&quot; },
+        { title: &quot;Next month name&quot;, isBold: false, value: &quot;NEXT_MONTH_NAME&quot; },
+        { title: &quot;Next quarter&quot;, isBold: false, value: &quot;NEXT_QUARTER&quot; },
+        { title: &quot;Next year&quot;, isBold: false, value: &quot;NEXT_YEAR&quot; },
+      ];
+      setShortcuts(accountShortcuts</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\BulkActions\ManageTeams.js (Line 159:9 - Line 174:2), src\Pages\BulkActions\SendAccountEmail.js (Line 622:13 - Line 637:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn19" onclick="toggleCodeBlock('cloneGroup19', 'expandBtn19', 'collapseBtn19')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn19" onclick="toggleCodeBlock('cloneGroup19', 'expandBtn19', 'collapseBtn19')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup19"><code class="language-javascript text-sm text-gray-800">&lt;/Button&gt;
+        &lt;Button variant=&quot;outlined&quot;  onClick={handleCancel} sx={{
+                    borderColor: 'var(--color-border-cancel-btn)',  // Normal background
+                   color:'var(--color-save-btn)',
+                    '&amp;:hover': {
+                      backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
+                      color:'#fff',
+                      border:&quot;none&quot;
+                    },
+                    width:'80px',borderRadius:'15px'
+                  }}&gt;
+          Cancel
+        &lt;/Button&gt;
+      &lt;/Box&gt;
+    &lt;/Box&gt;
+  )</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\BulkActions\ManageTags.js (Line 12:3 - Line 21:40), src\Pages\old account\Account.js (Line 173:3 - Line 182:8)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn20" onclick="toggleCodeBlock('cloneGroup20', 'expandBtn20', 'collapseBtn20')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn20" onclick="toggleCodeBlock('cloneGroup20', 'expandBtn20', 'collapseBtn20')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup20"><code class="language-javascript text-sm text-gray-800">}, []);
+
+  const fetchTagData = async () =&gt; {
+    try {
+      const url = `${TAGS_API}/tags/`;
+      const response = await fetch(url);
+      const data = await response.json();
+      setTags(data.tags);
+
+      // Initialize action state for each tag</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\BulkActions\ManageTags.js (Line 165:21 - Line 179:13), src\Pages\BulkActions\ManageTeams.js (Line 136:21 - Line 150:19)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn21" onclick="toggleCodeBlock('cloneGroup21', 'expandBtn21', 'collapseBtn21')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn21" onclick="toggleCodeBlock('cloneGroup21', 'expandBtn21', 'collapseBtn21')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup21"><code class="language-javascript text-sm text-gray-800">sx={{ width: &quot;150px&quot; }}
+                  &gt;
+                    &lt;MenuItem value=&quot;Assign to all&quot;&gt;Assign to all&lt;/MenuItem&gt;
+                    &lt;MenuItem value=&quot;Remove from all&quot;&gt;Remove from all&lt;/MenuItem&gt;
+                    &lt;MenuItem value=&quot;Do nothing&quot;&gt;Do nothing&lt;/MenuItem&gt;
+                  &lt;/Select&gt;
+                &lt;/TableCell&gt;
+              &lt;/TableRow&gt;
+            ))}
+          &lt;/TableBody&gt;
+        &lt;/Table&gt;
+      &lt;/TableContainer&gt;
+
+      &lt;Box className=&quot;buttons-email&quot; sx={{ display: &quot;flex&quot;, gap: 2, mt: 2 }}&gt;
+        &lt;Button variant=&quot;contained&quot;onClick={sendbulkTags</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\BulkActions\ManageTags.js (Line 188:9 - Line 206:11), src\Pages\BulkActions\SendAccountEmail.js (Line 622:13 - Line 177:12)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn22" onclick="toggleCodeBlock('cloneGroup22', 'expandBtn22', 'collapseBtn22')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn22" onclick="toggleCodeBlock('cloneGroup22', 'expandBtn22', 'collapseBtn22')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup22"><code class="language-javascript text-sm text-gray-800">&lt;/Button&gt;
+        &lt;Button variant=&quot;outlined&quot;  onClick={handleCancel} sx={{
+                    borderColor: 'var(--color-border-cancel-btn)',  // Normal background
+                   color:'var(--color-save-btn)',
+                    '&amp;:hover': {
+                      backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
+                      color:'#fff',
+                      border:&quot;none&quot;
+                    },
+                    width:'80px',borderRadius:'15px'
+                  }}&gt;
+          Cancel
+        &lt;/Button&gt;
+      &lt;/Box&gt;
+    &lt;/Box&gt;
+  );
+};
+
+export default ManageTags</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\Accounts\TagsMultiSelectDropDown.js (Line 24:5 - Line 41:6), src\Pages\Accounts\TeamMemberMultiSelectDropDown.js (Line 61:2 - Line 77:8)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn23" onclick="toggleCodeBlock('cloneGroup23', 'expandBtn23', 'collapseBtn23')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn23" onclick="toggleCodeBlock('cloneGroup23', 'expandBtn23', 'collapseBtn23')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup23"><code class="language-javascript text-sm text-gray-800">);
+
+  const handleClick = (event) =&gt; {
+    setAnchorEl(event.currentTarget);
+    if (containerRef.current) {
+      setMenuWidth(containerRef.current.offsetWidth);
+    }
+  };
+
+  const handleClose = () =&gt; {
+    setAnchorEl(null);
+    setSearchQuery(&quot;&quot;);
+  };
+
+  const handleSelect = (selectedValue) =&gt; {
+    if (!selectedValue) return;
+    
+    const</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\Accounts\TagsMultiSelectDropDown.js (Line 66:3 - Line 87:2), src\Pages\Accounts\TeamMemberMultiSelectDropDown.js (Line 109:2 - Line 130:3)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn24" onclick="toggleCodeBlock('cloneGroup24', 'expandBtn24', 'collapseBtn24')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn24" onclick="toggleCodeBlock('cloneGroup24', 'expandBtn24', 'collapseBtn24')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup24"><code class="language-javascript text-sm text-gray-800">);
+
+  return (
+    &lt;Box sx={{ width }}&gt;
+      &lt;Box
+        ref={containerRef}
+        sx={{
+          display: &quot;flex&quot;,
+          alignItems: &quot;center&quot;,
+          justifyContent: &quot;space-between&quot;,
+          border: &quot;1px solid #ccc&quot;,
+          borderRadius: &quot;8px&quot;,
+          padding: &quot;4px&quot;,
+          cursor: &quot;pointer&quot;,
+          bgcolor: &quot;background.paper&quot;,
+          width: &quot;100%&quot;,
+          minHeight: &quot;40px&quot;
+        }}
+        onClick={handleClick}
+      &gt;
+        &lt;Box sx={{ display: &quot;flex&quot;, flexWrap: &quot;wrap&quot;, gap: 0.5, flex: 1 }}&gt;
+          {value.</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\Accounts\TagsMultiSelectDropDown.js (Line 111:2 - Line 119:2), src\Pages\Accounts\TeamMemberMultiSelectDropDown.js (Line 155:2 - Line 163:3)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn25" onclick="toggleCodeBlock('cloneGroup25', 'expandBtn25', 'collapseBtn25')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn25" onclick="toggleCodeBlock('cloneGroup25', 'expandBtn25', 'collapseBtn25')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup25"><code class="language-javascript text-sm text-gray-800">)
+          ) : (
+            &lt;Typography variant=&quot;body2&quot; color=&quot;textSecondary&quot; sx={{ pl: 1 }}&gt;
+              {placeholder}
+            &lt;/Typography&gt;
+          )}
+        &lt;/Box&gt;
+        &lt;Box sx={{ display: &quot;flex&quot;, alignItems: &quot;center&quot; }}&gt;
+          {value.</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\Accounts\TagsMultiSelectDropDown.js (Line 119:2 - Line 151:17), src\Pages\Accounts\TeamMemberMultiSelectDropDown.js (Line 163:2 - Line 195:25)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn26" onclick="toggleCodeBlock('cloneGroup26', 'expandBtn26', 'collapseBtn26')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn26" onclick="toggleCodeBlock('cloneGroup26', 'expandBtn26', 'collapseBtn26')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup26"><code class="language-javascript text-sm text-gray-800">value.length &gt; 0 &amp;&amp; (
+            &lt;IconButton
+              onClick={clearSelection}
+              size=&quot;small&quot;
+              sx={{ color: &quot;text.secondary&quot; }}
+            &gt;
+              &lt;FaTimes /&gt;
+            &lt;/IconButton&gt;
+          )}
+          &lt;IconButton size=&quot;small&quot;&gt;
+            {anchorEl ? &lt;FaCaretUp /&gt; : &lt;FaCaretDown /&gt;}
+          &lt;/IconButton&gt;
+        &lt;/Box&gt;
+      &lt;/Box&gt;
+
+      &lt;Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: &quot;bottom&quot;, horizontal: &quot;left&quot; }}
+        transformOrigin={{ vertical: &quot;top&quot;, horizontal: &quot;left&quot; }}
+        PaperProps={{
+          style: {
+            width: menuWidth || &quot;auto&quot;,
+            maxHeight: &quot;250px&quot;,
+          }
+        }}
+      &gt;
+        &lt;Box sx={{ p: 1 }}&gt;
+          &lt;TextField
+            fullWidth
+            size=&quot;small&quot;
+            placeholder=&quot;Search tags...&quot;</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\Accounts\TagsMultiSelectDropDown.js (Line 165:2 - Line 180:11), src\Pages\Accounts\TeamMemberMultiSelectDropDown.js (Line 213:2 - Line 228:6)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn27" onclick="toggleCodeBlock('cloneGroup27', 'expandBtn27', 'collapseBtn27')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn27" onclick="toggleCodeBlock('cloneGroup27', 'expandBtn27', 'collapseBtn27')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup27"><code class="language-javascript text-sm text-gray-800">(
+              &lt;Box
+                key={option.value}
+                sx={{
+                  display: &quot;flex&quot;,
+                  alignItems: &quot;center&quot;,
+                  p: &quot;4px 8px&quot;,
+                  cursor: &quot;pointer&quot;,
+                  &quot;&amp;:hover&quot;: {
+                    backgroundColor: 'action.hover'
+                  }
+                }}
+                onClick={() =&gt; handleSelect(option.value)}
+              &gt;
+                &lt;Checkbox 
+                  checked={isSelected</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\Accounts\Accounts.js (Line 104:11 - Line 119:37), src\Pages\Organizers\AccountOrganizers.js (Line 57:7 - Line 72:23)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn28" onclick="toggleCodeBlock('cloneGroup28', 'expandBtn28', 'collapseBtn28')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn28" onclick="toggleCodeBlock('cloneGroup28', 'expandBtn28', 'collapseBtn28')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup28"><code class="language-javascript text-sm text-gray-800">style={({ isActive }) =&gt; ({
+            padding: &quot;8px 16px&quot;,
+            borderRadius: &quot;10px&quot;,
+            fontSize: &quot;15px&quot;,
+            cursor: &quot;pointer&quot;,
+            textDecoration: &quot;none&quot;,
+            fontWeight: isActive ? &quot;bold&quot; : &quot;normal&quot;,
+            color: isActive ? &quot;var(--color-save-btn)&quot; : &quot;#333&quot;,
+            backgroundColor: isActive ? &quot;#fff&quot; : &quot;transparent&quot;,
+            transition: &quot;all 0.3s ease&quot;,
+          })}
+        &gt;
+          Active
+        &lt;/NavLink&gt;
+        &lt;NavLink
+          to=&quot;/clients/accounts/archivedaccounts&quot;</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\Accounts\Accounts.js (Line 120:11 - Line 137:8), src\Pages\Organizers\AccountOrganizers.js (Line 57:7 - Line 92:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn29" onclick="toggleCodeBlock('cloneGroup29', 'expandBtn29', 'collapseBtn29')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn29" onclick="toggleCodeBlock('cloneGroup29', 'expandBtn29', 'collapseBtn29')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup29"><code class="language-javascript text-sm text-gray-800">style={({ isActive }) =&gt; ({
+            padding: &quot;8px 16px&quot;,
+            borderRadius: &quot;10px&quot;,
+            fontSize: &quot;15px&quot;,
+            cursor: &quot;pointer&quot;,
+            textDecoration: &quot;none&quot;,
+            fontWeight: isActive ? &quot;bold&quot; : &quot;normal&quot;,
+            color: isActive ? &quot;var(--color-save-btn)&quot; : &quot;#333&quot;,
+            backgroundColor: isActive ? &quot;#fff&quot; : &quot;transparent&quot;,
+            transition: &quot;all 0.3s ease&quot;,
+          })}
+        &gt;
+          Archived
+        &lt;/NavLink&gt;
+      &lt;/Box&gt;
+
+      &lt;Box mt={2}&gt;
+        &lt;Outlet context</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\UpdateJob.js (Line 55:2 - Line 61:28), src\Pages\BulkActions\SendAccountEmail.js (Line 533:6 - Line 536:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn30" onclick="toggleCodeBlock('cloneGroup30', 'expandBtn30', 'collapseBtn30')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn30" onclick="toggleCodeBlock('cloneGroup30', 'expandBtn30', 'collapseBtn30')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup30"><code class="language-javascript text-sm text-gray-800">}
+          isOptionEqualToValue={(option, value) =&gt; option.value === value.value}
+          renderOption={(props, option) =&gt; (
+            &lt;Box
+              component=&quot;li&quot;
+              {...props}
+              sx={{ cursor: &quot;pointer&quot;, margin: &quot;5px 10px&quot; }} // Add cursor pointer style</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\UpdateContact.js (Line 284:2 - Line 296:8), src\Pages\old account\UpdateContact.js (Line 239:2 - Line 251:8)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn31" onclick="toggleCodeBlock('cloneGroup31', 'expandBtn31', 'collapseBtn31')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn31" onclick="toggleCodeBlock('cloneGroup31', 'expandBtn31', 'collapseBtn31')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup31"><code class="language-javascript text-sm text-gray-800">}}&gt;First name&lt;/InputLabel&gt;
+          &lt;TextField
+            margin=&quot;normal&quot;
+            fullWidth
+            name=&quot;firstName&quot;
+            value={firstName}
+            onChange={(e) =&gt; setFirstName(e.target.value)}
+            placeholder=&quot;First Name&quot;
+            size=&quot;small&quot;
+          /&gt;
+        &lt;/Box&gt;
+        &lt;Box&gt;
+          &lt;InputLabel sx={{ color: &quot;black&quot;</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\UpdateContact.js (Line 296:2 - Line 308:8), src\Pages\old account\UpdateContact.js (Line 251:2 - Line 263:8)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn32" onclick="toggleCodeBlock('cloneGroup32', 'expandBtn32', 'collapseBtn32')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn32" onclick="toggleCodeBlock('cloneGroup32', 'expandBtn32', 'collapseBtn32')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup32"><code class="language-javascript text-sm text-gray-800">}}&gt;Middle Name&lt;/InputLabel&gt;
+          &lt;TextField
+            margin=&quot;normal&quot;
+            fullWidth
+            name=&quot;middleName&quot;
+            value={middleName}
+            onChange={(e) =&gt; setMiddleName(e.target.value)}
+            placeholder=&quot;Middle Name&quot;
+            size=&quot;small&quot;
+          /&gt;
+        &lt;/Box&gt;
+        &lt;Box&gt;
+          &lt;InputLabel sx={{ color: &quot;black&quot;</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\UpdateContact.js (Line 308:2 - Line 320:3), src\Pages\old account\UpdateContact.js (Line 263:2 - Line 275:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn33" onclick="toggleCodeBlock('cloneGroup33', 'expandBtn33', 'collapseBtn33')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn33" onclick="toggleCodeBlock('cloneGroup33', 'expandBtn33', 'collapseBtn33')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup33"><code class="language-javascript text-sm text-gray-800">}}&gt;Last Name&lt;/InputLabel&gt;
+          &lt;TextField
+            fullWidth
+            name=&quot;lastName&quot;
+            value={lastName}
+            onChange={(e) =&gt; setLastName(e.target.value)}
+            margin=&quot;normal&quot;
+            placeholder=&quot;Last name&quot;
+            size=&quot;small&quot;
+          /&gt;
+        &lt;/Box&gt;
+      &lt;/Box&gt;
+      &lt;Box mt</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\UpdateContact.js (Line 321:2 - Line 332:3), src\Pages\old account\UpdateContact.js (Line 276:2 - Line 287:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn34" onclick="toggleCodeBlock('cloneGroup34', 'expandBtn34', 'collapseBtn34')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn34" onclick="toggleCodeBlock('cloneGroup34', 'expandBtn34', 'collapseBtn34')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup34"><code class="language-javascript text-sm text-gray-800">}}&gt;Contact Name&lt;/InputLabel&gt;
+        &lt;TextField
+          name=&quot;contactName&quot;
+          value={contactName}
+          onChange={(e) =&gt; setContactName(e.target.value)}
+          fullWidth
+          placeholder=&quot;Contact Name&quot;
+          margin=&quot;normal&quot;
+          size=&quot;small&quot;
+        /&gt;
+      &lt;/Box&gt;
+      &lt;Box mt</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\UpdateContact.js (Line 333:2 - Line 344:3), src\Pages\old account\UpdateContact.js (Line 288:2 - Line 299:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn35" onclick="toggleCodeBlock('cloneGroup35', 'expandBtn35', 'collapseBtn35')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn35" onclick="toggleCodeBlock('cloneGroup35', 'expandBtn35', 'collapseBtn35')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup35"><code class="language-javascript text-sm text-gray-800">}}&gt;Company Name&lt;/InputLabel&gt;
+        &lt;TextField
+          fullWidth
+          name=&quot;companyName&quot;
+          value={companyName}
+          onChange={(e) =&gt; setCompanyName(e.target.value)}
+          margin=&quot;normal&quot;
+          placeholder=&quot;Company Name&quot;
+          size=&quot;small&quot;
+        /&gt;
+      &lt;/Box&gt;
+      &lt;Box mt</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\UpdateContact.js (Line 345:2 - Line 356:3), src\Pages\old account\UpdateContact.js (Line 300:2 - Line 311:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn36" onclick="toggleCodeBlock('cloneGroup36', 'expandBtn36', 'collapseBtn36')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn36" onclick="toggleCodeBlock('cloneGroup36', 'expandBtn36', 'collapseBtn36')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup36"><code class="language-javascript text-sm text-gray-800">}}&gt;Note&lt;/InputLabel&gt;
+        &lt;TextField
+          fullWidth
+          name=&quot;note&quot;
+          value={note}
+          onChange={(e) =&gt; setNote(e.target.value)}
+          margin=&quot;normal&quot;
+          placeholder=&quot;Note&quot;
+          size=&quot;small&quot;
+        /&gt;
+      &lt;/Box&gt;
+      &lt;Box mt</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\UpdateContact.js (Line 357:2 - Line 368:3), src\Pages\old account\UpdateContact.js (Line 312:2 - Line 323:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn37" onclick="toggleCodeBlock('cloneGroup37', 'expandBtn37', 'collapseBtn37')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn37" onclick="toggleCodeBlock('cloneGroup37', 'expandBtn37', 'collapseBtn37')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup37"><code class="language-javascript text-sm text-gray-800">}}&gt;SSN&lt;/InputLabel&gt;
+        &lt;TextField
+          fullWidth
+          name=&quot;ssn&quot;
+          value={ssn}
+          onChange={(e) =&gt; setSsn(e.target.value)}
+          margin=&quot;normal&quot;
+          placeholder=&quot;SSN&quot;
+          size=&quot;small&quot;
+        /&gt;
+      &lt;/Box&gt;
+      &lt;Box mt</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\UpdateContact.js (Line 369:2 - Line 380:3), src\Pages\old account\UpdateContact.js (Line 324:2 - Line 335:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn38" onclick="toggleCodeBlock('cloneGroup38', 'expandBtn38', 'collapseBtn38')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn38" onclick="toggleCodeBlock('cloneGroup38', 'expandBtn38', 'collapseBtn38')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup38"><code class="language-javascript text-sm text-gray-800">}}&gt;Email&lt;/InputLabel&gt;
+        &lt;TextField
+          fullWidth
+          name=&quot;email&quot;
+          value={email}
+          onChange={(e) =&gt; setEmail(e.target.value)}
+          margin=&quot;normal&quot;
+          placeholder=&quot;Email&quot;
+          size=&quot;small&quot;
+        /&gt;
+      &lt;/Box&gt;
+      &lt;Box mt</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\UpdateContact.js (Line 511:2 - Line 524:7), src\Pages\old account\UpdateContact.js (Line 453:2 - Line 464:7)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn39" onclick="toggleCodeBlock('cloneGroup39', 'expandBtn39', 'collapseBtn39')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn39" onclick="toggleCodeBlock('cloneGroup39', 'expandBtn39', 'collapseBtn39')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup39"><code class="language-javascript text-sm text-gray-800">}}&gt;Street Address&lt;/InputLabel&gt;
+        &lt;TextField
+          fullWidth
+          name=&quot;streetAddress&quot;
+          value={streetAddress}
+          onChange={(e) =&gt; setStreetAddress(e.target.value)}
+          margin=&quot;normal&quot;
+          placeholder=&quot;Street Address&quot;
+          size=&quot;small&quot;
+        /&gt;
+      &lt;/Box&gt;
+      &lt;Box
+        sx={{
+          display: &quot;flex&quot;</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\UpdateContact.js (Line 532:2 - Line 544:8), src\Pages\old account\UpdateContact.js (Line 466:2 - Line 478:8)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn40" onclick="toggleCodeBlock('cloneGroup40', 'expandBtn40', 'collapseBtn40')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn40" onclick="toggleCodeBlock('cloneGroup40', 'expandBtn40', 'collapseBtn40')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup40"><code class="language-javascript text-sm text-gray-800">}}&gt;City&lt;/InputLabel&gt;
+          &lt;TextField
+            fullWidth
+            name=&quot;city&quot;
+            value={city}
+            onChange={(e) =&gt; setCity(e.target.value)}
+            margin=&quot;normal&quot;
+            placeholder=&quot;City&quot;
+            size=&quot;small&quot;
+          /&gt;
+        &lt;/Box&gt;
+        &lt;Box&gt;
+          &lt;InputLabel sx={{ color: &quot;black&quot;</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\UpdateContact.js (Line 544:2 - Line 556:8), src\Pages\old account\UpdateContact.js (Line 478:2 - Line 490:8)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn41" onclick="toggleCodeBlock('cloneGroup41', 'expandBtn41', 'collapseBtn41')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn41" onclick="toggleCodeBlock('cloneGroup41', 'expandBtn41', 'collapseBtn41')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup41"><code class="language-javascript text-sm text-gray-800">}}&gt;State&lt;/InputLabel&gt;
+          &lt;TextField
+            fullWidth
+            name=&quot;state&quot;
+            value={state}
+            onChange={(e) =&gt; setState(e.target.value)}
+            margin=&quot;normal&quot;
+            placeholder=&quot;State&quot;
+            size=&quot;small&quot;
+          /&gt;
+        &lt;/Box&gt;
+        &lt;Box&gt;
+          &lt;InputLabel sx={{ color: &quot;black&quot;</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\UpdateContact.js (Line 556:2 - Line 572:3), src\Pages\old account\UpdateContact.js (Line 490:2 - Line 507:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn42" onclick="toggleCodeBlock('cloneGroup42', 'expandBtn42', 'collapseBtn42')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn42" onclick="toggleCodeBlock('cloneGroup42', 'expandBtn42', 'collapseBtn42')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup42"><code class="language-javascript text-sm text-gray-800">}}&gt;Postal Code&lt;/InputLabel&gt;
+          &lt;TextField
+            fullWidth
+            name=&quot;postalCode&quot;
+            value={postalCode}
+            onChange={(e) =&gt; setPostalCode(e.target.value)}
+            margin=&quot;normal&quot;
+            placeholder=&quot;Postal Code&quot;
+            size=&quot;small&quot;
+          /&gt;
+        &lt;/Box&gt;
+      &lt;/Box&gt;
+      &lt;Box sx={{ mt: 2, mb: 2 }}&gt;
+        &lt;Button
+          variant=&quot;contained&quot;
+          onClick={handleSave} // Attach the save handler
+          sx</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\tagsSelect.js (Line 153:4 - Line 167:2), src\Pages\Accounts\TagsMultiSelectDropDown.js (Line 97:4 - Line 111:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn43" onclick="toggleCodeBlock('cloneGroup43', 'expandBtn43', 'collapseBtn43')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn43" onclick="toggleCodeBlock('cloneGroup43', 'expandBtn43', 'collapseBtn43')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup43"><code class="language-javascript text-sm text-gray-800">,
+                      fontSize: &quot;10px&quot;,
+                      borderRadius: &quot;16px&quot;,
+                      height: &quot;20px&quot;,
+                      cursor: &quot;pointer&quot;,
+                      boxShadow: &quot;0px 2px 4px rgba(0, 0, 0, 0.2)&quot;,
+                      &quot;&amp; .MuiChip-deleteIcon&quot;: {
+                      color: &quot;#fff&quot;,
+                      opacity: 0.7,
+                      transition: &quot;opacity 0.2s&quot;,
+                      &quot;&amp;:hover&quot;: { opacity: 1 },
+                    },
+                    }}
+                  /&gt;
+                ) :</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\ServiceUpdate.js (Line 426:24 - Line 439:7), src\Pages\BulkActions\SendAccountEmail.js (Line 623:13 - Line 636:4)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn44" onclick="toggleCodeBlock('cloneGroup44', 'expandBtn44', 'collapseBtn44')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn44" onclick="toggleCodeBlock('cloneGroup44', 'expandBtn44', 'collapseBtn44')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup44"><code class="language-javascript text-sm text-gray-800">} sx={{
+                        borderColor: 'var(--color-border-cancel-btn)',  // Normal background
+                       color:'var(--color-save-btn)',
+                        '&amp;:hover': {
+                          backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
+                          color:'#fff',
+                          border:&quot;none&quot;
+                        },
+                        width:'80px',borderRadius:'15px'
+                      }}&gt;
+                  Cancel
+                &lt;/Button&gt;
+              &lt;/Box&gt;
+            &lt;/Drawer</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\ServiceUpdate.js (Line 459:11 - Line 473:5), src\Pages\BulkActions\SendAccountEmail.js (Line 623:13 - Line 637:4)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn45" onclick="toggleCodeBlock('cloneGroup45', 'expandBtn45', 'collapseBtn45')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn45" onclick="toggleCodeBlock('cloneGroup45', 'expandBtn45', 'collapseBtn45')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup45"><code class="language-javascript text-sm text-gray-800">} sx={{
+                  borderColor: 'var(--color-border-cancel-btn)',  // Normal background
+                 color:'var(--color-save-btn)',
+                  '&amp;:hover': {
+                    backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
+                    color:'#fff',
+                    border:&quot;none&quot;
+                  },
+                  width:'80px',borderRadius:'15px'
+                }}&gt;
+              Cancel
+            &lt;/Button&gt;
+          &lt;/Box&gt;
+        &lt;/Box&gt;
+      &lt;/form</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\Service.js (Line 53:5 - Line 63:15), src\Pages\ServiceUpdate.js (Line 26:3 - Line 35:8)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn46" onclick="toggleCodeBlock('cloneGroup46', 'expandBtn46', 'collapseBtn46')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn46" onclick="toggleCodeBlock('cloneGroup46', 'expandBtn46', 'collapseBtn46')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup46"><code class="language-javascript text-sm text-gray-800">const [isCategoryFormOpen, setCategoryFormOpen] = useState(false);
+    const handleCategoryFormClose = () =&gt; {
+        setCategoryFormOpen(false);
+    };
+
+    const options = [
+        // { label: &quot;Select Rate Type&quot;, value: &quot;&quot; },
+        { label: &quot;Item&quot;, value: &quot;item&quot; },
+        { label: &quot;Hour&quot;, value: &quot;hour&quot; },
+    ];
+    const [selectedOption</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\Service.js (Line 71:5 - Line 83:16), src\Pages\ServiceUpdate.js (Line 47:3 - Line 58:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn47" onclick="toggleCodeBlock('cloneGroup47', 'expandBtn47', 'collapseBtn47')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn47" onclick="toggleCodeBlock('cloneGroup47', 'expandBtn47', 'collapseBtn47')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup47"><code class="language-javascript text-sm text-gray-800">const [categoryData, setCategoryData] = useState([]);
+    useEffect(() =&gt; {
+        fetchData();
+    }, []);
+
+    const fetchData = async () =&gt; {
+        try {
+            // const url = `${API_KEY}/common/user/`;
+            const url = `${CATEGORY_API}/workflow/category/categorys`;
+            const response = await fetch(url);
+            const data = await response.json();
+            console.log(data)
+            setCategoryData</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\Service.js (Line 83:13 - Line 99:2), src\Pages\ServiceUpdate.js (Line 59:7 - Line 73:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn48" onclick="toggleCodeBlock('cloneGroup48', 'expandBtn48', 'collapseBtn48')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn48" onclick="toggleCodeBlock('cloneGroup48', 'expandBtn48', 'collapseBtn48')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup48"><code class="language-javascript text-sm text-gray-800">setCategoryData(data.category);
+        } catch (error) {
+            console.error(&quot;Error fetching data:&quot;, error);
+        }
+    };
+    const categoryoptions = categoryData.map((category) =&gt; ({
+        value: category._id,
+        label: category.categoryName,
+    }));
+    const createCategory = () =&gt; {
+
+        const myHeaders = new Headers();
+        myHeaders.append(&quot;Content-Type&quot;, &quot;application/json&quot;);
+
+        const raw = JSON.stringify({
+            categoryName: categorycreate
+        }</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\Service.js (Line 112:17 - Line 126:6), src\Pages\ServiceUpdate.js (Line 87:9 - Line 97:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn49" onclick="toggleCodeBlock('cloneGroup49', 'expandBtn49', 'collapseBtn49')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn49" onclick="toggleCodeBlock('cloneGroup49', 'expandBtn49', 'collapseBtn49')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup49"><code class="language-javascript text-sm text-gray-800">if (result &amp;&amp; result.message === &quot;Category created successfully&quot;) {
+                    toast.success(&quot;Category created successfully&quot;);
+                    handleCategoryFormClose(false);
+                    fetchData();
+                    setcategorycreate();
+                } else {
+                    toast.error(result.message || &quot;Failed to create Service Template&quot;);
+                }
+            })
+            .catch((error) =&gt; console.error(error));
+
+    }
+
+
+    const</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\Service.js (Line 126:2 - Line 140:2), src\Pages\ServiceUpdate.js (Line 157:2 - Line 168:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn50" onclick="toggleCodeBlock('cloneGroup50', 'expandBtn50', 'collapseBtn50')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn50" onclick="toggleCodeBlock('cloneGroup50', 'expandBtn50', 'collapseBtn50')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup50"><code class="language-javascript text-sm text-gray-800">= () =&gt; {
+        const myHeaders = new Headers();
+        myHeaders.append(&quot;Content-Type&quot;, &quot;application/json&quot;);
+    
+        const raw = JSON.stringify({
+          serviceName: servicename,
+          description: discription,
+          rate: rate,
+          ratetype: selectedOption.value,
+          tax: service,
+          
+          category: selectedCategory ? selectedCategory.value : null,
+          active: &quot;true&quot;
+    
+        }</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\Service.js (Line 648:2 - Line 667:6), src\Pages\ServiceUpdate.js (Line 251:2 - Line 275:6)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn51" onclick="toggleCodeBlock('cloneGroup51', 'expandBtn51', 'collapseBtn51')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn51" onclick="toggleCodeBlock('cloneGroup51', 'expandBtn51', 'collapseBtn51')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup51"><code class="language-javascript text-sm text-gray-800">}}&gt;Rate Type&lt;/InputLabel&gt;
+                                            &lt;Autocomplete
+                                                size=&quot;small&quot;
+                                                fullWidth
+                                                sx={{ mt: 2 }}
+                                                options={options}
+                                                getOptionLabel={(option) =&gt; option?.label || &quot;&quot;}
+                                                value={selectedOption}
+                                                onChange={handleRateTypeChange}
+                                                renderInput={(params) =&gt; (
+                                                    &lt;TextField {...params} variant=&quot;outlined&quot; placeholder=&quot;Select Rate Type&quot; /&gt;
+                                                )}
+                                                isOptionEqualToValue={(option, value) =&gt; option.value === value.value}
+                                                renderOption={(props, option) =&gt; (
+                                                    &lt;Box
+                                                        component=&quot;li&quot;
+                                                        {...props}
+                                                        sx={{
+
+                                                            margin: '4px'</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\Service.js (Line 668:10 - Line 697:7), src\Pages\ServiceUpdate.js (Line 276:10 - Line 305:7)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn52" onclick="toggleCodeBlock('cloneGroup52', 'expandBtn52', 'collapseBtn52')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn52" onclick="toggleCodeBlock('cloneGroup52', 'expandBtn52', 'collapseBtn52')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup52"><code class="language-javascript text-sm text-gray-800">,
+
+                                                        }}
+                                                    &gt;
+                                                        &lt;Typography &gt;
+                                                            {option.label}
+                                                        &lt;/Typography&gt;
+                                                    &lt;/Box&gt;
+                                                )}
+                                            /&gt;
+                                        &lt;/Box&gt;
+                                    &lt;/Grid&gt;
+                                &lt;/Grid&gt;
+                            &lt;/Box&gt;
+
+                            &lt;Box mt={2} &gt;
+                                &lt;FormControlLabel
+                                    control={
+                                        &lt;Switch
+                                            checked={service}
+                                            onChange={(event) =&gt; handleServiceWitch(event.target.checked)}
+                                            color=&quot;primary&quot;
+                                        /&gt;
+                                    }
+                                    label={&quot;Tax&quot;}
+                                /&gt;
+                            &lt;/Box&gt;
+                            &lt;Box&gt;
+                                &lt;Box&gt;
+                                    &lt;Typography variant=&quot;h5&quot; gutterBottom sx={{ fontWeight: 'bold'</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\Service.js (Line 702:8 - Line 748:4), src\Pages\ServiceUpdate.js (Line 311:8 - Line 363:4)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn53" onclick="toggleCodeBlock('cloneGroup53', 'expandBtn53', 'collapseBtn53')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn53" onclick="toggleCodeBlock('cloneGroup53', 'expandBtn53', 'collapseBtn53')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup53"><code class="language-javascript text-sm text-gray-800">, mt: 2 }}&gt;Category Name&lt;/InputLabel&gt;
+                                    &lt;Autocomplete
+                                     size=&quot;small&quot;
+                                     fullWidth
+                                     sx={{ mt: 2 }}
+                                        options={categoryoptions}
+                                        getOptionLabel={(option) =&gt; option.label} // Adjust based on your data structure
+                                        value={selectedCategory}
+                                        onChange={handleCategoryChange}
+                                        renderInput={(params) =&gt; (
+                                            &lt;TextField
+                                                {...params}
+                                                placeholder=&quot;Category Name&quot;
+                                                variant=&quot;outlined&quot;
+                                            /&gt;
+                                        )}
+                                        clearOnEscape // Equivalent to isClearable
+                                        isOptionEqualToValue={(option, value) =&gt; option.value === value.value} // Compare options for equality
+                                    /&gt;
+                                &lt;/Box&gt;
+                            &lt;/Box&gt;
+                            &lt;Box&gt;
+                                &lt;Button
+                                    variant=&quot;contained&quot;
+                                    color=&quot;primary&quot;
+                                    onClick={setCategoryFormOpen}
+                                    sx={{
+                                      backgroundColor: 'var(--color-save-btn)',  // Normal background
+                                     
+                                      '&amp;:hover': {
+                                        backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
+                                      },
+                                      borderRadius:'15px',mt: 4, ml: 1
+                                    }}
+                                   
+                                &gt;
+                                    Create category
+                                &lt;/Button&gt;
+
+                                {/* category form */}
+                                &lt;Drawer
+                                    anchor=&quot;right&quot;
+                                    open={isCategoryFormOpen}
+                                    onClose={handleCategoryFormClose}
+                                    PaperProps={{
+                                        sx: {
+                                            borderRadius: isSmallScreen ? '0'</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\Service.js (Line 774:2 - Line 796:7), src\Pages\ServiceUpdate.js (Line 408:17 - Line 442:7)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn54" onclick="toggleCodeBlock('cloneGroup54', 'expandBtn54', 'collapseBtn54')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn54" onclick="toggleCodeBlock('cloneGroup54', 'expandBtn54', 'collapseBtn54')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup54"><code class="language-javascript text-sm text-gray-800">}}&gt;
+                                        &lt;Button variant=&quot;contained&quot; color=&quot;primary&quot; onClick={createCategory}  sx={{
+                        backgroundColor: 'var(--color-save-btn)',  // Normal background
+                       
+                        '&amp;:hover': {
+                          backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
+                        },
+                        width:'80px',borderRadius:'15px'
+                      }} &gt;Create&lt;/Button&gt;
+                                        &lt;Button variant=&quot;outlined&quot; onClick={handleCategoryFormClose} sx={{
+                        borderColor: 'var(--color-border-cancel-btn)',  // Normal background
+                       color:'var(--color-save-btn)',
+                        '&amp;:hover': {
+                          backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
+                          color:'#fff',
+                          border:&quot;none&quot;
+                        },
+                        width:'80px',borderRadius:'15px'
+                      }}&gt;Cancel&lt;/Button&gt;
+                                    &lt;/Box&gt;
+                                &lt;/Drawer &gt;
+                            &lt;/Box&gt;
+                            &lt;Box sx={{ pt: 5, display: 'flex'</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\Service.js (Line 805:21 - Line 825:2), src\Pages\BulkActions\SendAccountEmail.js (Line 623:13 - Line 475:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn55" onclick="toggleCodeBlock('cloneGroup55', 'expandBtn55', 'collapseBtn55')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn55" onclick="toggleCodeBlock('cloneGroup55', 'expandBtn55', 'collapseBtn55')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup55"><code class="language-javascript text-sm text-gray-800">} sx={{
+                        borderColor: 'var(--color-border-cancel-btn)',  // Normal background
+                       color:'var(--color-save-btn)',
+                        '&amp;:hover': {
+                          backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
+                          color:'#fff',
+                          border:&quot;none&quot;
+                        },
+                        width:'80px',borderRadius:'15px'
+                      }}&gt;Cancel&lt;/Button&gt;
+                            &lt;/Box&gt;
+                        &lt;/Box&gt;
+
+                    &lt;/form&gt;
+
+
+
+                &lt;/Box&gt;
+
+
+            &lt;</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\selectesting.js (Line 1:1 - Line 22:10), src\Pages\tagsSelect.js (Line 1:1 - Line 21:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn56" onclick="toggleCodeBlock('cloneGroup56', 'expandBtn56', 'collapseBtn56')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn56" onclick="toggleCodeBlock('cloneGroup56', 'expandBtn56', 'collapseBtn56')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup56"><code class="language-javascript text-sm text-gray-800">import React, { useState, useEffect,useRef } from &quot;react&quot;;
+import {
+  Box,
+  Checkbox,
+  TextField,
+  Menu,
+  MenuItem,
+  Chip,
+  Typography,
+  IconButton,Paper
+} from &quot;@mui/material&quot;;
+import { FaChevronDown, FaChevronUp,FaTimes  } from &quot;react-icons/fa&quot;;
+
+const MultiSelectDropdown = () =&gt; {
+  const containerRef = useRef(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedValues, setSelectedValues] = useState([]);
+  const [searchQuery, setSearchQuery] = useState(&quot;&quot;);
+  const [userData, setUserData] = useState([]);
+  const [menuWidth, setMenuWidth] = useState(null);
+
+  const LOGIN_API</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\selectesting.js (Line 40:9 - Line 73:12), src\Pages\tagsSelect.js (Line 45:10 - Line 80:12)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn57" onclick="toggleCodeBlock('cloneGroup57', 'expandBtn57', 'collapseBtn57')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn57" onclick="toggleCodeBlock('cloneGroup57', 'expandBtn57', 'collapseBtn57')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup57"><code class="language-javascript text-sm text-gray-800">,
+  }));
+
+  const handleClick = (event) =&gt; {
+    setAnchorEl(event.currentTarget);
+    if (containerRef.current) {
+      setMenuWidth(containerRef.current.offsetWidth);
+    }
+  };
+
+
+  const handleClose = () =&gt; {
+    setAnchorEl(null);
+  };
+
+  const handleSelect = (value) =&gt; {
+    setSelectedValues((prev) =&gt;
+      prev.includes(value) ? prev.filter((item) =&gt; item !== value) : [...prev, value]
+    );
+  };
+console.log(&quot;selcted values&quot;,selectedValues)
+  const handleSearchChange = (event) =&gt; {
+    setSearchQuery(event.target.value);
+  };
+
+  const clearSelection = () =&gt; {
+    setSelectedValues([]);
+  };
+
+  // const filteredOptions = userOptions.filter((option) =&gt;
+  //   option.label.toLowerCase().includes(searchQuery.toLowerCase())
+  // );
+ // Filter options to exclude selected ones and match search query
+ const filteredOptions = userOptions</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\selectesting.js (Line 73:12 - Line 82:9), src\Pages\tagsSelect.js (Line 80:12 - Line 89:5)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn58" onclick="toggleCodeBlock('cloneGroup58', 'expandBtn58', 'collapseBtn58')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn58" onclick="toggleCodeBlock('cloneGroup58', 'expandBtn58', 'collapseBtn58')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup58"><code class="language-javascript text-sm text-gray-800">.filter(
+  (option) =&gt;
+    !selectedValues.includes(option.value) &amp;&amp;
+    option.label.toLowerCase().includes(searchQuery.toLowerCase())
+);
+  return (
+   
+    &lt;Box sx={{ width: &quot;500px&quot; }}&gt;
+      &lt;Typography variant=&quot;subtitle1&quot; sx={{ mb: 1, fontWeight: &quot;bold&quot; }}&gt;
+        Assignee</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\selectesting.js (Line 83:7 - Line 104:15), src\Pages\tagsSelect.js (Line 90:7 - Line 111:35)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn59" onclick="toggleCodeBlock('cloneGroup59', 'expandBtn59', 'collapseBtn59')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn59" onclick="toggleCodeBlock('cloneGroup59', 'expandBtn59', 'collapseBtn59')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup59"><code class="language-javascript text-sm text-gray-800">&lt;/Typography&gt;
+
+      {/* Selected Items &amp; Dropdown Toggle */}
+      &lt;Box
+        ref={containerRef} // Reference the container
+        sx={{
+          display: &quot;flex&quot;,
+          alignItems: &quot;center&quot;,
+          justifyContent: &quot;space-between&quot;,
+          border: &quot;1px solid #ccc&quot;,
+          borderRadius: &quot;8px&quot;,
+          padding: &quot;4px&quot;,
+          cursor: &quot;pointer&quot;,
+          bgcolor: &quot;background.paper&quot;,
+          // &quot;&amp;:hover&quot;: { borderColor: &quot;primary.main&quot; },
+          width: &quot;100%&quot;,
+        }}
+        onClick={handleClick}
+      &gt;
+        &lt;Box sx={{ display: &quot;flex&quot;, flexWrap: &quot;wrap&quot;, gap: 0.5 }}&gt;
+          {selectedValues.length &gt; 0 ? (
+            selectedValues</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\selectesting.js (Line 118:21 - Line 136:9), src\Pages\Accounts\TagsMultiSelectDropDown.js (Line 97:19 - Line 171:5)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn60" onclick="toggleCodeBlock('cloneGroup60', 'expandBtn60', 'collapseBtn60')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn60" onclick="toggleCodeBlock('cloneGroup60', 'expandBtn60', 'collapseBtn60')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup60"><code class="language-javascript text-sm text-gray-800">fontWeight: 500,
+                    fontSize: &quot;10px&quot;,
+                    borderRadius: &quot;16px&quot;,
+                    height: &quot;20px&quot;,
+                    cursor: &quot;pointer&quot;,
+                    boxShadow: &quot;0px 2px 4px rgba(0, 0, 0, 0.2)&quot;,
+                    &quot;&amp; .MuiChip-deleteIcon&quot;: {
+                      color: &quot;#fff&quot;,
+                      opacity: 0.7,
+                      transition: &quot;opacity 0.2s&quot;,
+                      &quot;&amp;:hover&quot;: { opacity: 1 },
+                    },
+                  }}
+                /&gt;
+              ) : null;
+            })
+          ) : (
+            &lt;Typography variant=&quot;body2&quot; color=&quot;textSecondary&quot;&gt;
+              Assignee</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\selectesting.js (Line 137:13 - Line 186:16), src\Pages\tagsSelect.js (Line 172:13 - Line 221:37)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn61" onclick="toggleCodeBlock('cloneGroup61', 'expandBtn61', 'collapseBtn61')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn61" onclick="toggleCodeBlock('cloneGroup61', 'expandBtn61', 'collapseBtn61')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup61"><code class="language-javascript text-sm text-gray-800">&lt;/Typography&gt;
+          )}
+        &lt;/Box&gt;
+        &lt;Box sx={{ display: &quot;flex&quot;, alignItems: &quot;center&quot; }}&gt;
+          {selectedValues.length &gt; 0 &amp;&amp; (
+            &lt;IconButton
+              onClick={clearSelection}
+              size=&quot;small&quot;
+              sx={{ color: &quot;text.secondary&quot; }}
+            &gt;
+              &lt;FaTimes /&gt;
+            &lt;/IconButton&gt;
+          )}
+          &lt;IconButton size=&quot;small&quot;&gt;
+            {anchorEl ? &lt;FaChevronUp /&gt; : &lt;FaChevronDown /&gt;}
+          &lt;/IconButton&gt;
+        &lt;/Box&gt;
+      &lt;/Box&gt;
+
+      {/* Dropdown Menu with Fixed Width */}
+      &lt;Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: &quot;bottom&quot;, horizontal: &quot;left&quot; }}
+        transformOrigin={{ vertical: &quot;top&quot;, horizontal: &quot;left&quot; }}
+      &gt;
+        &lt;Box
+          sx={{
+            width: menuWidth || &quot;auto&quot;, // Maintain consistent width
+            maxHeight: &quot;250px&quot;,
+            overflowY: &quot;auto&quot;,
+          }}
+        &gt;
+          {/* Search Field */}
+          &lt;Box sx={{ p: 1 }}&gt;
+            &lt;TextField
+              fullWidth
+              size=&quot;small&quot;
+              placeholder=&quot;Search...&quot;
+              value={searchQuery}
+              onChange={handleSearchChange}
+              variant=&quot;outlined&quot;
+               autoComplete=&quot;off&quot;
+            /&gt;
+          &lt;/Box&gt;
+
+          {/* List of Options */}
+          {filteredOptions.length &gt; 0 ? (
+            filteredOptions</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\selectesting.js (Line 199:11 - Line 213:2), src\Pages\tagsSelect.js (Line 263:2 - Line 277:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn62" onclick="toggleCodeBlock('cloneGroup62', 'expandBtn62', 'collapseBtn62')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn62" onclick="toggleCodeBlock('cloneGroup62', 'expandBtn62', 'collapseBtn62')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup62"><code class="language-javascript text-sm text-gray-800">&gt;{option.label}&lt;/Typography&gt;
+              &lt;/Box&gt;
+            ))
+          ) : (
+            &lt;Typography sx={{ p: 2, color: &quot;gray&quot; }}&gt;No results found&lt;/Typography&gt;
+          )}
+
+            
+        &lt;/Box&gt;
+      &lt;/Menu&gt;
+    &lt;/Box&gt;
+  );
+};
+
+export default MultiSelectDropdown;</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\ChatForm.js (Line 62:3 - Line 76:25), src\Pages\internalChat\ChatDetails.js (Line 62:4 - Line 76:15)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn63" onclick="toggleCodeBlock('cloneGroup63', 'expandBtn63', 'collapseBtn63')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn63" onclick="toggleCodeBlock('cloneGroup63', 'expandBtn63', 'collapseBtn63')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup63"><code class="language-javascript text-sm text-gray-800">const fetchUserData = async (id) =&gt; {
+    const myHeaders = new Headers();
+
+    const requestOptions = {
+      method: &quot;GET&quot;,
+      headers: myHeaders,
+      redirect: &quot;follow&quot;,
+    };
+    const url = `${LOGIN_API}/common/user/${id}`;
+    fetch(url, requestOptions)
+      .then((response) =&gt; response.json())
+      .then((result) =&gt; {
+        console.log(&quot;id&quot;, result);
+
+        // console.log(userData)</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\ChatForm.js (Line 160:9 - Line 176:2), src\Pages\BulkActions\SendAccountEmail.js (Line 112:2 - Line 125:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn64" onclick="toggleCodeBlock('cloneGroup64', 'expandBtn64', 'collapseBtn64')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn64" onclick="toggleCodeBlock('cloneGroup64', 'expandBtn64', 'collapseBtn64')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup64"><code class="language-javascript text-sm text-gray-800">},
+        { title: &quot;Contact Shortcodes&quot;, isBold: true },
+        { title: &quot;Contact Name&quot;, isBold: false, value: &quot;CONTACT_NAME&quot; },
+        { title: &quot;First Name&quot;, isBold: false, value: &quot;FIRST_NAME&quot; },
+        { title: &quot;Middle Name&quot;, isBold: false, value: &quot;MIDDLE_NAME&quot; },
+        { title: &quot;Last Name&quot;, isBold: false, value: &quot;LAST_NAME&quot; },
+        { title: &quot;Phone number&quot;, isBold: false, value: &quot;PHONE_NUMBER&quot; },
+        { title: &quot;Country&quot;, isBold: false, value: &quot;COUNTRY&quot; },
+        { title: &quot;Company name&quot;, isBold: false, value: &quot;COMPANY_NAME &quot; },
+        { title: &quot;Street address&quot;, isBold: false, value: &quot;STREET_ADDRESS&quot; },
+        { title: &quot;City&quot;, isBold: false, value: &quot;CITY&quot; },
+        { title: &quot;State/Province&quot;, isBold: false, value: &quot;STATE / PROVINCE&quot; },
+        { title: &quot;Zip/Postal code&quot;, isBold: false, value: &quot;ZIP / POSTAL CODE&quot; },
+        {
+          title: &quot;Custom field:Email&quot;,
+          isBold: false,
+          value: &quot;CONTACT_CUSTOM_FIELD:Email&quot;,</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\ChatForm.js (Line 207:9 - Line 214:2), src\Pages\BulkActions\SendAccountEmail.js (Line 136:2 - Line 140:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn65" onclick="toggleCodeBlock('cloneGroup65', 'expandBtn65', 'collapseBtn65')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn65" onclick="toggleCodeBlock('cloneGroup65', 'expandBtn65', 'collapseBtn65')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup65"><code class="language-javascript text-sm text-gray-800">},
+        { title: &quot;Last day number&quot;, isBold: false, value: &quot;LAST_DAY_NUMBER&quot; },
+        { title: &quot;Last day name&quot;, isBold: false, value: &quot;LAST_DAY_NAME&quot; },
+        { title: &quot;Last week&quot;, isBold: false, value: &quot;LAST_WEEK&quot; },
+        {
+          title: &quot;Last month number&quot;,
+          isBold: false,
+          value: &quot;LAST_MONTH_NUMBER&quot;,</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\ChatForm.js (Line 215:9 - Line 222:2), src\Pages\BulkActions\SendAccountEmail.js (Line 140:2 - Line 144:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn66" onclick="toggleCodeBlock('cloneGroup66', 'expandBtn66', 'collapseBtn66')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn66" onclick="toggleCodeBlock('cloneGroup66', 'expandBtn66', 'collapseBtn66')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup66"><code class="language-javascript text-sm text-gray-800">},
+        { title: &quot;Last month name&quot;, isBold: false, value: &quot;LAST_MONTH_NAME&quot; },
+        { title: &quot;Last quarter&quot;, isBold: false, value: &quot;LAST_QUARTER&quot; },
+        { title: &quot;Last_year&quot;, isBold: false, value: &quot;LAST_YEAR&quot; },
+        {
+          title: &quot;Next day full date&quot;,
+          isBold: false,
+          value: &quot;NEXT_DAY_FULL_DATE&quot;,</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\ChatForm.js (Line 223:9 - Line 230:2), src\Pages\BulkActions\SendAccountEmail.js (Line 144:2 - Line 148:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn67" onclick="toggleCodeBlock('cloneGroup67', 'expandBtn67', 'collapseBtn67')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn67" onclick="toggleCodeBlock('cloneGroup67', 'expandBtn67', 'collapseBtn67')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup67"><code class="language-javascript text-sm text-gray-800">},
+        { title: &quot;Next day number&quot;, isBold: false, value: &quot;NEXT_DAY_NUMBER&quot; },
+        { title: &quot;Next day name&quot;, isBold: false, value: &quot;NEXT_DAY_NAME&quot; },
+        { title: &quot;Next week&quot;, isBold: false, value: &quot;NEXT_WEEK&quot; },
+        {
+          title: &quot;Next month number&quot;,
+          isBold: false,
+          value: &quot;NEXT_MONTH_NUMBER&quot;,</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\ChatForm.js (Line 231:9 - Line 238:6), src\Pages\BulkActions\SendAccountEmail.js (Line 148:2 - Line 155:25)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn68" onclick="toggleCodeBlock('cloneGroup68', 'expandBtn68', 'collapseBtn68')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn68" onclick="toggleCodeBlock('cloneGroup68', 'expandBtn68', 'collapseBtn68')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup68"><code class="language-javascript text-sm text-gray-800">},
+        { title: &quot;Next month name&quot;, isBold: false, value: &quot;NEXT_MONTH_NAME&quot; },
+        { title: &quot;Next quarter&quot;, isBold: false, value: &quot;NEXT_QUARTER&quot; },
+        { title: &quot;Next year&quot;, isBold: false, value: &quot;NEXT_YEAR&quot; },
+      ];
+      setShortcuts(contactShortcuts);
+    } else if (selectedOption === &quot;account&quot;) {
+      const</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\ChatForm.js (Line 244:31 - Line 304:17), src\Pages\ChatForm.js (Line 176:29 - Line 236:17)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn69" onclick="toggleCodeBlock('cloneGroup69', 'expandBtn69', 'collapseBtn69')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn69" onclick="toggleCodeBlock('cloneGroup69', 'expandBtn69', 'collapseBtn69')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup69"><code class="language-javascript text-sm text-gray-800">,
+        },
+        { title: &quot;Date Shortcodes&quot;, isBold: true },
+        {
+          title: &quot;Current day full date&quot;,
+          isBold: false,
+          value: &quot;CURRENT_DAY_FULL_DATE&quot;,
+        },
+        {
+          title: &quot;Current day number&quot;,
+          isBold: false,
+          value: &quot;CURRENT_DAY_NUMBER&quot;,
+        },
+        { title: &quot;Current day name&quot;, isBold: false, value: &quot;CURRENT_DAY_NAME&quot; },
+        { title: &quot;Current week&quot;, isBold: false, value: &quot;CURRENT_WEEK&quot; },
+        {
+          title: &quot;Current month number&quot;,
+          isBold: false,
+          value: &quot;CURRENT_MONTH_NUMBER&quot;,
+        },
+        {
+          title: &quot;Current month name&quot;,
+          isBold: false,
+          value: &quot;CURRENT_MONTH_NAME&quot;,
+        },
+        { title: &quot;Current quarter&quot;, isBold: false, value: &quot;CURRENT_QUARTER&quot; },
+        { title: &quot;Current year&quot;, isBold: false, value: &quot;CURRENT_YEAR&quot; },
+        {
+          title: &quot;Last day full date&quot;,
+          isBold: false,
+          value: &quot;LAST_DAY_FULL_DATE&quot;,
+        },
+        { title: &quot;Last day number&quot;, isBold: false, value: &quot;LAST_DAY_NUMBER&quot; },
+        { title: &quot;Last day name&quot;, isBold: false, value: &quot;LAST_DAY_NAME&quot; },
+        { title: &quot;Last week&quot;, isBold: false, value: &quot;LAST_WEEK&quot; },
+        {
+          title: &quot;Last month number&quot;,
+          isBold: false,
+          value: &quot;LAST_MONTH_NUMBER&quot;,
+        },
+        { title: &quot;Last month name&quot;, isBold: false, value: &quot;LAST_MONTH_NAME&quot; },
+        { title: &quot;Last quarter&quot;, isBold: false, value: &quot;LAST_QUARTER&quot; },
+        { title: &quot;Last_year&quot;, isBold: false, value: &quot;LAST_YEAR&quot; },
+        {
+          title: &quot;Next day full date&quot;,
+          isBold: false,
+          value: &quot;NEXT_DAY_FULL_DATE&quot;,
+        },
+        { title: &quot;Next day number&quot;, isBold: false, value: &quot;NEXT_DAY_NUMBER&quot; },
+        { title: &quot;Next day name&quot;, isBold: false, value: &quot;NEXT_DAY_NAME&quot; },
+        { title: &quot;Next week&quot;, isBold: false, value: &quot;NEXT_WEEK&quot; },
+        {
+          title: &quot;Next month number&quot;,
+          isBold: false,
+          value: &quot;NEXT_MONTH_NUMBER&quot;,
+        },
+        { title: &quot;Next month name&quot;, isBold: false, value: &quot;NEXT_MONTH_NAME&quot; },
+        { title: &quot;Next quarter&quot;, isBold: false, value: &quot;NEXT_QUARTER&quot; },
+        { title: &quot;Next year&quot;, isBold: false, value: &quot;NEXT_YEAR&quot; },
+      ];
+      setShortcuts(accountShortcuts</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\ChatForm.js (Line 299:9 - Line 307:20), src\Pages\BulkActions\SendAccountEmail.js (Line 181:2 - Line 190:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn70" onclick="toggleCodeBlock('cloneGroup70', 'expandBtn70', 'collapseBtn70')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn70" onclick="toggleCodeBlock('cloneGroup70', 'expandBtn70', 'collapseBtn70')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup70"><code class="language-javascript text-sm text-gray-800">},
+        { title: &quot;Next month name&quot;, isBold: false, value: &quot;NEXT_MONTH_NAME&quot; },
+        { title: &quot;Next quarter&quot;, isBold: false, value: &quot;NEXT_QUARTER&quot; },
+        { title: &quot;Next year&quot;, isBold: false, value: &quot;NEXT_YEAR&quot; },
+      ];
+      setShortcuts(accountShortcuts);
+    }
+  }, [selectedOption]);
+  const handleCloseDropdown</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\ChatForm.js (Line 438:25 - Line 446:8), src\Pages\internalChat\NewChat.js (Line 142:24 - Line 150:6)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn71" onclick="toggleCodeBlock('cloneGroup71', 'expandBtn71', 'collapseBtn71')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn71" onclick="toggleCodeBlock('cloneGroup71', 'expandBtn71', 'collapseBtn71')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup71"><code class="language-javascript text-sm text-gray-800">, requestOptions)
+      .then((response) =&gt; {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((result) =&gt; {
+        console</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\ChatForm.js (Line 527:24 - Line 540:2), src\Pages\BulkActions\SendAccountEmail.js (Line 533:6 - Line 66:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn72" onclick="toggleCodeBlock('cloneGroup72', 'expandBtn72', 'collapseBtn72')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn72" onclick="toggleCodeBlock('cloneGroup72', 'expandBtn72', 'collapseBtn72')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup72"><code class="language-javascript text-sm text-gray-800">}
+                isOptionEqualToValue={(option, value) =&gt;
+                  option.value === value.value
+                }
+                renderOption={(props, option) =&gt; (
+                  &lt;Box
+                    component=&quot;li&quot;
+                    {...props}
+                    sx={{ cursor: &quot;pointer&quot;, margin: &quot;5px 10px&quot; }} // Add cursor pointer style
+                  &gt;
+                    {option.label}
+                  &lt;/Box&gt;
+                )}
+                renderInput={(params) =&gt; (</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\ChatForm.js (Line 803:18 - Line 822:2), src\Pages\internalChat\NewChat.js (Line 277:18 - Line 295:7)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn73" onclick="toggleCodeBlock('cloneGroup73', 'expandBtn73', 'collapseBtn73')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn73" onclick="toggleCodeBlock('cloneGroup73', 'expandBtn73', 'collapseBtn73')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup73"><code class="language-javascript text-sm text-gray-800">}
+              variant=&quot;outlined&quot;
+              sx={{
+                borderColor: &quot;var(--color-border-cancel-btn)&quot;, // Normal background
+                color: &quot;var(--color-save-btn)&quot;,
+                &quot;&amp;:hover&quot;: {
+                  backgroundColor: &quot;var(--color-save-hover-btn)&quot;, // Hover background color
+                  color: &quot;#fff&quot;,
+                  border: &quot;none&quot;,
+                },
+                width: &quot;80px&quot;,
+                borderRadius: &quot;15px&quot;,
+              }}
+              
+            &gt;
+              Cancel
+            &lt;/Button&gt;
+          &lt;/Box&gt;
+      &lt;/Box&gt;
+    &lt;/&gt;</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\Bulkaccount.js (Line 305:8 - Line 317:12), src\Pages\Bulkaccount.js (Line 135:11 - Line 147:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn74" onclick="toggleCodeBlock('cloneGroup74', 'expandBtn74', 'collapseBtn74')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn74" onclick="toggleCodeBlock('cloneGroup74', 'expandBtn74', 'collapseBtn74')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup74"><code class="language-javascript text-sm text-gray-800">.push({
+      ...defaultClient,
+      isAlias: true,
+      baseEmail: baseClient.email,
+      aliasNumber,
+      email: generateAliasEmail(baseClient.email, aliasNumber),
+      accountName: `${baseClient.accountName} ${aliasNumber}`,
+      firstName: `${baseClient.firstName}${aliasNumber}`,
+      lastName: `${baseClient.lastName}${aliasNumber}`,
+      clientType: baseClient.clientType,
+      folderTemplate: baseClient.folderTemplate,
+      phoneNumber: baseClient.phoneNumber,
+      aliasConfig</code></pre></div><div class="py-4"><p class="text-gray-600">src\Pages\AccountDash.js (Line 59:2 - Line 76:10), src\Pages\Templates.js (Line 9:10 - Line 25:26)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn75" onclick="toggleCodeBlock('cloneGroup75', 'expandBtn75', 'collapseBtn75')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn75" onclick="toggleCodeBlock('cloneGroup75', 'expandBtn75', 'collapseBtn75')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup75"><code class="language-javascript text-sm text-gray-800">&lt;/Typography&gt;
+      &lt;/Box&gt;
+      &lt;Box className=&quot;firmtemp&quot;&gt;
+        &lt;Box
+          className=&quot;firmtemp-nav&quot;
+          sx={{
+            display: &quot;flex&quot;,
+
+            mt: 5,
+            flexWrap: &quot;wrap&quot;, // Allow items to wrap to the next line if they overflow
+            justifyContent: &quot;space-around&quot;, // Space out items evenly
+            &quot;&amp; a&quot;: {
+              // Styling for the NavLink components
+              textDecoration: &quot;none&quot;,
+              padding: &quot;8px 16px&quot;,
+              borderRadius: &quot;4px&quot;,
+             
+              &quot;&amp;:hover&quot;</code></pre></div><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div></section><!-- Add more sections for other formats and clone groups as needed--></main><footer class="bg-white shadow mt-8 py-4"><div class="container mx-auto px-4 text-center"><p class="text-sm text-gray-600">This report is generated by jscpd, an open-source copy/paste detector.</p><p class="text-sm text-gray-600">jscpd is licensed under the MIT License.</p><a class="text-blue-500 text-sm" href="https://github.com/kucherenko/jscpd" target="_blank" rel="noopener noreferrer">View jscpd on GitHub</a></div></footer><script src="js/prism.js"></script><script>function toggleCodeBlock(codeBlockId, expandBtnId, collapseBtnId) {
+  const codeBlock = document.getElementById(codeBlockId);
+  const expandBtn = document.getElementById(expandBtnId);
+  const collapseBtn = document.getElementById(collapseBtnId);
+
+  codeBlock.classList.toggle('hidden');
+  expandBtn.classList.toggle('hidden');
+  collapseBtn.classList.toggle('hidden');
+}</script></body></html>

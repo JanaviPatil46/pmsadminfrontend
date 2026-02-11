@@ -18,13 +18,32 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useNavigate } from "react-router-dom";
 import logo from "../Images/logoAdmin.png";
 import micropms from "../Images/micropms.png";
-import { Link, Divider, IconButton, Typography, TextField, InputLabel, Checkbox, FormHelperText, Button, FormControlLabel, Paper, Grid, FormControl, Slider, Input } from "@mui/material";
+import {
+  Link,
+  Divider,
+  IconButton,
+  Typography,
+  TextField,
+  InputLabel,
+  Checkbox,
+  FormHelperText,
+  Button,
+  FormControlLabel,
+  Paper,
+  Grid,
+  FormControl,
+  Slider,
+  Input,
+} from "@mui/material";
 const MyForm = () => {
+  console.log("🔥 newsignup.js FILE LOADED 🔥");
+
   const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
   const navigate = useNavigate();
   const handleAdminLogin = () => {
     navigate("/login");
   };
+  const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(0); // Tracks the main steps (Email, Information, Settings)
   const [subStep, setSubStep] = useState(3); // Tracks sub-steps within Information (Cases 3-7)
   const [settingsStep, setSettingsStep] = useState(8); // Tracks sub-steps within Settings (Cases 8-9)
@@ -38,17 +57,35 @@ const MyForm = () => {
   const [states, setStates] = useState([]);
   const [firmName, setFirmName] = useState("");
   const [selectedState, setSelectedState] = useState("");
+  const [emailError, setEmailError] = useState("");
 
   const [error, setError] = useState(null);
   const [selectedCountryD, setSelectedCountryD] = useState("");
   const [sliderValue, setSliderValue] = useState(0);
   const fixedValues = [0, 5, 10, 15, 50, 100, 200];
-  const colors = ["Google search", "Capterra/ Get app/ G2", "From a friend", "Offline event", "Social media", "Taxdome consultant/ Partner", "Other"];
-  const [buttonStates, setButtonStates] = useState([false, false, false, false, false, false, false]);
+  const colors = [
+    "Google search",
+    "Capterra/ Get app/ G2",
+    "From a friend",
+    "Offline event",
+    "Social media",
+    "Taxdome consultant/ Partner",
+    "Other",
+  ];
+  const [buttonStates, setButtonStates] = useState([
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+  ]);
   const [selectedButton, setSelectedButton] = useState(null);
 
   const handleInputChange = (event) => {
-    const newValue = event.target.value === "" ? "" : Number(event.target.value);
+    const newValue =
+      event.target.value === "" ? "" : Number(event.target.value);
     setInputValue(newValue); // Only update the input value, not the slider
   };
 
@@ -72,7 +109,9 @@ const MyForm = () => {
     setInputValue(newValue); // Sync input with slider value while sliding
   };
   const handleToggle = (index) => {
-    const updatedStates = buttonStates.map((state, i) => (i === index ? !state : false));
+    const updatedStates = buttonStates.map((state, i) =>
+      i === index ? !state : false,
+    );
     setButtonStates(updatedStates);
     setSelectedButton(index);
   };
@@ -91,7 +130,8 @@ const MyForm = () => {
     // You can perform additional actions or API calls here based on the selected services
   }, [selectedOption]);
 
-  const countryStates = states.find((country) => country.name === selectedCountry)?.states || [];
+  const countryStates =
+    states.find((country) => country.name === selectedCountry)?.states || [];
 
   // Transform the states data into options for React Select
   const stateOptions = countryStates.map((state, index) => ({
@@ -102,7 +142,9 @@ const MyForm = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("https://countriesnow.space/api/v0.1/countries/positions");
+        const response = await fetch(
+          "https://countriesnow.space/api/v0.1/countries/positions",
+        );
         if (!response.ok) {
           throw new Error("Failed to fetch data");
         }
@@ -127,7 +169,9 @@ const MyForm = () => {
   useEffect(() => {
     const getStatesData = async () => {
       try {
-        const response = await axios.get("https://countriesnow.space/api/v0.1/countries/states");
+        const response = await axios.get(
+          "https://countriesnow.space/api/v0.1/countries/states",
+        );
         setStates(response.data.data);
       } catch (error) {
         console.error("Error fetching state data:", error);
@@ -272,6 +316,23 @@ const MyForm = () => {
   const [inpval, setInpval] = useState({
     email: "",
   });
+
+  const handleEmailChange = (e) => {
+    const value = e.target.value;
+    setInpval((prev) => ({
+      ...prev,
+      email: value,
+    }));
+
+    if (!value) {
+      setEmailError("Email is required");
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+      setEmailError("Enter a valid email address");
+    } else {
+      setEmailError("");
+    }
+  };
+  const canSubmit = inpval.email && !emailError && isChecked && !loading;
   const createAccount = async () => {
     // e.preventDefault();
     setShowEmailContent(true);
@@ -302,7 +363,10 @@ const MyForm = () => {
         redirect: "follow",
       };
 
-      fetch(`${LOGIN_API}/common/user/email/getuserbyemail/` + email, requestOptions)
+      fetch(
+        `${LOGIN_API}/common/user/email/getuserbyemail/` + email,
+        requestOptions,
+      )
         .then((response) => {
           if (!response.ok) {
             throw new Error("Network response was not ok");
@@ -313,7 +377,9 @@ const MyForm = () => {
           console.log(inpval.email);
           // Assuming result is in JSON format and contains user data
           if (result.user.length > 0) {
-            toast.error("User with this EMail already exists", { position: "top-right" });
+            toast.error("User with this EMail already exists", {
+              position: "top-right",
+            });
             // You can also do further processing here if needed
           } else {
             // e.preventDefault();
@@ -430,7 +496,9 @@ const MyForm = () => {
   });
 
   const [selectAll, setSelectAll] = useState(false);
-  const buttonsOn = Object.keys(buttonStates2).filter((button) => buttonStates2[button]);
+  const buttonsOn = Object.keys(buttonStates2).filter(
+    (button) => buttonStates2[button],
+  );
   const handleButtonClick2 = (buttonName) => {
     setButtonStates2((prevStates) => ({
       ...prevStates,
@@ -467,12 +535,28 @@ const MyForm = () => {
     }
   };
 
-  const colors3 = ["Owner or partner", "Book keeper or Accountant", "Operations / office Manager", "Admin", "Assistant", "Other"];
-  const [buttonStates3, setButtonStates3] = useState([false, false, false, false, false, false]);
+  const colors3 = [
+    "Owner or partner",
+    "Book keeper or Accountant",
+    "Operations / office Manager",
+    "Admin",
+    "Assistant",
+    "Other",
+  ];
+  const [buttonStates3, setButtonStates3] = useState([
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+  ]);
   const [selectedButton3, setSelectedButton3] = useState(null);
 
   const handleToggle3 = (index) => {
-    const updatedStates = buttonStates3.map((state, i) => (i === index ? !state : false));
+    const updatedStates = buttonStates3.map((state, i) =>
+      i === index ? !state : false,
+    );
     setButtonStates3(updatedStates);
     setSelectedButton3(index);
   };
@@ -506,7 +590,9 @@ const MyForm = () => {
   useEffect(() => {
     const fetchCurrencies = async () => {
       try {
-        const response = await axios.get("https://api.coingecko.com/api/v3/simple/supported_vs_currencies");
+        const response = await axios.get(
+          "https://api.coingecko.com/api/v3/simple/supported_vs_currencies",
+        );
         const currencyOptions = Object.keys(response.data).map((currency) => ({
           value: currency,
           label: response.data[currency].toUpperCase(),
@@ -881,7 +967,8 @@ const MyForm = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
-  const handleClickShowConfirmPassword = () => setShowConfirmPassword((show) => !show);
+  const handleClickShowConfirmPassword = () =>
+    setShowConfirmPassword((show) => !show);
 
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
@@ -916,6 +1003,8 @@ const MyForm = () => {
     hasMinLength: inppass.password.length >= 8,
   };
   const renderFormFields = () => {
+    console.log("Current step:", currentStep);
+
     switch (currentStep) {
       // Email (Case 2)
       case 0:
@@ -956,9 +1045,19 @@ const MyForm = () => {
                                     <BorderColorIcon />
                                 </Box> */}
 
-              <Typography sx={{ fontSize: "14px", margin: "3px 0" }}>Please, enter it below:</Typography>
+              <Typography sx={{ fontSize: "14px", margin: "3px 0" }}>
+                Please, enter it below:
+              </Typography>
 
-              <Box sx={{ mt: 2, mb: 4, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Box
+                sx={{
+                  mt: 2,
+                  mb: 4,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
                 <OtpInput
                   value={otp}
                   onChange={setOtp}
@@ -979,7 +1078,15 @@ const MyForm = () => {
                 />
               </Box>
 
-              <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mb: 4, alignItems: "center" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  gap: 2,
+                  mb: 4,
+                  alignItems: "center",
+                }}
+              >
                 <Typography variant="body">
                   <strong>Didn't receive it? </strong>
                 </Typography>
@@ -988,11 +1095,26 @@ const MyForm = () => {
                 </Button>
               </Box>
 
-              <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "40px" }}>
-                <Button variant="contained" className="btn1" onClick={handleClearOtp}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "40px",
+                }}
+              >
+                <Button
+                  variant="contained"
+                  className="btn1"
+                  onClick={handleClearOtp}
+                >
                   Clear OTP
                 </Button>
-                <Button variant="contained" className="btn1" onClick={sendOtpVerify}>
+                <Button
+                  variant="contained"
+                  className="btn1"
+                  onClick={sendOtpVerify}
+                >
                   Verify
                 </Button>
               </Box>
@@ -1049,14 +1171,34 @@ const MyForm = () => {
                 <form>
                   <Box>
                     <InputLabel sx={{ color: "black" }}>First Name</InputLabel>
-                    <TextField fullWidth name="First Name" placeholder="First Name" size="small" sx={{ mt: 2 }} value={firstname} onChange={(e) => setFirstname(e.target.value)} />
+                    <TextField
+                      fullWidth
+                      name="First Name"
+                      placeholder="First Name"
+                      size="small"
+                      sx={{ mt: 2 }}
+                      value={firstname}
+                      onChange={(e) => setFirstname(e.target.value)}
+                    />
                   </Box>
                   <Box>
-                    <InputLabel sx={{ color: "black", mt: 2 }}>Last Name</InputLabel>
-                    <TextField fullWidth name="Last Name" placeholder="Last Name" size="small" sx={{ mt: 2 }} value={lastName} onChange={(e) => setLastName(e.target.value)} />
+                    <InputLabel sx={{ color: "black", mt: 2 }}>
+                      Last Name
+                    </InputLabel>
+                    <TextField
+                      fullWidth
+                      name="Last Name"
+                      placeholder="Last Name"
+                      size="small"
+                      sx={{ mt: 2 }}
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                    />
                   </Box>
                   <Box sx={{ mb: 2, width: "100%" }}>
-                    <InputLabel sx={{ color: "black", mt: 2 }}>Phone Number</InputLabel>
+                    <InputLabel sx={{ color: "black", mt: 2 }}>
+                      Phone Number
+                    </InputLabel>
 
                     <PhoneInput
                       style={{ width: "450px" }}
@@ -1068,7 +1210,10 @@ const MyForm = () => {
                       countryCodeEditabel={false}
                       isValid={(inputNumber, country, countries) => {
                         return countries.some((country) => {
-                          return startsWith(inputNumber, country.dialCode) || startsWith(country.dialCode, inputNumber);
+                          return (
+                            startsWith(inputNumber, country.dialCode) ||
+                            startsWith(country.dialCode, inputNumber)
+                          );
                         });
                       }}
                     />
@@ -1078,8 +1223,19 @@ const MyForm = () => {
                       </Typography>
                     )}
                   </Box>
-                  <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <Button variant="contained" color="primary" style={{ width: "100px", margin: "10px 0" }} onClick={submitUserinfo}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      style={{ width: "100px", margin: "10px 0" }}
+                      onClick={submitUserinfo}
+                    >
                       Next
                     </Button>
                   </Box>
@@ -1123,12 +1279,22 @@ const MyForm = () => {
                   <form>
                     <Box>
                       <InputLabel sx={{ color: "black" }}>Firm Name</InputLabel>
-                      <TextField fullWidth name="firm name" placeholder="Enter firm name" size="small" sx={{ mt: 2 }} value={value} onChange={(e) => setFirmName(e.target.value)} />
+                      <TextField
+                        fullWidth
+                        name="firm name"
+                        placeholder="Enter firm name"
+                        size="small"
+                        sx={{ mt: 2 }}
+                        value={value}
+                        onChange={(e) => setFirmName(e.target.value)}
+                      />
                     </Box>
 
                     <Box className="col-12">
                       <Box>
-                        <InputLabel sx={{ color: "black", mt: 2 }}>Country</InputLabel>
+                        <InputLabel sx={{ color: "black", mt: 2 }}>
+                          Country
+                        </InputLabel>
                         <Autocomplete
                           sx={{ mt: 2 }}
                           size="small"
@@ -1140,27 +1306,50 @@ const MyForm = () => {
                           }}
                           options={countries}
                           getOptionLabel={(option) => option.label}
-                          renderInput={(params) => <TextField {...params} placeholder="Country" variant="outlined" />}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder="Country"
+                              variant="outlined"
+                            />
+                          )}
                         />
                       </Box>
 
                       <Box>
-                        <InputLabel sx={{ color: "black", mt: 2 }}>State</InputLabel>
+                        <InputLabel sx={{ color: "black", mt: 2 }}>
+                          State
+                        </InputLabel>
                         <Autocomplete
                           sx={{ mt: 2 }}
                           size="small"
-                          value={stateOptions.find((option) => option.value === selectedState)}
+                          value={stateOptions.find(
+                            (option) => option.value === selectedState,
+                          )}
                           onChange={(event, newValue) => {
                             setSelectedState(newValue?.label || "");
                           }}
                           options={stateOptions}
                           getOptionLabel={(option) => option.label}
-                          renderInput={(params) => <TextField {...params} placeholder="States" variant="outlined" />}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder="States"
+                              variant="outlined"
+                            />
+                          )}
                         />
                       </Box>
                     </Box>
                   </form>
-                  <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", mt: 3 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      mt: 3,
+                    }}
+                  >
                     <Button variant="contained" onClick={submitFerminfo}>
                       Next
                     </Button>
@@ -1191,7 +1380,13 @@ const MyForm = () => {
             >
               Firm details
             </Typography>
-            <Box sx={{ justifyContent: "center", display: "flex", flexDirection: "column" }}>
+            <Box
+              sx={{
+                justifyContent: "center",
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
               {/* <Box >
                                     <Box style={{ textAlign: "center", marginBottom: "10px", alignItems: "center", justifyContent: "center" }}>Selected Value: {fixedValues[sliderValue]}</Box>
                                     <Box style={{ marginLeft: "20px", display: "flex", justifyContent: "space-between" }}>
@@ -1205,10 +1400,19 @@ const MyForm = () => {
                                 </Box> */}
               {/*  */}
               <Box sx={{ ml: "10%", mr: "10%" }}>
-                <InputLabel sx={{ mt: "3%", mb: "1%", fontWeight: "600" }} htmlFor="firimname">
+                <InputLabel
+                  sx={{ mt: "3%", mb: "1%", fontWeight: "600" }}
+                  htmlFor="firimname"
+                >
                   Firm Size
                 </InputLabel>
-                <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
                   <Input
                     value={inputValue}
                     size="small"
@@ -1245,18 +1449,31 @@ const MyForm = () => {
                 </Box>
               </Box>
 
-              <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", ml: 15 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  ml: 15,
+                }}
+              >
                 <Box>
                   <Box>
-                    <h2 style={{ marginLeft: "3%" }}>How did you hear about PMS Solutions? </h2>
+                    <h2 style={{ marginLeft: "3%" }}>
+                      How did you hear about PMS Solutions?{" "}
+                    </h2>
 
-                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2 }}>
+                    <Box
+                      sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2 }}
+                    >
                       {colors.map((color, index) => (
                         // <Button variant="contained" key={value} value={colors[selectedButton]} className={`slider-toggle-button ${buttonStates[index] ? "active" : ""}`} onClick={() => handleToggle(index)} style={{ margin: "10px 17px" }}>
                         //     {color}
                         // </Button>
                         <Button
-                          variant={buttonStates[index] ? "contained" : "outlined"}
+                          variant={
+                            buttonStates[index] ? "contained" : "outlined"
+                          }
                           key={value}
                           value={colors[selectedButton]}
                           // className={`slider-toggle-button ${buttonStates[index] ? "active" : ""}`}
@@ -1269,8 +1486,19 @@ const MyForm = () => {
                       {/* <Box style={{ marginTop: "10px" }}>{selectedButton !== null && <p>Sorce Of Information :<bold>{colors[selectedButton]}</bold>  </p>}</Box> */}
                     </Box>
                   </Box>
-                  <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", mt: 7 }}>
-                    <Button variant="contained" className="btn1" onClick={submitFirmDetail}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      mt: 7,
+                    }}
+                  >
+                    <Button
+                      variant="contained"
+                      className="btn1"
+                      onClick={submitFirmDetail}
+                    >
                       Next
                     </Button>
                   </Box>
@@ -1450,10 +1678,16 @@ const MyForm = () => {
                   <Grid container spacing={0}>
                     <Grid item xs={3}>
                       <Button
-                        variant={buttonStates2.TaxPreparation ? "contained" : "outlined"}
+                        variant={
+                          buttonStates2.TaxPreparation
+                            ? "contained"
+                            : "outlined"
+                        }
                         onClick={() => handleButtonClick2("TaxPreparation")}
                         style={{
-                          backgroundColor: buttonStates2.TaxPreparation ? "#043a77" : "",
+                          backgroundColor: buttonStates2.TaxPreparation
+                            ? "#043a77"
+                            : "",
                           width: "80%",
                           margin: "5px 0 ",
                         }}
@@ -1463,10 +1697,14 @@ const MyForm = () => {
                     </Grid>
                     <Grid item xs={3} sx={{ display: "flex" }}>
                       <Button
-                        variant={buttonStates2.TaxPlanning ? "contained" : "outlined"}
+                        variant={
+                          buttonStates2.TaxPlanning ? "contained" : "outlined"
+                        }
                         onClick={() => handleButtonClick2("TaxPlanning")}
                         style={{
-                          backgroundColor: buttonStates2.TaxPlanning ? "#043a77" : "",
+                          backgroundColor: buttonStates2.TaxPlanning
+                            ? "#043a77"
+                            : "",
                           width: "80%",
                           margin: "5px 0",
                           padding: "5px",
@@ -1477,10 +1715,14 @@ const MyForm = () => {
                     </Grid>
                     <Grid item xs={3}>
                       <Button
-                        variant={buttonStates2.Advisory ? "contained" : "outlined"}
+                        variant={
+                          buttonStates2.Advisory ? "contained" : "outlined"
+                        }
                         onClick={() => handleButtonClick2("Advisory")}
                         style={{
-                          backgroundColor: buttonStates2.Advisory ? "#043a77" : "",
+                          backgroundColor: buttonStates2.Advisory
+                            ? "#043a77"
+                            : "",
                           width: "80%",
                           margin: "5px 0",
                         }}
@@ -1490,10 +1732,14 @@ const MyForm = () => {
                     </Grid>
                     <Grid item xs={3}>
                       <Button
-                        variant={buttonStates2.Resolution ? "contained" : "outlined"}
+                        variant={
+                          buttonStates2.Resolution ? "contained" : "outlined"
+                        }
                         onClick={() => handleButtonClick2("Resolution")}
                         style={{
-                          backgroundColor: buttonStates2.Resolution ? "#043a77" : "",
+                          backgroundColor: buttonStates2.Resolution
+                            ? "#043a77"
+                            : "",
                           width: "80%",
                           margin: "5px 0",
                         }}
@@ -1503,10 +1749,14 @@ const MyForm = () => {
                     </Grid>
                     <Grid item xs={3} sx={{ display: "flex", gap: 3 }}>
                       <Button
-                        variant={buttonStates2.Payroll ? "contained" : "outlined"}
+                        variant={
+                          buttonStates2.Payroll ? "contained" : "outlined"
+                        }
                         onClick={() => handleButtonClick2("Payroll")}
                         style={{
-                          backgroundColor: buttonStates2.Payroll ? "#043a77" : "",
+                          backgroundColor: buttonStates2.Payroll
+                            ? "#043a77"
+                            : "",
                           width: "80%",
                           margin: "5px 0",
                           //   padding: "5px",
@@ -1517,10 +1767,14 @@ const MyForm = () => {
                     </Grid>
                     <Grid item xs={3}>
                       <Button
-                        variant={buttonStates2.Accounting ? "contained" : "outlined"}
+                        variant={
+                          buttonStates2.Accounting ? "contained" : "outlined"
+                        }
                         onClick={() => handleButtonClick2("Accounting")}
                         style={{
-                          backgroundColor: buttonStates2.Accounting ? "#043a77" : "",
+                          backgroundColor: buttonStates2.Accounting
+                            ? "#043a77"
+                            : "",
                           width: "80%",
                           margin: "5px 0",
                         }}
@@ -1543,10 +1797,14 @@ const MyForm = () => {
                     </Grid>
                     <Grid item xs={3} sx={{ display: "flex", gap: 3 }}>
                       <Button
-                        variant={buttonStates2.LawFirm ? "contained" : "outlined"}
+                        variant={
+                          buttonStates2.LawFirm ? "contained" : "outlined"
+                        }
                         onClick={() => handleButtonClick2("LawFirm")}
                         style={{
-                          backgroundColor: buttonStates2.LawFirm ? "#043a77" : "",
+                          backgroundColor: buttonStates2.LawFirm
+                            ? "#043a77"
+                            : "",
                           width: "80%",
                           margin: "5px 0",
                           padding: "5px",
@@ -1557,10 +1815,14 @@ const MyForm = () => {
                     </Grid>
                     <Grid item xs={3}>
                       <Button
-                        variant={buttonStates2.Bookkeeping ? "contained" : "outlined"}
+                        variant={
+                          buttonStates2.Bookkeeping ? "contained" : "outlined"
+                        }
                         onClick={() => handleButtonClick2("Bookkeeping")}
                         style={{
-                          backgroundColor: buttonStates2.Bookkeeping ? "#043a77" : "",
+                          backgroundColor: buttonStates2.Bookkeeping
+                            ? "#043a77"
+                            : "",
                           width: "80%",
                           margin: "5px 0",
                         }}
@@ -1586,10 +1848,19 @@ const MyForm = () => {
 
                 <Box>
                   <label>
-                    <input type="checkbox" onChange={handleSelectAll} style={{ marginLeft: "2%" }} />
+                    <input
+                      type="checkbox"
+                      onChange={handleSelectAll}
+                      style={{ marginLeft: "2%" }}
+                    />
                     Select All
                   </label>
-                  <Button variant="contained" onClick={submitService} className="btn1" style={{ marginLeft: "20px" }}>
+                  <Button
+                    variant="contained"
+                    onClick={submitService}
+                    className="btn1"
+                    style={{ marginLeft: "20px" }}
+                  >
                     Next
                   </Button>
                 </Box>
@@ -1654,10 +1925,16 @@ const MyForm = () => {
                       {colors3.map((color, index) => (
                         <Button
                           key={index}
-                          variant={buttonStates3[index] ? "contained" : "outlined"}
+                          variant={
+                            buttonStates3[index] ? "contained" : "outlined"
+                          }
                           fullWidth
                           onClick={() => handleToggle3(index)}
-                          sx={{ padding: "10px", margin: "10px 0", width: "30%" }} // Adjust width to match grid behavior
+                          sx={{
+                            padding: "10px",
+                            margin: "10px 0",
+                            width: "30%",
+                          }} // Adjust width to match grid behavior
                         >
                           {color}
                         </Button>
@@ -1699,12 +1976,22 @@ const MyForm = () => {
                 // flexDirection: 'column', // Column direction for centering
               }}
             >
-              <Box sx={{ display: "flex", justifyContent: "space-between", width: "50%" }} ml={5}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  width: "50%",
+                }}
+                ml={5}
+              >
                 <Box>
                   <h2>Firm Settings</h2>
 
                   <Box>
-                    <Typography variant="body1">A powerful, integrated platform to manage teams, clients, projects.</Typography>
+                    <Typography variant="body1">
+                      A powerful, integrated platform to manage teams, clients,
+                      projects.
+                    </Typography>
                     <Typography variant="body1">
                       <b>from $50/mo per user</b>
                       (with a 3-year subscription plan)
@@ -1715,7 +2002,10 @@ const MyForm = () => {
 
                   <p>choose web URL</p>
                   <Box style={{ fontSize: "13px" }}>
-                    <p>You will be ale to set up a fully custom domain(without.pms.com) later</p>
+                    <p>
+                      You will be ale to set up a fully custom
+                      domain(without.pms.com) later
+                    </p>
                   </Box>
 
                   <Box>
@@ -1731,30 +2021,79 @@ const MyForm = () => {
                       fullWidth
                       variant="outlined"
                       InputProps={{
-                        endAdornment: <InputAdornment position="end">.pms.com</InputAdornment>,
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            .pms.com
+                          </InputAdornment>
+                        ),
                       }}
                     />
                   </Box>
                   <label>You cannot Change it later</label>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 3, mt: 2 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 3,
+                      mt: 2,
+                    }}
+                  >
                     <Box>
                       <Typography>Select Currency: </Typography>
 
-                      <Autocomplete size="small" margin="normal" value={selectedCurrency} onChange={(event, newValue) => handleCurrencyChange(newValue)} options={currencies} getOptionLabel={(option) => option.label || ""} renderInput={(params) => <TextField {...params} placeholder="Select a currency" />} />
+                      <Autocomplete
+                        size="small"
+                        margin="normal"
+                        value={selectedCurrency}
+                        onChange={(event, newValue) =>
+                          handleCurrencyChange(newValue)
+                        }
+                        options={currencies}
+                        getOptionLabel={(option) => option.label || ""}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            placeholder="Select a currency"
+                          />
+                        )}
+                      />
                     </Box>
                     <Box>
                       <Typography>Select Language: </Typography>
-                      <Autocomplete size="small" margin="normal" value={selectedLanguage} onChange={(event, newValue) => handleLanguageChange(newValue)} options={languages} getOptionLabel={(option) => option.label || ""} renderInput={(params) => <TextField {...params} placeholder="Select a language" />} />
+                      <Autocomplete
+                        size="small"
+                        margin="normal"
+                        value={selectedLanguage}
+                        onChange={(event, newValue) =>
+                          handleLanguageChange(newValue)
+                        }
+                        options={languages}
+                        getOptionLabel={(option) => option.label || ""}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            placeholder="Select a language"
+                          />
+                        )}
+                      />
                     </Box>
                   </Box>
                   {/* submiturl */}
-                  <Button variant="contained" onClick={submiturl} style={{ margin: "25px 0" }}>
+                  <Button
+                    variant="contained"
+                    onClick={submiturl}
+                    style={{ margin: "25px 0" }}
+                  >
                     Continue
                   </Button>
                 </Box>
               </Box>
               <Box>
-                <img style={{ height: "500px", width: "100%" }} src={firmsetting} alt="" />
+                <img
+                  style={{ height: "500px", width: "100%" }}
+                  src={firmsetting}
+                  alt=""
+                />
               </Box>
             </Box>
           </>
@@ -1806,7 +2145,13 @@ const MyForm = () => {
                     InputProps={{
                       endAdornment: (
                         <InputAdornment position="end">
-                          <IconButton aria-label="toggle password visibility" onClick={handleClickShowPassword} onMouseDown={handleMouseDownPassword} onMouseUp={handleMouseUpPassword} edge="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={handleClickShowPassword}
+                            onMouseDown={handleMouseDownPassword}
+                            onMouseUp={handleMouseUpPassword}
+                            edge="end"
+                          >
                             {showPassword ? <VisibilityOff /> : <Visibility />}
                           </IconButton>
                         </InputAdornment>
@@ -1817,33 +2162,89 @@ const MyForm = () => {
                   <Box mt={3} ml={2}>
                     <Grid container spacing={2}>
                       <Grid item xs={6}>
-                        <FormHelperText sx={{ display: "flex" }} error={!passwordValidation.hasNumber}>
-                          <CheckCircleIcon color={passwordValidation.hasNumber ? "success" : "error"} fontSize="small" />
-                          <p style={{ marginTop: "1px", marginLeft: "3px" }}>a number</p>
+                        <FormHelperText
+                          sx={{ display: "flex" }}
+                          error={!passwordValidation.hasNumber}
+                        >
+                          <CheckCircleIcon
+                            color={
+                              passwordValidation.hasNumber ? "success" : "error"
+                            }
+                            fontSize="small"
+                          />
+                          <p style={{ marginTop: "1px", marginLeft: "3px" }}>
+                            a number
+                          </p>
                         </FormHelperText>
                       </Grid>
                       <Grid item xs={6}>
-                        <FormHelperText sx={{ display: "flex" }} error={!passwordValidation.hasUppercase}>
-                          <CheckCircleIcon color={passwordValidation.hasUppercase ? "success" : "error"} fontSize="small" />
-                          <p style={{ marginTop: "1px", marginLeft: "3px" }}>an uppercase letter</p>
+                        <FormHelperText
+                          sx={{ display: "flex" }}
+                          error={!passwordValidation.hasUppercase}
+                        >
+                          <CheckCircleIcon
+                            color={
+                              passwordValidation.hasUppercase
+                                ? "success"
+                                : "error"
+                            }
+                            fontSize="small"
+                          />
+                          <p style={{ marginTop: "1px", marginLeft: "3px" }}>
+                            an uppercase letter
+                          </p>
                         </FormHelperText>
                       </Grid>
                       <Grid item xs={6}>
-                        <FormHelperText sx={{ display: "flex" }} error={!passwordValidation.hasLowercase}>
-                          <CheckCircleIcon color={passwordValidation.hasLowercase ? "success" : "error"} fontSize="small" />
-                          <p style={{ marginTop: "1px", marginLeft: "3px" }}>a lowercase letter</p>
+                        <FormHelperText
+                          sx={{ display: "flex" }}
+                          error={!passwordValidation.hasLowercase}
+                        >
+                          <CheckCircleIcon
+                            color={
+                              passwordValidation.hasLowercase
+                                ? "success"
+                                : "error"
+                            }
+                            fontSize="small"
+                          />
+                          <p style={{ marginTop: "1px", marginLeft: "3px" }}>
+                            a lowercase letter
+                          </p>
                         </FormHelperText>
                       </Grid>
                       <Grid item xs={6}>
-                        <FormHelperText sx={{ display: "flex" }} error={!passwordValidation.hasSymbol}>
-                          <CheckCircleIcon color={passwordValidation.hasSymbol ? "success" : "error"} fontSize="small" />
-                          <p style={{ marginTop: "1px", marginLeft: "3px" }}>a symbol</p>
+                        <FormHelperText
+                          sx={{ display: "flex" }}
+                          error={!passwordValidation.hasSymbol}
+                        >
+                          <CheckCircleIcon
+                            color={
+                              passwordValidation.hasSymbol ? "success" : "error"
+                            }
+                            fontSize="small"
+                          />
+                          <p style={{ marginTop: "1px", marginLeft: "3px" }}>
+                            a symbol
+                          </p>
                         </FormHelperText>
                       </Grid>
                       <Grid item xs={6}>
-                        <FormHelperText sx={{ display: "flex" }} error={!passwordValidation.hasMinLength}>
-                          <CheckCircleIcon color={passwordValidation.hasMinLength ? "success" : "error"} fontSize="small" />
-                          <p style={{ marginTop: "1px", marginLeft: "3px" }}>at least 8 characters</p>
+                        <FormHelperText
+                          sx={{ display: "flex" }}
+                          error={!passwordValidation.hasMinLength}
+                        >
+                          <CheckCircleIcon
+                            color={
+                              passwordValidation.hasMinLength
+                                ? "success"
+                                : "error"
+                            }
+                            fontSize="small"
+                          />
+                          <p style={{ marginTop: "1px", marginLeft: "3px" }}>
+                            at least 8 characters
+                          </p>
                         </FormHelperText>
                       </Grid>
                     </Grid>
@@ -1864,8 +2265,18 @@ const MyForm = () => {
                     InputProps={{
                       endAdornment: (
                         <InputAdornment position="end">
-                          <IconButton aria-label="toggle confirm password visibility" onClick={handleClickShowConfirmPassword} onMouseDown={handleMouseDownPassword} onMouseUp={handleMouseUpPassword} edge="end">
-                            {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                          <IconButton
+                            aria-label="toggle confirm password visibility"
+                            onClick={handleClickShowConfirmPassword}
+                            onMouseDown={handleMouseDownPassword}
+                            onMouseUp={handleMouseUpPassword}
+                            edge="end"
+                          >
+                            {showConfirmPassword ? (
+                              <VisibilityOff />
+                            ) : (
+                              <Visibility />
+                            )}
                           </IconButton>
                         </InputAdornment>
                       ),
@@ -1873,7 +2284,12 @@ const MyForm = () => {
                   />
                 </Box>
 
-                <Box mt={5} display={"flex"} alignItems={"center"} justifyContent={"center"}>
+                <Box
+                  mt={5}
+                  display={"flex"}
+                  alignItems={"center"}
+                  justifyContent={"center"}
+                >
                   <Button variant="contained" onClick={submitPassword}>
                     {" "}
                     Continue
@@ -1893,10 +2309,31 @@ const MyForm = () => {
       {/* Render the Stepper only when the Email step content is shown */}
       <Box>
         {showEmailContent && (
-          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 15px" }}>
-            <Box sx={{ padding: "10px 15px", display: "flex", alignItems: "center" }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "10px 15px",
+            }}
+          >
+            <Box
+              sx={{
+                padding: "10px 15px",
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
               <img src={micropms} style={{ height: "40px" }} />
-              <Typography variant="h6" sx={{ fontFamily: "sans-serif", color: "black", fontSize: "20px", fontWeight: "700" }}>
+              <Typography
+                variant="h6"
+                sx={{
+                  fontFamily: "sans-serif",
+                  color: "black",
+                  fontSize: "20px",
+                  fontWeight: "700",
+                }}
+              >
                 PMS Solutions
               </Typography>
             </Box>
@@ -1928,63 +2365,185 @@ const MyForm = () => {
         {/* Show button to go to email step initially */}
         {!showEmailContent && (
           <>
-            <Box sx={{ padding: "10px 15px", display: "flex", alignItems: "center" }}>
-              <img src={micropms} style={{ height: "40px" }} />
-              <Typography variant="h6" sx={{ fontFamily: "sans-serif", color: "black", fontSize: "20px", fontWeight: "700" }}>
+            <Box
+              sx={{
+                py: 4,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 1,
+              }}
+            >
+              <img src={micropms} style={{ height: "32px" }} />
+              <Typography
+                variant="h6"
+                sx={{
+                  fontFamily: "'Manrope', sans-serif",
+                  color: "black",
+                  fontSize: "20px",
+                  fontWeight: "700",
+                }}
+              >
                 PMS Solutions
               </Typography>
             </Box>
             <Box
               sx={{
+                minHeight: "100vh",
+                background: "linear-gradient(180deg, #f7f9fc 0%, #ffffff 100%)",
+              
                 display: "flex",
+                // border: solid "black",
                 justifyContent: "center",
                 alignItems: "center",
-                margin: "5%",
+                margin: "3%",
                 maxHeight: "100vh", // Full viewport height
                 flexDirection: "column", // Column direction for centering
               }}
             >
-              <Box sx={{ width: "100%", maxWidth: 400, p: 3 }}>
+              <Box
+                className="fade-slide-in"
+                sx={{
+                  width: "100%",
+                  maxWidth: 420,
+                  p: 4,
+                  borderRadius: 3,
+                    boxShadow: "0 8px 30px rgba(0,0,0,0.06)",
+                }}
+              >
                 {/* <Typography variant="h5" textAlign={"center"}>
                   <b>Signup</b>
                 </Typography> */}
                 <Typography
-                  variant="h1"
+                  variant="h5"
                   sx={{
-                    color: "black",
-                    fontSize: "35px",
+                    color: "text.secondary",
+                    // fontSize: "35px",
                     fontWeight: "700",
-                    mb: "20px",
+                    mb: 0.5,
                     textAlign: "center",
-                    fontFamily: "sans-serif",
+                    // fontFamily: "sans-serif",
                   }}
                 >
-                  Signup
+                  Sign up
                 </Typography>
-                <p className="subtitle" style={{ textAlign: "center" }}>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    textAlign: "center",
+                    color: "text.secondary",
+                    mb: 3,
+                  }}
+                >
                   Sign up your firm and start upgrading your workflow
-                </p>
+                </Typography>
 
                 <form>
-                  <Box className="form-group">
+                  <Box
+                    className="form-group"
+                    sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+                  >
                     <InputLabel sx={{ color: "black" }}>Email</InputLabel>
-                    <TextField fullWidth type="email" name="email" placeholder="Enter Your Email" size="small" sx={{ mt: 2 }} value={inpval.email} onChange={setVal} />
+                    <TextField
+                      fullWidth
+                      type="email"
+                      name="email"
+                      placeholder="Enter Your Email"
+                      size="medium"
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          borderRadius: 2,
+                          transition: "border-color 0.2s ease",
+                        },
+                      }}
+                      value={inpval.email}
+                      onChange={handleEmailChange}
+                      error={Boolean(emailError)}
+                      helperText={emailError}
+                    />
                   </Box>
 
-                  <Box sx={{ display: "flex", alignItems: "center", width: "100%", mt: 1 }}>
-                    <FormControlLabel control={<Checkbox id="terms" onChange={setValbox} checked={isChecked} />} label={<span style={{ color: "#696969", fontSize: "14px", marginBottom: "0" }}>I agree to the terms and conditions</span>} />
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      width: "100%",
+                      mt: 1,
+                    }}
+                  >
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          id="terms"
+                          onChange={setValbox}
+                          checked={isChecked}
+                          disabled={loading}
+                        />
+                      }
+                      label={
+                        <Typography variant="body2" color="text.secondary">
+                          I agree to the terms and conditions
+                        </Typography>
+                      }
+                    />
                   </Box>
 
-                  <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <Button sx={{ mt: 2 }} variant="contained" onClick={createAccount}>
-                      Create Account
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Button
+                      fullwidth
+                      variant="contained"
+                      size="large"
+                      disabled={!canSubmit}
+                      sx={{
+                        mt: 2,
+                        py: 1.2,
+                        textTransform: "none",
+                        fontWeight: 600,
+                        boxShadow: "none",
+                        transition: "all 0.2s ease",
+                        "&:hover": {
+                          transform: "translateY(-1px)",
+                        },
+                        "&:active": {
+                          transform: "translateY(0)",
+                        },
+                      }}
+                      // variant="contained"
+                      onClick={async () => {
+                        try {
+                          setLoading(true);
+                          await createAccount();
+                        } finally {
+                          setLoading(false);
+                        }
+                      }}
+                    >
+                      {loading ? "Create account..." : "Create account"}
                     </Button>
                   </Box>
 
-                  <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", mt: 2 }}>
-                    <Typography variant="body2" className="sign-in-link">
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      mt: 2,
+                    }}
+                  >
+                    <Typography
+                      variant="body2"
+                      className="sign-in-link"
+                      textAlign="center"
+                      mt={3}
+                    >
                       Already have an account?{" "}
-                      <Link component={NavLink} to="/" sx={{ textDecoration: "none", color: "blue" }}>
+                      <Link component={NavLink} to="/" sx={{ fontWeight: 500 }}>
                         Sign in
                       </Link>
                     </Typography>

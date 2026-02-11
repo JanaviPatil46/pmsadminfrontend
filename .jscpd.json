@@ -1,0 +1,36 @@
+{
+  "min-lines": 5,
+  "min-tokens": 70,
+  "threshold": 1,
+  "reporters": ["console", "html"],
+  "ignore": [
+    "**/*.css",
+    "**/*.scss",
+    "**/*.json",
+    "**/*.test.js",
+    "**/*.spec.js",
+    "**/*.stories.js",
+    "**/index.js",
+    "**/App.js",
+    "**/styles/**",
+    "**/theme/**",
+    "**/constants/**",
+    "**/components/**",
+    "**/Admin-login-signup/**",
+    "**/Templates/**",
+    "**/Sidebar/**",
+    "**/Settings/**",
+    "**/*.jsx",
+    "**/*{.jsx,.tsx}"
+
+  ],
+  "patterns": {
+    "javascript": {
+      "comments": false,
+      "literal": false,
+      "strings": false,
+      "identifiers": false
+    }
+  },
+  "exitCode": 0
+}

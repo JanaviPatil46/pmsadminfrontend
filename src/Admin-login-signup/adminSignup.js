@@ -22,7 +22,7 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 const AdminSignup = () => {
-    
+      console.log("🔥 AdminSignup component rendered 🔥");
     const navigate = useNavigate();
     // TODO ======== #page control logic No1 =======
     //! Change state for testing
@@ -788,7 +788,11 @@ console.log(raw)
 
       .catch((error) => console.error(error));
   };
+ 
+  
     const renderFormFields = () => {
+        console.log("Current step:", currentStep);
+      
         switch (currentStep) {
             // Sign up
             case 1:
@@ -804,7 +808,7 @@ console.log(raw)
                                 <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
                                     <Box>
                                         <Typography variant="h5" textAlign={'center'}><b>Signup</b></Typography>
-                                        <p className="subtitle">Sign up your firm and start upgrading your workflow</p>
+                                        <p className="subtitle"> firm and start upgrading your workflow</p>
 
                                         <form onSubmit={handleSubmit}>
                                             <Box className="form-group">

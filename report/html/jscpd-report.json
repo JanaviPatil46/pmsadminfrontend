@@ -1,0 +1,3266 @@
+{
+  "statistics": {
+    "detectionDate": "2025-10-12T15:34:53.062Z",
+    "formats": {
+      "javascript": {
+        "sources": {
+          "src/redux/store.js": {
+            "lines": 10,
+            "tokens": 72,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/redux/accountContactSlice.js": {
+            "lines": 227,
+            "tokens": 1627,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/Organizers/ClientSelectionDialog.js": {
+            "lines": 194,
+            "tokens": 1232,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/Organizers/ArchivedOrganizers.js": {
+            "lines": 8,
+            "tokens": 55,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/Organizers/ActiveOrganizers.js": {
+            "lines": 8,
+            "tokens": 55,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/Organizers/AccountOrganizers.js": {
+            "lines": 97,
+            "tokens": 535,
+            "sources": 1,
+            "clones": 6,
+            "duplicatedLines": 92,
+            "duplicatedTokens": 868,
+            "percentage": 94.85,
+            "percentageTokens": 162.24,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/old account/UpdateContact.js": {
+            "lines": 519,
+            "tokens": 5065,
+            "sources": 1,
+            "clones": 23,
+            "duplicatedLines": 492,
+            "duplicatedTokens": 4302,
+            "percentage": 94.8,
+            "percentageTokens": 84.94,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/old account/Info.js": {
+            "lines": 203,
+            "tokens": 2252,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/old account/ContactForm.js": {
+            "lines": 661,
+            "tokens": 5547,
+            "sources": 1,
+            "clones": 11,
+            "duplicatedLines": 345,
+            "duplicatedTokens": 3098,
+            "percentage": 52.19,
+            "percentageTokens": 55.85,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/old account/Contact.js": {
+            "lines": 494,
+            "tokens": 4383,
+            "sources": 1,
+            "clones": 2,
+            "duplicatedLines": 26,
+            "duplicatedTokens": 280,
+            "percentage": 5.26,
+            "percentageTokens": 6.39,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/old account/Account.js": {
+            "lines": 587,
+            "tokens": 5345,
+            "sources": 1,
+            "clones": 5,
+            "duplicatedLines": 58,
+            "duplicatedTokens": 600,
+            "percentage": 9.88,
+            "percentageTokens": 11.23,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/Jobs/Jobs.js": {
+            "lines": 63,
+            "tokens": 528,
+            "sources": 1,
+            "clones": 2,
+            "duplicatedLines": 36,
+            "duplicatedTokens": 319,
+            "percentage": 57.14,
+            "percentageTokens": 60.42,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/Jobs/JobFilter.js": {
+            "lines": 428,
+            "tokens": 3613,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/internalChat/TextEditor.js": {
+            "lines": 75,
+            "tokens": 763,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/internalChat/NewChat.js": {
+            "lines": 298,
+            "tokens": 2171,
+            "sources": 1,
+            "clones": 3,
+            "duplicatedLines": 36,
+            "duplicatedTokens": 307,
+            "percentage": 12.08,
+            "percentageTokens": 14.14,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/internalChat/internalCommunication.js": {
+            "lines": 457,
+            "tokens": 3117,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 9,
+            "duplicatedTokens": 96,
+            "percentage": 1.97,
+            "percentageTokens": 3.08,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/internalChat/ChatDetails.js": {
+            "lines": 555,
+            "tokens": 4779,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 14,
+            "duplicatedTokens": 149,
+            "percentage": 2.52,
+            "percentageTokens": 3.12,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/BulkActions/SendAccountEmail.js": {
+            "lines": 641,
+            "tokens": 7789,
+            "sources": 1,
+            "clones": 15,
+            "duplicatedLines": 205,
+            "duplicatedTokens": 2824,
+            "percentage": 31.98,
+            "percentageTokens": 36.26,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/BulkActions/ManageTeams.js": {
+            "lines": 176,
+            "tokens": 1681,
+            "sources": 1,
+            "clones": 2,
+            "duplicatedLines": 29,
+            "duplicatedTokens": 288,
+            "percentage": 16.48,
+            "percentageTokens": 17.13,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/BulkActions/ManageTags.js": {
+            "lines": 205,
+            "tokens": 1895,
+            "sources": 1,
+            "clones": 3,
+            "duplicatedLines": 41,
+            "duplicatedTokens": 397,
+            "percentage": 20,
+            "percentageTokens": 20.95,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/Automations/SendInvoice.js": {
+            "lines": 32,
+            "tokens": 444,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/Automations/SendEmail.js": {
+            "lines": 136,
+            "tokens": 1228,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/Accounts/TeamMemberMultiSelectDropDown.js": {
+            "lines": 246,
+            "tokens": 2323,
+            "sources": 1,
+            "clones": 5,
+            "duplicatedLines": 93,
+            "duplicatedTokens": 806,
+            "percentage": 37.8,
+            "percentageTokens": 34.7,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/Accounts/TagsMultiSelectDropDown.js": {
+            "lines": 210,
+            "tokens": 1872,
+            "sources": 1,
+            "clones": 7,
+            "duplicatedLines": 125,
+            "duplicatedTokens": 1058,
+            "percentage": 59.52,
+            "percentageTokens": 56.52,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/Accounts/Accounts.js": {
+            "lines": 142,
+            "tokens": 849,
+            "sources": 1,
+            "clones": 2,
+            "duplicatedLines": 32,
+            "duplicatedTokens": 301,
+            "percentage": 22.54,
+            "percentageTokens": 35.45,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/UpdateJob.js": {
+            "lines": 75,
+            "tokens": 823,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 6,
+            "duplicatedTokens": 82,
+            "percentage": 8,
+            "percentageTokens": 9.96,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/UpdateContact.js": {
+            "lines": 606,
+            "tokens": 4954,
+            "sources": 1,
+            "clones": 12,
+            "duplicatedLines": 144,
+            "duplicatedTokens": 1195,
+            "percentage": 23.76,
+            "percentageTokens": 24.12,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/TimeEntry.js": {
+            "lines": 492,
+            "tokens": 1518,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/Templates.js": {
+            "lines": 59,
+            "tokens": 512,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 17,
+            "duplicatedTokens": 117,
+            "percentage": 28.81,
+            "percentageTokens": 22.85,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/tagsSelect.js": {
+            "lines": 276,
+            "tokens": 2248,
+            "sources": 1,
+            "clones": 7,
+            "duplicatedLines": 161,
+            "duplicatedTokens": 1423,
+            "percentage": 58.33,
+            "percentageTokens": 63.3,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/stagesAutomationNew.js": {
+            "lines": 260,
+            "tokens": 2936,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/ServiceUpdate.js": {
+            "lines": 477,
+            "tokens": 4240,
+            "sources": 1,
+            "clones": 11,
+            "duplicatedLines": 209,
+            "duplicatedTokens": 1825,
+            "percentage": 43.82,
+            "percentageTokens": 43.04,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/Service.js": {
+            "lines": 829,
+            "tokens": 6843,
+            "sources": 1,
+            "clones": 10,
+            "duplicatedLines": 202,
+            "duplicatedTokens": 1746,
+            "percentage": 24.37,
+            "percentageTokens": 25.52,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/selectesting.js": {
+            "lines": 420,
+            "tokens": 2641,
+            "sources": 1,
+            "clones": 7,
+            "duplicatedLines": 165,
+            "duplicatedTokens": 1461,
+            "percentage": 39.29,
+            "percentageTokens": 55.32,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/NewTag.js": {
+            "lines": 9,
+            "tokens": 77,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/MarketPlaces.js": {
+            "lines": 12,
+            "tokens": 86,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/Insights.js": {
+            "lines": 460,
+            "tokens": 2493,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/ErrorPage.js": {
+            "lines": 11,
+            "tokens": 111,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/ChatForm.js": {
+            "lines": 825,
+            "tokens": 7951,
+            "sources": 1,
+            "clones": 12,
+            "duplicatedLines": 226,
+            "duplicatedTokens": 2677,
+            "percentage": 27.39,
+            "percentageTokens": 33.67,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/Bulkaccount.js": {
+            "lines": 746,
+            "tokens": 7475,
+            "sources": 1,
+            "clones": 2,
+            "duplicatedLines": 24,
+            "duplicatedTokens": 268,
+            "percentage": 3.22,
+            "percentageTokens": 3.59,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/Pages/AccountDash.js": {
+            "lines": 106,
+            "tokens": 1119,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 17,
+            "duplicatedTokens": 117,
+            "percentage": 16.04,
+            "percentageTokens": 10.46,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 12335,
+          "tokens": 105247,
+          "sources": 41,
+          "clones": 76,
+          "duplicatedLines": 1402,
+          "duplicatedTokens": 13302,
+          "percentage": 11.37,
+          "percentageTokens": 12.64,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      }
+    },
+    "total": {
+      "lines": 12335,
+      "tokens": 105247,
+      "sources": 41,
+      "clones": 76,
+      "duplicatedLines": 1402,
+      "duplicatedTokens": 13302,
+      "percentage": 11.37,
+      "percentageTokens": 12.64,
+      "newDuplicatedLines": 0,
+      "newClones": 0
+    }
+  },
+  "duplicates": [
+    {
+      "format": "javascript",
+      "lines": 13,
+      "fragment": "style={({ isActive }) => ({\r\n        padding: \"8px 16px\",\r\n        borderRadius: \"10px\",\r\n        fontSize: \"15px\",\r\n        cursor: \"pointer\",\r\n        textDecoration: \"none\",\r\n        fontWeight: isActive ? \"bold\" : \"normal\",\r\n        color: isActive ? \"var(--color-save-btn)\" : \"#333\",\r\n        backgroundColor: isActive ? \"#fff\" : \"transparent\",\r\n        transition: \"all 0.3s ease\",\r\n      })}\r\n    >\r\n      Archived",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\Organizers\\AccountOrganizers.js",
+        "start": 73,
+        "end": 85,
+        "startLoc": {
+          "line": 73,
+          "column": 7,
+          "position": 342
+        },
+        "endLoc": {
+          "line": 85,
+          "column": 9,
+          "position": 466
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\Organizers\\AccountOrganizers.js",
+        "start": 57,
+        "end": 69,
+        "startLoc": {
+          "line": 57,
+          "column": 7,
+          "position": 196
+        },
+        "endLoc": {
+          "line": 69,
+          "column": 7,
+          "position": 320
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 9,
+      "fragment": "const [firstName, setFirstName] = useState('');\r\n    const [middleName, setMiddleName] = useState('');\r\n    const [lastName, setLastName] = useState('');\r\n    const [contactName, setContactName] = useState('');\r\n    const [companyName, setCompanyName] = useState('');\r\n    const [note, setNote] = useState('');\r\n    const [ssn, setSsn] = useState('');\r\n    const [email, setEmail] = useState('');\r\n    const [country",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\old account\\ContactForm.js",
+        "start": 40,
+        "end": 48,
+        "startLoc": {
+          "line": 40,
+          "column": 5,
+          "position": 366
+        },
+        "endLoc": {
+          "line": 48,
+          "column": 8,
+          "position": 521
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\old account\\UpdateContact.js",
+        "start": 15,
+        "end": 23,
+        "startLoc": {
+          "line": 15,
+          "column": 5,
+          "position": 184
+        },
+        "endLoc": {
+          "line": 23,
+          "column": 13,
+          "position": 339
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 6,
+      "fragment": "] = useState('');\r\n    const [streetAddress, setStreetAddress] = useState('');\r\n    const [city, setCity] = useState('');\r\n    const [state, setState] = useState('');\r\n    const [postalCode, setPostalCode] = useState('');\r\n    const [combinedValues",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\old account\\ContactForm.js",
+        "start": 48,
+        "end": 53,
+        "startLoc": {
+          "line": 48,
+          "column": 11,
+          "position": 525
+        },
+        "endLoc": {
+          "line": 53,
+          "column": 15,
+          "position": 616
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\old account\\UpdateContact.js",
+        "start": 24,
+        "end": 30,
+        "startLoc": {
+          "line": 24,
+          "column": 19,
+          "position": 363
+        },
+        "endLoc": {
+          "line": 30,
+          "column": 8,
+          "position": 456
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 17,
+      "fragment": "] = useState([]);\r\n    useEffect(() => {\r\n        axios\r\n            .get('https://restcountries.com/v3.1/all')\r\n            .then((response) => {\r\n                const countryData = response.data.map((country) => ({\r\n                    name: country.name.common,\r\n                    code: country.cca2,\r\n                }));\r\n                setCountries(countryData);\r\n            })\r\n            .catch((error) =>\r\n                console.error('Error fetching country data:', error)\r\n            );\r\n    }, []);\r\n\r\n    const handlePhoneNumberChange",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\old account\\ContactForm.js",
+        "start": 53,
+        "end": 69,
+        "startLoc": {
+          "line": 53,
+          "column": 18,
+          "position": 620
+        },
+        "endLoc": {
+          "line": 69,
+          "column": 24,
+          "position": 776
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\old account\\UpdateContact.js",
+        "start": 82,
+        "end": 97,
+        "startLoc": {
+          "line": 82,
+          "column": 13,
+          "position": 1041
+        },
+        "endLoc": {
+          "line": 97,
+          "column": 20,
+          "position": 1195
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 16,
+      "fragment": ";\r\n\r\n    const handleAddPhoneNumber = () => {\r\n        setPhoneNumbers((prevPhoneNumbers) => [\r\n            ...prevPhoneNumbers,\r\n            { id: Date.now(), phone: '', isPrimary: false },\r\n        ]);\r\n    };\r\n\r\n    const handleDeletePhoneNumber = (id) => {\r\n        setPhoneNumbers((prevPhoneNumbers) =>\r\n            prevPhoneNumbers.filter((item) => item.id !== id)\r\n        );\r\n    };\r\n\r\n    const handleCountryChange",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\old account\\ContactForm.js",
+        "start": 80,
+        "end": 95,
+        "startLoc": {
+          "line": 80,
+          "column": 2,
+          "position": 909
+        },
+        "endLoc": {
+          "line": 95,
+          "column": 20,
+          "position": 1050
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\old account\\UpdateContact.js",
+        "start": 108,
+        "end": 124,
+        "startLoc": {
+          "line": 108,
+          "column": 2,
+          "position": 1309
+        },
+        "endLoc": {
+          "line": 124,
+          "column": 16,
+          "position": 1452
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 18,
+      "fragment": ";\r\n    useEffect(() => {\r\n        fetchData();\r\n    }, []);\r\n\r\n    const fetchData = async () => {\r\n        try {\r\n\r\n            const url = `${TAGS_API}/tags/`;\r\n\r\n            const response = await fetch(url);\r\n            const data = await response.json();\r\n            setTags(data.tags);\r\n        } catch (error) {\r\n            console.error(\"Error fetching data:\", error);\r\n        }\r\n    };\r\n    //  for tags",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\old account\\ContactForm.js",
+        "start": 198,
+        "end": 215,
+        "startLoc": {
+          "line": 198,
+          "column": 2,
+          "position": 1802
+        },
+        "endLoc": {
+          "line": 215,
+          "column": 13,
+          "position": 1955
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\old account\\UpdateContact.js",
+        "start": 133,
+        "end": 150,
+        "startLoc": {
+          "line": 133,
+          "column": 2,
+          "position": 1530
+        },
+        "endLoc": {
+          "line": 150,
+          "column": 6,
+          "position": 1683
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 34,
+      "fragment": "return baseWidth + (charWidth * tagName.length) + padding;\r\n    };\r\n\r\n\r\n    const options = tags.map((tag) => ({\r\n        value: tag._id,\r\n        label: tag.tagName,\r\n        colour: tag.tagColour,\r\n\r\n        customStyle: {\r\n            backgroundColor: tag.tagColour,\r\n            color: \"#fff\",\r\n            borderRadius: \"8px\",\r\n            alignItems: \"center\",\r\n            textAlign: \"center\",\r\n            marginBottom: \"5px\",\r\n            padding: \"2px,8px\",\r\n            fontSize: '10px',\r\n            width: `${calculateWidth(tag.tagName)}px`,\r\n            margin: '7px',\r\n            cursor: 'pointer',\r\n        },\r\n        customTagStyle: {\r\n            backgroundColor: tag.tagColour,\r\n            color: \"#fff\",\r\n            alignItems: \"center\",\r\n            textAlign: \"center\",\r\n            padding: \"2px,8px\",\r\n            fontSize: '15px',\r\n            cursor: 'pointer',\r\n        },\r\n    }));\r\n\r\n    return",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\old account\\ContactForm.js",
+        "start": 221,
+        "end": 254,
+        "startLoc": {
+          "line": 221,
+          "column": 9,
+          "position": 2016
+        },
+        "endLoc": {
+          "line": 254,
+          "column": 7,
+          "position": 2291
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\old account\\UpdateContact.js",
+        "start": 154,
+        "end": 185,
+        "startLoc": {
+          "line": 154,
+          "column": 9,
+          "position": 1732
+        },
+        "endLoc": {
+          "line": 185,
+          "column": 6,
+          "position": 2003
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 10,
+      "fragment": "<form style={{ paddingRight: '3%', paddingLeft: '3%', height: '90vh', overflowY: 'auto' }} className='contact-form'>\r\n                <Typography variant=\"h6\" gutterBottom sx={{ ml: 1, fontWeight: 'bold', mt: 2 }}>\r\n                    Contact info\r\n                </Typography>\r\n                <Box\r\n                    sx={{\r\n                        display: 'flex',\r\n                        flexDirection: isSmallScreen ? 'column' : 'row',\r\n                        gap: isSmallScreen ? 2 : 5,\r\n                        padding: '1px 5px 0 5px',",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\old account\\ContactForm.js",
+        "start": 260,
+        "end": 269,
+        "startLoc": {
+          "line": 260,
+          "column": 13,
+          "position": 2397
+        },
+        "endLoc": {
+          "line": 269,
+          "column": 2,
+          "position": 2544
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\old account\\UpdateContact.js",
+        "start": 233,
+        "end": 237,
+        "startLoc": {
+          "line": 233,
+          "column": 9,
+          "position": 2383
+        },
+        "endLoc": {
+          "line": 237,
+          "column": 2,
+          "position": 2521
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 91,
+      "fragment": "}}\r\n                >\r\n                    <Box>\r\n\r\n\r\n                        <InputLabel sx={{ color: 'black' }}>First name</InputLabel>\r\n\r\n                        <TextField\r\n                            margin=\"normal\"\r\n                            fullWidth\r\n                            name=\"firstName\"\r\n                            value={firstName}\r\n                            onChange={(e) => setFirstName(e.target.value)}\r\n                            placeholder=\"First Name\"\r\n                            size=\"small\"\r\n                        />\r\n\r\n                    </Box>\r\n                    <Box>\r\n\r\n\r\n                        <InputLabel sx={{ color: 'black' }}>Middle Name</InputLabel>\r\n\r\n                        <TextField\r\n                            margin=\"normal\"\r\n                            fullWidth\r\n                            name=\"middleName\"\r\n                            value={middleName}\r\n                            onChange={(e) => setMiddleName(e.target.value)}\r\n                            placeholder=\"Middle Name\"\r\n                            size=\"small\"\r\n                        />\r\n\r\n                    </Box>\r\n                    <Box>\r\n\r\n\r\n                        <InputLabel sx={{ color: 'black' }}>Last Name</InputLabel>\r\n\r\n                        <TextField\r\n                            fullWidth\r\n                            name=\"lastName\"\r\n                            value={lastName}\r\n                            onChange={(e) => setLastName(e.target.value)}\r\n                            margin=\"normal\"\r\n                            placeholder=\"Last name\"\r\n                            size=\"small\"\r\n                        />\r\n\r\n                    </Box>\r\n                </Box>\r\n                <Box >\r\n\r\n\r\n                    <InputLabel sx={{ color: 'black' }}>Contact Name</InputLabel>\r\n\r\n                    <TextField\r\n                        name=\"contactName\"\r\n                        value={contactName}\r\n                        onChange={(e) => setContactName(e.target.value)}\r\n                        fullWidth\r\n                        placeholder=\"Contact Name\"\r\n                        margin=\"normal\"\r\n\r\n                        size=\"small\"\r\n                    />\r\n\r\n                </Box>\r\n                <Box >\r\n\r\n                    <InputLabel sx={{ color: 'black' }}>Company Name</InputLabel>\r\n\r\n                    <TextField\r\n                        fullWidth\r\n                        name=\"companyName\"\r\n                        value={companyName}\r\n                        onChange={(e) => setCompanyName(e.target.value)}\r\n                        margin=\"normal\"\r\n                        placeholder=\"Company Name\"\r\n                        size=\"small\"\r\n                    />\r\n                </Box>\r\n                <Box >\r\n\r\n                    <InputLabel sx={{ color: 'black' }}>Note</InputLabel>\r\n\r\n                    <TextField\r\n                        fullWidth\r\n                        name=\"note\"\r\n                        value={note}\r\n                        multiline",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\old account\\ContactForm.js",
+        "start": 271,
+        "end": 361,
+        "startLoc": {
+          "line": 271,
+          "column": 21,
+          "position": 2550
+        },
+        "endLoc": {
+          "line": 361,
+          "column": 10,
+          "position": 3194
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\old account\\UpdateContact.js",
+        "start": 237,
+        "end": 305,
+        "startLoc": {
+          "line": 237,
+          "column": 2,
+          "position": 2521
+        },
+        "endLoc": {
+          "line": 305,
+          "column": 9,
+          "position": 3117
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 45,
+      "fragment": "onChange={(e) => setNote(e.target.value)}\r\n                        margin=\"normal\"\r\n                        placeholder=\"Note\"\r\n                        size=\"small\"\r\n                    />\r\n                </Box>\r\n                <Box >\r\n\r\n                    <InputLabel sx={{ color: 'black' }}>SSN</InputLabel>\r\n\r\n                    <TextField\r\n                        fullWidth\r\n                        name=\"ssn\"\r\n                        value={ssn}\r\n                        onChange={(e) => setSsn(e.target.value)}\r\n                        margin=\"normal\"\r\n                        placeholder=\"SSN\"\r\n                        size=\"small\"\r\n                    />\r\n                </Box>\r\n                <Box >\r\n\r\n                    <InputLabel sx={{ color: 'black' }}>Email</InputLabel>\r\n\r\n                    <TextField\r\n                        fullWidth\r\n                        name=\"email\"\r\n                        value={email}\r\n                        onChange={(e) => setEmail(e.target.value)}\r\n                        margin=\"normal\"\r\n                        placeholder=\"Email\"\r\n                        size=\"small\"\r\n                    />\r\n                </Box>\r\n                <Box >\r\n\r\n                    <InputLabel sx={{ color: 'black' }}>Tags</InputLabel>\r\n\r\n                    <Autocomplete\r\n                        multiple\r\n                        size='small'\r\n                        id=\"tags-outlined\"\r\n                        options={options}\r\n                        getOptionLabel={(option) => option.label}\r\n                        value={options",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\old account\\ContactForm.js",
+        "start": 362,
+        "end": 406,
+        "startLoc": {
+          "line": 362,
+          "column": 25,
+          "position": 3198
+        },
+        "endLoc": {
+          "line": 406,
+          "column": 8,
+          "position": 3550
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\old account\\UpdateContact.js",
+        "start": 305,
+        "end": 343,
+        "startLoc": {
+          "line": 305,
+          "column": 21,
+          "position": 3117
+        },
+        "endLoc": {
+          "line": 343,
+          "column": 8,
+          "position": 3454
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 99,
+      "fragment": "}\r\n                        onChange={handleTagChange}\r\n                        renderTags={(selected, getTagProps) =>\r\n                            selected.map((option, index) => (\r\n                                <Chip\r\n                                    key={option.value}\r\n                                    label={option.label}\r\n                                    style={option.customTagStyle}\r\n                                    {...getTagProps({ index })}\r\n                                />\r\n                            ))\r\n                        }\r\n                        renderInput={(params) => (\r\n                            <TextField\r\n                                {...params}\r\n                                variant=\"outlined\"\r\n\r\n                                placeholder=\"Tags\"\r\n                                sx={{ width: '100%', marginTop: '8px' }}\r\n                            />\r\n                        )}\r\n                        renderOption={(props, option) => (\r\n                            <Box component=\"li\" {...props} style={option.customStyle}>\r\n                                {option.label}\r\n                            </Box>\r\n                        )}\r\n                    />\r\n\r\n                </Box>\r\n                <Typography variant=\"h6\" gutterBottom sx={{ ml: 1, fontWeight: 'bold', mt: 3 }}>\r\n                    Phone Numbers\r\n                </Typography>\r\n                {phoneNumbers.map((phone) => (\r\n                    <Box\r\n                        key={phone.id}\r\n                        sx={{\r\n                            display: 'flex',\r\n                            flexDirection: 'row',\r\n                            alignItems: 'center',\r\n                            gap: 2,\r\n                            ml: 1,\r\n                            mb: 2,\r\n                        }}\r\n                    >\r\n                        {phone.isPrimary && (\r\n                            <Chip\r\n                                label=\"Primary phone\"\r\n                                color=\"primary\"\r\n                                size=\"small\"\r\n                                sx={{ position: 'absolute', mt: -3 }}\r\n                            />\r\n                        )}\r\n                        <PhoneInput\r\n                            country={'us'}\r\n                            value={phone.phone}\r\n                            onChange={(phoneValue) =>\r\n                                handlePhoneNumberChange(phone.id, phoneValue)\r\n                            }\r\n                            inputStyle={{\r\n                                width: '100%',\r\n                            }}\r\n                            buttonStyle={{\r\n                                borderTopLeftRadius: '8px',\r\n                                borderBottomLeftRadius: '8px',\r\n                            }}\r\n                            containerStyle={{\r\n                                display: 'flex',\r\n                                alignItems: 'center',\r\n                                gap: '8px',\r\n                            }}\r\n                        />\r\n                        <AiOutlineDelete\r\n                            onClick={() => handleDeletePhoneNumber(phone.id)}\r\n                            style={{ cursor: 'pointer', color: 'red' }}\r\n                        />\r\n                    </Box>\r\n                ))}\r\n                <Box\r\n                    sx={{\r\n                        display: 'flex',\r\n                        gap: 2,\r\n                        alignItems: isSmallScreen ? 'center' : 'flex-start',\r\n                        ml: 1,\r\n                        cursor: 'pointer',\r\n                        color: 'blue',\r\n                        fontWeight: 600,\r\n                    }}\r\n                    onClick={handleAddPhoneNumber}\r\n                >\r\n                    <AiOutlinePlusCircle style={{ marginTop: '20px' }} />\r\n                    <p>Add phone number</p>\r\n                </Box>\r\n                <Typography variant=\"h6\" gutterBottom sx={{ ml: 1, fontWeight: 'bold', mt: 3 }}>\r\n                    Address\r\n                </Typography>\r\n                <Box>\r\n\r\n                    <InputLabel sx={{ color: 'black' }}>Country</InputLabel>\r\n                    {",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\old account\\ContactForm.js",
+        "start": 406,
+        "end": 504,
+        "startLoc": {
+          "line": 406,
+          "column": 2,
+          "position": 3567
+        },
+        "endLoc": {
+          "line": 504,
+          "column": 2,
+          "position": 4443
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\old account\\UpdateContact.js",
+        "start": 343,
+        "end": 436,
+        "startLoc": {
+          "line": 343,
+          "column": 8,
+          "position": 3455
+        },
+        "endLoc": {
+          "line": 436,
+          "column": 2,
+          "position": 4320
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 11,
+      "fragment": "(data.tags);\r\n    } catch (error) {\r\n      console.error(\"Error fetching data:\", error);\r\n    }\r\n  };\r\n  //  for tags\r\n  const calculateWidth = (tagName) => {\r\n    const baseWidth = 10; // base width for each tag\r\n    const charWidth = 8; // approximate width of each character\r\n    const padding = 10; // padding on either side\r\n    return baseWidth + charWidth",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\old account\\Account.js",
+        "start": 182,
+        "end": 192,
+        "startLoc": {
+          "line": 182,
+          "column": 4,
+          "position": 1959
+        },
+        "endLoc": {
+          "line": 192,
+          "column": 10,
+          "position": 2067
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\old account\\ContactForm.js",
+        "start": 210,
+        "end": 221,
+        "startLoc": {
+          "line": 210,
+          "column": 8,
+          "position": 1912
+        },
+        "endLoc": {
+          "line": 221,
+          "column": 2,
+          "position": 2022
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 14,
+      "fragment": "= tags.map((tag) => ({\r\n    value: tag._id,\r\n    label: tag.tagName,\r\n    colour: tag.tagColour,\r\n\r\n    customStyle: {\r\n      backgroundColor: tag.tagColour,\r\n      color: \"#fff\",\r\n      borderRadius: \"8px\",\r\n      alignItems: \"center\",\r\n      textAlign: \"center\",\r\n      marginBottom: \"5px\",\r\n      padding: \"2px,8px\",\r\n      fontSize: \"10px\"",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\old account\\Account.js",
+        "start": 195,
+        "end": 208,
+        "startLoc": {
+          "line": 195,
+          "column": 2,
+          "position": 2093
+        },
+        "endLoc": {
+          "line": 208,
+          "column": 7,
+          "position": 2210
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\old account\\UpdateContact.js",
+        "start": 157,
+        "end": 169,
+        "startLoc": {
+          "line": 157,
+          "column": 2,
+          "position": 1766
+        },
+        "endLoc": {
+          "line": 169,
+          "column": 7,
+          "position": 1881
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 13,
+      "fragment": "// Store the index as the value\r\n              }))}\r\n              value={columns[selectedFilterIndex] ? { label: columns[selectedFilterIndex].header, value: selectedFilterIndex } : null}\r\n              onChange={(event, newValue) => {\r\n                if (newValue) {\r\n                  setSelectedFilterIndex(newValue.value);\r\n                  handleFilterChange({ target: { value: newValue.value } });\r\n                } else {\r\n                  setSelectedFilterIndex(null);\r\n                  handleFilterChange({ target: { value: null } });\r\n                }\r\n              }}\r\n              getOptionLabel={(option) => option.label || \"\"",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\old account\\Account.js",
+        "start": 470,
+        "end": 482,
+        "startLoc": {
+          "line": 470,
+          "column": 2,
+          "position": 4671
+        },
+        "endLoc": {
+          "line": 482,
+          "column": 3,
+          "position": 4841
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\old account\\Contact.js",
+        "start": 420,
+        "end": 432,
+        "startLoc": {
+          "line": 420,
+          "column": 12,
+          "position": 3887
+        },
+        "endLoc": {
+          "line": 432,
+          "column": 3,
+          "position": 4057
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 15,
+      "fragment": "}}\r\n                >\r\n                  {option.label}\r\n                </li>\r\n              )}\r\n            />\r\n            <Stack direction=\"row\" gap=\"8px\">\r\n              {renderFilterContainers()}\r\n            </Stack>\r\n          </>\r\n        </Stack>\r\n      </Paper>\r\n      <MaterialReactTable columns={columns} table={table} />\r\n    </Stack>\r\n  )",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\old account\\Account.js",
+        "start": 504,
+        "end": 518,
+        "startLoc": {
+          "line": 504,
+          "column": 19,
+          "position": 5020
+        },
+        "endLoc": {
+          "line": 518,
+          "column": 2,
+          "position": 5130
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\old account\\Contact.js",
+        "start": 454,
+        "end": 471,
+        "startLoc": {
+          "line": 454,
+          "column": 19,
+          "position": 4234
+        },
+        "endLoc": {
+          "line": 471,
+          "column": 2,
+          "position": 4350
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 16,
+      "fragment": "style={({ isActive }) => ({\r\n                    padding: \"8px 16px\",\r\n                    borderRadius: \"10px\",\r\n                    fontSize: \"15px\",\r\n                    cursor: \"pointer\",\r\n                    textDecoration: \"none\",\r\n                    fontWeight: isActive ? \"bold\" : \"normal\",\r\n                    color: isActive ? \"var(--color-save-btn)\" : \"#333\",\r\n                    backgroundColor: isActive ? \"#fff\" : \"transparent\",\r\n                    transition: \"all 0.3s ease\",\r\n                  })}\r\n                >\r\n                  Active\r\n                </NavLink>\r\n                <NavLink\r\n                  to=\"/jobs/archivedjob\"",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\Jobs\\Jobs.js",
+        "start": 23,
+        "end": 38,
+        "startLoc": {
+          "line": 23,
+          "column": 19,
+          "position": 188
+        },
+        "endLoc": {
+          "line": 38,
+          "column": 20,
+          "position": 330
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\Organizers\\AccountOrganizers.js",
+        "start": 57,
+        "end": 72,
+        "startLoc": {
+          "line": 57,
+          "column": 7,
+          "position": 196
+        },
+        "endLoc": {
+          "line": 72,
+          "column": 23,
+          "position": 338
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 22,
+      "fragment": "style={({ isActive }) => ({\r\n                    padding: \"8px 16px\",\r\n                    borderRadius: \"10px\",\r\n                    fontSize: \"15px\",\r\n                    cursor: \"pointer\",\r\n                    textDecoration: \"none\",\r\n                    fontWeight: isActive ? \"bold\" : \"normal\",\r\n                    color: isActive ? \"var(--color-save-btn)\" : \"#333\",\r\n                    backgroundColor: isActive ? \"#fff\" : \"transparent\",\r\n                    transition: \"all 0.3s ease\",\r\n                  })}\r\n                >\r\n                  Archived\r\n                </NavLink>\r\n                \r\n              </Box>\r\n           \r\n          \r\n                <Box mt={2}>\r\n                  <Outlet />\r\n                </Box>\r\n   </Box",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\Jobs\\Jobs.js",
+        "start": 39,
+        "end": 60,
+        "startLoc": {
+          "line": 39,
+          "column": 19,
+          "position": 334
+        },
+        "endLoc": {
+          "line": 60,
+          "column": 4,
+          "position": 511
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\Organizers\\AccountOrganizers.js",
+        "start": 57,
+        "end": 94,
+        "startLoc": {
+          "line": 57,
+          "column": 7,
+          "position": 196
+        },
+        "endLoc": {
+          "line": 94,
+          "column": 2,
+          "position": 519
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 10,
+      "fragment": "const { logindata } = useContext(LoginContext);\r\n  const [loginUserId, setLoginUserId] = useState();\r\n\r\n  useEffect(() => {\r\n    if (logindata?.user?.id) {\r\n      setLoginUserId(logindata.user.id);\r\n    }\r\n  }, [logindata]);\r\n\r\n  const getsChatlist",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\internalChat\\internalCommunication.js",
+        "start": 276,
+        "end": 285,
+        "startLoc": {
+          "line": 276,
+          "column": 3,
+          "position": 1128
+        },
+        "endLoc": {
+          "line": 285,
+          "column": 13,
+          "position": 1224
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\internalChat\\NewChat.js",
+        "start": 9,
+        "end": 18,
+        "startLoc": {
+          "line": 9,
+          "column": 5,
+          "position": 123
+        },
+        "endLoc": {
+          "line": 18,
+          "column": 2,
+          "position": 219
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 28,
+      "fragment": "},\r\n        { title: \"Date Shortcodes\", isBold: true },\r\n        { title: \"Current day full date\", isBold: false, value: \"CURRENT_DAY_FULL_DATE\" },\r\n        { title: \"Current day number\", isBold: false, value: \"CURRENT_DAY_NUMBER\" },\r\n        { title: \"Current day name\", isBold: false, value: \"CURRENT_DAY_NAME\" },\r\n        { title: \"Current week\", isBold: false, value: \"CURRENT_WEEK\" },\r\n        { title: \"Current month number\", isBold: false, value: \"CURRENT_MONTH_NUMBER\" },\r\n        { title: \"Current month name\", isBold: false, value: \"CURRENT_MONTH_NAME\" },\r\n        { title: \"Current quarter\", isBold: false, value: \"CURRENT_QUARTER\" },\r\n        { title: \"Current year\", isBold: false, value: \"CURRENT_YEAR\" },\r\n        { title: \"Last day full date\", isBold: false, value: \"LAST_DAY_FULL_DATE\" },\r\n        { title: \"Last day number\", isBold: false, value: \"LAST_DAY_NUMBER\" },\r\n        { title: \"Last day name\", isBold: false, value: \"LAST_DAY_NAME\" },\r\n        { title: \"Last week\", isBold: false, value: \"LAST_WEEK\" },\r\n        { title: \"Last month number\", isBold: false, value: \"LAST_MONTH_NUMBER\" },\r\n        { title: \"Last month name\", isBold: false, value: \"LAST_MONTH_NAME\" },\r\n        { title: \"Last quarter\", isBold: false, value: \"LAST_QUARTER\" },\r\n        { title: \"Last_year\", isBold: false, value: \"LAST_YEAR\" },\r\n        { title: \"Next day full date\", isBold: false, value: \"NEXT_DAY_FULL_DATE\" },\r\n        { title: \"Next day number\", isBold: false, value: \"NEXT_DAY_NUMBER\" },\r\n        { title: \"Next day name\", isBold: false, value: \"NEXT_DAY_NAME\" },\r\n        { title: \"Next week\", isBold: false, value: \"NEXT_WEEK\" },\r\n        { title: \"Next month number\", isBold: false, value: \"NEXT_MONTH_NUMBER\" },\r\n        { title: \"Next month name\", isBold: false, value: \"NEXT_MONTH_NAME\" },\r\n        { title: \"Next quarter\", isBold: false, value: \"NEXT_QUARTER\" },\r\n        { title: \"Next year\", isBold: false, value: \"NEXT_YEAR\" },\r\n      ];\r\n      setShortcuts(accountShortcuts",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\BulkActions\\SendAccountEmail.js",
+        "start": 159,
+        "end": 186,
+        "startLoc": {
+          "line": 159,
+          "column": 2,
+          "position": 2263
+        },
+        "endLoc": {
+          "line": 186,
+          "column": 17,
+          "position": 2869
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\BulkActions\\SendAccountEmail.js",
+        "start": 125,
+        "end": 153,
+        "startLoc": {
+          "line": 125,
+          "column": 2,
+          "position": 1556
+        },
+        "endLoc": {
+          "line": 153,
+          "column": 17,
+          "position": 2164
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 16,
+      "fragment": "</Button>\r\n        <Button variant=\"outlined\"  onClick={handleCancel} sx={{\r\n                    borderColor: 'var(--color-border-cancel-btn)',  // Normal background\r\n                   color:'var(--color-save-btn)',\r\n                    '&:hover': {\r\n                      backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color\r\n                      color:'#fff',\r\n                      border:\"none\"\r\n                    },\r\n                    width:'80px',borderRadius:'15px'\r\n                  }}>\r\n          Cancel\r\n        </Button>\r\n      </Box>\r\n    </Box>\r\n  )",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\BulkActions\\ManageTeams.js",
+        "start": 159,
+        "end": 174,
+        "startLoc": {
+          "line": 159,
+          "column": 9,
+          "position": 1546
+        },
+        "endLoc": {
+          "line": 174,
+          "column": 2,
+          "position": 1666
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\BulkActions\\SendAccountEmail.js",
+        "start": 622,
+        "end": 637,
+        "startLoc": {
+          "line": 622,
+          "column": 13,
+          "position": 7640
+        },
+        "endLoc": {
+          "line": 637,
+          "column": 2,
+          "position": 7760
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 10,
+      "fragment": "}, []);\r\n\r\n  const fetchTagData = async () => {\r\n    try {\r\n      const url = `${TAGS_API}/tags/`;\r\n      const response = await fetch(url);\r\n      const data = await response.json();\r\n      setTags(data.tags);\r\n\r\n      // Initialize action state for each tag",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\BulkActions\\ManageTags.js",
+        "start": 12,
+        "end": 21,
+        "startLoc": {
+          "line": 12,
+          "column": 3,
+          "position": 201
+        },
+        "endLoc": {
+          "line": 21,
+          "column": 40,
+          "position": 296
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\old account\\Account.js",
+        "start": 173,
+        "end": 182,
+        "startLoc": {
+          "line": 173,
+          "column": 3,
+          "position": 1861
+        },
+        "endLoc": {
+          "line": 182,
+          "column": 8,
+          "position": 1956
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 15,
+      "fragment": "sx={{ width: \"150px\" }}\r\n                  >\r\n                    <MenuItem value=\"Assign to all\">Assign to all</MenuItem>\r\n                    <MenuItem value=\"Remove from all\">Remove from all</MenuItem>\r\n                    <MenuItem value=\"Do nothing\">Do nothing</MenuItem>\r\n                  </Select>\r\n                </TableCell>\r\n              </TableRow>\r\n            ))}\r\n          </TableBody>\r\n        </Table>\r\n      </TableContainer>\r\n\r\n      <Box className=\"buttons-email\" sx={{ display: \"flex\", gap: 2, mt: 2 }}>\r\n        <Button variant=\"contained\"onClick={sendbulkTags",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\BulkActions\\ManageTags.js",
+        "start": 165,
+        "end": 179,
+        "startLoc": {
+          "line": 165,
+          "column": 21,
+          "position": 1530
+        },
+        "endLoc": {
+          "line": 179,
+          "column": 13,
+          "position": 1698
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\BulkActions\\ManageTeams.js",
+        "start": 136,
+        "end": 150,
+        "startLoc": {
+          "line": 136,
+          "column": 21,
+          "position": 1313
+        },
+        "endLoc": {
+          "line": 150,
+          "column": 19,
+          "position": 1482
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 19,
+      "fragment": "</Button>\r\n        <Button variant=\"outlined\"  onClick={handleCancel} sx={{\r\n                    borderColor: 'var(--color-border-cancel-btn)',  // Normal background\r\n                   color:'var(--color-save-btn)',\r\n                    '&:hover': {\r\n                      backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color\r\n                      color:'#fff',\r\n                      border:\"none\"\r\n                    },\r\n                    width:'80px',borderRadius:'15px'\r\n                  }}>\r\n          Cancel\r\n        </Button>\r\n      </Box>\r\n    </Box>\r\n  );\r\n};\r\n\r\nexport default ManageTags",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\BulkActions\\ManageTags.js",
+        "start": 188,
+        "end": 206,
+        "startLoc": {
+          "line": 188,
+          "column": 9,
+          "position": 1760
+        },
+        "endLoc": {
+          "line": 206,
+          "column": 11,
+          "position": 1894
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\BulkActions\\SendAccountEmail.js",
+        "start": 622,
+        "end": 177,
+        "startLoc": {
+          "line": 622,
+          "column": 13,
+          "position": 7640
+        },
+        "endLoc": {
+          "line": 177,
+          "column": 12,
+          "position": 1680
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 18,
+      "fragment": ");\r\n\r\n  const handleClick = (event) => {\r\n    setAnchorEl(event.currentTarget);\r\n    if (containerRef.current) {\r\n      setMenuWidth(containerRef.current.offsetWidth);\r\n    }\r\n  };\r\n\r\n  const handleClose = () => {\r\n    setAnchorEl(null);\r\n    setSearchQuery(\"\");\r\n  };\r\n\r\n  const handleSelect = (selectedValue) => {\r\n    if (!selectedValue) return;\r\n    \r\n    const",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\Accounts\\TagsMultiSelectDropDown.js",
+        "start": 24,
+        "end": 41,
+        "startLoc": {
+          "line": 24,
+          "column": 5,
+          "position": 224
+        },
+        "endLoc": {
+          "line": 41,
+          "column": 6,
+          "position": 360
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\Accounts\\TeamMemberMultiSelectDropDown.js",
+        "start": 61,
+        "end": 77,
+        "startLoc": {
+          "line": 61,
+          "column": 2,
+          "position": 578
+        },
+        "endLoc": {
+          "line": 77,
+          "column": 8,
+          "position": 712
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 22,
+      "fragment": ");\r\n\r\n  return (\r\n    <Box sx={{ width }}>\r\n      <Box\r\n        ref={containerRef}\r\n        sx={{\r\n          display: \"flex\",\r\n          alignItems: \"center\",\r\n          justifyContent: \"space-between\",\r\n          border: \"1px solid #ccc\",\r\n          borderRadius: \"8px\",\r\n          padding: \"4px\",\r\n          cursor: \"pointer\",\r\n          bgcolor: \"background.paper\",\r\n          width: \"100%\",\r\n          minHeight: \"40px\"\r\n        }}\r\n        onClick={handleClick}\r\n      >\r\n        <Box sx={{ display: \"flex\", flexWrap: \"wrap\", gap: 0.5, flex: 1 }}>\r\n          {value.",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\Accounts\\TagsMultiSelectDropDown.js",
+        "start": 66,
+        "end": 87,
+        "startLoc": {
+          "line": 66,
+          "column": 3,
+          "position": 615
+        },
+        "endLoc": {
+          "line": 87,
+          "column": 2,
+          "position": 799
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\Accounts\\TeamMemberMultiSelectDropDown.js",
+        "start": 109,
+        "end": 130,
+        "startLoc": {
+          "line": 109,
+          "column": 2,
+          "position": 1041
+        },
+        "endLoc": {
+          "line": 130,
+          "column": 3,
+          "position": 1226
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 9,
+      "fragment": ")\r\n          ) : (\r\n            <Typography variant=\"body2\" color=\"textSecondary\" sx={{ pl: 1 }}>\r\n              {placeholder}\r\n            </Typography>\r\n          )}\r\n        </Box>\r\n        <Box sx={{ display: \"flex\", alignItems: \"center\" }}>\r\n          {value.",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\Accounts\\TagsMultiSelectDropDown.js",
+        "start": 111,
+        "end": 119,
+        "startLoc": {
+          "line": 111,
+          "column": 2,
+          "position": 1010
+        },
+        "endLoc": {
+          "line": 119,
+          "column": 2,
+          "position": 1101
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\Accounts\\TeamMemberMultiSelectDropDown.js",
+        "start": 155,
+        "end": 163,
+        "startLoc": {
+          "line": 155,
+          "column": 2,
+          "position": 1451
+        },
+        "endLoc": {
+          "line": 163,
+          "column": 3,
+          "position": 1543
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 33,
+      "fragment": "value.length > 0 && (\r\n            <IconButton\r\n              onClick={clearSelection}\r\n              size=\"small\"\r\n              sx={{ color: \"text.secondary\" }}\r\n            >\r\n              <FaTimes />\r\n            </IconButton>\r\n          )}\r\n          <IconButton size=\"small\">\r\n            {anchorEl ? <FaCaretUp /> : <FaCaretDown />}\r\n          </IconButton>\r\n        </Box>\r\n      </Box>\r\n\r\n      <Menu\r\n        anchorEl={anchorEl}\r\n        open={Boolean(anchorEl)}\r\n        onClose={handleClose}\r\n        anchorOrigin={{ vertical: \"bottom\", horizontal: \"left\" }}\r\n        transformOrigin={{ vertical: \"top\", horizontal: \"left\" }}\r\n        PaperProps={{\r\n          style: {\r\n            width: menuWidth || \"auto\",\r\n            maxHeight: \"250px\",\r\n          }\r\n        }}\r\n      >\r\n        <Box sx={{ p: 1 }}>\r\n          <TextField\r\n            fullWidth\r\n            size=\"small\"\r\n            placeholder=\"Search tags...\"",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\Accounts\\TagsMultiSelectDropDown.js",
+        "start": 119,
+        "end": 151,
+        "startLoc": {
+          "line": 119,
+          "column": 2,
+          "position": 1100
+        },
+        "endLoc": {
+          "line": 151,
+          "column": 17,
+          "position": 1384
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\Accounts\\TeamMemberMultiSelectDropDown.js",
+        "start": 163,
+        "end": 195,
+        "startLoc": {
+          "line": 163,
+          "column": 2,
+          "position": 1545
+        },
+        "endLoc": {
+          "line": 195,
+          "column": 25,
+          "position": 1829
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 16,
+      "fragment": "(\r\n              <Box\r\n                key={option.value}\r\n                sx={{\r\n                  display: \"flex\",\r\n                  alignItems: \"center\",\r\n                  p: \"4px 8px\",\r\n                  cursor: \"pointer\",\r\n                  \"&:hover\": {\r\n                    backgroundColor: 'action.hover'\r\n                  }\r\n                }}\r\n                onClick={() => handleSelect(option.value)}\r\n              >\r\n                <Checkbox \r\n                  checked={isSelected",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\Accounts\\TagsMultiSelectDropDown.js",
+        "start": 165,
+        "end": 180,
+        "startLoc": {
+          "line": 165,
+          "column": 2,
+          "position": 1526
+        },
+        "endLoc": {
+          "line": 180,
+          "column": 11,
+          "position": 1637
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\Accounts\\TeamMemberMultiSelectDropDown.js",
+        "start": 213,
+        "end": 228,
+        "startLoc": {
+          "line": 213,
+          "column": 2,
+          "position": 2022
+        },
+        "endLoc": {
+          "line": 228,
+          "column": 6,
+          "position": 2133
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 16,
+      "fragment": "style={({ isActive }) => ({\r\n            padding: \"8px 16px\",\r\n            borderRadius: \"10px\",\r\n            fontSize: \"15px\",\r\n            cursor: \"pointer\",\r\n            textDecoration: \"none\",\r\n            fontWeight: isActive ? \"bold\" : \"normal\",\r\n            color: isActive ? \"var(--color-save-btn)\" : \"#333\",\r\n            backgroundColor: isActive ? \"#fff\" : \"transparent\",\r\n            transition: \"all 0.3s ease\",\r\n          })}\r\n        >\r\n          Active\r\n        </NavLink>\r\n        <NavLink\r\n          to=\"/clients/accounts/archivedaccounts\"",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\Accounts\\Accounts.js",
+        "start": 104,
+        "end": 119,
+        "startLoc": {
+          "line": 104,
+          "column": 11,
+          "position": 498
+        },
+        "endLoc": {
+          "line": 119,
+          "column": 37,
+          "position": 640
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\Organizers\\AccountOrganizers.js",
+        "start": 57,
+        "end": 72,
+        "startLoc": {
+          "line": 57,
+          "column": 7,
+          "position": 196
+        },
+        "endLoc": {
+          "line": 72,
+          "column": 23,
+          "position": 338
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 18,
+      "fragment": "style={({ isActive }) => ({\r\n            padding: \"8px 16px\",\r\n            borderRadius: \"10px\",\r\n            fontSize: \"15px\",\r\n            cursor: \"pointer\",\r\n            textDecoration: \"none\",\r\n            fontWeight: isActive ? \"bold\" : \"normal\",\r\n            color: isActive ? \"var(--color-save-btn)\" : \"#333\",\r\n            backgroundColor: isActive ? \"#fff\" : \"transparent\",\r\n            transition: \"all 0.3s ease\",\r\n          })}\r\n        >\r\n          Archived\r\n        </NavLink>\r\n      </Box>\r\n\r\n      <Box mt={2}>\r\n        <Outlet context",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\Accounts\\Accounts.js",
+        "start": 120,
+        "end": 137,
+        "startLoc": {
+          "line": 120,
+          "column": 11,
+          "position": 644
+        },
+        "endLoc": {
+          "line": 137,
+          "column": 8,
+          "position": 803
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\Organizers\\AccountOrganizers.js",
+        "start": 57,
+        "end": 92,
+        "startLoc": {
+          "line": 57,
+          "column": 7,
+          "position": 196
+        },
+        "endLoc": {
+          "line": 92,
+          "column": 2,
+          "position": 505
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 7,
+      "fragment": "}\r\n          isOptionEqualToValue={(option, value) => option.value === value.value}\r\n          renderOption={(props, option) => (\r\n            <Box\r\n              component=\"li\"\r\n              {...props}\r\n              sx={{ cursor: \"pointer\", margin: \"5px 10px\" }} // Add cursor pointer style",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\UpdateJob.js",
+        "start": 55,
+        "end": 61,
+        "startLoc": {
+          "line": 55,
+          "column": 2,
+          "position": 590
+        },
+        "endLoc": {
+          "line": 61,
+          "column": 28,
+          "position": 672
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\BulkActions\\SendAccountEmail.js",
+        "start": 533,
+        "end": 536,
+        "startLoc": {
+          "line": 533,
+          "column": 6,
+          "position": 6503
+        },
+        "endLoc": {
+          "line": 536,
+          "column": 2,
+          "position": 6578
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 13,
+      "fragment": "}}>First name</InputLabel>\r\n          <TextField\r\n            margin=\"normal\"\r\n            fullWidth\r\n            name=\"firstName\"\r\n            value={firstName}\r\n            onChange={(e) => setFirstName(e.target.value)}\r\n            placeholder=\"First Name\"\r\n            size=\"small\"\r\n          />\r\n        </Box>\r\n        <Box>\r\n          <InputLabel sx={{ color: \"black\"",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\UpdateContact.js",
+        "start": 284,
+        "end": 296,
+        "startLoc": {
+          "line": 284,
+          "column": 2,
+          "position": 2440
+        },
+        "endLoc": {
+          "line": 296,
+          "column": 8,
+          "position": 2544
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\old account\\UpdateContact.js",
+        "start": 239,
+        "end": 251,
+        "startLoc": {
+          "line": 239,
+          "column": 2,
+          "position": 2546
+        },
+        "endLoc": {
+          "line": 251,
+          "column": 8,
+          "position": 2650
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 13,
+      "fragment": "}}>Middle Name</InputLabel>\r\n          <TextField\r\n            margin=\"normal\"\r\n            fullWidth\r\n            name=\"middleName\"\r\n            value={middleName}\r\n            onChange={(e) => setMiddleName(e.target.value)}\r\n            placeholder=\"Middle Name\"\r\n            size=\"small\"\r\n          />\r\n        </Box>\r\n        <Box>\r\n          <InputLabel sx={{ color: \"black\"",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\UpdateContact.js",
+        "start": 296,
+        "end": 308,
+        "startLoc": {
+          "line": 296,
+          "column": 2,
+          "position": 2546
+        },
+        "endLoc": {
+          "line": 308,
+          "column": 8,
+          "position": 2650
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\old account\\UpdateContact.js",
+        "start": 251,
+        "end": 263,
+        "startLoc": {
+          "line": 251,
+          "column": 2,
+          "position": 2652
+        },
+        "endLoc": {
+          "line": 263,
+          "column": 8,
+          "position": 2756
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 13,
+      "fragment": "}}>Last Name</InputLabel>\r\n          <TextField\r\n            fullWidth\r\n            name=\"lastName\"\r\n            value={lastName}\r\n            onChange={(e) => setLastName(e.target.value)}\r\n            margin=\"normal\"\r\n            placeholder=\"Last name\"\r\n            size=\"small\"\r\n          />\r\n        </Box>\r\n      </Box>\r\n      <Box mt",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\UpdateContact.js",
+        "start": 308,
+        "end": 320,
+        "startLoc": {
+          "line": 308,
+          "column": 2,
+          "position": 2652
+        },
+        "endLoc": {
+          "line": 320,
+          "column": 3,
+          "position": 2749
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\old account\\UpdateContact.js",
+        "start": 263,
+        "end": 275,
+        "startLoc": {
+          "line": 263,
+          "column": 2,
+          "position": 2758
+        },
+        "endLoc": {
+          "line": 275,
+          "column": 2,
+          "position": 2854
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 12,
+      "fragment": "}}>Contact Name</InputLabel>\r\n        <TextField\r\n          name=\"contactName\"\r\n          value={contactName}\r\n          onChange={(e) => setContactName(e.target.value)}\r\n          fullWidth\r\n          placeholder=\"Contact Name\"\r\n          margin=\"normal\"\r\n          size=\"small\"\r\n        />\r\n      </Box>\r\n      <Box mt",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\UpdateContact.js",
+        "start": 321,
+        "end": 332,
+        "startLoc": {
+          "line": 321,
+          "column": 2,
+          "position": 2771
+        },
+        "endLoc": {
+          "line": 332,
+          "column": 3,
+          "position": 2861
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\old account\\UpdateContact.js",
+        "start": 276,
+        "end": 287,
+        "startLoc": {
+          "line": 276,
+          "column": 2,
+          "position": 2871
+        },
+        "endLoc": {
+          "line": 287,
+          "column": 2,
+          "position": 2960
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 12,
+      "fragment": "}}>Company Name</InputLabel>\r\n        <TextField\r\n          fullWidth\r\n          name=\"companyName\"\r\n          value={companyName}\r\n          onChange={(e) => setCompanyName(e.target.value)}\r\n          margin=\"normal\"\r\n          placeholder=\"Company Name\"\r\n          size=\"small\"\r\n        />\r\n      </Box>\r\n      <Box mt",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\UpdateContact.js",
+        "start": 333,
+        "end": 344,
+        "startLoc": {
+          "line": 333,
+          "column": 2,
+          "position": 2883
+        },
+        "endLoc": {
+          "line": 344,
+          "column": 3,
+          "position": 2973
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\old account\\UpdateContact.js",
+        "start": 288,
+        "end": 299,
+        "startLoc": {
+          "line": 288,
+          "column": 2,
+          "position": 2977
+        },
+        "endLoc": {
+          "line": 299,
+          "column": 2,
+          "position": 3066
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 12,
+      "fragment": "}}>Note</InputLabel>\r\n        <TextField\r\n          fullWidth\r\n          name=\"note\"\r\n          value={note}\r\n          onChange={(e) => setNote(e.target.value)}\r\n          margin=\"normal\"\r\n          placeholder=\"Note\"\r\n          size=\"small\"\r\n        />\r\n      </Box>\r\n      <Box mt",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\UpdateContact.js",
+        "start": 345,
+        "end": 356,
+        "startLoc": {
+          "line": 345,
+          "column": 2,
+          "position": 2995
+        },
+        "endLoc": {
+          "line": 356,
+          "column": 3,
+          "position": 3083
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\old account\\UpdateContact.js",
+        "start": 300,
+        "end": 311,
+        "startLoc": {
+          "line": 300,
+          "column": 2,
+          "position": 3083
+        },
+        "endLoc": {
+          "line": 311,
+          "column": 2,
+          "position": 3170
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 12,
+      "fragment": "}}>SSN</InputLabel>\r\n        <TextField\r\n          fullWidth\r\n          name=\"ssn\"\r\n          value={ssn}\r\n          onChange={(e) => setSsn(e.target.value)}\r\n          margin=\"normal\"\r\n          placeholder=\"SSN\"\r\n          size=\"small\"\r\n        />\r\n      </Box>\r\n      <Box mt",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\UpdateContact.js",
+        "start": 357,
+        "end": 368,
+        "startLoc": {
+          "line": 357,
+          "column": 2,
+          "position": 3105
+        },
+        "endLoc": {
+          "line": 368,
+          "column": 3,
+          "position": 3193
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\old account\\UpdateContact.js",
+        "start": 312,
+        "end": 323,
+        "startLoc": {
+          "line": 312,
+          "column": 2,
+          "position": 3187
+        },
+        "endLoc": {
+          "line": 323,
+          "column": 2,
+          "position": 3274
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 12,
+      "fragment": "}}>Email</InputLabel>\r\n        <TextField\r\n          fullWidth\r\n          name=\"email\"\r\n          value={email}\r\n          onChange={(e) => setEmail(e.target.value)}\r\n          margin=\"normal\"\r\n          placeholder=\"Email\"\r\n          size=\"small\"\r\n        />\r\n      </Box>\r\n      <Box mt",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\UpdateContact.js",
+        "start": 369,
+        "end": 380,
+        "startLoc": {
+          "line": 369,
+          "column": 2,
+          "position": 3215
+        },
+        "endLoc": {
+          "line": 380,
+          "column": 3,
+          "position": 3303
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\old account\\UpdateContact.js",
+        "start": 324,
+        "end": 335,
+        "startLoc": {
+          "line": 324,
+          "column": 2,
+          "position": 3291
+        },
+        "endLoc": {
+          "line": 335,
+          "column": 2,
+          "position": 3378
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 14,
+      "fragment": "}}>Street Address</InputLabel>\r\n        <TextField\r\n          fullWidth\r\n          name=\"streetAddress\"\r\n          value={streetAddress}\r\n          onChange={(e) => setStreetAddress(e.target.value)}\r\n          margin=\"normal\"\r\n          placeholder=\"Street Address\"\r\n          size=\"small\"\r\n        />\r\n      </Box>\r\n      <Box\r\n        sx={{\r\n          display: \"flex\"",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\UpdateContact.js",
+        "start": 511,
+        "end": 524,
+        "startLoc": {
+          "line": 511,
+          "column": 2,
+          "position": 4191
+        },
+        "endLoc": {
+          "line": 524,
+          "column": 7,
+          "position": 4293
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\old account\\UpdateContact.js",
+        "start": 453,
+        "end": 464,
+        "startLoc": {
+          "line": 453,
+          "column": 2,
+          "position": 4469
+        },
+        "endLoc": {
+          "line": 464,
+          "column": 7,
+          "position": 4567
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 13,
+      "fragment": "}}>City</InputLabel>\r\n          <TextField\r\n            fullWidth\r\n            name=\"city\"\r\n            value={city}\r\n            onChange={(e) => setCity(e.target.value)}\r\n            margin=\"normal\"\r\n            placeholder=\"City\"\r\n            size=\"small\"\r\n          />\r\n        </Box>\r\n        <Box>\r\n          <InputLabel sx={{ color: \"black\"",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\UpdateContact.js",
+        "start": 532,
+        "end": 544,
+        "startLoc": {
+          "line": 532,
+          "column": 2,
+          "position": 4374
+        },
+        "endLoc": {
+          "line": 544,
+          "column": 8,
+          "position": 4476
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\old account\\UpdateContact.js",
+        "start": 466,
+        "end": 478,
+        "startLoc": {
+          "line": 466,
+          "column": 2,
+          "position": 4628
+        },
+        "endLoc": {
+          "line": 478,
+          "column": 8,
+          "position": 4730
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 13,
+      "fragment": "}}>State</InputLabel>\r\n          <TextField\r\n            fullWidth\r\n            name=\"state\"\r\n            value={state}\r\n            onChange={(e) => setState(e.target.value)}\r\n            margin=\"normal\"\r\n            placeholder=\"State\"\r\n            size=\"small\"\r\n          />\r\n        </Box>\r\n        <Box>\r\n          <InputLabel sx={{ color: \"black\"",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\UpdateContact.js",
+        "start": 544,
+        "end": 556,
+        "startLoc": {
+          "line": 544,
+          "column": 2,
+          "position": 4478
+        },
+        "endLoc": {
+          "line": 556,
+          "column": 8,
+          "position": 4580
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\old account\\UpdateContact.js",
+        "start": 478,
+        "end": 490,
+        "startLoc": {
+          "line": 478,
+          "column": 2,
+          "position": 4732
+        },
+        "endLoc": {
+          "line": 490,
+          "column": 8,
+          "position": 4834
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 17,
+      "fragment": "}}>Postal Code</InputLabel>\r\n          <TextField\r\n            fullWidth\r\n            name=\"postalCode\"\r\n            value={postalCode}\r\n            onChange={(e) => setPostalCode(e.target.value)}\r\n            margin=\"normal\"\r\n            placeholder=\"Postal Code\"\r\n            size=\"small\"\r\n          />\r\n        </Box>\r\n      </Box>\r\n      <Box sx={{ mt: 2, mb: 2 }}>\r\n        <Button\r\n          variant=\"contained\"\r\n          onClick={handleSave} // Attach the save handler\r\n          sx",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\UpdateContact.js",
+        "start": 556,
+        "end": 572,
+        "startLoc": {
+          "line": 556,
+          "column": 2,
+          "position": 4582
+        },
+        "endLoc": {
+          "line": 572,
+          "column": 3,
+          "position": 4722
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\old account\\UpdateContact.js",
+        "start": 490,
+        "end": 507,
+        "startLoc": {
+          "line": 490,
+          "column": 2,
+          "position": 4836
+        },
+        "endLoc": {
+          "line": 507,
+          "column": 2,
+          "position": 4976
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 15,
+      "fragment": ",\r\n                      fontSize: \"10px\",\r\n                      borderRadius: \"16px\",\r\n                      height: \"20px\",\r\n                      cursor: \"pointer\",\r\n                      boxShadow: \"0px 2px 4px rgba(0, 0, 0, 0.2)\",\r\n                      \"& .MuiChip-deleteIcon\": {\r\n                      color: \"#fff\",\r\n                      opacity: 0.7,\r\n                      transition: \"opacity 0.2s\",\r\n                      \"&:hover\": { opacity: 1 },\r\n                    },\r\n                    }}\r\n                  />\r\n                ) :",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\tagsSelect.js",
+        "start": 153,
+        "end": 167,
+        "startLoc": {
+          "line": 153,
+          "column": 4,
+          "position": 1301
+        },
+        "endLoc": {
+          "line": 167,
+          "column": 2,
+          "position": 1408
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\Accounts\\TagsMultiSelectDropDown.js",
+        "start": 97,
+        "end": 111,
+        "startLoc": {
+          "line": 97,
+          "column": 4,
+          "position": 904
+        },
+        "endLoc": {
+          "line": 111,
+          "column": 2,
+          "position": 1010
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 14,
+      "fragment": "} sx={{\r\n                        borderColor: 'var(--color-border-cancel-btn)',  // Normal background\r\n                       color:'var(--color-save-btn)',\r\n                        '&:hover': {\r\n                          backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color\r\n                          color:'#fff',\r\n                          border:\"none\"\r\n                        },\r\n                        width:'80px',borderRadius:'15px'\r\n                      }}>\r\n                  Cancel\r\n                </Button>\r\n              </Box>\r\n            </Drawer",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\ServiceUpdate.js",
+        "start": 426,
+        "end": 439,
+        "startLoc": {
+          "line": 426,
+          "column": 24,
+          "position": 3845
+        },
+        "endLoc": {
+          "line": 439,
+          "column": 7,
+          "position": 3942
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\BulkActions\\SendAccountEmail.js",
+        "start": 623,
+        "end": 636,
+        "startLoc": {
+          "line": 623,
+          "column": 13,
+          "position": 7658
+        },
+        "endLoc": {
+          "line": 636,
+          "column": 4,
+          "position": 7755
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 15,
+      "fragment": "} sx={{\r\n                  borderColor: 'var(--color-border-cancel-btn)',  // Normal background\r\n                 color:'var(--color-save-btn)',\r\n                  '&:hover': {\r\n                    backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color\r\n                    color:'#fff',\r\n                    border:\"none\"\r\n                  },\r\n                  width:'80px',borderRadius:'15px'\r\n                }}>\r\n              Cancel\r\n            </Button>\r\n          </Box>\r\n        </Box>\r\n      </form",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\ServiceUpdate.js",
+        "start": 459,
+        "end": 473,
+        "startLoc": {
+          "line": 459,
+          "column": 11,
+          "position": 4109
+        },
+        "endLoc": {
+          "line": 473,
+          "column": 5,
+          "position": 4213
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\BulkActions\\SendAccountEmail.js",
+        "start": 623,
+        "end": 637,
+        "startLoc": {
+          "line": 623,
+          "column": 13,
+          "position": 7658
+        },
+        "endLoc": {
+          "line": 637,
+          "column": 4,
+          "position": 7762
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 11,
+      "fragment": "const [isCategoryFormOpen, setCategoryFormOpen] = useState(false);\r\n    const handleCategoryFormClose = () => {\r\n        setCategoryFormOpen(false);\r\n    };\r\n\r\n    const options = [\r\n        // { label: \"Select Rate Type\", value: \"\" },\r\n        { label: \"Item\", value: \"item\" },\r\n        { label: \"Hour\", value: \"hour\" },\r\n    ];\r\n    const [selectedOption",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\Service.js",
+        "start": 53,
+        "end": 63,
+        "startLoc": {
+          "line": 53,
+          "column": 5,
+          "position": 626
+        },
+        "endLoc": {
+          "line": 63,
+          "column": 15,
+          "position": 733
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\ServiceUpdate.js",
+        "start": 26,
+        "end": 35,
+        "startLoc": {
+          "line": 26,
+          "column": 3,
+          "position": 254
+        },
+        "endLoc": {
+          "line": 35,
+          "column": 8,
+          "position": 359
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 13,
+      "fragment": "const [categoryData, setCategoryData] = useState([]);\r\n    useEffect(() => {\r\n        fetchData();\r\n    }, []);\r\n\r\n    const fetchData = async () => {\r\n        try {\r\n            // const url = `${API_KEY}/common/user/`;\r\n            const url = `${CATEGORY_API}/workflow/category/categorys`;\r\n            const response = await fetch(url);\r\n            const data = await response.json();\r\n            console.log(data)\r\n            setCategoryData",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\Service.js",
+        "start": 71,
+        "end": 83,
+        "startLoc": {
+          "line": 71,
+          "column": 5,
+          "position": 802
+        },
+        "endLoc": {
+          "line": 83,
+          "column": 16,
+          "position": 936
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\ServiceUpdate.js",
+        "start": 47,
+        "end": 58,
+        "startLoc": {
+          "line": 47,
+          "column": 3,
+          "position": 478
+        },
+        "endLoc": {
+          "line": 58,
+          "column": 2,
+          "position": 609
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 17,
+      "fragment": "setCategoryData(data.category);\r\n        } catch (error) {\r\n            console.error(\"Error fetching data:\", error);\r\n        }\r\n    };\r\n    const categoryoptions = categoryData.map((category) => ({\r\n        value: category._id,\r\n        label: category.categoryName,\r\n    }));\r\n    const createCategory = () => {\r\n\r\n        const myHeaders = new Headers();\r\n        myHeaders.append(\"Content-Type\", \"application/json\");\r\n\r\n        const raw = JSON.stringify({\r\n            categoryName: categorycreate\r\n        }",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\Service.js",
+        "start": 83,
+        "end": 99,
+        "startLoc": {
+          "line": 83,
+          "column": 13,
+          "position": 936
+        },
+        "endLoc": {
+          "line": 99,
+          "column": 2,
+          "position": 1096
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\ServiceUpdate.js",
+        "start": 59,
+        "end": 73,
+        "startLoc": {
+          "line": 59,
+          "column": 7,
+          "position": 613
+        },
+        "endLoc": {
+          "line": 73,
+          "column": 2,
+          "position": 768
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 15,
+      "fragment": "if (result && result.message === \"Category created successfully\") {\r\n                    toast.success(\"Category created successfully\");\r\n                    handleCategoryFormClose(false);\r\n                    fetchData();\r\n                    setcategorycreate();\r\n                } else {\r\n                    toast.error(result.message || \"Failed to create Service Template\");\r\n                }\r\n            })\r\n            .catch((error) => console.error(error));\r\n\r\n    }\r\n\r\n\r\n    const",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\Service.js",
+        "start": 112,
+        "end": 126,
+        "startLoc": {
+          "line": 112,
+          "column": 17,
+          "position": 1215
+        },
+        "endLoc": {
+          "line": 126,
+          "column": 6,
+          "position": 1330
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\ServiceUpdate.js",
+        "start": 87,
+        "end": 97,
+        "startLoc": {
+          "line": 87,
+          "column": 9,
+          "position": 893
+        },
+        "endLoc": {
+          "line": 97,
+          "column": 2,
+          "position": 999
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 15,
+      "fragment": "= () => {\r\n        const myHeaders = new Headers();\r\n        myHeaders.append(\"Content-Type\", \"application/json\");\r\n    \r\n        const raw = JSON.stringify({\r\n          serviceName: servicename,\r\n          description: discription,\r\n          rate: rate,\r\n          ratetype: selectedOption.value,\r\n          tax: service,\r\n          \r\n          category: selectedCategory ? selectedCategory.value : null,\r\n          active: \"true\"\r\n    \r\n        }",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\Service.js",
+        "start": 126,
+        "end": 140,
+        "startLoc": {
+          "line": 126,
+          "column": 2,
+          "position": 1334
+        },
+        "endLoc": {
+          "line": 140,
+          "column": 2,
+          "position": 1460
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\ServiceUpdate.js",
+        "start": 157,
+        "end": 168,
+        "startLoc": {
+          "line": 157,
+          "column": 2,
+          "position": 1618
+        },
+        "endLoc": {
+          "line": 168,
+          "column": 2,
+          "position": 1737
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 20,
+      "fragment": "}}>Rate Type</InputLabel>\r\n                                            <Autocomplete\r\n                                                size=\"small\"\r\n                                                fullWidth\r\n                                                sx={{ mt: 2 }}\r\n                                                options={options}\r\n                                                getOptionLabel={(option) => option?.label || \"\"}\r\n                                                value={selectedOption}\r\n                                                onChange={handleRateTypeChange}\r\n                                                renderInput={(params) => (\r\n                                                    <TextField {...params} variant=\"outlined\" placeholder=\"Select Rate Type\" />\r\n                                                )}\r\n                                                isOptionEqualToValue={(option, value) => option.value === value.value}\r\n                                                renderOption={(props, option) => (\r\n                                                    <Box\r\n                                                        component=\"li\"\r\n                                                        {...props}\r\n                                                        sx={{\r\n\r\n                                                            margin: '4px'",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\Service.js",
+        "start": 648,
+        "end": 667,
+        "startLoc": {
+          "line": 648,
+          "column": 2,
+          "position": 5230
+        },
+        "endLoc": {
+          "line": 667,
+          "column": 6,
+          "position": 5428
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\ServiceUpdate.js",
+        "start": 251,
+        "end": 275,
+        "startLoc": {
+          "line": 251,
+          "column": 2,
+          "position": 2532
+        },
+        "endLoc": {
+          "line": 275,
+          "column": 6,
+          "position": 2741
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 30,
+      "fragment": ",\r\n\r\n                                                        }}\r\n                                                    >\r\n                                                        <Typography >\r\n                                                            {option.label}\r\n                                                        </Typography>\r\n                                                    </Box>\r\n                                                )}\r\n                                            />\r\n                                        </Box>\r\n                                    </Grid>\r\n                                </Grid>\r\n                            </Box>\r\n\r\n                            <Box mt={2} >\r\n                                <FormControlLabel\r\n                                    control={\r\n                                        <Switch\r\n                                            checked={service}\r\n                                            onChange={(event) => handleServiceWitch(event.target.checked)}\r\n                                            color=\"primary\"\r\n                                        />\r\n                                    }\r\n                                    label={\"Tax\"}\r\n                                />\r\n                            </Box>\r\n                            <Box>\r\n                                <Box>\r\n                                    <Typography variant=\"h5\" gutterBottom sx={{ fontWeight: 'bold'",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\Service.js",
+        "start": 668,
+        "end": 697,
+        "startLoc": {
+          "line": 668,
+          "column": 10,
+          "position": 5437
+        },
+        "endLoc": {
+          "line": 697,
+          "column": 7,
+          "position": 5643
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\ServiceUpdate.js",
+        "start": 276,
+        "end": 305,
+        "startLoc": {
+          "line": 276,
+          "column": 10,
+          "position": 2750
+        },
+        "endLoc": {
+          "line": 305,
+          "column": 7,
+          "position": 2952
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 47,
+      "fragment": ", mt: 2 }}>Category Name</InputLabel>\r\n                                    <Autocomplete\r\n                                     size=\"small\"\r\n                                     fullWidth\r\n                                     sx={{ mt: 2 }}\r\n                                        options={categoryoptions}\r\n                                        getOptionLabel={(option) => option.label} // Adjust based on your data structure\r\n                                        value={selectedCategory}\r\n                                        onChange={handleCategoryChange}\r\n                                        renderInput={(params) => (\r\n                                            <TextField\r\n                                                {...params}\r\n                                                placeholder=\"Category Name\"\r\n                                                variant=\"outlined\"\r\n                                            />\r\n                                        )}\r\n                                        clearOnEscape // Equivalent to isClearable\r\n                                        isOptionEqualToValue={(option, value) => option.value === value.value} // Compare options for equality\r\n                                    />\r\n                                </Box>\r\n                            </Box>\r\n                            <Box>\r\n                                <Button\r\n                                    variant=\"contained\"\r\n                                    color=\"primary\"\r\n                                    onClick={setCategoryFormOpen}\r\n                                    sx={{\r\n                                      backgroundColor: 'var(--color-save-btn)',  // Normal background\r\n                                     \r\n                                      '&:hover': {\r\n                                        backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color\r\n                                      },\r\n                                      borderRadius:'15px',mt: 4, ml: 1\r\n                                    }}\r\n                                   \r\n                                >\r\n                                    Create category\r\n                                </Button>\r\n\r\n                                {/* category form */}\r\n                                <Drawer\r\n                                    anchor=\"right\"\r\n                                    open={isCategoryFormOpen}\r\n                                    onClose={handleCategoryFormClose}\r\n                                    PaperProps={{\r\n                                        sx: {\r\n                                            borderRadius: isSmallScreen ? '0'",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\Service.js",
+        "start": 702,
+        "end": 748,
+        "startLoc": {
+          "line": 702,
+          "column": 8,
+          "position": 5694
+        },
+        "endLoc": {
+          "line": 748,
+          "column": 4,
+          "position": 6054
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\ServiceUpdate.js",
+        "start": 311,
+        "end": 363,
+        "startLoc": {
+          "line": 311,
+          "column": 8,
+          "position": 3005
+        },
+        "endLoc": {
+          "line": 363,
+          "column": 4,
+          "position": 3380
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 23,
+      "fragment": "}}>\r\n                                        <Button variant=\"contained\" color=\"primary\" onClick={createCategory}  sx={{\r\n                        backgroundColor: 'var(--color-save-btn)',  // Normal background\r\n                       \r\n                        '&:hover': {\r\n                          backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color\r\n                        },\r\n                        width:'80px',borderRadius:'15px'\r\n                      }} >Create</Button>\r\n                                        <Button variant=\"outlined\" onClick={handleCategoryFormClose} sx={{\r\n                        borderColor: 'var(--color-border-cancel-btn)',  // Normal background\r\n                       color:'var(--color-save-btn)',\r\n                        '&:hover': {\r\n                          backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color\r\n                          color:'#fff',\r\n                          border:\"none\"\r\n                        },\r\n                        width:'80px',borderRadius:'15px'\r\n                      }}>Cancel</Button>\r\n                                    </Box>\r\n                                </Drawer >\r\n                            </Box>\r\n                            <Box sx={{ pt: 5, display: 'flex'",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\Service.js",
+        "start": 774,
+        "end": 796,
+        "startLoc": {
+          "line": 774,
+          "column": 2,
+          "position": 6360
+        },
+        "endLoc": {
+          "line": 796,
+          "column": 7,
+          "position": 6578
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\ServiceUpdate.js",
+        "start": 408,
+        "end": 442,
+        "startLoc": {
+          "line": 408,
+          "column": 17,
+          "position": 3727
+        },
+        "endLoc": {
+          "line": 442,
+          "column": 7,
+          "position": 3973
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 21,
+      "fragment": "} sx={{\r\n                        borderColor: 'var(--color-border-cancel-btn)',  // Normal background\r\n                       color:'var(--color-save-btn)',\r\n                        '&:hover': {\r\n                          backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color\r\n                          color:'#fff',\r\n                          border:\"none\"\r\n                        },\r\n                        width:'80px',borderRadius:'15px'\r\n                      }}>Cancel</Button>\r\n                            </Box>\r\n                        </Box>\r\n\r\n                    </form>\r\n\r\n\r\n\r\n                </Box>\r\n\r\n\r\n            <",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\Service.js",
+        "start": 805,
+        "end": 825,
+        "startLoc": {
+          "line": 805,
+          "column": 21,
+          "position": 6695
+        },
+        "endLoc": {
+          "line": 825,
+          "column": 2,
+          "position": 6817
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\BulkActions\\SendAccountEmail.js",
+        "start": 623,
+        "end": 475,
+        "startLoc": {
+          "line": 623,
+          "column": 13,
+          "position": 7658
+        },
+        "endLoc": {
+          "line": 475,
+          "column": 2,
+          "position": 4225
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 22,
+      "fragment": "import React, { useState, useEffect,useRef } from \"react\";\r\nimport {\r\n  Box,\r\n  Checkbox,\r\n  TextField,\r\n  Menu,\r\n  MenuItem,\r\n  Chip,\r\n  Typography,\r\n  IconButton,Paper\r\n} from \"@mui/material\";\r\nimport { FaChevronDown, FaChevronUp,FaTimes  } from \"react-icons/fa\";\r\n\r\nconst MultiSelectDropdown = () => {\r\n  const containerRef = useRef(null);\r\n  const [anchorEl, setAnchorEl] = useState(null);\r\n  const [selectedValues, setSelectedValues] = useState([]);\r\n  const [searchQuery, setSearchQuery] = useState(\"\");\r\n  const [userData, setUserData] = useState([]);\r\n  const [menuWidth, setMenuWidth] = useState(null);\r\n\r\n  const LOGIN_API",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\selectesting.js",
+        "start": 1,
+        "end": 22,
+        "startLoc": {
+          "line": 1,
+          "column": 1,
+          "position": 0
+        },
+        "endLoc": {
+          "line": 22,
+          "column": 10,
+          "position": 227
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\tagsSelect.js",
+        "start": 1,
+        "end": 21,
+        "startLoc": {
+          "line": 1,
+          "column": 1,
+          "position": 0
+        },
+        "endLoc": {
+          "line": 21,
+          "column": 2,
+          "position": 225
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 34,
+      "fragment": ",\r\n  }));\r\n\r\n  const handleClick = (event) => {\r\n    setAnchorEl(event.currentTarget);\r\n    if (containerRef.current) {\r\n      setMenuWidth(containerRef.current.offsetWidth);\r\n    }\r\n  };\r\n\r\n\r\n  const handleClose = () => {\r\n    setAnchorEl(null);\r\n  };\r\n\r\n  const handleSelect = (value) => {\r\n    setSelectedValues((prev) =>\r\n      prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]\r\n    );\r\n  };\r\nconsole.log(\"selcted values\",selectedValues)\r\n  const handleSearchChange = (event) => {\r\n    setSearchQuery(event.target.value);\r\n  };\r\n\r\n  const clearSelection = () => {\r\n    setSelectedValues([]);\r\n  };\r\n\r\n  // const filteredOptions = userOptions.filter((option) =>\r\n  //   option.label.toLowerCase().includes(searchQuery.toLowerCase())\r\n  // );\r\n // Filter options to exclude selected ones and match search query\r\n const filteredOptions = userOptions",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\selectesting.js",
+        "start": 40,
+        "end": 73,
+        "startLoc": {
+          "line": 40,
+          "column": 9,
+          "position": 423
+        },
+        "endLoc": {
+          "line": 73,
+          "column": 12,
+          "position": 701
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\tagsSelect.js",
+        "start": 45,
+        "end": 80,
+        "startLoc": {
+          "line": 45,
+          "column": 10,
+          "position": 481
+        },
+        "endLoc": {
+          "line": 80,
+          "column": 12,
+          "position": 763
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 10,
+      "fragment": ".filter(\r\n  (option) =>\r\n    !selectedValues.includes(option.value) &&\r\n    option.label.toLowerCase().includes(searchQuery.toLowerCase())\r\n);\r\n  return (\r\n   \r\n    <Box sx={{ width: \"500px\" }}>\r\n      <Typography variant=\"subtitle1\" sx={{ mb: 1, fontWeight: \"bold\" }}>\r\n        Assignee",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\selectesting.js",
+        "start": 73,
+        "end": 82,
+        "startLoc": {
+          "line": 73,
+          "column": 12,
+          "position": 702
+        },
+        "endLoc": {
+          "line": 82,
+          "column": 9,
+          "position": 809
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\tagsSelect.js",
+        "start": 80,
+        "end": 89,
+        "startLoc": {
+          "line": 80,
+          "column": 12,
+          "position": 764
+        },
+        "endLoc": {
+          "line": 89,
+          "column": 5,
+          "position": 871
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 22,
+      "fragment": "</Typography>\r\n\r\n      {/* Selected Items & Dropdown Toggle */}\r\n      <Box\r\n        ref={containerRef} // Reference the container\r\n        sx={{\r\n          display: \"flex\",\r\n          alignItems: \"center\",\r\n          justifyContent: \"space-between\",\r\n          border: \"1px solid #ccc\",\r\n          borderRadius: \"8px\",\r\n          padding: \"4px\",\r\n          cursor: \"pointer\",\r\n          bgcolor: \"background.paper\",\r\n          // \"&:hover\": { borderColor: \"primary.main\" },\r\n          width: \"100%\",\r\n        }}\r\n        onClick={handleClick}\r\n      >\r\n        <Box sx={{ display: \"flex\", flexWrap: \"wrap\", gap: 0.5 }}>\r\n          {selectedValues.length > 0 ? (\r\n            selectedValues",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\selectesting.js",
+        "start": 83,
+        "end": 104,
+        "startLoc": {
+          "line": 83,
+          "column": 7,
+          "position": 813
+        },
+        "endLoc": {
+          "line": 104,
+          "column": 15,
+          "position": 989
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\tagsSelect.js",
+        "start": 90,
+        "end": 111,
+        "startLoc": {
+          "line": 90,
+          "column": 7,
+          "position": 875
+        },
+        "endLoc": {
+          "line": 111,
+          "column": 35,
+          "position": 1051
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 19,
+      "fragment": "fontWeight: 500,\r\n                    fontSize: \"10px\",\r\n                    borderRadius: \"16px\",\r\n                    height: \"20px\",\r\n                    cursor: \"pointer\",\r\n                    boxShadow: \"0px 2px 4px rgba(0, 0, 0, 0.2)\",\r\n                    \"& .MuiChip-deleteIcon\": {\r\n                      color: \"#fff\",\r\n                      opacity: 0.7,\r\n                      transition: \"opacity 0.2s\",\r\n                      \"&:hover\": { opacity: 1 },\r\n                    },\r\n                  }}\r\n                />\r\n              ) : null;\r\n            })\r\n          ) : (\r\n            <Typography variant=\"body2\" color=\"textSecondary\">\r\n              Assignee",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\selectesting.js",
+        "start": 118,
+        "end": 136,
+        "startLoc": {
+          "line": 118,
+          "column": 21,
+          "position": 1111
+        },
+        "endLoc": {
+          "line": 136,
+          "column": 9,
+          "position": 1256
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\Accounts\\TagsMultiSelectDropDown.js",
+        "start": 97,
+        "end": 171,
+        "startLoc": {
+          "line": 97,
+          "column": 19,
+          "position": 900
+        },
+        "endLoc": {
+          "line": 171,
+          "column": 5,
+          "position": 1442
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 50,
+      "fragment": "</Typography>\r\n          )}\r\n        </Box>\r\n        <Box sx={{ display: \"flex\", alignItems: \"center\" }}>\r\n          {selectedValues.length > 0 && (\r\n            <IconButton\r\n              onClick={clearSelection}\r\n              size=\"small\"\r\n              sx={{ color: \"text.secondary\" }}\r\n            >\r\n              <FaTimes />\r\n            </IconButton>\r\n          )}\r\n          <IconButton size=\"small\">\r\n            {anchorEl ? <FaChevronUp /> : <FaChevronDown />}\r\n          </IconButton>\r\n        </Box>\r\n      </Box>\r\n\r\n      {/* Dropdown Menu with Fixed Width */}\r\n      <Menu\r\n        anchorEl={anchorEl}\r\n        open={Boolean(anchorEl)}\r\n        onClose={handleClose}\r\n        anchorOrigin={{ vertical: \"bottom\", horizontal: \"left\" }}\r\n        transformOrigin={{ vertical: \"top\", horizontal: \"left\" }}\r\n      >\r\n        <Box\r\n          sx={{\r\n            width: menuWidth || \"auto\", // Maintain consistent width\r\n            maxHeight: \"250px\",\r\n            overflowY: \"auto\",\r\n          }}\r\n        >\r\n          {/* Search Field */}\r\n          <Box sx={{ p: 1 }}>\r\n            <TextField\r\n              fullWidth\r\n              size=\"small\"\r\n              placeholder=\"Search...\"\r\n              value={searchQuery}\r\n              onChange={handleSearchChange}\r\n              variant=\"outlined\"\r\n               autoComplete=\"off\"\r\n            />\r\n          </Box>\r\n\r\n          {/* List of Options */}\r\n          {filteredOptions.length > 0 ? (\r\n            filteredOptions",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\selectesting.js",
+        "start": 137,
+        "end": 186,
+        "startLoc": {
+          "line": 137,
+          "column": 13,
+          "position": 1260
+        },
+        "endLoc": {
+          "line": 186,
+          "column": 16,
+          "position": 1676
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\tagsSelect.js",
+        "start": 172,
+        "end": 221,
+        "startLoc": {
+          "line": 172,
+          "column": 13,
+          "position": 1446
+        },
+        "endLoc": {
+          "line": 221,
+          "column": 37,
+          "position": 1862
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 15,
+      "fragment": ">{option.label}</Typography>\r\n              </Box>\r\n            ))\r\n          ) : (\r\n            <Typography sx={{ p: 2, color: \"gray\" }}>No results found</Typography>\r\n          )}\r\n\r\n            \r\n        </Box>\r\n      </Menu>\r\n    </Box>\r\n  );\r\n};\r\n\r\nexport default MultiSelectDropdown;",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\selectesting.js",
+        "start": 199,
+        "end": 213,
+        "startLoc": {
+          "line": 199,
+          "column": 11,
+          "position": 1790
+        },
+        "endLoc": {
+          "line": 213,
+          "column": 2,
+          "position": 1902
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\tagsSelect.js",
+        "start": 263,
+        "end": 277,
+        "startLoc": {
+          "line": 263,
+          "column": 2,
+          "position": 2136
+        },
+        "endLoc": {
+          "line": 277,
+          "column": 2,
+          "position": 2248
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 15,
+      "fragment": "const fetchUserData = async (id) => {\r\n    const myHeaders = new Headers();\r\n\r\n    const requestOptions = {\r\n      method: \"GET\",\r\n      headers: myHeaders,\r\n      redirect: \"follow\",\r\n    };\r\n    const url = `${LOGIN_API}/common/user/${id}`;\r\n    fetch(url, requestOptions)\r\n      .then((response) => response.json())\r\n      .then((result) => {\r\n        console.log(\"id\", result);\r\n\r\n        // console.log(userData)",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\ChatForm.js",
+        "start": 62,
+        "end": 76,
+        "startLoc": {
+          "line": 62,
+          "column": 3,
+          "position": 502
+        },
+        "endLoc": {
+          "line": 76,
+          "column": 25,
+          "position": 651
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\internalChat\\ChatDetails.js",
+        "start": 62,
+        "end": 76,
+        "startLoc": {
+          "line": 62,
+          "column": 4,
+          "position": 693
+        },
+        "endLoc": {
+          "line": 76,
+          "column": 15,
+          "position": 843
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 17,
+      "fragment": "},\r\n        { title: \"Contact Shortcodes\", isBold: true },\r\n        { title: \"Contact Name\", isBold: false, value: \"CONTACT_NAME\" },\r\n        { title: \"First Name\", isBold: false, value: \"FIRST_NAME\" },\r\n        { title: \"Middle Name\", isBold: false, value: \"MIDDLE_NAME\" },\r\n        { title: \"Last Name\", isBold: false, value: \"LAST_NAME\" },\r\n        { title: \"Phone number\", isBold: false, value: \"PHONE_NUMBER\" },\r\n        { title: \"Country\", isBold: false, value: \"COUNTRY\" },\r\n        { title: \"Company name\", isBold: false, value: \"COMPANY_NAME \" },\r\n        { title: \"Street address\", isBold: false, value: \"STREET_ADDRESS\" },\r\n        { title: \"City\", isBold: false, value: \"CITY\" },\r\n        { title: \"State/Province\", isBold: false, value: \"STATE / PROVINCE\" },\r\n        { title: \"Zip/Postal code\", isBold: false, value: \"ZIP / POSTAL CODE\" },\r\n        {\r\n          title: \"Custom field:Email\",\r\n          isBold: false,\r\n          value: \"CONTACT_CUSTOM_FIELD:Email\",",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\ChatForm.js",
+        "start": 160,
+        "end": 176,
+        "startLoc": {
+          "line": 160,
+          "column": 9,
+          "position": 1571
+        },
+        "endLoc": {
+          "line": 176,
+          "column": 2,
+          "position": 1882
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\BulkActions\\SendAccountEmail.js",
+        "start": 112,
+        "end": 125,
+        "startLoc": {
+          "line": 112,
+          "column": 2,
+          "position": 1250
+        },
+        "endLoc": {
+          "line": 125,
+          "column": 2,
+          "position": 1556
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 8,
+      "fragment": "},\r\n        { title: \"Last day number\", isBold: false, value: \"LAST_DAY_NUMBER\" },\r\n        { title: \"Last day name\", isBold: false, value: \"LAST_DAY_NAME\" },\r\n        { title: \"Last week\", isBold: false, value: \"LAST_WEEK\" },\r\n        {\r\n          title: \"Last month number\",\r\n          isBold: false,\r\n          value: \"LAST_MONTH_NUMBER\",",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\ChatForm.js",
+        "start": 207,
+        "end": 214,
+        "startLoc": {
+          "line": 207,
+          "column": 9,
+          "position": 2165
+        },
+        "endLoc": {
+          "line": 214,
+          "column": 2,
+          "position": 2266
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\BulkActions\\SendAccountEmail.js",
+        "start": 136,
+        "end": 140,
+        "startLoc": {
+          "line": 136,
+          "column": 2,
+          "position": 1792
+        },
+        "endLoc": {
+          "line": 140,
+          "column": 2,
+          "position": 1888
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 8,
+      "fragment": "},\r\n        { title: \"Last month name\", isBold: false, value: \"LAST_MONTH_NAME\" },\r\n        { title: \"Last quarter\", isBold: false, value: \"LAST_QUARTER\" },\r\n        { title: \"Last_year\", isBold: false, value: \"LAST_YEAR\" },\r\n        {\r\n          title: \"Next day full date\",\r\n          isBold: false,\r\n          value: \"NEXT_DAY_FULL_DATE\",",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\ChatForm.js",
+        "start": 215,
+        "end": 222,
+        "startLoc": {
+          "line": 215,
+          "column": 9,
+          "position": 2270
+        },
+        "endLoc": {
+          "line": 222,
+          "column": 2,
+          "position": 2371
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\BulkActions\\SendAccountEmail.js",
+        "start": 140,
+        "end": 144,
+        "startLoc": {
+          "line": 140,
+          "column": 2,
+          "position": 1888
+        },
+        "endLoc": {
+          "line": 144,
+          "column": 2,
+          "position": 1984
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 8,
+      "fragment": "},\r\n        { title: \"Next day number\", isBold: false, value: \"NEXT_DAY_NUMBER\" },\r\n        { title: \"Next day name\", isBold: false, value: \"NEXT_DAY_NAME\" },\r\n        { title: \"Next week\", isBold: false, value: \"NEXT_WEEK\" },\r\n        {\r\n          title: \"Next month number\",\r\n          isBold: false,\r\n          value: \"NEXT_MONTH_NUMBER\",",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\ChatForm.js",
+        "start": 223,
+        "end": 230,
+        "startLoc": {
+          "line": 223,
+          "column": 9,
+          "position": 2375
+        },
+        "endLoc": {
+          "line": 230,
+          "column": 2,
+          "position": 2476
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\BulkActions\\SendAccountEmail.js",
+        "start": 144,
+        "end": 148,
+        "startLoc": {
+          "line": 144,
+          "column": 2,
+          "position": 1984
+        },
+        "endLoc": {
+          "line": 148,
+          "column": 2,
+          "position": 2080
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 8,
+      "fragment": "},\r\n        { title: \"Next month name\", isBold: false, value: \"NEXT_MONTH_NAME\" },\r\n        { title: \"Next quarter\", isBold: false, value: \"NEXT_QUARTER\" },\r\n        { title: \"Next year\", isBold: false, value: \"NEXT_YEAR\" },\r\n      ];\r\n      setShortcuts(contactShortcuts);\r\n    } else if (selectedOption === \"account\") {\r\n      const",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\ChatForm.js",
+        "start": 231,
+        "end": 238,
+        "startLoc": {
+          "line": 231,
+          "column": 9,
+          "position": 2480
+        },
+        "endLoc": {
+          "line": 238,
+          "column": 6,
+          "position": 2588
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\BulkActions\\SendAccountEmail.js",
+        "start": 148,
+        "end": 155,
+        "startLoc": {
+          "line": 148,
+          "column": 2,
+          "position": 2080
+        },
+        "endLoc": {
+          "line": 155,
+          "column": 25,
+          "position": 2188
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 61,
+      "fragment": ",\r\n        },\r\n        { title: \"Date Shortcodes\", isBold: true },\r\n        {\r\n          title: \"Current day full date\",\r\n          isBold: false,\r\n          value: \"CURRENT_DAY_FULL_DATE\",\r\n        },\r\n        {\r\n          title: \"Current day number\",\r\n          isBold: false,\r\n          value: \"CURRENT_DAY_NUMBER\",\r\n        },\r\n        { title: \"Current day name\", isBold: false, value: \"CURRENT_DAY_NAME\" },\r\n        { title: \"Current week\", isBold: false, value: \"CURRENT_WEEK\" },\r\n        {\r\n          title: \"Current month number\",\r\n          isBold: false,\r\n          value: \"CURRENT_MONTH_NUMBER\",\r\n        },\r\n        {\r\n          title: \"Current month name\",\r\n          isBold: false,\r\n          value: \"CURRENT_MONTH_NAME\",\r\n        },\r\n        { title: \"Current quarter\", isBold: false, value: \"CURRENT_QUARTER\" },\r\n        { title: \"Current year\", isBold: false, value: \"CURRENT_YEAR\" },\r\n        {\r\n          title: \"Last day full date\",\r\n          isBold: false,\r\n          value: \"LAST_DAY_FULL_DATE\",\r\n        },\r\n        { title: \"Last day number\", isBold: false, value: \"LAST_DAY_NUMBER\" },\r\n        { title: \"Last day name\", isBold: false, value: \"LAST_DAY_NAME\" },\r\n        { title: \"Last week\", isBold: false, value: \"LAST_WEEK\" },\r\n        {\r\n          title: \"Last month number\",\r\n          isBold: false,\r\n          value: \"LAST_MONTH_NUMBER\",\r\n        },\r\n        { title: \"Last month name\", isBold: false, value: \"LAST_MONTH_NAME\" },\r\n        { title: \"Last quarter\", isBold: false, value: \"LAST_QUARTER\" },\r\n        { title: \"Last_year\", isBold: false, value: \"LAST_YEAR\" },\r\n        {\r\n          title: \"Next day full date\",\r\n          isBold: false,\r\n          value: \"NEXT_DAY_FULL_DATE\",\r\n        },\r\n        { title: \"Next day number\", isBold: false, value: \"NEXT_DAY_NUMBER\" },\r\n        { title: \"Next day name\", isBold: false, value: \"NEXT_DAY_NAME\" },\r\n        { title: \"Next week\", isBold: false, value: \"NEXT_WEEK\" },\r\n        {\r\n          title: \"Next month number\",\r\n          isBold: false,\r\n          value: \"NEXT_MONTH_NUMBER\",\r\n        },\r\n        { title: \"Next month name\", isBold: false, value: \"NEXT_MONTH_NAME\" },\r\n        { title: \"Next quarter\", isBold: false, value: \"NEXT_QUARTER\" },\r\n        { title: \"Next year\", isBold: false, value: \"NEXT_YEAR\" },\r\n      ];\r\n      setShortcuts(accountShortcuts",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\ChatForm.js",
+        "start": 244,
+        "end": 304,
+        "startLoc": {
+          "line": 244,
+          "column": 31,
+          "position": 2664
+        },
+        "endLoc": {
+          "line": 304,
+          "column": 17,
+          "position": 3346
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\ChatForm.js",
+        "start": 176,
+        "end": 236,
+        "startLoc": {
+          "line": 176,
+          "column": 29,
+          "position": 1882
+        },
+        "endLoc": {
+          "line": 236,
+          "column": 17,
+          "position": 2564
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 9,
+      "fragment": "},\r\n        { title: \"Next month name\", isBold: false, value: \"NEXT_MONTH_NAME\" },\r\n        { title: \"Next quarter\", isBold: false, value: \"NEXT_QUARTER\" },\r\n        { title: \"Next year\", isBold: false, value: \"NEXT_YEAR\" },\r\n      ];\r\n      setShortcuts(accountShortcuts);\r\n    }\r\n  }, [selectedOption]);\r\n  const handleCloseDropdown",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\ChatForm.js",
+        "start": 299,
+        "end": 307,
+        "startLoc": {
+          "line": 299,
+          "column": 9,
+          "position": 3262
+        },
+        "endLoc": {
+          "line": 307,
+          "column": 20,
+          "position": 3369
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\BulkActions\\SendAccountEmail.js",
+        "start": 181,
+        "end": 190,
+        "startLoc": {
+          "line": 181,
+          "column": 2,
+          "position": 2785
+        },
+        "endLoc": {
+          "line": 190,
+          "column": 2,
+          "position": 2894
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 9,
+      "fragment": ", requestOptions)\r\n      .then((response) => {\r\n        if (!response.ok) {\r\n          throw new Error(`HTTP error! Status: ${response.status}`);\r\n        }\r\n        return response.json();\r\n      })\r\n      .then((result) => {\r\n        console",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\ChatForm.js",
+        "start": 438,
+        "end": 446,
+        "startLoc": {
+          "line": 438,
+          "column": 25,
+          "position": 4773
+        },
+        "endLoc": {
+          "line": 446,
+          "column": 8,
+          "position": 4857
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\internalChat\\NewChat.js",
+        "start": 142,
+        "end": 150,
+        "startLoc": {
+          "line": 142,
+          "column": 24,
+          "position": 1081
+        },
+        "endLoc": {
+          "line": 150,
+          "column": 6,
+          "position": 1165
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 14,
+      "fragment": "}\r\n                isOptionEqualToValue={(option, value) =>\r\n                  option.value === value.value\r\n                }\r\n                renderOption={(props, option) => (\r\n                  <Box\r\n                    component=\"li\"\r\n                    {...props}\r\n                    sx={{ cursor: \"pointer\", margin: \"5px 10px\" }} // Add cursor pointer style\r\n                  >\r\n                    {option.label}\r\n                  </Box>\r\n                )}\r\n                renderInput={(params) => (",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\ChatForm.js",
+        "start": 527,
+        "end": 540,
+        "startLoc": {
+          "line": 527,
+          "column": 24,
+          "position": 5616
+        },
+        "endLoc": {
+          "line": 540,
+          "column": 2,
+          "position": 5740
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\BulkActions\\SendAccountEmail.js",
+        "start": 533,
+        "end": 66,
+        "startLoc": {
+          "line": 533,
+          "column": 6,
+          "position": 6503
+        },
+        "endLoc": {
+          "line": 66,
+          "column": 2,
+          "position": 709
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 20,
+      "fragment": "}\r\n              variant=\"outlined\"\r\n              sx={{\r\n                borderColor: \"var(--color-border-cancel-btn)\", // Normal background\r\n                color: \"var(--color-save-btn)\",\r\n                \"&:hover\": {\r\n                  backgroundColor: \"var(--color-save-hover-btn)\", // Hover background color\r\n                  color: \"#fff\",\r\n                  border: \"none\",\r\n                },\r\n                width: \"80px\",\r\n                borderRadius: \"15px\",\r\n              }}\r\n              \r\n            >\r\n              Cancel\r\n            </Button>\r\n          </Box>\r\n      </Box>\r\n    </>",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\ChatForm.js",
+        "start": 803,
+        "end": 822,
+        "startLoc": {
+          "line": 803,
+          "column": 18,
+          "position": 7805
+        },
+        "endLoc": {
+          "line": 822,
+          "column": 2,
+          "position": 7932
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\internalChat\\NewChat.js",
+        "start": 277,
+        "end": 295,
+        "startLoc": {
+          "line": 277,
+          "column": 18,
+          "position": 2029
+        },
+        "endLoc": {
+          "line": 295,
+          "column": 7,
+          "position": 2154
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 13,
+      "fragment": ".push({\r\n      ...defaultClient,\r\n      isAlias: true,\r\n      baseEmail: baseClient.email,\r\n      aliasNumber,\r\n      email: generateAliasEmail(baseClient.email, aliasNumber),\r\n      accountName: `${baseClient.accountName} ${aliasNumber}`,\r\n      firstName: `${baseClient.firstName}${aliasNumber}`,\r\n      lastName: `${baseClient.lastName}${aliasNumber}`,\r\n      clientType: baseClient.clientType,\r\n      folderTemplate: baseClient.folderTemplate,\r\n      phoneNumber: baseClient.phoneNumber,\r\n      aliasConfig",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\Bulkaccount.js",
+        "start": 305,
+        "end": 317,
+        "startLoc": {
+          "line": 305,
+          "column": 8,
+          "position": 3070
+        },
+        "endLoc": {
+          "line": 317,
+          "column": 12,
+          "position": 3204
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\Bulkaccount.js",
+        "start": 135,
+        "end": 147,
+        "startLoc": {
+          "line": 135,
+          "column": 11,
+          "position": 1332
+        },
+        "endLoc": {
+          "line": 147,
+          "column": 2,
+          "position": 1466
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 18,
+      "fragment": "</Typography>\r\n      </Box>\r\n      <Box className=\"firmtemp\">\r\n        <Box\r\n          className=\"firmtemp-nav\"\r\n          sx={{\r\n            display: \"flex\",\r\n\r\n            mt: 5,\r\n            flexWrap: \"wrap\", // Allow items to wrap to the next line if they overflow\r\n            justifyContent: \"space-around\", // Space out items evenly\r\n            \"& a\": {\r\n              // Styling for the NavLink components\r\n              textDecoration: \"none\",\r\n              padding: \"8px 16px\",\r\n              borderRadius: \"4px\",\r\n             \r\n              \"&:hover\"",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src\\Pages\\AccountDash.js",
+        "start": 59,
+        "end": 76,
+        "startLoc": {
+          "line": 59,
+          "column": 2,
+          "position": 633
+        },
+        "endLoc": {
+          "line": 76,
+          "column": 10,
+          "position": 750
+        }
+      },
+      "secondFile": {
+        "name": "src\\Pages\\Templates.js",
+        "start": 9,
+        "end": 25,
+        "startLoc": {
+          "line": 9,
+          "column": 10,
+          "position": 93
+        },
+        "endLoc": {
+          "line": 25,
+          "column": 26,
+          "position": 208
+        }
+      }
+    }
+  ],
+  "filename": "C:\\Users\\Vardhan\\AppData\\Local\\npm-cache\\_npx\\652ead47bf63fe99\\node_modules\\@jscpd\\html-reporter\\dist\\templates\\main.pug"
+}
