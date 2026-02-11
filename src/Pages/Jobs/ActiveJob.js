@@ -485,7 +485,7 @@ const fetchData = async () => {
       if (Object.keys(filters.pipelineStages).length > 0) {
   console.log('Filtering by pipeline/stages:', filters.pipelineStages);
   console.log('Job pipeline:', job.Pipeline);
-  console.log('Job stages:', job.Stages?.map(stage => stage.name));
+  // console.log('Job stages:', job.Stages?.map(stage => stage.name));
   
   const pipelineMatch = Object.entries(filters.pipelineStages).some(
     ([pipelineName, stageNames]) => {
@@ -494,12 +494,19 @@ const fetchData = async () => {
       
       if (!pipelineMatches) return false;
 
-      const jobStageNames = job.Stages?.map(stage => stage.name) || [];
-      const stageMatches = stageNames.some((selectedStage) =>
-        jobStageNames.some(
-          (jobStage) => jobStage.toLowerCase() === selectedStage.toLowerCase()
-        )
-      );
+      // const jobStageNames = job.Stages?.map(stage => stage.name) || [];
+      const jobStageNames = job.Stages?.name || "";
+
+      // const stageMatches = stageNames.some((selectedStage) =>
+      //   jobStageNames.some(
+      //     (jobStage) => jobStage.toLowerCase() === selectedStage.toLowerCase()
+      //   )
+      // );
+      const stageMatches = stageNames.some(
+  (selectedStage) =>
+    jobStageNames.toLowerCase() === selectedStage.toLowerCase()
+);
+
       
       console.log(`Pipeline "${pipelineName}" matches: ${pipelineMatches}, Stages match: ${stageMatches}`);
       return stageMatches;

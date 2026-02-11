@@ -46,7 +46,7 @@ const EditJobDrawer = ({
   const PIPELINE_API = process.env.REACT_APP_PIPELINE_TEMP_URL;
   const JOBS_API = process.env.REACT_APP_ADD_JOBS_URL;
   const CLIENT_FACING_API = process.env.REACT_APP_CLIENT_FACING_URL;
-
+// console.log("clientFacingOptions", clientFacingOptions);  
   // State variables
   const [selectedAccount, setSelectedAccount] = useState("");
   const [selectedPipeline, setSelectedPipeline] = useState(null);
@@ -140,6 +140,7 @@ const EditJobDrawer = ({
           clientfacingColour: jobData.ClientFacingStatus.clientfacingColour,
         };
         setSelectedJob(clientStatusData);
+        console.log("clientStatusData", clientStatusData);
       }
 
       // Set account name
@@ -244,8 +245,32 @@ const EditJobDrawer = ({
     }
   };
 
-  const handleJobChange = (event, newValue) => {
+  // const handleJobChange = (event, newValue) => {
+  //   setSelectedJob(newValue);
+  // };
+   const handleJobChange = async (event, newValue) => {
     setSelectedJob(newValue);
+
+    if (newValue && newValue.value) {
+      const clientjobId = newValue.value;
+      try {
+        const response = await fetch(
+          `${CLIENT_FACING_API}/workflow/clientfacingjobstatus/${clientjobId}`
+        );
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const data = await response.json();
+
+        console.log(data);
+        setClientDescription(
+          data.clientfacingjobstatuses.clientfacingdescription
+        );
+        console.log(data.clientfacingjobstatuses.clientfacingdescription);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
   };
 
   const handleClientFacingToggle = (event) => {

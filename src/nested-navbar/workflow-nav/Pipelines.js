@@ -76,27 +76,115 @@ const Pipelines = () => {
     }
   };
 
-  const handleDrop = (jobId, targetStageName) => {
-    const job = jobData.find((job) => job.id === jobId);
-    const pipeline = pipelineData.find((p) => p._id === job.PipelineId);
-    const targetStage = pipeline?.stages?.find((stage) => stage.name === targetStageName);
+  // const handleDrop = (jobId, targetStageName) => {
+  //   const job = jobData.find((job) => job.id === jobId);
+  //   const pipeline = pipelineData.find((p) => p._id === job.PipelineId);
+  //   const targetStage = pipeline?.stages?.find((stage) => stage.name === targetStageName);
 
-    if (job) {
-      setAccountName(job.Account.join(", "));
-      setAccountId(job.AccountId);
-    }
+  //   if (job) {
+  //     setAccountName(job.Account.join(", "));
+  //     setAccountId(job.AccountId);
+  //   }
 
-    // If the target stage has automations, show the drawer
-    if (targetStage?.automations?.length > 0) {
-      setAutomationData(targetStage.automations);
-      setCurrentJobId(jobId);
-      setCurrentTargetStage(targetStage);
-      setAutomationDrawerOpen(true);
-    } else {
-      // If no automations, immediately update the job's stage
-      moveJob(jobId, targetStageName, targetStage);
+  //   // If the target stage has automations, show the drawer
+  //   if (targetStage?.automations?.length > 0) {
+  //     setAutomationData(targetStage.automations);
+  //     setCurrentJobId(jobId);
+  //     setCurrentTargetStage(targetStage);
+  //     setAutomationDrawerOpen(true);
+  //   } else {
+  //     // If no automations, immediately update the job's stage
+  //     moveJob(jobId, targetStageName, targetStage);
+  //   }
+  // };
+  const moveJobWithAutomations = async ({
+    jobId,
+    stageId,
+    automations = [],
+  }) => {
+    try {
+      const res = await fetch(`${JOBS_API}/workflow/jobs/update-stage`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          jobId,
+          stageId,
+          automations,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to move job");
+      }
+
+      const data = await res.json();
+
+      // ✅ Show toast here based on response
+      if (data?.success) {
+        toast.success(data.message || "Job moved successfully");
+      } else {
+        toast.error(data.message || "Failed to move job");
+      }
+
+      console.log("Job moved successfully:", data);
+
+      return data; // optional, if caller needs it
+    } catch (error) {
+      toast.error("Failed to move job");
+      throw error;
     }
   };
+  const handleDrop = (jobId, targetStageName) => {
+  const job = jobData.find((job) => job.id === jobId);
+
+  if (!job) return;
+
+  const pipeline = pipelineData.find(
+    (p) => p._id === job.PipelineId
+  );
+
+  const targetStage = pipeline?.stages?.find(
+    (stage) => stage.name === targetStageName
+  );
+
+  console.log("target stage for drop", targetStageName);
+
+  // Set account details
+  setAccountName(job.Account.join(", "));
+  setAccountId(job.AccountId);
+
+  // If the target stage has automations, open drawer
+  if (targetStage?.automations?.length > 0) {
+    setAutomationData(targetStage.automations);
+    setCurrentJobId(jobId);
+    setCurrentTargetStage(targetStage);
+    setAutomationDrawerOpen(true);
+  } else {
+    // No automations → move immediately (same pattern as first function)
+    moveJobWithAutomations({
+      jobId,
+      stageId: targetStage?._id,
+      automations: [],
+    })
+      .then(() => {
+        // fetchJobData(); // refresh board
+         fetchJobList(data);
+      })
+      .catch(() => {
+        // error already handled inside moveJobWithAutomations
+      });
+  }
+
+  // Store temp drop info (same as first version)
+  // setTempJobData({
+  //   jobId,
+  //   targetStageId: targetStage?._id,
+  //   targetStageName,
+  // });
+};
+
 
   const moveJob = async (jobId, targetStageName, stage, automations = {}) => {
   try {
@@ -198,45 +286,27 @@ const handleJobUpdates = async (jobId, automations) => {
     }
   };
 
-  const handleAutomationComplete = (selectedAutomationIndices) => {
-  // Handle both array and object parameters
-  let selectedIndices;
-  
-  if (Array.isArray(selectedAutomationIndices)) {
-    // Direct array passed from AutomationDrawer
-    selectedIndices = selectedAutomationIndices;
-  } else {
-    // Object with additional data - extract what we need
-    const { clientStatus, assignees, ...rest } = selectedAutomationIndices;
-    // You might need to adjust this based on what data you actually need
-    selectedIndices = rest.selectedIndices || [];
-  }
-  
-  const selectedAutomations = selectedIndices.map(index => automationData[index]);
-  
-  // Find specific automations if needed
-  const clientStatusAutomation = selectedAutomations.find(a => a.type === "Update client-facing job status");
-  const assigneeAutomation = selectedAutomations.find(a => a.type === "Update job assignees");
-
-  if (currentJobId && currentTargetStage) {
-    moveJob(currentJobId, currentTargetStage.name, currentTargetStage, {
-      clientStatus: clientStatusAutomation,
-      assignees: assigneeAutomation
-    });
-  }
-  setAutomationDrawerOpen(false);
-};
-
 //   const handleAutomationComplete = (selectedAutomationIndices) => {
-//   // Get the selected automations
-//   const selectedAutomations = selectedAutomationIndices.map(index => automationData[index]);
+//   // Handle both array and object parameters
+//   let selectedIndices;
+  
+//   if (Array.isArray(selectedAutomationIndices)) {
+//     // Direct array passed from AutomationDrawer
+//     selectedIndices = selectedAutomationIndices;
+//   } else {
+//     // Object with additional data - extract what we need
+//     const { clientStatus, assignees, ...rest } = selectedAutomationIndices;
+//     // You might need to adjust this based on what data you actually need
+//     selectedIndices = rest.selectedIndices || [];
+//   }
+  
+//   const selectedAutomations = selectedIndices.map(index => automationData[index]);
   
 //   // Find specific automations if needed
 //   const clientStatusAutomation = selectedAutomations.find(a => a.type === "Update client-facing job status");
 //   const assigneeAutomation = selectedAutomations.find(a => a.type === "Update job assignees");
 
 //   if (currentJobId && currentTargetStage) {
-//     // Pass the automation data to moveJob
 //     moveJob(currentJobId, currentTargetStage.name, currentTargetStage, {
 //       clientStatus: clientStatusAutomation,
 //       assignees: assigneeAutomation
@@ -244,6 +314,65 @@ const handleJobUpdates = async (jobId, automations) => {
 //   }
 //   setAutomationDrawerOpen(false);
 // };
+const handleAutomationComplete = async (selectedAutomationIndices) => {
+  console.log("Automation complete payload:", selectedAutomationIndices);
+
+  try {
+    // Normalize selected indices
+    let selectedIndices = [];
+
+    if (Array.isArray(selectedAutomationIndices)) {
+      selectedIndices = selectedAutomationIndices;
+    } else {
+      const { selectedIndices: indices = [] } = selectedAutomationIndices || {};
+      selectedIndices = indices;
+    }
+
+    // Map indices to automation objects
+    const selectedAutomations = selectedIndices.map(
+      (index) => automationData[index]
+    );
+
+    if (!currentJobId || !currentTargetStage) {
+      throw new Error("Missing job or target stage");
+    }
+
+    const res = await fetch(`${JOBS_API}/workflow/jobs/update-stage`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        jobId: currentJobId,
+        stageId: currentTargetStage._id,
+        automations: selectedAutomations,
+      }),
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to move job with automations");
+    }
+
+    const data = await res.json();
+
+    // ✅ Toast handling (same as handleMoveJob)
+    if (data?.success) {
+      toast.success(data.message || "Job moved successfully");
+      setAutomationDrawerOpen(false);
+      fetchJobList(data); // Refresh job list after moving
+    } else {
+      toast.error(data.message || "Failed to move job");
+    }
+
+    console.log("Job moved with automations:", data);
+    return data;
+  } catch (error) {
+    console.error("Error completing automation:", error);
+    toast.error("Failed to move job");
+  }
+};
+
+
   const uniquePipelines = Array.from(
     new Map(pipelineData.map((pipeline) => [pipeline._id, pipeline])).values()
   );

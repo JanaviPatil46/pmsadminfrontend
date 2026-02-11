@@ -2000,7 +2000,7 @@ const handleBulkTrash = async () => {
             </>
           ) : (
             <Typography sx={{ p: 2, textAlign: "center" }}>
-              Loading folder data...
+              {/* Loading folder data... */}
             </Typography>
           )}
         </Paper>
