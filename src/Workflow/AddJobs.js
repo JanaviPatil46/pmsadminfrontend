@@ -1612,14 +1612,7 @@ const AddJobs = ({
         // console.log("Selected accounts:", accounts);
         console.log("Selected automations:", autos);
         const payload = {
-          // accounts,
-          // automations: autos,
-          // stageid: selectedStage.value,
-          // pipeline: pipelineId,
-          // jobTemplate: selectedtemp.value,
-          // jobname: jobName,
-          //  description: description,
-          //  username,
+      
           accounts,
           automations: autos,
           stageid: selectedStage.value,
@@ -1642,60 +1635,43 @@ const AddJobs = ({
           startdate: startDate,
           enddate: dueDate,
         };
-        console.log("📤 Sending JSON:", JSON.stringify(payload));
-        // 🔹 Call backend API
-        await fetch("https://www.snptaxes.com/workflow/jobs/create-job", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          // body: JSON.stringify({
-          //   accounts,
-          //   automations: autos,
-          //    stageid: selectedStage.value,
-          //       pipeline: selectedPipeline.value,
-          //       jobTemplate: selectedtemp.value,
-          //       jobname: jobName,
-          // }),
-          body: JSON.stringify(payload),
-        });
-
-        alert("Jobs started");
-
-        // // 🔹 Your existing logic
-        // const { accountJobMap } = await createJob();
-
-        // const automationResults = await Promise.allSettled(
-        //   accounts.map(async (accountId) => {
-        //     const jobId = accountJobMap[accountId];
-        //     if (!jobId) return;
-
-        //     await Promise.all(
-        //       autos.map(async (automation) => {
-        //         const hasMatchingTags = checkTagMatch(
-        //           automation.selectedTags,
-        //           accountId
-        //         );
-
-        //         if (!hasMatchingTags) return;
-
-        //         await selectAutomationApi(
-        //           automation.type,
-        //           automation.selectedtemp,
-        //           accountId,
-        //           automation,
-        //           automation.type === "Create Task" ? jobId : null
-        //         );
-        //       })
-        //     );
-        //   })
-        // );
-
-        // console.log("Automation results:", automationResults);
-        setIsDrawerOpen(false);
-      } catch (error) {
-        console.error("Operation failed:", error);
-      } finally {
-        setIsProcessing(false);
+        const res = await fetch(
+      "https://www.snptaxes.com/workflow/jobs/create-job",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data?.message || "Failed to create jobs");
+    }
+
+    // ✅ SUCCESS TOAST
+    // toast.success("Jobs started successfully");
+      // ✅ Show toast here based on response
+          if (data?.success) {
+            toast.success(data.message || "Jobs started successfully");
+          } else {
+            toast.error(data.message || "Failed to start jobs");
+          }
+
+    // onClose();
+    setIsDrawerOpen(false);
+    handleDrawerClose();
+    // navigate("/jobs/activejob");
+  } catch (error) {
+    console.error("Operation failed:", error);
+
+    // ❌ ERROR TOAST
+    toast.error(error.message || "Something went wrong");
+  } finally {
+    setIsProcessing(false);
+  }
+      
     };
 
     // Fetch login user data

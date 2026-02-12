@@ -1770,28 +1770,28 @@ const Pipeline = ({ charLimit = 4000 }) => {
     // edit
 
     // account
-    const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
-    const [accountData, setAccountData] = useState([]);
+    // const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
+    // const [accountData, setAccountData] = useState([]);
 
-    useEffect(() => {
-      fetchAccountData();
-    }, []);
+    // useEffect(() => {
+    //   fetchAccountData();
+    // }, []);
 
-    const fetchAccountData = async () => {
-      try {
-        const response = await fetch(`${ACCOUNT_API}/accounts/accountdetails`);
-        const data = await response.json();
-        setAccountData(data.accounts);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
+    // const fetchAccountData = async () => {
+    //   try {
+    //     const response = await fetch(`${ACCOUNT_API}/accounts/accountdetails`);
+    //     const data = await response.json();
+    //     setAccountData(data.accounts);
+    //   } catch (error) {
+    //     console.error("Error fetching data:", error);
+    //   }
+    // };
 
-    // Create account options
-    const accountOptions = accountData.map((account) => ({
-      value: account._id,
-      label: account.accountName,
-    }));
+    // // Create account options
+    // const accountOptions = accountData.map((account) => ({
+    //   value: account._id,
+    //   label: account.accountName,
+    // }));
 
     // pipeline
     const PIPELINE_API = process.env.REACT_APP_PIPELINE_TEMP_URL;
@@ -2412,7 +2412,7 @@ const Pipeline = ({ charLimit = 4000 }) => {
           onClose={() => setIsDrawerOpen(false)}
           jobId={editJobId}
           fetchJobData={fetchJobData}
-          accountOptions={accountOptions}
+          // accountOptions={accountOptions}
           pipelineOptions={optionpipeline}
           tagOptions={tagoptions}
           userOptions={useroptions}

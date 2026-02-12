@@ -810,17 +810,33 @@ useEffect(() => {
       data: JSON.stringify(data),
     };
 
-    axios
-      .request(config)
-      .then((response) => {
-        console.log("Job created successfully");
-        toast.success("Job created successfully");
-        navigate("/jobs/activejob");
-      })
-      .catch((error) => {
-        console.error("Failed to create Job Template:", error);
-        toast.error("Failed to create Job");
-      });
+    // axios
+    //   .request(config)
+    //   .then((response) => {
+    //     console.log("Job created successfully");
+    //     toast.success("Job created successfully");
+    //     navigate("/jobs/activejob");
+    //   })
+    //   .catch((error) => {
+    //     console.error("Failed to create Job Template:", error);
+    //     toast.error("Failed to create Job");
+    //   });
+
+     axios
+          .request(config)
+          .then((response) => {
+            console.log("Job created successfully",response.data);
+            toast.success("Job created successfully");
+            // handleClose();
+            onClose(); // Close the form after successful creation
+            // handleDrawerClose();
+            navigate("/jobs/activejob");
+            // fetchjobData();
+          })
+          .catch((error) => {
+            console.error("Failed to create Job Template:", error);
+            toast.error("Failed to create Job");
+          });
   };
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -1779,59 +1795,132 @@ const [clientFacingJobs, setClientFacingJobs] = useState([]);
   //       toast.error(`Operation failed: ${error.message}`);
   //     }
   //   };
-    const handleMove = async () => {
+//     const handleMove = async () => {
+//   if (isProcessing) return;
+
+//   setIsProcessing(true);
+
+//   try {
+//     // 🔹 Extract data for API
+//     const accounts = combinedaccountValues;
+//     const autos = selectedAutomations
+//       .map((index) => automations[index])
+//       .filter(Boolean);
+
+// console.log("Selected automations:", autos);
+// const payload = {
+
+
+//   accounts,
+//           automations: autos,
+//           stageid: selectedStage.value,
+//           pipeline: selectedPipeline.value,
+//           jobTemplate: selectedtemp.value,
+//           jobname: jobName,
+//           description: description,
+//           username,
+//           jobassignees: combinedAssigneesValues,
+//           priority: priority,
+//           absolutedates: absoluteDate,
+//           startsin: startsin,
+//           startsinduration: startsInDuration,
+//           duein: duein,
+//           dueinduration: dueinduration,
+//           showinclientportal: clientFacingStatus,
+//           jobnameforclient: inputText,
+//           clientfacingstatus: selectedJob,
+//           clientfacingDescription: clientDescription,
+//           startdate: startDate,
+//           enddate: dueDate,
+// };
+// console.log("📤 Sending JSON:", JSON.stringify(payload));
+//     // 🔹 Call backend API
+//     await fetch("https://www.snptaxes.com/workflow/jobs/create-job", {
+//       method: "POST",
+//       headers: { "Content-Type": "application/json" },
+     
+//        body: JSON.stringify(payload),
+//     });
+
+//     alert("Jobs started");
+
+  
+//     setDrawerOpen(false);
+//   } catch (error) {
+//     console.error("Operation failed:", error);
+//   } finally {
+//     setIsProcessing(false);
+//   }
+// };
+
+
+  const handleMove = async () => {
   if (isProcessing) return;
 
   setIsProcessing(true);
 
   try {
-    // 🔹 Extract data for API
     const accounts = combinedaccountValues;
     const autos = selectedAutomations
       .map((index) => automations[index])
       .filter(Boolean);
 
-console.log("Selected automations:", autos);
-const payload = {
+    const payload = {
+      accounts,
+      automations: autos,
+      stageid: selectedStage.value,
+      pipeline: selectedPipeline.value,
+      jobTemplate: selectedtemp.value,
+      jobname: jobName,
+      description,
+      username,
+      jobassignees: combinedAssigneesValues,
+      priority,
+      absolutedates: absoluteDate,
+      startsin,
+      startsinduration: startsInDuration,
+      duein,
+      dueinduration,
+      showinclientportal: clientFacingStatus,
+      jobnameforclient: inputText,
+      clientfacingstatus: selectedJob,
+      clientfacingDescription: clientDescription,
+      startdate: startDate,
+      enddate: dueDate,
+    };
 
+    const res = await fetch(
+      "https://www.snptaxes.com/workflow/jobs/create-job",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }
+    );
 
-  accounts,
-          automations: autos,
-          stageid: selectedStage.value,
-          pipeline: selectedPipeline.value,
-          jobTemplate: selectedtemp.value,
-          jobname: jobName,
-          description: description,
-          username,
-          jobassignees: combinedAssigneesValues,
-          priority: priority,
-          absolutedates: absoluteDate,
-          startsin: startsin,
-          startsinduration: startsInDuration,
-          duein: duein,
-          dueinduration: dueinduration,
-          showinclientportal: clientFacingStatus,
-          jobnameforclient: inputText,
-          clientfacingstatus: selectedJob,
-          clientfacingDescription: clientDescription,
-          startdate: startDate,
-          enddate: dueDate,
-};
-console.log("📤 Sending JSON:", JSON.stringify(payload));
-    // 🔹 Call backend API
-    await fetch("https://www.snptaxes.com/workflow/jobs/create-job", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-     
-       body: JSON.stringify(payload),
-    });
+    const data = await res.json();
 
-    alert("Jobs started");
+    if (!res.ok) {
+      throw new Error(data?.message || "Failed to create jobs");
+    }
 
-  
+    // ✅ SUCCESS TOAST
+    // toast.success("Jobs started successfully");
+      // ✅ Show toast here based on response
+          if (data?.success) {
+            toast.success(data.message || "Jobs started successfully");
+          } else {
+            toast.error(data.message || "Failed to start jobs");
+          }
+
+    onClose();
     setDrawerOpen(false);
+    navigate("/jobs/activejob");
   } catch (error) {
     console.error("Operation failed:", error);
+
+    // ❌ ERROR TOAST
+    toast.error(error.message || "Something went wrong");
   } finally {
     setIsProcessing(false);
   }
