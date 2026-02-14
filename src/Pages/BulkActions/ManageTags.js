@@ -59,7 +59,7 @@ const ManageTags = ({ selectedAccounts, onClose,fetchData }) => {
 
   // Format the final output with separate tag arrays
   const formattedOutput = {
-    accounts: ["671ce885aa9709c39fd3f974", "6718e47e1b7d40bc7d33611e"],
+    // accounts: ["671ce885aa9709c39fd3f974", "6718e47e1b7d40bc7d33611e"],
     assignToAllTags, // Tags for "Assign to all" action
     removeFromAllTags, // Tags for "Remove from all" action
   };

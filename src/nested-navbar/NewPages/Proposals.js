@@ -16,6 +16,8 @@ import {
   IconButton,
   MenuItem,
   Menu,
+  Checkbox,
+  TablePagination,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { Link, useParams } from "react-router-dom";
@@ -24,7 +26,7 @@ import { toast } from "react-toastify";
 import ProposalPreviewDialog from "./ProposalDialog";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-
+import { DeleteOutlineRounded } from "@mui/icons-material";
 const AccountProposalTable = () => {
   const { data } = useParams();
   const [proposals, setProposals] = useState([]);
@@ -60,7 +62,7 @@ const AccountProposalTable = () => {
 
         const response = await fetch(
           `https://www.snptaxes.com/account/proposals/byaccount/${data}`,
-          requestOptions
+          requestOptions,
         );
 
         const result = await response.json();
@@ -75,23 +77,61 @@ const AccountProposalTable = () => {
 
     fetchData();
   }, []);
-const handleDownload = async (proposal) => {
-  if (!proposal) return;
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [selectedIds, setSelectedIds] = useState([]);
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
 
-  const {
-    general,
-    introduction,
-    terms,
-    services,
-    payments,
-    status,
-    signature,
-    signedAt,
-  } = proposal;
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
-  // ---------- INTRODUCTION ----------
-  const introHtml =
-    general?.introductionEnabled
+  const paginatedProposals = proposals.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage,
+  );
+  const isSelected = (id) => selectedIds.includes(id);
+  console.log("Selected IDs:", selectedIds);
+
+  const handleSelectRow = (id) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    );
+  };
+
+  const handleSelectAllPage = (event) => {
+    if (event.target.checked) {
+      const pageIds = paginatedProposals.map((p) => p._id);
+      setSelectedIds((prev) => [...new Set([...prev, ...pageIds])]);
+    } else {
+      const pageIds = paginatedProposals.map((p) => p._id);
+      setSelectedIds((prev) => prev.filter((id) => !pageIds.includes(id)));
+    }
+  };
+
+  const allPageSelected =
+    paginatedProposals.length > 0 &&
+    paginatedProposals.every((p) => selectedIds.includes(p._id));
+
+  const handleDownload = async (proposal) => {
+    if (!proposal) return;
+
+    const {
+      general,
+      introduction,
+      terms,
+      services,
+      payments,
+      status,
+      signature,
+      signedAt,
+    } = proposal;
+
+    // ---------- INTRODUCTION ----------
+    const introHtml = general?.introductionEnabled
       ? `
       <h2>Introduction</h2>
       ${introduction?.description || ""}
@@ -99,9 +139,8 @@ const handleDownload = async (proposal) => {
     `
       : "";
 
-  // ---------- TERMS ----------
-  const termsHtml =
-    general?.termsEnabled
+    // ---------- TERMS ----------
+    const termsHtml = general?.termsEnabled
       ? `
       <h2>Terms & Conditions</h2>
       ${terms?.description || ""}
@@ -109,11 +148,11 @@ const handleDownload = async (proposal) => {
     `
       : "";
 
-  // ---------- SERVICES (ITEMIZED) ----------
-  let servicesHtml = "";
+    // ---------- SERVICES (ITEMIZED) ----------
+    let servicesHtml = "";
 
-  if (general?.servicesEnabled && services?.option === "services") {
-    servicesHtml = `
+    if (general?.servicesEnabled && services?.option === "services") {
+      servicesHtml = `
       <h2>Services</h2>
       <table width="100%" border="1" cellspacing="0" cellpadding="6">
         <thead>
@@ -157,13 +196,13 @@ const handleDownload = async (proposal) => {
       </p>
       <hr/>
     `;
-  }
+    }
 
-  // ---------- SERVICES (INVOICE MODE) ----------
-  if (general?.servicesEnabled && services?.option === "invoice") {
-    const invoice = services?.invoices?.[0];
+    // ---------- SERVICES (INVOICE MODE) ----------
+    if (general?.servicesEnabled && services?.option === "invoice") {
+      const invoice = services?.invoices?.[0];
 
-    servicesHtml = `
+      servicesHtml = `
       <h2>Invoice</h2>
 
       <p><b>Amount:</b> $${invoice?.totalAmount?.toFixed(2)}</p>
@@ -213,11 +252,10 @@ const handleDownload = async (proposal) => {
       </p>
       <hr/>
     `;
-  }
+    }
 
-  // ---------- PAYMENTS ----------
-  const paymentsHtml =
-    general?.paymentsEnabled
+    // ---------- PAYMENTS ----------
+    const paymentsHtml = general?.paymentsEnabled
       ? `
       <h2>Payments</h2>
       <p><b>Method:</b> ${payments?.method}</p>
@@ -226,14 +264,14 @@ const handleDownload = async (proposal) => {
     `
       : "";
 
-  // ---------- SIGNATURE (ONLY IF SIGNED) ----------
-  let signatureHtml = `
+    // ---------- SIGNATURE (ONLY IF SIGNED) ----------
+    let signatureHtml = `
     <h2>Sign & Accept</h2>
     <p style="color:red;">Proposal not signed yet.</p>
   `;
 
-  if (status === "Signed") {
-    signatureHtml = `
+    if (status === "Signed") {
+      signatureHtml = `
       <h2>Sign & Accept</h2>
       <p><b>Signed on:</b> ${new Date(signedAt).toLocaleString()}</p>
 
@@ -248,10 +286,10 @@ const handleDownload = async (proposal) => {
 
       
     `;
-  }
+    }
 
-  // ---------- FULL HTML ----------
-  const fullHtml = `
+    // ---------- FULL HTML ----------
+    const fullHtml = `
     <div style="font-family: Arial, sans-serif; font-size: 12px; padding: 20px;">
       <h1 style="text-align:center;">
         ${general?.proposalName || "Proposal"}
@@ -265,38 +303,36 @@ const handleDownload = async (proposal) => {
     </div>
   `;
 
-  // ---------- RENDER ----------
-  const tempDiv = document.createElement("div");
-  tempDiv.innerHTML = fullHtml;
-  document.body.appendChild(tempDiv);
+    // ---------- RENDER ----------
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = fullHtml;
+    document.body.appendChild(tempDiv);
 
-  const canvas = await html2canvas(tempDiv, { scale: 2 });
-  const imgData = canvas.toDataURL("image/png");
+    const canvas = await html2canvas(tempDiv, { scale: 2 });
+    const imgData = canvas.toDataURL("image/png");
 
-  document.body.removeChild(tempDiv);
+    document.body.removeChild(tempDiv);
 
-  const pdf = new jsPDF("p", "pt", "a4");
-  const pdfWidth = pdf.internal.pageSize.getWidth();
-  const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+    const pdf = new jsPDF("p", "pt", "a4");
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-  pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-  pdf.save(`${general?.proposalName || "Proposal"}.pdf`);
-};
-
-
+    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+    pdf.save(`${general?.proposalName || "Proposal"}.pdf`);
+  };
 
   const handleTemplateClick = (proposal) => {
     console.log("proposal to edit", proposal);
     // Navigate to proposal form with the proposal ID
     navigate(
-      `/clients/accounts/accountsdash/proposals/${data}/account-proposal?edit=${proposal._id}`
+      `/clients/accounts/accountsdash/proposals/${data}/account-proposal?edit=${proposal._id}`,
     );
   };
 
   const handleCreateNew = () => {
     // Navigate to empty proposal form
     navigate(
-      `/clients/accounts/accountsdash/proposals/${data}/account-proposal`
+      `/clients/accounts/accountsdash/proposals/${data}/account-proposal`,
     );
   };
 
@@ -309,6 +345,47 @@ const handleDownload = async (proposal) => {
     setAnchorEl(null);
     setSelectedProposal(null);
   };
+const handleBulkDelete = async () => {
+  // if (!selectedProposal) return;
+
+  if (!window.confirm("Are you sure you want to delete this proposal?")) {
+    handleMenuClose();
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      "https://www.snptaxes.com/account/proposals/delete-multiple",
+      {
+        method: "DELETE", // or POST if backend uses POST
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          proposalIds: selectedIds, // 🔹 send as array
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    // if (!response.ok) {
+    //   throw new Error(data.message || "Failed to delete proposal");
+    // }
+
+    toast.success(data.message || "Proposal deleted successfully");
+
+    // ✅ Remove from UI instantly
+    setProposals((prev) =>
+      prev.filter((p) => !selectedIds.includes(p._id))
+    );
+  } catch (err) {
+    console.error("Delete proposal error:", err);
+    toast.error(err.message || "Failed to delete proposal");
+  } finally {
+    handleMenuClose();
+  }
+};
 
   const handleDelete = async () => {
     if (!selectedProposal) return;
@@ -320,7 +397,7 @@ const handleDownload = async (proposal) => {
     try {
       const response = await fetch(
         `https://www.snptaxes.com/account/proposals/${selectedProposal._id}`,
-        { method: "DELETE" }
+        { method: "DELETE" },
       );
 
       if (!response.ok) {
@@ -329,7 +406,7 @@ const handleDownload = async (proposal) => {
       toast.success("Proposal Deleted Successfully");
       // ✅ Remove from UI list instantly
       setProposals((prev) =>
-        prev.filter((p) => p._id !== selectedProposal._id)
+        prev.filter((p) => p._id !== selectedProposal._id),
       );
     } catch (err) {
       console.error(err);
@@ -375,63 +452,70 @@ const handleDownload = async (proposal) => {
           Create New Proposal
         </Button>
       </Box>
-
+<Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+       
+        {selectedIds.length > 0 &&  (
+          <DeleteOutlineRounded
+            sx={{ color: "red", cursor: "pointer" }}
+            onClick={handleBulkDelete}
+          />
+        )}
+       
+      </Box>
       <TableContainer component={Paper} elevation={3}>
         <Table sx={{ minWidth: 650 }} size="medium">
-          <TableHead sx={{ bgcolor: "primary.main" }}>
+          <TableHead>
             <TableRow>
-              <TableCell
-                sx={{ color: "white", fontWeight: "bold", fontSize: "1rem" }}
-              >
+              <TableCell padding="checkbox">
+                <Checkbox
+                  checked={allPageSelected}
+                  indeterminate={selectedIds.length > 0 && !allPageSelected}
+                  onChange={handleSelectAllPage}
+                />
+              </TableCell>
+              <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>
                 Proposal Name
               </TableCell>
-              <TableCell
-                sx={{ color: "white", fontWeight: "bold", fontSize: "1rem" }}
-              >
+              <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>
                 Status
               </TableCell>
-              <TableCell
-                sx={{ color: "white", fontWeight: "bold", fontSize: "1rem" }}
-              >
+              <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>
                 Actions
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {proposals.map((proposal) => (
+            {paginatedProposals.map((proposal) => (
               <TableRow
                 key={proposal._id}
+                selected={isSelected(proposal._id)}
                 sx={{
-                  "&:nth-of-type(odd)": { backgroundColor: "action.hover" },
                   "&:hover": { backgroundColor: "action.selected" },
                 }}
               >
+                <TableCell padding="checkbox">
+                  <Checkbox
+                    checked={isSelected(proposal._id)}
+                    onChange={() => handleSelectRow(proposal._id)}
+                  />
+                </TableCell>
                 <TableCell>
-                  {/* <Link  to={`/clients/accounts/accountsdash/proposals/${data}/account-proposal?edit=${proposal._id}`}  style={{
-                        textDecoration: "none",
-                        color: "blue",
-                        fontWeight: 500,
-                      }}> */}
                   <Typography
-                    variant="body1"
-                    fontWeight="medium"
                     sx={{ cursor: "pointer" }}
                     color="primary"
                     onClick={() => handleOpenDialog(proposal)}
                   >
                     {proposal.general.proposalName}
                   </Typography>
-                  {/* </Link> */}
                 </TableCell>
 
-                {/* <TableCell>{proposal.status}</TableCell> */}
                 <TableCell>
-  <Chip
-    label={proposal.status}
-    color={proposal.status === "Signed" ? "success" : "default"}
-    size="small"
-  />
-</TableCell>
+                  <Chip
+                    label={proposal.status}
+                    color={proposal.status === "Signed" ? "success" : "default"}
+                    size="small"
+                  />
+                </TableCell>
 
                 <TableCell>
                   <IconButton onClick={(e) => handleMenuOpen(e, proposal)}>
@@ -443,54 +527,45 @@ const handleDownload = async (proposal) => {
           </TableBody>
         </Table>
       </TableContainer>
-      {/* ✅ Shared Menu */}
-      {/* <Menu
+      <TablePagination
+        component="div"
+        count={proposals.length}
+        page={page}
+        onPageChange={handleChangePage}
+        rowsPerPage={rowsPerPage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+        rowsPerPageOptions={[5, 10, 25, 50]}
+      />
+
+      <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
       >
-        <MenuItem
-          onClick={() => {
-            handleTemplateClick(selectedProposal);
-            handleMenuClose();
-          }}
-        >
-          Edit
-        </MenuItem>
+        {selectedProposal?.status === "Signed" ? (
+          <MenuItem
+            onClick={() => {
+              handleDownload(selectedProposal);
+              handleMenuClose();
+            }}
+          >
+            Download
+          </MenuItem>
+        ) : (
+          <MenuItem
+            onClick={() => {
+              handleTemplateClick(selectedProposal);
+              handleMenuClose();
+            }}
+          >
+            Edit
+          </MenuItem>
+        )}
 
         <MenuItem sx={{ color: "red" }} onClick={handleDelete}>
           Delete
         </MenuItem>
-      </Menu> */}
-      <Menu
-  anchorEl={anchorEl}
-  open={Boolean(anchorEl)}
-  onClose={handleMenuClose}
->
-  {selectedProposal?.status === "Signed" ? (
-    <MenuItem
-      onClick={() => {
-        handleDownload(selectedProposal);
-        handleMenuClose();
-      }}
-    >
-      Download
-    </MenuItem>
-  ) : (
-    <MenuItem
-      onClick={() => {
-        handleTemplateClick(selectedProposal);
-        handleMenuClose();
-      }}
-    >
-      Edit
-    </MenuItem>
-  )}
-
-  <MenuItem sx={{ color: "red" }} onClick={handleDelete}>
-    Delete
-  </MenuItem>
-</Menu>
+      </Menu>
 
       {proposals.length === 0 && (
         <Box textAlign="center" sx={{ mt: 4 }}>
@@ -507,7 +582,7 @@ const handleDownload = async (proposal) => {
           </Button>
         </Box>
       )}
-     
+
       <ProposalPreviewDialog
         open={openDialog}
         handleClose={handleCloseDialog}

@@ -2688,7 +2688,7 @@ const handleConfirmDelete = async () => {
               )}
 
               {/* NEW: Edit login, notify, email sync menu item */}
-              <Tooltip
+              {/* <Tooltip
                 title={
                   storedData?.teammember?.manageAccounts === false
                     ? "You don't have permission to edit account settings"
@@ -2704,7 +2704,7 @@ const handleConfirmDelete = async () => {
                     Edit login, notify, email sync
                   </MenuItem>
                 </span>
-              </Tooltip>
+              </Tooltip> */}
             </Menu>
           </div>
         </Box>

@@ -826,7 +826,7 @@ useEffect(() => {
           .request(config)
           .then((response) => {
             console.log("Job created successfully",response.data);
-            toast.success("Job created successfully");
+            toast.success("Jobs started successfully");
             // handleClose();
             onClose(); // Close the form after successful creation
             // handleDrawerClose();
@@ -1897,21 +1897,21 @@ const [clientFacingJobs, setClientFacingJobs] = useState([]);
         body: JSON.stringify(payload),
       }
     );
+toast.success("Jobs started successfully");
+    // const data = await res.json();
 
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data?.message || "Failed to create jobs");
-    }
+    // if (!res.ok) {
+    //   throw new Error(data?.message || "Failed to create jobs");
+    // }
 
     // ✅ SUCCESS TOAST
     // toast.success("Jobs started successfully");
       // ✅ Show toast here based on response
-          if (data?.success) {
-            toast.success(data.message || "Jobs started successfully");
-          } else {
-            toast.error(data.message || "Failed to start jobs");
-          }
+          // if (data?.success) {
+          //   toast.success(data.message || "Jobs started successfully");
+          // } else {
+          //   toast.error(data.message || "Failed to start jobs");
+          // }
 
     onClose();
     setDrawerOpen(false);
@@ -1991,12 +1991,12 @@ const [clientFacingJobs, setClientFacingJobs] = useState([]);
             body: JSON.stringify(jobData),
           });
 
-          if (!response.ok) {
-            const error = await response.json();
-            throw new Error(
-              `Failed to create job for account ${accountId}: ${error.message}`
-            );
-          }
+          // if (!response.ok) {
+          //   const error = await response.json();
+          //   throw new Error(
+          //     `Failed to create job for account ${accountId}: ${error.message}`
+          //   );
+          // }
 
           const result = await response.json();
           if (!result.createdJobs || result.createdJobs.length === 0) {

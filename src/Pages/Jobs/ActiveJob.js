@@ -55,7 +55,7 @@ import {
   ListItemText,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { MdOutlineArchive } from "react-icons/md";
+import { MdOutlineArchive,MdOutlineDelete } from "react-icons/md";
 import TablePagination from "@mui/material/TablePagination";
 import { GoDotFill } from "react-icons/go";
 import TagsMultiSelectDropDown from "../../Templates/TagsMultiSelectDropDown";
@@ -63,42 +63,14 @@ import MultiSelectDropdown from "../../Templates/MultiSelectDropdown";
 import CircularProgress from "@mui/material/CircularProgress"; // MUI Loader
 import FilterDropdown from "./JobFilter";
 const Example = ({ charLimit = 4000 }) => {
-  const ITEM_HEIGHT = 48;
-  const ITEM_PADDING_TOP = 8;
-  const MenuProps = {
-    PaperProps: {
-      style: {
-        maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-        width: "auto",
-      },
-    },
-  };
   const navigate = useNavigate();
   const JOBS_API = process.env.REACT_APP_ADD_JOBS_URL;
-  const USER_API = process.env.REACT_APP_USER_URL;
   const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
   const CLIENT_FACING_API = process.env.REACT_APP_CLIENT_FACING_URL;
-  // const PIPELINE_API = process.env.REACT_APP_PIPELINE_TEMP_URL;
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
-  const isMobile = useMediaQuery("(max-width: 1000px)");
   const [jobData, setJobData] = useState([]);
   const [isActiveTrue, setIsActiveTrue] = useState(true);
-
-  const [activeButton, setActiveButton] = useState("active");
-
-  const handleActiveClick = () => {
-    setIsActiveTrue(true);
-    setActiveButton("active");
-    fetchData(true);
-    console.log("Active action triggered.");
-  };
-  const handleArchivedClick = () => {
-    setIsActiveTrue(false);
-    setActiveButton("archived");
-    fetchData(false);
-    console.log("Archive action triggered.");
-  };
   const [userRole, setUserRole] = useState("");
   useEffect(() => {
     const storedUserRole = localStorage.getItem("userRole");
@@ -112,309 +84,101 @@ const Example = ({ charLimit = 4000 }) => {
   }, [userRole, isActiveTrue]);
 
   const [loading, setLoading] = useState(false); // Loader state
- 
-// const fetchData = async () => {
-//   setLoading(true); // Start loading
-//   const loaderDelay = new Promise((resolve) => setTimeout(resolve, 1000));
 
-//   try {
-//     const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
-//     console.log("Received stored teamMemberData:", storedData);
+  const [filterStatus, setFilterStatus] = useState("active");
+  const fetchData = async () => {
+    setLoading(true);
+    const loaderDelay = new Promise((resolve) => setTimeout(resolve, 1000));
 
-//     const loginuserid = storedData?.teammember?.userid;
-//     const viewAllAccounts = storedData?.teammember?.viewallAccounts;
+    try {
+      const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
 
-//     console.log("User role is:", userRole);
-//     console.log("access:", viewAllAccounts);
+      const loginuserid = storedData?.teammember?.userid;
+      const viewAllAccounts = storedData?.teammember?.viewallAccounts;
 
-//     let url = "";
+      console.log("User role:", userRole);
+      console.log("View all accounts:", viewAllAccounts);
 
-//     if (userRole === "Admin") {
-//       // Admin fetches all jobs
-//       url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}`;
-//     } 
-    
-//     else if (userRole === "TeamMember") {
-//       if (viewAllAccounts) {
-//         // TeamMember with full access gets all jobs
-//         url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}`;
-//       } else {
-//         // TeamMember with restricted access → fetch user's accounts
-//         const accountsResponse = await axios.get(
-//           `${ACCOUNT_API}/accounts/getaccounts/${loginuserid}/${isActiveTrue}`
-//         );
+      // ✅ Declare once (IMPORTANT)
+      let accountsData = [];
 
-//         const accountsData = accountsResponse.data.accountlist;
-//         console.log("Accounts fetched:", accountsData);
-
-//         if (!accountsData || accountsData.length === 0) {
-//           console.warn("No accounts found for user.");
-//           setJobData([]);
-//           await loaderDelay;
-//           setLoading(false);
-//           return;
-//         }
-
-//         const accountIds = accountsData.map((account) => account.id).join(",");
-//         url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
-//       }
-//     }
-
-//     if (!url) {
-//       await loaderDelay;
-//       setLoading(false);
-//       return;
-//     }
-
-//     console.log("Fetching jobs from URL:", url);
-
-//     const jobListResponse = await axios.get(url);
-
-//     const formattedData = jobListResponse.data.jobList.map((job) => ({
-//       ...job,
-//       StartDate: job.StartDate
-//         ? format(new Date(job.StartDate), "MMMM dd, yyyy")
-//         : "",
-//       DueDate: job.DueDate
-//         ? format(new Date(job.DueDate), "MMMM dd, yyyy")
-//         : "",
-//       updatedAt: formatDistanceToNow(new Date(job.updatedAt), { addSuffix: true }),
-//       JobAssignee: Array.isArray(job.JobAssignee)
-//         ? job.JobAssignee.join(", ")
-//         : job.JobAssignee,
-//       clientfacingstatus: {
-//         statusName: job.ClientFacingStatus?.statusName || "",
-//         statusColor: job.ClientFacingStatus?.statusColor || "",
-//       },
-//     }));
-
-//     setJobData(formattedData);
-//     console.log("Formatted Job Data:", formattedData);
-//   } 
-//   catch (error) {
-//     console.error("Error fetching data:", error);
-//   } 
-//   finally {
-//     await loaderDelay;
-//     setLoading(false);
-//   }
-// };
-
-const [filterStatus, setFilterStatus] = useState("active"); 
-// const fetchData = async () => {
-//   setLoading(true);
-//   const loaderDelay = new Promise((resolve) => setTimeout(resolve, 1000));
-
-//   try {
-//     const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
-//     console.log("Received stored teamMemberData:", storedData);
-
-//     const loginuserid = storedData?.teammember?.userid;
-//     const viewAllAccounts = storedData?.teammember?.viewallAccounts;
-
-//     console.log("User role is:", userRole);
-//     console.log("access:", viewAllAccounts);
-
-//     let url = "";
-
-//     if (userRole === "Admin") {
-//       // ✅ Fetch active accounts first
-//       const accountsResponse = await axios.get(
-//         `https://www.snptaxes.com/api/accounts/list?active=${filterStatus === "active"}`
-//       );
-// console.log("accountsResponse",accountsResponse)
-//       const accountsData = accountsResponse.data.accountlist
-// ;
-//       console.log("Admin accounts fetched:", accountsData);
-
-//       if (!accountsData || accountsData.length === 0) {
-//         console.warn("No active accounts found for Admin.");
-//         setJobData([]);
-//         await loaderDelay;
-//         setLoading(false);
-//         return;
-//       }
-
-//       const accountIds = accountsData.map((account) => account._id).join(",");
-//       url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
-//     } 
-    
- 
-// else if (userRole === "TeamMember") {
-
-//   let accountsData = [];
-
-//   if (viewAllAccounts) {
-//     // 🔹 TeamMember WITH view all access → fetch ALL active accounts
-//     const accountsResponse = await axios.get(
-//       `https://www.snptaxes.com/api/accounts/list?active=${filterStatus === "active"}`
-//     );
-
-//     accountsData = accountsResponse.data.accountlist;
-//     console.log("TeamMember (view all) accounts:", accountsData);
-
-//   } else {
-//     // 🔹 TeamMember WITHOUT view all access → fetch assigned accounts only
-//     const accountsResponse = await axios.get(
-//       `https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=${filterStatus === "active"}`
-//     );
-
-//     accountsData = accountsResponse.data.accountlist;
-//     console.log("TeamMember assigned accounts:", accountsData);
-//   }
-
-//   // 🔹 Validate accounts
-//   if (!accountsData || accountsData.length === 0) {
-//     console.warn("No accounts found for TeamMember.");
-//     setJobData([]);
-//     await loaderDelay;
-//     setLoading(false);
-//     return;
-//   }
-
-//   // 🔹 Map account IDs
-//   const accountIds = accountsData.map((account) => account._id).join(",");
-
-//   // 🔹 Prepare URL for jobs
-//   url = `${JOBS_API}/workflow/jobs/job/joblist/list/${isActiveTrue}/${accountIds}`;
-
-//   console.log("TeamMember Job Fetch URL:", url);
-// }
-
-//     if (!url) {
-//       await loaderDelay;
-//       setLoading(false);
-//       return;
-//     }
-
-//     console.log("Fetching jobs from URL:", url);
-
-//     const jobListResponse = await axios.get(url);
-
-//     const formattedData = jobListResponse.data.jobList.map((job) => ({
-//       ...job,
-//       StartDate: job.StartDate
-//         ? format(new Date(job.StartDate), "MMMM dd, yyyy")
-//         : "",
-//       DueDate: job.DueDate
-//         ? format(new Date(job.DueDate), "MMMM dd, yyyy")
-//         : "",
-//       updatedAt: formatDistanceToNow(new Date(job.updatedAt), { addSuffix: true }),
-//       JobAssignee: Array.isArray(job.JobAssignee)
-//         ? job.JobAssignee.join(", ")
-//         : job.JobAssignee,
-//       clientfacingstatus: {
-//         statusName: job.ClientFacingStatus?.statusName || "",
-//         statusColor: job.ClientFacingStatus?.statusColor || "",
-//       },
-//     }));
-
-//     setJobData(formattedData);
-//     console.log("Formatted Job Data:", formattedData);
-//   } catch (error) {
-//     console.error("Error fetching data:", error);
-//   } finally {
-//     await loaderDelay;
-//     setLoading(false);
-//   }
-// };
-const fetchData = async () => {
-  setLoading(true);
-  const loaderDelay = new Promise((resolve) => setTimeout(resolve, 1000));
-
-  try {
-    const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
-
-    const loginuserid = storedData?.teammember?.userid;
-    const viewAllAccounts = storedData?.teammember?.viewallAccounts;
-
-    console.log("User role:", userRole);
-    console.log("View all accounts:", viewAllAccounts);
-
-    // ✅ Declare once (IMPORTANT)
-    let accountsData = [];
-
-    /* =======================
+      /* =======================
        FETCH ACCOUNTS
     ======================= */
 
-    if (userRole === "Admin") {
-      const accountsResponse = await axios.get(
-        `https://www.snptaxes.com/api/accounts/list?active=${filterStatus === "active"}`
-      );
-
-      accountsData = accountsResponse.data.accountlist || [];
-      console.log("Admin accounts:", accountsData);
-
-    } else if (userRole === "TeamMember") {
-
-      if (viewAllAccounts) {
+      if (userRole === "Admin") {
         const accountsResponse = await axios.get(
-          `https://www.snptaxes.com/api/accounts/list?active=${filterStatus === "active"}`
+          `https://www.snptaxes.com/api/accounts/list?active=${filterStatus === "active"}`,
         );
 
         accountsData = accountsResponse.data.accountlist || [];
-        console.log("TeamMember (view all) accounts:", accountsData);
+        console.log("Admin accounts:", accountsData);
+      } else if (userRole === "TeamMember") {
+        if (viewAllAccounts) {
+          const accountsResponse = await axios.get(
+            `https://www.snptaxes.com/api/accounts/list?active=${filterStatus === "active"}`,
+          );
 
-      } else {
-        const accountsResponse = await axios.get(
-          `https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=${filterStatus === "active"}`
-        );
+          accountsData = accountsResponse.data.accountlist || [];
+          console.log("TeamMember (view all) accounts:", accountsData);
+        } else {
+          const accountsResponse = await axios.get(
+            `https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=${filterStatus === "active"}`,
+          );
 
-        accountsData = accountsResponse.data.accountlist || [];
-        console.log("TeamMember assigned accounts:", accountsData);
+          accountsData = accountsResponse.data.accountlist || [];
+          console.log("TeamMember assigned accounts:", accountsData);
+        }
       }
-    }
 
-    // 🔒 Safety check
-    if (!accountsData.length) {
-      console.warn("No accounts found.");
-      setJobData([]);
-      return;
-    }
+      // 🔒 Safety check
+      if (!accountsData.length) {
+        console.warn("No accounts found.");
+        setJobData([]);
+        return;
+      }
 
-    /* =======================
+      /* =======================
        FETCH JOBS (POST ✅)
     ======================= */
 
-    const jobListResponse = await axios.post(
-      `${JOBS_API}/workflow/jobs/job/joblist/list`,
-      {
-        isActive: isActiveTrue,
-        accountIds: accountsData.map(acc => acc._id),
-      }
-    );
+      const jobListResponse = await axios.post(
+        `${JOBS_API}/workflow/jobs/job/joblist/list`,
+        {
+          isActive: isActiveTrue,
+          accountIds: accountsData.map((acc) => acc._id),
+        },
+      );
 
-    const formattedData = jobListResponse.data.jobList.map((job) => ({
-      ...job,
-      StartDate: job.StartDate
-        ? format(new Date(job.StartDate), "MMMM dd, yyyy")
-        : "",
-      DueDate: job.DueDate
-        ? format(new Date(job.DueDate), "MMMM dd, yyyy")
-        : "",
-      updatedAt: formatDistanceToNow(new Date(job.updatedAt), {
-        addSuffix: true,
-      }),
-      JobAssignee: Array.isArray(job.JobAssignee)
-        ? job.JobAssignee.join(", ")
-        : job.JobAssignee,
-      clientfacingstatus: {
-        statusName: job.ClientFacingStatus?.statusName || "",
-        statusColor: job.ClientFacingStatus?.statusColor || "",
-      },
-    }));
+      const formattedData = jobListResponse.data.jobList.map((job) => ({
+        ...job,
+        StartDate: job.StartDate
+          ? format(new Date(job.StartDate), "MMMM dd, yyyy")
+          : "",
+        DueDate: job.DueDate
+          ? format(new Date(job.DueDate), "MMMM dd, yyyy")
+          : "",
+        updatedAt: formatDistanceToNow(new Date(job.updatedAt), {
+          addSuffix: true,
+        }),
+        JobAssignee: Array.isArray(job.JobAssignee)
+          ? job.JobAssignee.join(", ")
+          : job.JobAssignee,
+        clientfacingstatus: {
+          statusName: job.ClientFacingStatus?.statusName || "",
+          statusColor: job.ClientFacingStatus?.statusColor || "",
+        },
+      }));
 
-    setJobData(formattedData);
-    console.log("Final job data:", formattedData);
-
-  } catch (error) {
-    console.error("Error fetching jobs:", error);
-  } finally {
-    await loaderDelay;
-    setLoading(false);
-  }
-};
+      setJobData(formattedData);
+      console.log("Final job data:", formattedData);
+    } catch (error) {
+      console.error("Error fetching jobs:", error);
+    } finally {
+      await loaderDelay;
+      setLoading(false);
+    }
+  };
 
   const [filters, setFilters] = useState({
     jobAssignees: [],
@@ -441,7 +205,7 @@ const fetchData = async () => {
 
         if (
           !jobAssignees?.some((assignee) =>
-            filters.jobAssignees.includes(assignee)
+            filters.jobAssignees.includes(assignee),
           )
         ) {
           return false;
@@ -456,65 +220,36 @@ const fetchData = async () => {
         }
       }
 
-      // Pipeline and stage filter - updated to match your data structure
-    
-      // if (Object.keys(filters.pipelineStages).length > 0) {
-      //   console.log("job filter by pipeline and stage",filters.pipelineStages);
-      //   const pipelineMatch = Object.entries(filters.pipelineStages).some(
-      //     ([pipelineName, stageNames]) => {
-      //       const jobPipeline = job.Pipeline || "";
-      //       if (jobPipeline.toLowerCase() !== pipelineName.toLowerCase()) {
-      //         return false;
-      //       }
-
-      //       const jobStages = Array.isArray(job.Stage)
-      //         ? job.Stage
-      //         : [job.Stage || ""];
-
-      //       return stageNames.some((stage) =>
-      //         jobStages.some(
-      //           (jobStage) => jobStage.toLowerCase() === stage.toLowerCase()
-      //         )
-      //       );
-      //     }
-      //   );
-      //   console.log("jkhdfds", pipelineMatch);
-      //   if (!pipelineMatch) return false;
-        
-      // }
       if (Object.keys(filters.pipelineStages).length > 0) {
-  console.log('Filtering by pipeline/stages:', filters.pipelineStages);
-  console.log('Job pipeline:', job.Pipeline);
-  // console.log('Job stages:', job.Stages?.map(stage => stage.name));
-  
-  const pipelineMatch = Object.entries(filters.pipelineStages).some(
-    ([pipelineName, stageNames]) => {
-      const jobPipeline = job.Pipeline || "";
-      const pipelineMatches = jobPipeline.toLowerCase() === pipelineName.toLowerCase();
-      
-      if (!pipelineMatches) return false;
+        console.log("Filtering by pipeline/stages:", filters.pipelineStages);
+        console.log("Job pipeline:", job.Pipeline);
+        // console.log('Job stages:', job.Stages?.map(stage => stage.name));
 
-      // const jobStageNames = job.Stages?.map(stage => stage.name) || [];
-      const jobStageNames = job.Stages?.name || "";
+        const pipelineMatch = Object.entries(filters.pipelineStages).some(
+          ([pipelineName, stageNames]) => {
+            const jobPipeline = job.Pipeline || "";
+            const pipelineMatches =
+              jobPipeline.toLowerCase() === pipelineName.toLowerCase();
 
-      // const stageMatches = stageNames.some((selectedStage) =>
-      //   jobStageNames.some(
-      //     (jobStage) => jobStage.toLowerCase() === selectedStage.toLowerCase()
-      //   )
-      // );
-      const stageMatches = stageNames.some(
-  (selectedStage) =>
-    jobStageNames.toLowerCase() === selectedStage.toLowerCase()
-);
+            if (!pipelineMatches) return false;
 
-      
-      console.log(`Pipeline "${pipelineName}" matches: ${pipelineMatches}, Stages match: ${stageMatches}`);
-      return stageMatches;
-    }
-  );
+            // const jobStageNames = job.Stages?.map(stage => stage.name) || [];
+            const jobStageNames = job.Stages?.name || "";
 
-  if (!pipelineMatch) return false;
-}
+            const stageMatches = stageNames.some(
+              (selectedStage) =>
+                jobStageNames.toLowerCase() === selectedStage.toLowerCase(),
+            );
+
+            console.log(
+              `Pipeline "${pipelineName}" matches: ${pipelineMatches}, Stages match: ${stageMatches}`,
+            );
+            return stageMatches;
+          },
+        );
+
+        if (!pipelineMatch) return false;
+      }
       // Account name filter - with null/undefined check
       if (filters.accountName) {
         const accountName = job.Account
@@ -554,12 +289,6 @@ const fetchData = async () => {
     }
   };
 
-  // Create account options
-  const accountOptions = accountData.map((account) => ({
-    value: account._id,
-    label: account.accountName,
-  }));
-
   // pipeline
   const PIPELINE_API = process.env.REACT_APP_PIPELINE_TEMP_URL;
   const [pipelineData, setPipelineData] = useState([]);
@@ -567,7 +296,7 @@ const fetchData = async () => {
   const [piplineid, setPipelineId] = useState();
   const [pipelineIdData, setPipelineIdData] = useState();
   const [stages, setstages] = useState();
-const [jobName,setJobName]=useState("")
+  const [jobName, setJobName] = useState("");
   useEffect(() => {
     fetchPipelineDataid();
   }, [piplineid]);
@@ -575,7 +304,7 @@ const [jobName,setJobName]=useState("")
   const fetchPipelineDataid = async (piplineid) => {
     try {
       const response = await fetch(
-        `${PIPELINE_API}/workflow/pipeline/pipeline/${piplineid}`
+        `${PIPELINE_API}/workflow/pipeline/pipeline/${piplineid}`,
       );
       const data = await response.json();
 
@@ -622,7 +351,6 @@ const [jobName,setJobName]=useState("")
     fetchPipelineDataid(selectedOptions.value);
   };
 
-  const [stagesoptions, setStagesOptions] = useState([]);
   const [selectedstage, setSelectedstage] = useState("");
   const handleStageChange = (selectedOptions) => {
     setSelectedstage(selectedOptions);
@@ -683,10 +411,6 @@ const [jobName,setJobName]=useState("")
       console.error("Error fetching data:", error);
     }
   };
-  const useroptions = userData.map((user) => ({
-    value: user._id,
-    label: user.username,
-  }));
 
   const handleUserChange = (newSelectedUsers) => {
     setSelectedUser(newSelectedUsers);
@@ -717,7 +441,7 @@ const [jobName,setJobName]=useState("")
       }
       const data = await response.json();
       setSelectedJob(data.jobList);
-      setJobName(data.jobList.Name)
+      setJobName(data.jobList.Name);
       console.log(data.jobList);
       if (data.jobList.Account && data.jobList.Account.length > 0) {
         const { _id, accountName } = data.jobList.Account[0];
@@ -863,63 +587,70 @@ const [jobName,setJobName]=useState("")
     console.log("Deleted:", selectedJob);
   };
 
+  // const handleDeleteJob = async () => {
+  //   const isConfirmed = window.confirm(
+  //     "Are you sure you want to delete the selected jobs? This action cannot be undone.",
+  //   );
+  //   if (isConfirmed) {
+  //     try {
+  //       // Make delete requests for each selected job
+  //       await Promise.all(
+  //         selected.map((id) =>
+  //           fetch(`${JOBS_API}/workflow/jobs/job/` + id, {
+  //             method: "DELETE",
+  //             redirect: "follow",
+  //           }),
+  //         ),
+  //       );
+
+  //       toast.success("Job deleted successfully!");
+  //       setSelected([]); // Clear the selected jobs
+  //       fetchData(true); // Refresh the data after deletion
+  //     } catch (error) {
+  //       console.error("Delete API Error:", error);
+  //       toast.error("Failed to delete selected jobs");
+  //     }
+  //   }
+  // };
+
   const handleDeleteJob = async () => {
-    const isConfirmed = window.confirm(
-      "Are you sure you want to delete the selected jobs? This action cannot be undone."
-    );
-    if (isConfirmed) {
-      try {
-        // Make delete requests for each selected job
-        await Promise.all(
-          selected.map((id) =>
-            fetch(`${JOBS_API}/workflow/jobs/job/` + id, {
-              method: "DELETE",
-              redirect: "follow",
-            })
-          )
-        );
+  if (selected.length === 0) {
+    toast.error("Please select at least one job");
+    return;
+  }
+  console.log("Selected job IDs for deletion:", selected);
 
-        toast.success("Job deleted successfully!");
-        setSelected([]); // Clear the selected jobs
-        fetchData(true); // Refresh the data after deletion
-      } catch (error) {
-        console.error("Delete API Error:", error);
-        toast.error("Failed to delete selected jobs");
-      }
-    }
-  };
-  const handleEditClick = (action) => {
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
+  const isConfirmed = window.confirm(
+    "Are you sure you want to delete the selected jobs? This action cannot be undone."
+  );
 
-    // Set "active" to false if "Archive" is selected, or true if "Make Active" is selected
-    const raw = JSON.stringify({
-      active: action === "Archive" ? false : true,
+  if (!isConfirmed) return;
+
+  try {
+    const response = await fetch(`${JOBS_API}/workflow/jobs/job`, {
+      method: "DELETE", // or POST if your backend uses POST
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        jobIds : selected, // 🔹 send array directly
+      }),
     });
 
-    const requestOptions = {
-      method: "PATCH",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-    };
+    const data = await response.json();
 
-    // Assuming you're passing the row.id or jobId to the function to update the specific job
-    fetch(`${JOBS_API}/workflow/jobs/job/${selectedJob}`, requestOptions)
-      .then((response) => response.json())
-      .then((result) => {
-        console.log(result);
-        setAnchorEl(null);
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to delete jobs");
+    }
 
-        if (action === "Archive") {
-          handleArchivedClick(); // Call the handleArchivedClick function
-        } else if (action === "Make Active") {
-          handleActiveClick(); // Call the handleActiveClick function
-        }
-        setSelectedJob(null);
-      })
-      .catch((error) => console.error(error));
-  };
+    toast.success(data.message || "Jobs deleted successfully!");
+    setSelected([]);
+    fetchData(true); // refresh table
+  } catch (error) {
+    console.error("Bulk Delete API Error:", error);
+    toast.error(error.message || "Failed to delete selected jobs");
+  }
+};
 
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -939,7 +670,7 @@ const [jobName,setJobName]=useState("")
     const raw = JSON.stringify({
       pipeline: selectedPipeline.value,
       stageid: selectedstage.value,
-      jobname:jobName,
+      jobname: jobName,
       jobassignees: combinedValues,
       priority: priority,
       description: description,
@@ -983,16 +714,17 @@ const [jobName,setJobName]=useState("")
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     const raw = JSON.stringify({
+      accounts:accountId,
       tags: combinedTagsValues,
     });
     console.log(raw);
     const requestOptions = {
-      method: "PATCH",
+      method: "POST",
       headers: myHeaders,
       body: raw,
       redirect: "follow",
     };
-    const url = `${ACCOUNT_API}/accounts/accountdetails/${accountId}`;
+    const url = `https://www.snptaxes.com/api/accounts/assignbulktags/tomultipleaccount`;
     fetch(url, requestOptions)
       .then((response) => response.json())
       .then((result) => {
@@ -1015,7 +747,7 @@ const [jobName,setJobName]=useState("")
       pipeline: selectedPipeline.value,
       stageid: selectedstage.value,
       jobassignees: combinedValues,
-jobname:jobName,
+      jobname: jobName,
       priority: priority,
       description: description,
       startdate: startDate,
@@ -1058,19 +790,17 @@ jobname:jobName,
 
   const [clientFacingStatus, setClientFacingStatus] = useState(false);
   const [selectedJobShortcut, setSelectedJobShortcut] = useState("");
-  const [anchorElClientJob, setAnchorElClientJob] = useState(null);
-  const [anchorElDescription, setAnchorElDecription] = useState(null);
+
   const [inputText, setInputText] = useState("");
   const [charCount, setCharCount] = useState(0);
   const [clientDescription, setClientDescription] = useState("");
-  const [showDropdownClientJob, setShowDropdownClientJob] = useState(false);
-  const [showDropdownDescription, setShowDropdownDescription] = useState(false);
+
   const [selectedjob, setSelectedjob] = useState(null);
   const [clientFacingJobs, setClientFacingJobs] = useState([]);
   const fetchClientFacingJobsData = async () => {
     try {
       const response = await fetch(
-        `${CLIENT_FACING_API}/workflow/clientfacingjobstatus/`
+        `${CLIENT_FACING_API}/workflow/clientfacingjobstatus/`,
       );
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -1100,7 +830,7 @@ jobname:jobName,
       const clientjobId = newValue.value;
       try {
         const response = await fetch(
-          `${CLIENT_FACING_API}/workflow/clientfacingjobstatus/${clientjobId}`
+          `${CLIENT_FACING_API}/workflow/clientfacingjobstatus/${clientjobId}`,
         );
         if (!response.ok) {
           throw new Error("Network response was not ok");
@@ -1109,7 +839,7 @@ jobname:jobName,
 
         console.log(data);
         setClientDescription(
-          data.clientfacingjobstatuses.clientfacingdescription
+          data.clientfacingjobstatuses.clientfacingdescription,
         );
         console.log(data.clientfacingjobstatuses.clientfacingdescription);
       } catch (error) {
@@ -1118,14 +848,6 @@ jobname:jobName,
     }
   };
 
-  const handleDescriptionAddShortcut = (shortcut) => {
-    const updatedTextValue = clientDescription + `[${shortcut}]`;
-    if (updatedTextValue.length <= charLimit) {
-      setClientDescription(updatedTextValue);
-      setCharCount(updatedTextValue.length);
-    }
-    setShowDropdownDescription(false);
-  };
   const handlechatsubject = (e) => {
     const { value } = e.target;
     setInputText(value);
@@ -1141,42 +863,6 @@ jobname:jobName,
     setClientFacingStatus(checked);
   };
 
-  const handleJobAddShortcut = (shortcut) => {
-    setInputText((prevText) => prevText + `[${shortcut}]`);
-    setShowDropdownClientJob(false);
-  };
-
-  const toggleShortcodeDropdown = (event) => {
-    setAnchorElClientJob(event.currentTarget);
-    setShowDropdownClientJob(!showDropdownClientJob);
-  };
-  const toggleDescriptionDropdown = (event) => {
-    setAnchorElDecription(event.currentTarget);
-    setShowDropdownDescription(!showDropdownDescription);
-  };
-  const [selectedRows, setSelectedRows] = useState({});
-
-  // Handle individual checkbox changes
-  const handleCheckboxChange = (id) => {
-    setSelectedRows((prevState) => ({
-      ...prevState,
-      [id]: !prevState[id],
-    }));
-  };
-
-  // Handle the "select all" checkbox change
-  const handleSelectAllChange = (event) => {
-    const checked = event.target.checked;
-    const newSelectedRows = checked
-      ? jobData.reduce((acc, row) => {
-          acc[row.id] = true;
-          return acc;
-        }, {})
-      : {};
-
-    setSelectedRows(newSelectedRows);
-  };
-
   const [selected, setSelected] = useState([]);
   const handleSelect = (id) => {
     const currentIndex = selected.indexOf(id);
@@ -1185,8 +871,7 @@ jobname:jobName,
         ? [...selected, id]
         : selected.filter((item) => item !== id);
     setSelected(newSelected);
-    // Log all selected row IDs
-    // console.log("Selected IDs:", newSelected); // Log all selected IDs
+    console.log("Selected IDs:", newSelected);
   };
   // Pagination State
   const [page, setPage] = useState(0);
@@ -1200,16 +885,24 @@ jobname:jobName,
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-  // Compute paginated tasks
-  // const paginatedChats = jobData.slice(
-  //   page * rowsPerPage,
-  //   page * rowsPerPage + rowsPerPage
-  // );
+
   // Update your pagination to use filteredData instead of jobData
   const paginatedChats = filteredData.slice(
     page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
+    page * rowsPerPage + rowsPerPage,
   );
+
+  // IDs on current page
+  const pageIds = paginatedChats.map((row) => row.id);
+
+  // Is every row on this page selected?
+  const isPageSelected =
+    pageIds.length > 0 && pageIds.every((id) => selected.includes(id));
+
+  // Is partial selection on this page?
+  const isPageIndeterminate =
+    pageIds.some((id) => selected.includes(id)) && !isPageSelected;
+
   //
   // Define additional action handlers
   const handleArchive = () => {
@@ -1251,33 +944,32 @@ jobname:jobName,
         toast.error("An error occurred while submitting the form"); // Display error toast
       });
   };
-const getPriorityStyle = (priority) => {
-  const baseStyle = {
-    display: "inline-block",
-    borderRadius: "50px",
-    padding: "2px 10px",
-    fontSize: "12px",
-    fontWeight: 500,
-    textTransform: "capitalize",
-    color: "white",
-    width: "fit-content",
+  const getPriorityStyle = (priority) => {
+    const baseStyle = {
+      display: "inline-block",
+      borderRadius: "50px",
+      padding: "2px 10px",
+      fontSize: "12px",
+      fontWeight: 500,
+      textTransform: "capitalize",
+      color: "white",
+      width: "fit-content",
+    };
+
+    switch (priority?.toLowerCase()) {
+      case "urgent":
+        return { ...baseStyle, backgroundColor: "#0E0402" };
+      case "high":
+        return { ...baseStyle, backgroundColor: "#fe676e" };
+      case "medium":
+        return { ...baseStyle, backgroundColor: "#FFC300" };
+      case "low":
+        return { ...baseStyle, backgroundColor: "#56c288" };
+      default:
+        return { ...baseStyle, backgroundColor: "#6c757d" }; // default gray
+    }
   };
 
-  switch (priority?.toLowerCase()) {
-    case "urgent":
-      return { ...baseStyle, backgroundColor: "#0E0402" };
-    case "high":
-      return { ...baseStyle, backgroundColor: "#fe676e" };
-    case "medium":
-      return { ...baseStyle, backgroundColor: "#FFC300", };
-    case "low":
-      return { ...baseStyle, backgroundColor: "#56c288" };
-    default:
-      return { ...baseStyle, backgroundColor: "#6c757d" }; // default gray
-  }
-};
-
- 
   return (
     <>
       <Drawer
@@ -1332,20 +1024,20 @@ const getPriorityStyle = (priority) => {
             </Box>
 
             <Box>
-                        <InputLabel sx={{ color: "black" }}>Job Name</InputLabel>
-                        <TextField
-                          value={jobName}
-                           onChange={(e) => setJobName(e.target.value)}
-                          size="small"
-                          fullWidth
-                          margin="normal"
-                        />
-                      </Box>
+              <InputLabel sx={{ color: "black" }}>Job Name</InputLabel>
+              <TextField
+                value={jobName}
+                onChange={(e) => setJobName(e.target.value)}
+                size="small"
+                fullWidth
+                margin="normal"
+              />
+            </Box>
             <Box>
               <InputLabel sx={{ color: "black" }}>Pipeline</InputLabel>
 
               <Autocomplete
-              disabled
+                disabled
                 options={optionpipeline}
                 getOptionLabel={(option) => option.label}
                 value={selectedPipeline}
@@ -1375,12 +1067,12 @@ const getPriorityStyle = (priority) => {
                 clearOnEscape // Enable clearable functionality
               />
             </Box>
-            
+
             <Box mt={2}>
               <InputLabel sx={{ color: "black", mb: 1 }}>
                 Account Tags
               </InputLabel>
-            
+
               <TagsMultiSelectDropDown
                 value={selectedTags}
                 onChange={handleTagChange}
@@ -1389,7 +1081,6 @@ const getPriorityStyle = (priority) => {
             </Box>
             <Box mt={2} mr={2.5}>
               <InputLabel sx={{ color: "black" }}>Job Assignee</InputLabel>
-              
 
               <MultiSelectDropdown
                 value={selectedUser}
@@ -1439,7 +1130,7 @@ const getPriorityStyle = (priority) => {
             <Box mt={2}>
               <InputLabel sx={{ color: "black" }}>Start Date</InputLabel>
               <DatePicker
-                 format="MM/DD/YYYY"
+                format="MM/DD/YYYY"
                 sx={{ width: "100%", backgroundColor: "#fff", mt: 2 }}
                 // value={startDate}
                 // onChange={handleStartDateChange}
@@ -1452,7 +1143,7 @@ const getPriorityStyle = (priority) => {
             <Box mt={2}>
               <InputLabel sx={{ color: "black" }}>Due Date</InputLabel>
               <DatePicker
-                 format="MM/DD/YYYY"
+                format="MM/DD/YYYY"
                 sx={{ width: "100%", backgroundColor: "#fff", mt: 2 }}
                 // value={dueDate}
                 // onChange={handleDueDateChange}
@@ -1564,7 +1255,7 @@ const getPriorityStyle = (priority) => {
                                             clientFacingJobs.find(
                                               (job) =>
                                                 job.clientfacingName ===
-                                                params.inputProps.value
+                                                params.inputProps.value,
                                             )?.clientfacingColour, // Set color from selection
                                           marginRight: 8,
                                           marginLeft: 2,
@@ -1669,133 +1360,17 @@ const getPriorityStyle = (priority) => {
           </Box>
         </LocalizationProvider>
       </Drawer>
-      {/* <Box
-          className="client-document-nav"
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between", // Add this line
-            alignItems: "center", // Vertically align items
-            // mt: 5,
-            width: "100%",
-            // margin: "20px",
-            gap: "10px",
-            "& a": {
-              textDecoration: "none",
-              padding: "10px 16px",
-              borderRadius: "4px",
-              // color: "primary.main",
-              "&:hover": {
-                backgroundColor: "var(--color-save-btn)",
-                color: "white",
-              },
-              "&.active": {
-                backgroundColor: "var(--color-save-btn)",
-                color: "white",
-              },
-            },
-          }}
-        >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <Typography
-              style={{
-                backgroundColor:
-                  activeButton === "active"
-                    ? "var(--color-save-btn)"
-                    : "transparent",
-                color: activeButton === "active" ? "white" : "black",
-                fontWeight: activeButton === "active" ? "bold" : "normal",
-                padding: "4px 8px",
-                borderRadius: "10px",
-                fontSize: "14px",
-                cursor: "pointer",
-              }}
-              onClick={handleActiveClick}
-            >
-              Active Jobs
-            </Typography>
-
-            <Typography
-              style={{
-                backgroundColor:
-                  activeButton === "archived"
-                    ? "var(--color-save-btn)"
-                    : "transparent",
-                color: activeButton === "archived" ? "white" : "black",
-                fontWeight: activeButton === "archived" ? "bold" : "normal",
-                padding: "4px 8px",
-                borderRadius: "10px",
-                fontSize: "14px",
-                cursor: "pointer",
-              }}
-              onClick={handleArchivedClick}
-            >
-              Archived Jobs
-            </Typography>
-            <Box>
-              {selected.length > 0 && (
-                <IconButton
-                  sx={{ color: "red" }}
-                  onClick={handleDeleteJob} // Pass selected job IDs
-                >
-                  <DeleteIcon />
-                </IconButton>
-              )}
-            </Box>
-          </Box>
-        </Box> */}
-      {/* <Box
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        backgroundColor: "#EBF0F5", // Light grayish-blue background
-        borderRadius: "12px",
-        padding: "4px",
-        width: "fit-content",
-      }}
-    >
-      <Typography
-        onClick={handleActiveClick}
-        sx={{
-          backgroundColor: activeButton === "active" ? "#FFFFFF" : "transparent",
-          color: activeButton === "active" ? "var(--color-save-btn)" : "#333",
-          fontWeight: activeButton === "active" ? "bold" : "normal",
-          padding: "6px 12px",
-          borderRadius: "8px",
-          fontSize: "15px",
-          cursor: "pointer",
-          transition: "all 0.3s ease",
-        }}
-      >
-        Active
-      </Typography>
-
-      <Typography
-        onClick={handleArchivedClick}
-        sx={{
-          backgroundColor: activeButton === "archived" ? "#FFFFFF" : "transparent",
-          color: activeButton === "archived" ? "var(--color-save-btn)" : "#333",
-          fontWeight: activeButton === "archived" ? "bold" : "normal",
-          padding: "6px 12px",
-          borderRadius: "8px",
-          fontSize: "15px",
-          cursor: "pointer",
-          transition: "all 0.3s ease",
-        }}
-      >
-        Archived
-      </Typography>
-    </Box> */}
 
       <Box>
         {/* Render action panel when items are selected */}
         {selected.length > 0 && (
+          <Box sx={{ display: "flex", gap: 2, mb: 1 }}>
           <Box
             sx={{
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
-              gap: 2,
+              gap: 1,
             }}
           >
             <MdOutlineArchive />
@@ -1806,6 +1381,49 @@ const getPriorityStyle = (priority) => {
               Archive
             </Typography>
           </Box>
+          <Box
+            sx={{
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              color:'red'
+            }}
+          >
+            <MdOutlineDelete />
+            <Typography
+              sx={{ fontSize: "15px", fontWeight: "bold", }}
+              onClick={handleDeleteJob}
+            >
+              Delete
+            </Typography>
+          </Box>
+            <Box sx={{ display: "flex", gap: 2, mb: 1 }}>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => setSelected(filteredData.map((row) => row.id))}
+              >
+                Select All
+              </Button>
+
+              <Button
+                variant="outlined"
+                size="small"
+                color="error"
+                onClick={() => setSelected([])}
+                disabled={selected.length === 0}
+              >
+                Clear Selection ({" "}
+                {selected.length > 0 && (
+                  <Typography variant="caption" sx={{ ml: 1 }}>
+                    {selected.length} selected
+                  </Typography>
+                )}
+                )
+              </Button>
+            </Box>
+        </Box>
         )}
       </Box>
 
@@ -1822,9 +1440,12 @@ const getPriorityStyle = (priority) => {
         </Box>
       ) : (
         <Box>
-          <Box >
+          <Box sx={{ display: "flex", gap: 2 }}>
             <FilterDropdown onFilterChange={handleFilterChange} />
+           
           </Box>
+          
+          
           <TableContainer component={Paper}>
             <Table style={{ tableLayout: "fixed", width: "100%" }}>
               <TableHead>
@@ -1841,7 +1462,7 @@ const getPriorityStyle = (priority) => {
                       textAlign: "center",
                     }}
                   >
-                    <Checkbox
+                    {/* <Checkbox
                       checked={selected.length === jobData.length}
                       onChange={() => {
                         if (selected.length === jobData.length) {
@@ -1849,6 +1470,24 @@ const getPriorityStyle = (priority) => {
                         } else {
                           const allSelected = jobData.map((item) => item.id);
                           setSelected(allSelected);
+                        }
+                      }}
+                    /> */}
+                    <Checkbox
+                      checked={isPageSelected}
+                      indeterminate={isPageIndeterminate}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          // Select all rows on current page
+                          const newSelected = Array.from(
+                            new Set([...selected, ...pageIds]),
+                          );
+                          setSelected(newSelected);
+                        } else {
+                          // Deselect all rows on current page
+                          setSelected(
+                            selected.filter((id) => !pageIds.includes(id)),
+                          );
                         }
                       }}
                     />
@@ -2078,28 +1717,27 @@ const getPriorityStyle = (priority) => {
                       >
                         {row.visibilityForClient === true ? (
                           <>
-                           {row.clientfacingstatus?.statusName && (
-                          <span
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "8px",
-                            }}
-                          >
-                            <GoDotFill
-                              style={{
-                                color: row.clientfacingstatus.statusColor,
-                                fontSize: "20px",
-                              }}
-                            />
-                            {row.clientfacingstatus.statusName}
-                          </span>
-                        )}</>
+                            {row.clientfacingstatus?.statusName && (
+                              <span
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "8px",
+                                }}
+                              >
+                                <GoDotFill
+                                  style={{
+                                    color: row.clientfacingstatus.statusColor,
+                                    fontSize: "20px",
+                                  }}
+                                />
+                                {row.clientfacingstatus.statusName}
+                              </span>
+                            )}
+                          </>
                         ) : (
                           <> -</>
-                   
                         )}
-                       
                       </TableCell>
                       <TableCell
                         style={{
@@ -2109,8 +1747,8 @@ const getPriorityStyle = (priority) => {
                         }}
                       >
                         <Box sx={getPriorityStyle(row.Priority)}>
-    {row.Priority}
-  </Box>
+                          {row.Priority}
+                        </Box>
                       </TableCell>
                       <TableCell
                         style={{
@@ -2140,11 +1778,6 @@ const getPriorityStyle = (priority) => {
                         {row.updatedAt}
                       </TableCell>
                       <TableCell
-                        // style={{
-                        //   fontSize: "12px",
-                        //   padding: "4px 8px",
-                        //   lineHeight: "1",
-                        // }}
                         style={{
                           position: "sticky",
                           right: 0, // Stick to the right side
@@ -2165,9 +1798,6 @@ const getPriorityStyle = (priority) => {
                           open={Boolean(anchorEl && selectedJob === row.id)}
                           onClose={handleClose}
                         >
-                          {/* <MenuItem onClick={handleEditClick}>
-                          {isActiveTrue ? "Archive" : "Make Active"}
-                        </MenuItem> */}
                           <MenuItem onClick={() => handleSubmit(row.id)}>
                             Archive
                           </MenuItem>
@@ -2182,9 +1812,9 @@ const getPriorityStyle = (priority) => {
             </Table>
           </TableContainer>
           <TablePagination
-            rowsPerPageOptions={[25,30, 40, 50, 60, 100]}
+            rowsPerPageOptions={[25, 30, 40, 50, 60, 100]}
             component="div"
-            count={jobData.length}
+            count={filteredData.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
@@ -2197,9 +1827,3 @@ const getPriorityStyle = (priority) => {
 };
 
 export default Example;
-// {selectedJob && <UpdateJob selectedJob={selectedJob} handleClose={() => setIsDrawerOpen(false)} />}
-{
-  /* <Stack direction={isMobile ? "column-reverse" : "column"} gap="8px">
-          <MaterialReactTable columns={columns} table={table} />
-        </Stack> */
-}

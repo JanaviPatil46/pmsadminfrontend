@@ -591,7 +591,7 @@ import {
   CircularProgress,
   Typography,
   Button,
-  Stack,
+  Stack,Box,TextField,TablePagination
 } from "@mui/material";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -604,6 +604,10 @@ const AccountTable = () => {
   const [selectedZip, setSelectedZip] = useState(null);
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [folderName, setFolderName] = useState("");
+  const [search, setSearch] = useState("");
+const [page, setPage] = useState(0);
+const [rowsPerPage, setRowsPerPage] = useState(10);
+
 
   const fileInputRef = useRef(null);
 
@@ -624,6 +628,15 @@ const AccountTable = () => {
       setLoading(false);
     }
   };
+const filteredAccounts = accounts.filter((account) =>
+  account.accountName
+    ?.toLowerCase()
+    .includes(search.toLowerCase())
+);
+const paginatedAccounts = filteredAccounts.slice(
+  page * rowsPerPage,
+  page * rowsPerPage + rowsPerPage
+);
 
   // 👉 Open ZIP selector
   const handleSelectZip = (account) => {
@@ -700,6 +713,20 @@ formData.append("accountId", selectedAccount._id);
 
   return (
     <>
+    <Box sx={{ p: 2 }}>
+  <TextField
+    // fullWidth
+    size="small"
+    // label="Search Account"
+    placeholder="Search by account name..."
+    value={search}
+    onChange={(e) => {
+      setSearch(e.target.value);
+      setPage(0); // reset page on search
+    }}
+  />
+</Box>
+
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -713,7 +740,7 @@ formData.append("accountId", selectedAccount._id);
             </TableRow>
           </TableHead>
           <TableBody>
-            {accounts.map((account) => (
+            {paginatedAccounts.map((account) => (
               <TableRow key={account._id}>
                 <TableCell>{account.accountName}</TableCell>
                 <TableCell align="right">
@@ -744,6 +771,19 @@ formData.append("accountId", selectedAccount._id);
           </TableBody>
         </Table>
       </TableContainer>
+      <TablePagination
+  component="div"
+  count={filteredAccounts.length}
+  page={page}
+  onPageChange={(e, newPage) => setPage(newPage)}
+  rowsPerPage={rowsPerPage}
+  onRowsPerPageChange={(e) => {
+    setRowsPerPage(parseInt(e.target.value, 10));
+    setPage(0);
+  }}
+  rowsPerPageOptions={[5, 10, 25, 50]}
+/>
+
 
       {/* Hidden ZIP input */}
       <input

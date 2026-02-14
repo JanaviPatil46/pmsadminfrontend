@@ -112,10 +112,7 @@ const Invoice = () => {
 
   console.log(accountInvoicesData);
   const [anchorEl, setAnchorEl] = useState(null);
-  // const toggleMenu = (_id) => {
-  //   setOpenMenuId(openMenuId === _id ? null : _id);
-  //   setTempIdGet(_id);
-  // };
+  
   const toggleMenu = (event, _id) => {
     setAnchorEl(event.currentTarget);
     setOpenMenuId(_id);
