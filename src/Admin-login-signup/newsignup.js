@@ -18,6 +18,11 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useNavigate } from "react-router-dom";
 import logo from "../Images/logoAdmin.png";
 import micropms from "../Images/micropms.png";
+import PremiumSignupProgress from "../components/ui/Progressbar";
+
+import { Card, CardContent } from "../components/ui/card";
+import { Input } from "../components/ui/input";
+import { Button } from "../components/ui/button";
 import {
   Link,
   Divider,
@@ -27,14 +32,21 @@ import {
   InputLabel,
   Checkbox,
   FormHelperText,
-  Button,
+  // Button,
   FormControlLabel,
   Paper,
   Grid,
   FormControl,
   Slider,
-  Input,
+  // Input,
 } from "@mui/material";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "../components/ui/select";
 const MyForm = () => {
   console.log("🔥 newsignup.js FILE LOADED 🔥");
 
@@ -205,8 +217,8 @@ const MyForm = () => {
       e.preventDefault();
 
       let data = JSON.stringify({
-        email: inpval.email,
-        otp: otp,
+        email: inpval.email.trim(),
+        otp: otp.toString().trim(),
       });
 
       const Url = `${LOGIN_API}/otp/verify-otp/`;
@@ -224,6 +236,7 @@ const MyForm = () => {
         .request(config)
         .then((response) => {
           console.log(JSON.stringify(response.data));
+          console.log("Verify response:", response.data);
           // toast.success("Check your email ID for OTP", { position: "top-right" });
 
           alert("Email verified sucessfully");
@@ -233,7 +246,7 @@ const MyForm = () => {
         })
         .catch((error) => {
           alert("please check your OTP");
-          console.log(error);
+          console.log("Catch block executed", error);
         });
     }
   };
@@ -258,6 +271,7 @@ const MyForm = () => {
       },
       data: data,
     };
+    console.log("Verify button clicked");
 
     axios
       .request(config)
@@ -269,7 +283,7 @@ const MyForm = () => {
       })
       .catch((error) => {
         alert("please check your OTP");
-        // console.log(error);
+        console.log(error);
       });
   };
 
@@ -1008,56 +1022,134 @@ const MyForm = () => {
     switch (currentStep) {
       // Email (Case 2)
       case 0:
-        return showEmailContent ? (
-          <>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                margin: "5%",
-                // maxHeight: '100vh',
-                flexDirection: "column",
-              }}
-            >
-              {/* <Typography variant="h4" component="h2" gutterBottom>
-                Confirmation Code
-              </Typography> */}
-              <Typography
-                variant="h1"
-                sx={{
-                  color: "black",
-                  fontSize: "35px",
-                  fontWeight: "700",
-                  mb: "20px",
-                  textAlign: "center",
-                  fontFamily: "sans-serif",
-                }}
-              >
-                Confirmation Code
-              </Typography>
+        // return showEmailContent ? (
+        //   <>
+        //     <Box
+        //       sx={{
+        //         display: "flex",
+        //         justifyContent: "center",
+        //         alignItems: "center",
+        //         margin: "5%",
+        //         // maxHeight: '100vh',
+        //         flexDirection: "column",
+        //       }}
+        //     >
+        //       {/* <Typography variant="h4" component="h2" gutterBottom>
+        //         Confirmation Code
+        //       </Typography> */}
+        //       <Typography
+        //         variant="h1"
+        //         sx={{
+        //           color: "black",
+        //           fontSize: "35px",
+        //           fontWeight: "700",
+        //           mb: "20px",
+        //           textAlign: "center",
+        //           fontFamily: "sans-serif",
+        //         }}
+        //       >
+        //         Confirmation Code
+        //       </Typography>
 
-              <Typography sx={{ margin: "3px 0" }}>
-                We sent a confirmation code to your email: <b>{inpval.email}</b>
-              </Typography>
+        //       <Typography sx={{ margin: "3px 0" }}>
+        //         We sent a confirmation code to your email: <b>{inpval.email}</b>
+        //       </Typography>
 
-              {/* <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 2 }}>
-                                    <BorderColorIcon />
-                                </Box> */}
+        //       {/* <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 2 }}>
+        //                             <BorderColorIcon />
+        //                         </Box> */}
 
-              <Typography sx={{ fontSize: "14px", margin: "3px 0" }}>
-                Please, enter it below:
-              </Typography>
+        //       <Typography sx={{ fontSize: "14px", margin: "3px 0" }}>
+        //         Please, enter it below:
+        //       </Typography>
 
-              <Box
-                sx={{
-                  mt: 2,
-                  mb: 4,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
+        //       <Box
+        //         sx={{
+        //           mt: 2,
+        //           mb: 4,
+        //           display: "flex",
+        //           alignItems: "center",
+        //           justifyContent: "center",
+        //         }}
+        //       >
+        //         <OtpInput
+        //           value={otp}
+        //           onChange={setOtp}
+        //           numInputs={6}
+        //           renderInput={(props) => (
+        //             <input
+        //               {...props}
+        //               style={{
+        //                 width: "40px",
+        //                 height: "60px",
+        //                 fontSize: "42px",
+        //                 fontFamily: "Arial, sans-serif",
+        //                 margin: "10px",
+        //                 textAlign: "center",
+        //               }}
+        //             />
+        //           )}
+        //         />
+        //       </Box>
+
+        //       <Box
+        //         sx={{
+        //           display: "flex",
+        //           justifyContent: "center",
+        //           gap: 2,
+        //           mb: 4,
+        //           alignItems: "center",
+        //         }}
+        //       >
+        //         <Typography variant="body">
+        //           <strong>Didn't receive it? </strong>
+        //         </Typography>
+        //         <Button variant="text" onClick={resensotp}>
+        //           Resend code
+        //         </Button>
+        //       </Box>
+
+        //       <Box
+        //         sx={{
+        //           display: "flex",
+        //           alignItems: "center",
+        //           justifyContent: "center",
+        //           gap: "40px",
+        //         }}
+        //       >
+        //         <Button
+        //           variant="contained"
+        //           className="btn1"
+        //           onClick={handleClearOtp}
+        //         >
+        //           Clear OTP
+        //         </Button>
+        //         <Button
+        //           variant="contained"
+        //           className="btn1"
+        //           onClick={sendOtpVerify}
+        //         >
+        //           Verify
+        //         </Button>
+        //       </Box>
+        //     </Box>
+        //   </>
+        // ) : null;
+        return (
+          showEmailContent && (
+            <div className="space-y-6 text-center">
+              <h2 className="text-2xl font-semibold">Confirmation Code</h2>
+
+              <p className="text-sm text-slate-600">
+                We sent a confirmation code to:
+              </p>
+
+              <p className="font-medium text-black break-all">{inpval.email}</p>
+
+              <p className="text-sm text-slate-500">Please enter it below</p>
+
+              {/* OTP INPUT */}
+              <div className="flex justify-center">
                 <OtpInput
                   value={otp}
                   onChange={setOtp}
@@ -1065,62 +1157,46 @@ const MyForm = () => {
                   renderInput={(props) => (
                     <input
                       {...props}
-                      style={{
-                        width: "40px",
-                        height: "60px",
-                        fontSize: "42px",
-                        fontFamily: "Arial, sans-serif",
-                        margin: "10px",
-                        textAlign: "center",
-                      }}
+                      className="w-12 h-14 mx-2 text-2xl text-center border 
+                         border-slate-300 rounded-md 
+                         focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   )}
                 />
-              </Box>
+              </div>
 
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  gap: 2,
-                  mb: 4,
-                  alignItems: "center",
-                }}
-              >
-                <Typography variant="body">
-                  <strong>Didn't receive it? </strong>
-                </Typography>
-                <Button variant="text" onClick={resensotp}>
+              {/* RESEND */}
+              <div className="flex justify-center items-center gap-2 text-sm">
+                <span className="text-slate-600">Didn't receive it?</span>
+                <button
+                  onClick={resensotp}
+                  className="text-blue-600 font-medium hover:underline"
+                >
                   Resend code
-                </Button>
-              </Box>
+                </button>
+              </div>
 
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "40px",
-                }}
-              >
-                <Button
-                  variant="contained"
-                  className="btn1"
+              {/* ACTION BUTTONS */}
+              <div className="flex justify-center gap-4 pt-2">
+                <button
                   onClick={handleClearOtp}
+                  className="px-4 py-2 border border-slate-300 
+                     rounded-md hover:bg-slate-100 transition"
                 >
                   Clear OTP
-                </Button>
-                <Button
-                  variant="contained"
-                  className="btn1"
+                </button>
+
+                <button
                   onClick={sendOtpVerify}
+                  className="px-6 py-2 bg-black text-white 
+                     rounded-md hover:opacity-90 transition"
                 >
                   Verify
-                </Button>
-              </Box>
-            </Box>
-          </>
-        ) : null;
+                </button>
+              </div>
+            </div>
+          )
+        );
 
       // Information (Cases 3-7)
       case 1:
@@ -1140,819 +1216,416 @@ const MyForm = () => {
     switch (subStep) {
       case 3:
         return (
-          <>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                margin: "5%",
-                // maxHeight: '100vh',
-                flexDirection: "column",
-              }}
-            >
-              <Box sx={{ width: "100%", maxWidth: 400, p: 3 }}>
-                {/* <Typography variant="h4" gutterBottom>
-                  Your Information
-                </Typography> */}
-                <Typography
-                  variant="h1"
-                  sx={{
-                    color: "black",
-                    fontSize: "35px",
-                    fontWeight: "700",
-                    mb: "20px",
-                    textAlign: "center",
-                    fontFamily: "sans-serif",
-                  }}
-                >
-                  Your Information
-                </Typography>
-                <form>
-                  <Box>
-                    <InputLabel sx={{ color: "black" }}>First Name</InputLabel>
-                    <TextField
-                      fullWidth
-                      name="First Name"
-                      placeholder="First Name"
-                      size="small"
-                      sx={{ mt: 2 }}
-                      value={firstname}
-                      onChange={(e) => setFirstname(e.target.value)}
-                    />
-                  </Box>
-                  <Box>
-                    <InputLabel sx={{ color: "black", mt: 2 }}>
-                      Last Name
-                    </InputLabel>
-                    <TextField
-                      fullWidth
-                      name="Last Name"
-                      placeholder="Last Name"
-                      size="small"
-                      sx={{ mt: 2 }}
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                    />
-                  </Box>
-                  <Box sx={{ mb: 2, width: "100%" }}>
-                    <InputLabel sx={{ color: "black", mt: 2 }}>
-                      Phone Number
-                    </InputLabel>
+          <div className="space-y-6">
+            <h2 className="text-2xl font-semibold text-center">
+              Your Information
+            </h2>
 
-                    <PhoneInput
-                      style={{ width: "450px" }}
-                      country={"us"}
-                      placeholder="enter phone number "
-                      onChange={(value) => {
-                        setPhoneNumber(value);
-                      }}
-                      countryCodeEditabel={false}
-                      isValid={(inputNumber, country, countries) => {
-                        return countries.some((country) => {
-                          return (
-                            startsWith(inputNumber, country.dialCode) ||
-                            startsWith(country.dialCode, inputNumber)
-                          );
-                        });
-                      }}
-                    />
-                    {!valid && (
-                      <Typography color="error" variant="body2">
-                        Please enter a valid phone number.
-                      </Typography>
-                    )}
-                  </Box>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      style={{ width: "100px", margin: "10px 0" }}
-                      onClick={submitUserinfo}
-                    >
-                      Next
-                    </Button>
-                  </Box>
-                </form>
-              </Box>
-            </Box>
-          </>
+            <div className="space-y-4">
+              {/* First Name */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-700">
+                  First Name
+                </label>
+                <input
+                  type="text"
+                  placeholder="First Name"
+                  value={firstname}
+                  onChange={(e) => setFirstname(e.target.value)}
+                  className="w-full border border-slate-300 rounded-md px-3 py-2
+                       focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              {/* Last Name */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-700">
+                  Last Name
+                </label>
+                <input
+                  type="text"
+                  placeholder="Last Name"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="w-full border border-slate-300 rounded-md px-3 py-2
+                       focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              {/* Phone */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-700">
+                  Phone Number
+                </label>
+
+                <PhoneInput
+                  country="us"
+                  value={phoneNumber}
+                  onChange={(value) => setPhoneNumber(value)}
+                  enableSearch
+                  searchPlaceholder="Search country..."
+                  disableCountryCode={false}
+                  containerClass="!w-full"
+                  inputClass="!w-full 
+                !h-11 
+                !pl-14 
+                !pr-3 
+                !rounded-lg 
+                !border 
+                !border-slate-300 
+                !bg-white 
+                !text-sm 
+                !cursor-text
+                focus:!outline-none 
+                focus:!ring-2 
+                focus:!ring-blue-500 
+                focus:!border-blue-500 
+                transition-all duration-200"
+                  buttonClass="!border-slate-300 
+                 !bg-white 
+                 hover:!bg-slate-50 
+                 !rounded-l-lg 
+                 transition-colors duration-200"
+                  dropdownClass="!rounded-lg 
+                   !shadow-lg 
+                   !border 
+                   !border-slate-200 
+                   !mt-2 
+                   animate-fadeIn"
+                />
+
+                {!valid && (
+                  <p className="text-sm text-red-500">
+                    Please enter a valid phone number.
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Next Button */}
+            <div className="flex justify-center pt-4">
+              <button
+                onClick={submitUserinfo}
+                className="px-6 py-2 bg-black text-white 
+                     rounded-md hover:opacity-90 transition"
+              >
+                Next
+              </button>
+            </div>
+          </div>
         );
+
       case 4:
         return (
-          <>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                margin: "5%",
-                // maxHeight: '100vh',
-                flexDirection: "column",
-              }}
-            >
-              {/* <Paper elevation={3} sx={{ padding: 4, width: '550px', }}> */}
-              <Box sx={{ width: "100%", maxWidth: 400, p: 3 }}>
-                <Box>
-                  {/* <Typography variant="h3" sx={{ marginBottom: "20px" }}>
-                    Firm Information
-                  </Typography> */}
-                  <Typography
-                    variant="h1"
+          <div className="flex items-center justify-center p-8">
+            <div className="space-y-6">
+              <div className="text-center space-y-2">
+                <h2 className="text-2xl font-semibold">Firm Information</h2>
+                <p className="text-sm text-slate-500">
+                  Tell us about your firm
+                </p>
+              </div>
+
+              <form className="space-y-5">
+                {/* Firm Name */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-700">
+                    Firm Name
+                  </label>
+                  <TextField
+                    fullWidth
+                    name="firm name"
+                    placeholder="Enter firm name"
+                    size="small"
+                    value={firmName}
+                    onChange={(e) => setFirmName(e.target.value)}
                     sx={{
-                      color: "black",
-                      fontSize: "35px",
-                      fontWeight: "700",
-                      mb: "20px",
-                      textAlign: "center",
-                      fontFamily: "sans-serif",
+                      "& .MuiOutlinedInput-root": {
+                        borderRadius: "10px",
+                        transition: "all 0.2s ease",
+                      },
                     }}
-                  >
-                    Firm Information
-                  </Typography>
-                  <form>
-                    <Box>
-                      <InputLabel sx={{ color: "black" }}>Firm Name</InputLabel>
+                  />
+                </div>
+
+                {/* Country */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-700">
+                    Country
+                  </label>
+                  <Autocomplete
+                    size="small"
+                    value={selectedCountryD}
+                    onChange={(event, newValue) => {
+                      setSelectedCountry(newValue?.label || "");
+                      setSelectedCountryD(newValue || null);
+                      setSelectedState(null);
+                    }}
+                    options={countries}
+                    getOptionLabel={(option) => option.label}
+                    renderInput={(params) => (
                       <TextField
-                        fullWidth
-                        name="firm name"
-                        placeholder="Enter firm name"
-                        size="small"
-                        sx={{ mt: 2 }}
-                        value={value}
-                        onChange={(e) => setFirmName(e.target.value)}
+                        {...params}
+                        placeholder="Select country"
+                        sx={{
+                          "& .MuiOutlinedInput-root": {
+                            borderRadius: "10px",
+                            transition: "all 0.2s ease",
+                          },
+                        }}
                       />
-                    </Box>
+                    )}
+                  />
+                </div>
 
-                    <Box className="col-12">
-                      <Box>
-                        <InputLabel sx={{ color: "black", mt: 2 }}>
-                          Country
-                        </InputLabel>
-                        <Autocomplete
-                          sx={{ mt: 2 }}
-                          size="small"
-                          value={selectedCountryD}
-                          onChange={(event, newValue) => {
-                            setSelectedCountry(newValue?.label || "");
-                            setSelectedCountryD(newValue || null);
-                            setSelectedState(null); // Reset selected state when the country changes
-                          }}
-                          options={countries}
-                          getOptionLabel={(option) => option.label}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder="Country"
-                              variant="outlined"
-                            />
-                          )}
-                        />
-                      </Box>
-
-                      <Box>
-                        <InputLabel sx={{ color: "black", mt: 2 }}>
-                          State
-                        </InputLabel>
-                        <Autocomplete
-                          sx={{ mt: 2 }}
-                          size="small"
-                          value={stateOptions.find(
-                            (option) => option.value === selectedState,
-                          )}
-                          onChange={(event, newValue) => {
-                            setSelectedState(newValue?.label || "");
-                          }}
-                          options={stateOptions}
-                          getOptionLabel={(option) => option.label}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder="States"
-                              variant="outlined"
-                            />
-                          )}
-                        />
-                      </Box>
-                    </Box>
-                  </form>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      mt: 3,
+                {/* State */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-700">
+                    State
+                  </label>
+                  <Autocomplete
+                    size="small"
+                    value={stateOptions.find(
+                      (option) => option.value === selectedState,
+                    )}
+                    onChange={(event, newValue) => {
+                      setSelectedState(newValue?.label || "");
                     }}
+                    options={stateOptions}
+                    getOptionLabel={(option) => option.label}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        placeholder="Select state"
+                        sx={{
+                          "& .MuiOutlinedInput-root": {
+                            borderRadius: "10px",
+                            transition: "all 0.2s ease",
+                          },
+                        }}
+                      />
+                    )}
+                  />
+                </div>
+
+                {/* Next Button */}
+                <div className="pt-4">
+                  <button
+                    type="button"
+                    onClick={submitFerminfo}
+                    className="w-full bg-black text-white py-2.5 rounded-lg 
+                           font-medium transition hover:opacity-90"
                   >
-                    <Button variant="contained" onClick={submitFerminfo}>
-                      Next
-                    </Button>
-                  </Box>
-                </Box>
-              </Box>
-              {/* </Paper> */}
-            </Box>
-          </>
+                    Next
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
         );
+
       case 5:
         return (
-          <>
-            {/* <Typography sx={{ mt: 5, ml: 15 }} variant="h3">
-              Firm details
-            </Typography> */}
-            <Typography
-              variant="h1"
-              sx={{
-                color: "black",
-                fontSize: "35px",
-                fontWeight: "700",
-                mt: "30px",
-                // mb: "20px",
-                textAlign: "center",
-                fontFamily: "sans-serif",
-              }}
-            >
-              Firm details
-            </Typography>
-            <Box
-              sx={{
-                justifyContent: "center",
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              {/* <Box >
-                                    <Box style={{ textAlign: "center", marginBottom: "10px", alignItems: "center", justifyContent: "center" }}>Selected Value: {fixedValues[sliderValue]}</Box>
-                                    <Box style={{ marginLeft: "20px", display: "flex", justifyContent: "space-between" }}>
-                                        {fixedValues.map((value, index) => (
-                                            <Box key={index}>{value}</Box>
-                                        ))}
-                                    </Box>
-                                    <Box style={{ marginBottom: "20px" }}>
-                                        <input type="range" min="0" max={fixedValues.length - 1} step="1" value={sliderValue} onChange={handleSliderChange} style={{ width: "100%", justifyContent: "center" }} />
-                                    </Box>
-                                </Box> */}
-              {/*  */}
-              <Box sx={{ ml: "10%", mr: "10%" }}>
-                <InputLabel
-                  sx={{ mt: "3%", mb: "1%", fontWeight: "600" }}
-                  htmlFor="firimname"
-                >
+          <div className="flex items-center justify-center p-8">
+            <div className="space-y-8">
+              {/* Header */}
+              <div className="text-center space-y-2">
+                <h2 className="text-2xl font-semibold">Firm Details</h2>
+                <p className="text-sm text-slate-500">
+                  Help us understand your firm better
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                <label className="text-sm font-medium text-slate-700">
                   Firm Size
-                </InputLabel>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <Input
+                </label>
+
+                <div className="flex items-center gap-4">
+                  {/* Number Input */}
+                  <input
+                    type="number"
                     value={inputValue}
-                    size="small"
                     onChange={handleInputChange}
                     onBlur={handleBlur}
-                    disableUnderline
-                    sx={{
-                      width: "100px",
-                      p: "10px 10px 10px 40px",
-                      textAlign: "center",
-                      border: "1px solid dodgerblue",
-                      mr: "10px",
-                      borderRadius: "4px",
-                      marginRight: "10px",
-                    }}
+                    className="w-24 border rounded-md px-3 py-2 text-center"
                   />
-                  <Slider
-                    value={inputValue}
-                    onChange={handleSliderChange}
-                    step={1}
-                    min={0}
-                    max={200}
-                    marks={[
-                      { value: 0, label: "0" },
-                      { value: 5, label: "5" },
-                      { value: 10, label: "10" },
-                      { value: 15, label: "15" },
-                      { value: 50, label: "50" },
-                      { value: 100, label: "100" },
-                      { value: 200, label: "200+" },
-                    ]}
-                    sx={{ width: "90%", ml: "20px" }}
-                  />
-                </Box>
-              </Box>
 
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  ml: 15,
-                }}
-              >
-                <Box>
-                  <Box>
-                    <h2 style={{ marginLeft: "3%" }}>
-                      How did you hear about PMS Solutions?{" "}
-                    </h2>
+                  {/* Slider Wrapper */}
+                  <div className="flex-1 pr-2">
+                    <Slider
+                      value={inputValue}
+                      onChange={handleSliderChange}
+                      step={1}
+                      min={0}
+                      max={200}
+                      sx={{
+                        width: "100%",
+                        "& .MuiSlider-rail": {
+                          opacity: 0.3,
+                        },
+                        "& .MuiSlider-thumb": {
+                          width: 16,
+                          height: 16,
+                        },
+                        "& .MuiSlider-markLabel": {
+                          display: "none",
+                        },
+                      }}
+                    />
+                  </div>
+                </div>
 
-                    <Box
-                      sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2 }}
+                {/* Clean scale labels */}
+                <div className="flex justify-between text-xs text-slate-500 px-1">
+                  <span>0</span>
+                  <span>50</span>
+                  <span>100</span>
+                  <span>200+</span>
+                </div>
+              </div>
+
+              {/* Source Section */}
+              <div className="space-y-4">
+                <h3 className="text-sm font-medium text-slate-700">
+                  How did you hear about PMS Solutions?
+                </h3>
+
+                <div className="flex flex-wrap gap-3">
+                  {colors.map((color, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleToggle(index)}
+                      className={`px-4 py-2 text-sm rounded-lg border transition
+                  ${
+                    buttonStates[index]
+                      ? "bg-black text-white border-black"
+                      : "border-slate-300 hover:bg-slate-100"
+                  }`}
                     >
-                      {colors.map((color, index) => (
-                        // <Button variant="contained" key={value} value={colors[selectedButton]} className={`slider-toggle-button ${buttonStates[index] ? "active" : ""}`} onClick={() => handleToggle(index)} style={{ margin: "10px 17px" }}>
-                        //     {color}
-                        // </Button>
-                        <Button
-                          variant={
-                            buttonStates[index] ? "contained" : "outlined"
-                          }
-                          key={value}
-                          value={colors[selectedButton]}
-                          // className={`slider-toggle-button ${buttonStates[index] ? "active" : ""}`}
-                          onClick={() => handleToggle(index)}
-                          style={{ margin: "10px 17px" }}
-                        >
-                          {color}
-                        </Button>
-                      ))}
-                      {/* <Box style={{ marginTop: "10px" }}>{selectedButton !== null && <p>Sorce Of Information :<bold>{colors[selectedButton]}</bold>  </p>}</Box> */}
-                    </Box>
-                  </Box>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      mt: 7,
-                    }}
-                  >
-                    <Button
-                      variant="contained"
-                      className="btn1"
-                      onClick={submitFirmDetail}
-                    >
-                      Next
-                    </Button>
-                  </Box>
-                </Box>
-              </Box>
-            </Box>
-          </>
+                      {color}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Next Button */}
+              <div className="pt-4">
+                <button
+                  onClick={submitFirmDetail}
+                  className="w-full bg-black text-white py-2.5 rounded-lg 
+                       font-medium transition hover:opacity-90"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          </div>
         );
+
       case 6:
         return (
           <>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                margin: "5%",
-                maxHeight: "100vh", // Full viewport height
-                flexDirection: "column", // Column direction for centering
-              }}
-            >
-              <Box>
-                {/* <h2>Services your firm offers</h2> */}
-                <Typography
-                  variant="h1"
-                  sx={{
-                    color: "black",
-                    fontSize: "35px",
-                    fontWeight: "700",
-                    // mt: "30px",
-                    mb: "10%",
-                    textAlign: "center",
-                    fontFamily: "sans-serif",
-                  }}
-                >
-                  Services your firm offers
-                </Typography>
-                {/* <Box style={{ margin: "20px 0" }}>
-                  <Grid container spacing={0}>
-                    <Grid item xs={4}>
-                      <Button
-                        variant={buttonStates2.TaxPreparation ? "contained" : "outlined"}
-                        onClick={() => handleButtonClick2("TaxPreparation")}
-                        style={{
-                          backgroundColor: buttonStates2.TaxPreparation ? "#043a77" : "",
-                          width: "50%",
-                          margin: "5px 0 ",
-                        }}
-                      >
-                        Tax Preparation
-                      </Button>
-                    </Grid>
-                    <Grid item xs={4} sx={{ display: "flex" }}>
-                      <Button
-                        variant={buttonStates2.TaxPlanning ? "contained" : "outlined"}
-                        onClick={() => handleButtonClick2("TaxPlanning")}
-                        style={{
-                          backgroundColor: buttonStates2.TaxPlanning ? "#043a77" : "",
-                          width: "50%",
-                          margin: "5px",
-                          padding: "5px",
-                        }}
-                      >
-                        Tax Planning
-                      </Button>
-                    </Grid>
-                    <Grid item xs={4}>
-                      <Button
-                        variant={buttonStates2.Advisory ? "contained" : "outlined"}
-                        onClick={() => handleButtonClick2("Advisory")}
-                        style={{
-                          backgroundColor: buttonStates2.Advisory ? "#043a77" : "",
-                          width: "50%",
-                          margin: "5px 0",
-                        }}
-                      >
-                        Advisory
-                      </Button>
-                    </Grid>
+            <>
+              <div className="space-y-8">
+                {/* Title */}
+                <div className="text-center">
+                  <h2 className="text-3xl font-semibold tracking-tight">
+                    Services your firm offers
+                  </h2>
+                  <p className="text-sm text-slate-500 mt-2">
+                    Select all services that apply
+                  </p>
+                </div>
 
-                    <Grid item xs={4}>
-                      <Button
-                        variant={buttonStates2.Resolution ? "contained" : "outlined"}
-                        onClick={() => handleButtonClick2("Resolution")}
-                        style={{
-                          backgroundColor: buttonStates2.Resolution ? "#043a77" : "",
-                          width: "50%",
-                          margin: "5px 0",
-                        }}
-                      >
-                        Resolution
-                      </Button>
-                    </Grid>
-                    <Grid item xs={4} sx={{ display: "flex", gap: 3 }}>
-                      <Button
-                        variant={buttonStates2.Payroll ? "contained" : "outlined"}
-                        onClick={() => handleButtonClick2("Payroll")}
-                        style={{
-                          backgroundColor: buttonStates2.Payroll ? "#043a77" : "",
-                          width: "50%",
-                          margin: "5px",
-                          padding: "5px",
-                        }}
-                      >
-                        Payroll
-                      </Button>
-                    </Grid>
-                    <Grid item xs={4}>
-                      <Button
-                        variant={buttonStates2.Accounting ? "contained" : "outlined"}
-                        onClick={() => handleButtonClick2("Accounting")}
-                        style={{
-                          backgroundColor: buttonStates2.Accounting ? "#043a77" : "",
-                          width: "50%",
-                          margin: "5px 0",
-                        }}
-                      >
-                        Accounting
-                      </Button>
-                    </Grid>
-                    <Grid item xs={4}>
-                      <Button
-                        variant={buttonStates2.Audit ? "contained" : "outlined"}
-                        onClick={() => handleButtonClick2("Audit")}
-                        style={{
-                          backgroundColor: buttonStates2.Audit ? "#043a77" : "",
-                          width: "50%",
-                          margin: "5px 0",
-                        }}
-                      >
-                        Audit
-                      </Button>
-                    </Grid>
-                    <Grid item xs={4} sx={{ display: "flex", gap: 3 }}>
-                      <Button
-                        variant={buttonStates2.LawFirm ? "contained" : "outlined"}
-                        onClick={() => handleButtonClick2("LawFirm")}
-                        style={{
-                          backgroundColor: buttonStates2.LawFirm ? "#043a77" : "",
-                          width: "50%",
-                          margin: "5px",
-                          padding: "5px",
-                        }}
-                      >
-                        Law Firm
-                      </Button>
-                    </Grid>
-                    <Grid item xs={4}>
-                      <Button
-                        variant={buttonStates2.Bookkeeping ? "contained" : "outlined"}
-                        onClick={() => handleButtonClick2("Bookkeeping")}
-                        style={{
-                          backgroundColor: buttonStates2.Bookkeeping ? "#043a77" : "",
-                          width: "50%",
-                          margin: "5px 0",
-                        }}
-                      >
-                        Bookkeeping
-                      </Button>
-                    </Grid>
-                    <Grid item xs={4}>
-                      <Button
-                        variant={buttonStates2.Other ? "contained" : "outlined"}
-                        onClick={() => handleButtonClick2("Other")}
-                        style={{
-                          backgroundColor: buttonStates2.Other ? "#043a77" : "",
-                          width: "50%",
-                          margin: "5px 0",
-                        }}
-                      >
-                        Other
-                      </Button>
-                    </Grid>
-                  </Grid>
-                </Box> */}
-                <Box style={{ margin: "20px 0" }}>
-                  <Grid container spacing={0}>
-                    <Grid item xs={3}>
-                      <Button
-                        variant={
-                          buttonStates2.TaxPreparation
-                            ? "contained"
-                            : "outlined"
-                        }
-                        onClick={() => handleButtonClick2("TaxPreparation")}
-                        style={{
-                          backgroundColor: buttonStates2.TaxPreparation
-                            ? "#043a77"
-                            : "",
-                          width: "80%",
-                          margin: "5px 0 ",
-                        }}
-                      >
-                        Tax Preparation
-                      </Button>
-                    </Grid>
-                    <Grid item xs={3} sx={{ display: "flex" }}>
-                      <Button
-                        variant={
-                          buttonStates2.TaxPlanning ? "contained" : "outlined"
-                        }
-                        onClick={() => handleButtonClick2("TaxPlanning")}
-                        style={{
-                          backgroundColor: buttonStates2.TaxPlanning
-                            ? "#043a77"
-                            : "",
-                          width: "80%",
-                          margin: "5px 0",
-                          padding: "5px",
-                        }}
-                      >
-                        Tax Planning
-                      </Button>
-                    </Grid>
-                    <Grid item xs={3}>
-                      <Button
-                        variant={
-                          buttonStates2.Advisory ? "contained" : "outlined"
-                        }
-                        onClick={() => handleButtonClick2("Advisory")}
-                        style={{
-                          backgroundColor: buttonStates2.Advisory
-                            ? "#043a77"
-                            : "",
-                          width: "80%",
-                          margin: "5px 0",
-                        }}
-                      >
-                        Advisory
-                      </Button>
-                    </Grid>
-                    <Grid item xs={3}>
-                      <Button
-                        variant={
-                          buttonStates2.Resolution ? "contained" : "outlined"
-                        }
-                        onClick={() => handleButtonClick2("Resolution")}
-                        style={{
-                          backgroundColor: buttonStates2.Resolution
-                            ? "#043a77"
-                            : "",
-                          width: "80%",
-                          margin: "5px 0",
-                        }}
-                      >
-                        Resolution
-                      </Button>
-                    </Grid>
-                    <Grid item xs={3} sx={{ display: "flex", gap: 3 }}>
-                      <Button
-                        variant={
-                          buttonStates2.Payroll ? "contained" : "outlined"
-                        }
-                        onClick={() => handleButtonClick2("Payroll")}
-                        style={{
-                          backgroundColor: buttonStates2.Payroll
-                            ? "#043a77"
-                            : "",
-                          width: "80%",
-                          margin: "5px 0",
-                          //   padding: "5px",
-                        }}
-                      >
-                        Payroll
-                      </Button>
-                    </Grid>
-                    <Grid item xs={3}>
-                      <Button
-                        variant={
-                          buttonStates2.Accounting ? "contained" : "outlined"
-                        }
-                        onClick={() => handleButtonClick2("Accounting")}
-                        style={{
-                          backgroundColor: buttonStates2.Accounting
-                            ? "#043a77"
-                            : "",
-                          width: "80%",
-                          margin: "5px 0",
-                        }}
-                      >
-                        Accounting
-                      </Button>
-                    </Grid>
-                    <Grid item xs={3}>
-                      <Button
-                        variant={buttonStates2.Audit ? "contained" : "outlined"}
-                        onClick={() => handleButtonClick2("Audit")}
-                        style={{
-                          backgroundColor: buttonStates2.Audit ? "#043a77" : "",
-                          width: "80%",
-                          margin: "5px 0",
-                        }}
-                      >
-                        Audit
-                      </Button>
-                    </Grid>
-                    <Grid item xs={3} sx={{ display: "flex", gap: 3 }}>
-                      <Button
-                        variant={
-                          buttonStates2.LawFirm ? "contained" : "outlined"
-                        }
-                        onClick={() => handleButtonClick2("LawFirm")}
-                        style={{
-                          backgroundColor: buttonStates2.LawFirm
-                            ? "#043a77"
-                            : "",
-                          width: "80%",
-                          margin: "5px 0",
-                          padding: "5px",
-                        }}
-                      >
-                        Law Firm
-                      </Button>
-                    </Grid>
-                    <Grid item xs={3}>
-                      <Button
-                        variant={
-                          buttonStates2.Bookkeeping ? "contained" : "outlined"
-                        }
-                        onClick={() => handleButtonClick2("Bookkeeping")}
-                        style={{
-                          backgroundColor: buttonStates2.Bookkeeping
-                            ? "#043a77"
-                            : "",
-                          width: "80%",
-                          margin: "5px 0",
-                        }}
-                      >
-                        Bookkeeping
-                      </Button>
-                    </Grid>
-                    <Grid item xs={3}>
-                      <Button
-                        variant={buttonStates2.Other ? "contained" : "outlined"}
-                        onClick={() => handleButtonClick2("Other")}
-                        style={{
-                          backgroundColor: buttonStates2.Other ? "#043a77" : "",
-                          width: "80%",
-                          margin: "5px 0",
-                        }}
-                      >
-                        Other
-                      </Button>
-                    </Grid>
-                  </Grid>
-                </Box>
+                {/* Services Grid */}
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {Object.keys(buttonStates2).map((service) => (
+                    <button
+                      key={service}
+                      onClick={() => handleButtonClick2(service)}
+                      className={`
+            px-4 py-2 rounded-lg border text-sm font-medium transition
+            ${
+              buttonStates2[service]
+                ? "bg-slate-900 text-white border-slate-900 shadow-sm"
+                : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50"
+            }
+          `}
+                    >
+                      {service.replace(/([A-Z])/g, " $1").trim()}
+                    </button>
+                  ))}
+                </div>
 
-                <Box>
-                  <label>
+                {/* Bottom Section */}
+                <div className="flex items-center justify-between pt-6">
+                  <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
                     <input
                       type="checkbox"
                       onChange={handleSelectAll}
-                      style={{ marginLeft: "2%" }}
+                      className="w-4 h-4 accent-slate-900"
                     />
                     Select All
                   </label>
-                  <Button
-                    variant="contained"
+
+                  <button
                     onClick={submitService}
-                    className="btn1"
-                    style={{ marginLeft: "20px" }}
+                    className="px-6 py-2 bg-slate-900 text-white rounded-lg hover:opacity-90 transition"
                   >
                     Next
-                  </Button>
-                </Box>
-              </Box>
-            </Box>
+                  </button>
+                </div>
+              </div>
+            </>
           </>
         );
       case 7:
         return (
           <>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                margin: "5%",
-                maxHeight: "100vh", // Full viewport height
-                flexDirection: "column", // Column direction for centering
-              }}
-            >
-              <Box>
-                {/* <h1>Your role in the firm </h1> */}
-                <Typography
-                  variant="h1"
-                  sx={{
-                    color: "black",
-                    fontSize: "35px",
-                    fontWeight: "700",
-                    // mt: "30px",
-                    mb: "20px",
-                    textAlign: "center",
-                    fontFamily: "sans-serif",
-                  }}
-                >
-                  Your role in the firm
-                </Typography>
-                <Box>
-                  <Box>
-                    {/* <Grid container spacing={2}>
-                                            {colors3.map((color, index) => (
-                                                <Grid item xs={4} key={index}>
-                                                    <Button
-                                                       
-                                                        variant={buttonStates3[index] ? "contained" : "outlined"}
-                                                        fullWidth 
-                                                        onClick={() => handleToggle3(index)}
-                                                        sx={{ padding: "10px" , margin:'10px'}}
-                                                    >
-                                                        {color}
-                                                    </Button>
-                                                </Grid>
-                                            ))}
-                                        </Grid> */}
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexWrap: "wrap",
-                        gap: 2, // Space between buttons
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      {colors3.map((color, index) => (
-                        <Button
-                          key={index}
-                          variant={
-                            buttonStates3[index] ? "contained" : "outlined"
-                          }
-                          fullWidth
-                          onClick={() => handleToggle3(index)}
-                          sx={{
-                            padding: "10px",
-                            margin: "10px 0",
-                            width: "30%",
-                          }} // Adjust width to match grid behavior
-                        >
-                          {color}
-                        </Button>
-                      ))}
-                    </Box>
+            <>
+              <div className="space-y-8">
+                {/* Title */}
+                <div className="text-center">
+                  <h2 className="text-3xl font-semibold tracking-tight">
+                    Your role in the firm
+                  </h2>
+                  <p className="text-sm text-slate-500 mt-2">
+                    Select the option that best describes your role
+                  </p>
+                </div>
 
-                    {/* <Box style={{ marginTop: "10px" }}>
-                                            {selectedButton3 !== null && <p>Source Of Information: {colors3[selectedButton3]}</p>}
-                                        </Box> */}
-                  </Box>
-                </Box>
-              </Box>
-              <Box mt={5}>
-                <Button variant="contained" onClick={submitRole}>
-                  Next
-                </Button>
-              </Box>
-            </Box>
+                {/* Role Options */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {colors3.map((role, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleToggle3(index)}
+                      className={`
+            w-full px-4 py-3 rounded-lg border text-sm font-medium text-left transition
+            ${
+              buttonStates3[index]
+                ? "bg-slate-900 text-white border-slate-900 shadow-sm"
+                : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50"
+            }
+          `}
+                    >
+                      {role}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Next Button */}
+                <div className="flex justify-center pt-4">
+                  <button
+                    onClick={submitRole}
+                    className="px-8 py-2 bg-slate-900 text-white rounded-lg hover:opacity-90 transition"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            </>
           </>
         );
       default:
@@ -1965,596 +1638,644 @@ const MyForm = () => {
     switch (settingsStep) {
       case 8:
         return (
-          <>
-            <Box
-              sx={{
-                display: "flex",
-                // justifyContent: 'center',
-                alignItems: "center",
-                mt: "5%",
-                maxHeight: "100vh", // Full viewport height
-                // flexDirection: 'column', // Column direction for centering
-              }}
-            >
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  width: "50%",
-                }}
-                ml={5}
-              >
-                <Box>
-                  <h2>Firm Settings</h2>
+          <div className="w-full flex justify-center items-center py-8">
+            <div className="w-full max-w-lg space-y-6">
+              {/* HEADER */}
+              <div className="text-center space-y-3">
+                <h2 className="text-3xl font-semibold tracking-tight">
+                  Firm Settings
+                </h2>
 
-                  <Box>
-                    <Typography variant="body1">
-                      A powerful, integrated platform to manage teams, clients,
-                      projects.
-                    </Typography>
-                    <Typography variant="body1">
-                      <b>from $50/mo per user</b>
-                      (with a 3-year subscription plan)
-                    </Typography>
-                  </Box>
+                <p className="text-slate-600">
+                  A powerful, integrated platform to manage teams, clients,
+                  projects.
+                </p>
 
-                  <h3>Firm Setting</h3>
+                <p className="text-slate-900 font-medium">
+                  from $50/mo per user
+                  <span className="text-slate-500 font-normal ml-1">
+                    (with a 3-year subscription plan)
+                  </span>
+                </p>
+              </div>
 
-                  <p>choose web URL</p>
-                  <Box style={{ fontSize: "13px" }}>
-                    <p>
-                      You will be ale to set up a fully custom
-                      domain(without.pms.com) later
-                    </p>
-                  </Box>
+              {/* WORKSPACE URL */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                  Choose your workspace URL
+                </label>
 
-                  <Box>
-                    {/* <label id="domin_lable">
-                                        .pms.com
-                                    </label> */}
-                    <TextField
-                      id="url_input"
-                      size="small"
-                      value={url}
-                      onChange={(e) => setUrl(e.target.value)}
-                      placeholder="Enter your URL"
-                      fullWidth
-                      variant="outlined"
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            .pms.com
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Box>
-                  <label>You cannot Change it later</label>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 3,
-                      mt: 2,
+                <p className="text-sm text-slate-500">
+                  You can connect a custom domain later (without .pms.com)
+                </p>
+
+                <div className="flex">
+                  <input
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    placeholder="your-firm-name"
+                    className="
+                flex-1 h-11 px-3 rounded-l-md
+                border border-slate-300
+                focus:outline-none focus:ring-2 focus:ring-slate-900
+              "
+                  />
+
+                  <div
+                    className="
+                flex items-center px-3
+                border border-l-0 border-slate-300
+                rounded-r-md bg-slate-50 text-slate-600
+              "
+                  >
+                    .pms.com
+                  </div>
+                </div>
+
+                <p className="text-xs text-slate-500">
+                  You cannot change this later
+                </p>
+              </div>
+
+              {/* DROPDOWNS */}
+              <div className="grid grid-cols-2 gap-4">
+                {/* Currency */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Currency</label>
+
+                  <Select
+                    value={selectedCurrency?.label || ""}
+                    onValueChange={(value) => {
+                      const selected = currencies.find(
+                        (c) => c.label === value,
+                      );
+
+                      handleCurrencyChange(selected);
                     }}
                   >
-                    <Box>
-                      <Typography>Select Currency: </Typography>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select currency" />
+                    </SelectTrigger>
 
-                      <Autocomplete
-                        size="small"
-                        margin="normal"
-                        value={selectedCurrency}
-                        onChange={(event, newValue) =>
-                          handleCurrencyChange(newValue)
-                        }
-                        options={currencies}
-                        getOptionLabel={(option) => option.label || ""}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            placeholder="Select a currency"
-                          />
-                        )}
-                      />
-                    </Box>
-                    <Box>
-                      <Typography>Select Language: </Typography>
-                      <Autocomplete
-                        size="small"
-                        margin="normal"
-                        value={selectedLanguage}
-                        onChange={(event, newValue) =>
-                          handleLanguageChange(newValue)
-                        }
-                        options={languages}
-                        getOptionLabel={(option) => option.label || ""}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            placeholder="Select a language"
-                          />
-                        )}
-                      />
-                    </Box>
-                  </Box>
-                  {/* submiturl */}
-                  <Button
-                    variant="contained"
-                    onClick={submiturl}
-                    style={{ margin: "25px 0" }}
+                    <SelectContent>
+                      {currencies.map((currency, index) => (
+                        <SelectItem key={index} value={currency.label}>
+                          {currency.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Language */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Language</label>
+
+                  <Select
+                    value={selectedLanguage?.label || ""}
+                    onValueChange={(value) => {
+                      const selected = languages.find((l) => l.label === value);
+
+                      handleLanguageChange(selected);
+                    }}
                   >
-                    Continue
-                  </Button>
-                </Box>
-              </Box>
-              <Box>
-                <img
-                  style={{ height: "500px", width: "100%" }}
-                  src={firmsetting}
-                  alt=""
-                />
-              </Box>
-            </Box>
-          </>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select language" />
+                    </SelectTrigger>
+
+                    <SelectContent>
+                      {languages.map((language, index) => (
+                        <SelectItem key={index} value={language.label}>
+                          {language.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* CONTINUE BUTTON */}
+              <button
+                onClick={submiturl}
+                className="
+            w-full h-11 rounded-md
+            bg-slate-900 text-white font-medium
+            hover:bg-slate-800
+            transition
+          "
+              >
+                Continue
+              </button>
+            </div>
+          </div>
         );
       case 9:
         return (
-          <>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                margin: "5%",
-                maxHeight: "100vh", // Full viewport height
-                flexDirection: "column", // Column direction for centering
-              }}
-            >
-              {/* <Paper elevation={3} sx={{ padding: 4, width: '550px', height: '400px', }}> */}
-              <Box sx={{ width: "100%", maxWidth: 400, p: 3 }}>
-                {/* <Typography textAlign={"center"} variant="h5">
-                  Set Password
-                </Typography> */}
-                <Typography
-                  variant="h1"
-                  sx={{
-                    color: "black",
-                    fontSize: "35px",
-                    fontWeight: "700",
-                    // mt: "30px",
-                    mb: "20px",
-                    textAlign: "center",
-                    fontFamily: "sans-serif",
-                  }}
-                >
-                  Set Password
-                </Typography>
-                <Box mt={2}>
-                  <Typography mb={1}>Password</Typography>
-                  <TextField
-                    fullWidth
-                    //    margin='normal'
-                    size="small"
-                    variant="outlined"
+          <div className="w-full flex justify-center items-center py-8">
+            <div className="w-full max-w-lg space-y-6">
+              {/* Header */}
+              <div className="text-center">
+                <h2 className="text-3xl font-semibold">Set Password</h2>
+              </div>
+
+              {/* Password Field */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Password</label>
+
+                <div className="relative">
+                  <input
                     type={showPassword ? "text" : "password"}
-                    value={inppass.password}
                     name="password"
+                    value={inppass.password}
+                    onChange={setValP}
                     placeholder="Password"
-                    onChange={setValP}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton
-                            aria-label="toggle password visibility"
-                            onClick={handleClickShowPassword}
-                            onMouseDown={handleMouseDownPassword}
-                            onMouseUp={handleMouseUpPassword}
-                            edge="end"
-                          >
-                            {showPassword ? <VisibilityOff /> : <Visibility />}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
+                    className="
+                w-full h-11 px-3 pr-10 rounded-md
+                border border-slate-300
+                focus:outline-none focus:ring-2 focus:ring-slate-900
+              "
                   />
 
-                  <Box mt={3} ml={2}>
-                    <Grid container spacing={2}>
-                      <Grid item xs={6}>
-                        <FormHelperText
-                          sx={{ display: "flex" }}
-                          error={!passwordValidation.hasNumber}
-                        >
-                          <CheckCircleIcon
-                            color={
-                              passwordValidation.hasNumber ? "success" : "error"
-                            }
-                            fontSize="small"
-                          />
-                          <p style={{ marginTop: "1px", marginLeft: "3px" }}>
-                            a number
-                          </p>
-                        </FormHelperText>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <FormHelperText
-                          sx={{ display: "flex" }}
-                          error={!passwordValidation.hasUppercase}
-                        >
-                          <CheckCircleIcon
-                            color={
-                              passwordValidation.hasUppercase
-                                ? "success"
-                                : "error"
-                            }
-                            fontSize="small"
-                          />
-                          <p style={{ marginTop: "1px", marginLeft: "3px" }}>
-                            an uppercase letter
-                          </p>
-                        </FormHelperText>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <FormHelperText
-                          sx={{ display: "flex" }}
-                          error={!passwordValidation.hasLowercase}
-                        >
-                          <CheckCircleIcon
-                            color={
-                              passwordValidation.hasLowercase
-                                ? "success"
-                                : "error"
-                            }
-                            fontSize="small"
-                          />
-                          <p style={{ marginTop: "1px", marginLeft: "3px" }}>
-                            a lowercase letter
-                          </p>
-                        </FormHelperText>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <FormHelperText
-                          sx={{ display: "flex" }}
-                          error={!passwordValidation.hasSymbol}
-                        >
-                          <CheckCircleIcon
-                            color={
-                              passwordValidation.hasSymbol ? "success" : "error"
-                            }
-                            fontSize="small"
-                          />
-                          <p style={{ marginTop: "1px", marginLeft: "3px" }}>
-                            a symbol
-                          </p>
-                        </FormHelperText>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <FormHelperText
-                          sx={{ display: "flex" }}
-                          error={!passwordValidation.hasMinLength}
-                        >
-                          <CheckCircleIcon
-                            color={
-                              passwordValidation.hasMinLength
-                                ? "success"
-                                : "error"
-                            }
-                            fontSize="small"
-                          />
-                          <p style={{ marginTop: "1px", marginLeft: "3px" }}>
-                            at least 8 characters
-                          </p>
-                        </FormHelperText>
-                      </Grid>
-                    </Grid>
-                  </Box>
-                </Box>
+                  <button
+                    type="button"
+                    onClick={handleClickShowPassword}
+                    onMouseDown={handleMouseDownPassword}
+                    onMouseUp={handleMouseUpPassword}
+                    className="
+                absolute right-3 top-1/2 -translate-y-1/2
+                text-slate-500 hover:text-slate-800
+              "
+                  >
+                    👁
+                  </button>
+                </div>
+              </div>
 
-                <Box mt={2}>
-                  <Typography mb={1}>Confirm Password</Typography>
-
-                  <TextField
-                    fullWidth
-                    size="small"
-                    type={showConfirmPassword ? "text" : "password"}
-                    value={inppass.cpassword}
-                    name="cpassword"
-                    placeholder="Confirm Password"
-                    onChange={setValP}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton
-                            aria-label="toggle confirm password visibility"
-                            onClick={handleClickShowConfirmPassword}
-                            onMouseDown={handleMouseDownPassword}
-                            onMouseUp={handleMouseUpPassword}
-                            edge="end"
-                          >
-                            {showConfirmPassword ? (
-                              <VisibilityOff />
-                            ) : (
-                              <Visibility />
-                            )}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </Box>
-
-                <Box
-                  mt={5}
-                  display={"flex"}
-                  alignItems={"center"}
-                  justifyContent={"center"}
+              {/* Password Validation */}
+              <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm">
+                <p
+                  className={
+                    passwordValidation.hasNumber
+                      ? "text-green-600"
+                      : "text-red-500"
+                  }
                 >
-                  <Button variant="contained" onClick={submitPassword}>
-                    {" "}
-                    Continue
-                  </Button>
-                </Box>
-              </Box>
-            </Box>
-          </>
+                  ✓ a number
+                </p>
+
+                <p
+                  className={
+                    passwordValidation.hasUppercase
+                      ? "text-green-600"
+                      : "text-red-500"
+                  }
+                >
+                  ✓ an uppercase letter
+                </p>
+
+                <p
+                  className={
+                    passwordValidation.hasLowercase
+                      ? "text-green-600"
+                      : "text-red-500"
+                  }
+                >
+                  ✓ a lowercase letter
+                </p>
+
+                <p
+                  className={
+                    passwordValidation.hasSymbol
+                      ? "text-green-600"
+                      : "text-red-500"
+                  }
+                >
+                  ✓ a symbol
+                </p>
+
+                <p
+                  className={
+                    passwordValidation.hasMinLength
+                      ? "text-green-600"
+                      : "text-red-500"
+                  }
+                >
+                  ✓ at least 8 characters
+                </p>
+              </div>
+
+              {/* Confirm Password */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Confirm Password</label>
+
+                <div className="relative">
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    name="cpassword"
+                    value={inppass.cpassword}
+                    onChange={setValP}
+                    placeholder="Confirm Password"
+                    className="
+                w-full h-11 px-3 pr-10 rounded-md
+                border border-slate-300
+                focus:outline-none focus:ring-2 focus:ring-slate-900
+              "
+                  />
+
+                  <button
+                    type="button"
+                    onClick={handleClickShowConfirmPassword}
+                    onMouseDown={handleMouseDownPassword}
+                    onMouseUp={handleMouseUpPassword}
+                    className="
+                absolute right-3 top-1/2 -translate-y-1/2
+                text-slate-500 hover:text-slate-800
+              "
+                  >
+                    👁
+                  </button>
+                </div>
+              </div>
+
+              {/* Continue Button */}
+              <button
+                onClick={submitPassword}
+                className="
+            w-full h-11 mt-4
+            bg-slate-900 text-white
+            rounded-md
+            hover:bg-slate-800 transition-all
+          "
+              >
+                Continue
+              </button>
+            </div>
+          </div>
         );
+
       default:
         return null;
     }
   };
 
+  // return (
+  //   <Box>
+  //     {/* Render the Stepper only when the Email step content is shown */}
+  //     <Box>
+  //       {showEmailContent && (
+  //         <Box
+  //           sx={{
+  //             display: "flex",
+  //             alignItems: "center",
+  //             justifyContent: "space-between",
+  //             padding: "10px 15px",
+  //           }}
+  //         >
+  //           <Box
+  //             sx={{
+  //               padding: "10px 15px",
+  //               display: "flex",
+  //               alignItems: "center",
+  //             }}
+  //           >
+  //             <img src={micropms} style={{ height: "40px" }} />
+  //             <Typography
+  //               variant="h6"
+  //               sx={{
+  //                 fontFamily: "sans-serif",
+  //                 color: "black",
+  //                 fontSize: "20px",
+  //                 fontWeight: "700",
+  //               }}
+  //             >
+  //               PMS Solutions
+  //             </Typography>
+  //           </Box>
+  //           <Stepper activeStep={currentStep}>
+  //             {steps.map((label, index) => (
+  //               <Step key={index}>
+  //                 <StepLabel>
+  //                   <Typography fontSize="25px" ml={2} mr={2}>
+  //                     {label}
+  //                   </Typography>
+  //                 </StepLabel>
+  //               </Step>
+  //             ))}
+  //           </Stepper>
+
+  //           <Button variant="outlined" onClick={handleAdminLogin}>
+  //             Log In
+  //           </Button>
+  //         </Box>
+  //       )}
+  //     </Box>
+
+  //     <Box>
+  //       {/* Render form fields based on current step */}
+  //       {renderFormFields()}
+  //     </Box>
+
+  //     <Box>
+  //       {/* Show button to go to email step initially */}
+  //       {!showEmailContent && (
+  //         <>
+  //           <Box
+  //             sx={{
+  //               py: 4,
+  //               display: "flex",
+  //               alignItems: "center",
+  //               justifyContent: "center",
+  //               gap: 1,
+  //             }}
+  //           >
+  //             <img src={micropms} style={{ height: "32px" }} />
+  //             <Typography
+  //               variant="h6"
+  //               sx={{
+  //                 fontFamily: "'Manrope', sans-serif",
+  //                 color: "black",
+  //                 fontSize: "20px",
+  //                 fontWeight: "700",
+  //               }}
+  //             >
+  //               PMS Solutions
+  //             </Typography>
+  //           </Box>
+  //           <Box
+  //             sx={{
+  //               minHeight: "100vh",
+  //               background: "linear-gradient(180deg, #f7f9fc 0%, #ffffff 100%)",
+
+  //               display: "flex",
+  //               // border: solid "black",
+  //               justifyContent: "center",
+  //               alignItems: "center",
+  //               margin: "3%",
+  //               maxHeight: "100vh", // Full viewport height
+  //               flexDirection: "column", // Column direction for centering
+  //             }}
+  //           >
+  //             <Box
+  //               className="fade-slide-in"
+  //               sx={{
+  //                 width: "100%",
+  //                 maxWidth: 420,
+  //                 p: 4,
+  //                 borderRadius: 3,
+  //                   boxShadow: "0 8px 30px rgba(0,0,0,0.06)",
+  //               }}
+  //             >
+  //               {/* <Typography variant="h5" textAlign={"center"}>
+  //                 <b>Signup</b>
+  //               </Typography> */}
+  //               <Typography
+  //                 variant="h5"
+  //                 sx={{
+  //                   color: "text.secondary",
+  //                   // fontSize: "35px",
+  //                   fontWeight: "700",
+  //                   mb: 0.5,
+  //                   textAlign: "center",
+  //                   // fontFamily: "sans-serif",
+  //                 }}
+  //               >
+  //                 Sign up
+  //               </Typography>
+  //               <Typography
+  //                 variant="body2"
+  //                 sx={{
+  //                   textAlign: "center",
+  //                   color: "text.secondary",
+  //                   mb: 3,
+  //                 }}
+  //               >
+  //                 Sign up your firm and start upgrading your workflow
+  //               </Typography>
+
+  //               <form>
+  //                 <Box
+  //                   className="form-group"
+  //                   sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+  //                 >
+  //                   <InputLabel sx={{ color: "black" }}>Email</InputLabel>
+  //                   <TextField
+  //                     fullWidth
+  //                     type="email"
+  //                     name="email"
+  //                     placeholder="Enter Your Email"
+  //                     size="medium"
+  //                     sx={{
+  //                       "& .MuiOutlinedInput-root": {
+  //                         borderRadius: 2,
+  //                         transition: "border-color 0.2s ease",
+  //                       },
+  //                     }}
+  //                     value={inpval.email}
+  //                     onChange={handleEmailChange}
+  //                     error={Boolean(emailError)}
+  //                     helperText={emailError}
+  //                   />
+  //                 </Box>
+
+  //                 <Box
+  //                   sx={{
+  //                     display: "flex",
+  //                     alignItems: "center",
+  //                     width: "100%",
+  //                     mt: 1,
+  //                   }}
+  //                 >
+  //                   <FormControlLabel
+  //                     control={
+  //                       <Checkbox
+  //                         id="terms"
+  //                         onChange={setValbox}
+  //                         checked={isChecked}
+  //                         disabled={loading}
+  //                       />
+  //                     }
+  //                     label={
+  //                       <Typography variant="body2" color="text.secondary">
+  //                         I agree to the terms and conditions
+  //                       </Typography>
+  //                     }
+  //                   />
+  //                 </Box>
+
+  //                 <Box
+  //                   sx={{
+  //                     display: "flex",
+  //                     alignItems: "center",
+  //                     justifyContent: "center",
+  //                   }}
+  //                 >
+  //                   <Button
+  //                     fullwidth
+  //                     variant="contained"
+  //                     size="large"
+  //                     disabled={!canSubmit}
+  //                     sx={{
+  //                       mt: 2,
+  //                       py: 1.2,
+  //                       textTransform: "none",
+  //                       fontWeight: 600,
+  //                       boxShadow: "none",
+  //                       transition: "all 0.2s ease",
+  //                       "&:hover": {
+  //                         transform: "translateY(-1px)",
+  //                       },
+  //                       "&:active": {
+  //                         transform: "translateY(0)",
+  //                       },
+  //                     }}
+  //                     // variant="contained"
+  //                     onClick={async () => {
+  //                       try {
+  //                         setLoading(true);
+  //                         await createAccount();
+  //                       } finally {
+  //                         setLoading(false);
+  //                       }
+  //                     }}
+  //                   >
+  //                     {loading ? "Create account..." : "Create account"}
+  //                   </Button>
+  //                 </Box>
+
+  //                 <Box
+  //                   sx={{
+  //                     display: "flex",
+  //                     alignItems: "center",
+  //                     justifyContent: "center",
+  //                     mt: 2,
+  //                   }}
+  //                 >
+  //                   <Typography
+  //                     variant="body2"
+  //                     className="sign-in-link"
+  //                     textAlign="center"
+  //                     mt={3}
+  //                   >
+  //                     Already have an account?{" "}
+  //                     <Link component={NavLink} to="/" sx={{ fontWeight: 500 }}>
+  //                       Sign in
+  //                     </Link>
+  //                   </Typography>
+  //                 </Box>
+  //               </form>
+  //             </Box>
+  //           </Box>
+  //         </>
+  //       )}
+  //     </Box>
+  //   </Box>
+  // );
+
   return (
-    <Box>
-      {/* Render the Stepper only when the Email step content is shown */}
-      <Box>
-        {showEmailContent && (
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              padding: "10px 15px",
-            }}
-          >
-            <Box
-              sx={{
-                padding: "10px 15px",
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              <img src={micropms} style={{ height: "40px" }} />
-              <Typography
-                variant="h6"
-                sx={{
-                  fontFamily: "sans-serif",
-                  color: "black",
-                  fontSize: "20px",
-                  fontWeight: "700",
-                }}
-              >
-                PMS Solutions
-              </Typography>
-            </Box>
-            <Stepper activeStep={currentStep}>
-              {steps.map((label, index) => (
-                <Step key={index}>
-                  <StepLabel>
-                    <Typography fontSize="25px" ml={2} mr={2}>
-                      {label}
-                    </Typography>
-                  </StepLabel>
-                </Step>
-              ))}
-            </Stepper>
+    <div className="min-h-screen grid grid-cols-1 md:grid-cols-2">
+      {/* LEFT PANEL */}
+      <div className="hidden md:flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-700 text-white p-12">
+        <div className="max-w-md text-center space-y-6">
+          <h1 className="text-3xl font-semibold tracking-tight">
+            PMS Solutions
+          </h1>
+          <p className="text-slate-300">
+            A powerful platform to manage your firm, clients, workflows and
+            billing — all in one place.
+          </p>
+        </div>
+      </div>
+      {/* RIGHT PANEL */}
+      <div className="
+  flex
+  flex-col
+  items-center
+  justify-center
+  min-h-screen
+  bg-slate-50
+  px-4
+">
 
-            <Button variant="outlined" onClick={handleAdminLogin}>
-              Log In
-            </Button>
-          </Box>
-        )}
-      </Box>
+     <div className="w-full max-w-md">
 
-      <Box>
-        {/* Render form fields based on current step */}
+  {/* Progress Bar */}
+  {showEmailContent && (
+    <div className="mb-6">
+      <PremiumSignupProgress
+        currentStep={currentStep}
+        showEmailContent={showEmailContent}
+        subStep={subStep}
+        settingsStep={settingsStep}
+      />
+    </div>
+  )}
+
+  {/* Card */}
+  <Card className="w-full p-8 shadow-xl rounded-2xl bg-white max-h-[85vh] overflow-y-auto">
+
+    {!showEmailContent && (
+      <>
+        <h2 className="text-2xl font-semibold text-center">
+          Sign up
+        </h2>
+
+        <p className="text-sm text-slate-500 text-center">
+          Sign up your firm and start upgrading your workflow
+        </p>
+
+        <div className="space-y-2">
+          <input
+            type="email"
+            name="email"
+            value={inpval.email}
+            onChange={handleEmailChange}
+            className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 transition
+              ${
+                emailError
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-slate-300 focus:ring-slate-900"
+              }`}
+            placeholder="Enter your email"
+          />
+
+          {emailError && (
+            <p className="text-sm text-red-500">{emailError}</p>
+          )}
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="terms"
+            checked={isChecked}
+            onChange={setValbox}
+            className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
+          />
+          <label htmlFor="terms" className="text-sm text-slate-600">
+            I agree to the terms and conditions
+          </label>
+        </div>
+
+        <button
+          onClick={createAccount}
+          className="w-full bg-slate-900 text-white py-2 rounded-md hover:bg-slate-800 transition"
+        >
+          Create Account
+        </button>
+      </>
+    )}
+
+    {showEmailContent && (
+      <div className="animate-in fade-in duration-300">
         {renderFormFields()}
-      </Box>
+      </div>
+    )}
 
-      <Box>
-        {/* Show button to go to email step initially */}
-        {!showEmailContent && (
-          <>
-            <Box
-              sx={{
-                py: 4,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 1,
-              }}
-            >
-              <img src={micropms} style={{ height: "32px" }} />
-              <Typography
-                variant="h6"
-                sx={{
-                  fontFamily: "'Manrope', sans-serif",
-                  color: "black",
-                  fontSize: "20px",
-                  fontWeight: "700",
-                }}
-              >
-                PMS Solutions
-              </Typography>
-            </Box>
-            <Box
-              sx={{
-                minHeight: "100vh",
-                background: "linear-gradient(180deg, #f7f9fc 0%, #ffffff 100%)",
-              
-                display: "flex",
-                // border: solid "black",
-                justifyContent: "center",
-                alignItems: "center",
-                margin: "3%",
-                maxHeight: "100vh", // Full viewport height
-                flexDirection: "column", // Column direction for centering
-              }}
-            >
-              <Box
-                className="fade-slide-in"
-                sx={{
-                  width: "100%",
-                  maxWidth: 420,
-                  p: 4,
-                  borderRadius: 3,
-                    boxShadow: "0 8px 30px rgba(0,0,0,0.06)",
-                }}
-              >
-                {/* <Typography variant="h5" textAlign={"center"}>
-                  <b>Signup</b>
-                </Typography> */}
-                <Typography
-                  variant="h5"
-                  sx={{
-                    color: "text.secondary",
-                    // fontSize: "35px",
-                    fontWeight: "700",
-                    mb: 0.5,
-                    textAlign: "center",
-                    // fontFamily: "sans-serif",
-                  }}
-                >
-                  Sign up
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    textAlign: "center",
-                    color: "text.secondary",
-                    mb: 3,
-                  }}
-                >
-                  Sign up your firm and start upgrading your workflow
-                </Typography>
+  </Card>
 
-                <form>
-                  <Box
-                    className="form-group"
-                    sx={{ display: "flex", flexDirection: "column", gap: 2 }}
-                  >
-                    <InputLabel sx={{ color: "black" }}>Email</InputLabel>
-                    <TextField
-                      fullWidth
-                      type="email"
-                      name="email"
-                      placeholder="Enter Your Email"
-                      size="medium"
-                      sx={{
-                        "& .MuiOutlinedInput-root": {
-                          borderRadius: 2,
-                          transition: "border-color 0.2s ease",
-                        },
-                      }}
-                      value={inpval.email}
-                      onChange={handleEmailChange}
-                      error={Boolean(emailError)}
-                      helperText={emailError}
-                    />
-                  </Box>
+</div>
 
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      width: "100%",
-                      mt: 1,
-                    }}
-                  >
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          id="terms"
-                          onChange={setValbox}
-                          checked={isChecked}
-                          disabled={loading}
-                        />
-                      }
-                      label={
-                        <Typography variant="body2" color="text.secondary">
-                          I agree to the terms and conditions
-                        </Typography>
-                      }
-                    />
-                  </Box>
-
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Button
-                      fullwidth
-                      variant="contained"
-                      size="large"
-                      disabled={!canSubmit}
-                      sx={{
-                        mt: 2,
-                        py: 1.2,
-                        textTransform: "none",
-                        fontWeight: 600,
-                        boxShadow: "none",
-                        transition: "all 0.2s ease",
-                        "&:hover": {
-                          transform: "translateY(-1px)",
-                        },
-                        "&:active": {
-                          transform: "translateY(0)",
-                        },
-                      }}
-                      // variant="contained"
-                      onClick={async () => {
-                        try {
-                          setLoading(true);
-                          await createAccount();
-                        } finally {
-                          setLoading(false);
-                        }
-                      }}
-                    >
-                      {loading ? "Create account..." : "Create account"}
-                    </Button>
-                  </Box>
-
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      mt: 2,
-                    }}
-                  >
-                    <Typography
-                      variant="body2"
-                      className="sign-in-link"
-                      textAlign="center"
-                      mt={3}
-                    >
-                      Already have an account?{" "}
-                      <Link component={NavLink} to="/" sx={{ fontWeight: 500 }}>
-                        Sign in
-                      </Link>
-                    </Typography>
-                  </Box>
-                </form>
-              </Box>
-            </Box>
-          </>
-        )}
-      </Box>
-    </Box>
+    </div>
   );
 };
 

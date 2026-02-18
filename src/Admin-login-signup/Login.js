@@ -268,6 +268,10 @@ useEffect(() => {
             <Typography variant="p" sx={{ color: "white", mx: 8, textAlign: "center", fontSize: "20px", fontWeight: "400" }}>
               "Welcome to 'SNP Tax & Financials', where tax management meets simplicity. Our advanced software streamlines tax processes for individuals, businesses, and professionals, ensuring accuracy and efficiency. Experience a new era of financial ease with SNP Tax & Financials."
             </Typography>
+            {/* <div className="bg-red-500 text-white p-10">
+  TAILWIND TEST
+</div> */}
+
           </Box>
 
           <Typography variant="p" className="fontchange">
