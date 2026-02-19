@@ -23,6 +23,7 @@ import PremiumSignupProgress from "../components/ui/Progressbar";
 import { Card, CardContent } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
+import { ArrowLeft } from "lucide-react"
 import {
   Link,
   Divider,
@@ -199,6 +200,8 @@ const MyForm = () => {
     // You can perform additional actions or API calls here based on the selected country
   }, [selectedCountry]);
 
+
+  
   const [otp, setOtp] = useState("");
   const handleClearOtp = () => {
     console.log(otp);
@@ -287,6 +290,30 @@ const MyForm = () => {
       });
   };
 
+
+  const handleBack = () => {
+     if (currentStep === 0) {
+      // Move from Email to Information step
+      return
+    } else if (currentStep === 1) {
+      // Handle Information sub-steps (Cases 3-7)
+      if (subStep >3 ) {
+        setSubStep((prevSubStep) => prevSubStep - 1);
+      } else {
+        // If all sub-steps are completed, move to Settings
+        setCurrentStep(0);
+        setShowEmailContent(false)
+      }
+    } else if (currentStep === 2) {
+      // Handle Settings sub-steps (Cases 8-9)
+      if (settingsStep < 9) {
+        setSettingsStep((prevSettingsStep) => prevSettingsStep - 1 );
+      } else {
+        // You can add finish behavior here
+        // console.log('Form Completed!');
+      }
+    }
+  }
   const handleNext = () => {
     if (currentStep === 0) {
       // Move from Email to Information step
@@ -2186,15 +2213,8 @@ const MyForm = () => {
         </div>
       </div>
       {/* RIGHT PANEL */}
-      <div className="
-  flex
-  flex-col
-  items-center
-  justify-center
-  min-h-screen
-  bg-slate-50
-  px-4
-">
+ <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 px-4">
+
 
      <div className="w-full max-w-md">
 
@@ -2210,8 +2230,21 @@ const MyForm = () => {
     </div>
   )}
 
+  {showEmailContent && (
+    <Button
+  variant="outline"
+  size="icon"
+  onClick={handleBack}
+  className="absolute left-6 top-6 rounded-full shadow-md hover:shadow-lg"
+>
+  <ArrowLeft className="w-4 h-4" />
+  Back
+    </Button>
+
+  )}
+
   {/* Card */}
-  <Card className="w-full p-8 shadow-xl rounded-2xl bg-white max-h-[85vh] overflow-y-auto">
+  <Card className="w-full p-8 shadow-xl rounded-2xl bg-white space-y-6 animate-in fade-in zoom-in-95 duration-300">
 
     {!showEmailContent && (
       <>
@@ -2274,7 +2307,7 @@ const MyForm = () => {
   </Card>
 
 </div>
-
+</div>
     </div>
   );
 };
