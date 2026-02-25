@@ -23,7 +23,8 @@ import PremiumSignupProgress from "../components/ui/Progressbar";
 import { Card, CardContent } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft } from "lucide-react";
+import StepTransition from "../components/ui/StepTransition";
 import {
   Link,
   Divider,
@@ -200,8 +201,6 @@ const MyForm = () => {
     // You can perform additional actions or API calls here based on the selected country
   }, [selectedCountry]);
 
-
-  
   const [otp, setOtp] = useState("");
   const handleClearOtp = () => {
     console.log(otp);
@@ -290,30 +289,32 @@ const MyForm = () => {
       });
   };
 
-
   const handleBack = () => {
-     if (currentStep === 0) {
+    if (currentStep === 0) {
       // Move from Email to Information step
-      return
+      return;
     } else if (currentStep === 1) {
       // Handle Information sub-steps (Cases 3-7)
-      if (subStep >3 ) {
+      if (subStep > 3) {
         setSubStep((prevSubStep) => prevSubStep - 1);
       } else {
         // If all sub-steps are completed, move to Settings
-        setCurrentStep(0);
-        setShowEmailContent(false)
+          
+        // setShowEmailContent(false)
       }
     } else if (currentStep === 2) {
       // Handle Settings sub-steps (Cases 8-9)
-      if (settingsStep < 9) {
-        setSettingsStep((prevSettingsStep) => prevSettingsStep - 1 );
-      } else {
+      if (settingsStep > 8) {
+        setSettingsStep((prevSettingsStep) => prevSettingsStep - 1);
+      } else if(settingsStep == 8){
         // You can add finish behavior here
         // console.log('Form Completed!');
+
+          setCurrentStep(1);
+          setSubStep(7);
       }
     }
-  }
+  };
   const handleNext = () => {
     if (currentStep === 0) {
       // Move from Email to Information step
@@ -1345,7 +1346,7 @@ const MyForm = () => {
       case 4:
         return (
           <div className="flex items-center justify-center p-8">
-            <div className="space-y-6">
+            <div className="space-y-6 w-full">
               <div className="text-center space-y-2">
                 <h2 className="text-2xl font-semibold">Firm Information</h2>
                 <p className="text-sm text-slate-500">
@@ -1359,19 +1360,21 @@ const MyForm = () => {
                   <label className="text-sm font-medium text-slate-700">
                     Firm Name
                   </label>
-                  <TextField
-                    fullWidth
+                  <Input
                     name="firm name"
                     placeholder="Enter firm name"
-                    size="small"
                     value={firmName}
                     onChange={(e) => setFirmName(e.target.value)}
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        borderRadius: "10px",
-                        transition: "all 0.2s ease",
-                      },
-                    }}
+                    className="
+      h-11
+      rounded-lg
+      border-slate-300
+      focus:border-[#0f172a]
+      
+      focus:ring-[#0f172a]/10
+      transition-all
+      duration-200
+    "
                   />
                 </div>
 
@@ -1380,7 +1383,7 @@ const MyForm = () => {
                   <label className="text-sm font-medium text-slate-700">
                     Country
                   </label>
-                  <Autocomplete
+                  {/* <Autocomplete
                     size="small"
                     value={selectedCountryD}
                     onChange={(event, newValue) => {
@@ -1402,7 +1405,31 @@ const MyForm = () => {
                         }}
                       />
                     )}
-                  />
+                  /> */}
+                  <div className="relative z-10">
+                    <Select
+                      value={selectedCountry}
+                      onValueChange={(value) => {
+                        setSelectedCountry(value);
+                        setSelectedState("");
+                      }}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select country" />
+                      </SelectTrigger>
+
+                      <SelectContent
+                        position="popper"
+                        className="max-h-60 overflow-y-auto"
+                      >
+                        {countries.map((country) => (
+                          <SelectItem key={country.value} value={country.label}>
+                            {country.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
 
                 {/* State */}
@@ -1410,29 +1437,24 @@ const MyForm = () => {
                   <label className="text-sm font-medium text-slate-700">
                     State
                   </label>
-                  <Autocomplete
-                    size="small"
-                    value={stateOptions.find(
-                      (option) => option.value === selectedState,
-                    )}
-                    onChange={(event, newValue) => {
-                      setSelectedState(newValue?.label || "");
+                  <Select
+                    value={selectedState}
+                    onValueChange={(value) => {
+                      setSelectedState(value);
                     }}
-                    options={stateOptions}
-                    getOptionLabel={(option) => option.label}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        placeholder="Select state"
-                        sx={{
-                          "& .MuiOutlinedInput-root": {
-                            borderRadius: "10px",
-                            transition: "all 0.2s ease",
-                          },
-                        }}
-                      />
-                    )}
-                  />
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select state" />
+                    </SelectTrigger>
+
+                    <SelectContent className="max-h-60">
+                      {stateOptions.map((state) => (
+                        <SelectItem key={state.value} value={state.label}>
+                          {state.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {/* Next Button */}
@@ -2213,101 +2235,95 @@ const MyForm = () => {
         </div>
       </div>
       {/* RIGHT PANEL */}
- <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 px-4">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 px-4">
+        <div className="w-full max-w-md">
+          {/* Progress Bar */}
+          {showEmailContent && (
+            <div className="mb-6">
+              <PremiumSignupProgress
+                currentStep={currentStep}
+                showEmailContent={showEmailContent}
+                subStep={subStep}
+                settingsStep={settingsStep}
+              />
+            </div>
+          )}
 
+          {/* Card */}
+          <Card className="relative w-full p-8 shadow-xl rounded-2xl bg-white space-y-6 animate-in fade-in zoom-in-95 duration-300">
+            {showEmailContent && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleBack}
+                className="absolute top-4 left-4 h-9 w-9 rounded-full hover:bg-slate-100 transition"
+              >
+                <ArrowLeft className="w-5 h-5 text-slate-700" />
+              </Button>
+            )}
 
-     <div className="w-full max-w-md">
+            {!showEmailContent && (
+              <>
+                <h2 className="text-2xl font-semibold text-center">Sign up</h2>
 
-  {/* Progress Bar */}
-  {showEmailContent && (
-    <div className="mb-6">
-      <PremiumSignupProgress
-        currentStep={currentStep}
-        showEmailContent={showEmailContent}
-        subStep={subStep}
-        settingsStep={settingsStep}
-      />
-    </div>
-  )}
+                <p className="text-sm text-slate-500 text-center">
+                  Sign up your firm and start upgrading your workflow
+                </p>
 
-  {showEmailContent && (
-    <Button
-  variant="outline"
-  size="icon"
-  onClick={handleBack}
-  className="absolute left-6 top-6 rounded-full shadow-md hover:shadow-lg"
->
-  <ArrowLeft className="w-4 h-4" />
-  Back
-    </Button>
-
-  )}
-
-  {/* Card */}
-  <Card className="w-full p-8 shadow-xl rounded-2xl bg-white space-y-6 animate-in fade-in zoom-in-95 duration-300">
-
-    {!showEmailContent && (
-      <>
-        <h2 className="text-2xl font-semibold text-center">
-          Sign up
-        </h2>
-
-        <p className="text-sm text-slate-500 text-center">
-          Sign up your firm and start upgrading your workflow
-        </p>
-
-        <div className="space-y-2">
-          <input
-            type="email"
-            name="email"
-            value={inpval.email}
-            onChange={handleEmailChange}
-            className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 transition
+                <div className="space-y-2">
+                  <input
+                    type="email"
+                    name="email"
+                    value={inpval.email}
+                    onChange={handleEmailChange}
+                    className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 transition
               ${
                 emailError
                   ? "border-red-500 focus:ring-red-500"
                   : "border-slate-300 focus:ring-slate-900"
               }`}
-            placeholder="Enter your email"
-          />
+                    placeholder="Enter your email"
+                  />
 
-          {emailError && (
-            <p className="text-sm text-red-500">{emailError}</p>
-          )}
+                  {emailError && (
+                    <p className="text-sm text-red-500">{emailError}</p>
+                  )}
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="terms"
+                    checked={isChecked}
+                    onChange={setValbox}
+                    className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
+                  />
+                  <label htmlFor="terms" className="text-sm text-slate-600">
+                    I agree to the terms and conditions
+                  </label>
+                </div>
+
+                <button
+                  onClick={createAccount}
+                  className="w-full bg-slate-900 text-white py-2 rounded-md hover:bg-slate-800 transition"
+                >
+                  Create Account
+                </button>
+              </>
+            )}
+
+            {showEmailContent && (
+              <StepTransition
+                stepKey={`${currentStep}-${subStep}-${settingsStep}`}
+              >
+                <div className="animate-in fade-in duration-300">
+                  {renderFormFields()}
+                </div>
+              </StepTransition>
+            )}
+          </Card>
         </div>
-
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            id="terms"
-            checked={isChecked}
-            onChange={setValbox}
-            className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
-          />
-          <label htmlFor="terms" className="text-sm text-slate-600">
-            I agree to the terms and conditions
-          </label>
-        </div>
-
-        <button
-          onClick={createAccount}
-          className="w-full bg-slate-900 text-white py-2 rounded-md hover:bg-slate-800 transition"
-        >
-          Create Account
-        </button>
-      </>
-    )}
-
-    {showEmailContent && (
-      <div className="animate-in fade-in duration-300">
-        {renderFormFields()}
       </div>
-    )}
-
-  </Card>
-
-</div>
-</div>
     </div>
   );
 };
