@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { Stepper, Step, StepLabel, Box } from "@mui/material";
+// import { Stepper, Step, StepLabel, Box } from "@mui/material";
 import { NavLink } from "react-router-dom";
 import { toast } from "react-toastify";
-import { Autocomplete } from "@mui/material";
+// import { Autocomplete } from "@mui/material";
 import axios from "axios";
 import OtpInput from "react-otp-input";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import startsWith from "lodash.startswith";
-import firmsetting from "../Images/setting.png";
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import InputAdornment from "@mui/material/InputAdornment";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+// import startsWith from "lodash.startswith";
+// import firmsetting from "../Images/setting.png";
+// import Visibility from "@mui/icons-material/Visibility";
+// import VisibilityOff from "@mui/icons-material/VisibilityOff";
+// import OutlinedInput from "@mui/material/OutlinedInput";
+// import InputAdornment from "@mui/material/InputAdornment";
+// import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useNavigate } from "react-router-dom";
 import logo from "../Images/logoAdmin.png";
 import micropms from "../Images/micropms.png";
@@ -23,24 +23,26 @@ import PremiumSignupProgress from "../components/ui/Progressbar";
 import { Card, CardContent } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
+
 import { ArrowLeft } from "lucide-react";
 import StepTransition from "../components/ui/StepTransition";
+
 import {
-  Link,
-  Divider,
-  IconButton,
-  Typography,
-  TextField,
-  InputLabel,
-  Checkbox,
-  FormHelperText,
-  // Button,
-  FormControlLabel,
-  Paper,
-  Grid,
-  FormControl,
+  //   Link,
+  //   Divider,
+  //   IconButton,
+  //   Typography,
+  //   TextField,
+  //   InputLabel,
+  //   Checkbox,
+  //   FormHelperText,
+  //   // Button,
+  //   FormControlLabel,
+  //   Paper,
+  //   Grid,
+  //   FormControl,
   Slider,
-  // Input,
+  //   // Input,
 } from "@mui/material";
 import {
   Select,
@@ -124,7 +126,7 @@ const MyForm = () => {
   };
   const handleToggle = (index) => {
     const updatedStates = buttonStates.map((state, i) =>
-      i === index ? !state : false,
+      i === index ? !state : false
     );
     setButtonStates(updatedStates);
     setSelectedButton(index);
@@ -157,7 +159,7 @@ const MyForm = () => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          "https://countriesnow.space/api/v0.1/countries/positions",
+          "https://countriesnow.space/api/v0.1/countries/positions"
         );
         if (!response.ok) {
           throw new Error("Failed to fetch data");
@@ -184,7 +186,7 @@ const MyForm = () => {
     const getStatesData = async () => {
       try {
         const response = await axios.get(
-          "https://countriesnow.space/api/v0.1/countries/states",
+          "https://countriesnow.space/api/v0.1/countries/states"
         );
         setStates(response.data.data);
       } catch (error) {
@@ -299,22 +301,22 @@ const MyForm = () => {
         setSubStep((prevSubStep) => prevSubStep - 1);
       } else {
         // If all sub-steps are completed, move to Settings
-          
         // setShowEmailContent(false)
       }
     } else if (currentStep === 2) {
       // Handle Settings sub-steps (Cases 8-9)
       if (settingsStep > 8) {
         setSettingsStep((prevSettingsStep) => prevSettingsStep - 1);
-      } else if(settingsStep == 8){
+      } else if (settingsStep == 8) {
         // You can add finish behavior here
         // console.log('Form Completed!');
 
-          setCurrentStep(1);
-          setSubStep(7);
+        setCurrentStep(1);
+        setSubStep(7);
       }
     }
   };
+
   const handleNext = () => {
     if (currentStep === 0) {
       // Move from Email to Information step
@@ -407,7 +409,7 @@ const MyForm = () => {
 
       fetch(
         `${LOGIN_API}/common/user/email/getuserbyemail/` + email,
-        requestOptions,
+        requestOptions
       )
         .then((response) => {
           if (!response.ok) {
@@ -539,7 +541,7 @@ const MyForm = () => {
 
   const [selectAll, setSelectAll] = useState(false);
   const buttonsOn = Object.keys(buttonStates2).filter(
-    (button) => buttonStates2[button],
+    (button) => buttonStates2[button]
   );
   const handleButtonClick2 = (buttonName) => {
     setButtonStates2((prevStates) => ({
@@ -597,7 +599,7 @@ const MyForm = () => {
 
   const handleToggle3 = (index) => {
     const updatedStates = buttonStates3.map((state, i) =>
-      i === index ? !state : false,
+      i === index ? !state : false
     );
     setButtonStates3(updatedStates);
     setSelectedButton3(index);
@@ -633,7 +635,7 @@ const MyForm = () => {
     const fetchCurrencies = async () => {
       try {
         const response = await axios.get(
-          "https://api.coingecko.com/api/v3/simple/supported_vs_currencies",
+          "https://api.coingecko.com/api/v3/simple/supported_vs_currencies"
         );
         const currencyOptions = Object.keys(response.data).map((currency) => ({
           value: currency,
@@ -1216,7 +1218,7 @@ const MyForm = () => {
 
                 <button
                   onClick={sendOtpVerify}
-                  className="px-6 py-2 bg-black text-white 
+                  className="px-6 py-2 bg-primary text-primary-foreground text-white 
                      rounded-md hover:opacity-90 transition"
                 >
                   Verify
@@ -1252,7 +1254,7 @@ const MyForm = () => {
             <div className="space-y-4">
               {/* First Name */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">
+                <label className="text-sm font-medium text-foreground">
                   First Name
                 </label>
                 <input
@@ -1267,7 +1269,7 @@ const MyForm = () => {
 
               {/* Last Name */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">
+                <label className="text-sm font-medium text-foreground">
                   Last Name
                 </label>
                 <input
@@ -1282,7 +1284,7 @@ const MyForm = () => {
 
               {/* Phone */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">
+                <label className="text-sm font-medium text-foreground">
                   Phone Number
                 </label>
 
@@ -1334,7 +1336,7 @@ const MyForm = () => {
             <div className="flex justify-center pt-4">
               <button
                 onClick={submitUserinfo}
-                className="px-6 py-2 bg-black text-white 
+                className="px-6 py-2 bg-primary text-primary-foreground text-white 
                      rounded-md hover:opacity-90 transition"
               >
                 Next
@@ -1357,7 +1359,7 @@ const MyForm = () => {
               <form className="space-y-5">
                 {/* Firm Name */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">
+                  <label className="text-sm font-medium text-foreground">
                     Firm Name
                   </label>
                   <Input
@@ -1380,7 +1382,7 @@ const MyForm = () => {
 
                 {/* Country */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">
+                  <label className="text-sm font-medium text-foreground">
                     Country
                   </label>
                   {/* <Autocomplete
@@ -1434,9 +1436,10 @@ const MyForm = () => {
 
                 {/* State */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">
+                  <label className="text-sm font-medium text-foreground">
                     State
                   </label>
+
                   <Select
                     value={selectedState}
                     onValueChange={(value) => {
@@ -1447,7 +1450,7 @@ const MyForm = () => {
                       <SelectValue placeholder="Select state" />
                     </SelectTrigger>
 
-                    <SelectContent className="max-h-60">
+                    <SelectContent className="max-h-60 overflow-y-auto">
                       {stateOptions.map((state) => (
                         <SelectItem key={state.value} value={state.label}>
                           {state.label}
@@ -1462,7 +1465,7 @@ const MyForm = () => {
                   <button
                     type="button"
                     onClick={submitFerminfo}
-                    className="w-full bg-black text-white py-2.5 rounded-lg 
+                    className="w-full bg-primary text-primary-foreground text-white py-2.5 rounded-lg 
                            font-medium transition hover:opacity-90"
                   >
                     Next
@@ -1486,7 +1489,7 @@ const MyForm = () => {
               </div>
 
               <div className="space-y-4">
-                <label className="text-sm font-medium text-slate-700">
+                <label className="text-sm font-medium text-foreground">
                   Firm Size
                 </label>
 
@@ -1536,7 +1539,7 @@ const MyForm = () => {
 
               {/* Source Section */}
               <div className="space-y-4">
-                <h3 className="text-sm font-medium text-slate-700">
+                <h3 className="text-sm font-medium text-foreground">
                   How did you hear about PMS Solutions?
                 </h3>
 
@@ -1548,7 +1551,7 @@ const MyForm = () => {
                       className={`px-4 py-2 text-sm rounded-lg border transition
                   ${
                     buttonStates[index]
-                      ? "bg-black text-white border-black"
+                      ? "bg-primary text-primary-foreground text-white border-black"
                       : "border-slate-300 hover:bg-slate-100"
                   }`}
                     >
@@ -1562,7 +1565,7 @@ const MyForm = () => {
               <div className="pt-4">
                 <button
                   onClick={submitFirmDetail}
-                  className="w-full bg-black text-white py-2.5 rounded-lg 
+                  className="w-full bg-primary text-primary-foreground text-white py-2.5 rounded-lg 
                        font-medium transition hover:opacity-90"
                 >
                   Next
@@ -1597,8 +1600,8 @@ const MyForm = () => {
             px-4 py-2 rounded-lg border text-sm font-medium transition
             ${
               buttonStates2[service]
-                ? "bg-slate-900 text-white border-slate-900 shadow-sm"
-                : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50"
+                ? "bg-primary text-white border-slate-900 shadow-sm"
+                : "bg-white text-foreground border-slate-300 hover:bg-slate-50"
             }
           `}
                     >
@@ -1620,7 +1623,7 @@ const MyForm = () => {
 
                   <button
                     onClick={submitService}
-                    className="px-6 py-2 bg-slate-900 text-white rounded-lg hover:opacity-90 transition"
+                    className="px-6 py-2 bg-primary text-white rounded-lg hover:opacity-90 transition"
                   >
                     Next
                   </button>
@@ -1654,8 +1657,8 @@ const MyForm = () => {
             w-full px-4 py-3 rounded-lg border text-sm font-medium text-left transition
             ${
               buttonStates3[index]
-                ? "bg-slate-900 text-white border-slate-900 shadow-sm"
-                : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50"
+                ? "bg-primary text-white border-slate-900 shadow-sm"
+                : "bg-white text-foreground border-slate-300 hover:bg-slate-50"
             }
           `}
                     >
@@ -1668,7 +1671,7 @@ const MyForm = () => {
                 <div className="flex justify-center pt-4">
                   <button
                     onClick={submitRole}
-                    className="px-8 py-2 bg-slate-900 text-white rounded-lg hover:opacity-90 transition"
+                    className="px-8 py-2 bg-primary text-white rounded-lg hover:opacity-90 transition"
                   >
                     Next
                   </button>
@@ -1756,7 +1759,7 @@ const MyForm = () => {
                     value={selectedCurrency?.label || ""}
                     onValueChange={(value) => {
                       const selected = currencies.find(
-                        (c) => c.label === value,
+                        (c) => c.label === value
                       );
 
                       handleCurrencyChange(selected);
@@ -1808,7 +1811,7 @@ const MyForm = () => {
                 onClick={submiturl}
                 className="
             w-full h-11 rounded-md
-            bg-slate-900 text-white font-medium
+            bg-primary text-white font-medium
             hover:bg-slate-800
             transition
           "
@@ -1951,7 +1954,7 @@ const MyForm = () => {
                 onClick={submitPassword}
                 className="
             w-full h-11 mt-4
-            bg-slate-900 text-white
+            bg-primary text-white
             rounded-md
             hover:bg-slate-800 transition-all
           "
@@ -2221,98 +2224,126 @@ const MyForm = () => {
   // );
 
   return (
-    <div className="min-h-screen grid grid-cols-1 md:grid-cols-2">
+    <div className="min-h-screen grid grid-cols-1 md:grid-cols-2 bg-background text-foreground">
       {/* LEFT PANEL */}
-      <div className="hidden md:flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-700 text-white p-12">
+      <div
+        className="hidden md:flex items-center justify-center bg-primary text-primary-foreground p-12 bg-gradient-to-br 
+from-indigo-500 
+via-blue-500 
+to-blue-600"
+      >
         <div className="max-w-md text-center space-y-6">
-          <h1 className="text-3xl font-semibold tracking-tight">
+          <h1 className="text-3xl font-semibold tracking-tight text-white ">
             PMS Solutions
           </h1>
-          <p className="text-slate-300">
+          <p className="text-primary-foreground/80 text-white/90">
             A powerful platform to manage your firm, clients, workflows and
             billing — all in one place.
           </p>
         </div>
       </div>
+
       {/* RIGHT PANEL */}
-      <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 px-4">
-        <div className="w-full max-w-md">
+      <div className="flex flex-col items-center justify-center px-6 py-10">
+        <div className="w-full max-w-md space-y-6">
           {/* Progress Bar */}
           {showEmailContent && (
-            <div className="mb-6">
-              <PremiumSignupProgress
-                currentStep={currentStep}
-                showEmailContent={showEmailContent}
-                subStep={subStep}
-                settingsStep={settingsStep}
-              />
-            </div>
+            <PremiumSignupProgress
+              currentStep={currentStep}
+              showEmailContent={showEmailContent}
+              subStep={subStep}
+              settingsStep={settingsStep}
+            />
           )}
 
           {/* Card */}
-          <Card className="relative w-full p-8 shadow-xl rounded-2xl bg-white space-y-6 animate-in fade-in zoom-in-95 duration-300">
+          <Card className="relative w-full p-8 rounded-2xl shadow-xl bg-card text-card-foreground border border-border space-y-6 transition-all duration-300">
+            {/* Back Button */}
             {showEmailContent && (
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={handleBack}
-                className="absolute top-4 left-4 h-9 w-9 rounded-full hover:bg-slate-100 transition"
+                className="absolute top-4 left-4 h-9 w-9 rounded-full hover:bg-muted transition"
               >
-                <ArrowLeft className="w-5 h-5 text-slate-700" />
+                <ArrowLeft className="w-5 h-5" />
               </Button>
             )}
 
-            {!showEmailContent && (
+            {/* EMAIL STEP */}
+            {!showEmailContent ? (
               <>
                 <h2 className="text-2xl font-semibold text-center">Sign up</h2>
 
-                <p className="text-sm text-slate-500 text-center">
+                <p className="text-sm text-muted-foreground text-center">
                   Sign up your firm and start upgrading your workflow
                 </p>
 
+                {/* Email Field */}
                 <div className="space-y-2">
                   <input
                     type="email"
                     name="email"
                     value={inpval.email}
                     onChange={handleEmailChange}
-                    className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 transition
-              ${
-                emailError
-                  ? "border-red-500 focus:ring-red-500"
-                  : "border-slate-300 focus:ring-slate-900"
-              }`}
                     placeholder="Enter your email"
+                    className={`
+                    w-full
+                    rounded-md
+                    px-3 py-2
+                    bg-background
+                    border
+                    ${
+                      emailError
+                        ? "border-destructive focus:ring-destructive"
+                        : "border-border focus:ring-primary"
+                    }
+                    focus:outline-none
+                    focus:ring-2
+                    transition
+                  `}
                   />
 
                   {emailError && (
-                    <p className="text-sm text-red-500">{emailError}</p>
+                    <p className="text-sm text-destructive">{emailError}</p>
                   )}
                 </div>
 
+                {/* Terms */}
                 <div className="flex items-center space-x-2">
                   <input
                     type="checkbox"
                     id="terms"
                     checked={isChecked}
                     onChange={setValbox}
-                    className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
+                    className="h-4 w-4 border-border accent-primary"
                   />
-                  <label htmlFor="terms" className="text-sm text-slate-600">
+                  <label
+                    htmlFor="terms"
+                    className="text-sm text-muted-foreground"
+                  >
                     I agree to the terms and conditions
                   </label>
                 </div>
 
+                {/* Submit */}
                 <button
                   onClick={createAccount}
-                  className="w-full bg-slate-900 text-white py-2 rounded-md hover:bg-slate-800 transition"
+                  className="
+                  w-full
+                  bg-primary
+                  text-primary-foreground
+                  py-2
+                  rounded-md
+                  hover:opacity-90
+                  transition
+                  font-medium
+                "
                 >
                   Create Account
                 </button>
               </>
-            )}
-
-            {showEmailContent && (
+            ) : (
               <StepTransition
                 stepKey={`${currentStep}-${subStep}-${settingsStep}`}
               >

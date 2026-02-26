@@ -3,6 +3,22 @@
 @tailwind utilities;
 
 
+:root {
+  --primary: 210 95% 45%;      /* stronger blue */
+  --primary-foreground: 0 0% 100%;
+
+  --background: 210 40% 98%;   /* softer clean bg */
+
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+
+  --muted: 210 20% 94%;
+  --muted-foreground: 215 16% 40%;
+
+  --border: 210 25% 85%;
+  --destructive: 0 84% 60%;
+}
+
 .step-enter {
   animation: stepEnter 0.4s ease;
 }
