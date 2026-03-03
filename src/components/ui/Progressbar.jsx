@@ -42,7 +42,7 @@ export default function PremiumSignupProgress({
               {index !== 0 && (
                 <div
                   className={`absolute top-5 -left-1/2 w-full h-[2px]
-                  ${isCompleted ? "bg-slate-900" : "bg-slate-300"}`}
+                  ${isCompleted ? "bg-primary" : "bg-primary/20"}`}
                 />
               )}
 
@@ -54,20 +54,20 @@ export default function PremiumSignupProgress({
 
                   ${
                     isCompleted
-                      ? "bg-slate-900 text-white border-slate-900"
-                      : isActive
-                      ? "border-slate-900 text-slate-900 bg-white"
-                      : "border-slate-300 text-slate-400 bg-white"
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : isActive
+                    ? "border-primary text-primary bg-background"
+                    : "border-border text-muted-foreground bg-background"
                   }
                 `}
               >
-                {isCompleted ? <Check size={16} /> : index + 1}
+                {isCompleted ? <Check size={16} color="white" /> : index + 1}
               </div>
 
               {/* LABEL */}
               <span
                 className={`mt-2 text-sm font-medium
-                ${isActive ? "text-slate-900" : "text-slate-400"}`}
+              ${isActive || isCompleted ? "text-primary" : "text-muted-foreground"}`}
               >
                 {label}
               </span>

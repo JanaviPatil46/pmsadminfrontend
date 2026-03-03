@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 // import { Stepper, Step, StepLabel, Box } from "@mui/material";
 import { NavLink } from "react-router-dom";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 // import { Autocomplete } from "@mui/material";
 import axios from "axios";
 import OtpInput from "react-otp-input";
@@ -25,6 +25,7 @@ import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 
 import { ArrowLeft } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 import StepTransition from "../components/ui/StepTransition";
 
 import {
@@ -51,6 +52,8 @@ import {
   SelectContent,
   SelectItem,
 } from "../components/ui/select";
+import { Eye, EyeOff } from "lucide-react";
+import  FormMessage from "../components/ui/FormMessage";
 const MyForm = () => {
   console.log("🔥 newsignup.js FILE LOADED 🔥");
 
@@ -74,8 +77,11 @@ const MyForm = () => {
   const [firmName, setFirmName] = useState("");
   const [selectedState, setSelectedState] = useState("");
   const [emailError, setEmailError] = useState("");
+  const [ErrorType , setErrorType]  = useState(null);
 
   const [error, setError] = useState(null);
+  // const [formError , toast.error] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
   const [selectedCountryD, setSelectedCountryD] = useState("");
   const [sliderValue, setSliderValue] = useState(0);
   const fixedValues = [0, 5, 10, 15, 50, 100, 200];
@@ -104,6 +110,26 @@ const MyForm = () => {
       event.target.value === "" ? "" : Number(event.target.value);
     setInputValue(newValue); // Only update the input value, not the slider
   };
+
+  // useEffect(() => {
+  //   if (formError) {
+  //     const timer = setTimeout(() => {
+  //       toast.error(null);
+  //     }, 2000); // 3 seconds
+  
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [formError]);
+
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage(null);
+      }, 2000);
+  
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
 
   const [inputValue, setInputValue] = useState(sliderValue);
 
@@ -214,9 +240,11 @@ const MyForm = () => {
     //const { email } = inpval;
 
     if (otp === "") {
-      toast.error(" OTP required! ", {
-        position: "top-center",
-      });
+      // toast.error(" OTP required! ", {
+      //   position: "top-right",
+      // });
+      
+      toast.error("OTP required")
     } else {
       e.preventDefault();
 
@@ -243,13 +271,14 @@ const MyForm = () => {
           console.log("Verify response:", response.data);
           // toast.success("Check your email ID for OTP", { position: "top-right" });
 
-          alert("Email verified sucessfully");
+          // toast.error("Email verified sucessfully");
+          toast.success("Email verified successfully")
           setOtp("");
           handleNext();
           // nextStep();
         })
         .catch((error) => {
-          alert("please check your OTP");
+          toast.error("please check your OTP");
           console.log("Catch block executed", error);
         });
     }
@@ -283,10 +312,10 @@ const MyForm = () => {
         console.log(JSON.stringify(response.data));
         //toast.success("Check your email ID for OTP", { position: "top-right" });
 
-        alert("Check your email ID for OTP");
+        toast.success("Check your email ID for OTP");
       })
       .catch((error) => {
-        alert("please check your OTP");
+        toast.error("Invalid OTP");
         console.log(error);
       });
   };
@@ -379,22 +408,23 @@ const MyForm = () => {
   const canSubmit = inpval.email && !emailError && isChecked && !loading;
   const createAccount = async () => {
     // e.preventDefault();
-    setShowEmailContent(true);
+   
     const { email } = inpval;
 
     if (email === "") {
-      toast.error("email is required!", {
-        position: "top-center",
+      toast.error("Email is required!", {
+        position: "top-right",
       });
     } else if (!email.includes("@")) {
-      toast.warning("includes @ in your email!", {
-        position: "top-center",
+      toast.error("includes @ in your email!", {
+        position: "top-right",
       });
     } else if (isChecked === false) {
       toast.error("Accept terms and condtion ", {
-        position: "top-center",
+        position: "top-right",
       });
     } else {
+      setShowEmailContent(true);
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
       console.log(inpval.email);
@@ -421,9 +451,12 @@ const MyForm = () => {
           console.log(inpval.email);
           // Assuming result is in JSON format and contains user data
           if (result.user.length > 0) {
+            
             toast.error("User with this EMail already exists", {
               position: "top-right",
             });
+
+            setShowEmailContent(false);
             // You can also do further processing here if needed
           } else {
             // e.preventDefault();
@@ -446,13 +479,13 @@ const MyForm = () => {
               .then((response) => {
                 console.log(JSON.stringify(response.data));
                 //toast.success("Check your email ID for OTP", { position: "top-right" });
-                alert("Check your email ID for OTP");
+                toast.success("Check your email ID for OTP");
                 //   setInpval({ ...inpval, email: "" });
                 setIsChecked(false);
                 // nextStep();
               })
               .catch((error) => {
-                alert("please check your OTP");
+                toast.error("please check your OTP");
                 // console.log(error);
               });
           }
@@ -469,19 +502,19 @@ const MyForm = () => {
 
     if (firstname === "") {
       toast.error(" First Name Required ! ", {
-        position: "top-center",
+        position: "top-right",
       });
     } else if (lastName === "") {
       toast.error(" Last Name Required ! ", {
-        position: "top-center",
+        position: "top-right",
       });
     } else if (lastName === "") {
       toast.error(" Last Name Required ! ", {
-        position: "top-center",
+        position: "top-right",
       });
     } else if (phoneNumber === "") {
       toast.error(" Phone number required ", {
-        position: "top-center",
+        position: "top-right",
       });
     } else {
       handleNext();
@@ -493,15 +526,15 @@ const MyForm = () => {
 
     if (firmName === "") {
       toast.error(" Firm Name Required ! ", {
-        position: "top-center",
+        position: "top-right",
       });
     } else if (selectedCountry === "") {
-      toast.warning(" Select Country ! ", {
-        position: "top-center",
+      toast.error(" Select Country ! ", {
+        position: "top-right",
       });
     } else if (selectedState === "") {
-      toast.warning(" Select state ! ", {
-        position: "top-center",
+      toast.error(" Select state ! ", {
+        position: "top-right",
       });
     } else {
       handleNext();
@@ -514,11 +547,11 @@ const MyForm = () => {
 
     if (svalue === 0) {
       toast.error(" Select Firm Size  ! ", {
-        position: "top-center",
+        position: "top-right",
       });
     } else if (selectedOption === "") {
-      toast.warning(" Select How did you hear about us ? ", {
-        position: "top-center",
+      toast.error(" Select How did you hear about us ? ", {
+        position: "top-right",
       });
     } else {
       handleNext();
@@ -572,7 +605,7 @@ const MyForm = () => {
 
     if (selectedButtons == []) {
       toast.error(" Select Service  ! ", {
-        position: "top-center",
+        position: "top-right",
       });
     } else {
       handleNext();
@@ -617,7 +650,7 @@ const MyForm = () => {
 
     if (selectedButton3 === "") {
       //   toast.error(" Select Role  ! ", {
-      //     position: "top-center",
+      //     position: "top-right",
       //   });
     } else {
       handleNext();
@@ -692,15 +725,15 @@ const MyForm = () => {
 
     if (url === "") {
       toast.error(" Choose web URL ! ", {
-        position: "top-center",
+        position: "top-right",
       });
     } else if (currencies === "") {
-      toast.warning(" Select Currency ! ", {
-        position: "top-center",
+      toast.error(" Select Currency ! ", {
+        position: "top-right",
       });
     } else if (language === "") {
-      toast.warning(" Select language ! ", {
-        position: "top-center",
+      toast.error(" Select language ! ", {
+        position: "top-right",
       });
     } else {
       handleNext();
@@ -712,24 +745,24 @@ const MyForm = () => {
     const { password, cpassword } = inppass;
 
     if (password === "") {
-      alert("password is required!", {
-        position: "top-center",
+      toast.error("password is required!", {
+        position: "top-right",
       });
     } else if (password.length < 8) {
-      alert("password must be 6 char!", {
-        position: "top-center",
+      toast.error("password must be 6 char!", {
+        position: "top-right",
       });
     } else if (cpassword === "") {
-      alert("cpassword is required!", {
-        position: "top-center",
+      toast.error("cpassword is required!", {
+        position: "top-right",
       });
     } else if (cpassword.length < 8) {
-      alert("confirm password must be 6 char!", {
-        position: "top-center",
+      toast.error("confirm password must be 6 char!", {
+        position: "top-right",
       });
     } else if (password !== cpassword) {
-      alert("pass and Cpass are not matching!", {
-        position: "top-center",
+      toast.error("pass and Cpass are not matching!", {
+        position: "top-right",
       });
     } else {
       toast.success(" Account created successfully  ", {
@@ -787,11 +820,15 @@ const MyForm = () => {
         setAdminIdUpdate(result.admin._id);
         newUser(result.admin._id);
 
-        toast.success("Signup successful!");
+        toast.success("Signup successful!",{
+          position:"top-right"
+        })
       })
       .catch((error) => {
         console.error(error);
-        toast.error("Error signing up. Please try again.", error);
+        toast.error("Error signing up. Please try again." , {
+          position : "top-right"
+        })
       });
   };
   console.log(adminIdUpdate);
@@ -1187,7 +1224,7 @@ const MyForm = () => {
                   renderInput={(props) => (
                     <input
                       {...props}
-                      className="w-12 h-14 mx-2 text-2xl text-center border 
+                      className="w-12 h-14 mx-2 text-2xl text-center border
                          border-slate-300 rounded-md 
                          focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
@@ -1290,6 +1327,7 @@ const MyForm = () => {
 
                 <PhoneInput
                   country="us"
+                  required
                   value={phoneNumber}
                   onChange={(value) => setPhoneNumber(value)}
                   enableSearch
@@ -1307,7 +1345,7 @@ const MyForm = () => {
                 !text-sm 
                 !cursor-text
                 focus:!outline-none 
-                focus:!ring-2 
+                focus:!ring-1
                 focus:!ring-blue-500 
                 focus:!border-blue-500 
                 transition-all duration-200"
@@ -1362,21 +1400,13 @@ const MyForm = () => {
                   <label className="text-sm font-medium text-foreground">
                     Firm Name
                   </label>
-                  <Input
+                  <input
                     name="firm name"
                     placeholder="Enter firm name"
                     value={firmName}
                     onChange={(e) => setFirmName(e.target.value)}
-                    className="
-      h-11
-      rounded-lg
-      border-slate-300
-      focus:border-[#0f172a]
-      
-      focus:ring-[#0f172a]/10
-      transition-all
-      duration-200
-    "
+             className="w-full border border-slate-300 rounded-md px-3 py-2
+                       focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
@@ -1551,7 +1581,7 @@ const MyForm = () => {
                       className={`px-4 py-2 text-sm rounded-lg border transition
                   ${
                     buttonStates[index]
-                      ? "bg-primary text-primary-foreground text-white border-black"
+                      ? "bg-primary text-primary-foreground text-white border"
                       : "border-slate-300 hover:bg-slate-100"
                   }`}
                     >
@@ -1582,7 +1612,7 @@ const MyForm = () => {
               <div className="space-y-8">
                 {/* Title */}
                 <div className="text-center">
-                  <h2 className="text-3xl font-semibold tracking-tight">
+                  <h2 className="text-2xl font-semibold tracking-tight">
                     Services your firm offers
                   </h2>
                   <p className="text-sm text-slate-500 mt-2">
@@ -1600,7 +1630,7 @@ const MyForm = () => {
             px-4 py-2 rounded-lg border text-sm font-medium transition
             ${
               buttonStates2[service]
-                ? "bg-primary text-white border-slate-900 shadow-sm"
+                ? "bg-primary text-white border-primary shadow-sm"
                 : "bg-white text-foreground border-slate-300 hover:bg-slate-50"
             }
           `}
@@ -1616,7 +1646,7 @@ const MyForm = () => {
                     <input
                       type="checkbox"
                       onChange={handleSelectAll}
-                      className="w-4 h-4 accent-slate-900"
+                      className="w-4 h-4 accent-primary"
                     />
                     Select All
                   </label>
@@ -1639,7 +1669,7 @@ const MyForm = () => {
               <div className="space-y-8">
                 {/* Title */}
                 <div className="text-center">
-                  <h2 className="text-3xl font-semibold tracking-tight">
+                  <h2 className="text-2xl font-semibold tracking-tight">
                     Your role in the firm
                   </h2>
                   <p className="text-sm text-slate-500 mt-2">
@@ -1657,7 +1687,7 @@ const MyForm = () => {
             w-full px-4 py-3 rounded-lg border text-sm font-medium text-left transition
             ${
               buttonStates3[index]
-                ? "bg-primary text-white border-slate-900 shadow-sm"
+                ? "bg-primary text-white border-primary shadow-sm"
                 : "bg-white text-foreground border-slate-300 hover:bg-slate-50"
             }
           `}
@@ -1694,7 +1724,7 @@ const MyForm = () => {
             <div className="w-full max-w-lg space-y-6">
               {/* HEADER */}
               <div className="text-center space-y-3">
-                <h2 className="text-3xl font-semibold tracking-tight">
+                <h2 className="text-2xl font-semibold tracking-tight">
                   Firm Settings
                 </h2>
 
@@ -1729,7 +1759,7 @@ const MyForm = () => {
                     className="
                 flex-1 h-11 px-3 rounded-l-md
                 border border-slate-300
-                focus:outline-none focus:ring-2 focus:ring-slate-900
+                focus:outline-none focus:ring-2 focus:ring-primary
               "
                   />
 
@@ -1738,6 +1768,7 @@ const MyForm = () => {
                 flex items-center px-3
                 border border-l-0 border-slate-300
                 rounded-r-md bg-slate-50 text-slate-600
+                focus:ring-primary
               "
                   >
                     .pms.com
@@ -1827,7 +1858,7 @@ const MyForm = () => {
             <div className="w-full max-w-lg space-y-6">
               {/* Header */}
               <div className="text-center">
-                <h2 className="text-3xl font-semibold">Set Password</h2>
+                <h2 className="text-2xl font-semibold">Set Password</h2>
               </div>
 
               {/* Password Field */}
@@ -1844,7 +1875,7 @@ const MyForm = () => {
                     className="
                 w-full h-11 px-3 pr-10 rounded-md
                 border border-slate-300
-                focus:outline-none focus:ring-2 focus:ring-slate-900
+                focus:outline-none focus:ring-2 focus:ring-primary
               "
                   />
 
@@ -1858,7 +1889,7 @@ const MyForm = () => {
                 text-slate-500 hover:text-slate-800
               "
                   >
-                    👁
+                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
               </div>
@@ -1930,7 +1961,7 @@ const MyForm = () => {
                     className="
                 w-full h-11 px-3 pr-10 rounded-md
                 border border-slate-300
-                focus:outline-none focus:ring-2 focus:ring-slate-900
+                focus:outline-none focus:ring-2 focus:ring-primary
               "
                   />
 
@@ -1944,7 +1975,7 @@ const MyForm = () => {
                 text-slate-500 hover:text-slate-800
               "
                   >
-                    👁
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
               </div>
@@ -2223,140 +2254,334 @@ const MyForm = () => {
   //   </Box>
   // );
 
-  return (
-    <div className="min-h-screen grid grid-cols-1 md:grid-cols-2 bg-background text-foreground">
-      {/* LEFT PANEL */}
-      <div
-        className="hidden md:flex items-center justify-center bg-primary text-primary-foreground p-12 bg-gradient-to-br 
-from-indigo-500 
-via-blue-500 
-to-blue-600"
-      >
-        <div className="max-w-md text-center space-y-6">
-          <h1 className="text-3xl font-semibold tracking-tight text-white ">
-            PMS Solutions
+//   return (
+//     <div className="min-h-screen grid grid-cols-1 md:grid-cols-2 bg-background text-foreground">
+//       {/* LEFT PANEL */}
+//       <div
+//         className="hidden md:flex items-center justify-center bg-primary text-primary-foreground p-12 bg-gradient-to-br 
+// from-indigo-500 
+// via-blue-500 
+// to-blue-600"
+//       >
+//         <div className="max-w-md text-center space-y-6">
+//           <h1 className="text-3xl font-semibold tracking-tight text-white ">
+//             PMS Solutions
+//           </h1>
+//           <p className="text-primary-foreground/80 text-white/90">
+//             A powerful platform to manage your firm, clients, workflows and
+//             billing — all in one place.
+//           </p>
+//         </div>
+//       </div>
+
+//       {/* RIGHT PANEL */}
+//       <div className="flex flex-col items-center justify-center px-6 py-10">
+//         <div className="w-full max-w-md space-y-6">
+//           {/* Progress Bar */}
+//           {showEmailContent && (
+//             <PremiumSignupProgress
+//               currentStep={currentStep}
+//               showEmailContent={showEmailContent}
+//               subStep={subStep}
+//               settingsStep={settingsStep}
+//             />
+//           )}
+
+//           {/* Card */}
+//           <Card className="relative w-full p-8 rounded-2xl shadow-xl bg-card text-card-foreground border border-border space-y-6 transition-all duration-300">
+//             {/* Back Button */}
+//             {showEmailContent && (
+//               <Button
+//                 variant="ghost"
+//                 size="icon"
+//                 onClick={handleBack}
+//                 className="absolute top-4 left-4 h-9 w-9 rounded-full hover:bg-muted transition"
+//               >
+//                 <ArrowLeft className="w-5 h-5" />
+//               </Button>
+//             )}
+
+//             {/* EMAIL STEP */}
+//             {!showEmailContent ? (
+//               <>
+//                 <h2 className="text-2xl font-semibold text-center">Sign up</h2>
+
+//                 <p className="text-sm text-muted-foreground text-center">
+//                   Sign up your firm and start upgrading your workflow
+//                 </p>
+
+//                 {/* Email Field */}
+//                 <div className="space-y-2">
+//                   <input
+//                     type="email"
+//                     name="email"
+//                     value={inpval.email}
+//                     onChange={handleEmailChange}
+//                     placeholder="Enter your email"
+//                     className={`
+//                     w-full
+//                     rounded-md
+//                     px-3 py-2
+//                     bg-background
+//                     border
+//                     ${
+//                       emailError
+//                         ? "border-destructive focus:ring-destructive"
+//                         : "border-border focus:ring-primary"
+//                     }
+//                     focus:outline-none
+//                     focus:ring-2
+//                     transition
+//                   `}
+//                   />
+
+//                   {emailError && (
+//                     <p className="text-sm text-destructive">{emailError}</p>
+//                   )}
+//                 </div>
+
+//                 {/* Terms */}
+//                 <div className="flex items-center space-x-2">
+//                   <input
+//                     type="checkbox"
+//                     id="terms"
+//                     checked={isChecked}
+//                     onChange={setValbox}
+//                     className="h-4 w-4 border-border accent-primary"
+//                   />
+//                   <label
+//                     htmlFor="terms"
+//                     className="text-sm text-muted-foreground"
+//                   >
+//                     I agree to the terms and conditions
+//                   </label>
+//                 </div>
+
+//                 {/* Submit */}
+//                 <button
+//                   onClick={createAccount}
+//                   className="
+//                   w-full
+//                   bg-primary
+//                   text-primary-foreground
+//                   py-2
+//                   rounded-md
+//                   hover:opacity-90
+//                   transition
+//                   font-medium
+//                 "
+//                 >
+//                   Create Account
+//                 </button>
+//               </>
+//             ) : (
+//               <StepTransition
+//                 stepKey={`${currentStep}-${subStep}-${settingsStep}`}
+//               >
+//                 <div className="animate-in fade-in duration-300">
+//                   {renderFormFields()}
+//                 </div>
+//               </StepTransition>
+//             )}
+//           </Card>
+//         </div>
+//       </div>
+//     </div>
+//   );
+
+return (
+
+  <div className="relative min-h-screen flex items-center justify-center bg-background overflow-hidden px-6">
+
+    {/* ===== TOP LEFT BLUE PATTERN ===== */}
+    <div className="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full bg-primary/10 blur-3xl" />
+    <div className="absolute -top-20 left-20 w-[400px] h-[400px] rounded-full bg-primary/20 blur-2xl" />
+    <div className="absolute top-0 left-0 w-[300px] h-[300px] bg-gradient-to-br from-primary/30 to-transparent rounded-br-[200px]" />
+
+    {/* ===== BOTTOM RIGHT BLUE PATTERN ===== */}
+    <div className="absolute -bottom-40 -right-40 w-[500px] h-[500px] rounded-full bg-primary/10 blur-3xl" />
+    <div className="absolute bottom-20 right-20 w-[400px] h-[400px] rounded-full bg-primary/20 blur-2xl" />
+    <div className="absolute bottom-0 right-0 w-[300px] h-[300px] bg-gradient-to-tl from-primary/30 to-transparent rounded-tl-[200px]" />
+
+
+
+    {/* ===== CENTER CONTENT ===== */}
+    <div className="relative w-full max-w-md space-y-6">
+
+    {/* <div
+  className={`
+    transition-all duration-300 ease-in-out
+    ${formError ? "opacity-100 max-h-40 mb-4" : "opacity-0 max-h-0 overflow-hidden"}
+  `}
+>
+  {formError && (
+    <FormMessage type="error" message={formError} />
+  )}
+</div> */}
+      
+<div
+  className={`
+    transition-all duration-300 ease-in-out
+    ${successMessage ? "opacity-100 max-h-40 mb-4" : "opacity-0 max-h-0 overflow-hidden"}
+  `}
+>
+  {successMessage && (
+    <FormMessage type="success" message={successMessage} />
+  )}
+</div>
+
+    {/* {formError && (
+  <div className="flex items-center gap-2 rounded-md border border-success bg-success/10 px-4 py-3 text-sm text-success">
+  <CheckCircle className="h-4 w-4" />
+{formError}
+</div>
+)} */}
+
+      {/* LOGO / TITLE */}
+      {!showEmailContent && (
+        <div className="text-center space-y-2">
+           <div className="relative max-w-md text-center space-y-6">
+           <img src={logo} alt="logo" className="mx-auto h-16 mb-6" />
+           </div>
+          <h1 className="text-2xl font-light tracking-tight">
+            Hi there 👋, Welcome to SNP tax and Financials
           </h1>
-          <p className="text-primary-foreground/80 text-white/90">
-            A powerful platform to manage your firm, clients, workflows and
-            billing — all in one place.
-          </p>
         </div>
-      </div>
+      )}
 
-      {/* RIGHT PANEL */}
-      <div className="flex flex-col items-center justify-center px-6 py-10">
-        <div className="w-full max-w-md space-y-6">
-          {/* Progress Bar */}
-          {showEmailContent && (
-            <PremiumSignupProgress
-              currentStep={currentStep}
-              showEmailContent={showEmailContent}
-              subStep={subStep}
-              settingsStep={settingsStep}
-            />
-          )}
+      {/* PROGRESS BAR */}
+      {showEmailContent && (
+        <PremiumSignupProgress
+          currentStep={currentStep}
+          showEmailContent={showEmailContent}
+          subStep={subStep}
+          settingsStep={settingsStep}
+        />
+      )}
 
-          {/* Card */}
-          <Card className="relative w-full p-8 rounded-2xl shadow-xl bg-card text-card-foreground border border-border space-y-6 transition-all duration-300">
-            {/* Back Button */}
-            {showEmailContent && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleBack}
-                className="absolute top-4 left-4 h-9 w-9 rounded-full hover:bg-muted transition"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-            )}
+      {/* CARD */}
+      <Card className="
+        relative
+        w-full
+        p-8
+        rounded-2xl
+        shadow-2xl
+        border
+        border-border
+        bg-card
+        text-card-foreground
+        space-y-6
+        backdrop-blur-sm
+        transition-all
+        duration-300
+      ">
 
-            {/* EMAIL STEP */}
-            {!showEmailContent ? (
-              <>
-                <h2 className="text-2xl font-semibold text-center">Sign up</h2>
+        {/* BACK BUTTON */}
+        {showEmailContent && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleBack}
+            className="absolute top-4 left-4 h-9 w-9 rounded-full hover:bg-muted transition"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+        )}
 
-                <p className="text-sm text-muted-foreground text-center">
-                  Sign up your firm and start upgrading your workflow
-                </p>
+        {/* ===== EMAIL STEP ===== */}
+        {!showEmailContent ? (
+          <>
+            <div className="space-y-1 text-center">
+              <h2 className="text-xl font-semibold">
+                Create Account
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Sign up your firm and start upgrading your workflow
+              </p>
+            </div>
 
-                {/* Email Field */}
-                <div className="space-y-2">
-                  <input
-                    type="email"
-                    name="email"
-                    value={inpval.email}
-                    onChange={handleEmailChange}
-                    placeholder="Enter your email"
-                    className={`
-                    w-full
-                    rounded-md
-                    px-3 py-2
-                    bg-background
-                    border
-                    ${
-                      emailError
-                        ? "border-destructive focus:ring-destructive"
-                        : "border-border focus:ring-primary"
-                    }
-                    focus:outline-none
-                    focus:ring-2
-                    transition
-                  `}
-                  />
-
-                  {emailError && (
-                    <p className="text-sm text-destructive">{emailError}</p>
-                  )}
-                </div>
-
-                {/* Terms */}
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="terms"
-                    checked={isChecked}
-                    onChange={setValbox}
-                    className="h-4 w-4 border-border accent-primary"
-                  />
-                  <label
-                    htmlFor="terms"
-                    className="text-sm text-muted-foreground"
-                  >
-                    I agree to the terms and conditions
-                  </label>
-                </div>
-
-                {/* Submit */}
-                <button
-                  onClick={createAccount}
-                  className="
+            {/* Email Field */}
+            <div className="space-y-2">
+              <input
+                type="email"
+                name="email"
+                value={inpval.email}
+                onChange={handleEmailChange}
+                placeholder="Enter your email"
+                className={`
                   w-full
-                  bg-primary
-                  text-primary-foreground
-                  py-2
                   rounded-md
-                  hover:opacity-90
+                  px-3 py-2
+                  bg-background
+                  border
+                  ${
+                    emailError
+                      ? "border-destructive focus:ring-destructive"
+                      : "border-border focus:ring-primary"
+                  }
+                  focus:outline-none
+                  focus:ring-2
                   transition
-                  font-medium
-                "
-                >
-                  Create Account
-                </button>
-              </>
-            ) : (
-              <StepTransition
-                stepKey={`${currentStep}-${subStep}-${settingsStep}`}
+                `}
+              />
+
+              {emailError && (
+                <p className="text-sm text-destructive">
+                  {emailError}
+                </p>
+              )}
+            </div>
+
+            {/* Terms */}
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="terms"
+                checked={isChecked}
+                onChange={setValbox}
+                className="h-4 w-4 border-border accent-primary"
+              />
+              <label
+                htmlFor="terms"
+                className="text-sm text-muted-foreground"
               >
-                <div className="animate-in fade-in duration-300">
-                  {renderFormFields()}
-                </div>
-              </StepTransition>
-            )}
-          </Card>
-        </div>
-      </div>
+                I agree to the terms and conditions
+              </label>
+            </div>
+
+            {/* Submit */}
+            <button
+              onClick={createAccount}
+              className="
+                w-full
+                bg-primary
+                text-primary-foreground
+                text-white
+                py-2
+                rounded-md
+                hover:opacity-90
+                transition
+                font-medium
+                shadow-md
+              "
+            >
+              Create Account
+            </button>
+          </>
+        ) : (
+          <StepTransition
+            stepKey={`${currentStep}-${subStep}-${settingsStep}`}
+          >
+            <div className="animate-in fade-in duration-300">
+              {renderFormFields()}
+            </div>
+          </StepTransition>
+        )}
+
+      </Card>
     </div>
-  );
+  </div>
+);
 };
 
 export default MyForm;

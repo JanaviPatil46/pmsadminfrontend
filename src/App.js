@@ -39,6 +39,7 @@ import Jobs from "./Pages/Jobs/Jobs.js";
 import PipelineTempUpdate from "./Templates/PipelineTemp/PipelineTempUpdate.js";
 import TasksUpdate from "./Templates/Task/TasksUpdate.js";
 import EmailTempUpdate from "./Templates/EmailTemp/EmailTempUpdate.js";
+import  {Toaster} from "sonner";
 
 import Overview from "./nested-navbar/NewPages/Overview.js";
 import Notes from "./nested-navbar/NewPages/Notes.js";
@@ -123,8 +124,11 @@ import ImportedIncompleteAccountsTable from "./Import/ImportedIncompleteAccounts
 import AccountsDocsTree from "./Import/AccountsDocsTree.js";
 const App = () => {
   return (
+  
     <BrowserRouter>
+      <Toaster position="top-right" richColors />
       <Routes>
+    
         <Route path="/login" element={<AdminLogin />} />
         <Route path="/signup" element={<Adminsignup />} />
 

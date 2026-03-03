@@ -42,6 +42,7 @@ const AdminSignup = () => {
     const [selectedState, setSelectedState] = useState("");
 
     const [error, setError] = useState(null);
+    const [formError , setformError] = useState(null);
     const [selectedCountryD, setSelectedCountryD] = useState("");
 
     const countryStates = states.find((country) => country.name === selectedCountry)?.states || [];
@@ -472,7 +473,8 @@ const AdminSignup = () => {
                             .then((response) => {
                                 console.log(JSON.stringify(response.data));
                                 //toast.success("Check your email ID for OTP", { position: "top-right" });
-                                alert("Check your email ID for OTP");
+                                // alert("Check your email ID for OTP");
+                                setformError("OTP has been sent to your email ID")
                                 //   setInpval({ ...inpval, email: "" });
                                 setIsChecked(false);
                                 nextStep();
@@ -797,1055 +799,966 @@ console.log(raw)
             // Sign up
             case 1:
                 return (
-                    <Box>
-                        <Box>
-                            <Box style={{ margin: "20px" }}>
-                                <img style={{ width: "30px" }} src={logo} alt="" />
-                                <b>PMS Solutions</b>
-                            </Box>
-
-                            <Box className="col-12 case1">
-                                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
-                                    <Box>
-                                        <Typography variant="h5" textAlign={'center'}><b>Signup</b></Typography>
-                                        <p className="subtitle"> firm and start upgrading your workflow</p>
-
-                                        <form onSubmit={handleSubmit}>
-                                            <Box className="form-group">
-                                                <InputLabel sx={{ color: 'black' }}>Email</InputLabel>
-
-                                                <TextField
-                                                    fullWidth
-                                                    type="email"
-                                                    name="email"
-                                                    placeholder="Enter Your Email"
-                                                    size="small"
-                                                    sx={{ mt: 2 }}
-                                                    value={inpval.email} onChange={setVal}
-                                                />
-                                            </Box>
-
-                                            <Box
-                                                sx={{
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    width: '100%',
-                                                    mt: 1, // Margin Top
-                                                }}
-                                            >
-                                                <FormControlLabel
-                                                    control={
-                                                        <Checkbox
-                                                            id="terms"
-                                                            onChange={setValbox} checked={isChecked}
-                                                        />
-                                                    }
-                                                    label={
-                                                        <span style={{ color: '#696969', fontSize: '14px', marginBottom: '0' }}>
-                                                            I agree to the terms and conditions
-                                                        </span>
-                                                    }
-                                                />
-                                            </Box>
-
-                                            <Box sx={{ display: "flex", alignItems: 'center', justifyContent: 'center' }}>
-                                                <Button sx={{ mt: 2 }} variant="contained" onClick={createAccount}>
-                                                    Create Account
-                                                </Button>
-                                            </Box>
-
-                                            <Box sx={{ display: "flex", alignItems: 'center', justifyContent: 'center' }}>
-                                                <Typography variant="body2" className="sign-in-link">
-                                                    Already have an account?{" "}
-                                                    <Link component={NavLink} to="/" sx={{ textDecoration: "none", color: "blue" }}>
-                                                        Sign in
-                                                    </Link>
-                                                </Typography>
-                                            </Box>
-                                        </form>
-                                    </Box>
-                                </Box>
-                                <br />
-                            </Box>
-                        </Box>
-                    </Box>
-                );
+                    <div className="min-h-screen bg-background flex flex-col">
+                  
+                      {/* Header */}
+                      <header className="w-full px-6 py-4 border-b border-border bg-background">
+                        <div className="flex items-center gap-2">
+                          <img src={logo} alt="Logo" className="w-8" />
+                          <span className="font-semibold text-lg text-foreground">
+                            PMS Solutions
+                          </span>
+                        </div>
+                      </header>
+                  
+                      {/* Center Content */}
+                      <div className="flex-1 flex items-center justify-center px-4">
+                  
+                        <Card className="w-full max-w-md p-8 rounded-2xl shadow-xl border border-border bg-card text-card-foreground space-y-6">
+                  
+                          {/* Title Section */}
+                          <div className="text-center space-y-2">
+                            <h2 className="text-2xl font-semibold">
+                              Create Account
+                            </h2>
+                            <p className="text-sm text-muted-foreground">
+                              Sign up your firm and start upgrading your workflow
+                            </p>
+                          </div>
+                  
+                          {/* Form */}
+                          <form onSubmit={handleSubmit} className="space-y-5">
+                  
+                            {/* Email Field */}
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium text-foreground">
+                                Email
+                              </label>
+                  
+                              <Input
+                                type="email"
+                                name="email"
+                                placeholder="Enter your email"
+                                value={inpval.email}
+                                onChange={setVal}
+                                className="bg-background focus-visible:ring-2 focus-visible:ring-primary"
+                              />
+                            </div>
+                  
+                            {/* Terms */}
+                            <div className="flex items-center space-x-2">
+                              <input
+                                type="checkbox"
+                                id="terms"
+                                checked={isChecked}
+                                onChange={setValbox}
+                                className="h-4 w-4 border-border accent-primary"
+                              />
+                              <label
+                                htmlFor="terms"
+                                className="text-sm text-muted-foreground"
+                              >
+                                I agree to the terms and conditions
+                              </label>
+                            </div>
+                  
+                            {/* Button */}
+                            <Button
+                              type="submit"
+                              onClick={createAccount}
+                              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition"
+                            >
+                              Create Account
+                            </Button>
+                  
+                            {/* Sign In Link */}
+                            <p className="text-sm text-center text-muted-foreground">
+                              Already have an account?{" "}
+                              <NavLink
+                                to="/"
+                                className="text-primary font-medium hover:underline"
+                              >
+                                Sign in
+                              </NavLink>
+                            </p>
+                  
+                          </form>
+                        </Card>
+                      </div>
+                    </div>
+                  );
 
             // code confirmation 
             case 2:
                 return (
-                    <>
-                        <Box className=" col-12 ">
-                            <Box className="top-header col-12" style={{ display: "flex" }}>
-                                <Box className="col-4" style={{ margin: "20px" }}>
-                                    <img style={{ width: "30px" }} src={logo} alt="" />
-                                    <b>PMS Solutions</b>
-                                </Box>
-
-                            </Box>
-                            <Box sx={{backgroundColor: '#f0f0f0',height: '89vh',display:'flex',alignItems:'center',justifyContent:'center'}}> 
-
-                            <Paper elevation={3} sx={{ padding: 4, width: '500px', textAlign: 'center', borderRadius: '10px' }}>
-                                    <Typography variant="h4" component="h2" gutterBottom>
-                                        Confirmation Code
-                                    </Typography>
-
-                                    <Typography sx={{ margin: '3px 0' }}>
-                                        We sent a confirmation code to your email: <b>{inpval.email}</b>
-                                    </Typography>
-
-                                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 2 }}>
-                                        <BorderColorIcon />
-                                    </Box>
-
-                                    <Typography sx={{ fontSize: '14px', margin: '3px 0' }}>
-                                        Please, enter it below:
-                                    </Typography>
-
-                                    <Box sx={{ mt: 2, mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <OtpInput
-                                            value={otp}
-                                            onChange={setOtp}
-                                            numInputs={6}
-                                            renderInput={(props) => (
-                                                <input
-                                                    {...props}
-                                                    style={{
-                                                        width: '40px',
-                                                        height: '60px',
-                                                        fontSize: '42px',
-                                                        fontFamily: 'Arial, sans-serif',
-                                                        margin: '10px',
-                                                        textAlign: 'center',
-
-                                                    }}
-                                                />
-                                            )}
-                                        />
-                                    </Box>
-
-                                    <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 4 }}>
-                                        <Typography variant="body"> <strong>Didn't receive it? </strong></Typography>
-                                        <Button variant="contained" className="btn1" onClick={resensotp}>
-                                            Resend code
-                                        </Button>
-                                    </Box>
-
-                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '40px' }}>
-                                        <Button variant="contained" className="btn1" onClick={handleClearOtp}>
-                                            Clear OTP
-                                        </Button>
-                                        <Button variant="contained" className="btn1" onClick={sendOtpVerify}>
-                                            Verify
-                                        </Button>
-                                    </Box>
-                                </Paper>
-
-                            </Box>
-                            {/* <Box
-                                sx={{
-                                    height: '100vh',
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    backgroundColor: '#f0f0f0',
-
-                                }}
+                    <div className="min-h-screen bg-background flex flex-col">
+                  
+                      {/* Header */}
+                      <header className="w-full px-6 py-4 border-b border-border bg-background">
+                        <div className="flex items-center gap-2">
+                          <img src={logo} alt="Logo" className="w-8" />
+                          <span className="font-semibold text-lg text-foreground">
+                            PMS Solutions
+                          </span>
+                        </div>
+                      </header>
+                  
+                      {/* Center Content */}
+                      <div className="flex-1 flex items-center justify-center px-4">
+                  
+                        <Card className="w-full max-w-md p-8 rounded-2xl shadow-xl border border-border bg-card text-card-foreground space-y-6">
+                  
+                          {/* Title */}
+                          <div className="space-y-2 text-center">
+                            <h2 className="text-2xl font-semibold">
+                              Confirmation Code
+                            </h2>
+                  
+                            <p className="text-sm text-muted-foreground">
+                              We sent a confirmation code to:
+                            </p>
+                  
+                            <p className="text-sm font-medium text-foreground break-all">
+                              {inpval.email}
+                            </p>
+                  
+                            <p className="text-sm text-muted-foreground">
+                              Please enter it below
+                            </p>
+                          </div>
+                  
+                          {/* OTP Inputs */}
+                          <div className="flex justify-center gap-3 pt-2">
+                            <OtpInput
+                              value={otp}
+                              onChange={setOtp}
+                              numInputs={6}
+                              renderInput={(props) => (
+                                <input
+                                  {...props}
+                                  className="
+                                    w-15 h-14
+                                    text-xl
+                                    text-center
+                                    rounded-md
+                                    border border-border
+                                    bg-background
+                                    focus:outline-none
+                                    focus:ring-2
+                                    focus:ring-primary
+                                    transition
+                                  "
+                                />
+                              )}
+                            />
+                          </div>
+                  
+                          {/* Resend */}
+                          <div className="text-center text-sm">
+                            <span className="text-muted-foreground">
+                              Didn't receive it?
+                            </span>{" "}
+                            <button
+                              onClick={resensotp}
+                              className="text-primary font-medium hover:underline"
                             >
-                                <Paper elevation={3} sx={{ padding: 4, width: '500px', textAlign: 'center', borderRadius: '10px' }}>
-                                    <Typography variant="h4" component="h2" gutterBottom>
-                                        Confirmation Code
-                                    </Typography>
-
-                                    <Typography sx={{ margin: '3px 0' }}>
-                                        We sent a confirmation code to your email: <b>{inpval.email}</b>
-                                    </Typography>
-
-                                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 2 }}>
-                                        <BorderColorIcon />
-                                    </Box>
-
-                                    <Typography sx={{ fontSize: '14px', margin: '3px 0' }}>
-                                        Please, enter it below:
-                                    </Typography>
-
-                                    <Box sx={{ mt: 2, mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <OtpInput
-                                            value={otp}
-                                            onChange={setOtp}
-                                            numInputs={6}
-                                            renderInput={(props) => (
-                                                <input
-                                                    {...props}
-                                                    style={{
-                                                        width: '40px',
-                                                        height: '60px',
-                                                        fontSize: '42px',
-                                                        fontFamily: 'Arial, sans-serif',
-                                                        margin: '10px',
-                                                        textAlign: 'center',
-
-                                                    }}
-                                                />
-                                            )}
-                                        />
-                                    </Box>
-
-                                    <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 4 }}>
-                                        <Typography variant="body"> <strong>Didn't receive it? </strong></Typography>
-                                        <Button variant="contained" className="btn1" onClick={resensotp}>
-                                            Resend code
-                                        </Button>
-                                    </Box>
-
-                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '40px' }}>
-                                        <Button variant="contained" className="btn1" onClick={handleClearOtp}>
-                                            Clear OTP
-                                        </Button>
-                                        <Button variant="contained" className="btn1" onClick={sendOtpVerify}>
-                                            Verify
-                                        </Button>
-                                    </Box>
-                                </Paper>
-                            </Box> */}
-
-                        </Box>
-                    </>
-                );
+                              Resend code
+                            </button>
+                          </div>
+                  
+                          {/* Actions */}
+                          <div className="flex gap-4 pt-2">
+                            <Button
+                              variant="outline"
+                              className="flex-1"
+                              onClick={handleClearOtp}
+                            >
+                              Clear OTP
+                            </Button>
+                  
+                            <Button
+                              className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
+                              onClick={sendOtpVerify}
+                            >
+                              Verify
+                            </Button>
+                          </div>
+                  
+                        </Card>
+                      </div>
+                    </div>
+                  );
             //!================================================================================================================================================================
             case 3:
                 return (
-                    <>
-                        <Box className=" col-12  ">
-                            <Box className="top-header col-12" style={{ display: "flex" }}>
-                                <Box className="col-4" style={{ margin: "20px" }}>
-                                    <img style={{ width: "30px" }} src={logo} alt="" />
-                                    <b>PMS Solutions</b>
-                                </Box>
-
-                                {/* <Box sx={{ width: '85%' }}>
-                                    <Stepper activeStep={currentStep} alternativeLabel>
-                                        {steps.map((label) => (
-                                            <Step key={label}>
-                                                <StepLabel>{label}</StepLabel>
-                                            </Step>
-                                        ))}
-                                    </Stepper>
-                                </Box>  */}
-                            </Box>
-                        </Box>
-                         
-
-
-                        <Box
-                            backgroundColor={'#f0f0f0'}
-                            height={'89vh'}
-                            display="flex"
-                            alignItems="center"
-                            justifyContent="center"
-
-                        >
-                            <Paper
-                                elevation={3}
-                                sx={{
-                                    padding: 4,
-                                    width: '500px',
-                                    margin: 'auto',
-                                }}
+                    <div className="min-h-screen bg-background flex flex-col">
+                  
+                      {/* Header */}
+                      <header className="w-full px-6 py-4 border-b border-border bg-background">
+                        <div className="flex items-center gap-2">
+                          <img src={logo} alt="Logo" className="w-8" />
+                          <span className="font-semibold text-lg text-foreground">
+                            PMS Solutions
+                          </span>
+                        </div>
+                      </header>
+                  
+                      {/* Center Content */}
+                      <div className="flex-1 flex items-center justify-center px-4">
+                  
+                        <Card className="w-full max-w-md p-8 rounded-2xl shadow-xl border border-border bg-card text-card-foreground space-y-6">
+                  
+                          {/* Title */}
+                          <div className="text-center space-y-2">
+                            <h2 className="text-2xl font-semibold">
+                              Your Information
+                            </h2>
+                            <p className="text-sm text-muted-foreground">
+                              Tell us a bit about yourself
+                            </p>
+                          </div>
+                  
+                          <form className="space-y-5">
+                  
+                            {/* First Name */}
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium text-foreground">
+                                First Name
+                              </label>
+                              <Input
+                                name="First Name"
+                                placeholder="First Name"
+                                value={firstname}
+                                onChange={(e) => setFirstname(e.target.value)}
+                                className="bg-background focus-visible:ring-2 focus-visible:ring-primary"
+                              />
+                            </div>
+                  
+                            {/* Last Name */}
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium text-foreground">
+                                Last Name
+                              </label>
+                              <Input
+                                name="Last Name"
+                                placeholder="Last Name"
+                                value={lastName}
+                                onChange={(e) => setLastName(e.target.value)}
+                                className="bg-background focus-visible:ring-2 focus-visible:ring-primary"
+                              />
+                            </div>
+                  
+                            {/* Phone Number */}
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium text-foreground">
+                                Phone Number
+                              </label>
+                  
+                              <div className="rounded-md border border-border bg-background focus-within:ring-2 focus-within:ring-primary transition">
+                                <PhoneInput
+                                  country={"us"}
+                                  placeholder="Enter phone number"
+                                  value={phoneNumber}
+                                  onChange={(value) => {
+                                    setPhoneNumber(value);
+                                  }}
+                                  countryCodeEditable={false}
+                                  inputStyle={{
+                                    width: "100%",
+                                    border: "none",
+                                    background: "transparent",
+                                  }}
+                                  buttonStyle={{
+                                    border: "none",
+                                    background: "transparent",
+                                  }}
+                                  containerStyle={{
+                                    width: "100%",
+                                  }}
+                                  isValid={(inputNumber, country, countries) => {
+                                    return countries.some((country) => {
+                                      return (
+                                        startsWith(inputNumber, country.dialCode) ||
+                                        startsWith(country.dialCode, inputNumber)
+                                      );
+                                    });
+                                  }}
+                                />
+                              </div>
+                  
+                              {!valid && (
+                                <p className="text-sm text-destructive">
+                                  Please enter a valid phone number.
+                                </p>
+                              )}
+                            </div>
+                  
+                            {/* Button */}
+                            <Button
+                              type="button"
+                              onClick={submitUserinfo}
+                              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition"
                             >
-                                <Box
-                                    sx={{
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                    }}
-                                >
-                                    <Typography variant="h4" gutterBottom>
-                                        Your Information
-                                    </Typography>
-                                    <form>
-                                        <Box>
-                                            <InputLabel sx={{ color: 'black' }}>First Name</InputLabel>
-                                            <TextField
-                                                fullWidth
-                                                name="First Name"
-                                                placeholder="First Name"
-                                                size="small"
-                                                sx={{ mt: 2 }}
-                                                value={firstname} onChange={(e) => setFirstname(e.target.value)}
-                                            />
-                                        </Box>
-                                        <Box>
-                                            <InputLabel sx={{ color: 'black', mt: 2 }}>Last Name</InputLabel>
-                                            <TextField
-                                                fullWidth
-                                                name="Last Name"
-                                                placeholder="Last Name"
-                                                size="small"
-                                                sx={{ mt: 2 }}
-                                                value={lastName} onChange={(e) => setLastName(e.target.value)}
-                                            />
-                                        </Box>
-                                        <Box sx={{ mb: 2, width: '100%' }}>
-                                            <InputLabel sx={{ color: 'black', mt: 2 }}>Phone Number</InputLabel>
-                                            {/* <PhoneInput
-                                                country={'us'}
-                                                value={phoneNumber}
-                                                placeholder="Enter phone number"
-                                                inputStyle={{
-                                                    width: '100%',
-                                                    padding: '10px',
-                                                    borderRadius: '4px',
-                                                    border: '1px solid rgba(0, 0, 0, 0.23)',
-                                                }}
-                                            /> */}
-                                            <PhoneInput
-                                                style={{ width: "450px" }}
-                                                country={"us"}
-                                                placeholder="enter phone number "
-                                                onChange={(value) => {
-                                                    setPhoneNumber(value);
-                                                }}
-                                                countryCodeEditabel={false}
-                                                isValid={(inputNumber, country, countries) => {
-                                                    return countries.some((country) => {
-                                                        return startsWith(inputNumber, country.dialCode) || startsWith(country.dialCode, inputNumber);
-                                                    });
-                                                }}
-                                            />
-                                            {!valid && (
-                                                <Typography color="error" variant="body2">
-                                                    Please enter a valid phone number.
-                                                </Typography>
-                                            )}
-                                        </Box>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                            <Button
-                                                variant="contained"
-                                                color="primary"
-                                                style={{ width: '100px', margin: '10px 0' }}
-                                                onClick={submitUserinfo}
-                                            >
-                                                Next
-                                            </Button>
-                                        </Box>
-                                    </form>
-                                </Box>
-                            </Paper>
-
-                        </Box>
-
-
-                        <br />
-
-
-                    </>
-                );
+                              Next
+                            </Button>
+                  
+                          </form>
+                  
+                        </Card>
+                      </div>    
+                    </div>
+                  );
             //!===============================================================================================================================
             case 4:
                 return (
-                    <>
-                        <Box className="top-header col-12" style={{ display: "flex" }}>
-                            <Box className="col-4" style={{ padding: "20px" }}>
-                                <img style={{ width: "30px" }} src={logo} alt="" />
-                                <b>PMS Solutions</b>
-                            </Box>
-
-                            {/* <Box sx={{ width: '85%' }}>
-                                            <Stepper activeStep={currentStep} alternativeLabel>
-                                                {steps.map((label) => (
-                                                    <Step key={label}>
-                                                        <StepLabel>{label}</StepLabel>
-                                                    </Step>
-                                                ))}
-                                            </Stepper>
-                                        </Box>   */}
-                        </Box>
-                        {/* <Box
-                            backgroundColor={'#f0f0f0'}
-                            height={'100vh'}
-                            display="flex"
-                            alignItems="center"
-                           
-                            
-                            justifyContent="center"
-                        >
-                            <Paper elevation={3} sx={{ padding: 4, width: '550px',height:'430px', border:'2px solid red',mt:5}}>
-                                <Box className="col-12 case4">
-                                    <Box className="container">
-                                        <Typography variant="h3" sx={{ marginBottom: '20px' }}>
-                                            Firm Information
-                                        </Typography>
-                                        <form>
-                                            <Box>
-                                                <InputLabel sx={{ color: 'black' }}>Firm Name</InputLabel>
-                                                <TextField
-                                                    fullWidth
-                                                    name="firm name"
-                                                    placeholder="Enter firm name"
-                                                    size="small"
-                                                    sx={{ mt: 2 }}
-                                                />
-                                            </Box>
-
-                                            <Box className="col-12">
-                                                <Box>
-                                                    <InputLabel sx={{ color: 'black', mt: 2 }}>Country</InputLabel>
-                                                    <Autocomplete
-                                                        sx={{ mt: 2 }}
-                                                        size="small"
-                                                        value={selectedCountryD}
-                                                        onChange={(event, newValue) => {
-                                                            setSelectedCountry(newValue?.label || "");
-                                                            setSelectedCountryD(newValue);
-                                                            setSelectedState(null); // Reset selected state when the country changes
-                                                        }}
-                                                        options={countries}
-                                                        getOptionLabel={(option) => option.label}
-                                                        renderInput={(params) => (
-                                                            <TextField {...params} placeholder="Country" variant="outlined" />
-                                                        )}
-                                                    />
-                                                </Box>
-
-                                                <Box>
-                                                    <InputLabel sx={{ color: 'black', mt: 2 }}>State</InputLabel>
-                                                    <Autocomplete
-                                                        sx={{ mt: 2 }}
-                                                        size="small"
-                                                        value={stateOptions.find((option) => option.value === selectedState)}
-                                                        onChange={(event, newValue) => {
-                                                            setSelectedState(newValue?.label || "");
-                                                        }}
-                                                        options={stateOptions}
-                                                        getOptionLabel={(option) => option.label}
-                                                        renderInput={(params) => (
-                                                            <TextField {...params} placeholder="States" variant="outlined" />
-                                                        )}
-                                                    />
-                                                </Box>
-                                            </Box>
-                                        </form>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mt: 3 }}>
-                                            <Button variant="contained">Next</Button>
-                                        </Box>
-                                    </Box>
-                                </Box>
-                            </Paper>
-                        </Box> */}
-
-                        <Box height={'90vh'} display="flex"
-                            alignItems="center"
-
-                            backgroundColor={'#f0f0f0'}
-                            justifyContent="center">
-
-
-                            <Paper elevation={3} sx={{ padding: 4, width: '550px', height: '430px', }}>
-                                <Box className="col-12 case4">
-                                    <Box className="container">
-                                        <Typography variant="h3" sx={{ marginBottom: '20px' }}>
-                                            Firm Information
-                                        </Typography>
-                                        <form>
-                                            <Box>
-                                                <InputLabel sx={{ color: 'black' }}>Firm Name</InputLabel>
-                                                <TextField
-                                                    fullWidth
-                                                    name="firm name"
-                                                    placeholder="Enter firm name"
-                                                    size="small"
-                                                    sx={{ mt: 2 }}
-                                                    value={value} onChange={(e) => setFirmName(e.target.value)}
-                                                />
-                                            </Box>
-
-                                            <Box className="col-12">
-                                                <Box>
-                                                    <InputLabel sx={{ color: 'black', mt: 2 }}>Country</InputLabel>
-                                                    <Autocomplete
-                                                        sx={{ mt: 2 }}
-                                                        size="small"
-                                                        value={selectedCountryD}
-                                                        onChange={(event, newValue) => {
-                                                            setSelectedCountry(newValue?.label || "");
-                                                            setSelectedCountryD(newValue);
-                                                            setSelectedState(null); // Reset selected state when the country changes
-                                                        }}
-                                                        options={countries}
-                                                        getOptionLabel={(option) => option.label}
-                                                        renderInput={(params) => (
-                                                            <TextField {...params} placeholder="Country" variant="outlined" />
-                                                        )}
-                                                    />
-                                                </Box>
-
-                                                <Box>
-                                                    <InputLabel sx={{ color: 'black', mt: 2 }}>State</InputLabel>
-                                                    <Autocomplete
-                                                        sx={{ mt: 2 }}
-                                                        size="small"
-                                                        value={stateOptions.find((option) => option.value === selectedState)}
-                                                        onChange={(event, newValue) => {
-                                                            setSelectedState(newValue?.label || "");
-                                                        }}
-                                                        options={stateOptions}
-                                                        getOptionLabel={(option) => option.label}
-                                                        renderInput={(params) => (
-                                                            <TextField {...params} placeholder="States" variant="outlined" />
-                                                        )}
-                                                    />
-                                                </Box>
-                                            </Box>
-                                        </form>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mt: 3 }}>
-                                            <Button variant="contained" onClick={submitFerminfo}>Next</Button>
-                                        </Box>
-                                    </Box>
-                                </Box>
-                            </Paper>
-                        </Box>
-                    </>
-                );
+                    <div className="min-h-screen bg-background flex flex-col">
+                  
+                      {/* Header */}
+                      <header className="w-full px-6 py-4 border-b border-border bg-background">
+                        <div className="flex items-center gap-2">
+                          <img src={logo} alt="Logo" className="w-8" />
+                          <span className="font-semibold text-lg text-foreground">
+                            PMS Solutions
+                          </span>
+                        </div>
+                      </header>
+                  
+                      {/* Center Section */}
+                      <div className="flex-1 flex items-center justify-center px-4">
+                  
+                        <Card className="w-full max-w-lg p-8 rounded-2xl shadow-xl border border-border bg-card text-card-foreground space-y-6">
+                  
+                          {/* Title */}
+                          <div className="text-center space-y-1">
+                            <h2 className="text-2xl font-semibold">
+                              Firm Information
+                            </h2>
+                            <p className="text-sm text-muted-foreground">
+                              Tell us about your firm
+                            </p>
+                          </div>
+                  
+                          <form className="space-y-6">
+                  
+                            {/* Firm Name */}
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium">
+                                Firm Name
+                              </label>
+                              <Input
+                                name="firm name"
+                                placeholder="Enter firm name"
+                                value={value}
+                                onChange={(e) => setFirmName(e.target.value)}
+                                className="bg-background focus-visible:ring-2 focus-visible:ring-primary"
+                              />
+                            </div>
+                  
+                            {/* Country */}
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium">
+                                Country
+                              </label>
+                  
+                              <Select
+                                value={selectedCountryD?.label || ""}
+                                onValueChange={(value) => {
+                                  const selected = countries.find(c => c.label === value)
+                                  setSelectedCountry(value)
+                                  setSelectedCountryD(selected)
+                                  setSelectedState(null)
+                                }}
+                              >
+                                <SelectTrigger className="w-full">
+                                  <SelectValue placeholder="Select country" />
+                                </SelectTrigger>
+                  
+                                <SelectContent className="max-h-60">
+                                  {countries.map((country) => (
+                                    <SelectItem
+                                      key={country.label}
+                                      value={country.label}
+                                    >
+                                      {country.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                  
+                            {/* State */}
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium">
+                                State
+                              </label>
+                  
+                              <Select
+                                value={selectedState || ""}
+                                onValueChange={(value) => {
+                                  setSelectedState(value)
+                                }}
+                              >
+                                <SelectTrigger className="w-full">
+                                  <SelectValue placeholder="Select state" />
+                                </SelectTrigger>
+                  
+                                <SelectContent className="max-h-60">
+                                  {stateOptions.map((state) => (
+                                    <SelectItem
+                                      key={state.value}
+                                      value={state.label}
+                                    >
+                                      {state.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                  
+                            {/* Button */}
+                            <Button
+                              type="button"
+                              onClick={submitFerminfo}
+                              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition"
+                            >
+                              Next
+                            </Button>
+                  
+                          </form>
+                  
+                        </Card>
+                      </div>
+                    </div>
+                  )
             //!===============================================================================================================================
 
             case 5:
                 return (
-                    <>
-                        <Box className="top-header col-12" style={{ display: "flex" }}>
-                            <Box className="col-4" style={{ margin: "20px" }}>
-                                <img style={{ width: "30px" }} src={logo} alt="" />
-                                <b>PMS Solutions</b>
-                            </Box>
-
-                            {/* <Box sx={{ width: '85%' }}>
-                                    <Stepper activeStep={currentStep} alternativeLabel>
-                                        {steps.map((label) => (
-                                            <Step key={label}>
-                                                <StepLabel>{label}</StepLabel>
-                                            </Step>
-                                        ))}
-                                    </Stepper>
-                                </Box>  */}
-                        </Box>
-
-                        <Box
-                            backgroundColor={'#f0f0f0'}
-                            height={'100vh'}
-                            display="flex"
-                            alignItems="center"
-                            justifyContent="center"
-
-                        >
-                            <Box className="case5">
-                                <Box className=" col-12 case5"></Box>
-
-                                <Box className=" col-12 selectbar  " style={{ margin: " 5% 20%" }}>
-                                    <Box style={{ textAlign: "center", marginBottom: "10px", alignItems: "center", justifyContent: "center" }}>Selected Value: {fixedValues[sliderValue]}</Box>
-                                    <Box style={{ marginLeft: "20px", display: "flex", justifyContent: "space-between" }}>
-                                        {fixedValues.map((value, index) => (
-                                            <Box key={index}>{value}</Box>
-                                        ))}
-                                    </Box>
-                                    <Box style={{ marginBottom: "20px" }}>
-                                        <input type="range" min="0" max={fixedValues.length - 1} step="1" value={sliderValue} onChange={handleSliderChange} style={{ width: "100%", justifyContent: "center" }} />
-                                    </Box>
-                                </Box>
-                                <Box className=" col-12">
-                                    <hr className="hr" />
-                                    {sliderValue === 0 && (
-                                        <p className="p" style={{ color: "black", marginLeft: "19%" }}>
-                                            Please select company size
-                                        </p>
-                                    )}
-                                </Box>
-                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', ml: 15 }}>
-
-
-                                    <Box >
-                                        <Box className="container selection">
-                                            <h2 style={{ marginLeft: "3%" }}>How did you hear about PMS Solutions? </h2>
-
-
-                                            <Box>
-                                                {colors.map((color, index) => (
-                                                    <Button variant="contained" key={value} value={colors[selectedButton]} className={`slider-toggle-button ${buttonStates[index] ? "active" : ""}`} onClick={() => handleToggle(index)} style={{ margin: "10px 17px" }}>
-                                                        {color}
-                                                    </Button>
-                                                ))}
-                                                <Box style={{ marginTop: "10px" }}>{selectedButton !== null && <p>Sorce Of Information :<bold>{colors[selectedButton]}</bold>  </p>}</Box>
-                                            </Box>
-
-
-
-                                        </Box>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mt: 7 }}>
-                                            <Button variant="contained" className="btn1" onClick={submitFirmDetail}>
-                                                Next
-                                            </Button>
-                                        </Box>
-                                    </Box>
-                                </Box>
-                            </Box>
-                        </Box>
-
-                    </>
-                );
+                    <div className="min-h-screen bg-background flex flex-col">
+                  
+                      {/* Header */}
+                      <header className="w-full px-6 py-4 border-b border-border bg-background">
+                        <div className="flex items-center gap-2">
+                          <img src={logo} alt="Logo" className="w-8" />
+                          <span className="font-semibold text-lg text-foreground">
+                            PMS Solutions
+                          </span>
+                        </div>
+                      </header>
+                  
+                      {/* Center Content */}
+                      <div className="flex-1 flex items-center justify-center px-4">
+                  
+                        <Card className="w-full max-w-xl p-8 rounded-2xl shadow-xl border border-border bg-card text-card-foreground space-y-8">
+                  
+                          {/* ===== FIRM SIZE ===== */}
+                          <div className="space-y-4">
+                  
+                            <div className="text-center space-y-1">
+                              <h2 className="text-2xl font-semibold">
+                                Firm Size
+                              </h2>
+                              <p className="text-sm text-muted-foreground">
+                                Selected: {fixedValues[sliderValue]}
+                              </p>
+                            </div>
+                  
+                            {/* Labels */}
+                            <div className="flex justify-between text-sm text-muted-foreground px-1">
+                              {fixedValues.map((value, index) => (
+                                <span key={index}>{value}</span>
+                              ))}
+                            </div>
+                  
+                            {/* Slider */}
+                            <input
+                              type="range"
+                              min="0"
+                              max={fixedValues.length - 1}
+                              step="1"
+                              value={sliderValue}
+                              onChange={handleSliderChange}
+                              className="
+                                w-full
+                                accent-primary
+                                cursor-pointer
+                              "
+                            />
+                  
+                            {sliderValue === 0 && (
+                              <p className="text-sm text-destructive text-center">
+                                Please select company size
+                              </p>
+                            )}
+                          </div>
+                  
+                          {/* Divider */}
+                          <div className="border-t border-border pt-6 space-y-4">
+                  
+                            <h3 className="text-lg font-semibold text-center">
+                              How did you hear about PMS Solutions?
+                            </h3>
+                  
+                            {/* Selection Buttons */}
+                            <div className="flex flex-wrap justify-center gap-3">
+                  
+                              {colors.map((color, index) => (
+                                <Button
+                                  key={index}
+                                  type="button"
+                                  onClick={() => handleToggle(index)}
+                                  className={`
+                                    ${
+                                      buttonStates[index]
+                                        ? "bg-primary text-primary-foreground"
+                                        : "bg-muted text-foreground hover:bg-muted/70"
+                                    }
+                                    transition
+                                  `}
+                                >
+                                  {color}
+                                </Button>
+                              ))}
+                  
+                            </div>
+                  
+                            {/* Selected Source */}
+                            {selectedButton !== null && (
+                              <p className="text-sm text-center text-muted-foreground pt-2">
+                                Source of Information:{" "}
+                                <span className="font-medium text-foreground">
+                                  {colors[selectedButton]}
+                                </span>
+                              </p>
+                            )}
+                  
+                          </div>
+                  
+                          {/* Next Button */}
+                          <Button
+                            type="button"
+                            onClick={submitFirmDetail}
+                            className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition"
+                          >
+                            Next
+                          </Button>
+                  
+                        </Card>
+                  
+                      </div>
+                    </div>
+                  );
             //!===============================================================================================================        
             case 6:
                 return (
-                    <>
-                        <Box className="top-header col-12" style={{ display: "flex" }}>
-                            <Box className="col-4" style={{ margin: "20px" }}>
-                                <img style={{ width: "30px" }} src={logo} alt="" />
-                                <b>PMS Solutions</b>
-                            </Box>
-
-                            {/* <Box sx={{ width: '85%' }}>
-                                    <Stepper activeStep={currentStep} alternativeLabel>
-                                        {steps.map((label) => (
-                                            <Step key={label}>
-                                                <StepLabel>{label}</StepLabel>
-                                            </Step>
-                                        ))}
-                                    </Stepper>
-                                </Box>  */}
-                        </Box>
-                        <Box className="col-12"></Box>
-
-                        <Box className=" col-12 case6">
-                            <Box className="container" style={{ padding: "6%", margin: "5% 20%" }}>
-                                <h2>Services your firm offers</h2>
-                                <Box style={{ margin: "20px 0" }}>
-                                    <Grid container spacing={2} >
-                                        <Grid item xs={4}>
-                                            <Button
-                                                variant="contained"
-                                                onClick={() => handleButtonClick2("TaxPreparation")}
-                                                style={{
-                                                    backgroundColor: buttonStates2.TaxPreparation ? "#043a77" : "",
-                                                    width: '100%',
-                                                    margin: "5px 0 "
-                                                }}
-                                            >
-                                                Tax Preparation
-                                            </Button>
-                                        </Grid>
-                                        <Grid item xs={4} sx={{ display: 'flex', gap: 3 }}>
-                                            <Button
-                                                variant="contained"
-                                                onClick={() => handleButtonClick2("TaxPlanning")}
-                                                style={{
-                                                    backgroundColor: buttonStates2.TaxPlanning ? "#043a77" : "",
-                                                    width: '100%',
-                                                    margin: "5px",
-                                                    padding: '5px'
-                                                }}
-                                            >
-                                                Tax Planning
-                                            </Button>
-                                        </Grid>
-                                        <Grid item xs={4}>
-                                            <Button
-                                                variant="contained"
-                                                className="btn1"
-                                                onClick={() => handleButtonClick2("Advisory")}
-                                                style={{
-                                                    backgroundColor: buttonStates2.Advisory ? "#043a77" : "",
-                                                    width: '100%',
-                                                    margin: "5px 0"
-                                                }}
-                                            >
-                                                Advisory
-                                            </Button>
-                                        </Grid>
-                                        {/* Repeat for the rest of the buttons */}
-                                        <Grid item xs={4}>
-                                            <Button
-                                                variant="contained"
-                                                onClick={() => handleButtonClick2("Resolution")}
-                                                style={{
-                                                    backgroundColor: buttonStates2.Resolution ? "#043a77" : "",
-                                                    width: '100%',
-                                                    margin: "5px 0"
-                                                }}
-                                            >
-                                                Resolution
-                                            </Button>
-                                        </Grid>
-                                        <Grid item xs={4} sx={{ display: 'flex', gap: 3 }}>
-                                            <Button
-                                                variant="contained"
-                                                onClick={() => handleButtonClick2("Payroll")}
-                                                style={{
-                                                    backgroundColor: buttonStates2.Payroll ? "#043a77" : "",
-                                                    width: '100%',
-                                                    margin: "5px",
-                                                    padding: '5px'
-                                                }}
-                                            >
-                                                Payroll
-                                            </Button>
-                                        </Grid>
-                                        <Grid item xs={4}>
-                                            <Button
-                                                variant="contained"
-                                                onClick={() => handleButtonClick2("Accounting")}
-                                                style={{
-                                                    backgroundColor: buttonStates2.Accounting ? "#043a77" : "",
-                                                    width: '100%',
-                                                    margin: "5px 0"
-                                                }}
-                                            >
-                                                Accounting
-                                            </Button>
-                                        </Grid>
-                                        <Grid item xs={4}>
-                                            <Button
-                                                variant="contained"
-                                                onClick={() => handleButtonClick2("Audit")}
-                                                style={{
-                                                    backgroundColor: buttonStates2.Audit ? "#043a77" : "",
-                                                    width: '100%',
-                                                    margin: "5px 0"
-                                                }}
-                                            >
-                                                Audit
-                                            </Button>
-                                        </Grid>
-                                        <Grid item xs={4} sx={{ display: 'flex', gap: 3 }}>
-                                            <Button
-                                                variant="contained"
-                                                onClick={() => handleButtonClick2("LawFirm")}
-                                                style={{
-                                                    backgroundColor: buttonStates2.LawFirm ? "#043a77" : "",
-                                                    width: '100%',
-                                                    margin: "5px",
-                                                    padding: '5px'
-                                                }}
-                                            >
-                                                Law Firm
-                                            </Button>
-                                        </Grid>
-                                        <Grid item xs={4}>
-                                            <Button
-                                                variant="contained"
-                                                onClick={() => handleButtonClick2("Bookkeeping")}
-                                                style={{
-                                                    backgroundColor: buttonStates2.Bookkeeping ? "#043a77" : "",
-                                                    width: '100%',
-                                                    margin: "5px 0"
-                                                }}
-                                            >
-                                                Bookkeeping
-                                            </Button>
-                                        </Grid>
-                                        <Grid item xs={4}>
-                                            <Button
-                                                variant="contained"
-                                                onClick={() => handleButtonClick2("Other")}
-                                                style={{
-                                                    backgroundColor: buttonStates2.Other ? "#043a77" : "",
-                                                    width: '100%',
-                                                    margin: "5px 0"
-                                                }}
-                                            >
-                                                Other
-                                            </Button>
-                                        </Grid>
-                                    </Grid>
-                                </Box>
-
-                                <Box>
-                                    <p>{buttonsOn.length > 0 && <p>Services that are Selected: {buttonsOn.join(", ")}</p>}</p>
-                                </Box>
-                                <Box>
-                                    <label>
-                                        <input type="checkbox" onChange={handleSelectAll} style={{ marginLeft: "2%" }} />
-                                        Select All
-                                    </label>
-                                    <Button variant="contained" onClick={submitService} className="btn1" style={{ marginLeft: "20px" }}>
-                                        Next
-                                    </Button>
-                                </Box>
-                            </Box>
-                        </Box>
-
-
-                    </>
-                );
+                    <div className="min-h-screen bg-background flex flex-col">
+                  
+                      {/* Header */}
+                      <header className="w-full px-6 py-4 border-b border-border bg-background">
+                        <div className="flex items-center gap-2">
+                          <img src={logo} alt="Logo" className="w-8" />
+                          <span className="font-semibold text-lg text-foreground">
+                            PMS Solutions
+                          </span>
+                        </div>
+                      </header>
+                  
+                      {/* Center Content */}
+                      <div className="flex-1 flex items-center justify-center px-4 py-10">
+                  
+                        <Card className="w-full max-w-4xl p-8 rounded-2xl shadow-xl border border-border bg-card text-card-foreground">
+                  
+                          {/* Title */}
+                          <div className="text-center mb-8">
+                            <h2 className="text-2xl font-semibold">
+                              Services your firm offers
+                            </h2>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              Select all that apply
+                            </p>
+                          </div>
+                  
+                          {/* Services Grid */}
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  
+                            {[
+                              "TaxPreparation",
+                              "TaxPlanning",
+                              "Advisory",
+                              "Resolution",
+                              "Payroll",
+                              "Accounting",
+                              "Audit",
+                              "LawFirm",
+                              "Bookkeeping",
+                              "Other",
+                            ].map((service) => (
+                              <Button
+                                key={service}
+                                type="button"
+                                onClick={() => handleButtonClick2(service)}
+                                variant={buttonStates2[service] ? "default" : "secondary"}
+                                className="w-full transition-all duration-200"
+                              >
+                                {service.replace(/([A-Z])/g, " $1").trim()}
+                              </Button>
+                            ))}
+                  
+                          </div>
+                  
+                          {/* Selected Services */}
+                          {buttonsOn.length > 0 && (
+                            <div className="mt-6 text-sm text-muted-foreground text-center">
+                              Services Selected:
+                              <span className="ml-2 font-medium text-foreground">
+                                {buttonsOn.join(", ")}
+                              </span>
+                            </div>
+                          )}
+                  
+                          {/* Footer Section */}
+                          <div className="mt-8 flex items-center justify-between">
+                  
+                            <label className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <input
+                                type="checkbox"
+                                onChange={handleSelectAll}
+                                className="h-4 w-4 accent-primary"
+                              />
+                              Select All
+                            </label>
+                  
+                            <Button
+                              type="button"
+                              onClick={submitService}
+                              className="bg-primary text-primary-foreground hover:bg-primary/90 transition"
+                            >
+                              Next
+                            </Button>
+                  
+                          </div>
+                  
+                        </Card>
+                  
+                      </div>
+                    </div>
+                  );
             // !=======================================================================================+================
 
             case 7:
                 return (
-                    <Box>
-                        <Box className="top-header col-12" style={{ display: "flex" }}>
-                            <Box className="col-4" style={{ margin: "20px" }}>
-                                <img style={{ width: "30px" }} src={logo} alt="" />
-                                <b>PMS Solutions</b>
-                            </Box>
-
-                            {/* <Box sx={{ width: '85%' }}>
-                                    <Stepper activeStep={currentStep} alternativeLabel>
-                                        {steps.map((label) => (
-                                            <Step key={label}>
-                                                <StepLabel>{label}</StepLabel>
-                                            </Step>
-                                        ))}
-                                    </Stepper>
-                                </Box>  */}
-                        </Box>
-
-
-                        <Box
-                            backgroundColor={'#f0f0f0'}
-                            height={'100vh'}
-                            display="flex"
-                            alignItems="center"
-                            justifyContent="center"
-
-                        >
-                            <Box className="containerf">
-
-                                <Box className="container selection">
-                                    <h1>Your role in the firm </h1>
-
-                                    <Box>
-                                        <Box>
-                                            <Grid container spacing={1}>
-                                                {colors3.map((color, index) => (
-                                                    <Grid item xs={4} key={index}>
-                                                        <Button
-                                                            variant="contained"
-                                                            className={`case7toggle-button ${buttonStates3[index] ? "active" : ""}`}
-                                                            onClick={() => handleToggle3(index)}
-                                                            style={{ margin: "5px 0 0 0", }}
-                                                        >
-                                                            {color}
-                                                        </Button>
-                                                    </Grid>
-                                                ))}
-                                            </Grid>
-                                            <Box style={{ marginTop: "10px" }}>
-                                                {selectedButton3 !== null && <p>Source Of Information: {colors3[selectedButton3]}</p>}
-                                            </Box>
-                                        </Box>
-                                    </Box>
-                                </Box>{" "}
-                                <Button variant="contained" style={{ marginLeft: "10%" }} onClick={submitRole}>
-                                    Next
-                                </Button>
-                            </Box>
-
-                        
-
-
-
-                        </Box>
-                    </Box>
-
-                );
+                    <div className="min-h-screen bg-background flex flex-col">
+                  
+                      {/* Header */}
+                      <header className="w-full px-6 py-4 border-b border-border bg-background">
+                        <div className="flex items-center gap-2">
+                          <img src={logo} alt="Logo" className="w-8" />
+                          <span className="font-semibold text-lg text-foreground">
+                            PMS Solutions
+                          </span>
+                        </div>
+                      </header>
+                  
+                      {/* Center Content */}
+                      <div className="flex-1 flex items-center justify-center px-4 py-10">
+                  
+                        <Card className="w-full max-w-3xl p-8 rounded-2xl shadow-xl border border-border bg-card text-card-foreground space-y-8">
+                  
+                          {/* Title */}
+                          <div className="text-center space-y-2">
+                            <h1 className="text-2xl font-semibold">
+                              Your role in the firm
+                            </h1>
+                            <p className="text-sm text-muted-foreground">
+                              Select the option that best describes you
+                            </p>
+                          </div>
+                  
+                          {/* Roles Grid */}
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  
+                            {colors3.map((color, index) => (
+                              <Button
+                                key={index}
+                                type="button"
+                                variant={buttonStates3[index] ? "default" : "secondary"}
+                                onClick={() => handleToggle3(index)}
+                                className="w-full transition-all duration-200"
+                              >
+                                {color}
+                              </Button>
+                            ))}
+                  
+                          </div>
+                  
+                          {/* Selected Role */}
+                          {selectedButton3 !== null && (
+                            <div className="text-center text-sm text-muted-foreground">
+                              Selected Role:
+                              <span className="ml-2 font-medium text-foreground">
+                                {colors3[selectedButton3]}
+                              </span>
+                            </div>
+                          )}
+                  
+                          {/* Next Button */}
+                          <div className="flex justify-end pt-4">
+                            <Button
+                              type="button"
+                              onClick={submitRole}
+                              className="bg-primary text-primary-foreground hover:bg-primary/90 transition"
+                            >
+                              Next
+                            </Button>
+                          </div>
+                  
+                        </Card>
+                  
+                      </div>
+                    </div>
+                  );
 
             // !===============================================================
             case 8:
                 return (
-                    <>
-                        <Box className="col-12" style={{ display: "flex" }}>
-                            <Box className="col-4" style={{ margin: "20px" }}>
-                                <img style={{ width: "30px" }} src={logo} alt="" />
-                                <b>PMS Solutions</b>
-                            </Box>
-                            {/* <div className="path col-12" style={{ marginRight: "200px" }}>
-                <MultiStage steps={totalSteps} currentStepForm={2} stageNames={stageNames} />
-              </div> */}
-                        </Box>
-
-                        <Box className=" col-12 case8">
-                            <Box className="container" style={{ marginRight: "10%" }}>
-                                <Box className="firm">
-                                    <h2>Firm Settings</h2>
-
-                                    <Box className="firm-info">
-                                        <Typography variant="body1">
-                                            A powerful, integrated platform <br /> to manage teams, clients, projects.
-                                        </Typography>
-                                        <Typography variant="body1">
-                                            <b>from $50/mo per user</b> <br />
-                                            (with a 3-year subscription plan)
-                                        </Typography>
-                                    </Box>
-
-
-                                    <h3 style={{ marginTop: "20px" }}>Firm Setting</h3>
-
-                                    <p>choose web URL</p>
-                                    <Box style={{ fontSize: "13px" }}>
-                                        <p>You will be ale to set up a fully custom domain(without.pms.com) later</p>
-                                    </Box>
-
-                                    <Box className="url_container">
-                                        <label className="label" id="domin_lable">
-                                            .pms.com
-                                        </label>
-                                        <TextField
-                                            id="url_input"
-                                            size="small"
-                                            value={url}
-                                            onChange={(e) => setUrl(e.target.value)}
-                                            placeholder="Enter your URL"
-                                            fullWidth
-                                            variant="outlined"
-
-
-                                        />
-
-                                    </Box>
-
-                                    <Box className="currency-container">
-                                        <Box className="currency">
-                                            <label>You cannot Change it later</label>
-                                            <br />
-
-                                            <Box>
-                                                <InputLabel>Select Currency: </InputLabel>
-
-                                                <Autocomplete
-                                                    size="small"
-                                                    value={selectedCurrency}
-                                                    onChange={(event, newValue) => handleCurrencyChange(newValue)}
-                                                    options={currencies}
-                                                    getOptionLabel={(option) => option.label || ""}
-                                                    renderInput={(params) => <TextField {...params} placeholder="Select a currency" />}
-                                                />
-
-                                            </Box>
-                                        </Box>
-                                        <br />
-                                        <Box>
-                                            <InputLabel>Select Language: </InputLabel>
-                                            <Autocomplete
-                                                size="small"
-                                                value={selectedLanguage}
-                                                onChange={(event, newValue) => handleLanguageChange(newValue)}
-                                                options={languages}
-                                                getOptionLabel={(option) => option.label || ""}
-                                                renderInput={(params) => <TextField {...params} placeholder="Select a language" />}
-                                            />
-                                            {selectedLanguage && <p>You selected: {selectedLanguage.label}</p>}
-                                        </Box>
-                                    </Box>
-                                    {/* submiturl */}
-                                    <Button variant="contained" onClick={submiturl} style={{ margin: "25px 0" }}>
-                                        Continue
-                                    </Button>
-
-                                </Box>
-                            </Box>
-                            <Box className="image">
-                                <img style={{ height: "400px" }} src={firmsetting} alt="" />
-                            </Box>
-                        </Box>
-                        <br />
-
-
-                    </>
-                );
-
+                    <div className="min-h-screen bg-background flex flex-col">
+                  
+                      {/* Header */}
+                      <header className="w-full px-6 py-4 border-b border-border bg-background">
+                        <div className="flex items-center gap-2">
+                          <img src={logo} alt="Logo" className="w-8" />
+                          <span className="font-semibold text-lg text-foreground">
+                            PMS Solutions
+                          </span>
+                        </div>
+                      </header>
+                  
+                      {/* Center Content */}
+                      <div className="flex-1 flex items-center justify-center px-4 py-10">
+                  
+                        <Card className="w-full max-w-2xl p-8 rounded-2xl shadow-xl border border-border bg-card text-card-foreground space-y-8">
+                  
+                          {/* Title */}
+                          <div className="text-center space-y-2">
+                            <h2 className="text-2xl font-semibold">
+                              Firm Settings
+                            </h2>
+                            <p className="text-sm text-muted-foreground">
+                              A powerful, integrated platform to manage teams, clients and projects.
+                            </p>
+                            <p className="text-sm font-medium text-primary">
+                              from $50/mo per user (with a 3-year subscription plan)
+                            </p>
+                          </div>
+                  
+                          {/* URL Section */}
+                          <div className="space-y-2">
+                            <h3 className="text-lg font-semibold">Choose Web URL</h3>
+                            <p className="text-sm text-muted-foreground">
+                              You will be able to set up a fully custom domain later.
+                            </p>
+                  
+                            <div className="flex items-center">
+                              <Input
+                                value={url}
+                                onChange={(e) => setUrl(e.target.value)}
+                                placeholder="Enter your URL"
+                                className="rounded-r-none"
+                              />
+                              <div className="px-4 py-2 border border-l-0 border-border bg-muted text-sm rounded-r-md">
+                                .pms.com
+                              </div>
+                            </div>
+                  
+                            <p className="text-xs text-destructive">
+                              You cannot change this later
+                            </p>
+                          </div>
+                  
+                          {/* Currency + Language */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  
+                            {/* Currency */}
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium">
+                                Select Currency
+                              </label>
+                  
+                              <Select
+                                value={selectedCurrency?.label}
+                                onValueChange={(value) =>
+                                  handleCurrencyChange(
+                                    currencies.find((c) => c.label === value)
+                                  )
+                                }
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select a currency" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {currencies.map((currency) => (
+                                    <SelectItem
+                                      key={currency.label}
+                                      value={currency.label}
+                                    >
+                                      {currency.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                  
+                            {/* Language */}
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium">
+                                Select Language
+                              </label>
+                  
+                              <Select
+                                value={selectedLanguage?.label}
+                                onValueChange={(value) =>
+                                  handleLanguageChange(
+                                    languages.find((l) => l.label === value)
+                                  )
+                                }
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select a language" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {languages.map((language) => (
+                                    <SelectItem
+                                      key={language.label}
+                                      value={language.label}
+                                    >
+                                      {language.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                  
+                              {selectedLanguage && (
+                                <p className="text-xs text-muted-foreground">
+                                  You selected: {selectedLanguage.label}
+                                </p>
+                              )}
+                            </div>
+                  
+                          </div>
+                  
+                          {/* Continue Button */}
+                          <Button
+                            onClick={submiturl}
+                            className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition"
+                          >
+                            Continue
+                          </Button>
+                  
+                        </Card>
+                  
+                      </div>
+                    </div>
+                  );
             //!===========================================================================================================
 
             case 9:
-                return (
-                    <>
-                        <div className="col-12" style={{ display: "flex" }}>
-                            <div className="col-4" style={{ margin: "20px" }}>
-                                <img style={{ width: "30px" }} src={logo} alt="" />
-                                <b>PMS Solutions</b>
-                            </div>
+              return (
+  <div className="min-h-screen bg-background flex flex-col">
 
-                        </div>
-                        <Box
-                            height={'90vh'} display="flex"
-                            alignItems="center"
+    {/* Header */}
+    <header className="w-full px-6 py-4 border-b border-border bg-background">
+      <div className="flex items-center gap-2">
+        <img src={logo} alt="Logo" className="w-8" />
+        <span className="font-semibold text-lg text-foreground">
+          PMS Solutions
+        </span>
+      </div>
+    </header>
 
-                            backgroundColor={'#f0f0f0'}
-                            justifyContent="center">
-                            <Paper elevation={3} sx={{ padding: 4, width: '550px', height: '400px', }}>
-                                <Box>
-                                    <Typography textAlign={'center'} variant="h5">Set Password</Typography>
+    {/* Center Content */}
+    <div className="flex-1 flex items-center justify-center px-4 py-10">
 
-                                    <Box>
-                                        <InputLabel sx={{ color: 'black' }}>Password</InputLabel>
-                                        <FormControl sx={{ mt: 2, width: '100%' }} variant="outlined">
-                                            <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
-                                            <OutlinedInput
-                                                id="outlined-adornment-password"
-                                                type={showPassword ? 'text' : 'password'}
-                                                value={inppass.password}
-                                                name="password"
-                                                onChange={setValP}
-                                                endAdornment={
-                                                    <InputAdornment position="end">
-                                                        <IconButton
-                                                            aria-label="toggle password visibility"
-                                                            onClick={handleClickShowPassword}
-                                                            onMouseDown={handleMouseDownPassword}
-                                                            onMouseUp={handleMouseUpPassword}
-                                                            edge="end"
-                                                        >
-                                                            {showPassword ? <VisibilityOff /> : <Visibility />}
-                                                        </IconButton>
-                                                    </InputAdornment>
-                                                }
-                                                label="Password"
-                                            />
-                                        </FormControl>
-                                    </Box>
+      <Card className="w-full max-w-md p-8 rounded-2xl shadow-xl border border-border bg-card text-card-foreground space-y-8">
 
+        {/* Title */}
+        <div className="text-center space-y-1">
+          <h2 className="text-2xl font-semibold">
+            Set Password
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Secure your account with a strong password
+          </p>
+        </div>
 
-                                    <Box>
-                                        <InputLabel sx={{ color: 'black', mt: 2 }}>Confirm Password</InputLabel>
-                                        <FormControl sx={{ mt: 2, width: '100%' }} variant="outlined">
-                                            <InputLabel htmlFor="outlined-adornment-confirm-password">Confirm Password</InputLabel>
-                                            <OutlinedInput
-                                                id="outlined-adornment-confirm-password"
-                                                type={showConfirmPassword ? 'text' : 'password'}
-                                                value={inppass.cpassword}
-                                                name="cpassword"
-                                                onChange={setValP}
-                                                endAdornment={
-                                                    <InputAdornment position="end">
-                                                        <IconButton
-                                                            aria-label="toggle confirm password visibility"
-                                                            onClick={handleClickShowConfirmPassword}
-                                                            onMouseDown={handleMouseDownPassword}
-                                                            onMouseUp={handleMouseUpPassword}
-                                                            edge="end"
-                                                        >
-                                                            {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-                                                        </IconButton>
-                                                    </InputAdornment>
-                                                }
-                                                label="Confirm Password"
-                                            />
-                                        </FormControl>
-                                    </Box>
+        {/* Password */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium">
+            Password
+          </label>
 
+          <div className="relative">
+            <Input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              value={inppass.password}
+              onChange={setValP}
+              placeholder="Enter password"
+              className="pr-foreground"
+            />
 
-                                    <Box mt={5} display={'flex'} alignItems={'center'} justifyContent={'center'}>
-                                        <Button variant="contained" onClick={submitPassword}> Continue</Button>
-                                    </Box>
+            <button
+              type="button"
+              onClick={handleClickShowPassword}
+              onMouseDown={handleMouseDownPassword}
+              onMouseUp={handleMouseUpPassword}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition"
+            >
+              {showPassword ? <VisibilityOff size={18} /> : <Visibility size={18} />}
+            </button>
+          </div>
+        </div>
 
+        {/* Confirm Password */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium">
+            Confirm Password
+          </label>
 
-                                </Box>
+          <div className="relative">
+            <Input
+              type={showConfirmPassword ? "text" : "password"}
+              name="cpassword"
+              value={inppass.cpassword}
+              onChange={setValP}
+              placeholder="Confirm password"
+              className="pr-10"
+            />
 
-                            </Paper>
-                        </Box>
+            <button
+              type="button"
+              onClick={handleClickShowConfirmPassword}
+              onMouseDown={handleMouseDownPassword}
+              onMouseUp={handleMouseUpPassword}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition"
+            >
+              {showConfirmPassword ? <VisibilityOff size={18} /> : <Visibility size={18} />}
+            </button>
+          </div>
+        </div>
 
+        {/* Continue Button */}
+        <Button
+          onClick={submitPassword}
+          className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition"
+        >
+          Continue
+        </Button>
 
+      </Card>
 
-                    </>
-                );
+    </div>
+  </div>
+);
             default:
                 return null;
         }
@@ -1859,6 +1772,11 @@ console.log(raw)
 
     return (
         <Box>
+            {formError && (
+  <div className="rounded-md border border-destructive bg-destructive/10 px-4 py-3 text-sm text-destructive">
+    {formError}
+  </div>
+)}
             {renderFormFields()}
         </Box>
     );

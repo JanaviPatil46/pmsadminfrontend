@@ -14,6 +14,9 @@ module.exports = {
         border: "hsl(var(--border))",
         muted: "hsl(var(--muted))",
         destructive: "hsl(var(--destructive))",
+        success: "hsl(var(--success))",
+        "success-foreground": "hsl(var(--success-foreground))",
+      
       },
     },
   },

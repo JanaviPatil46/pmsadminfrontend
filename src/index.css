@@ -4,10 +4,10 @@
 
 
 :root {
-  --primary: 210 95% 45%;      /* stronger blue */
+  --primary: 209 60% 49%;      
   --primary-foreground: 0 0% 100%;
 
-  --background: 210 40% 98%;   /* softer clean bg */
+  --background: 210 40% 98%;   
 
   --card: 0 0% 100%;
   --card-foreground: 222 47% 11%;
@@ -17,6 +17,11 @@
 
   --border: 210 25% 85%;
   --destructive: 0 84% 60%;
+
+  
+    --success: 142 71% 48%;
+    --success-foreground: 0 0% 100%;
+
 }
 
 .step-enter {

@@ -1,9 +1,9 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import "./login.css";
 import "react-toastify/dist/ReactToastify.css";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
-import {Menu, Alert, Box, Typography, FormControl, Button, Checkbox, FormControlLabel, IconButton, InputAdornment, InputLabel, Select, MenuItem, OutlinedInput, TextField } from "@mui/material";
+// import {Menu, Alert, Box, Typography, FormControl, Button, Checkbox, FormControlLabel, IconButton, InputAdornment, InputLabel, Select, MenuItem, OutlinedInput, TextField } from "@mui/material";
 import { Grid } from "@mui/material";
 import Cookies from "js-cookie";
 import Visibility from "@mui/icons-material/Visibility";
@@ -20,19 +20,31 @@ import android from "../Images/android.png";
 import apple from "../Images/apple.png";
 import { Link } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import { Card } from "../components/ui/card";
+import { Input } from "../components/ui/input";
+import { Button } from "../components/ui/button";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "../components/ui/select";
+// import { Checkbox } from "../components/ui/checkbox";
+import { Eye, EyeOff } from "lucide-react";
 const Login = () => {
   const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
   const history = useNavigate();
   const [agreeToTerms, setAgreeToTerms] = useState(false);
- const [logoutTimer, setLogoutTimer] = useState(null);
+  const [logoutTimer, setLogoutTimer] = useState(null);
   const [inpval, setInpval] = useState({
     email: "",
     password: "",
     expiryTime: "",
   });
-const [userList, setUserList] = React.useState([]);
+  const [userList, setUserList] = React.useState([]);
   const [selectedUser, setSelectedUser] = React.useState(null);
-   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = React.useState(null);
   const setVal = (e) => {
     const { name, value } = e.target;
 
@@ -70,128 +82,136 @@ const [userList, setUserList] = React.useState([]);
       return;
     }
     if (!agreeToTerms) {
-  toast.error("You must agree to the conditions!");
-  return;
-}
-
-
-
-try {
-  const loginUrl = `${LOGIN_API}/common/login/generatetoken`;
-
-  const loginPayload = {
-    email,
-    password,
-    expiryTime,
-     username:selectedUser.username
-    // Optionally add username if needed: username: selectedUser?.username
-  };
-
-  // Enhanced console logging
-  console.group("Login Payload Details");
-  console.log("Stringified payload:", JSON.stringify(loginPayload));
-  console.log("Email:", email);
-  console.log("Password length:", password?.length);
-  console.log("Expiry time (seconds):", expiryTime);
-  console.groupEnd();
-
-  console.log("Sending request to:", loginUrl);
-
-  const loginResponse = await fetch(loginUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(loginPayload),
-  });
-
-  console.log("Response status:", loginResponse.status);
-
-  const loginResult = await loginResponse.json();
-  console.log("Full response:", loginResult);
-
-  if (loginResult.status === 200) {
-    console.log("Login successful, token received");
-
-    const token = loginResult.result.token;
-    const user = jwtDecode(token);
-    console.log("Decoded user from token:", user);
-
-    // Handle user role
-    function handleUserRole(role) {
-      switch (role) {
-        case "Admin":
-          console.log("User is an Admin.");
-          break;
-        case "TeamMember":
-          console.log("User is a Team Member.");
-          break;
-        case "Client":
-          console.log("User is a Client.");
-          break;
-        default:
-          console.log("Unknown role.");
-          break;
-      }
+      toast.error("You must agree to the conditions!");
+      return;
     }
 
-    handleUserRole(user.role);
+    try {
+      const loginUrl = `${LOGIN_API}/common/login/generatetoken`;
 
-    // Store token
-    localStorage.setItem("usersdatatoken", token);
-    Cookies.set("userToken", token);
+      const loginPayload = {
+        email,
+        password,
+        expiryTime,
+        username: selectedUser.username,
+        // Optionally add username if needed: username: selectedUser?.username
+      };
 
-    // Start token expiry timer
-    startLogoutTimer(expiryTime);
+      // Enhanced console logging
+      console.group("Login Payload Details");
+      console.log("Stringified payload:", JSON.stringify(loginPayload));
+      console.log("Email:", email);
+      console.log("Password length:", password?.length);
+      console.log("Expiry time (seconds):", expiryTime);
+      console.groupEnd();
 
-    // Navigate to home
-    history("/");
+      console.log("Sending request to:", loginUrl);
 
-    // Clear form
-    setInpval({ ...inpval, email: "", password: "" });
-  } else if (loginResult.status === 400) {
-    console.error("Login failed: Invalid email or password.");
-    toast.error("Invalid email or password!");
-  } else {
-    console.error("Login failed with message:", loginResult.message);
-    toast.error("An error occurred. Please try again.");
-  }
-} catch (error) {
-  console.error("Unexpected error during login:", error);
-  toast.error("An error occurred. Please try again.");
-}
+      const loginResponse = await fetch(loginUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(loginPayload),
+      });
 
+      console.log("Response status:", loginResponse.status);
+
+      const loginResult = await loginResponse.json();
+      console.log("Full response:", loginResult);
+
+      if (loginResult.status === 200) {
+        console.log("Login successful, token received");
+
+        const token = loginResult.result.token;
+        const user = jwtDecode(token);
+        console.log("Decoded user from token:", user);
+
+        // Handle user role
+        function handleUserRole(role) {
+          switch (role) {
+            case "Admin":
+              console.log("User is an Admin.");
+              break;
+            case "TeamMember":
+              console.log("User is a Team Member.");
+              break;
+            case "Client":
+              console.log("User is a Client.");
+              break;
+            default:
+              console.log("Unknown role.");
+              break;
+          }
+        }
+
+        handleUserRole(user.role);
+
+        // Store token
+        localStorage.setItem("usersdatatoken", token);
+        Cookies.set("userToken", token);
+
+        // Start token expiry timer
+        startLogoutTimer(expiryTime);
+
+        // Navigate to home
+        history("/");
+
+        // Clear form
+        setInpval({ ...inpval, email: "", password: "" });
+      } else if (loginResult.status === 400) {
+        console.error("Login failed: Invalid email or password.");
+        toast.error("Invalid email or password!");
+      } else {
+        console.error("Login failed with message:", loginResult.message);
+        toast.error("An error occurred. Please try again.");
+      }
+    } catch (error) {
+      console.error("Unexpected error during login:", error);
+      toast.error("An error occurred. Please try again.");
+    }
   };
-const startLogoutTimer = (expiryTime) => {
-  let timeout;
-  switch(expiryTime) {
-    case '1min': timeout = 60 * 1000; break;
-    case '5min': timeout = 5 * 60 * 1000; break;
-    case '30min': timeout = 30 * 60 * 1000; break;
-    case '4hours': timeout = 4 * 60 * 60 * 1000; break;
-    case '8hours': timeout = 8 * 60 * 60 * 1000; break;
-    default: timeout = 30 * 60 * 1000; // default to 30 minutes
-  }
+  const startLogoutTimer = (expiryTime) => {
+    let timeout;
+    switch (expiryTime) {
+      case "1min":
+        timeout = 60 * 1000;
+        break;
+      case "5min":
+        timeout = 5 * 60 * 1000;
+        break;
+      case "30min":
+        timeout = 30 * 60 * 1000;
+        break;
+      case "4hours":
+        timeout = 4 * 60 * 60 * 1000;
+        break;
+      case "8hours":
+        timeout = 8 * 60 * 60 * 1000;
+        break;
+      default:
+        timeout = 30 * 60 * 1000; // default to 30 minutes
+    }
 
-  const timer = setTimeout(() => {
-    // Perform logout actions
-    localStorage.removeItem("usersdatatoken");
-    localStorage.removeItem("teamMemberData");
-    localStorage.removeItem("userRole");
-    Cookies.remove("userToken");
-    history("/login");
-    toast.info("Your session has expired. Please login again.");
-  }, timeout);
+    const timer = setTimeout(() => {
+      // Perform logout actions
+      localStorage.removeItem("usersdatatoken");
+      localStorage.removeItem("teamMemberData");
+      localStorage.removeItem("userRole");
+      Cookies.remove("userToken");
+      history("/login");
+      toast.info("Your session has expired. Please login again.");
+    }, timeout);
 
-  setLogoutTimer(timer);
-};
-
-// Add this useEffect to clear timer on component unmount
-useEffect(() => {
-  return () => {
-    if (logoutTimer) clearTimeout(logoutTimer);
+    setLogoutTimer(timer);
   };
-}, [logoutTimer]);
+
+  // Add this useEffect to clear timer on component unmount
+  useEffect(() => {
+    return () => {
+      if (logoutTimer) clearTimeout(logoutTimer);
+    };
+  }, [logoutTimer]);
   const [showPassword, setShowPassword] = useState(false);
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (event) => {
@@ -201,16 +221,16 @@ useEffect(() => {
     event.preventDefault();
   };
 
-    const handleUserMenuClose = () => {
+  const handleUserMenuClose = () => {
     setAnchorEl(null);
   };
- const handleUserSelect = (user) => {
+  const handleUserSelect = (user) => {
     setSelectedUser(user);
     handleUserMenuClose();
     // You could automatically submit the form here if you want
     // Or just let the user enter the password and then submit
   };
-   const checkEmailForUsers = async (email) => {
+  const checkEmailForUsers = async (email) => {
     if (!email || !email.includes("@")) return;
 
     try {
@@ -223,7 +243,7 @@ useEffect(() => {
       });
 
       const userData = await checkUserResponse.json();
-      
+
       if (userData.user && userData.user.length > 1) {
         setUserList(userData.user);
         return true; // multiple users
@@ -242,212 +262,423 @@ useEffect(() => {
 
   const handleEmailBlur = async () => {
     if (!inpval.email || !inpval.email.includes("@")) return;
-    
+
     const hasMultipleUsers = await checkEmailForUsers(inpval.email);
     if (hasMultipleUsers) {
       // We'll show the dropdown when the user focuses on the password field
     }
   };
 
-  
+  //   return (
+  //     <Grid
+  //       container
+  //       sx={{
+  //         height: "100vh",
+  //       }}
+  //     >
+  //       <Grid item xs={12} md={6} sx={{ width: "50%" }}>
+  //         <Box className="logininfo">
+  //           <Box mt={2} className="login-logo">
+  //             <img src={logo} alt="" style={{ height: "95px" }} />
+  //           </Box>
+
+  //           <h1 className="wbtext">Welcome Back</h1>
+  //           <Box sx={{ margin: "10%", textAlign: "center" }}>
+  //             <Typography variant="p" sx={{ color: "white", mx: 8, textAlign: "center", fontSize: "20px", fontWeight: "400" }}>
+  //               "Welcome to 'SNP Tax & Financials', where tax management meets simplicity. Our advanced software streamlines tax processes for individuals, businesses, and professionals, ensuring accuracy and efficiency. Experience a new era of financial ease with SNP Tax & Financials."
+  //             </Typography>
+  //             {/* <div className="bg-red-500 text-white p-10">
+  //   TAILWIND TEST
+  // </div> */}
+
+  //           </Box>
+
+  //           <Typography variant="p" className="fontchange">
+  //             Please Login to access your account
+  //           </Typography>
+  //           <Box sx={{ position: "fixed", bottom: "10px" }}>
+  //             <Grid container justifyContent="center" spacing={2}>
+  //               {[FacebookIcon, TwitterIcon, InstagramIcon, LinkedInIcon].map((Icon, index) => (
+  //                 <Grid item key={index}>
+  //                   <IconButton color="primary">
+  //                     <Icon sx={{ fontSize: 40, color: "#fff", ml: 3 }} />
+  //                   </IconButton>
+  //                 </Grid>
+  //               ))}
+  //             </Grid>
+  //           </Box>
+  //         </Box>
+  //       </Grid>
+  //       <Grid item xs={12} md={6} sx={{ width: "50%" }}>
+  //         <Box className="logininput">
+  //           <Box className="loginalign">
+  //             <Typography
+  //               variant="h1"
+  //               sx={{
+  //                 color: "black",
+  //                 fontSize: "35px",
+  //                 fontWeight: "700",
+  //                 mb: "20px",
+  //                 textAlign: "center",
+  //                 fontFamily: "sans-serif",
+  //               }}
+  //             >
+  //               Login Account
+  //             </Typography>
+  //             <Typography mb={1}>Email</Typography>
+
+  //             <TextField fullWidth name="email" placeholder="Enter Your Email" size="small" value={inpval.email} onChange={setVal} id="email" sx={{ mb: 1 }}  onBlur={handleEmailBlur} />
+
+  //             {selectedUser && (
+  //               <Typography variant="body2" color="text.secondary">
+  //                 Logging in as: {selectedUser.username}
+  //               </Typography>
+  //             )}
+
+  //             <Menu
+  //               id="user-menu"
+  //               anchorEl={anchorEl}
+  //               open={Boolean(anchorEl)}
+  //               onClose={handleUserMenuClose}
+  //               MenuListProps={{
+  //                 'aria-labelledby': 'user-menu-button',
+  //               }}
+  //             >
+  //               {userList.map((user) => (
+  //                 <MenuItem
+  //                   key={user._id}
+  //                   onClick={() => handleUserSelect(user)}
+  //                   selected={selectedUser && selectedUser._id === user._id}
+  //                 >
+  //                   {user.username}  ({user.role})
+  //                 </MenuItem>
+  //               ))}
+  //             </Menu>
+  //             <Box>
+  //               <Typography mb={1}>Password</Typography>
+
+  //               <TextField
+  //                 fullWidth
+  //                 size="small"
+  //                 variant="outlined"
+  //                 value={inpval.password}
+  //                 onChange={setVal}
+  //                 type={showPassword ? "text" : "password"}
+  //                 name="password"
+  //                 placeholder="Password"
+  //                 InputProps={{
+  //                   endAdornment: (
+  //                     <InputAdornment position="end">
+  //                       <IconButton aria-label="toggle password visibility" onClick={handleClickShowPassword} onMouseDown={handleMouseDownPassword} onMouseUp={handleMouseUpPassword} edge="end">
+  //                         {showPassword ? <VisibilityOff /> : <Visibility />}
+  //                       </IconButton>
+  //                     </InputAdornment>
+  //                   ),
+  //                 }}
+  //               />
+
+  //               <Box sx={{ textAlign: "left", mb: "3%", fontSize: "12px", mt: 1 }}>
+  //                 <Link component={NavLink} to="/forgotpass" sx={{ color: "cornflowerblue", textDecoration: "none" }}>
+  //                   Forgot Password?
+  //                 </Link>
+  //               </Box>
+  //             </Box>
+
+  //             <Box>
+  //               <FormControl fullWidth>
+  //                 <Typography sx={{ color: "black" }}>Stay signed in for</Typography>
+  //                 <Select
+  //                   size="small"
+  //                   margin="normal"
+  //                   value={inpval.expiryTime}
+  //                   onChange={setVal}
+  //                   name="expiryTime"
+  //                   sx={{
+  //                     border: "2px solid rgb(100, 149, 237)",
+  //                     borderRadius: "10px",
+  //                   }}
+  //                 >
+  //                   <MenuItem value="">
+  //                     <em>Select</em>
+  //                   </MenuItem>
+  //                   <MenuItem value="1min">1 minute</MenuItem>
+  //                   <MenuItem value="5min">5 minute</MenuItem>
+  //                   <MenuItem value="30min">30 minutes</MenuItem>
+  //                   <MenuItem value="4hours">4 hours</MenuItem>
+  //                   <MenuItem value="8hours">8 hours</MenuItem>
+  //                 </Select>
+  //               </FormControl>
+  //             </Box>
+
+  //             <Box display="flex" alignItems={"center"}>
+  //               {/* <Checkbox id="terms" /> */}
+  //               <Checkbox
+  //   id="terms"
+  //   checked={agreeToTerms}
+  //   onChange={(e) => setAgreeToTerms(e.target.checked)}
+  // />
+
+  //               <Typography fontSize="14px" color="#696969" component="label" htmlFor="terms">
+  //                 Agree to{" "}
+  //                 <Link href="https://policies.google.com/terms?hl=en-US" color="rgb(58, 145, 245)" underline="none">
+  //                   Conditions
+  //                 </Link>
+  //               </Typography>
+  //             </Box>
+
+  //             <Box mt={2}>
+  //               <Button
+  //                 onClick={loginuser}
+  //                 variant="contained"
+  //                 fullWidth
+  //                 sx={{
+  //                   borderColor: "primary.main",
+  //                   borderWidth: "2px",
+  //                   borderStyle: "solid",
+  //                   fontSize: "15px",
+  //                   fontWeight: "600",
+  //                   borderRadius: "100px",
+  //                   mt: "10px",
+  //                   ":hover": {
+  //                     backgroundColor: "transparent",
+  //                     borderColor: "primary.main",
+  //                     color: "primary.main",
+  //                     boxShadow: "none",
+  //                     borderWidth: "2px",
+  //                     borderStyle: "solid",
+  //                   },
+  //                 }}
+  //               >
+  //                 Login
+  //               </Button>
+  //             </Box>
+
+  //             <p className="donthaveacc">
+  //               Don't have an account?
+  //               <Link to="/signup" className="route-links">
+  //                 Sign Up
+  //               </Link>
+  //             </p>
+  //           </Box>
+  //         </Box>
+  //       </Grid>
+  //     </Grid>
+  //   );
+
   return (
-    <Grid
-      container
-      sx={{
-        height: "100vh",
-      }}
-    >
-      <Grid item xs={12} md={6} sx={{ width: "50%" }}>
-        <Box className="logininfo">
-          <Box mt={2} className="login-logo">
-            <img src={logo} alt="" style={{ height: "95px" }} />
-          </Box>
+    <div className="min-h-screen grid grid-cols-1 md:grid-cols-2 bg-background text-foreground">
+      {/* LEFT PANEL — PREMIUM BRAND */}
+      <div
+        className="
+      hidden md:flex
+      relative
+      items-center justify-center
+      p-16
+      overflow-hidden
+      text-white
+      bg-gradient-to-br
+      from-primary
+      via-primary/90
+      to-primary/70
+    "
+      >
+        {/* Glow Effects */}
+        <div className="absolute -top-32 -left-32 w-[400px] h-[400px] bg-white/10 blur-3xl rounded-full" />
+        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-accent/20 blur-3xl rounded-full" />
 
-          <h1 className="wbtext">Welcome Back</h1>
-          <Box sx={{ margin: "10%", textAlign: "center" }}>
-            <Typography variant="p" sx={{ color: "white", mx: 8, textAlign: "center", fontSize: "20px", fontWeight: "400" }}>
-              "Welcome to 'SNP Tax & Financials', where tax management meets simplicity. Our advanced software streamlines tax processes for individuals, businesses, and professionals, ensuring accuracy and efficiency. Experience a new era of financial ease with SNP Tax & Financials."
-            </Typography>
-            {/* <div className="bg-red-500 text-white p-10">
-  TAILWIND TEST
-</div> */}
+        <div className="relative max-w-md text-center space-y-6">
+          <img src={logo} alt="logo" className="mx-auto h-16 mb-6" />
 
-          </Box>
+          <h1 className="text-4xl font-semibold tracking-tight text-white">
+            PMS Solutions
+          </h1>
 
-          <Typography variant="p" className="fontchange">
-            Please Login to access your account
-          </Typography>
-          <Box sx={{ position: "fixed", bottom: "10px" }}>
-            <Grid container justifyContent="center" spacing={2}>
-              {[FacebookIcon, TwitterIcon, InstagramIcon, LinkedInIcon].map((Icon, index) => (
-                <Grid item key={index}>
-                  <IconButton color="primary">
-                    <Icon sx={{ fontSize: 40, color: "#fff", ml: 3 }} />
-                  </IconButton>
-                </Grid>
-              ))}
-            </Grid>
-          </Box>
-        </Box>
-      </Grid>
-      <Grid item xs={12} md={6} sx={{ width: "50%" }}>
-        <Box className="logininput">
-          <Box className="loginalign">
-            <Typography
-              variant="h1"
-              sx={{
-                color: "black",
-                fontSize: "35px",
-                fontWeight: "700",
-                mb: "20px",
-                textAlign: "center",
-                fontFamily: "sans-serif",
-              }}
-            >
-              Login Account
-            </Typography>
-            <Typography mb={1}>Email</Typography>
+          <p className="text-white/90 text-lg leading-relaxed">
+                   Welcome to SNP Tax & Financials, where tax management meets simplicity. Our advanced software streamlines tax processes for individuals, businesses, and professionals, ensuring accuracy and efficiency. Experience a new era of financial ease with SNP Tax & Financials."
+          </p>
+        </div>
+      </div>
 
-            <TextField fullWidth name="email" placeholder="Enter Your Email" size="small" value={inpval.email} onChange={setVal} id="email" sx={{ mb: 1 }}  onBlur={handleEmailBlur} />
+      {/* RIGHT PANEL */}
+      <div className="flex items-center justify-center px-6 py-12">
+        <div className="w-full max-w-md">
+          <Card
+            className="
+          p-8
+          rounded-2xl
+          shadow-2xl
+          border
+          border-border
+          bg-card
+          text-card-foreground
+          space-y-6
+        "
+          >
+            <div className="text-center space-y-2">
+              <h2 className="text-2xl font-semibold">Login Account</h2>
+              <p className="text-sm text-muted-foreground">
+                Welcome back. Enter your credentials.
+              </p>
+            </div>
 
+            {/* EMAIL */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Email</label>
 
+              <Input
+                name="email"
+                value={inpval.email}
+                onChange={setVal}
+                onBlur={handleEmailBlur}
+                placeholder="Enter your email"
+                className="focus-visible:ring-primary"
+              />
+            </div>
 
-
+            {/* MULTI USER DISPLAY */}
             {selectedUser && (
-              <Typography variant="body2" color="text.secondary">
-                Logging in as: {selectedUser.username} 
-              </Typography>
+              <div className="text-sm text-muted-foreground">
+                Logging in as:{" "}
+                <span className="font-medium text-foreground">
+                  {selectedUser.username}
+                </span>
+              </div>
             )}
 
-            <Menu
-              id="user-menu"
-              anchorEl={anchorEl}
-              open={Boolean(anchorEl)}
-              onClose={handleUserMenuClose}
-              MenuListProps={{
-                'aria-labelledby': 'user-menu-button',
-              }}
-            >
-              {userList.map((user) => (
-                <MenuItem 
-                  key={user._id} 
-                  onClick={() => handleUserSelect(user)}
-                  selected={selectedUser && selectedUser._id === user._id}
-                >
-                  {user.username}  ({user.role})
-                </MenuItem>
-              ))}
-            </Menu>
-            <Box>
-              <Typography mb={1}>Password</Typography>
-
-              <TextField
-                fullWidth
-                size="small"
-                variant="outlined"
-                value={inpval.password}
-                onChange={setVal}
-                type={showPassword ? "text" : "password"}
-                name="password"
-                placeholder="Password"
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton aria-label="toggle password visibility" onClick={handleClickShowPassword} onMouseDown={handleMouseDownPassword} onMouseUp={handleMouseUpPassword} edge="end">
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-
-              <Box sx={{ textAlign: "left", mb: "3%", fontSize: "12px", mt: 1 }}>
-                <Link component={NavLink} to="/forgotpass" sx={{ color: "cornflowerblue", textDecoration: "none" }}>
-                  Forgot Password?
-                </Link>
-              </Box>
-            </Box>
-
-            <Box>
-              <FormControl fullWidth>
-                <Typography sx={{ color: "black" }}>Stay signed in for</Typography>
-                <Select
-                  size="small"
-                  margin="normal"
-                  value={inpval.expiryTime}
-                  onChange={setVal}
-                  name="expiryTime"
-                  sx={{
-                    border: "2px solid rgb(100, 149, 237)",
-                    borderRadius: "10px",
-                  }}
-                >
-                  <MenuItem value="">
-                    <em>Select</em>
-                  </MenuItem>
-                  <MenuItem value="1min">1 minute</MenuItem>
-                  <MenuItem value="5min">5 minute</MenuItem>
-                  <MenuItem value="30min">30 minutes</MenuItem>
-                  <MenuItem value="4hours">4 hours</MenuItem>
-                  <MenuItem value="8hours">8 hours</MenuItem>
-                </Select>
-              </FormControl>
-            </Box>
-
-            <Box display="flex" alignItems={"center"}>
-              {/* <Checkbox id="terms" /> */}
-              <Checkbox
-  id="terms"
-  checked={agreeToTerms}
-  onChange={(e) => setAgreeToTerms(e.target.checked)}
-/>
-
-
-              <Typography fontSize="14px" color="#696969" component="label" htmlFor="terms">
-                Agree to{" "}
-                <Link href="https://policies.google.com/terms?hl=en-US" color="rgb(58, 145, 245)" underline="none">
-                  Conditions
-                </Link>
-              </Typography>
-            </Box>
-
-            <Box mt={2}>
-              <Button
-                onClick={loginuser}
-                variant="contained"
-                fullWidth
-                sx={{
-                  borderColor: "primary.main",
-                  borderWidth: "2px",
-                  borderStyle: "solid",
-                  fontSize: "15px",
-                  fontWeight: "600",
-                  borderRadius: "100px",
-                  mt: "10px",
-                  ":hover": {
-                    backgroundColor: "transparent",
-                    borderColor: "primary.main",
-                    color: "primary.main",
-                    boxShadow: "none",
-                    borderWidth: "2px",
-                    borderStyle: "solid",
-                  },
+            {/* MULTI USER DROPDOWN */}
+            {userList.length > 1 && (
+              <Select
+                onValueChange={(value) => {
+                  const user = userList.find((u) => u._id === value);
+                  handleUserSelect(user);
                 }}
               >
-                Login
-              </Button>
-            </Box>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select account" />
+                </SelectTrigger>
+                <SelectContent>
+                  {userList.map((user) => (
+                    <SelectItem key={user._id} value={user._id}>
+                      {user.username} ({user.role})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
 
-            <p className="donthaveacc">
-              Don't have an account?
-              <Link to="/signup" className="route-links">
+            {/* PASSWORD */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Password</label>
+
+              <div className="relative">
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={inpval.password}
+                  onChange={setVal}
+                  placeholder="Password"
+                  className="pr-10 focus-visible:ring-primary"
+                />
+
+                <button
+                  type="button"
+                  onClick={handleClickShowPassword}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+
+              <div className="text-right">
+                <NavLink
+                  to="/forgotpass"
+                  className="text-sm text-primary hover:underline"
+                >
+                  Forgot Password?
+                </NavLink>
+              </div>
+            </div>
+
+            {/* EXPIRY SELECT */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Stay signed in for</label>
+
+              <Select
+                value={inpval.expiryTime}
+                onValueChange={(value) =>
+                  setVal({ target: { name: "expiryTime", value } })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select duration" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1min">1 minute</SelectItem>
+                  <SelectItem value="5min">5 minutes</SelectItem>
+                  <SelectItem value="30min">30 minutes</SelectItem>
+                  <SelectItem value="4hours">4 hours</SelectItem>
+                  <SelectItem value="8hours">8 hours</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* TERMS */}
+            <div className="flex items-center space-x-2">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={agreeToTerms}
+                  onChange={(e) => setAgreeToTerms(e.target.checked)}
+                  className="
+      h-4 w-4
+      rounded
+      border-border
+      accent-primary
+      focus:ring-primary
+    "
+                />
+                <span className="text-sm text-muted-foreground">
+                  Agree to{" "}
+                  <a
+                    href="https://policies.google.com/terms?hl=en-US"
+                    className="text-primary hover:underline"
+                  >
+                    Terms & Conditions
+                  </a>
+                </span>
+              </label>
+              {/* <span className="text-sm text-muted-foreground">
+                Agree to{" "}
+                <a
+                  href="https://policies.google.com/terms?hl=en-US"
+                  className="text-primary hover:underline"
+                >
+                  Conditions
+                </a>
+              </span> */}
+            </div>
+
+            {/* LOGIN BUTTON */}
+            <Button
+              onClick={loginuser}
+              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
+            >
+              Login
+            </Button>
+
+            <div className="text-center text-sm text-muted-foreground">
+              Don't have an account?{" "}
+              <NavLink
+                to="/signup"
+                className="text-primary font-medium hover:underline"
+              >
                 Sign Up
-              </Link>
-            </p>
-          </Box>
-        </Box>
-      </Grid>
-    </Grid>
+              </NavLink>
+            </div>
+          </Card>
+        </div>
+      </div>
+    </div>
   );
 };
 
