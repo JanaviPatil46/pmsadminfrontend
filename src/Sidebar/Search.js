@@ -43,7 +43,8 @@ const SearchComponent = () => {
   // FINAL UPDATED SEARCH LOGIC
   // -------------------------------
   const handleSearchChange = async (event) => {
-    const query = event.target.value.trim();
+    // const query = event.target.value.trim();
+     const query = event.target.value;
     setSearchQuery(query);
 
     if (!query) {

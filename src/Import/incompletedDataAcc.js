@@ -87,14 +87,14 @@ const paginatedAccounts = filteredAccounts.slice(
 
     toast.success(`Selected ZIP: ${file.name}`);
   };
-
+const [isUploading, setIsUploading] = useState(false);
   // 👉 Upload ZIP
   const handleUpload = async () => {
     if (!selectedZip || !selectedAccount) {
       toast.error("Please select a ZIP file first");
       return;
     }
-
+ setIsUploading(true); // start loading
     const targetFolderPath = `${selectedAccount._id}/${folderName}`;
 console.log("targetFolderPath",targetFolderPath)
     const formData = new FormData();
@@ -117,6 +117,9 @@ formData.append("accountId", selectedAccount._id);
       console.error(err);
       toast.error("Upload failed");
     }
+    finally {
+    setIsUploading(false); // stop loading
+  }
   };
 
   if (loading)
@@ -175,7 +178,7 @@ formData.append("accountId", selectedAccount._id);
                       Select ZIP
                     </Button>
 
-                    <Button
+                    {/* <Button
                       variant="contained"
                       size="small"
                       onClick={handleUpload}
@@ -185,7 +188,20 @@ formData.append("accountId", selectedAccount._id);
                       }
                     >
                       Upload
-                    </Button>
+                    </Button> */}
+
+                    <Button
+  variant="contained"
+  size="small"
+  onClick={handleUpload}
+  disabled={
+    isUploading ||
+    !selectedZip ||
+    selectedAccount?._id !== account._id
+  }
+>
+  {isUploading ? "Processing..." : "Upload"}
+</Button>
                   </Stack>
                 </TableCell>
               </TableRow>

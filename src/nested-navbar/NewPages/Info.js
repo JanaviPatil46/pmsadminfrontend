@@ -541,7 +541,7 @@ const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
                         checked={c.canEmailSync}
                         onChange={() => handleEmailSyncToggle(c)}
                         color="primary"
-                        disabled
+                        // disabled
                       />
                       <MenuDropdown
                         contact={c}

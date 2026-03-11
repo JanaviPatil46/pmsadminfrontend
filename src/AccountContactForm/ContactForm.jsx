@@ -518,8 +518,9 @@ const handleCancelPersonalization = () => {
                 <FormControlLabel
                   control={
                     <Checkbox
-                      checked={contact.emailSync || false}
-                      disabled
+                      // checked={contact.emailSync || false}
+                       checked={true}
+                      // disabled
                       onChange={(e) =>
                         dispatch(
                           updateContactField({

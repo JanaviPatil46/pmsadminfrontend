@@ -1,4 +1,4 @@
-import React, { useState, useEffect,  } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   Typography,
@@ -66,7 +66,7 @@ import {
   FaFileAlt,
 } from "react-icons/fa";
 import { AiFillFileUnknown } from "react-icons/ai";
-
+import * as XLSX from 'xlsx';
 const DOCS_MANAGMENTS = process.env.REACT_APP_CLIENT_DOCS_MANAGE;
 const DocsFolderTree = () => {
   const { data } = useParams();
@@ -84,7 +84,7 @@ const DocsFolderTree = () => {
       setLoading(true);
       try {
         const response = await axios.get(
-          "https://www.snptaxes.com/api/foldertemp/templatelist"
+          "https://www.snptaxes.com/api/foldertemp/templatelist",
         );
         setTemplates(response.data.folderTemplates);
       } catch (err) {
@@ -116,7 +116,7 @@ const DocsFolderTree = () => {
     console.log(raw);
     fetch(
       `https://www.snptaxes.com/api/docManagement/apply-template`,
-      requestOptions
+      requestOptions,
     )
       .then((response) => response.json())
       .then((result) => {
@@ -140,7 +140,7 @@ const DocsFolderTree = () => {
     const fetchAccountDetails = async () => {
       try {
         const res = await fetch(
-          `https://www.snptaxes.com/api/accounts/${accountId}`
+          `https://www.snptaxes.com/api/accounts/${accountId}`,
         );
         const data = await res.json();
         console.log("accounts details", data);
@@ -172,6 +172,9 @@ const DocsFolderTree = () => {
     const [openApprovalDialog, setOpenApprovalDialog] = useState(false);
     const [folderTree, setFolderTree] = useState([]);
     const [selectedItem, setSelectedItem] = useState("");
+    const [token, setToken] = useState("");
+    const [showBuilderFor, setShowBuilderFor] = useState(null);
+    const [openDialog, setOpenDialog] = useState(false);
     // console.log("hgjhg",data)
     const [selectedItems, setSelectedItems] = useState(new Set());
     const [selectAll, setSelectAll] = useState(false);
@@ -189,10 +192,10 @@ const DocsFolderTree = () => {
     const fetchFolderTree = async (accountId) => {
       try {
         const res = await fetch(
-          `https://www.snptaxes.com/api/accountsdoc/files/list?folderPath=${accountId}`
+          `https://www.snptaxes.com/api/accountsdoc/files/list?folderPath=${accountId}`,
         );
         const data = await res.json();
-        console.log("janavi patil", data);
+        console.log("janavi patil", data.contents);
         if (res.ok) {
           setFolderTree(data.contents);
         } else {
@@ -202,6 +205,8 @@ const DocsFolderTree = () => {
         setError("Error fetching folder tree");
       }
     };
+
+  
     const toggleFolder = (path, isReadOnly) => {
       // if (isReadOnly) return;
       setExpandedFolders((prev) => ({
@@ -240,10 +245,7 @@ const DocsFolderTree = () => {
     };
 
     const SIGNATURE_API = process.env.REACT_APP_ESIGNATURE_API;
-    const [token, setToken] = useState("");
-    const [showBuilderFor, setShowBuilderFor] = useState(null);
-    const [openDialog, setOpenDialog] = useState(false);
-   
+
     // Update getAllChildrenPaths to work with item.path
     const getAllChildrenPaths = (item) => {
       const paths = [item.path];
@@ -287,7 +289,7 @@ const DocsFolderTree = () => {
     const isFolderPartiallySelected = (item) => {
       const allChildPaths = getAllChildrenPaths(item);
       const selectedCount = allChildPaths.filter((path) =>
-        selectedItems.has(path)
+        selectedItems.has(path),
       ).length;
       return selectedCount > 0 && selectedCount < allChildPaths.length;
     };
@@ -311,23 +313,23 @@ const DocsFolderTree = () => {
       setSelectAll(!selectAll);
     };
     const [emails, setEmails] = useState([]);
-     useEffect(() => {
-    const fetchEmails = async () => {
-      try {
-        const res = await axios.get(
-          `https://snptaxes.com/api/accounts/contacts-emails/${accountId}`
-        );
-        setEmails(res.data.emails);
-        console.log("Fetched emails:", res.data.emails);
-      } catch (err) {
-        console.error("Error fetching emails:", err);
-      }
-    };
+    useEffect(() => {
+      const fetchEmails = async () => {
+        try {
+          const res = await axios.get(
+            `https://snptaxes.com/api/accounts/contacts-emails/${accountId}`,
+          );
+          setEmails(res.data.emails);
+          console.log("Fetched emails:", res.data.emails);
+        } catch (err) {
+          console.error("Error fetching emails:", err);
+        }
+      };
 
-    if (accountId) {
-      fetchEmails();
-    }
-  }, [accountId]);
+      if (accountId) {
+        fetchEmails();
+      }
+    }, [accountId]);
     // Toggle signature and request token
     const toggleSignStatus = async (item) => {
       try {
@@ -337,7 +339,7 @@ const DocsFolderTree = () => {
         const fileUrl = `https://snptaxes.com/uploads/accounts/${item.path}`;
         const fileName = item.name;
         const res = await fetch(
-          `${SIGNATURE_API}/api/generate-token?url=${encodeURIComponent(fileUrl)}&name=${encodeURIComponent(fileName)}&accountId=${accountId}`
+          `${SIGNATURE_API}/api/generate-token?url=${encodeURIComponent(fileUrl)}&name=${encodeURIComponent(fileName)}&accountId=${accountId}`,
         );
         const data = await res.json();
         console.log("token data", data);
@@ -357,7 +359,7 @@ const DocsFolderTree = () => {
               folder: item.meta.folder, // EXACT value from meta file
               name: item.meta.name, // "1.5MB.pdf"
             },
-          }
+          },
         );
 
         alert("Signature request cancelled.");
@@ -403,7 +405,7 @@ const DocsFolderTree = () => {
               filePath: item.path,
               action: "cancel",
             }),
-          }
+          },
         );
 
         if (!res.ok) throw new Error("Cancel failed");
@@ -449,7 +451,7 @@ const DocsFolderTree = () => {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
-          }
+          },
         );
 
         const result = await res.json();
@@ -476,7 +478,7 @@ const DocsFolderTree = () => {
       statusType,
       newValue,
       approvalId = null,
-      esignRequestId = null
+      esignRequestId = null,
     ) => {
       try {
         if (!item?.path) return alert("Invalid item selected");
@@ -496,7 +498,7 @@ const DocsFolderTree = () => {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(body),
-          }
+          },
         );
 
         const data = await res.json();
@@ -522,7 +524,7 @@ const DocsFolderTree = () => {
     const fetchInvoices = async () => {
       try {
         const response = await fetch(
-          `https://www.snptaxes.com/workflow/invoices/invoice/pending/invoicelistby/accountid/${accountId}`
+          `https://www.snptaxes.com/workflow/invoices/invoice/pending/invoicelistby/accountid/${accountId}`,
         );
         const data = await response.json();
         setInvoiceList(data.invoice || []);
@@ -549,7 +551,7 @@ const DocsFolderTree = () => {
             filePath: selectedDoc.path,
             invoiceIds,
             action: "lock",
-          }
+          },
         );
 
         toast.success("Invoice locked successfully");
@@ -562,7 +564,6 @@ const DocsFolderTree = () => {
       }
     };
 
-    
     const toggleInvoiceLock = async (item) => {
       const filePath = item.path;
       const invoiceIds = item.meta?.invoiceLock || [];
@@ -582,7 +583,7 @@ const DocsFolderTree = () => {
               filePath,
               invoiceIds,
               action: "unlock",
-            }
+            },
           );
 
           toast.success("Invoice unlocked");
@@ -598,7 +599,7 @@ const DocsFolderTree = () => {
       try {
         // 🔹 Check pending invoices first
         const res = await fetch(
-          `https://www.snptaxes.com/workflow/invoices/invoice/pending/invoicelistby/accountid/${accountId}`
+          `https://www.snptaxes.com/workflow/invoices/invoice/pending/invoicelistby/accountid/${accountId}`,
         );
         const data = await res.json();
         const pendingInvoices = data.invoice || [];
@@ -675,7 +676,7 @@ const DocsFolderTree = () => {
             body: JSON.stringify({
               paths: item.path, // backend already supports string or array
             }),
-          }
+          },
         );
 
         if (!res.ok) {
@@ -697,42 +698,42 @@ const DocsFolderTree = () => {
         console.error("Download error:", err);
       }
     };
-// 🗑️ Move File or Folder to Trash (Soft delete)
-const trashItem = async (item) => {
-  if (!item?.path) return alert("Invalid path");
-console.log("trash path", item.path);
-  const confirmTrash = window.confirm(
-    `Are you sure you want to move "${item.name}" to Trash?`
-  );
-  if (!confirmTrash) return;
+    // 🗑️ Move File or Folder to Trash (Soft delete)
+    const trashItem = async (item) => {
+      if (!item?.path) return alert("Invalid path");
+      console.log("trash path", item.path);
+      const confirmTrash = window.confirm(
+        `Are you sure you want to move "${item.name}" to Trash?`,
+      );
+      if (!confirmTrash) return;
 
-  try {
-    const response = await fetch(
-      "https://www.snptaxes.com/api/accountsdoc/trash",
-      {
-        method: "PATCH", // ✅ trash = PATCH
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ targetPath: item.path, trashedBy: "Admin" }),
+      try {
+        const response = await fetch(
+          "https://www.snptaxes.com/api/accountsdoc/trash",
+          {
+            method: "PATCH", // ✅ trash = PATCH
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ targetPath: item.path, trashedBy: "Admin" }),
+          },
+        );
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          toast.success(data.message || "Moved to trash");
+          setTimeout(() => {
+            fetchFolderTree(accountId); // refresh tree
+          }, 500);
+        } else {
+          toast.error(data.message || "Failed to move to trash");
+        }
+      } catch (err) {
+        console.error("Error trashing item:", err);
+        toast.error("Error moving item to trash");
       }
-    );
 
-    const data = await response.json();
-
-    if (response.ok && data.success) {
-      toast.success(data.message || "Moved to trash");
-      setTimeout(() => {
-        fetchFolderTree(accountId); // refresh tree
-      }, 500);
-    } else {
-      toast.error(data.message || "Failed to move to trash");
-    }
-  } catch (err) {
-    console.error("Error trashing item:", err);
-    toast.error("Error moving item to trash");
-  }
-
-  handleMenuClose();
-};
+      handleMenuClose();
+    };
 
     // 🗑️ Delete File or Folder (Universal)
     const deleteItem = async (item) => {
@@ -740,7 +741,7 @@ console.log("trash path", item.path);
       // console.log("delete path", item.path);
       // console.log("delete item", item);
       const confirmDelete = window.confirm(
-        `Are you sure you want to delete "${item.name}"? This cannot be undone!`
+        `Are you sure you want to delete "${item.name}"? This cannot be undone!`,
       );
       if (!confirmDelete) return;
 
@@ -751,7 +752,7 @@ console.log("trash path", item.path);
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ targetPath: item.path }),
-          }
+          },
         );
 
         const data = await response.json();
@@ -776,63 +777,63 @@ console.log("trash path", item.path);
       handleMenuClose();
     };
     // Bulk Trash
-const handleBulkTrash = async () => {
-  if (selectedItems.size === 0) {
-    toast.warning("Please select items to move to trash");
-    return;
-  }
-
-  const confirmTrash = window.confirm(
-    `Are you sure you want to move ${selectedItems.size} item(s) to trash?`
-  );
-  if (!confirmTrash) return;
-
-  setBulkOperationLoading(true);
-
-  try {
-    const paths = Array.from(selectedItems);
-
-    console.log("Trashing paths:", paths); // Debug log
-
-    const response = await fetch(
-      "https://www.snptaxes.com/api/accountsdoc/bulktrash",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ targetPaths: paths, trashedBy: "Admin" }),
+    const handleBulkTrash = async () => {
+      if (selectedItems.size === 0) {
+        toast.warning("Please select items to move to trash");
+        return;
       }
-    );
 
-    const data = await response.json();
-    console.log("Bulk trash response:", data); // Debug log
+      const confirmTrash = window.confirm(
+        `Are you sure you want to move ${selectedItems.size} item(s) to trash?`,
+      );
+      if (!confirmTrash) return;
 
-    if (response.ok) {
-      if (data.success) {
-        toast.success(
-          `${data.trashedItems.length} item(s) moved to trash successfully`
+      setBulkOperationLoading(true);
+
+      try {
+        const paths = Array.from(selectedItems);
+
+        console.log("Trashing paths:", paths); // Debug log
+
+        const response = await fetch(
+          "https://www.snptaxes.com/api/accountsdoc/bulktrash",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ targetPaths: paths, trashedBy: "Admin" }),
+          },
         );
 
-        if (data.failedItems && data.failedItems.length > 0) {
-          toast.warning(`${data.failedItems.length} item(s) failed`);
-          console.log("Failed trash items:", data.failedItems);
-        }
-      } else {
-        toast.error(data.message || "Failed to trash some items");
-      }
+        const data = await response.json();
+        console.log("Bulk trash response:", data); // Debug log
 
-      // Clear selection regardless of partial success
-      setSelectedItems(new Set());
-      fetchFolderTree(accountId);
-    } else {
-      toast.error(data.message || "Failed to trash items");
-    }
-  } catch (err) {
-    console.error("Bulk trash error:", err);
-    toast.error("Error moving items to trash: " + err.message);
-  } finally {
-    setBulkOperationLoading(false);
-  }
-};
+        if (response.ok) {
+          if (data.success) {
+            toast.success(
+              `${data.trashedItems.length} item(s) moved to trash successfully`,
+            );
+
+            if (data.failedItems && data.failedItems.length > 0) {
+              toast.warning(`${data.failedItems.length} item(s) failed`);
+              console.log("Failed trash items:", data.failedItems);
+            }
+          } else {
+            toast.error(data.message || "Failed to trash some items");
+          }
+
+          // Clear selection regardless of partial success
+          setSelectedItems(new Set());
+          fetchFolderTree(accountId);
+        } else {
+          toast.error(data.message || "Failed to trash items");
+        }
+      } catch (err) {
+        console.error("Bulk trash error:", err);
+        toast.error("Error moving items to trash: " + err.message);
+      } finally {
+        setBulkOperationLoading(false);
+      }
+    };
 
     // Bulk delete
     const handleBulkDelete = async () => {
@@ -842,7 +843,7 @@ const handleBulkTrash = async () => {
       }
 
       const confirmDelete = window.confirm(
-        `Are you sure you want to delete ${selectedItems.size} item(s)? This cannot be undone!`
+        `Are you sure you want to delete ${selectedItems.size} item(s)? This cannot be undone!`,
       );
       if (!confirmDelete) return;
 
@@ -858,7 +859,7 @@ const handleBulkTrash = async () => {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ paths }),
-          }
+          },
         );
 
         const data = await response.json();
@@ -867,7 +868,7 @@ const handleBulkTrash = async () => {
         if (response.ok) {
           if (data.success) {
             toast.success(
-              `${data.summary.success} item(s) deleted successfully`
+              `${data.summary.success} item(s) deleted successfully`,
             );
             if (data.errors && data.errors.length > 0) {
               toast.warning(`${data.errors.length} item(s) failed to delete`);
@@ -910,13 +911,13 @@ const handleBulkTrash = async () => {
               paths,
               readOnly: lockStatus === "lock",
             }),
-          }
+          },
         );
 
         const data = await response.json();
         if (response.ok) {
           toast.success(
-            `${data.summary.success} item(s) ${lockStatus === "lock" ? "locked" : "unlocked"} successfully`
+            `${data.summary.success} item(s) ${lockStatus === "lock" ? "locked" : "unlocked"} successfully`,
           );
           setSelectedItems(new Set());
           fetchFolderTree(accountId);
@@ -932,7 +933,6 @@ const handleBulkTrash = async () => {
       }
     };
 
-    
     const handleBulkDownload = async () => {
       if (selectedItems.size === 0) {
         toast.warning("Please select items to download");
@@ -948,7 +948,7 @@ const handleBulkTrash = async () => {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ paths }),
-          }
+          },
         );
 
         if (!res.ok) {
@@ -973,8 +973,18 @@ const handleBulkTrash = async () => {
         setBulkOperationLoading(false);
       }
     };
+    // const [openTemplateDialog, setOpenTemplateDialog] = useState(false);
+    const [openTemplateDialog, setOpenTemplateDialog] = useState(false);
 
-  
+   
+    const [selectedFileUrl, setSelectedFileUrl] = useState("");
+const [selectedFileName, setSelectedFileName] = useState("");
+const [openFileViewer, setOpenFileViewer] = useState(false);
+const [openExcelDialog, setOpenExcelDialog] = useState(false);
+const [openWordDialog, setOpenWordDialog] = useState(false);
+const [openTextDialog, setOpenTextDialog] = useState(false);
+const [textContent, setTextContent] = useState("");
+
     const handleFileClick = async (fullPath, fileName, meta = {}) => {
       try {
         // 🔒 Prevent opening locked files
@@ -982,8 +992,31 @@ const handleBulkTrash = async () => {
           alert("This file is locked and cannot be opened.");
           return;
         }
-        console.log("filepath", fullPath);
+        // console.log("filepath", fullPath);
         console.log("meta", meta);
+        // ⭐ If DocuSeal template exists
+        if (meta.templateId) {
+          console.log("meta.templateid", meta.templateId);
+
+          const res = await fetch(
+            `${SIGNATURE_API}/api/docuseal-token?templateId=${meta.templateId}`,
+          );
+
+          const data = await res.json();
+
+          console.log("meta token", data.token);
+
+          if (!data.token) {
+            console.error("Token not received");
+            return;
+          }
+
+          setToken(data.token);
+          setOpenTemplateDialog(true);
+
+          return;
+        }
+
         // 🔔 Remove "New" tag (fire-and-forget)
         // 🔔 Remove "New" tag & refetch tree
         if (
@@ -997,7 +1030,7 @@ const handleBulkTrash = async () => {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({ filePath: fullPath }),
-            }
+            },
           );
 
           // 🔄 REFRESH folder tree so parent tags update
@@ -1007,62 +1040,71 @@ const handleBulkTrash = async () => {
         // ✅ Construct file URL
         const fileUrl = `https://www.snptaxes.com/uploads/accounts/${fullPath}`;
 
-        // ✅ Detect file extension
-        const fileExt = fileName.split(".").pop().toLowerCase();
+//         // Instead of window.open, set states to trigger your UI viewer
+//    setSelectedFileUrl(fileUrl);
+// setSelectedFileName(fileName); // Pass the name for the Dialog title
 
-        // ✅ Browser-viewable files
-        const viewableExtensions = ["pdf", "jpg", "jpeg", "png", "gif", "txt"];
+// setOpenFileViewer(true);
+  // 📂 Get file extension
+    const extension = fileName.split(".").pop().toLowerCase();
 
-        if (viewableExtensions.includes(fileExt)) {
-          // Open in new tab
-          window.open(fileUrl, "_blank", "noopener,noreferrer");
-        } else {
-          // Force download
-          const link = document.createElement("a");
-          link.href = fileUrl;
-          link.download = fileName;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        }
+    // 📊 If Excel file → open Dialog
+    if (extension === "xls" || extension === "xlsx") {
+      setSelectedFileUrl(fileUrl);
+      setSelectedFileName(fileName);
+      setOpenExcelDialog(true);   // Excel Dialog
+      return;
+    }
+    // 📄 Word
+    if (extension === "doc" || extension === "docx") {
+      setSelectedFileUrl(fileUrl);
+      setSelectedFileName(fileName);
+      setOpenWordDialog(true);
+      return;
+    }
+
+    // 📝 Text
+    if (extension === "txt") {
+      const res = await fetch(fileUrl);
+      const text = await res.text();
+      setTextContent(text);
+      setSelectedFileName(fileName);
+      setOpenTextDialog(true);
+      return;
+    }
+
+    // 📄 Default file viewer
+    setSelectedFileUrl(fileUrl);
+    setSelectedFileName(fileName);
+    setOpenFileViewer(true);
+
       } catch (error) {
         console.error("Error opening/downloading file:", error);
       }
     };
 
-    // const handleFileClick = (fullPath, fileName, meta = {}) => {
-    //   try {
-    //     // 🔒 Prevent opening locked files
-    //     if (meta.readOnly) {
-    //       alert("This file is locked and cannot be opened.");
-    //       return;
-    //     }
+    
+        // // ✅ Detect file extension
+        // const fileExt = fileName.split(".").pop().toLowerCase();
 
-    //     // ✅ Construct full file URL
-    //     const fileUrl = `https://www.snptaxes.com/uploads/accounts/${fullPath}`;
+        // // ✅ Browser-viewable files
+        // const viewableExtensions = ["pdf", "jpg", "jpeg", "png", "gif", "txt"];
 
-    //     // ✅ Detect file extension (case-insensitive)
-    //     const fileExt = fileName.split(".").pop().toLowerCase();
+        // if (viewableExtensions.includes(fileExt)) {
+        //   // Open in new tab
+        //   window.open(fileUrl, "_blank", "noopener,noreferrer");
+        // } else {
+        //   // Force download
+        //   const link = document.createElement("a");
+        //   link.href = fileUrl;
+        //   link.download = fileName;
+        //   document.body.appendChild(link);
+        //   link.click();
+        //   document.body.removeChild(link);
+        // }
 
-    //     // ✅ Extensions that can open in browser
-    //     const viewableExtensions = ["pdf", "jpg", "jpeg", "png", "gif", "txt"];
 
-    //     if (viewableExtensions.includes(fileExt)) {
-    //       // Open supported file types in a new tab
-    //       window.open(fileUrl, "_blank", "noopener,noreferrer");
-    //     } else {
-    //       // Force download for unsupported types (e.g., docx, xlsx, zip, etc.)
-    //       const link = document.createElement("a");
-    //       link.href = fileUrl;
-    //       link.download = fileName;
-    //       document.body.appendChild(link);
-    //       link.click();
-    //       document.body.removeChild(link);
-    //     }
-    //   } catch (error) {
-    //     console.error("Error opening/downloading file:", error);
-    //   }
-    // };
+    
     const getFileIcon = (fileName) => {
       const ext = fileName.split(".").pop().toLowerCase();
 
@@ -1117,7 +1159,7 @@ const handleBulkTrash = async () => {
               size="small"
               variant="outlined"
               color={color}
-            />
+            />,
           );
         }
 
@@ -1179,7 +1221,7 @@ const handleBulkTrash = async () => {
               size="small"
               variant="outlined"
               color={color}
-            />
+            />,
           );
         }
         // ======= SHOW NOTHING IF NO STATUS =======
@@ -1456,15 +1498,7 @@ const handleBulkTrash = async () => {
         </Typography>
       );
     };
-    // const UploadedInfo = ({ meta }) => {
-    //   if (!meta) return null;
 
-    //   return (
-    //     <Typography variant="caption" sx={{ fontWeight: "bold" }}>
-    //       {meta.uploadedAt}
-    //     </Typography>
-    //   );
-    // };
     const getStatusChip = (meta, isFolder) => {
       // Return null for folders - don't show status chips for folders
       if (isFolder) return null;
@@ -1485,7 +1519,7 @@ const handleBulkTrash = async () => {
             size="small"
             variant="outlined"
             color={color}
-          />
+          />,
         );
       }
 
@@ -1539,7 +1573,7 @@ const handleBulkTrash = async () => {
             size="small"
             variant="outlined"
             color={color}
-          />
+          />,
         );
       }
 
@@ -1552,7 +1586,7 @@ const handleBulkTrash = async () => {
       // console.log("Finding 'New' tag in item:", item);
       // Check current item
       const newTag = item.meta?.tags?.find(
-        (tag) => tag.isSystemTag && tag.tagName === "New"
+        (tag) => tag.isSystemTag && tag.tagName === "New",
       );
 
       if (newTag) return newTag;
@@ -1567,14 +1601,46 @@ const handleBulkTrash = async () => {
 
       return null;
     };
+      const getFolderCounts = (folder) => {
+  let fileCount = 0;
+  let folderCount = 0;
+
+  if (folder.children && folder.children.length > 0) {
+    folder.children.forEach((child) => {
+      if (child.type === "folder") {
+        folderCount += 1;
+        const subCounts = getFolderCounts(child);
+        fileCount += subCounts.fileCount;
+        folderCount += subCounts.folderCount;
+      } else {
+        fileCount += 1;
+      }
+    });
+  }
+
+  return { fileCount, folderCount };
+};
 
     const renderTableRows = (items, level = 0, parentPath = "") => {
-      return items.map((item) => {
+      // 🔥 Sort: folders first, then files
+      const sortedItems = [...items].sort((a, b) => {
+        if (a.type === "folder" && b.type !== "folder") return -1;
+        if (a.type !== "folder" && b.type === "folder") return 1;
+
+        // Optional: sort alphabetically inside same type
+        return a.name.localeCompare(b.name);
+      });
+
+      return sortedItems.map((item) => {
+        // return items.map((item) => {
         // console.log("itemlist", item);
         // const fullPath = parentPath ? `${parentPath}/${item.name}` : item.name;
         const fullPath = item.path;
         const meta = item.meta || {};
         const isFolder = item.type === "folder";
+        const { folderCount, fileCount } = isFolder
+  ? getFolderCounts(item)
+  : { folderCount: 0, fileCount: 0 };
         const isSelected = selectedItems.has(fullPath);
         // Update the helper function to use item.path for children
         const getAllChildrenPaths = (item) => {
@@ -1681,6 +1747,7 @@ const handleBulkTrash = async () => {
                           </Typography>
                         )}
                       </Typography>
+              
                     </>
                   ) : (
                     <>
@@ -1728,6 +1795,9 @@ const handleBulkTrash = async () => {
                   )}
                 </Box>
               </TableCell>
+              <TableCell> <Typography variant="caption" sx={{ ml: 1, color: "gray" }}>
+      ({folderCount} folders, {fileCount} files)
+    </Typography></TableCell>
               <TableCell>
                 <Box sx={{ mt: 0.5 }}>{getStatusChip(meta, isFolder)}</Box>
               </TableCell>
@@ -1950,16 +2020,7 @@ const handleBulkTrash = async () => {
         </Box>
 
         {/* Folder Explorer */}
-        {/* <Paper elevation={3} sx={{ p: 2 }}>
-          <Typography variant="h6" gutterBottom>
-            📜 Folder Explorer
-          </Typography>
-          {folderTree ? (
-            renderTree(folderTree)
-          ) : (
-            <Typography>Loading folder data...</Typography>
-          )}
-        </Paper> */}
+       
         <Paper elevation={3} sx={{ p: 2, mt: 3 }}>
           <Typography variant="h6" gutterBottom>
             📜 Folder Explorer
@@ -1979,6 +2040,7 @@ const handleBulkTrash = async () => {
                         />
                       </TableCell>
                       <TableCell>Name</TableCell>
+                      <TableCell>Content</TableCell>
                       <TableCell>Status</TableCell>
                       <TableCell>Uploaded</TableCell>
                       <TableCell>User</TableCell>
@@ -2118,13 +2180,13 @@ const handleBulkTrash = async () => {
             let docType = "client"; // default
             if (path.includes("firm")) docType = "firm";
             if (path.includes("private")) docType = "private";
-const PROTECTED_FOLDERS = [
-  "Client Uploaded Documents",
-  "Firm Documents Shared with Client",
-  "Private",
-];
-const isProtectedFolder =
-  isFolder && PROTECTED_FOLDERS.includes(item.name);
+            const PROTECTED_FOLDERS = [
+              "Client Uploaded Documents",
+              "Firm Documents Shared with Client",
+              "Private",
+            ];
+            const isProtectedFolder =
+              isFolder && PROTECTED_FOLDERS.includes(item.name);
 
             const menuItems = [];
 
@@ -2154,7 +2216,7 @@ const isProtectedFolder =
                     label: "Delete",
                     // action: () => deleteItem(item),
                     action: () => trashItem(item),
-                     disabled: isProtectedFolder,
+                    disabled: isProtectedFolder,
                   },
                   {
                     icon: <DownloadIcon />,
@@ -2175,7 +2237,7 @@ const isProtectedFolder =
                     icon: <LockIcon />,
                     label: isLocked ? "Unlock" : "Lock",
                     action: () => toggleReadOnly(item),
-                  }
+                  },
                 );
               } else if (docType === "firm") {
                 menuItems.push(
@@ -2212,10 +2274,10 @@ const isProtectedFolder =
                   {
                     icon: <DeleteIcon />,
                     label: "Delete",
-                   // action: () => deleteItem(item),
-                   action: () => trashItem(item),
+                    // action: () => deleteItem(item),
+                    action: () => trashItem(item),
                     disabled: isProtectedFolder,
-                  }
+                  },
                 );
               } else if (docType === "private") {
                 menuItems.push(
@@ -2243,14 +2305,14 @@ const isProtectedFolder =
                     icon: <DeleteIcon />,
                     label: "Delete",
                     //action: () => deleteItem(item),
-                       action: () => trashItem(item),
-                        disabled: isProtectedFolder,
+                    action: () => trashItem(item),
+                    disabled: isProtectedFolder,
                   },
                   {
                     icon: <DownloadIcon />,
                     label: "Download",
                     action: () => handleDownload(item),
-                  }
+                  },
                 );
               }
             }
@@ -2280,13 +2342,13 @@ const isProtectedFolder =
                     icon: <DeleteIcon />,
                     label: "Delete",
                     //action: () => deleteItem(item),
-                       action: () => trashItem(item),
+                    action: () => trashItem(item),
                   },
                   {
                     icon: <DownloadIcon />,
                     label: "Download",
                     action: () => handleDownload(item),
-                  }
+                  },
                 );
               } else if (docType === "firm") {
                 const currentStatus =
@@ -2321,7 +2383,7 @@ const isProtectedFolder =
                     icon: <DriveFileMoveIcon />,
                     label: "Move",
                     action: () => setMoveDrawerOpen(true),
-                  }
+                  },
                 );
                 // SIGNATURE MENU
                 if (currentStatus === "pendingSignature") {
@@ -2390,7 +2452,7 @@ const isProtectedFolder =
                   icon: <DeleteIcon />,
                   label: "Delete",
                   //action: () => deleteItem(item),
-                    action: () => trashItem(item),
+                  action: () => trashItem(item),
                 });
                 menuItems.push({
                   icon: <DownloadIcon />,
@@ -2407,8 +2469,8 @@ const isProtectedFolder =
                   {
                     icon: <DeleteIcon />,
                     label: "Delete",
-                   // action: () => deleteItem(item),
-                      action: () => trashItem(item),
+                    // action: () => deleteItem(item),
+                    action: () => trashItem(item),
                   },
                   {
                     icon: <DownloadIcon />,
@@ -2419,7 +2481,7 @@ const isProtectedFolder =
                     icon: <DriveFileMoveIcon />,
                     label: "Move",
                     action: () => setMoveDrawerOpen(true),
-                  }
+                  },
                 );
               }
             }
@@ -2521,6 +2583,140 @@ const isProtectedFolder =
               Lock Invoice
             </Button>
           </DialogActions>
+        </Dialog>
+<Dialog
+  open={openFileViewer}
+  onClose={() => setOpenFileViewer(false)}
+  fullWidth
+  maxWidth="lg" // Adjust size as needed (sm, md, lg, xl)
+>
+  <DialogTitle sx={{ m: 0, p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <Typography variant="h6" component="div">
+      {selectedFileName}
+    </Typography>
+    <IconButton
+      aria-label="close"
+      onClick={() => setOpenFileViewer(false)}
+      sx={{ color: (theme) => theme.palette.grey[500] }}
+    >
+      <CloseIcon />
+    </IconButton>
+  </DialogTitle>
+
+  <DialogContent dividers sx={{ p: 0, height: '80vh', overflow: 'hidden' }}>
+    <Box sx={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', bgcolor: '#f5f5f5' }}>
+      {/* The iframe will handle PDFs, Images, and Text files. 
+          Browsers will automatically use their built-in viewers.
+      */}
+      <iframe
+        src={selectedFileUrl}
+        title="File Preview"
+        width="100%"
+        height="100%"
+        style={{ border: 'none' }}
+      />
+    </Box>
+  </DialogContent>
+</Dialog>
+<Dialog open={openWordDialog} onClose={() => setOpenWordDialog(false)} maxWidth="lg" fullWidth>
+  {/* <DialogTitle>{selectedFileName}</DialogTitle> */}
+   <DialogTitle sx={{ m: 0, p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <Typography variant="h6" component="div">
+      {selectedFileName}
+    </Typography>
+    <IconButton
+      aria-label="close"
+      onClick={() => setOpenWordDialog(false)}
+      sx={{ color: (theme) => theme.palette.grey[500] }}
+    >
+      <CloseIcon />
+    </IconButton>
+  </DialogTitle>
+  <DialogContent>
+    <iframe
+      src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(selectedFileUrl)}`}
+      width="100%"
+      height="600px"
+      title="Word Viewer"
+    />
+  </DialogContent>
+</Dialog>
+
+<Dialog open={openTextDialog} onClose={() => setOpenTextDialog(false)} maxWidth="md" fullWidth>
+  {/* <DialogTitle>{selectedFileName}</DialogTitle> */}
+   <DialogTitle sx={{ m: 0, p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <Typography variant="h6" component="div">
+      {selectedFileName}
+    </Typography>
+    <IconButton
+      aria-label="close"
+      onClick={() => setOpenTextDialog(false)}
+      sx={{ color: (theme) => theme.palette.grey[500] }}
+    >
+      <CloseIcon />
+    </IconButton>
+  </DialogTitle>
+  <DialogContent>
+    <pre style={{ whiteSpace: "pre-wrap" }}>
+      {textContent}
+    </pre>
+  </DialogContent>
+</Dialog>
+<Dialog
+  open={openExcelDialog}
+  onClose={() => setOpenExcelDialog(false)}
+  maxWidth="lg"
+  fullWidth
+>
+  <DialogTitle sx={{display:'flex', alignItems:'center',justifyContent:'space-between'}}>
+    <Typography>{selectedFileName}</Typography>
+  <IconButton
+      aria-label="close"
+      onClick={() => setOpenExcelDialog(false)}
+      sx={{ color: (theme) => theme.palette.grey[500] }}
+    >
+      <CloseIcon />
+    </IconButton>
+
+  </DialogTitle>
+  <DialogContent>
+    <iframe
+      src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(selectedFileUrl)}`}
+      width="100%"
+      height="600px"
+      title="Excel Viewer"
+    />
+  </DialogContent>
+</Dialog>
+        <Dialog
+          open={openTemplateDialog}
+          onClose={() => setOpenTemplateDialog(false)}
+          maxWidth="lg"
+          fullWidth
+        >
+          <DialogTitle>
+            {/* {items.name} */}
+            <IconButton
+              aria-label="close"
+              onClick={() => setOpenTemplateDialog(false)}
+              style={{ position: "absolute", right: 8, top: 8 }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
+          <DialogContent sx={{ height: "80vh" }}>
+            {token ? (
+              <DocusealBuilder
+                token={token}
+                onComplete={() => {
+                  console.log("Template edited");
+                  setOpenTemplateDialog(false);
+                }}
+              />
+            ) : (
+              <p>Loading template...</p>
+            )}
+          </DialogContent>
         </Dialog>
       </Box>
     );
