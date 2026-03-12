@@ -66,7 +66,7 @@ import {
   FaFileAlt,
 } from "react-icons/fa";
 import { AiFillFileUnknown } from "react-icons/ai";
-import * as XLSX from 'xlsx';
+import * as XLSX from "xlsx";
 const DOCS_MANAGMENTS = process.env.REACT_APP_CLIENT_DOCS_MANAGE;
 const DocsFolderTree = () => {
   const { data } = useParams();
@@ -206,7 +206,6 @@ const DocsFolderTree = () => {
       }
     };
 
-  
     const toggleFolder = (path, isReadOnly) => {
       // if (isReadOnly) return;
       setExpandedFolders((prev) => ({
@@ -976,14 +975,13 @@ const DocsFolderTree = () => {
     // const [openTemplateDialog, setOpenTemplateDialog] = useState(false);
     const [openTemplateDialog, setOpenTemplateDialog] = useState(false);
 
-   
     const [selectedFileUrl, setSelectedFileUrl] = useState("");
-const [selectedFileName, setSelectedFileName] = useState("");
-const [openFileViewer, setOpenFileViewer] = useState(false);
-const [openExcelDialog, setOpenExcelDialog] = useState(false);
-const [openWordDialog, setOpenWordDialog] = useState(false);
-const [openTextDialog, setOpenTextDialog] = useState(false);
-const [textContent, setTextContent] = useState("");
+    const [selectedFileName, setSelectedFileName] = useState("");
+    const [openFileViewer, setOpenFileViewer] = useState(false);
+    const [openExcelDialog, setOpenExcelDialog] = useState(false);
+    const [openWordDialog, setOpenWordDialog] = useState(false);
+    const [openTextDialog, setOpenTextDialog] = useState(false);
+    const [textContent, setTextContent] = useState("");
 
     const handleFileClick = async (fullPath, fileName, meta = {}) => {
       try {
@@ -995,7 +993,7 @@ const [textContent, setTextContent] = useState("");
         // console.log("filepath", fullPath);
         console.log("meta", meta);
         // ⭐ If DocuSeal template exists
-        if (meta.templateId) {
+        if (meta.templateId && meta.signStatus == "pendingSignature") {
           console.log("meta.templateid", meta.templateId);
 
           const res = await fetch(
@@ -1040,71 +1038,67 @@ const [textContent, setTextContent] = useState("");
         // ✅ Construct file URL
         const fileUrl = `https://www.snptaxes.com/uploads/accounts/${fullPath}`;
 
-//         // Instead of window.open, set states to trigger your UI viewer
-//    setSelectedFileUrl(fileUrl);
-// setSelectedFileName(fileName); // Pass the name for the Dialog title
+        //         // Instead of window.open, set states to trigger your UI viewer
+        //    setSelectedFileUrl(fileUrl);
+        // setSelectedFileName(fileName); // Pass the name for the Dialog title
 
-// setOpenFileViewer(true);
-  // 📂 Get file extension
-    const extension = fileName.split(".").pop().toLowerCase();
+        // setOpenFileViewer(true);
+        // 📂 Get file extension
+        const extension = fileName.split(".").pop().toLowerCase();
 
-    // 📊 If Excel file → open Dialog
-    if (extension === "xls" || extension === "xlsx") {
-      setSelectedFileUrl(fileUrl);
-      setSelectedFileName(fileName);
-      setOpenExcelDialog(true);   // Excel Dialog
-      return;
-    }
-    // 📄 Word
-    if (extension === "doc" || extension === "docx") {
-      setSelectedFileUrl(fileUrl);
-      setSelectedFileName(fileName);
-      setOpenWordDialog(true);
-      return;
-    }
+        // 📊 If Excel file → open Dialog
+        if (extension === "xls" || extension === "xlsx") {
+          setSelectedFileUrl(fileUrl);
+          setSelectedFileName(fileName);
+          setOpenExcelDialog(true); // Excel Dialog
+          return;
+        }
+        // 📄 Word
+        if (extension === "doc" || extension === "docx") {
+          setSelectedFileUrl(fileUrl);
+          setSelectedFileName(fileName);
+          setOpenWordDialog(true);
+          return;
+        }
 
-    // 📝 Text
-    if (extension === "txt") {
-      const res = await fetch(fileUrl);
-      const text = await res.text();
-      setTextContent(text);
-      setSelectedFileName(fileName);
-      setOpenTextDialog(true);
-      return;
-    }
+        // 📝 Text
+        if (extension === "txt") {
+          const res = await fetch(fileUrl);
+          const text = await res.text();
+          setTextContent(text);
+          setSelectedFileName(fileName);
+          setOpenTextDialog(true);
+          return;
+        }
 
-    // 📄 Default file viewer
-    setSelectedFileUrl(fileUrl);
-    setSelectedFileName(fileName);
-    setOpenFileViewer(true);
-
+        // 📄 Default file viewer
+        setSelectedFileUrl(fileUrl);
+        setSelectedFileName(fileName);
+        setOpenFileViewer(true);
       } catch (error) {
         console.error("Error opening/downloading file:", error);
       }
     };
 
-    
-        // // ✅ Detect file extension
-        // const fileExt = fileName.split(".").pop().toLowerCase();
+    // // ✅ Detect file extension
+    // const fileExt = fileName.split(".").pop().toLowerCase();
 
-        // // ✅ Browser-viewable files
-        // const viewableExtensions = ["pdf", "jpg", "jpeg", "png", "gif", "txt"];
+    // // ✅ Browser-viewable files
+    // const viewableExtensions = ["pdf", "jpg", "jpeg", "png", "gif", "txt"];
 
-        // if (viewableExtensions.includes(fileExt)) {
-        //   // Open in new tab
-        //   window.open(fileUrl, "_blank", "noopener,noreferrer");
-        // } else {
-        //   // Force download
-        //   const link = document.createElement("a");
-        //   link.href = fileUrl;
-        //   link.download = fileName;
-        //   document.body.appendChild(link);
-        //   link.click();
-        //   document.body.removeChild(link);
-        // }
+    // if (viewableExtensions.includes(fileExt)) {
+    //   // Open in new tab
+    //   window.open(fileUrl, "_blank", "noopener,noreferrer");
+    // } else {
+    //   // Force download
+    //   const link = document.createElement("a");
+    //   link.href = fileUrl;
+    //   link.download = fileName;
+    //   document.body.appendChild(link);
+    //   link.click();
+    //   document.body.removeChild(link);
+    // }
 
-
-    
     const getFileIcon = (fileName) => {
       const ext = fileName.split(".").pop().toLowerCase();
 
@@ -1601,25 +1595,25 @@ const [textContent, setTextContent] = useState("");
 
       return null;
     };
-      const getFolderCounts = (folder) => {
-  let fileCount = 0;
-  let folderCount = 0;
+    const getFolderCounts = (folder) => {
+      let fileCount = 0;
+      let folderCount = 0;
 
-  if (folder.children && folder.children.length > 0) {
-    folder.children.forEach((child) => {
-      if (child.type === "folder") {
-        folderCount += 1;
-        const subCounts = getFolderCounts(child);
-        fileCount += subCounts.fileCount;
-        folderCount += subCounts.folderCount;
-      } else {
-        fileCount += 1;
+      if (folder.children && folder.children.length > 0) {
+        folder.children.forEach((child) => {
+          if (child.type === "folder") {
+            folderCount += 1;
+            const subCounts = getFolderCounts(child);
+            fileCount += subCounts.fileCount;
+            folderCount += subCounts.folderCount;
+          } else {
+            fileCount += 1;
+          }
+        });
       }
-    });
-  }
 
-  return { fileCount, folderCount };
-};
+      return { fileCount, folderCount };
+    };
 
     const renderTableRows = (items, level = 0, parentPath = "") => {
       // 🔥 Sort: folders first, then files
@@ -1639,8 +1633,8 @@ const [textContent, setTextContent] = useState("");
         const meta = item.meta || {};
         const isFolder = item.type === "folder";
         const { folderCount, fileCount } = isFolder
-  ? getFolderCounts(item)
-  : { folderCount: 0, fileCount: 0 };
+          ? getFolderCounts(item)
+          : { folderCount: 0, fileCount: 0 };
         const isSelected = selectedItems.has(fullPath);
         // Update the helper function to use item.path for children
         const getAllChildrenPaths = (item) => {
@@ -1747,7 +1741,6 @@ const [textContent, setTextContent] = useState("");
                           </Typography>
                         )}
                       </Typography>
-              
                     </>
                   ) : (
                     <>
@@ -1795,9 +1788,12 @@ const [textContent, setTextContent] = useState("");
                   )}
                 </Box>
               </TableCell>
-              <TableCell> <Typography variant="caption" sx={{ ml: 1, color: "gray" }}>
-      ({folderCount} folders, {fileCount} files)
-    </Typography></TableCell>
+              <TableCell>
+                {" "}
+                <Typography variant="caption" sx={{ ml: 1, color: "gray" }}>
+                  ({folderCount} folders, {fileCount} files)
+                </Typography>
+              </TableCell>
               <TableCell>
                 <Box sx={{ mt: 0.5 }}>{getStatusChip(meta, isFolder)}</Box>
               </TableCell>
@@ -2020,7 +2016,7 @@ const [textContent, setTextContent] = useState("");
         </Box>
 
         {/* Folder Explorer */}
-       
+
         <Paper elevation={3} sx={{ p: 2, mt: 3 }}>
           <Typography variant="h6" gutterBottom>
             📜 Folder Explorer
@@ -2584,110 +2580,159 @@ const [textContent, setTextContent] = useState("");
             </Button>
           </DialogActions>
         </Dialog>
-<Dialog
-  open={openFileViewer}
-  onClose={() => setOpenFileViewer(false)}
-  fullWidth
-  maxWidth="lg" // Adjust size as needed (sm, md, lg, xl)
->
-  <DialogTitle sx={{ m: 0, p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-    <Typography variant="h6" component="div">
-      {selectedFileName}
-    </Typography>
-    <IconButton
-      aria-label="close"
-      onClick={() => setOpenFileViewer(false)}
-      sx={{ color: (theme) => theme.palette.grey[500] }}
-    >
-      <CloseIcon />
-    </IconButton>
-  </DialogTitle>
+        <Dialog
+          open={openFileViewer}
+          onClose={() => setOpenFileViewer(false)}
+          fullWidth
+          maxWidth="lg" // Adjust size as needed (sm, md, lg, xl)
+        >
+          <DialogTitle
+            sx={{
+              m: 0,
+              p: 2,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Typography variant="h6" component="div">
+              {selectedFileName}
+            </Typography>
+            <IconButton
+              aria-label="close"
+              onClick={() => setOpenFileViewer(false)}
+              sx={{ color: (theme) => theme.palette.grey[500] }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
 
-  <DialogContent dividers sx={{ p: 0, height: '80vh', overflow: 'hidden' }}>
-    <Box sx={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', bgcolor: '#f5f5f5' }}>
-      {/* The iframe will handle PDFs, Images, and Text files. 
+          <DialogContent
+            dividers
+            sx={{ p: 0, height: "80vh", overflow: "hidden" }}
+          >
+            <Box
+              sx={{
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                bgcolor: "#f5f5f5",
+              }}
+            >
+              {/* The iframe will handle PDFs, Images, and Text files. 
           Browsers will automatically use their built-in viewers.
       */}
-      <iframe
-        src={selectedFileUrl}
-        title="File Preview"
-        width="100%"
-        height="100%"
-        style={{ border: 'none' }}
-      />
-    </Box>
-  </DialogContent>
-</Dialog>
-<Dialog open={openWordDialog} onClose={() => setOpenWordDialog(false)} maxWidth="lg" fullWidth>
-  {/* <DialogTitle>{selectedFileName}</DialogTitle> */}
-   <DialogTitle sx={{ m: 0, p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-    <Typography variant="h6" component="div">
-      {selectedFileName}
-    </Typography>
-    <IconButton
-      aria-label="close"
-      onClick={() => setOpenWordDialog(false)}
-      sx={{ color: (theme) => theme.palette.grey[500] }}
-    >
-      <CloseIcon />
-    </IconButton>
-  </DialogTitle>
-  <DialogContent>
-    <iframe
-      src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(selectedFileUrl)}`}
-      width="100%"
-      height="600px"
-      title="Word Viewer"
-    />
-  </DialogContent>
-</Dialog>
+              <iframe
+                src={selectedFileUrl}
+                title="File Preview"
+                width="100%"
+                height="100%"
+                style={{ border: "none" }}
+              />
+            </Box>
+          </DialogContent>
+        </Dialog>
+        <Dialog
+          open={openWordDialog}
+          onClose={() => setOpenWordDialog(false)}
+          maxWidth="lg"
+          fullWidth
+        >
+          {/* <DialogTitle>{selectedFileName}</DialogTitle> */}
+          <DialogTitle
+            sx={{
+              m: 0,
+              p: 2,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Typography variant="h6" component="div">
+              {selectedFileName}
+            </Typography>
+            <IconButton
+              aria-label="close"
+              onClick={() => setOpenWordDialog(false)}
+              sx={{ color: (theme) => theme.palette.grey[500] }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
+          <DialogContent>
+            <iframe
+              src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(selectedFileUrl)}`}
+              width="100%"
+              height="600px"
+              title="Word Viewer"
+            />
+          </DialogContent>
+        </Dialog>
 
-<Dialog open={openTextDialog} onClose={() => setOpenTextDialog(false)} maxWidth="md" fullWidth>
-  {/* <DialogTitle>{selectedFileName}</DialogTitle> */}
-   <DialogTitle sx={{ m: 0, p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-    <Typography variant="h6" component="div">
-      {selectedFileName}
-    </Typography>
-    <IconButton
-      aria-label="close"
-      onClick={() => setOpenTextDialog(false)}
-      sx={{ color: (theme) => theme.palette.grey[500] }}
-    >
-      <CloseIcon />
-    </IconButton>
-  </DialogTitle>
-  <DialogContent>
-    <pre style={{ whiteSpace: "pre-wrap" }}>
-      {textContent}
-    </pre>
-  </DialogContent>
-</Dialog>
-<Dialog
-  open={openExcelDialog}
-  onClose={() => setOpenExcelDialog(false)}
-  maxWidth="lg"
-  fullWidth
->
-  <DialogTitle sx={{display:'flex', alignItems:'center',justifyContent:'space-between'}}>
-    <Typography>{selectedFileName}</Typography>
-  <IconButton
-      aria-label="close"
-      onClick={() => setOpenExcelDialog(false)}
-      sx={{ color: (theme) => theme.palette.grey[500] }}
-    >
-      <CloseIcon />
-    </IconButton>
-
-  </DialogTitle>
-  <DialogContent>
-    <iframe
-      src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(selectedFileUrl)}`}
-      width="100%"
-      height="600px"
-      title="Excel Viewer"
-    />
-  </DialogContent>
-</Dialog>
+        <Dialog
+          open={openTextDialog}
+          onClose={() => setOpenTextDialog(false)}
+          maxWidth="md"
+          fullWidth
+        >
+          {/* <DialogTitle>{selectedFileName}</DialogTitle> */}
+          <DialogTitle
+            sx={{
+              m: 0,
+              p: 2,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Typography variant="h6" component="div">
+              {selectedFileName}
+            </Typography>
+            <IconButton
+              aria-label="close"
+              onClick={() => setOpenTextDialog(false)}
+              sx={{ color: (theme) => theme.palette.grey[500] }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
+          <DialogContent>
+            <pre style={{ whiteSpace: "pre-wrap" }}>{textContent}</pre>
+          </DialogContent>
+        </Dialog>
+        <Dialog
+          open={openExcelDialog}
+          onClose={() => setOpenExcelDialog(false)}
+          maxWidth="lg"
+          fullWidth
+        >
+          <DialogTitle
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <Typography>{selectedFileName}</Typography>
+            <IconButton
+              aria-label="close"
+              onClick={() => setOpenExcelDialog(false)}
+              sx={{ color: (theme) => theme.palette.grey[500] }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
+          <DialogContent>
+            <iframe
+              src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(selectedFileUrl)}`}
+              width="100%"
+              height="600px"
+              title="Excel Viewer"
+            />
+          </DialogContent>
+        </Dialog>
         <Dialog
           open={openTemplateDialog}
           onClose={() => setOpenTemplateDialog(false)}

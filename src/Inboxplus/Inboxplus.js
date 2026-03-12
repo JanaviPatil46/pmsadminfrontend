@@ -24,15 +24,17 @@ import CloseIcon from "@mui/icons-material/Close";
 import { ExpandLess, ExpandMore, AttachFile } from "@mui/icons-material";
 import { Button, TextField } from "@mui/material";
 import { toast } from "react-toastify";
+// import { Pagination } from "@mui/material";
+import { TablePagination } from "@mui/material";
 
-
-const hasMongoIdTag = (subject = "") => {
-  return /#([a-f0-9]{24})#/i.test(subject);
-};
 
 
 
 const EmailViewer = () => {
+//   const [page, setPage] = useState(1);
+// const threadsPerPage = 10;
+const [page, setPage] = useState(0);
+const [rowsPerPage, setRowsPerPage] = useState(10);
   const [threads, setThreads] = useState([]);
   const [expandedThreadId, setExpandedThreadId] = useState(null);
   const [expandedMessageId, setExpandedMessageId] = useState(null);
@@ -47,6 +49,19 @@ const EmailViewer = () => {
     message: false,
     organizer: false,
   });
+
+
+//   const handlePageChange = (event, value) => {
+//   setPage(value);
+// };
+const handleChangePage = (event, newPage) => {
+  setPage(newPage);
+};
+const handleChangeRowsPerPage = (event) => {
+  setRowsPerPage(parseInt(event.target.value, 10));
+  setPage(0);
+};
+
   /* ================= FILTER CONFIG ================= */
 
   const FILTER_KEYWORDS = {
@@ -91,24 +106,7 @@ const EmailViewer = () => {
     setCheckedItems(cleared);
     setFilterDrawerOpen(false);
   };
-  // const openAttachment = (attachment) => {
-  //   const byteCharacters = atob(attachment.data);
-  //   const byteNumbers = new Array(byteCharacters.length);
-
-  //   for (let i = 0; i < byteCharacters.length; i++) {
-  //     byteNumbers[i] = byteCharacters.charCodeAt(i);
-  //   }
-
-  //   const byteArray = new Uint8Array(byteNumbers);
-  //   const blob = new Blob([byteArray], { type: attachment.mimeType });
-
-  //   const url = URL.createObjectURL(blob);
-
-  //   setPreviewFile({
-  //     ...attachment,
-  //     url
-  //   });
-  // };
+ 
   const openAttachment = (attachment) => {
     const byteCharacters = atob(attachment.data);
     const byteNumbers = new Array(byteCharacters.length);
@@ -144,6 +142,8 @@ const EmailViewer = () => {
     }
   };
 
+
+
   const handleExpandThread = (threadId) => {
     setExpandedThreadId(expandedThreadId === threadId ? null : threadId);
     setExpandedMessageId(null);
@@ -153,14 +153,7 @@ const EmailViewer = () => {
     setExpandedMessageId(expandedMessageId === messageId ? null : messageId);
   };
 
-  // const getPreview = (html, length = 120) => {
-  //   const text = html.replace(/<[^>]*>?/gm, "");
-  //   return text.length > length ? text.slice(0, length) + "..." : text;
-  // };
-
-  // const getPreview = (html) => {
-  //   return html.replace(/<[^>]*>?/gm, "");
-  // };
+ 
 
   const getPreview = (html) => {
     const tempDiv = document.createElement("div");
@@ -173,24 +166,16 @@ const EmailViewer = () => {
     return match ? match[1] : from;
   };
 
-  // const hasMongoIdTag = (subject = "") => {
-  //   return subject.startsWith("#") && /#[a-f0-9]{24}#/i.test(subject);
-  // };
+  
   const hasMongoIdTag = (subject = "") => {
     return /#[a-f0-9]{24}\b/i.test(subject);
   };
-  // const extractMongoId = (subject = "") => {
-  //   const match = subject.match(/#([a-f0-9]{24})/i);
-  //   return match ? match[1] : null;
-  // };
+  
   const extractMongoId = (subject = "") => {
     const match = subject.match(/#([a-f0-9]{24})\b/i);
     return match ? match[1] : null;
   };
 
-  // const cleanSubjectText = (subject = "") => {
-  //   return subject.replace(/#[a-f0-9]{24} /i, "").trim();
-  // };
   const cleanSubjectText = (subject = "") => {
     return subject.replace(/#[a-f0-9]{24}\b/i, "").trim();
   };
@@ -231,11 +216,6 @@ const EmailViewer = () => {
     }
   };
 
-  // const filteredThreads = threads.filter((thread) => {
-  //   const isArchived = thread.latest?.archived;
-  //   return tab === 0 ? !isArchived : isArchived;
-  // });
-
   const filteredThreads = threads
     .filter((thread) => {
       const isArchived = thread.latest?.archived;
@@ -248,6 +228,17 @@ const EmailViewer = () => {
         matchesSelectedFilters(msg.subject),
       );
     });
+
+      // const startIndex = (page - 1) * threadsPerPage;
+// const paginatedThreads = filteredThreads.slice(
+//   startIndex,
+//   startIndex + threadsPerPage
+// );
+const paginatedThreads = filteredThreads.slice(
+  page * rowsPerPage,
+  page * rowsPerPage + rowsPerPage
+);
+
   const renderLinkedSubject = (subject, isBold = false) => {
     const mongoId = extractMongoId(subject);
     const text = cleanSubjectText(subject) || "linktext";
@@ -269,6 +260,17 @@ const EmailViewer = () => {
       </a>
     );
   };
+  const formatDate = (date) => {
+  if (!date) return "";
+
+  const d = new Date(date);
+
+  const day = d.getDate();
+  const month = d.toLocaleString("default", { month: "long" });
+  const year = d.getFullYear();
+
+  return `${day}-${month}-${year}`;
+};
 
   return (
     <Box
@@ -307,7 +309,9 @@ const EmailViewer = () => {
       </Box>
 
       <List>
-        {filteredThreads.map((thread) => {
+        {/* {filteredThreads.map((thread) => { */}
+         
+         {paginatedThreads.map((thread) => {
           const latest = thread.latest;
 
           return (
@@ -329,6 +333,11 @@ const EmailViewer = () => {
                       {renderLinkedSubject(latest.subject, true)}
                     </Typography>
                   }
+                  secondary={
+    <Typography variant="caption" color="text.secondary">
+      {formatDate(latest.threadDate || latest.createdAt)}
+    </Typography>
+  }
                   
                 />
                 <Box sx={{ display: "flex", gap: 2, mb: 1 }}>
@@ -562,6 +571,43 @@ const EmailViewer = () => {
           );
         })}
       </List>
+      <Box display="flex" justifyContent="center" mt={3}>
+  {/* <Pagination
+    count={Math.ceil(filteredThreads.length / threadsPerPage)}
+    page={page}
+    onChange={handlePageChange}
+    color="primary"
+  /> */}
+
+  {/* <TablePagination
+  component="div"
+  count={filteredThreads.length}
+  page={page}
+  onPageChange={handleChangePage}
+  rowsPerPage={rowsPerPage}
+  onRowsPerPageChange={handleChangeRowsPerPage}
+  rowsPerPageOptions={[5, 10, 25, 50]}
+/> */}
+<Box
+  sx={{
+    display: "flex",
+    justifyContent: "flex-end",
+    mt: 2,
+    ml:"50%"
+  }}
+>
+  <TablePagination
+    component="div"
+    count={filteredThreads.length}
+    page={page}
+    onPageChange={handleChangePage}
+    rowsPerPage={rowsPerPage}
+    onRowsPerPageChange={handleChangeRowsPerPage}
+    rowsPerPageOptions={[5, 10, 25, 50]}
+    sx={{ width: "auto" }}
+  />
+</Box>
+</Box>
 
       <Drawer
         anchor="right"
