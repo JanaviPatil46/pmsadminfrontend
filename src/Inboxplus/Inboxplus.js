@@ -697,27 +697,15 @@
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { Avatar as ShadAvatar, AvatarFallback } from "../components/ui/avatar";
+import { Button as ShadButton } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Separator } from "../components/ui/separator";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../components/ui/sheet";
 import {
-  Box,
-  List,
-  ListItemButton,
-  ListItemText,
-  Typography,
-  Collapse,
-  Tabs,
-  Tab,
-  Divider,
-  Drawer,
-  Chip,
-  IconButton,
-  Checkbox,
-  FormGroup,
-  FormControlLabel,
-} from "@mui/material";
-import FilterListIcon from "@mui/icons-material/FilterList";
-import CloseIcon from "@mui/icons-material/Close";
-import { ExpandLess, ExpandMore, AttachFile } from "@mui/icons-material";
-import { Button, TextField } from "@mui/material";
+  Search, SlidersHorizontal, Archive, ArchiveRestore,
+  ChevronDown, ChevronUp, Paperclip, X, Mail, CheckCheck,
+} from "lucide-react";
 
 // const EmailViewer = () => {
 //   const [emails, setEmails] = useState([]);
@@ -807,6 +795,29 @@ import { Button, TextField } from "@mui/material";
 // };
 const hasMongoIdTag = (subject = "") => {
   return /#([a-f0-9]{24})#/i.test(subject);
+};
+
+const AVATAR_COLORS = ["#00ACC1","#7C3AED","#16A34A","#DC2626","#D97706","#2563EB","#DB2777"];
+const getAvatarColor = (str = "") => {
+  const hash = str.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0);
+  return AVATAR_COLORS[hash % AVATAR_COLORS.length];
+};
+const getInitialsFromStr = (str = "") => {
+  const clean = str.replace(/<.*?>/g, "").trim();
+  const parts = clean.split(/[\s@]+/);
+  return ((parts[0]?.[0] || "?") + (parts[1]?.[0] || "")).toUpperCase();
+};
+const getRelativeTime = (dateStr) => {
+  if (!dateStr) return "";
+  const diff = Date.now() - new Date(dateStr);
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "Now";
+  if (mins < 60) return `${mins}m`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h`;
+  const days = Math.floor(hrs / 24);
+  if (days < 7) return new Date(dateStr).toLocaleDateString("en-US", { weekday: "short" });
+  return new Date(dateStr).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 };
 
 // const EmailViewer = () => {
@@ -1569,386 +1580,370 @@ const cleanSubjectText = (subject = "") => {
     );
   };
 
+  const selectedThread = threads.find((t) => t._id === expandedThreadId);
+
   return (
-    <Box
-      sx={{
-        maxWidth: 900,
-        margin: "20px auto",
-        bgcolor: "#f9f9f9",
-        p: 2,
-        borderRadius: 2,
-      }}
-    >
-      <Typography variant="h5" sx={{ mb: 2 }}>
-        Email Inbox
-      </Typography>
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-<Tabs value={tab} onChange={(e, v) => setTab(v)} sx={{ mb: 2 }}>
-        <Tab label="Inbox" />
-        <Tab label="Archived" />
-      </Tabs>
-      <Box sx={{ display: "flex", justifyContent: "right" }}>
-        {" "}
-        <Button
-          variant="contained"
-          startIcon={<FilterListIcon />}
-          onClick={toggleFilterDrawer(true)}
-        >
-          Filter
-        </Button>
-      </Box>
-      </Box>
-      
-      <List>
-        {filteredThreads.map((thread) => {
-          const latest = thread.latest;
+    <>
+      <div style={{ display: "flex", height: "100%", overflow: "hidden", backgroundColor: "#fff" }}>
 
-          return (
-            <React.Fragment key={thread._id}>
-              {/* Thread Header */}
-              <ListItemButton onClick={() => handleExpandThread(thread._id)}>
-                <ListItemText
-                  primary={
-                    // <Typography
-                    //   variant="subtitle1"
-                    //   sx={{
-                    //     fontWeight: latest.read ? "normal" : "bold",
-                    //     color: hasMongoIdTag(latest.subject)
-                    //       ? "#D32F2F"
-                    //       : "inherit",
-                    //   }}
-                    // >
-                    //   {/* {renderLinkedSubject(
-                    //     latest.subject,
-                    //     !latest.read
-                    //   )} */}
-                    //   {renderLinkedSubject(cleanSubjectText(latest.subject), !latest.read)}
+        {/* ── LEFT: Thread list panel ── */}
+        <div style={{ width: 340, minWidth: 340, display: "flex", flexDirection: "column", borderRight: "1px solid #f0f0f0", height: "100%", overflow: "hidden" }}>
 
-                    // </Typography>
-                    <Typography
-                      variant="subtitle2"
-                      sx={{
-                        fontWeight: "bold",
-                        color: hasMongoIdTag(latest.subject)
-                          ? "#2f3fd3"
-                          : "inherit",
-                      }}
-                    >
-                      {renderLinkedSubject(latest.subject, true)}
-                    </Typography>
-                  }
-                  // secondary={
-                  //   <>
-                  //     <Typography variant="body2">
-                  //       From: {latest.from}
-                  //     </Typography>
-                  //     <Typography variant="caption" color="text.secondary">
-                  //       {new Date(latest.createdAt).toLocaleString()}
-                  //     </Typography>
-                  //   </>
-                  // }
-                />
-                <Box sx={{ display: "flex", gap: 2, mb: 1 }}>
-                  {!latest.read && (
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      onClick={() => markThreadAsRead(thread._id)}
-                    >
-                      Mark as Read
-                    </Button>
-                  )}
-
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    color={latest.archived ? "success" : "warning"}
-                    onClick={() => archiveThread(thread._id, !latest.archived)}
-                  >
-                    {latest.archived ? "Unarchive" : "Archive"}
-                  </Button>
-                </Box>
-
-                {expandedThreadId === thread._id ? (
-                  <ExpandLess />
-                ) : (
-                  <ExpandMore />
-                )}
-              </ListItemButton>
-
-              {/* Thread Messages */}
-              <Collapse
-                in={expandedThreadId === thread._id}
-                timeout="auto"
-                unmountOnExit
+          {/* Search + tabs + filter header */}
+          <div style={{ padding: "12px 12px 10px", borderBottom: "1px solid #f0f0f0", flexShrink: 0 }}>
+            <div style={{ position: "relative", marginBottom: 8 }}>
+              <Search size={13} style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "#bbb", pointerEvents: "none" }} />
+              <Input
+                placeholder="Search emails"
+                style={{ paddingLeft: 30, height: 32, fontSize: 12, borderRadius: 8, border: "1px solid #eee", backgroundColor: "#fafafa" }}
+              />
+            </div>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div style={{ display: "flex", gap: 2 }}>
+                <button
+                  onClick={() => setTab(0)}
+                  style={{ padding: "3px 14px", borderRadius: 20, fontSize: 11.5, fontWeight: 500, border: "none", cursor: "pointer", backgroundColor: tab === 0 ? "#00ACC1" : "transparent", color: tab === 0 ? "#fff" : "#666", transition: "all 0.2s" }}
+                >
+                  Inbox
+                </button>
+                <button
+                  onClick={() => setTab(1)}
+                  style={{ padding: "3px 14px", borderRadius: 20, fontSize: 11.5, fontWeight: 500, border: "none", cursor: "pointer", backgroundColor: tab === 1 ? "#00ACC1" : "transparent", color: tab === 1 ? "#fff" : "#666", transition: "all 0.2s" }}
+                >
+                  Archived
+                </button>
+              </div>
+              <ShadButton
+                variant="ghost"
+                size="sm"
+                className="h-7 w-7 p-0 rounded-lg text-gray-400 hover:text-[#00ACC1] hover:bg-[rgba(0,172,193,0.08)]"
+                onClick={toggleFilterDrawer(true)}
               >
-                <Box sx={{ p: 2, bgcolor: "#fff", borderRadius: 1, mb: 1 }}>
-                  {[...thread.messages]
-                    .sort((a, b) => {
-                      const aTagged = hasMongoIdTag(a.subject);
-                      const bTagged = hasMongoIdTag(b.subject);
+                <SlidersHorizontal size={14} />
+              </ShadButton>
+            </div>
+          </div>
 
-                      if (aTagged && !bTagged) return -1;
-                      if (!aTagged && bTagged) return 1;
-                      return 0;
-                    })
-                    .map((email) => {
-                      const isExpanded = expandedMessageId === email.messageId;
+          {/* Thread list */}
+          <div style={{ flex: 1, overflowY: "auto" }}>
+            {filteredThreads.length === 0 ? (
+              <div style={{ padding: 32, textAlign: "center", color: "#bbb", fontSize: 13 }}>
+                <Mail size={32} style={{ margin: "0 auto 10px", opacity: 0.25, display: "block" }} />
+                No emails found
+              </div>
+            ) : (
+              filteredThreads.map((thread) => {
+                const latest = thread.latest;
+                const isSelected = expandedThreadId === thread._id;
+                const isUnread = !latest?.read;
+                const avatarBg = getAvatarColor(latest?.from || "");
+                const initials = getInitialsFromStr(latest?.from || "");
 
-                      return (
-                        <Box
-                          key={email.messageId}
-                          sx={{
-                            mb: 2,
-                            p: 1.5,
-                            border: "1px solid #eee",
-                            borderRadius: 1,
-                            cursor: "pointer",
-                          }}
+                return (
+                  <div
+                    key={thread._id}
+                    onClick={() => handleExpandThread(thread._id)}
+                    style={{
+                      display: "flex",
+                      alignItems: "flex-start",
+                      gap: 11,
+                      padding: "12px 14px 12px 11px",
+                      cursor: "pointer",
+                      borderBottom: "1px solid #f4f4f5",
+                      borderLeft: isSelected ? "3px solid #00ACC1" : "3px solid transparent",
+                      backgroundColor: isSelected ? "rgba(0,172,193,0.06)" : "transparent",
+                      transition: "background 0.15s ease",
+                    }}
+                    onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.backgroundColor = "#f9fafb"; }}
+                    onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.backgroundColor = isSelected ? "rgba(0,172,193,0.06)" : "transparent"; }}
+                  >
+                    <ShadAvatar className="h-8 w-8 shrink-0 mt-0.5">
+                      <AvatarFallback style={{ backgroundColor: avatarBg, color: "#fff", fontSize: "0.6rem", fontWeight: 700, letterSpacing: "0.02em" }}>
+                        {initials}
+                      </AvatarFallback>
+                    </ShadAvatar>
+
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 3 }}>
+                        <span style={{ fontSize: 13, fontWeight: isUnread ? 700 : 500, color: "#111827", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 170 }}>
+                          {latest?.from?.replace(/<.*?>/g, "").trim() || "Unknown"}
+                        </span>
+                        <span style={{ fontSize: 11, color: isUnread ? "#00ACC1" : "#9ca3af", flexShrink: 0, marginLeft: 6, fontWeight: isUnread ? 600 : 400 }}>
+                          {getRelativeTime(latest?.createdAt)}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: 12.5, fontWeight: isUnread ? 600 : 400, color: isUnread ? "#1f2937" : "#4b5563", marginBottom: 3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {cleanSubjectText(latest?.subject || "") || "(No Subject)"}
+                      </div>
+                      <div style={{ fontSize: 11.5, color: "#9ca3af", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", lineHeight: 1.3 }}>
+                        {getPreview(latest?.body || "").slice(0, 65)}
+                      </div>
+                    </div>
+
+                    {isUnread && (
+                      <div style={{ width: 6, height: 6, borderRadius: "50%", backgroundColor: "#00ACC1", flexShrink: 0, marginTop: 7 }} />
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+
+        {/* ── RIGHT: Thread reader panel ── */}
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "100%", overflow: "hidden", backgroundColor: "#fff" }}>
+          {selectedThread ? (
+            <>
+              {/* Subject header + action buttons */}
+              <div style={{ padding: "16px 22px 12px", borderBottom: "1px solid #f0f0f0", display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexShrink: 0 }}>
+                <h2 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#1a1a1a", margin: 0, flex: 1, marginRight: 16, lineHeight: 1.4 }}>
+                  {renderLinkedSubject(selectedThread.latest?.subject, true)}
+                </h2>
+                <div style={{ display: "flex", gap: 4, alignItems: "center", flexShrink: 0 }}>
+                  {!selectedThread.latest?.read && (
+                    <ShadButton
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 px-2 text-xs rounded-lg gap-1.5 text-gray-500 hover:text-[#00ACC1] hover:bg-[rgba(0,172,193,0.07)]"
+                      onClick={(e) => { e.stopPropagation(); markThreadAsRead(expandedThreadId); }}
+                    >
+                      <CheckCheck size={14} />
+                      Read
+                    </ShadButton>
+                  )}
+                  <ShadButton
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 px-2 text-xs rounded-lg gap-1.5 text-gray-500 hover:bg-gray-100"
+                    onClick={(e) => { e.stopPropagation(); archiveThread(expandedThreadId, !selectedThread.latest?.archived); }}
+                  >
+                    {selectedThread.latest?.archived
+                      ? <><ArchiveRestore size={14} /> Unarchive</>
+                      : <><Archive size={14} /> Archive</>
+                    }
+                  </ShadButton>
+                  <ShadButton
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                    onClick={() => handleExpandThread(expandedThreadId)}
+                  >
+                    <X size={15} />
+                  </ShadButton>
+                </div>
+              </div>
+
+              {/* Messages — scrollable */}
+              <div style={{ flex: 1, overflowY: "auto", padding: "0 22px 20px" }}>
+                {[...selectedThread.messages]
+                  .sort((a, b) => {
+                    const aTagged = hasMongoIdTag(a.subject);
+                    const bTagged = hasMongoIdTag(b.subject);
+                    if (aTagged && !bTagged) return -1;
+                    if (!aTagged && bTagged) return 1;
+                    return 0;
+                  })
+                  .map((email, idx, arr) => {
+                    const isExpanded = expandedMessageId === email.messageId;
+                    const emailAvatarBg = getAvatarColor(email.from || "");
+                    const emailInitials = getInitialsFromStr(email.from || "");
+
+                    return (
+                      <div key={email.messageId} style={{ padding: "4px 0", borderBottom: idx < arr.length - 1 ? "1px solid #f3f4f6" : "none" }}>
+                        {/* Message header — always visible */}
+                        <div
                           onClick={() => handleExpandMessage(email.messageId)}
+                          style={{
+                            display: "flex",
+                            alignItems: "flex-start",
+                            gap: 12,
+                            padding: "12px 12px 12px 0",
+                            cursor: "pointer",
+                            borderRadius: 8,
+                            transition: "background 0.12s",
+                          }}
+                          onMouseEnter={(e) => { if (!isExpanded) e.currentTarget.style.backgroundColor = "#f9fafb"; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "transparent"; }}
                         >
-                          {/* {email.subject && (
-                            <Typography
-                              variant="subtitle2"
-                              sx={{
-                                fontWeight: "bold",
-                                color: hasMongoIdTag(email.subject)
-                                  ? "#D32F2F"
-                                  : "inherit",
-                              }}
-                            >
-                              {renderLinkedSubject(email.subject, true)}
-                            </Typography>
-                          )} */}
+                          <ShadAvatar className="h-8 w-8 shrink-0 mt-0.5">
+                            <AvatarFallback style={{ backgroundColor: emailAvatarBg, color: "#fff", fontSize: "0.6rem", fontWeight: 700 }}>
+                              {emailInitials}
+                            </AvatarFallback>
+                          </ShadAvatar>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
+                              <span style={{ fontSize: 13.5, fontWeight: 600, color: "#111827" }}>
+                                {email.from?.replace(/<.*?>/g, "").trim()}
+                              </span>
+                              <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0, marginLeft: 10 }}>
+                                <span style={{ fontSize: 11, color: "#9ca3af" }}>
+                                  {new Date(email.createdAt).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}
+                                </span>
+                                {isExpanded
+                                  ? <ChevronUp size={13} style={{ color: "#9ca3af" }} />
+                                  : <ChevronDown size={13} style={{ color: "#9ca3af" }} />
+                                }
+                              </div>
+                            </div>
+                            {!isExpanded && (
+                              <p style={{ fontSize: 12.5, color: "#6b7280", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                {getPreview(email.body || "").slice(0, 130)}
+                              </p>
+                            )}
+                          </div>
+                        </div>
 
-                          {/* <Typography variant="body2" sx={{ mt: 0.5 }}>
-                            From: {email.from}
-                          </Typography> */}
+                        {/* Expanded body — card wrapper */}
+                        {isExpanded && (
+                          <div style={{ marginLeft: 44, marginBottom: 12, backgroundColor: "#f9fafb", borderRadius: 10, border: "1px solid #f0f0f0", padding: "16px 18px" }}>
+                            {email.subject && hasMongoIdTag(email.subject) && (
+                              <div style={{ marginBottom: 10, fontSize: 12.5, fontWeight: 600 }}>
+                                {renderLinkedSubject(email.subject, true)}
+                              </div>
+                            )}
+                            <div
+                              style={{ fontSize: 14, color: "#374151", lineHeight: 1.8, wordBreak: "break-word" }}
+                              dangerouslySetInnerHTML={{ __html: email.body }}
+                            />
 
-                          <Typography variant="caption" color="text.secondary">
-                            {new Date(email.createdAt).toLocaleString()}
-                          </Typography>
-
-                          <Typography
-                            variant="body2"
-                            sx={{ mt: 1 }}
-                            dangerouslySetInnerHTML={{
-                              __html: isExpanded
-                                ? email.body
-                                : getPreview(email.body),
-                            }}
-                          />
-
-                          {/* <Typography
-                            variant="caption"
-                            color="primary"
-                            sx={{ display: "block", mt: 1 }}
-                          >
-                            {isExpanded
-                              ? "Click to collapse"
-                              : "Click to expand"}
-                          </Typography> */}
-
-                          {email.attachments?.length > 0 && (
-                            <Box sx={{ mt: 2 }}>
-                              <Typography variant="subtitle2">
-                                Attachments({email.attachments.length})
-                              </Typography>
-                              <Divider sx={{ my: 1 }} />
-                              <Box
-                                sx={{
-                                  display: "flex",
-                                  gap: 2,
-                                  flexWrap: "wrap",
-                                }}
-                              >
-                                {email.attachments.map((att, idx) => (
-                                  <Box
-                                    key={idx}
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      openAttachment(att);
-                                    }}
-                                    sx={{
-                                      border: "1px solid #ddd",
-                                      borderRadius: 2,
-                                      p: 1.5,
-                                      minWidth: 180,
-                                      cursor: "pointer",
-                                      bgcolor: "#fafafa",
-                                      "&:hover": { bgcolor: "#f0f0f0" },
-                                    }}
-                                  >
-                                    <Typography fontWeight="bold">
-                                      {att.filename}
-                                    </Typography>
-
-                                    <Typography variant="caption">
-                                      {Math.round(
-                                        (att.data.length * 3) / 4 / 1024,
-                                      )}{" "}
-                                      KB
-                                    </Typography>
-                                  </Box>
-                                ))}
-                              </Box>
-                              {previewFile && (
-                                <Box
-                                  sx={{
-                                    position: "fixed",
-                                    top: 0,
-                                    left: 0,
-                                    width: "100vw",
-                                    height: "100vh",
-                                    bgcolor: "rgba(0,0,0,0.7)",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    zIndex: 9999,
-                                  }}
-                                  onClick={() => setPreviewFile(null)}
-                                >
-                                  <Box
-                                    sx={{
-                                      width: "85%",
-                                      height: "90%",
-                                      bgcolor: "#fff",
-                                      borderRadius: 2,
-                                      overflow: "hidden",
-                                      position: "relative",
-                                    }}
-                                    onClick={(e) => e.stopPropagation()}
-                                  >
-                                    {/* Header */}
-                                    <Box
-                                      sx={{
-                                        p: 1,
-                                        borderBottom: "1px solid #ddd",
-                                        display: "flex",
-                                        justifyContent: "space-between",
-                                        alignItems: "center",
-                                      }}
+                            {/* Attachments */}
+                            {email.attachments?.length > 0 && (
+                              <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid #e5e7eb" }}>
+                                <p style={{ fontSize: 11.5, fontWeight: 600, color: "#6b7280", marginBottom: 10, display: "flex", alignItems: "center", gap: 5, textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                                  <Paperclip size={11} />
+                                  {email.attachments.length} attachment{email.attachments.length > 1 ? "s" : ""}
+                                </p>
+                                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                                  {email.attachments.map((att, i) => (
+                                    <div
+                                      key={i}
+                                      onClick={(e) => { e.stopPropagation(); openAttachment(att); }}
+                                      style={{ border: "1px solid #e5e7eb", borderRadius: 8, padding: "8px 12px", cursor: "pointer", minWidth: 140, backgroundColor: "#fff", transition: "border-color 0.15s, box-shadow 0.15s" }}
+                                      onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#00ACC1"; e.currentTarget.style.boxShadow = "0 0 0 2px rgba(0,172,193,0.1)"; }}
+                                      onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#e5e7eb"; e.currentTarget.style.boxShadow = "none"; }}
                                     >
-                                      <Typography fontWeight="bold">
-                                        {previewFile.filename}
-                                      </Typography>
+                                      <p style={{ fontSize: 12, fontWeight: 600, color: "#374151", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                        {att.filename}
+                                      </p>
+                                      <p style={{ fontSize: 11, color: "#9ca3af", margin: "3px 0 0" }}>
+                                        {Math.round((att.data.length * 3) / 4 / 1024)} KB
+                                      </p>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+              </div>
+            </>
+          ) : (
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+              <Mail size={40} style={{ color: "#ddd", marginBottom: 12 }} />
+              <p style={{ fontSize: 13, color: "#bbb", margin: 0 }}>Select an email to read</p>
+            </div>
+          )}
+        </div>
+      </div>
 
-                                      <Button
-                                        onClick={() => setPreviewFile(null)}
-                                      >
-                                        Close
-                                      </Button>
-                                    </Box>
-
-                                    {/* Preview Area */}
-                                    <Box sx={{ height: "100%" }}>
-                                      {/* Images */}
-                                      {previewFile.mimeType.startsWith(
-                                        "image/",
-                                      ) && (
-                                        <img
-                                          src={previewFile.url}
-                                          alt={previewFile.filename}
-                                          style={{
-                                            width: "100%",
-                                            height: "100%",
-                                            objectFit: "contain",
-                                          }}
-                                        />
-                                      )}
-
-                                      {/* PDF */}
-                                      {previewFile.mimeType ===
-                                        "application/pdf" && (
-                                        <iframe
-                                          src={previewFile.url}
-                                          style={{
-                                            width: "100%",
-                                            height: "100%",
-                                            border: "none",
-                                          }}
-                                          title="PDF Preview"
-                                        />
-                                      )}
-
-                                      {/* Excel / Word / Others */}
-                                      {!previewFile.mimeType.startsWith(
-                                        "image/",
-                                      ) &&
-                                        previewFile.mimeType !==
-                                          "application/pdf" && (
-                                          <iframe
-                                            src={previewFile.url}
-                                            style={{
-                                              width: "100%",
-                                              height: "100%",
-                                              border: "none",
-                                            }}
-                                            title="File Preview"
-                                          />
-                                        )}
-                                    </Box>
-                                  </Box>
-                                </Box>
-                              )}
-                            </Box>
-                          )}
-                        </Box>
-                      );
-                    })}
-                </Box>
-              </Collapse>
-
-              <Divider />
-            </React.Fragment>
-          );
-        })}
-      </List>
-
-      <Drawer
-        anchor="right"
-        open={filterDrawerOpen}
-        onClose={toggleFilterDrawer(false)}
-      >
-        <Box sx={{ width: 400, p: 3 }}>
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
+      {/* Attachment preview modal */}
+      {previewFile && (
+        <div
+          onClick={() => setPreviewFile(null)}
+          style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", backgroundColor: "rgba(0,0,0,0.65)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999 }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{ width: "85%", height: "90%", backgroundColor: "#fff", borderRadius: 12, overflow: "hidden", display: "flex", flexDirection: "column" }}
           >
-            <Typography variant="h6">Filters</Typography>
-            <IconButton onClick={toggleFilterDrawer(false)}>
-              <CloseIcon />
-            </IconButton>
-          </Box>
+            <div style={{ padding: "10px 16px", borderBottom: "1px solid #eee", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
+              <span style={{ fontWeight: 600, fontSize: 13 }}>{previewFile.filename}</span>
+              <ShadButton variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => setPreviewFile(null)}>
+                <X size={15} />
+              </ShadButton>
+            </div>
+            <div style={{ flex: 1, overflow: "hidden" }}>
+              {previewFile.mimeType.startsWith("image/") && (
+                <img src={previewFile.url} alt={previewFile.filename} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+              )}
+              {!previewFile.mimeType.startsWith("image/") && (
+                <iframe src={previewFile.url} style={{ width: "100%", height: "100%", border: "none" }} title="File Preview" />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
-          <FormGroup>
-            {Object.keys(checkedItems).map((key) => (
-              <FormControlLabel
-                key={key}
-                control={
-                  <Checkbox
+      {/* Filter Sheet */}
+      <Sheet open={filterDrawerOpen} onOpenChange={(o) => !o && setFilterDrawerOpen(false)}>
+        <SheetContent
+          side="right"
+          className="p-0 flex flex-col [&>button]:hidden"
+          style={{ width: 300 }}
+        >
+          <SheetHeader
+            style={{ padding: "14px 20px", borderBottom: "1px solid #f0f0f0", display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}
+          >
+            <SheetTitle style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.9rem", fontWeight: 600 }}>
+              <SlidersHorizontal size={15} style={{ color: "#00ACC1" }} />
+              Filters
+            </SheetTitle>
+            <ShadButton variant="ghost" size="sm" className="h-7 w-7 p-0 text-gray-400 hover:text-gray-600" onClick={() => setFilterDrawerOpen(false)}>
+              <X size={15} />
+            </ShadButton>
+          </SheetHeader>
+
+          <div style={{ flex: 1, overflowY: "auto", padding: "16px 20px" }}>
+            <p style={{ fontSize: 11, fontWeight: 600, color: "#888", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 10 }}>
+              Email Type
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              {Object.keys(checkedItems).map((key) => (
+                <label
+                  key={key}
+                  style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 10px", borderRadius: 8, cursor: "pointer", fontSize: 13, color: "#333", backgroundColor: checkedItems[key] ? "rgba(0,172,193,0.06)" : "transparent", transition: "background 0.15s" }}
+                  onMouseEnter={(e) => { if (!checkedItems[key]) e.currentTarget.style.backgroundColor = "#fafafa"; }}
+                  onMouseLeave={(e) => { if (!checkedItems[key]) e.currentTarget.style.backgroundColor = checkedItems[key] ? "rgba(0,172,193,0.06)" : "transparent"; }}
+                >
+                  <input
+                    type="checkbox"
+                    name={key}
                     checked={checkedItems[key]}
                     onChange={handleCheckboxChange}
-                    name={key}
+                    style={{ accentColor: "#00ACC1", width: 14, height: 14, flexShrink: 0 }}
                   />
-                }
-                label={key.charAt(0).toUpperCase() + key.slice(1)}
-              />
-            ))}
-          </FormGroup>
+                  <span style={{ fontWeight: checkedItems[key] ? 600 : 400 }}>
+                    {key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, " $1")}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
 
-          <Box mt={3} display="flex" justifyContent="flex-end" gap={2}>
-            <Button variant="contained" onClick={toggleFilterDrawer(false)}>
+          <div style={{ borderTop: "1px solid #f0f0f0", padding: "12px 20px", display: "flex", justifyContent: "flex-end", gap: 8, flexShrink: 0 }}>
+            <ShadButton
+              variant="outline"
+              size="sm"
+              className="h-8 px-4 text-xs rounded-lg"
+              onClick={handleClearAll}
+            >
+              Clear All
+            </ShadButton>
+            <ShadButton
+              size="sm"
+              className="h-8 px-4 text-xs rounded-lg"
+              style={{ backgroundColor: "#00ACC1", color: "#fff" }}
+              onClick={toggleFilterDrawer(false)}
+            >
               Apply
-            </Button>
-            <Button variant="outlined" onClick={handleClearAll}>
-              Clear
-            </Button>
-          </Box>
-        </Box>
-      </Drawer>
-    </Box>
+            </ShadButton>
+          </div>
+        </SheetContent>
+      </Sheet>
+    </>
   );
 };
 

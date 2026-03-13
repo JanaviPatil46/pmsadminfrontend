@@ -16,8 +16,6 @@ import {
   DialogActions,
   TextField,
   CircularProgress,
-  Popover,
-  Chip,
 } from "@mui/material";
 import {
   ChevronLeft,
@@ -55,12 +53,15 @@ import user from "../Images/user.jpg";
 import { styled } from "@mui/material/styles";
 import Badge from "@mui/material/Badge";
 import CloseIcon from "@mui/icons-material/Close";
-// import Avatar from "@mui/material/Avatar";
 import Stack from "@mui/material/Stack";
 import SearchComponent from "./Search";
 import { useDispatch } from "react-redux";
-// import Badge from "@mui/material/Badge";
-import Avatar from "@mui/material/Avatar";
+import { Avatar as ShadAvatar, AvatarImage, AvatarFallback } from "../components/ui/avatar";
+import { Popover as ShadPopover, PopoverTrigger, PopoverContent } from "../components/ui/popover";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../components/ui/sheet";
+import { Badge as ShadBadge } from "../components/ui/badge";
+import { Separator } from "../components/ui/separator";
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "../components/ui/tooltip";
 import ClientSelectionDialog from "../Billing/ClientSelectionDialog";
 import { faL } from "@fortawesome/free-solid-svg-icons";
 import OrganizerDialog from "../Pages/Organizers/ClientSelectionDialog";
@@ -79,6 +80,14 @@ import {
 import AccountDrawer from "../components/AccountContactForm/Drawer";
 import AccountContactDrawer from "../AccountContactForm/AccountContactDrawer";
 import { use } from "react";
+
+const getInitials = (str = "") => {
+  const clean = str.replace(/<.*?>/g, "").trim();
+  const parts = clean.split(/[\s@]+/);
+  return (
+    ((parts[0]?.[0] || "?") + (parts[1]?.[0] || "")).toUpperCase()
+  );
+};
 
 function Sidebar() {
   const StyledBadge = styled(Badge)(({ theme }) => ({
@@ -819,154 +828,93 @@ axios.request(config)
   const [fetchError, setFetchError] = useState("");
 
   return (
+    <TooltipProvider delayDuration={200}>
     <div className="grid-container">
       <header className="header">
         <Box
           component="header"
           sx={{
-            p: 2,
+            px: 2.5,
+            py: 1,
             display: "flex",
+            alignItems: "center",
             justifyContent: "space-between",
-            gap: 3,
+            width: "100%",
+            gap: 2,
           }}
         >
           <Box className="bar-icon">
             <FaBars
               onClick={handleToggleSidebar}
-              style={{ fontSize: "1.7rem" }}
+              style={{ fontSize: "1.5rem", cursor: "pointer" }}
             />
           </Box>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              gap: 3,
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
-            <Box>
-              <FaPlusCircle className="add-icon" onClick={handleDrawerOpen} />
-            </Box>
+
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+            <FaPlusCircle className="add-icon" onClick={handleDrawerOpen} />
           </Box>
 
-          <Box>
+          <Box sx={{ flex: 1, maxWidth: 420 }}>
             <SearchComponent />
           </Box>
 
-          <Box
-            ml={"auto"}
-            mr={3}
-            sx={{ display: "flex", alignItems: "center", gap: 3 }}
-          >
-            <Link to="#" className="logout-link">
-              <Box className="info">
-                <Box
-                  onClick={toggleDropdown}
-                  style={{ display: "flex", alignItems: "center", gap: "2px" }}
-                >
+          <Box ml="auto" sx={{ display: "flex", alignItems: "center" }}>
+            <ShadPopover open={isDropdownOpen} onOpenChange={setDropdownOpen}>
+              <PopoverTrigger asChild>
+                <div className="header-user-chip">
                   <StyledBadge
                     overlap="circular"
                     anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                     variant="dot"
                   >
-                    <Avatar
-                      src={preview || currentImage}
-                      sx={{
-                        width: 40,
-                        height: 40,
-                        border: "2px solid #eee",
-                      }}
-                    />
+                    <ShadAvatar className="h-9 w-9 border-2 border-[rgba(0,172,193,0.25)]">
+                      <AvatarImage src={preview || currentImage} alt={username} />
+                      <AvatarFallback className="bg-[rgba(0,172,193,0.15)] text-[#00ACC1] text-xs font-semibold">
+                        {getInitials(username)}
+                      </AvatarFallback>
+                    </ShadAvatar>
                   </StyledBadge>
-                  <Box ml={2}>
-                    <Typography
-                      style={{ fontWeight: "bold", fontSize: "12px" }}
-                    >
+                  <Box>
+                    <Typography sx={{ fontWeight: 600, fontSize: "12px", lineHeight: 1.3 }}>
                       {username}
                     </Typography>
-                    <Typography style={{ fontSize: "10px", color: "#666" }}>
+                    <Typography sx={{ fontSize: "10px", color: "#888", lineHeight: 1.2 }}>
                       {userData}
                     </Typography>
                   </Box>
-                </Box>
-              </Box>
-            </Link>
+                </div>
+              </PopoverTrigger>
+              <PopoverContent
+                align="end"
+                sideOffset={8}
+                className="p-0 w-[230px] rounded-xl shadow-xl overflow-hidden border border-[rgba(0,172,193,0.15)]"
+              >
+                <div className="popover-header">
+                  <StyledBadge
+                    overlap="circular"
+                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                    variant="dot"
+                  >
+                    <ShadAvatar className="h-11 w-11 border-2 border-[rgba(0,172,193,0.3)]">
+                      <AvatarImage src={preview || currentImage} alt={username} />
+                      <AvatarFallback className="bg-[rgba(0,172,193,0.15)] text-[#00ACC1] text-sm font-semibold">
+                        {getInitials(username)}
+                      </AvatarFallback>
+                    </ShadAvatar>
+                  </StyledBadge>
+                  <div>
+                    <p className="font-semibold text-[13px] leading-tight">{username}</p>
+                    <p className="text-[11px] text-gray-500 leading-tight">{userEmail}</p>
+                  </div>
+                </div>
+                <Separator className="opacity-40" />
+                <div className="popover-logout-row" onClick={logoutuser}>
+                  <AiOutlineLogout size={17} />
+                  <span style={{ fontSize: "13px", fontWeight: 500 }}>Log out</span>
+                </div>
+              </PopoverContent>
+            </ShadPopover>
           </Box>
-
-          <Popover
-            open={isDropdownOpen}
-            anchorEl={anchorEl}
-            onClose={handleCloseDropdown}
-            anchorOrigin={{
-              vertical: "bottom",
-              horizontal: "left",
-            }}
-            transformOrigin={{
-              vertical: "top",
-              horizontal: "left",
-            }}
-            sx={{ mt: 2 }}
-          >
-            <Box
-              sx={{
-                padding: "16px",
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-              }}
-            >
-              <StyledBadge
-                overlap="circular"
-                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                variant="dot"
-              >
-                <Avatar
-                  src={preview || currentImage}
-                  sx={{
-                    width: 40,
-                    height: 40,
-                    border: "2px solid #eee",
-                  }}
-                />
-              </StyledBadge>
-              <Box>
-                <Typography
-                  sx={{ fontWeight: "600", fontSize: "13px", color: "#333" }}
-                >
-                  {username}
-                </Typography>
-                <Typography sx={{ fontSize: "11px", color: "#777" }}>
-                  {userEmail}
-                </Typography>
-              </Box>
-            </Box>
-
-            <Box sx={{ borderTop: "1px solid #eee" }} />
-
-            <Box sx={{ padding: "14px" }}>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                  cursor: "pointer",
-                  color: "red",
-                  fontWeight: "500",
-                  padding: "8px",
-                  borderRadius: "6px",
-                  transition: "background 0.3s",
-                  "&:hover": {
-                    backgroundColor: "#f8d7da",
-                  },
-                }}
-                onClick={logoutuser}
-              >
-                <AiOutlineLogout size={18} />
-                <Typography sx={{ fontSize: "13px" }}>Log out</Typography>
-              </Box>
-            </Box>
-          </Popover>
         </Box>
       </header>
 
@@ -983,31 +931,34 @@ axios.request(config)
         <Box
           component="aside"
           style={{
-            width: isCollapsed ? "50px" : "225px",
-            padding: 5,
-            transition: "width 0.3s",
+            width: isCollapsed ? "58px" : "230px",
+            padding: isCollapsed ? "0 4px" : "0 8px",
+            transition: "width 0.25s ease",
           }}
         >
           <Box
             sx={{
-              pt: 3,
+              pt: 2.5,
+              pb: 1.5,
               display: "flex",
               alignItems: "center",
-              justifyContent: "start",
-              gap: 1,
+              justifyContent: isCollapsed ? "center" : "flex-start",
+              px: isCollapsed ? 0 : 0.5,
+              borderBottom: "1px solid rgba(0,172,193,0.1)",
+              mb: 1,
             }}
           >
             {isCollapsed ? (
               <img
                 src={Logo}
                 alt="logo"
-                style={{ height: "40px", display: "block" }}
+                style={{ height: "36px", display: "block" }}
               />
             ) : (
               <img
                 src={FullLogo}
                 alt="logo"
-                style={{ height: "60px", display: "block", width: "90%" }}
+                style={{ height: "56px", display: "block", width: "88%" }}
               />
             )}
           </Box>
@@ -1282,9 +1233,9 @@ axios.request(config)
 
           <Box
             className="sidebar-contents"
-            sx={{ mt: 2, height: "85vh", overflowY: "auto" }}
+            sx={{ mt: 1, height: "85vh", overflowY: "auto" }}
           >
-            <List sx={{ cursor: "pointer" }}>
+            <List sx={{ cursor: "pointer", px: 0.5 }}>
               {sidebarItems.map((item) => {
                 const isActiveMenu =
                   (item.path !== "/" &&
@@ -1296,81 +1247,82 @@ axios.request(config)
 
                 return (
                   <Box key={item._id}>
-                    <ListItem
-                      onClick={() => handleToggleSubmenu(item._id, item.label)}
-                      component={Link}
-                      to={item.path}
-                      className="menu-item"
-                      sx={{
-                        mt: 1,
-                        borderRadius: "10px",
-                        padding: "4px 6px",
-                        backgroundColor: isActiveMenu
-                          ? "#E0F7FA"
-                          : "transparent",
-                        transition: "background-color 0.3s, color 0.3s",
-                        "&:hover": {
-                          color: "#fff",
-                          backgroundColor: "#00ACC1",
-                          ".menu-icon": { color: "#fff" },
-                          ".menu-text": { color: "#fff" },
-                        },
-                      }}
-                    >
-                      <ListItemIcon
-                        sx={{ fontSize: "1.2rem" }}
-                        className="menu-icon"
-                      >
-                        {iconMapping[item.icon]
-                          ? React.createElement(iconMapping[item.icon])
-                          : null}
-                      </ListItemIcon>
-
-                      {!isCollapsed && (
-                        <ListItemText
-                          primary={
-                            item.label === "Inbox +" ? (
-                              <>
-                                {item.label}
-                                <Chip
-                                  label={inboxCount}
-                                  size="small"
-                                  color="success"
-                                  sx={{
-                                    ml: 10,
-                                    height: "20px",
-                                    fontSize: "12px",
-                                    
-                                  }}
-                                />
-                              </>
-                            ) : (
-                              item.label
-                            )
-                          }
-                          primaryTypographyProps={{
-                            fontSize: "0.9rem",
-                            fontWeight: 400,
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <ListItem
+                          onClick={() => handleToggleSubmenu(item._id, item.label)}
+                          component={Link}
+                          to={item.path}
+                          className={`menu-item ${isActiveMenu ? "menu-item-active" : ""}`}
+                          sx={{
+                            mt: 0.5,
+                            borderRadius: "8px",
+                            padding: "6px 8px",
+                            backgroundColor: isActiveMenu
+                              ? "rgba(0,172,193,0.09)"
+                              : "transparent",
+                            transition: "background-color 0.2s ease, color 0.2s ease",
+                            "&:hover": {
+                              backgroundColor: isActiveMenu
+                                ? "rgba(0,172,193,0.15)"
+                                : "rgba(0,172,193,0.07)",
+                              ".menu-icon": { color: "#00ACC1" },
+                            },
                           }}
-                          sx={{ ml: -3 }}
-                          className="menu-text"
-                        />
-                      )}
+                        >
+                          <ListItemIcon
+                            sx={{ fontSize: "1.15rem", minWidth: isCollapsed ? "auto" : 36 }}
+                            className="menu-icon"
+                          >
+                            {iconMapping[item.icon]
+                              ? React.createElement(iconMapping[item.icon])
+                              : null}
+                          </ListItemIcon>
 
-                      {!isCollapsed && item.submenu.length > 0 && (
-                        <ListItemIcon sx={{ justifyContent: "end" }}>
-                          {openMenu === item._id ? (
-                            <ExpandLess className="menu-icon" />
-                          ) : (
-                            <ExpandMore className="menu-icon" />
+                          {!isCollapsed && (
+                            <ListItemText
+                              primary={
+                                item.label === "Inbox +" ? (
+                                  <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                                    <span>{item.label}</span>
+                                    <ShadBadge className="bg-green-500 text-white border-0 h-4 text-[10px] px-1.5 rounded-full font-semibold">
+                                      {inboxCount}
+                                    </ShadBadge>
+                                  </span>
+                                ) : (
+                                  item.label
+                                )
+                              }
+                              primaryTypographyProps={{
+                                fontSize: "0.875rem",
+                                fontWeight: isActiveMenu ? 600 : 400,
+                              }}
+                              sx={{ ml: -1 }}
+                              className="menu-text"
+                            />
                           )}
-                        </ListItemIcon>
+
+                          {!isCollapsed && item.submenu.length > 0 && (
+                            <ListItemIcon sx={{ justifyContent: "flex-end", minWidth: "auto" }}>
+                              {openMenu === item._id ? (
+                                <ExpandLess sx={{ fontSize: "1.1rem" }} className="menu-icon" />
+                              ) : (
+                                <ExpandMore sx={{ fontSize: "1.1rem" }} className="menu-icon" />
+                              )}
+                            </ListItemIcon>
+                          )}
+                        </ListItem>
+                      </TooltipTrigger>
+                      {isCollapsed && (
+                        <TooltipContent side="right" className="text-xs font-medium bg-[#00ACC1] text-white border-0">
+                          {item.label}
+                        </TooltipContent>
                       )}
-                    </ListItem>
+                    </Tooltip>
 
                     {item.submenu.length > 0 && (
                       <Collapse in={openMenu === item._id}>
-                        <List component="div" disablePadding>
+                        <List component="div" disablePadding sx={{ pl: 0.5 }}>
                           {item.submenu.map((subItem) => {
                             const isActiveSubmenu =
                               location.pathname.startsWith(subItem.path);
@@ -1380,28 +1332,26 @@ axios.request(config)
                                 key={subItem.path}
                                 component={Link}
                                 to={subItem.path}
-                                className="menu-item"
+                                className={`menu-item ${isActiveSubmenu ? "menu-item-active" : ""}`}
                                 sx={{
-                                  mt: 1,
-                                  padding: "4px 6px",
-                                  borderRadius: "10px",
+                                  mt: 0.5,
+                                  padding: "5px 8px",
+                                  borderRadius: "8px",
                                   backgroundColor: isActiveSubmenu
-                                    ? "#E0F7FA"
+                                    ? "rgba(0,172,193,0.09)"
                                     : "transparent",
-                                  color: "black",
-                                  pl: 4,
-                                  transition:
-                                    "background-color 0.3s, color 0.3s",
+                                  pl: isCollapsed ? 1 : 3.5,
+                                  transition: "background-color 0.2s ease",
                                   "&:hover": {
-                                    color: "#fff",
-                                    backgroundColor: "#00ACC1",
-                                    ".menu-icon": { color: "#fff" },
-                                    ".menu-text": { color: "#fff" },
+                                    backgroundColor: isActiveSubmenu
+                                      ? "rgba(0,172,193,0.15)"
+                                      : "rgba(0,172,193,0.07)",
+                                    ".menu-icon": { color: "#00ACC1" },
                                   },
                                 }}
                               >
                                 <ListItemIcon
-                                  sx={{ fontSize: "1.2rem" }}
+                                  sx={{ fontSize: "1rem", minWidth: isCollapsed ? "auto" : 30 }}
                                   className="menu-icon"
                                 >
                                   {iconMapping[subItem.icon]
@@ -1415,10 +1365,10 @@ axios.request(config)
                                   <ListItemText
                                     primary={subItem.label}
                                     primaryTypographyProps={{
-                                      fontSize: "0.9rem",
-                                      fontWeight: 400,
+                                      fontSize: "0.85rem",
+                                      fontWeight: isActiveSubmenu ? 600 : 400,
                                     }}
-                                    sx={{ ml: -2 }}
+                                    sx={{ ml: -1 }}
                                     className="menu-text"
                                   />
                                 )}
@@ -1440,27 +1390,23 @@ axios.request(config)
           <Outlet />
         </Box>
       </main>
-      <Drawer anchor="left" open={isDrawerOpen} onClose={handleDrawerClose}>
-        <Box sx={{ width: 200, p: 2, height: "100%" }} className="newSidebar">
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Typography
-              fontWeight="bold"
-              sx={{ display: "flex", alignItems: "center", gap: 1 }}
-            >
-              <FaPlus /> New
-            </Typography>
+      <Sheet open={isDrawerOpen} onOpenChange={(open) => !open && handleDrawerClose()}>
+        <SheetContent
+          side="left"
+          className="newSidebar p-0 w-[210px] flex flex-col [&>button]:hidden"
+        >
+          <SheetHeader className="new-drawer-header">
+            <SheetTitle className="new-drawer-title">
+              <FaPlus size={12} style={{ color: "#00ACC1" }} />
+              <span style={{ fontSize: "0.9rem" }}>Create New</span>
+            </SheetTitle>
             <RxCross2
+              size={17}
+              className="new-drawer-close"
               onClick={handleDrawerClose}
-              style={{ cursor: "pointer" }}
             />
-          </Box>
-          <List>
+          </SheetHeader>
+          <List sx={{ px: 1, pt: 0.5, flex: 1, overflowY: "auto" }}>
             {newSidebarItems.map((item) => (
               <ListItem
                 key={item._id}
@@ -1469,34 +1415,33 @@ axios.request(config)
                 className="menu-item"
                 onClick={(e) => {
                   if (item.restricted) {
-                    e.preventDefault(); // Prevent navigation
+                    e.preventDefault();
                     toast.error("Access to this feature is restricted.");
                   } else {
                     handleNewItemClick(item.label);
                   }
                 }}
                 sx={{
-                  mt: 1, // margin-top: 8px
-                  borderRadius: "10px",
-                  padding: "4px 6px",
-                  color: "black",
-                  transition: "background-color 0.3s, color 0.3s",
+                  mt: 0.5,
+                  borderRadius: "8px",
+                  padding: "7px 10px",
+                  opacity: item.restricted ? 0.5 : 1,
+                  transition: "background-color 0.2s ease",
                   "&:hover": {
-                    color: item.restricted ? "grey" : "#fff",
-                    backgroundColor: item.restricted ? "" : "#00ACC1",
+                    backgroundColor: item.restricted
+                      ? "transparent"
+                      : "rgba(0,172,193,0.09)",
                     ".menu-icon": {
-                      color: item.restricted ? "grey" : "#fff",
-                    },
-                    ".menu-text": {
-                      color: item.restricted ? "grey" : "#fff",
+                      color: item.restricted ? "grey" : "#00ACC1",
                     },
                   },
                 }}
               >
                 <ListItemIcon
                   sx={{
-                    fontSize: "1.2rem",
-                    color: item.restricted ? "grey" : "#00ACC1",
+                    fontSize: "1.1rem",
+                    minWidth: 34,
+                    color: item.restricted ? "#aaa" : "#00ACC1",
                   }}
                   className="menu-icon"
                 >
@@ -1508,16 +1453,16 @@ axios.request(config)
                   primary={item.label}
                   className="menu-text"
                   primaryTypographyProps={{
-                    fontSize: "0.9rem", // Adjust size for submenu text
-                    fontWeight: 400, // Optional: control weight
+                    fontSize: "0.875rem",
+                    fontWeight: 400,
+                    color: item.restricted ? "#aaa" : "inherit",
                   }}
-                  sx={{ color: item.restricted ? "grey" : "inherit" }}
                 />
               </ListItem>
             ))}
           </List>
-        </Box>
-      </Drawer>
+        </SheetContent>
+      </Sheet>
       <Drawer
         anchor="right"
         open={isRightDrawerOpen}
@@ -1593,6 +1538,7 @@ axios.request(config)
         handleDrawerClose={handleDrawerClose}
       />
     </div>
+    </TooltipProvider>
   );
 }
 
