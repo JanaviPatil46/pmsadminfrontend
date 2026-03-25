@@ -1,31 +1,14 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import {
-  Box,
-  Button,
-  Typography,
-  Container,
-  TextField,
-  FormControl,
-  FormControlLabel,
-  Radio,
-  RadioGroup,
-  InputLabel,
-  IconButton,
-  List,
-  ListItem,
-  ListItemText,
-  Popover,
-  Autocomplete,
-} from "@mui/material";
 import EditorShortcodes from "../Texteditor/EditorShortcodes";
-import Select from "react-select";
-import Grid from "@mui/material/Unstable_Grid2";
-import DeleteIcon from "@mui/icons-material/Delete"; // For delete icon
-import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
-import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile"; // For file icon
+import { FormPage, FormSection, FormField, FormRow, FormActions, FormGrid, ShortcodePopover } from "../../components/ui/form-layout";
+import { Input } from "../../components/ui/input";
+import { Button } from "../../components/ui/button";
+import { Label } from "../../components/ui/label";
+import { RadioGroup, RadioGroupItem } from "../../components/ui/radio-group";
+import { Upload, Trash2, FileText, Mail, Paperclip, User } from "lucide-react";
 
 const EmailTempUpdate = () => {
   const EMAIL_API = process.env.REACT_APP_EMAIL_TEMP_URL;
@@ -694,361 +677,168 @@ console.log("formdata",formData)
   };
 
   return (
-    <Box p={2}>
-      <Box>
-        <Typography variant="h6" gutterBottom>
-          Edit Email Template
-        </Typography>
+    <FormPage
+      title="Edit Email Template"
+      subtitle="Configure your email template settings"
+      actions={
+        <>
+          <Button variant="outline" onClick={handleTempCancle}>
+            Cancel
+          </Button>
+          <Button variant="secondary" onClick={saveTemp}>
+            Save
+          </Button>
+          <Button onClick={handleSaveExitTemplate}>
+            Save & Exit
+          </Button>
+        </>
+      }
+    >
+      <FormGrid>
+        {/* ===== LEFT COLUMN: Email Form ===== */}
+        <FormGrid.Main>
+          <FormSection title="Template Details" icon={<Mail className="h-4 w-4" />}>
+            <FormField label="Template Name">
+              <Input
+                name="templateName"
+                value={templateName}
+                onChange={(e) => setTemplateName(e.target.value)}
+                placeholder="Template Name"
+              />
+            </FormField>
 
-        <Grid container spacing={2}>
-          <Grid xs={12} sm={5.8}>
-            <Box sx={{ mt: 2 }}>
-              <form>
-                <Box>
-                  <InputLabel sx={{ color: "black" }}>Template Name</InputLabel>
-                  <TextField
-                    margin="normal"
-                    fullWidth
-                    name="templateName"
-                    value={templateName}
-                    onChange={(e) => setTemplateName(e.target.value)}
-                    placeholder="Template Name"
-                    size="small"
-                  />
-                </Box>
-                <Box>
-                  <InputLabel sx={{ color: "black" }}>Mode</InputLabel>
-                  <FormControl>
-                    <RadioGroup
-                      aria-labelledby="demo-controlled-radio-buttons-group"
-                      name="controlled-radio-buttons-group"
-                      value={selectedOption}
-                      onChange={handleChange}
-                    >
-                      <FormControlLabel
-                        value="contacts"
-                        control={<Radio />}
-                        label="Contact Shortcodes"
-                      />
-                      <FormControlLabel
-                        value="account"
-                        control={<Radio />}
-                        label="Account Shortcodes"
-                      />
-                    </RadioGroup>
-                  </FormControl>
-                </Box>
-                <Box mt={2}>
-                  <InputLabel sx={{ color: "black" }}>From</InputLabel>
-                  {/* <Select className='job-template-select-dropdown'
-                                        placeholder="from"
-                                        options={options}
-                                        isMulti={false}// Enable multi-select
-                                        isSearchable // Enable search
-                                        value={fromtempdata}
-                                        isClearable
-                                        onChange={handleuserChange}
-                                        styles={{marginTop:'5px'}}
-                                    /> */}
-                  <Autocomplete
-                    options={options}
-                    sx={{ mt: 2, mb: 2, backgroundColor: "#fff" }}
-                    size="small"
-                    value={selecteduser}
-                    onChange={handleuserChange}
-                    isOptionEqualToValue={(option, value) =>
-                      option.value === value.value
-                    }
-                    getOptionLabel={(option) => option.label || ""}
-                    renderInput={(params) => (
-                      <>
-                        <TextField {...params} placeholder="Form" />
-                      </>
-                    )}
-                    isClearable={true}
-                  />
-                </Box>
-                <Box mt={2}>
-                  <InputLabel sx={{ color: "black" }}>Subject</InputLabel>
-                  <TextField
-                    margin="normal"
-                    fullWidth
-                    name="subject"
-                    onChange={handlesubject}
-                    inputRef={textFieldRef}
-                    value={inputText}
-                    onClick={(e) => setCursorPosition(e.target.selectionStart)}
-                    placeholder="Subject"
-                    size="small"
-                  />
-                </Box>
-                <Box>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={toggleDropdown}
-                    // sx={{ mt: 2 }}
-                    sx={{
-                      backgroundColor: "var(--color-save-btn)", // Normal background
+            <FormField label="Mode">
+              <RadioGroup value={selectedOption} onValueChange={(val) => handleChange({ target: { value: val } })}>
+                <div className="flex items-center gap-6">
+                  <div className="flex items-center gap-2">
+                    <RadioGroupItem value="contacts" id="contacts" />
+                    <Label htmlFor="contacts" className="cursor-pointer text-sm">Contact Shortcodes</Label>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <RadioGroupItem value="account" id="account" />
+                    <Label htmlFor="account" className="cursor-pointer text-sm">Account Shortcodes</Label>
+                  </div>
+                </div>
+              </RadioGroup>
+            </FormField>
+          </FormSection>
 
-                      "&:hover": {
-                        backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                      },
-                      borderRadius: "15px",
-                      mt: 2,
-                    }}
-                  >
-                    Add Shortcode
-                  </Button>
-                  <Popover
-                    open={showDropdown}
-                    anchorEl={anchorEl}
-                    onClose={handleCloseDropdown}
-                    anchorOrigin={{
-                      vertical: "bottom",
-                      horizontal: "left",
-                    }}
-                    transformOrigin={{
-                      vertical: "top",
-                      horizontal: "left",
-                    }}
-                  >
-                    <Box>
-                      <List
-                        className="dropdown-list"
-                        sx={{
-                          width: "300px",
-                          height: "300px",
-                          cursor: "pointer",
-                        }}
-                      >
-                        {filteredShortcuts.map((shortcut, index) => (
-                          <ListItem
-                            key={index}
-                            onClick={() => handleAddShortcut(shortcut.value)}
-                          >
-                            <ListItemText
-                              primary={shortcut.title}
-                              primaryTypographyProps={{
-                                style: {
-                                  fontWeight: shortcut.isBold
-                                    ? "bold"
-                                    : "normal",
-                                },
-                              }}
-                            />
-                          </ListItem>
-                        ))}
-                      </List>
-                    </Box>
-                  </Popover>
-                </Box>
-                <Box sx={{ mt: 5 }}>
-                  <EditorShortcodes
-                    onChange={handleEditorChange}
-                    initialContent={emailBody}
-                  />
-                </Box>
-                <Box sx={{ mt: 5, display: "flex", gap: 2 }}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleSaveExitTemplate}
-                    sx={{
-                      backgroundColor: "var(--color-save-btn)", // Normal background
-
-                      "&:hover": {
-                        backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                      },
-                      borderRadius: "15px",
-                    }}
-                  >
-                    Save & exit
-                  </Button>
-                  <Button
-                    onClick={saveTemp}
-                    variant="contained"
-                    color="primary"
-                    sx={{
-                      backgroundColor: "var(--color-save-btn)", // Normal background
-
-                      "&:hover": {
-                        backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                      },
-                      borderRadius: "15px",
-                      width: "80px",
-                    }}
-                  >
-                    {" "}
-                    Save
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    onClick={handleTempCancle}
-                    sx={{
-                      borderColor: "var(--color-border-cancel-btn)", // Normal background
-                      color: "var(--color-save-btn)",
-                      "&:hover": {
-                        backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                        color: "#fff",
-                        border: "none",
-                      },
-                      width: "80px",
-                      borderRadius: "15px",
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                </Box>
-              </form>
-            </Box>
-          </Grid>
-
-          <Grid
-            item
-            xs={12}
-            sm={0.4}
-            sx={{ display: { xs: "none", sm: "block" } }}
-          >
-            <Box
-              className="vertical-line"
-              sx={{
-                // borderLeft: '1px solid black',
-                height: "100%",
-                ml: 1.5,
-              }}
-            ></Box>
-          </Grid>
-
-          <Grid xs={12} sm={5.8}>
-            <Box
-              sx={{
-                alignItems: "center",
-                display: "flex",
-                justifyContent: "center",
-                flexDirection: "column",
-              }}
-            >
-              {/* Upload Zone */}
-
-              <Box
-                {...getRootProps()} // Spread dropzone props here
-                sx={{
-                  alignItems: "center",
-                  justifyContent: "center",
-                  display: "flex",
-                  flexDirection: "column",
-                  border: "2px dashed #ccc",
-                  padding: "20px",
-                  width: "100%",
-                  maxWidth: "500px",
-                  textAlign: "center",
-                  cursor: "pointer",
-                  marginBottom: "16px",
+          <FormSection title="Sender & Subject" icon={<User className="h-4 w-4" />}>
+            <FormField label="From">
+              <select
+                className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                value={selecteduser?.value || ""}
+                onChange={(e) => {
+                  const selected = options.find((o) => o.value === e.target.value) || null;
+                  handleuserChange(null, selected);
                 }}
               >
-                <input
-                  id="file-input"
-                  {...getInputProps()} // Spread input props here
-                  style={{ display: "none" }} // Hide the default file input
-                  multiple // Enable multiple file selection
+                <option value="">Select Sender</option>
+                {options.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            </FormField>
+
+            <FormField label="Subject">
+              <div className="space-y-2">
+                <Input
+                  name="subject"
+                  onChange={handlesubject}
+                  ref={textFieldRef}
+                  value={inputText}
+                  onClick={(e) => setCursorPosition(e.target.selectionStart)}
+                  placeholder="Subject"
                 />
-                <Typography variant="h6">Drag & drop file here</Typography>
-                <Typography variant="body2">or</Typography>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  sx={{
-                    backgroundColor: "var(--color-save-btn)",
-                    "&:hover": {
-                      backgroundColor: "var(--color-save-hover-btn)",
-                    },
-                    borderRadius: "15px",
-                  }}
-                >
-                  Browse Files
-                </Button>
-                <Typography variant="body2" sx={{ marginTop: "8px" }}>
-                  20 MB file size limit. Supported file types: PDF, DOC, DOCX,
-                  XLS, XLSX, JPG, PNG.
-                </Typography>
-              </Box>
+                <ShortcodePopover
+                  shortcuts={filteredShortcuts}
+                  onSelect={handleAddShortcut}
+                />
+              </div>
+            </FormField>
+          </FormSection>
 
-              {files.length > 0 && (
-                <Box sx={{ width: "100%", marginTop: "16px" }}>
-                  <Typography variant="h6" sx={{ marginBottom: "8px" }}>
-                    Selected Files:
-                  </Typography>
-                  {files.map((file, index) => (
-                    <Box
-                      key={index}
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        padding: "8px",
-                        borderBottom: "1px solid #eee",
+          {/* Email Body */}
+          <FormSection title="Email Body">
+            <EditorShortcodes
+              onChange={handleEditorChange}
+              initialContent={emailBody}
+            />
+          </FormSection>
+        </FormGrid.Main>
+
+        {/* ===== RIGHT COLUMN: Attachments ===== */}
+        <FormGrid.Sidebar>
+          <FormSection title="Attachments" icon={<Paperclip className="h-4 w-4" />}>
+            {/* Dropzone */}
+            <div
+              {...getRootProps()}
+              className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-muted/30 p-8 text-center transition-colors hover:border-primary/40 hover:bg-primary/5"
+            >
+              <input id="file-input" {...getInputProps()} className="hidden" multiple />
+              <Upload className="mb-3 h-8 w-8 text-muted-foreground" />
+              <p className="text-sm font-medium text-foreground">Drag & drop files here</p>
+              <p className="mt-1 text-xs text-muted-foreground">or</p>
+              <Button type="button" variant="outline" size="sm" className="mt-3">
+                Browse Files
+              </Button>
+              <p className="mt-3 text-xs text-muted-foreground">
+                20 MB limit. PDF, DOC, DOCX, XLS, XLSX, JPG, PNG.
+              </p>
+            </div>
+
+            {/* File List */}
+            {files.length > 0 && (
+              <div className="mt-4 space-y-1">
+                <p className="text-sm font-medium text-foreground">Selected Files:</p>
+                {files.map((file, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between rounded-lg border border-border px-3 py-2"
+                  >
+                    <div className="flex items-center gap-2 text-sm">
+                      <FileText className="h-4 w-4 text-muted-foreground" />
+                      <span className="truncate">{file.name}</span>
+                      <span className="text-xs text-muted-foreground">
+                        ({(file.size / 1024).toFixed(2)} KB)
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        const fileToDelete = files[index];
+                        console.log("filename", fileToDelete);
+                        if (!fileToDelete.id) {
+                          const updatedFiles = files.filter((_, i) => i !== index);
+                          setFiles(updatedFiles);
+                          return;
+                        }
+                        try {
+                          const response = await fetch(
+                            `${EMAIL_API}/workflow/deleteattachments/${_id}/${fileToDelete.name}`,
+                            { method: "DELETE" }
+                          );
+                          if (!response.ok) {
+                            throw new Error("Failed to delete file from server");
+                          }
+                          const updatedFiles = files.filter((_, i) => i !== index);
+                          setFiles(updatedFiles);
+                        } catch (error) {
+                          console.error("Error deleting file:", error);
+                        }
                       }}
+                      className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                     >
-                      <Typography variant="body1">
-                        {file.name} ({(file.size / 1024).toFixed(2)} KB)
-                      </Typography>
-                      {/* <IconButton
-                                            onClick={() => {
-                                              const updatedFiles = files.filter((_, i) => i !== index);
-                                              setFiles(updatedFiles); // Remove the file from the list
-                                            }}
-                                            sx={{ color: "red" }}
-                                          >
-                                            <DeleteIcon />
-                                          </IconButton> */}
-                      <IconButton
-                        onClick={async () => {
-                          const fileToDelete = files[index];
-                          console.log("filename", fileToDelete);
-                          // If the file has no `id`, it's a newly selected file (not saved yet)
-                          if (!fileToDelete.id) {
-                            const updatedFiles = files.filter(
-                              (_, i) => i !== index
-                            );
-                            setFiles(updatedFiles);
-                            return;
-                          }
-
-                          try {
-                            const response = await fetch(
-                              `${EMAIL_API}/workflow/deleteattachments/${_id}/${fileToDelete.name}`,
-                              { method: "DELETE" }
-                            );
-
-                            if (!response.ok) {
-                              throw new Error(
-                                "Failed to delete file from server"
-                              );
-                            }
-
-                            // Remove from local state after successful deletion
-                            const updatedFiles = files.filter(
-                              (_, i) => i !== index
-                            );
-                            setFiles(updatedFiles);
-                          } catch (error) {
-                            console.error("Error deleting file:", error);
-                          }
-                        }}
-                        sx={{ color: "red" }}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Box>
-                  ))}
-                </Box>
-              )}
-            </Box>
-          </Grid>
-        </Grid>
-      </Box>
-    </Box>
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </FormSection>
+        </FormGrid.Sidebar>
+      </FormGrid>
+    </FormPage>
   );
 };
 

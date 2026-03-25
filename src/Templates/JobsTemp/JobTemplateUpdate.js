@@ -1,5 +1,4 @@
-import React, { useState, useEffect,useRef } from "react";
-import { Chip, InputAdornment, Box, Button, Typography, Container, Grid, IconButton, Autocomplete, TextField, InputLabel, Switch, FormControlLabel, List, ListItem, ListItemText, Popover } from "@mui/material";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import Priority from "../Priority/Priority";
@@ -9,8 +8,17 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import DeleteIcon from "@mui/icons-material/Delete";
-import MultiSelectDropdown from "../MultiSelectDropdown"
+import MultiSelectDropdown from "../MultiSelectDropdown";
+import { FormPage, FormSection, FormField, FormRow, FormActions, FormGrid, ShortcodePopover } from "../../components/ui/form-layout";
+import { Input } from "../../components/ui/input";
+import { Button } from "../../components/ui/button";
+import { Switch } from "../../components/ui/switch";
+import { Label } from "../../components/ui/label";
+import { Textarea } from "../../components/ui/textarea";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../../components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "../../components/ui/popover";
+import { ScrollArea } from "../../components/ui/scroll-area";
+import { Trash2, MessageSquarePlus, FileText, Calendar, Users, Globe, Code } from "lucide-react";
 dayjs.extend(customParseFormat);
 
 const JobTemplateUpdate = ({ charLimit = 4000 }) => {
@@ -633,404 +641,247 @@ const [selectedUser, setSelectedUser] = useState([]);
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Box p={2}>
-        <Box
-          
-        >
-          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <Typography variant="h6" gutterBottom>
-              Edit Job Template
-            </Typography>
-            <Button onClick={addCommentField}>Add comments</Button>
-          </Box>
-          <Box>
-            <hr />
-          </Box>
-          <Grid container spacing={2}>
-            <Grid xs={12} sm={5.8} ml={2}>
-              <Box mt={2}>
-                <InputLabel sx={{ color: "black" }}>Template Name</InputLabel>
-                <TextField size="small" margin="normal" fullWidth placeholder="Template Name" onChange={(e) => setTempNameNew(e.target.value)} value={tempNameNew} />
-              </Box>
-              <Box mt={1}>
-                <InputLabel sx={{ color: "black" }}>Job Name</InputLabel>
-                <TextField value={jobname}   onClick={(e) => setCursorPosition(e.target.selectionStart)} onChange={handlejobName} size="small" margin="normal" fullWidth placeholder="Job Name" />
-              </Box>
-              <Box>
-                <Button variant="contained" color="primary" onClick={toggleDropdown} sx={{
-              backgroundColor: 'var(--color-save-btn)',  // Normal background
-             
-              '&:hover': {
-                backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-              },
-              borderRadius:'15px', mt: 2
-            }}>
-                  Add Shortcode
-                </Button>
+      <FormPage
+        title="Edit Job Template"
+        subtitle="Update your job template configuration"
+        actions={
+          <>
+            <Button variant="outline" onClick={handleJobTempCancle}>
+              Cancel
+            </Button>
+            <Button variant="secondary" onClick={updatesavejobtemp}>
+              Save
+            </Button>
+            <Button onClick={updatejobtemp}>
+              Save & Exit
+            </Button>
+          </>
+        }
+      >
+        <FormGrid>
+          {/* ===== LEFT COLUMN: Main Form ===== */}
+          <FormGrid.Main>
+            {/* General Info Section */}
+            <FormSection title="General Information" icon={<FileText className="h-4 w-4" />}>
+              <FormField label="Template Name">
+                <Input
+                  placeholder="Template Name"
+                  onChange={(e) => setTempNameNew(e.target.value)}
+                  value={tempNameNew}
+                />
+              </FormField>
 
-                <Popover
-                  open={showDropdown}
-                  anchorEl={anchorEl}
-                  onClose={handleCloseDropdown}
-                  anchorOrigin={{
-                    vertical: "bottom",
-                    horizontal: "left",
-                  }}
-                  transformOrigin={{
-                    vertical: "top",
-                    horizontal: "left",
-                  }}
-                >
-                  <Box>
-                    <List className="dropdown-list" sx={{ width: "300px", height: "300px", cursor: "pointer" }}>
-                      {filteredShortcuts.map((shortcut, index) => (
-                        <ListItem key={index} onClick={() => handleAddShortcut(shortcut.value)}>
-                          <ListItemText
-                            primary={shortcut.title}
-                            primaryTypographyProps={{
-                              style: {
-                                fontWeight: shortcut.isBold ? "bold" : "normal",
-                              },
-                            }}
-                          />
-                        </ListItem>
-                      ))}
-                    </List>
-                  </Box>
-                </Popover>
-              </Box>
-              <Box mt={2}>
-                <InputLabel sx={{ color: "black" }}>Job Assignees</InputLabel>
-                {/* <Autocomplete
-                  multiple
-                  sx={{ mt: 2 }}
-                  options={options}
-                  size="small"
-                  getOptionLabel={(option) => option.label}
-                  value={AssigneesNew}
-                  onChange={handleuserChange}
-                  renderOption={(props, option) => (
-                    <Box
-                      component="li"
-                      {...props}
-                      sx={{ cursor: "pointer", margin: "5px 10px" }} // Add cursor pointer style
-                    >
-                      {option.label}
-                    </Box>
-                  )}
-                  renderInput={(params) => <TextField {...params} variant="outlined" placeholder="Assignees" />}
-                  isOptionEqualToValue={(option, value) => option.value === value.value}
-                /> */}
-                 <MultiSelectDropdown 
-                                    value={selectedUser}
-                                    onChange={handleUserChange}
-                                    placeholder="Job Assignees"
-                                  />
-              </Box>
-              <Box mt={2}>
+              <FormField label="Job Name">
+                <div className="space-y-2">
+                  <Input
+                    value={jobname}
+                    ref={textFieldRef}
+                    onClick={(e) => setCursorPosition(e.target.selectionStart)}
+                    onChange={handlejobName}
+                    placeholder="Job Name"
+                  />
+                  <ShortcodePopover
+                    shortcuts={filteredShortcuts}
+                    onSelect={handleAddShortcut}
+                  />
+                </div>
+              </FormField>
+            </FormSection>
+
+            {/* Assignment Section */}
+            <FormSection title="Assignment" icon={<Users className="h-4 w-4" />}>
+              <FormField label="Job Assignees">
+                <MultiSelectDropdown
+                  value={selectedUser}
+                  onChange={handleUserChange}
+                  placeholder="Job Assignees"
+                />
+              </FormField>
+
+              <FormField label="Priority">
                 <Priority onPriorityChange={handlePriorityChange} selectedPriority={PriorityNew} />
-              </Box>
-              <Box mt={2}>
-                <EditorShortcodes initialContent={JobDescriptionNew} onChange={handleEditorChange} />
-              </Box>
-              <Box mt={5}>
-                <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-                  <Typography variant="h6">Start and Due Date</Typography>
-                  <Box className="absolutes-dates">
-                    <FormControlLabel control={<Switch checked={AbsoluteDateNew} onChange={(event) => handleAbsolutesDates(event.target.checked)} color="primary" />} label={"Absolute Date"} />
-                  </Box>
-                </Box>
-              </Box>
-              {AbsoluteDateNew && (
-                <>
-                  <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
-                    <Typography>Start Date</Typography>
+              </FormField>
+            </FormSection>
 
-                    <DatePicker  format="MM/DD/YYYY" sx={{ width: "100%" }} value={StartsDateNew} onChange={handleStartDateChange} renderInput={(params) => <TextField {...params} size="small" />} />
-                  </Box>
-                  <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
-                    <Typography>Due Date</Typography>
-                    <DatePicker  format="MM/DD/YYYY" sx={{ width: "100%" }} value={DueDateNew} onChange={handleDueDateChange} renderInput={(params) => <TextField {...params} size="small" />} />
-                  </Box>
-                </>
+            {/* Description Section */}
+            <FormSection title="Description">
+              <EditorShortcodes initialContent={JobDescriptionNew} onChange={handleEditorChange} />
+            </FormSection>
+
+            {/* Scheduling Section */}
+            <FormSection title="Start and Due Date" icon={<Calendar className="h-4 w-4" />}>
+              <div className="flex items-center justify-between">
+                <Label className="text-sm font-medium">Use Absolute Dates</Label>
+                <Switch
+                  checked={AbsoluteDateNew}
+                  onCheckedChange={handleAbsolutesDates}
+                />
+              </div>
+
+              {AbsoluteDateNew && (
+                <FormRow cols={2}>
+                  <FormField label="Start Date">
+                    <DatePicker format="MM/DD/YYYY" sx={{ width: "100%" }} value={StartsDateNew} onChange={handleStartDateChange} slotProps={{ textField: { size: "small" } }} />
+                  </FormField>
+                  <FormField label="Due Date">
+                    <DatePicker format="MM/DD/YYYY" sx={{ width: "100%" }} value={DueDateNew} onChange={handleDueDateChange} slotProps={{ textField: { size: "small" } }} />
+                  </FormField>
+                </FormRow>
               )}
 
               {!AbsoluteDateNew && (
-                <>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                    <Typography>Start In</Typography>
-                    <TextField size="small" margin="normal" fullWidth value={StartsInNew} onChange={(e) => setStartsInNew(e.target.value)} sx={{ ml: 1 }} />
-                    <Autocomplete
-                      options={dayOptions}
-                      size="small"
-                      getOptionLabel={(option) => option.label}
-                      onChange={(event, newValue) => {
-                        if (newValue) {
-                          setStartsInDurationNew(newValue.value); // Update the duration state
-                          // Update the TextField state with the selected option's label
-                        }
-                      }}
-                      renderInput={(params) => <TextField {...params} variant="outlined" />}
-                      value={dayOptions.find((option) => option.value === StartsInDurationNew) || null}
-                      className="job-template-select-dropdown"
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <Label className="w-16 shrink-0 text-sm">Start In</Label>
+                    <Input
+                      value={StartsInNew}
+                      onChange={(e) => setStartsInNew(e.target.value)}
+                      className="flex-1"
                     />
-                  </Box>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                    <Typography>Due In</Typography>
-                    <TextField size="small" margin="normal" fullWidth value={DueInNew} onChange={(e) => setDueInNew(e.target.value)} sx={{ ml: 1.5 }} />
-                    <Autocomplete
-                      options={dayOptions}
-                      size="small"
-                      getOptionLabel={(option) => option.label}
-                      onChange={(event, newValue) => {
-                        if (newValue) {
-                          setDueInDurationNew(newValue.value); // Update the duration state
-                          // Update the TextField state with the selected option's label
-                        }
-                      }}
-                      renderInput={(params) => <TextField {...params} variant="outlined" />}
-                      value={dayOptions.find((option) => option.value === DueInDurationNew) || null}
-                      className="job-template-select-dropdown"
+                    <Select value={StartsInDurationNew} onValueChange={setStartsInDurationNew}>
+                      <SelectTrigger className="w-28">
+                        <SelectValue placeholder="Unit" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {dayOptions.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Label className="w-16 shrink-0 text-sm">Due In</Label>
+                    <Input
+                      value={DueInNew}
+                      onChange={(e) => setDueInNew(e.target.value)}
+                      className="flex-1"
                     />
-                  </Box>
-                </>
+                    <Select value={DueInDurationNew} onValueChange={setDueInDurationNew}>
+                      <SelectTrigger className="w-28">
+                        <SelectValue placeholder="Unit" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {dayOptions.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
               )}
-            </Grid>
+            </FormSection>
+          </FormGrid.Main>
 
-            <Grid xs={12} sm={5.8} mt={3} ml={2}>
-              <Box style={{ display: "flex", alignItems: "center" }}>
-                {/* <EditCalendarRoundedIcon sx={{ fontSize: '120px', color: '#c6c7c7', }} /> */}
-                <Box style={{ display: "flex", flexDirection: "column", gap: "8px", width: "100%" }}>
-                  <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                    <Typography variant="body">
-                      <b>Client-facing status</b>
-                    </Typography>
-                    <FormControlLabel control={<Switch onChange={(event) => handleClientFacing(event.target.checked)} checked={clientFacingStatus} color="primary" />} label="Show in Client portal" />
-                  </Box>
-                  <Box>
-                    {clientFacingStatus && (
-                      <>
-                        <Typography>Job name for client</Typography>
-                        <TextField fullWidth name="subject"  inputRef={textFieldRef}
-                         value={inputText}
-                           onChange={handlechatsubject} 
-                           onClick={(e) => setCursorPosition(e.target.selectionStart)} placeholder="Job name for client" size="small" sx={{ background: "#fff", mt: 2 }} />
+          {/* ===== RIGHT COLUMN: Sidebar ===== */}
+          <FormGrid.Sidebar>
+            {/* Client-Facing Section */}
+            <FormSection title="Client-Facing Status" icon={<Globe className="h-4 w-4" />}>
+              <div className="flex items-center justify-between">
+                <Label className="text-sm font-medium">Show in Client Portal</Label>
+                <Switch
+                  checked={clientFacingStatus}
+                  onCheckedChange={handleClientFacing}
+                />
+              </div>
 
-                        <Box>
-                          <Button variant="contained" color="primary" onClick={toggleShortcodeDropdown} sx={{
-              backgroundColor: 'var(--color-save-btn)',  // Normal background
-             
-              '&:hover': {
-                backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-              },
-              borderRadius:'15px', mt: 2
-            }}>
-                            Add Shortcode
-                          </Button>
-                          <Popover
-                            open={showDropdownClientJob}
-                            anchorEl={anchorElClientJob}
-                            onClose={handleCloseDropdown}
-                            anchorOrigin={{
-                              vertical: "bottom",
-                              horizontal: "left",
-                            }}
-                            transformOrigin={{
-                              vertical: "top",
-                              horizontal: "left",
-                            }}
-                          >
-                            <Box>
-                              <List className="dropdown-list" sx={{ width: "300px", height: "300px", cursor: "pointer" }}>
-                                {filteredShortcuts.map((shortcut, index) => (
-                                  <ListItem key={index} onClick={() => handleJobAddShortcut(shortcut.value)}>
-                                    <ListItemText
-                                      primary={shortcut.title}
-                                      primaryTypographyProps={{
-                                        style: {
-                                          fontWeight: shortcut.isBold ? "bold" : "normal",
-                                        },
-                                      }}
-                                    />
-                                  </ListItem>
-                                ))}
-                              </List>
-                            </Box>
-                          </Popover>
-                        </Box>
-                        <Box mt={2}>
-                          <Typography>Status</Typography>
-                          <Autocomplete
-                            options={optionstatus}
-                            size="small"
-                            sx={{ mt: 1 }}
-                            value={selectedJob}
-                            onChange={handleJobChange}
-                            getOptionLabel={(option) => option.label}
-                            isOptionEqualToValue={(option, value) => option.value === value.value}
-                            renderOption={(props, option) => (
-                              <Box component="li" {...props}>
-                                {/* Color dot */}
-                                <Chip
-                                  size="small"
-                                  style={{
-                                    backgroundColor: option.clientfacingColour,
-                                    marginRight: 8,
-                                    marginLeft: 8,
-                                    borderRadius: "50%",
-                                    height: "15px",
-                                  }}
-                                />
-                                {option.label}
-                              </Box>
-                            )}
-                            renderInput={(params) => (
-                              <TextField
-                                {...params}
-                                placeholder="Select Client Facing Job"
-                                InputProps={{
-                                  ...params.InputProps,
-                                  startAdornment:
-                                    params.inputProps.value && clientFacingJobs.length > 0 ? (
-                                      <Chip
-                                        size="small"
-                                        style={{
-                                          backgroundColor: clientFacingJobs.find((job) => job.clientfacingName === params.inputProps.value)?.clientfacingColour, // Set color from selection
-                                          marginRight: 8,
-                                          marginLeft: 2,
-                                          borderRadius: "50%",
-                                          height: "15px",
-                                        }}
-                                      />
-                                    ) : null,
-                                }}
-                              />
-                            )}
-                          />
-                        </Box>
-                        <Box sx={{ position: "relative", mt: 2 }}>
-                          <InputLabel sx={{ color: "black" }}>Description</InputLabel>
-                          <TextField
-                            fullWidth
-                            size="small"
-                            margin="normal"
-                            type="text"
-                            multiline
-                            value={clientDescription}
-                              inputRef={descriptionFieldRef}
-                              onClick={(e) => setCursorPosition(e.target.selectionStart)}
-                              onChange={handleChange}
-                            placeholder="Description"
-                            InputProps={{
-                              endAdornment: (
-                                <InputAdornment position="end">
-                                  <Typography sx={{ color: "gray", fontSize: "12px", position: "absolute", bottom: "15px", right: "15px" }}>
-                                    {charCount}/{charLimit}
-                                  </Typography>
-                                </InputAdornment>
-                              ),
-                            }}
-                          />
-                        </Box>
-                        <Box>
-                          <Button variant="contained" color="primary" onClick={toggleDescriptionDropdown} sx={{
-              backgroundColor: 'var(--color-save-btn)',  // Normal background
-             
-              '&:hover': {
-                backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-              },
-              borderRadius:'15px', mt: 2
-            }}>
-                            Add Shortcode
-                          </Button>
-
-                          <Popover
-                            open={showDropdownDescription}
-                            anchorEl={anchorElDescription}
-                            onClose={handleCloseDropdown}
-                            anchorOrigin={{
-                              vertical: "bottom",
-                              horizontal: "left",
-                            }}
-                            transformOrigin={{
-                              vertical: "top",
-                              horizontal: "left",
-                            }}
-                          >
-                            <Box>
-                              <List className="dropdown-list" sx={{ width: "300px", height: "300px", cursor: "pointer" }}>
-                                {filteredShortcuts.map((shortcut, index) => (
-                                  <ListItem key={index} onClick={() => handleDescriptionAddShortcut(shortcut.value)}>
-                                    <ListItemText
-                                      primary={shortcut.title}
-                                      primaryTypographyProps={{
-                                        style: {
-                                          fontWeight: shortcut.isBold ? "bold" : "normal",
-                                        },
-                                      }}
-                                    />
-                                  </ListItem>
-                                ))}
-                              </List>
-                            </Box>
-                          </Popover>
-                        </Box>
-                      </>
-                    )}
-                  </Box>
-
-                  {comments.map((comment, index) => (
-                    <div key={index} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                      <TextField value={comment}  size="small" onChange={(e) => handleCommentChange(index, e.target.value)} placeholder={`Comment ${index + 1}`} variant="outlined" fullWidth multiline />
-                      <IconButton onClick={() => deleteCommentField(index)}>
-                        <DeleteIcon />
-                      </IconButton>
+              {clientFacingStatus && (
+                <div className="space-y-4 pt-2">
+                  <FormField label="Job Name for Client">
+                    <div className="space-y-2">
+                      <Input
+                        ref={textFieldRef}
+                        value={inputText}
+                        onChange={handlechatsubject}
+                        onClick={(e) => setCursorPosition(e.target.selectionStart)}
+                        placeholder="Job name for client"
+                      />
+                      <ShortcodePopover
+                        shortcuts={filteredShortcuts}
+                        onSelect={handleJobAddShortcut}
+                      />
                     </div>
-                  ))}
-                </Box>
-              </Box>
-            </Grid>
-          </Grid>
-          <Box mt={3}>
-            <hr />
-          </Box>
+                  </FormField>
 
-          <Box sx={{ pt: 2, display: "flex", alignItems: "center", gap: 5 }}>
-            <Button variant="contained" color="primary" onClick={updatejobtemp} sx={{
-                      backgroundColor: 'var(--color-save-btn)',  // Normal background
-                     
-                      '&:hover': {
-                        backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                      },
-                      borderRadius:'15px', 
-                    }}>
-              Save & exit
-            </Button>
-            <Button variant="contained" color="primary" onClick={updatesavejobtemp} sx={{
-                      backgroundColor: 'var(--color-save-btn)',  // Normal background
-                     
-                      '&:hover': {
-                        backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                      },
-                      borderRadius:'15px', width:'80px'
-                    }}>
-              Save
-            </Button>
-            <Button variant="outlined" onClick={handleJobTempCancle} sx={{
-                  borderColor: 'var(--color-border-cancel-btn)',  // Normal background
-                 color:'var(--color-save-btn)',
-                  '&:hover': {
-                    backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                    color:'#fff',
-                    border:"none"
-                  },
-                  width:'80px',borderRadius:'15px'
-                }}>
-              Cancel
-            </Button>
-          </Box>
-        </Box>
-      </Box>
+                  <FormField label="Status">
+                    <select
+                      className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      value={selectedJob?.value || ""}
+                      onChange={(e) => {
+                        const selected = optionstatus.find((s) => s.value === e.target.value);
+                        handleJobChange(null, selected || null);
+                      }}
+                    >
+                      <option value="">Select Client Facing Job</option>
+                      {optionstatus.map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </select>
+                  </FormField>
+
+                  <FormField label="Description">
+                    <div className="relative">
+                      <Textarea
+                        ref={descriptionFieldRef}
+                        value={clientDescription}
+                        onClick={(e) => setCursorPosition(e.target.selectionStart)}
+                        onChange={handleChange}
+                        placeholder="Description"
+                        rows={4}
+                      />
+                      <span className="absolute bottom-2 right-3 text-xs text-muted-foreground">
+                        {charCount}/{charLimit}
+                      </span>
+                    </div>
+                    <ShortcodePopover
+                      shortcuts={filteredShortcuts}
+                      onSelect={handleDescriptionAddShortcut}
+                    />
+                  </FormField>
+                </div>
+              )}
+            </FormSection>
+
+            {/* Comments Section */}
+            <FormSection
+              title="Comments"
+              icon={<MessageSquarePlus className="h-4 w-4" />}
+            >
+              <div className="space-y-3">
+                {comments.map((comment, index) => (
+                  <div key={index} className="flex items-start gap-2">
+                    <Textarea
+                      value={comment}
+                      onChange={(e) => handleCommentChange(index, e.target.value)}
+                      placeholder={`Comment ${index + 1}`}
+                      rows={2}
+                      className="flex-1"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => deleteCommentField(index)}
+                      className="mt-1 rounded-lg p-2 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addCommentField}
+                  className="w-full"
+                >
+                  <MessageSquarePlus className="h-3.5 w-3.5" />
+                  Add Comment
+                </Button>
+              </div>
+            </FormSection>
+          </FormGrid.Sidebar>
+        </FormGrid>
+      </FormPage>
     </LocalizationProvider>
   );
 };

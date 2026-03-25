@@ -1,16 +1,10 @@
-
 import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Typography,
-  Drawer,
-  IconButton,
-  CircularProgress,
-  TextField,
-  Button,
-} from "@mui/material";
-import { MdClose } from "react-icons/md";
 import axios from "axios";
+import { FormDrawer, FormDrawerFooter, FormSection, FormField } from "../../components/ui/form-layout";
+import { Input } from "../../components/ui/input";
+import { Button } from "../../components/ui/button";
+import { ScrollArea } from "../../components/ui/scroll-area";
+import { FolderOpen, FolderClosed, FileText } from "lucide-react";
 
 const CreateFolder = ({
   open,
@@ -404,63 +398,48 @@ const handleclose=()=>{
   }
 
   return (
-    <Box>
-      <Drawer anchor="right" open={open} onClose={handleclose}>
-        
-        <Box
-          sx={{
-            backgroundColor: "#fff",
-            borderRadius: "8px",
-
-            padding: 2,
-            width: 600,
-            fontFamily:
-              "'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif",
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Typography variant="h6">Create folder new </Typography>
-            <IconButton onClick={handleclose}>
-              <MdClose />
-            </IconButton>
-          </Box>
-          <TextField
-            fullWidth
-            size="small"
-            variant="outlined"
+    <FormDrawer
+      open={open}
+      onClose={handleclose}
+      title="Create New Folder"
+      description="Choose a location and name your folder"
+      width="lg"
+    >
+      <FormSection title="Folder Details">
+        <FormField label="Folder Name">
+          <Input
             placeholder="Folder Name"
             value={newFolderName}
             onChange={(e) => setNewFolderName(e.target.value)}
           />
-          <Button
-            variant="contained"
-            sx={{ mt: 2 }}
-            onClick={createFolderAPI}
-          >
-            Create Folder
-          </Button>
+        </FormField>
+      </FormSection>
 
-          <Box sx={{ maxHeight: "500px", overflowY: "auto" }}>
+      <FormSection title="Select Location">
+        <ScrollArea className="h-[400px] rounded-lg border border-border">
+          <div className="p-2">
             {renderContents(structFolder.folders, (newFolders) =>
               setStructFolder({ ...structFolder, folders: newFolders })
             )}
-
             {renderPrivateContents(privateStructFolder.folders, (newFolders) =>
               setPrivateStructFolder({
                 ...privateStructFolder,
                 folders: newFolders,
               })
             )}
-          </Box>
-        </Box>
-      </Drawer>
-    </Box>
+          </div>
+        </ScrollArea>
+      </FormSection>
+
+      <FormDrawerFooter>
+        <Button variant="outline" onClick={handleclose}>
+          Cancel
+        </Button>
+        <Button onClick={createFolderAPI}>
+          Create Folder
+        </Button>
+      </FormDrawerFooter>
+    </FormDrawer>
   );
 };
 
