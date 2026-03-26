@@ -1,40 +1,23 @@
 
-
-
 import React, { useState, useEffect } from 'react';
-
-
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import {
-    Box,
-    Button,
-    Typography,
-    Container,
-    Autocomplete,
-    TextField,
-    Dialog, DialogActions, DialogContent, DialogTitle,
-    Switch,
-    FormControlLabel,
-    Chip,
-    IconButton,
-    Checkbox,
-    OutlinedInput,MenuItem, Select,FormControl,InputLabel
-} from '@mui/material';
 import { toast } from "react-toastify";
 import { useNavigate, useParams } from "react-router-dom";
 import Editor from '../Texteditor/Editor';
-import Grid from '@mui/material/Unstable_Grid2';
 import Priority from '../Priority/Priority';
 import Status from '../Status/Status';
 import dayjs from 'dayjs';
-
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { PiDotsSixVerticalBold } from "react-icons/pi";
-import { RiDeleteBin6Line } from "react-icons/ri";
-import { FiPlusCircle } from "react-icons/fi";
-import MultiSelectDropdown from "../MultiSelectDropdown"
-import TagsMultiSelectDropDown  from "../TagsMultiSelectDropDown"
+import MultiSelectDropdown from "../MultiSelectDropdown";
+import TagsMultiSelectDropDown from "../TagsMultiSelectDropDown";
+import { FormPage, FormSection, FormField, FormRow, FormGrid } from "../../components/ui/form-layout";
+import { Input } from "../../components/ui/input";
+import { Button } from "../../components/ui/button";
+import { Label } from "../../components/ui/label";
+import { Switch } from "../../components/ui/switch";
+import { Checkbox } from "../../components/ui/checkbox";
+import { Trash2, Plus, GripVertical, FileText, Calendar, ListChecks } from "lucide-react";
 const Tasks = () => {
     const TASK_API = process.env.REACT_APP_TASK_TEMP_URL;
     const USER_API = process.env.REACT_APP_USER_URL;
@@ -612,468 +595,205 @@ const Tasks = () => {
     };
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <Box p={2}>
-                <Box >
-                    <Box>
-                        <form>
-                            <Box className='box-b'>
-                                <Typography variant='h5' gutterBottom>Edit Task Template</Typography>
-                                <Box mt={2} mb={2}><hr /></Box>
-                                <Grid container spacing={2}>
-                                    <Grid item xs={12} sm={5.8}>
+            <FormPage
+                title="Edit Task Template"
+                subtitle="Configure your task template settings"
+                actions={
+                    <>
+                        <Button variant="outline" onClick={handleTaskTempCancle}>Cancel</Button>
+                        <Button variant="secondary" onClick={updatesavetasktemp}>Save</Button>
+                        <Button onClick={updatetasktemp}>Save & Exit</Button>
+                    </>
+                }
+            >
+                <FormGrid>
+                    {/* ===== LEFT COLUMN: Task Details ===== */}
+                    <FormGrid.Main>
+                        <FormSection title="General" icon={<FileText className="h-4 w-4" />}>
+                            <FormRow cols={2}>
+                                <FormField label="Template Name">
+                                    <Input
+                                        name="TemplateName"
+                                        placeholder="Template Name"
+                                        value={tempNameNew}
+                                        onChange={(e) => setTempNameNew(e.target.value)}
+                                    />
+                                </FormField>
+                                <div>
+                                    <Status onStatusChange={handleStatusChange} selectedStatus={status} />
+                                </div>
+                            </FormRow>
 
-                                        <Box sx={{ width: '100%' }}>
-                                            <Grid container spacing={2}>
-                                                <Grid item xs={12} sm={6}>
-                                                    <Box>
-                                                        <label className='task-input-label' >Template Name</label>
-                                                        <TextField
-                                                            fullWidth
-                                                            name="TemplateName"
-                                                            placeholder="Template Name"
-                                                            size="small"
-                                                            margin='normal'
-                                                            sx={{ background: '#fff',  }}
-                                                            onChange={(e) => setTempNameNew(e.target.value)} value={tempNameNew}
-                                                        />
-                                                    </Box>
-                                                </Grid>
-                                                <Grid item xs={12} sm={6}>
-                                                    <Box>
-                                                        <Status onStatusChange={handleStatusChange} selectedStatus={status} />
-                                                    </Box>
-                                                </Grid>
-                                            </Grid>
-                                        </Box>
-                                        <Box sx={{ width: '100%' }}>
-                                            <Grid container spacing={2}>
-                                                {/* <Grid item xs={12} sm={6}>
-                                                    <Box>
-                                                        <label className='task-input-label'>Task Assignee</label>
-                                                        <Autocomplete
-                                                            multiple
-                                                            sx={{ mt: 2 }}
-                                                            options={options}
-                                                            size="small"
-                                                            getOptionLabel={(option) => option.label}
-                                                            value={AssigneesNew}
-                                                            onChange={handleuserChange}
-                                                            renderOption={(props, option) => (
-                                                                <Box
-                                                                    component="li"
-                                                                    {...props}
-                                                                    sx={{ cursor: 'pointer', margin: '5px 10px' }} // Add cursor pointer style
-                                                                >
-                                                                    {option.label}
-                                                                </Box>
-                                                            )}
-                                                            renderInput={(params) => (
-                                                                <TextField {...params} variant="outlined" placeholder="Assignees" />
-                                                            )}
-                                                            isOptionEqualToValue={(option, value) => option.value === value.value}
-                                                        />
-                                                    </Box>
-                                                </Grid> */}
-                                                                  <Grid item xs={12} sm={6} pr={3}>
-  
-  <InputLabel sx={{color:'black'}}>Task Assignee</InputLabel>
-  {/* // With internal options (fetches data automatically) */}
-<MultiSelectDropdown 
-value={selectedUser}
-onChange={handleUserChange}
-placeholder="Assignees"
-/>
+                            <FormRow cols={2}>
+                                <FormField label="Task Assignee">
+                                    <MultiSelectDropdown
+                                        value={selectedUser}
+                                        onChange={handleUserChange}
+                                        placeholder="Assignees"
+                                    />
+                                </FormField>
+                                <div>
+                                    <Priority onPriorityChange={handlePriorityChange} selectedPriority={priority} />
+                                </div>
+                            </FormRow>
+                        </FormSection>
 
-</Grid>
-                                                <Grid item xs={12} sm={6}>
-                                                    <Box >
-                                                        <Priority onPriorityChange={handlePriorityChange} selectedPriority={priority} />
-                                                    </Box>
-                                                </Grid>
-                                            </Grid>
-                                        </Box>
-                                        <Box sx={{ mt: 3,mb:7 }}>
-                                            <Editor
-                                                initialContent={taskDiscription} onChange={handleEditorChange}
-                                            />
-                                        </Box>
-                                        <Box mt={2} mr={1}>
-                                            {/* <label className='task-input-label'>Tags</label>
-                                            <Autocomplete
-                                                multiple
-                                                size='small'
-                                                id="tags-outlined"
-                                                options={tagsoptions}
-                                                getOptionLabel={(option) => option.label}
-                                                value={tagsNew}
-                                                onChange={handleTagChange}
-                                                renderTags={(selected, getTagProps) =>
-                                                    selected.map((option, index) => (
-                                                        <Chip
-                                                            key={option.value}
-                                                            label={option.label}
-                                                            style={option.customTagStyle}
-                                                            {...getTagProps({ index })}
-                                                        />
-                                                    ))
-                                                }
-                                                renderInput={(params) => (
-                                                    <TextField
-                                                        {...params}
-                                                        variant="outlined"
+                        <FormSection title="Description">
+                            <Editor initialContent={taskDiscription} onChange={handleEditorChange} />
+                        </FormSection>
 
-                                                        placeholder="Tags"
-                                                        sx={{ width: '100%', marginTop: '8px', backgroundColor: '#fff' }}
-                                                    />
-                                                )}
-                                                renderOption={(props, option) => (
-                                                    <Box component="li" {...props} style={option.customStyle}>
-                                                        {option.label}
-                                                    </Box>
-                                                )}
-                                                isOptionEqualToValue={(option, value) => option.value === value.value}
-                                            /> */}
-                                            <InputLabel sx={{ color: "black", mb: 1 }}>Tags</InputLabel>
-{/* <FormControl sx={{ width: "100%" }}>
-  <Select
-    multiple
-    size="small"
-    id="tags-outlined"
-    value={combinedTagsValues}
-    onChange={handleTagChange}
-    input={<OutlinedInput />}
-    displayEmpty
-    renderValue={(selected) => {
-      if (selected.length === 0) {
-        return <span style={{ color: "#aaa" }}>Select tags...</span>;
-      }
-      return (
-        <Box sx={{ display: "flex", flexWrap: "wrap", gap: "6px", padding: "6px" }}>
-          {selected.map((value) => {
-            const option = tagsoptions.find((opt) => opt.value === value);
-            return (
-              <Chip
-                key={value}
-                label={option?.label}
-                sx={{
-                  backgroundColor: option?.colour,
-                  color: "#fff",
-                  fontWeight: 500,
-                  fontSize: "10px",
-                  borderRadius: "16px",
-                  height: "20px",
-                  cursor: "pointer",
-                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)",
-                }}
-              />
-            );
-          })}
-        </Box>
-      );
-    }}
-    MenuProps={{
-      PaperProps: {
-        style: { maxHeight: 250 },
-      },
-    }}
-    sx={{
-      borderRadius: "10px",
-      "& .MuiOutlinedInput-root": { borderRadius: "10px" },
-    }}
-  >
-    {tagsoptions.map((option) => {
-      const dynamicWidth = Math.min(option.label.length * 8 + 16, 150);
-      return (
-        <MenuItem
-          key={option.value}
-          value={option.value}
-          sx={{
-            backgroundColor: option.colour,
-            color: "#fff",
-            fontSize: "10px",
-            borderRadius: "10px",
-            margin: "5px",
-            textAlign: "center",
-            padding: "4px 9px",
-            minWidth: `${dynamicWidth}px`,
-            maxWidth: `${dynamicWidth}px`,
-            "&:hover": { backgroundColor: option.colour, color: "#fff" },
-          }}
-        >
-          {option.label}
-        </MenuItem>
-      );
-    })}
-  </Select>
-  </FormControl> */}
-  <TagsMultiSelectDropDown 
-    value={tagsNew}
-    onChange={handleTagChange}
-    placeholder="Tags"
-  />
-                                        </Box>
-                                        <Box mt={2}>
-                                            <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
-                                                <Typography variant='h6' className='task-input-label'>Start and Due Date</Typography>
-                                                <Box className='absolutes-dates'>
-                                                    <FormControlLabel
-                                                        control={
-                                                            <Switch
-                                                                checked={absoluteDate}
-                                                                onChange={(event) => handleAbsolutesDates(event.target.checked)}
-                                                                color="primary"
-                                                            />
-                                                        }
-                                                        label={"Absolute Date"}
-                                                    />
-                                                </Box>
-                                            </Box>
-                                        </Box>
-                                        {absoluteDate && (
-                                            <>
-                                                <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-                                                    <Typography className='task-input-label'>Start Date</Typography>
-                                                    <DatePicker
-                                                         format="MM/DD/YYYY"
-                                                        sx={{ width: '100%', backgroundColor: '#fff' }}
-                                                        value={StartsDateNew} onChange={handleStartDateChange}
-                                                        renderInput={(params) => <TextField {...params} size="small" />}
-                                                    />
-                                                </Box>
-                                                <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-                                                    <Typography className='task-input-label'>Due Date</Typography>
-                                                    <DatePicker
-                                                   format="MM/DD/YYYY"
-                                                        sx={{ width: '100%', backgroundColor: '#fff' }}
-                                                        value={DueDateNew} onChange={handleDueDateChange}
-                                                        renderInput={(params) => <TextField {...params} size="small" />}
-                                                    />
-                                                </Box>
-                                            </>
-                                        )}
-                                        {!absoluteDate && (
-                                            <>
-                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                                    <Typography className='task-input-label'>Start In</Typography>
-                                                    <TextField
-                                                         size="small"
-                                                        margin='normal'
-                                                        fullWidth
-                                                        defaultValue={0}
+                        <FormSection title="Tags">
+                            <TagsMultiSelectDropDown
+                                value={tagsNew}
+                                onChange={handleTagChange}
+                                placeholder="Tags"
+                            />
+                        </FormSection>
 
-                                                        sx={{ background: '#fff', ml: 1.5 }}
-                                                        value={StartsInNew}
-                                                        onChange={(e) => setStartsInNew(e.target.value)}
-                                                    />
-                                                    <Autocomplete
-                                                        options={dayOptions}
-                                                       size="small"
-                                                        getOptionLabel={(option) => option.label}
-                                                        onChange={(event, newValue) => {
-                                                            if (newValue) {
-                                                                setStartsInDurationNew(newValue.value); // Update the duration state
-                                                                // Update the TextField state with the selected option's label
-                                                            }
-                                                        }}
-                                                        renderInput={(params) => <TextField {...params} variant="outlined" />}
-                                                        value={dayOptions.find((option) => option.value === StartsInDurationNew) || null}
-                                                        className="job-template-select-dropdown"
-                                                    />
-                                                </Box>
-                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                                    <Typography className='task-input-label'>Due In</Typography>
-                                                    <TextField
-                                                       size="small"
-                                                        margin='normal'
-                                                        value={DueInNew}
-                                                        onChange={(e) => setDueInNew(e.target.value)}
-                                                        fullWidth
-                                                        defaultValue={0}
+                        <FormSection title="Start and Due Date" icon={<Calendar className="h-4 w-4" />}>
+                            <div className="flex items-center justify-between">
+                                <Label className="text-sm font-medium">Absolute Date</Label>
+                                <Switch
+                                    checked={absoluteDate}
+                                    onCheckedChange={handleAbsolutesDates}
+                                />
+                            </div>
 
-                                                        sx={{ background: '#fff', ml: 1.8, }}
+                            {absoluteDate && (
+                                <div className="space-y-4 mt-4">
+                                    <FormField label="Start Date">
+                                        <DatePicker
+                                            format="MM/DD/YYYY"
+                                            sx={{ width: '100%', backgroundColor: '#fff' }}
+                                            value={StartsDateNew}
+                                            onChange={handleStartDateChange}
+                                        />
+                                    </FormField>
+                                    <FormField label="Due Date">
+                                        <DatePicker
+                                            format="MM/DD/YYYY"
+                                            sx={{ width: '100%', backgroundColor: '#fff' }}
+                                            value={DueDateNew}
+                                            onChange={handleDueDateChange}
+                                        />
+                                    </FormField>
+                                </div>
+                            )}
 
-                                                    />
+                            {!absoluteDate && (
+                                <div className="space-y-4 mt-4">
+                                    <div className="flex items-center gap-3">
+                                        <Label className="w-20 shrink-0 text-sm">Start In</Label>
+                                        <Input
+                                            value={StartsInNew}
+                                            onChange={(e) => setStartsInNew(e.target.value)}
+                                            className="flex-1"
+                                        />
+                                        <select
+                                            className="flex h-10 rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                            value={StartsInDurationNew || ""}
+                                            onChange={(e) => setStartsInDurationNew(e.target.value)}
+                                        >
+                                            <option value="">Select</option>
+                                            {dayOptions.map((opt) => (
+                                                <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <Label className="w-20 shrink-0 text-sm">Due In</Label>
+                                        <Input
+                                            value={DueInNew}
+                                            onChange={(e) => setDueInNew(e.target.value)}
+                                            className="flex-1"
+                                        />
+                                        <select
+                                            className="flex h-10 rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                            value={DueInDurationNew || ""}
+                                            onChange={(e) => setDueInDurationNew(e.target.value)}
+                                        >
+                                            <option value="">Select</option>
+                                            {dayOptions.map((opt) => (
+                                                <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+                            )}
+                        </FormSection>
+                    </FormGrid.Main>
 
-                                                    <Autocomplete
-                                                        options={dayOptions}
-                                                        size="small"
-                                                        getOptionLabel={(option) => option.label}
-                                                        onChange={(event, newValue) => {
-                                                            if (newValue) {
-                                                                setDueInDurationNew(newValue.value); // Update the duration state
-                                                                // Update the TextField state with the selected option's label
-                                                            }
-                                                        }}
-                                                        renderInput={(params) => <TextField {...params} variant="outlined" />}
-                                                        value={dayOptions.find((option) => option.value === DueInDurationNew) || null}
-                                                        className="job-template-select-dropdown"
-                                                    />
-                                                </Box>
-                                            </>
-                                        )}
-                                    </Grid>
-                                    <Grid item xs={12} sm={0.4} sx={{ display: { xs: 'none', sm: 'block' } }}>
-                                        <Box
-                                            sx={{
-                                                borderLeft: '1px solid black',
-                                                height: '100%',
-                                                ml: 1.5
-                                            }}
-                                        ></Box>
-                                    </Grid>
-                                    <Grid item xs={12} sm={5.8} >
-                                        <div className="B">
+                    {/* ===== RIGHT COLUMN: Subtasks ===== */}
+                    <FormGrid.Sidebar>
+                        <FormSection title="Subtasks" icon={<ListChecks className="h-4 w-4" />}>
+                            <div className="flex items-center justify-between">
+                                <Label className="text-sm font-medium">Enable Subtasks</Label>
+                                <Switch
+                                    checked={SubtaskSwitch}
+                                    onCheckedChange={handleSubtaskSwitch}
+                                />
+                            </div>
 
-                                            <DragDropContext onDragEnd={handleDragEnd}>
-
-                                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                                    <Typography variant='h6'>Subtasks</Typography>
-                                                    <FormControlLabel
-                                                        control={
-                                                            <Switch onChange={(event) => handleSubtaskSwitch(event.target.checked)} checked={SubtaskSwitch} color="primary" />
-                                                        }
-
-                                                    />
-                                                </Box>
-
-                                                {/* {SubtaskSwitch && (
-                                                    <Droppable droppableId="subtaskList">
+                            {SubtaskSwitch && (
+                                <DragDropContext onDragEnd={handleDragEnd}>
+                                    <Droppable droppableId="subtaskList">
+                                        {(provided) => (
+                                            <div className="space-y-2 mt-3" {...provided.droppableProps} ref={provided.innerRef}>
+                                                {subtasks.map((subtask, index) => (
+                                                    <Draggable key={subtask.id} draggableId={subtask.id} index={index}>
                                                         {(provided) => (
-                                                            <div className="subtask-input" {...provided.droppableProps} ref={provided.innerRef}>
-
-                                                                {(subtasks.length > 0 ? subtasks : [{ id: 'default', text: '' }]).map((subtask, index) => (
-                                                                    <Draggable key={subtask.id} draggableId={subtask.id} index={index}>
-                                                                        {(provided) => (
-                                                                            <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-
-                                                                                <Box display="flex" gap="30px" alignItems="center">
-                                                                                    <Checkbox
-                                                                                        style={{ cursor: 'pointer' }}
-                                                                                        // checked={checkedSubtasks.includes(subtask.id)}
-                                                                                        checked={subtask.checked}
-                                                                                        onChange={() => handleCheckboxChange(subtask.id)}
-                                                                                    />
-                                                                                    <TextField
-                                                                                        placeholder="Things To do"
-                                                                                        value={subtask.text}
-                                                                                        size="small"
-                                                                                        margin='normal'
-                                                                                        fullWidth
-                                                                                        onChange={(e) => handleInputChange(subtask.id, e.target.value)}
-                                                                                        variant="outlined"
-                                                                                    />
-                                                                                    <IconButton onClick={() => handleDeleteSubtask(subtask.id)} style={{ cursor: 'pointer' }}>
-                                                                                        <RiDeleteBin6Line />
-                                                                                    </IconButton>
-                                                                                    <IconButton style={{ cursor: 'move' }}>
-                                                                                        <PiDotsSixVerticalBold />
-                                                                                    </IconButton>
-                                                                                </Box>
-                                                                            </div>
-                                                                        )}
-                                                                    </Draggable>
-                                                                ))}
-
-                                                                {provided.placeholder}
-                                                                <Box sx={{ cursor: 'pointer' }} onClick={handleAddSubtask} style={{ margin: "10px", color: "#1976d3" }}>
-                                                                    <FiPlusCircle /> Add Subtasks
-                                                                </Box>
+                                                            <div
+                                                                ref={provided.innerRef}
+                                                                {...provided.draggableProps}
+                                                                className="flex items-center gap-2 rounded-lg border border-border bg-white p-2 shadow-sm"
+                                                            >
+                                                                <Checkbox
+                                                                    checked={subtask.checked}
+                                                                    onCheckedChange={() => handleCheckboxChange(subtask.id)}
+                                                                />
+                                                                <Input
+                                                                    placeholder="Things to do"
+                                                                    value={subtask.text}
+                                                                    onChange={(e) => handleInputChange(subtask.id, e.target.value)}
+                                                                    className="flex-1 border-0 shadow-none focus-visible:ring-0"
+                                                                />
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => handleDeleteSubtask(subtask.id)}
+                                                                    className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                                                                >
+                                                                    <Trash2 className="h-4 w-4" />
+                                                                </button>
+                                                                <div
+                                                                    {...provided.dragHandleProps}
+                                                                    className="cursor-grab rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent"
+                                                                >
+                                                                    <GripVertical className="h-4 w-4" />
+                                                                </div>
                                                             </div>
                                                         )}
-                                                    </Droppable>
-                                                )} */}
-  {SubtaskSwitch && (
-                                                      <Droppable droppableId="subtaskList">
-                                                        {(provided) => (
-                                                          <div className="subtask-input" {...provided.droppableProps} ref={provided.innerRef}>
-                          
-                                                            
-                        {subtasks.map((subtask, index) => (
-                          <Draggable key={subtask.id} draggableId={subtask.id} index={index}>
-                            {(provided) => (
-                              <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                <Box display="flex" gap="30px" alignItems="center">
-                                  {/* <Checkbox
-                                    checked={checkedSubtasks.includes(subtask.id)}
-                                    onChange={() => handleCheckboxChange(subtask.id, subtask.checked)}
-                                  /> */}
-                                  <Checkbox
-  checked={subtask.checked}
-  onChange={() => handleCheckboxChange(subtask.id)}
-/>
-
-                                  <TextField
-                                    placeholder="Things To do"
-                                    value={subtask.text}
-                                    size="small"
-                                    margin="normal"
-                                    fullWidth
-                                    onChange={(e) => handleInputChange(subtask.id, e.target.value)}
-                                    variant="outlined"
-                                  />
-                                  <IconButton onClick={() => handleDeleteSubtask(subtask.id)}>
-                                    <RiDeleteBin6Line />
-                                  </IconButton>
-                                  <IconButton {...provided.dragHandleProps}>
-                                    <PiDotsSixVerticalBold />
-                                  </IconButton>
-                                </Box>
-                              </div>
+                                                    </Draggable>
+                                                ))}
+                                                {provided.placeholder}
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={handleAddSubtask}
+                                                    className="mt-2 w-full text-primary"
+                                                >
+                                                    <Plus className="h-4 w-4" />
+                                                    Add Subtask
+                                                </Button>
+                                            </div>
+                                        )}
+                                    </Droppable>
+                                </DragDropContext>
                             )}
-                          </Draggable>
-                        ))}
-                          
-                          
-                                                            {provided.placeholder}
-                                                            <Box sx={{ cursor: 'pointer' }} onClick={handleAddSubtask} style={{ margin: "10px", color: "#1976d3" }}>
-                                                              <FiPlusCircle /> Add Subtasks
-                                                            </Box>
-                                                          </div>
-                                                        )}
-                                                      </Droppable>
-                                                    )}
-                                            </DragDropContext>
-                                        </div>
-                                    </Grid>
-                                </Grid>
-
-
-
-                                <Box mt={2} mb={2}><hr /></Box>
-                                <Box sx={{ pt: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
-                                    <Button variant="contained" color="primary" onClick={updatetasktemp} sx={{
-                      backgroundColor: 'var(--color-save-btn)',  // Normal background
-                     
-                      '&:hover': {
-                        backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                      },
-                      borderRadius:'15px', 
-                    }} >Save & exit</Button>
-                                    <Button variant="contained" color="primary" onClick={updatesavetasktemp}  sx={{
-                      backgroundColor: 'var(--color-save-btn)',  // Normal background
-                     
-                      '&:hover': {
-                        backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                      },
-                      borderRadius:'15px', width:'80px'
-                    }} >Save</Button>
-                                    <Button variant="outlined" onClick={handleTaskTempCancle} sx={{
-                  borderColor: 'var(--color-border-cancel-btn)',  // Normal background
-                 color:'var(--color-save-btn)',
-                  '&:hover': {
-                    backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                    color:'#fff',
-                    border:"none"
-                  },
-                  width:'80px',borderRadius:'15px'
-                }}>Cancel</Button>
-                                </Box>
-                            </Box>
-                        </form>
-                    </Box>
-                </Box>
-
-            </Box>
+                        </FormSection>
+                    </FormGrid.Sidebar>
+                </FormGrid>
+            </FormPage>
         </LocalizationProvider>
     );
 };

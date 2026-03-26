@@ -1,28 +1,16 @@
-import {
-  useTheme,
-  useMediaQuery,
-  Box,
-  FormControlLabel,
-  Typography,
-  Button,
-  Autocomplete,
-  InputLabel,
-  TextField,
-  Divider,
-} from "@mui/material";
 import React, { useState, useEffect } from "react";
-import Switch from "@mui/material/Switch";
-import Drawer from "@mui/material/Drawer";
-import Grid from "@mui/material/Unstable_Grid2";
 import { toast } from "react-toastify";
 import { useNavigate, useParams } from "react-router-dom";
-import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
+import { FormPage, FormSection, FormField, FormRow, FormDrawer, FormDrawerFooter } from "../components/ui/form-layout";
+import { Input } from "../components/ui/input";
+import { Button } from "../components/ui/button";
+import { Label } from "../components/ui/label";
+import { Switch } from "../components/ui/switch";
+import { Plus } from "lucide-react";
 const ServiceUpdate = () => {
   const [isHovered, setIsHovered] = useState(false);
   const CATEGORY_API = process.env.REACT_APP_CATEGORY_URL;
   const { id } = useParams();
-  const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const [isCategoryFormOpen, setCategoryFormOpen] = useState(false);
   const handleCategoryFormClose = () => {
     setCategoryFormOpen(false);
@@ -196,282 +184,99 @@ const ServiceUpdate = () => {
     navigate("/firmtemp/service");
   };
   return (
-    <Box>
-      <form style={{ margin: "15px" }}>
-        <Typography variant="h5" fontWeight={"bold"} mb={2}>
-          Edit Service
-        </Typography>
-        <Box>
-          <Box>
-            <InputLabel sx={{ color: "black" }}>Service Name</InputLabel>
-            <TextField
-              // margin="normal"
-              fullWidth
-              name="ServiceName"
+    <FormPage
+      title="Edit Service"
+      actions={
+        <>
+          <Button variant="outline" onClick={handleBack}>Cancel</Button>
+          <Button onClick={updateservicetemp}>Save</Button>
+        </>
+      }
+    >
+      <form>
+        <FormSection title="Service Details">
+          <FormField label="Service Name">
+            <Input
               placeholder="Service Name"
-              size="small"
-              margin="normal"
               value={servicename}
               onChange={(e) => setservicename(e.target.value)}
             />
-          </Box>
-          <Box sx={{ mt: 1 }}>
-            <InputLabel sx={{ color: "black" }}>Description</InputLabel>
-            <TextField
+          </FormField>
+          <FormField label="Description">
+            <Input
+              placeholder="Description"
               value={discription}
               onChange={(e) => setdiscription(e.target.value)}
-              fullWidth
-              name="Description"
-              placeholder="Description"
-              size="small"
-              margin="normal"
             />
-          </Box>
-          <Box sx={{ width: "100%", mt: 2 }}>
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <Box>
-                  <InputLabel sx={{ color: "black" }}>Rate</InputLabel>
-                  <TextField
-                    fullWidth
-                    name="Rate"
-                    placeholder="Rate"
-                    size="small"
-                    margin="normal"
-                    // value={rate}
-                    // onChange={(e) => setrate(e.target.value)}
-                    value={rate}
-                    // onChange={(e) => setrate(e.target.value)}
-                    onChange={handleRateChange}
-                  />
-                </Box>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Box sx={{ mr: "15px" }}>
-                  <InputLabel sx={{ color: "black" }}>Rate Type</InputLabel>
-                  <Autocomplete
-                    size="small"
-                    fullWidth
-                    sx={{ mt: 2 }}
-                    options={options}
-                    getOptionLabel={(option) => option?.label || ""}
-                    value={selectedOption}
-                    onChange={handleRateTypeChange}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        variant="outlined"
-                        placeholder="Select Rate Type"
-                      />
-                    )}
-                    isOptionEqualToValue={(option, value) =>
-                      option.value === value.value
-                    }
-                    renderOption={(props, option) => (
-                      <Box
-                        component="li"
-                        {...props}
-                        sx={{
-                          margin: "4px",
-                          cursor: "pointer",
-                        }}
-                      >
-                        <Typography>{option.label}</Typography>
-                      </Box>
-                    )}
-                  />
-                </Box>
-              </Grid>
-            </Grid>
-          </Box>
-
-          <Box mt={2}>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={service}
-                  onChange={(event) => handleServiceWitch(event.target.checked)}
-                  color="primary"
-                />
-              }
-              label={"Tax"}
-            />
-          </Box>
-          <Box>
-            <Box>
-              <Typography
-                variant="h5"
-                gutterBottom
-                sx={{ fontWeight: "bold", mt: 2 }}
-              >
-                Category
-              </Typography>
-            </Box>
-            <Box>
-              <InputLabel sx={{ color: "black", mt: 2 }}>
-                Category Name
-              </InputLabel>
-              <Autocomplete
-                size="small"
-                fullWidth
-                sx={{ mt: 2 }}
-                options={categoryoptions}
-                getOptionLabel={(option) => option.label} // Adjust based on your data structure
-                value={selectedCategory}
-                onChange={handleCategoryChange}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    placeholder="Category Name"
-                    variant="outlined"
-                  />
-                )}
-                clearOnEscape // Equivalent to isClearable
-                isOptionEqualToValue={(option, value) =>
-                  option.value === value.value
-                } // Compare options for equality
+          </FormField>
+          <FormRow cols={2}>
+            <FormField label="Rate">
+              <Input
+                placeholder="Rate"
+                value={rate}
+                onChange={handleRateChange}
               />
-            </Box>
-          </Box>
-          <Box>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={setCategoryFormOpen}
-              sx={{
-                backgroundColor: 'var(--color-save-btn)',  // Normal background
-               
-                '&:hover': {
-                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                },
-                borderRadius:'15px',mt: 4, ml: 1
-              }}
-             
-              
-            
-            >
-              Create category
-            </Button>
-
-            {/* category form */}
-            <Drawer
-              anchor="right"
-              open={isCategoryFormOpen}
-              onClose={handleCategoryFormClose}
-              PaperProps={{
-                sx: {
-                  borderRadius: isSmallScreen ? "0" : "10px 0 0 10px",
-                  width: isSmallScreen ? "100%" : "650px",
-                  maxWidth: "100%",
-                },
-              }}
-            >
-              <Box>
-                <Box
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    padding: "20px",
-                  }}
-                >
-                  <ArrowBackRoundedIcon
-                    onClick={handleCategoryFormClose}
-                    style={{ cursor: "pointer" }}
-                  />
-                </Box>
-                <Divider />
-              </Box>
-              <Box p={3}>
-                <InputLabel sx={{ color: "black", mt: 2 }}>
-                  Category Name
-                </InputLabel>
-
-                <TextField
-                  fullWidth
-                  name="Rate"
-                  placeholder="Category Name"
-                  size="small"
-                  margin="normal"
-                  value={categorycreate}
-                  onChange={(e) => setcategorycreate(e.target.value)}
-                />
-              </Box>
-              <Box
-                sx={{
-                  pt: 2,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 5,
-                  margin: "8px",
-                  ml: 3,
+            </FormField>
+            <FormField label="Rate Type">
+              <select
+                className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                value={selectedOption?.value || ""}
+                onChange={(e) => {
+                  const opt = options.find(o => o.value === e.target.value);
+                  handleRateTypeChange(null, opt);
                 }}
               >
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={createCategory}
-                  sx={{
-                    backgroundColor: 'var(--color-save-btn)',  // Normal background
-                   
-                    '&:hover': {
-                      backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                    },
-                    width:'80px',borderRadius:'15px'
-                  }}
-               
-                >
-                  Create
-                </Button>
-                <Button variant="outlined" onClick={handleCategoryFormClose} sx={{
-                        borderColor: 'var(--color-border-cancel-btn)',  // Normal background
-                       color:'var(--color-save-btn)',
-                        '&:hover': {
-                          backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                          color:'#fff',
-                          border:"none"
-                        },
-                        width:'80px',borderRadius:'15px'
-                      }}>
-                  Cancel
-                </Button>
-              </Box>
-            </Drawer>
-          </Box>
-          <Box
-            sx={{ pt: 5, display: "flex", alignItems: "center", gap: 5, ml: 1 }}
-          >
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={updateservicetemp}
-              sx={{
-                backgroundColor: 'var(--color-save-btn)',  // Normal background
-               
-                '&:hover': {
-                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                },
-                width:'80px',borderRadius:'15px'
+                <option value="">Select Rate Type</option>
+                {options.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            </FormField>
+          </FormRow>
+          <div className="flex items-center justify-between mt-2">
+            <Label className="text-sm">Tax</Label>
+            <Switch checked={service} onCheckedChange={handleServiceWitch} />
+          </div>
+        </FormSection>
+
+        <FormSection title="Category">
+          <FormField label="Category Name">
+            <select
+              className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              value={selectedCategory?.value || ""}
+              onChange={(e) => {
+                const opt = categoryoptions.find(o => o.value === e.target.value);
+                handleCategoryChange(null, opt || null);
               }}
             >
-              Save
-            </Button>
-            <Button variant="outlined" onClick={handleBack} sx={{
-                  borderColor: 'var(--color-border-cancel-btn)',  // Normal background
-                 color:'var(--color-save-btn)',
-                  '&:hover': {
-                    backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                    color:'#fff',
-                    border:"none"
-                  },
-                  width:'80px',borderRadius:'15px'
-                }}>
-              Cancel
-            </Button>
-          </Box>
-        </Box>
+              <option value="">Select Category</option>
+              {categoryoptions.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </FormField>
+          <Button type="button" variant="outline" size="sm" onClick={setCategoryFormOpen} className="mt-2">
+            <Plus className="h-4 w-4 mr-1" /> Create category
+          </Button>
+        </FormSection>
       </form>
-    </Box>
+
+      <FormDrawer open={isCategoryFormOpen} onClose={handleCategoryFormClose} title="Create Category" width="md">
+        <FormSection>
+          <FormField label="Category Name">
+            <Input
+              placeholder="Category Name"
+              value={categorycreate}
+              onChange={(e) => setcategorycreate(e.target.value)}
+            />
+          </FormField>
+        </FormSection>
+        <FormDrawerFooter>
+          <Button variant="outline" onClick={handleCategoryFormClose}>Cancel</Button>
+          <Button onClick={createCategory}>Create</Button>
+        </FormDrawerFooter>
+      </FormDrawer>
+    </FormPage>
   );
 };
 

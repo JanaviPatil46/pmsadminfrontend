@@ -1,32 +1,25 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Stepper, Step, StepLabel, Button, Typography, Box, Grid, TextField, FormControl, FormControlLabel, Switch, List, ListItem, ListItemText, Popover, Autocomplete, Alert, InputLabel } from "@mui/material";
 import Editor from "../Texteditor/Editor";
 import TermEditor from "../Texteditor/TermEditor";
 import CreatableSelect from "react-select/creatable";
-import { AiOutlinePlusCircle } from "react-icons/ai";
-import { CiDiscount1 } from "react-icons/ci";
-import { BsThreeDotsVertical } from "react-icons/bs";
-import { RiCloseLine } from "react-icons/ri";
 import Invoice from "./Invoice";
-import { Divider, Drawer, Menu, MenuItem, useMediaQuery, Table, TableHead, TableBody, TableRow, TableCell, Checkbox, IconButton } from "@mui/material";
-import { MaterialReactTable, useMaterialReactTable } from "material-react-table";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { RxCross2 } from "react-icons/rx";
-import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
-import { CiMenuKebab } from "react-icons/ci";
 import EditorShortcodes from "../Texteditor/EditorShortcodes";
-import { useTheme } from "@mui/material/styles";
-import MultiSelectDropdown from "../MultiSelectDropdown"
+import MultiSelectDropdown from "../MultiSelectDropdown";
+import { FormPage, FormSection, FormField, FormRow, FormGrid, FormDrawer, FormDrawerFooter, FormSteps, ShortcodePopover } from "../../components/ui/form-layout";
+import { Input } from "../../components/ui/input";
+import { Button } from "../../components/ui/button";
+import { Label } from "../../components/ui/label";
+import { Switch } from "../../components/ui/switch";
+import { Plus, Percent, MoreVertical, X, ChevronLeft, ChevronRight, FileText, Receipt, CreditCard } from "lucide-react";
 const MyStepperUpdate = () => {
   const { _id } = useParams();
   console.log(_id);
-  const theme = useTheme();
   const navigate = useNavigate();
   const SERVICE_API = process.env.REACT_APP_SERVICES_URL;
   const USER_API = process.env.REACT_APP_USER_URL;
   const PROPOSAL_API = process.env.REACT_APP_PROPOSAL_TEMP_URL;
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const [activeStep, setActiveStep] = useState(0);
   const [introductionContent, setIntroductionContent] = useState("");
   const [termsContent, setTermsContent] = useState("");
@@ -1153,369 +1146,194 @@ useEffect(() => {
     switch (step) {
       case 0:
         return (
-          <Box>
-            <Typography sx={{ fontWeight: "bold" }}>General </Typography>
-            <Box mt={2}>
-                <InputLabel sx={{ color: "black" }}>Template name (not visible to clients)</InputLabel>
-              <TextField error={!!errors.templatename} placeholder="Template name (not visible to clients)" value={templatename} onChange={(e) => settemplatename(e.target.value)} size="small" margin="normal" fullWidth sx={{ backgroundColor: "#fff" }} />
-              {!!errors.templatename && (
-                <Alert
-                  sx={{
-                    width: "96%",
-                    p: "0", // Adjust padding to control the size
-                    pl: "4%",
-                    height: "23px",
-                    borderRadius: "10px",
-                    borderTopLeftRadius: "0",
-                    borderTopRightRadius: "0",
-                    fontSize: "15px",
-                    display: "flex",
-                    alignItems: "center", // Center content vertically
-                    "& .MuiAlert-icon": {
-                      fontSize: "16px", // Adjust the size of the icon
-                      mr: "8px", // Add margin to the right of the icon
-                    },
-                  }}
-                  variant="filled"
-                  severity="error"
-                >
-                  {errors.templatename}
-                </Alert>
-              )}
-            </Box>
-            <Box sx={{ width: "100%", marginTop: "30px" }}>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <Box ml={2}>
-                      <InputLabel sx={{ color: "black" }}>Team Member</InputLabel>
-                      <MultiSelectDropdown 
-  value={selectedUser}
-  onChange={handleUserChange}
-  placeholder="TeamMember"
-/>
-                    {/* <Autocomplete multiple sx={{ mt: 2, backgroundColor: "#fff" }} options={options} size="small" getOptionLabel={(option) => option.label} value={selectedUser} onChange={handleUserChange} renderInput={(params) => <TextField {...params} variant="outlined" placeholder="Assignees" />} isOptionEqualToValue={(option, value) => option.value === value.value} /> */}
-                  </Box>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Box ml={3}>
-                      <InputLabel sx={{ color: "black" }}>Proposal name (visible to clients)</InputLabel>
-                    <TextField 
-                    fullWidth 
-                    // value={proposalName + selectedShortcut}
-                    //  onChange={handleProposalName} 
-                    inputRef={textFieldRef}
-                    value={proposalName} 
-                    onChange={handleProposalName} 
+          <div className="space-y-6">
+            <FormSection title="General" icon={<FileText className="h-4 w-4" />}>
+              <FormField label="Template name (not visible to clients)">
+                <Input
+                  placeholder="Template name (not visible to clients)"
+                  value={templatename}
+                  onChange={(e) => settemplatename(e.target.value)}
+                  error={!!errors.templatename}
+                />
+                {!!errors.templatename && (
+                  <p className="text-sm text-destructive mt-1">{errors.templatename}</p>
+                )}
+              </FormField>
+
+              <FormRow cols={2}>
+                <FormField label="Team Member">
+                  <MultiSelectDropdown
+                    value={selectedUser}
+                    onChange={handleUserChange}
+                    placeholder="TeamMember"
+                  />
+                </FormField>
+                <FormField label="Proposal name (visible to clients)">
+                  <Input
+                    ref={textFieldRef}
+                    value={proposalName}
+                    onChange={handleProposalName}
                     onClick={(e) => setCursorPosition(e.target.selectionStart)}
-                     placeholder="Proposal name (visible to clients)" size="small" sx={{ mt: 2, backgroundColor: "#fff" }} />
-                    {/* <Box>
-                      <Button variant="contained" color="primary" onClick={toggleDropdown}  sx={{
-                            backgroundColor: 'var(--color-save-btn)',  // Normal background
-                           
-                            '&:hover': {
-                              backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                            },
-                            borderRadius:'15px', mt: 2
-                          }}>
-                        Add Shortcode
-                      </Button>
+                    placeholder="Proposal name (visible to clients)"
+                  />
+                  <ShortcodePopover
+                    shortcuts={filteredShortcuts}
+                    onSelect={handleAddShortcut}
+                    selectedOption={selectedOption}
+                    onOptionChange={setSelectedOption}
+                  />
+                </FormField>
+              </FormRow>
+            </FormSection>
 
-                      <Popover
-                        open={showDropdown}
-                        anchorEl={anchorEl}
-                        onClose={handleCloseDropdown}
-                        anchorOrigin={{
-                          vertical: "bottom",
-                          horizontal: "left",
-                        }}
-                        transformOrigin={{
-                          vertical: "top",
-                          horizontal: "left",
-                        }}
-                      >
-                        <Box>
-                          <List className="dropdown-list" sx={{ width: "300px", height: "300px", cursor: "pointer" }}>
-                            {filteredShortcuts.map((shortcut, index) => (
-                              <ListItem key={index} onClick={() => handleAddShortcut(shortcut.value)}>
-                                <ListItemText
-                                  primary={shortcut.title}
-                                  primaryTypographyProps={{
-                                    style: {
-                                      fontWeight: shortcut.isBold ? "bold" : "normal",
-                                    },
-                                  }}
-                                />
-                              </ListItem>
-                            ))}
-                          </List>
-                        </Box>
-                      </Popover>
-                    </Box> */}
-                    <Box>
-                                          <Button variant="contained" color="primary" onClick={toggleDropdown} sx={{
-                                                backgroundColor: 'var(--color-save-btn)',  // Normal background
-                                               
-                                                '&:hover': {
-                                                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                                                },
-                                                borderRadius:'15px', mt: 2
-                                              }}>
-                                            Add Shortcode
-                                          </Button>
-                    
-                                          <Popover
-                                            open={showDropdown}
-                                            anchorEl={anchorEl}
-                                            onClose={handleCloseDropdown}
-                                            anchorOrigin={{
-                                              vertical: "bottom",
-                                              horizontal: "left",
-                                            }}
-                                            transformOrigin={{
-                                              vertical: "top",
-                                              horizontal: "left",
-                                            }}
-                                          >
-                                            <Box>
-                                              <List className="dropdown-list" sx={{ width: "300px", height: "300px", cursor: "pointer" }}>
-                                                {filteredShortcuts.map((shortcut, index) => (
-                                                  <ListItem key={index} onClick={() => handleAddShortcut(shortcut.value)}>
-                                                    <ListItemText
-                                                      primary={shortcut.title}
-                                                      primaryTypographyProps={{
-                                                        style: {
-                                                          fontWeight: shortcut.isBold ? "bold" : "normal",
-                                                        },
-                                                      }}
-                                                    />
-                                                  </ListItem>
-                                                ))}
-                                              </List>
-                                            </Box>
-                                          </Popover>
-                                        </Box>
-                  </Box>
-                </Grid>
-              </Grid>
-            </Box>
+            <FormSection title="Steps">
+              <div className="space-y-3">
+                <div className="rounded-xl border border-border p-4">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-medium">Introduction</Label>
+                    <Switch checked={stepsVisibility.Introduction} onCheckedChange={(checked) => handleSwitchChange("Introduction")({ target: { checked } })} />
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-1">Explain to your clients who you are, what services you provide, the value you bring, and any other information you want to share</p>
+                </div>
 
-            <FormControl component="fieldset" sx={{ width: "100%", mt: 3 }}>
-              <Typography sx={{ fontWeight: "bold" }}>Steps </Typography>
-              <Box sx={{ border: "1px solid grey", borderRadius: "20px", padding: "15px", mb: 2, mt: 2}} className="stepsCard">
-                <FormControlLabel control={<Switch checked={stepsVisibility.Introduction} onChange={handleSwitchChange("Introduction")} />} label="Introduction" />
-                <p>Explain to your clients who you are, what services you provide, the value you bring, and any other information you want to share</p>
-              </Box>
-              <Box sx={{ border: "1px solid grey", borderRadius: "20px", padding: "15px", mb: 2 }} className="stepsCard">
-                <FormControlLabel control={<Switch checked={stepsVisibility.Terms} onChange={handleSwitchChange("Terms")} />} label="Terms" />
-                <p>Engagement letter or contractual agreement that outlines the terms of the relationship between your firm and clients. The section title can be renamed.</p>
-              </Box>
-              <Box sx={{ border: "1px solid grey", borderRadius: "20px", padding: "15px", mb: 2 }} className="stepsCard">
-                <FormControlLabel control={<Switch checked={stepsVisibility.ServicesInvoices} onChange={handleSwitchChange("ServicesInvoices")} />} label="Services & Invoices" />
-                <p>Specify the services your firm will provide. Add one-time or recurring invoices to get paid automatically.</p>
-              </Box>
+                <div className="rounded-xl border border-border p-4">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-medium">Terms</Label>
+                    <Switch checked={stepsVisibility.Terms} onCheckedChange={(checked) => handleSwitchChange("Terms")({ target: { checked } })} />
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-1">Engagement letter or contractual agreement that outlines the terms of the relationship between your firm and clients.</p>
+                </div>
 
-              <Box sx={{ border: "1px solid grey", borderRadius: "20px", padding: "15px", mb: 2, mt: 2 }} className="stepsCard">
-                <Box display="flex" alignItems="center" justifyContent="space-between" mb={1}>
-                  <FormControlLabel control={<Switch checked={stepsVisibility.CustomEmailMessage} onChange={handleSwitchChange("CustomEmailMessage")} />} label="Custom message in email" />
-                  <Box sx={{ backgroundColor: "var(--colors-core-blue-600)", padding: "5px 10px", borderRadius: "5px" }}>
-                    <Typography variant="body2" fontWeight="bold" color="white">
-                      Best practice
-                    </Typography>
-                  </Box>
-                </Box>
-                <Typography variant="body2" color="textSecondary">
-                  Your client will receive a link via email to view and sign this proposal.
-                </Typography>
+                <div className="rounded-xl border border-border p-4">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-medium">Services & Invoices</Label>
+                    <Switch checked={stepsVisibility.ServicesInvoices} onCheckedChange={(checked) => handleSwitchChange("ServicesInvoices")({ target: { checked } })} />
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-1">Specify the services your firm will provide. Add one-time or recurring invoices to get paid automatically.</p>
+                </div>
 
-                {stepsVisibility.CustomEmailMessage && (
-                  <Grid item xs={12} sm={6}>
-                    <Box>
-                      <Popover
-                        open={showDropdown}
-                        anchorEl={anchorEl}
-                        onClose={handleCloseDropdown}
-                        anchorOrigin={{
-                          vertical: "bottom",
-                          horizontal: "left",
-                        }}
-                        transformOrigin={{
-                          vertical: "top",
-                          horizontal: "left",
-                        }}
-                      >
-                        <Box>
-                          <List className="dropdown-list" sx={{ width: "300px", height: "300px", cursor: "pointer" }}>
-                            {filteredShortcuts.map((shortcut, index) => (
-                              <ListItem key={index} onClick={() => handleAddShortcut(shortcut.value)}>
-                                <ListItemText
-                                  primary={shortcut.title}
-                                  primaryTypographyProps={{
-                                    style: {
-                                      fontWeight: shortcut.isBold ? "bold" : "normal",
-                                    },
-                                  }}
-                                />
-                              </ListItem>
-                            ))}
-                          </List>
-                        </Box>
-                      </Popover>
-                    </Box>
-
-                    <Box mt={2}>
+                <div className="rounded-xl border border-border p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Label className="text-sm font-medium">Custom message in email</Label>
+                      <span className="rounded bg-primary px-2 py-0.5 text-xs font-bold text-primary-foreground">Best practice</span>
+                    </div>
+                    <Switch checked={stepsVisibility.CustomEmailMessage} onCheckedChange={(checked) => handleSwitchChange("CustomEmailMessage")({ target: { checked } })} />
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-1">Your client will receive a link via email to view and sign this proposal.</p>
+                  {stepsVisibility.CustomEmailMessage && (
+                    <div className="mt-3">
                       <EditorShortcodes onChange={handleEditorChange} initialContent={description} />
-                    </Box>
-                  </Grid>
-                )}
-              </Box>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </FormSection>
 
-              
-            </FormControl>
-            <Box mt={2}>
-                <Box display={"flex"} alignItems={"center"}>
-                  <Box>
-                    <FormControlLabel control={<Switch checked={stepsVisibility.Reminders} onChange={handleSwitchChange("Reminders")} />} label="Reminders" />
-                  </Box>
-                  {/* <Typography variant="h6">Reminders</Typography> */}
-                </Box>
-                {stepsVisibility.Reminders && (
-                  <Box mb={3}>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 3, mt: 2 }}>
-                      <Box>
-                        <InputLabel sx={{ color: "black" }}>Days until next reminder</InputLabel>
-                        <TextField
-                          
-                          fullWidth
-                          name="Daysuntilnextreminder"
-                          value={daysuntilNextReminder}
-                          onChange={(e) => setDaysuntilNextReminder(e.target.value)}
-                          placeholder="Days until next reminder"
-                          size="small"
-                          sx={{ mt: 2 }}
-                        />
-                      </Box>
-
-                      <Box>
-                        <InputLabel sx={{ color: "black" }}>No Of reminders</InputLabel>
-                        <TextField fullWidth name="No Of reminders" value={noOfReminder} onChange={(e) => setNoOfReminder(e.target.value)} placeholder="NoOfreminders" size="small" sx={{ mt: 2 }} />
-                      </Box>
-                    </Box>
-                  </Box>
-                )}
-              </Box>
-          </Box>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Label className="text-sm font-medium">Reminders</Label>
+                <Switch checked={stepsVisibility.Reminders} onCheckedChange={(checked) => handleSwitchChange("Reminders")({ target: { checked } })} />
+              </div>
+              {stepsVisibility.Reminders && (
+                <FormRow cols={2}>
+                  <FormField label="Days until next reminder">
+                    <Input
+                      value={daysuntilNextReminder}
+                      onChange={(e) => setDaysuntilNextReminder(e.target.value)}
+                      placeholder="Days until next reminder"
+                    />
+                  </FormField>
+                  <FormField label="No. of reminders">
+                    <Input
+                      value={noOfReminder}
+                      onChange={(e) => setNoOfReminder(e.target.value)}
+                      placeholder="No. of reminders"
+                    />
+                  </FormField>
+                </FormRow>
+              )}
+            </div>
+          </div>
         );
       case steps.indexOf("Introduction"):
         return (
-          <Box>
-            <Typography variant="h6">Introduction</Typography>
-            <Box mt={1} mb={3}>
-              <TextField
-                size="small"
-               
-                fullWidth
-                margin="normal"
-                placeholder="Introduction"
-                sx={{ backgroundColor: "#fff" }}
-                onChange={handleIntroductionName}
-                value={introductionname}
-              />
-            </Box>
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Introduction</h3>
+            <Input
+              placeholder="Introduction"
+              onChange={handleIntroductionName}
+              value={introductionname}
+            />
             <Editor onChange={handleIntroductionChange} initialContent={introductionContent} />
-          </Box>
+          </div>
         );
       case steps.indexOf("Terms"):
         return (
-          <Box>
-            <Typography variant="h6">Terms and Conditions</Typography>
-
-            <Box mt={1} mb={3}>
-              <TextField
-                size="small"
-                // variant="standard"
-                fullWidth
-                margin="normal"
-                placeholder="Engagement letter"
-                sx={{ backgroundColor: "#fff" }}
-                onChange={handleTermsandConditionName}
-                value={termsandconditionname}
-              />
-            </Box>
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Terms and Conditions</h3>
+            <Input
+              placeholder="Engagement letter"
+              onChange={handleTermsandConditionName}
+              value={termsandconditionname}
+            />
             <TermEditor onChange={handleTermsChange} initialContent={termsContent} />
-          </Box>
+          </div>
         );
       case steps.indexOf("Services & Invoices"):
         return (
-          <Box>
-            <Typography sx={{ fontWeight: "bold" }}>Choose one of the options</Typography>
+          <div className="space-y-6">
+            <h3 className="text-base font-semibold">Choose one of the options</h3>
 
-            <Typography
-              sx={{
-                border: activeOption === "invoice" ? "1px solid blue" : "1px solid grey",
-                borderRadius: "20px",
-                padding: "15px",
-                cursor: "pointer",
-                marginTop: "15px",
-                backgroundColor: activeOption === "invoice" ? "rgba(90, 165, 230, 0.5)" : "transparent",
-                boxShadow: activeOption === "invoice" ? "0 0 10px rgba(0, 0, 0, 0.1)" : "none",
-              }}
+            <div
+              className={`rounded-xl border-2 p-4 cursor-pointer transition-all ${
+                activeOption === "invoice" ? "border-primary bg-primary/10 shadow-sm" : "border-border hover:border-primary/50"
+              }`}
               onClick={handleShowInvoiceForm}
-            
             >
-              Add invoice or ask for deposit
-              <Typography component="p">Create one-time or recurring invoice, or ask for deposit to sign</Typography>
-            </Typography>
+              <p className="font-medium">Add invoice or ask for deposit</p>
+              <p className="text-sm text-muted-foreground mt-1">Create one-time or recurring invoice, or ask for deposit to sign</p>
+            </div>
 
-            <Typography
-              sx={{
-                border: activeOption === "service" ? "1px solid blue" : "1px solid grey",
-                borderRadius: "20px",
-                padding: "15px",
-                cursor: "pointer",
-                marginTop: "15px",
-                backgroundColor: activeOption === "service" ? "rgba(90, 165, 230, 0.5)" : "transparent",
-                boxShadow: activeOption === "service" ? "0 0 10px rgba(0, 0, 0, 0.1)" : "none",
-              }}
+            <div
+              className={`rounded-xl border-2 p-4 cursor-pointer transition-all ${
+                activeOption === "service" ? "border-primary bg-primary/10 shadow-sm" : "border-border hover:border-primary/50"
+              }`}
               onClick={handleShowServiceForm}
-             
             >
-              Add itemized services without creating invoices
-              <Typography component="p">No invoice or deposit request will be created</Typography>
-            </Typography>
-
-            
+              <p className="font-medium">Add itemized services without creating invoices</p>
+              <p className="text-sm text-muted-foreground mt-1">No invoice or deposit request will be created</p>
+            </div>
 
             {activeOption === "invoice" && invoiceData && Object.keys(invoiceData).length > 0 && (
-              <Box>
-                <Invoice serviceandinvoiceSettings={serviceandinvoiceSettings} serviceandinvoiceSettingonupdate={serviceandinvoiceSettingonupdate} />
-              </Box>
+              <Invoice serviceandinvoiceSettings={serviceandinvoiceSettings} serviceandinvoiceSettingonupdate={serviceandinvoiceSettingonupdate} />
             )}
-            {activeOption === "service" && (
-              <Box p={2}>
-                
-                <div className="invoice-section-three">
-                  <Box sx={{ margin: "20px 0 10px 0" }}>
-                    <Typography variant="h6">Line items</Typography>
-                    <Typography variant="body2">Client-facing itemized list of products and services</Typography>
-                  </Box>
 
-                  <Table sx={{ width: "100%", backgroundColor: "#fff" }}>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>PRODUCT OR SERVICE</TableCell>
-                        <TableCell>DESCRIPTION</TableCell>
-                        <TableCell>RATE</TableCell>
-                        <TableCell>QTY</TableCell>
-                        <TableCell>AMOUNT</TableCell>
-                        <TableCell>TAX</TableCell>
-                        <TableCell />
-                        <TableCell />
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
+            {activeOption === "service" && (
+              <div className="space-y-4">
+                <div>
+                  <h4 className="text-base font-semibold">Line items</h4>
+                  <p className="text-sm text-muted-foreground">Client-facing itemized list of products and services</p>
+                </div>
+
+                <div className="overflow-x-auto rounded-lg border border-border">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-border bg-muted/50">
+                        <th className="sticky left-0 bg-muted/50 px-3 py-2 text-left font-medium text-muted-foreground">Product/Service</th>
+                        <th className="px-3 py-2 text-left font-medium text-muted-foreground">Description</th>
+                        <th className="px-3 py-2 text-left font-medium text-muted-foreground">Rate</th>
+                        <th className="px-3 py-2 text-left font-medium text-muted-foreground">Qty</th>
+                        <th className="px-3 py-2 text-left font-medium text-muted-foreground">Amount</th>
+                        <th className="px-3 py-2 text-center font-medium text-muted-foreground">Tax</th>
+                        <th className="px-3 py-2 w-10" />
+                        <th className="px-3 py-2 w-10" />
+                      </tr>
+                    </thead>
+                    <tbody>
                       {rows.map((row, index) => (
-                        <TableRow key={index}>
-                          <TableCell>
+                        <tr key={index} className="border-b border-border last:border-0">
+                          <td className="sticky left-0 bg-white px-2 py-1.5" style={{ minWidth: 180 }}>
                             <CreatableSelect
                               placeholder={row.isDiscount ? "Reason for discount" : "Product or Service"}
                               options={serviceoptions}
@@ -1524,542 +1342,275 @@ useEffect(() => {
                               onInputChange={(inputValue, actionMeta) => handleServiceInputChange(inputValue, actionMeta, index)}
                               isClearable
                               styles={{
-                                container: (provided) => ({ ...provided, width: "180px" }),
-                                control: (provided) => ({ ...provided, width: "180px" }),
+                                container: (provided) => ({ ...provided, minWidth: "160px" }),
+                                control: (provided) => ({ ...provided, minHeight: "34px", borderColor: "#e2e8f0" }),
                                 menuPortal: (provided) => ({ ...provided, zIndex: 9999 }),
                               }}
                               menuPortalTarget={document.body}
                             />
-                           
-                          </TableCell>
-                          <TableCell>
-                            <input type="text" name="description" value={row.description} onChange={(e) => handleInputChange(index, e)} style={{ border: "none" }} placeholder="Description" />
-                          </TableCell>
-                          <TableCell>
-                            <input type="text" name="rate" value={row.rate} onChange={(e) => handleInputChange(index, e)} style={{ border: "none" }} />
-                          </TableCell>
-                          <TableCell>
-                            <input type="text" name="qty" value={row.qty} onChange={(e) => handleInputChange(index, e)} style={{ border: "none" }} />
-                          </TableCell>
-                          <TableCell className={row.isDiscount ? "discount-amount" : ""}>{row.amount}</TableCell>
-                          <TableCell>
-                            <Checkbox name="tax" checked={row.tax} onChange={(e) => handleInputChange(index, e)} />
-                          </TableCell>
-                          <TableCell>
-                            <IconButton onClick={(event) => handleMenuOpen(event, index)}>
-                              <BsThreeDotsVertical />
-                            </IconButton>
-                            <Menu anchorEl={anchorElNew} open={Boolean(anchorElNew) && selectedRow === index} onClose={handleMenuClose} anchorOrigin={{ vertical: "top", horizontal: "left" }} transformOrigin={{ vertical: "top", horizontal: "left" }}>
-                              <MenuItem onClick={() => handleEditService(row, index)}>Edit</MenuItem>
-                              <MenuItem onClick={handleDeleteService}>Delete</MenuItem>
-                              <MenuItem onClick={() => handleSaveAsNewService(row)}>Save as new service</MenuItem>
-                              <MenuItem onClick={handleDuplicate}>Duplicate</MenuItem>
-                            </Menu>
-                          </TableCell>
-                          <TableCell>
-                            <IconButton onClick={() => deleteRow(index)}>
-                              <RiCloseLine />
-                            </IconButton>
-                          </TableCell>
-                        </TableRow>
+                          </td>
+                          <td className="px-2 py-1.5">
+                            <input type="text" name="description" value={row.description} onChange={(e) => handleInputChange(index, e)} className="w-full rounded border-0 bg-transparent px-1 py-1 text-sm outline-none focus:ring-1 focus:ring-ring" placeholder="Description" />
+                          </td>
+                          <td className="px-2 py-1.5">
+                            <input type="text" name="rate" value={row.rate} onChange={(e) => handleInputChange(index, e)} className="w-20 rounded border-0 bg-transparent px-1 py-1 text-sm outline-none focus:ring-1 focus:ring-ring" />
+                          </td>
+                          <td className="px-2 py-1.5">
+                            <input type="text" name="qty" value={row.qty} onChange={(e) => handleInputChange(index, e)} className="w-14 rounded border-0 bg-transparent px-1 py-1 text-sm outline-none focus:ring-1 focus:ring-ring" />
+                          </td>
+                          <td className="px-2 py-1.5 text-sm">{row.amount}</td>
+                          <td className="px-2 py-1.5 text-center">
+                            <input type="checkbox" name="tax" checked={row.tax} onChange={(e) => handleInputChange(index, e)} className="h-4 w-4 rounded border-gray-300" />
+                          </td>
+                          <td className="px-1 py-1.5">
+                            <div className="relative">
+                              <button type="button" onClick={(event) => handleMenuOpen(event, index)} className="rounded p-1 text-muted-foreground hover:bg-accent">
+                                <MoreVertical className="h-4 w-4" />
+                              </button>
+                              {Boolean(anchorElNew) && selectedRow === index && (
+                                <div className="absolute right-0 top-full z-50 mt-1 w-48 rounded-lg border border-border bg-white py-1 shadow-lg">
+                                  <button type="button" onClick={() => handleEditService(row, index)} className="w-full px-3 py-1.5 text-left text-sm hover:bg-accent">Edit</button>
+                                  <button type="button" onClick={handleDeleteService} className="w-full px-3 py-1.5 text-left text-sm hover:bg-accent text-destructive">Delete</button>
+                                  <button type="button" onClick={() => handleSaveAsNewService(row)} className="w-full px-3 py-1.5 text-left text-sm hover:bg-accent">Save as new service</button>
+                                  <button type="button" onClick={handleDuplicate} className="w-full px-3 py-1.5 text-left text-sm hover:bg-accent">Duplicate</button>
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-1 py-1.5">
+                            <button type="button" onClick={() => deleteRow(index)} className="rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive">
+                              <X className="h-4 w-4" />
+                            </button>
+                          </td>
+                        </tr>
                       ))}
-                    </TableBody>
-                  </Table>
+                    </tbody>
+                  </table>
+                </div>
 
-                  <Box sx={{ display: "flex", alignItems: "center", gap: "20px", marginTop: "10px" }}>
-                    <Button onClick={() => addRow()} startIcon={<AiOutlinePlusCircle />} sx={{ color: "blue", fontSize: "18px" }}>
-                      Line item
-                    </Button>
-                    <Button onClick={() => addRow(true)} startIcon={<CiDiscount1 />} sx={{ color: "blue", fontSize: "18px" }}>
-                      Discount
-                    </Button>
-                  </Box>
+                <div className="flex items-center gap-4">
+                  <Button type="button" variant="ghost" size="sm" onClick={() => addRow()} className="text-primary">
+                    <Plus className="h-4 w-4 mr-1" /> Line item
+                  </Button>
+                  <Button type="button" variant="ghost" size="sm" onClick={() => addRow(true)} className="text-primary">
+                    <Percent className="h-4 w-4 mr-1" /> Discount
+                  </Button>
+                </div>
 
-                  <div className="one-time-summary" style={{ marginTop: "20px" }}>
-                    <Typography variant="h6">Summary</Typography>
-                    <Table sx={{ backgroundColor: "#fff" }}>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>SUBTOTAL</TableCell>
-                          <TableCell>TAX RATE</TableCell>
-                          <TableCell>TAX TOTAL</TableCell>
-                          <TableCell>TOTAL</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        <TableRow>
-                          <TableCell>
-                            <input type="number" value={subtotal} onChange={handleSubtotalChange} style={{ border: "none" }} />
-                          </TableCell>
-                          <TableCell>
-                            <input type="number" value={taxRate} onChange={handleTaxRateChange} style={{ border: "none" }} />%
-                          </TableCell>
-                          <TableCell>${taxTotal.toFixed(2)}</TableCell>
-                          <TableCell>${totalAmount}</TableCell>
-                        </TableRow>
-                      </TableBody>
-                    </Table>
+                {/* Summary */}
+                <div>
+                  <h4 className="text-base font-semibold mb-3">Summary</h4>
+                  <div className="overflow-x-auto rounded-lg border border-border bg-white">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-border bg-muted/50">
+                          <th className="px-3 py-2 text-left font-medium text-muted-foreground">Subtotal</th>
+                          <th className="px-3 py-2 text-left font-medium text-muted-foreground">Tax Rate</th>
+                          <th className="px-3 py-2 text-left font-medium text-muted-foreground">Tax Total</th>
+                          <th className="px-3 py-2 text-left font-medium text-muted-foreground">Total</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td className="px-3 py-2">
+                            <div className="flex items-center gap-1">
+                              <span>$</span>
+                              <input value={subtotal} onChange={handleSubtotalChange} className="w-20 rounded border-0 bg-transparent px-1 py-0.5 text-sm outline-none focus:ring-1 focus:ring-ring" />
+                            </div>
+                          </td>
+                          <td className="px-3 py-2">
+                            <div className="flex items-center gap-1">
+                              <input value={taxRate} onChange={handleTaxRateChange} className="w-16 rounded border-0 bg-transparent px-1 py-0.5 text-sm outline-none focus:ring-1 focus:ring-ring" />
+                              <span>%</span>
+                            </div>
+                          </td>
+                          <td className="px-3 py-2 text-sm">${taxTotal.toFixed(2)}</td>
+                          <td className="px-3 py-2 text-sm font-semibold">${totalAmount}</td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
 
-                {/* save as nwe service */}
-                <Drawer
-                  anchor="right"
-                  open={isNewDrawerOpen}
-                  onClose={handleNewDrawerClose}
-                  PaperProps={{
-                    sx: {
-                      borderRadius: isSmallScreen ? "0" : "10px 0 0 10px",
-                      width: isSmallScreen ? "100%" : "650px",
-                      zIndex: 1000,
-                    },
-                  }}
-                >
-                  <Box role="presentation" sx={{ borderRadius: isSmallScreen ? "0" : "15px" }}>
-                    <Box>
-                      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", p: 2, borderBottom: "1px solid grey" }}>
-                        <Typography variant="h6">Create Service</Typography>
-                        <RxCross2 onClick={handleNewDrawerClose} style={{ cursor: "pointer" }} />
-                      </Box>
-                    </Box>
-                    <form style={{ margin: "15px" }}>
-                      <Box>
-                        <Box>
-                          <InputLabel sx={{ color: "black" }}>Service Name</InputLabel>
-                          <TextField
-                            // margin="normal"
-                            fullWidth
-                            name="ServiceName"
-                            placeholder="Service Name"
-                            size="small"
-                            margin="normal"
-                            value={selectedRowData?.productName || ""} // Use selected row data
-                            onChange={(e) => setSelectedRowData({ ...selectedRowData, productName: e.target.value })}
-                          />
-                        </Box>
-                        <Box sx={{ mt: 1 }}>
-                          <InputLabel sx={{ color: "black" }}>Description</InputLabel>
-                          <TextField
-                            fullWidth
-                            name="Description"
-                            placeholder="Description"
-                            size="small"
-                            margin="normal"
-                            value={selectedRowData?.description || ""} // Use selected row data
-                            onChange={(e) => setSelectedRowData({ ...selectedRowData, description: e.target.value })}
-                          />
-                        </Box>
-                        {/* <Box sx={{ width: "100%", mt: 2 }}>
-                          <Grid container spacing={2}>
-                            <Grid item xs={12} sm={6}>
-                              <Box>
-                                <InputLabel sx={{ color: "black" }}>Rate</InputLabel>
-                                <TextField
-                                  fullWidth
-                                  name="Rate"
-                                  placeholder="Rate"
-                                  size="small"
-                                  margin="normal"
-                                  value={selectedRowData?.rate || ""} // Use selected row data
-                                  onChange={(e) => setSelectedRowData({ ...selectedRowData, rate: e.target.value })}
-                                />
-                              </Box>
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                              <Box sx={{ mr: "15px" }}>
-                                <InputLabel sx={{ color: "black" }}>Rate Type</InputLabel>
-                                <Autocomplete
-                                  size="small"
-                                  fullWidth
-                                  sx={{ mt: 2 }}
-                                  options={Rateoptions}
-                                  getOptionLabel={(option) => option?.label || ""}
-                                  value={selectedRateOption}
-                                  onChange={handleRateTypeChange}
-                                  renderInput={(params) => <TextField {...params} variant="outlined" placeholder="Select Rate Type" />}
-                                  isOptionEqualToValue={(option, value) => option.value === value.value}
-                                  renderOption={(props, option) => (
-                                    <Box
-                                      component="li"
-                                      {...props}
-                                      sx={{
-                                        margin: "4px",
-                                        cursor: "pointer",
-                                      }}
-                                    >
-                                      <Typography>{option.label}</Typography>
-                                    </Box>
-                                  )}
-                                />
-                              </Box>
-                            </Grid>
-                          </Grid>
-                        </Box> */}
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                          <Box width="50%">
-                            <Typography sx={{ color: "black" }}>Rate</Typography>
-                            <TextField
-                              fullWidth
-                              name="Rate"
-                              placeholder="Rate"
-                              size="small"
-                              sx={{ mt: 1 }}
-                             
-                              value={selectedRowData?.rate || ""} // Use selected row data
-                              onChange={(e) => setSelectedRowData({ ...selectedRowData, rate: e.target.value })}
-                            />
-                          </Box>
-
-                          <Box width="50%">
-                            <Typography sx={{ color: "black" }}>Rate Type</Typography>
-                            <Autocomplete
-                              size="small"
-                              fullWidth
-                              sx={{ mt: 1 }}
-                              options={options}
-                              getOptionLabel={(option) => option?.label || ""}
-                              value={selectedRateOption}
-                              onChange={handleRateTypeChange}
-                              renderInput={(params) => <TextField {...params} variant="outlined" placeholder="Select Rate Type" />}
-                              isOptionEqualToValue={(option, value) => option.value === value.value}
-                              renderOption={(props, option) => (
-                                <Box
-                                  component="li"
-                                  {...props}
-                                  sx={{
-                                    margin: "4px",
-                                    cursor: "pointer",
-                                  }}
-                                >
-                                  <Typography>{option.label}</Typography>
-                                </Box>
-                              )}
-                            />
-                          </Box>
-                        </Box>
-                        <Box mt={2}>
-                          <FormControlLabel
-                            control={
-                              <Switch
-                                checked={selectedRowData?.tax || false} // Use the tax value from state
-                                onChange={(event) => handleServiceSwitch(event.target.checked)}
-                                color="primary"
-                              />
-                            }
-                            label={"Tax"}
-                          />
-                        </Box>
-                        <Box>
-                          <Box>
-                            <Typography variant="h5" gutterBottom sx={{ fontWeight: "bold", mt: 2 }}>
-                              Category
-                            </Typography>
-                          </Box>
-                          <Box>
-                            <InputLabel sx={{ color: "black", mt: 2 }}>Category Name</InputLabel>
-                            <Autocomplete
-                              size="small"
-                              fullWidth
-                              sx={{ mt: 2 }}
-                              options={categoryoptions}
-                              getOptionLabel={(option) => option.label} // Adjust based on your data structure
-                              value={selectedCategory}
-                              onChange={handleCategoryChange}
-                              renderInput={(params) => <TextField {...params} placeholder="Category Name" variant="outlined" />}
-                              clearOnEscape // Equivalent to isClearable
-                              isOptionEqualToValue={(option, value) => option.value === value.value} // Compare options for equality
-                            />
-                          </Box>
-                        </Box>
-                        <Box>
-                          <Button variant="contained" color="primary" onClick={setCategoryFormOpen} sx={{
-                      backgroundColor: 'var(--color-save-btn)',  // Normal background
-                     
-                      '&:hover': {
-                        backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                      },
-                      borderRadius:'15px', mt: 4, ml: 1
-                    }}>
-                            Create category
-                          </Button>
-
-                          {/* category form */}
-                          <Drawer
-                            anchor="right"
-                            open={isCategoryFormOpen}
-                            onClose={handleCategoryFormClose}
-                            PaperProps={{
-                              sx: {
-                                borderRadius: isSmallScreen ? "0" : "10px 0 0 10px",
-                                width: isSmallScreen ? "100%" : "650px",
-                                maxWidth: "100%",
-                              },
-                            }}
-                          >
-                            <Box>
-                              <Box style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px" }}>
-                                <ArrowBackRoundedIcon onClick={handleCategoryFormClose} style={{ cursor: "pointer" }} />
-                              </Box>
-                              <Divider />
-                            </Box>
-                            <Box p={3}>
-                              <InputLabel sx={{ color: "black", mt: 2 }}>Category Name</InputLabel>
-
-                              <TextField fullWidth name="Rate" placeholder="Category Name" size="small" margin="normal" value={categorycreate} onChange={(e) => setcategorycreate(e.target.value)} />
-                            </Box>
-                            <Box sx={{ pt: 2, display: "flex", alignItems: "center", gap: 5, margin: "8px", ml: 3 }}>
-                              <Button variant="contained" color="primary" onClick={createCategory} sx={{
-                      backgroundColor: 'var(--color-save-btn)',  // Normal background
-                     
-                      '&:hover': {
-                        backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                      },
-                      borderRadius:'15px', width:'80px'
-                    }}>
-                                Create
-                              </Button>
-                              <Button variant="outlined" onClick={handleCategoryFormClose} sx={{
-                  borderColor: 'var(--color-border-cancel-btn)',  // Normal background
-                 color:'var(--color-save-btn)',
-                  '&:hover': {
-                    backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                    color:'#fff',
-                    border:"none"
-                  },
-                  width:'80px',borderRadius:'15px'
-                }}>
-                                Cancel
-                              </Button>
-                            </Box>
-                          </Drawer>
-                        </Box>
-                        <Box sx={{ pt: 5, display: "flex", alignItems: "center", gap: 5, ml: 1 }}>
-                          <Button variant="contained" color="primary" onClick={createservicetemp} sx={{
-                      backgroundColor: 'var(--color-save-btn)',  // Normal background
-                     
-                      '&:hover': {
-                        backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                      },
-                      borderRadius:'15px', width:'80px'
-                    }}>
-                            Save
-                          </Button>
-                          <Button variant="outlined" onClick={handleNewDrawerClose} sx={{
-                  borderColor: 'var(--color-border-cancel-btn)',  // Normal background
-                 color:'var(--color-save-btn)',
-                  '&:hover': {
-                    backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                    color:'#fff',
-                    border:"none"
-                  },
-                  width:'80px',borderRadius:'15px'
-                }}>
-                            Cancel
-                          </Button>
-                        </Box>
-                      </Box>
-                    </form>
-                  </Box>
-                </Drawer>
-                {/* category  */}
-                <Drawer
-                  anchor="right"
-                  open={isCategoryFormOpen}
-                  onClose={handleCategoryFormClose}
-                  PaperProps={{
-                    sx: {
-                      borderRadius: isSmallScreen ? "0" : "10px 0 0 10px",
-                      width: isSmallScreen ? "100%" : "650px",
-                      maxWidth: "100%",
-                    },
-                  }}
-                >
-                  <Box>
-                    <Box style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px" }}>
-                      <ArrowBackRoundedIcon onClick={handleCategoryFormClose} style={{ cursor: "pointer" }} />
-                    </Box>
-                    <Divider />
-                  </Box>
-                  <Box p={3}>
-                    <InputLabel sx={{ color: "black", mt: 2 }}>Category Name</InputLabel>
-
-                    <TextField fullWidth name="Rate" placeholder="Category Name" size="small" margin="normal" value={categorycreate} onChange={(e) => setcategorycreate(e.target.value)} />
-                  </Box>
-                  <Box sx={{ pt: 2, display: "flex", alignItems: "center", gap: 5, margin: "8px", ml: 3 }}>
-                    <Button variant="contained" color="primary" onClick={createCategory} sx={{
-                      backgroundColor: 'var(--color-save-btn)',  // Normal background
-                     
-                      '&:hover': {
-                        backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                      },
-                      borderRadius:'15px', width:'80px'
-                    }}>
-                      Create
+                {/* Drawers rendered outside the service table flow */}
+                <FormDrawer open={isNewDrawerOpen} onClose={handleNewDrawerClose} title="Create Service" width="lg">
+                  <FormSection title="Service Details">
+                    <FormField label="Service Name">
+                      <Input placeholder="Service Name" value={selectedRowData?.productName || ""} onChange={(e) => setSelectedRowData({ ...selectedRowData, productName: e.target.value })} />
+                    </FormField>
+                    <FormField label="Description">
+                      <Input placeholder="Description" value={selectedRowData?.description || ""} onChange={(e) => setSelectedRowData({ ...selectedRowData, description: e.target.value })} />
+                    </FormField>
+                    <FormRow cols={2}>
+                      <FormField label="Rate">
+                        <Input placeholder="Rate" value={selectedRowData?.rate || ""} onChange={(e) => setSelectedRowData({ ...selectedRowData, rate: e.target.value })} />
+                      </FormField>
+                      <FormField label="Rate Type">
+                        <select
+                          className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          value={selectedRateOption?.value || ""}
+                          onChange={(e) => {
+                            const opt = options.find(o => o.value === e.target.value);
+                            handleRateTypeChange(null, opt);
+                          }}
+                        >
+                          <option value="">Select Rate Type</option>
+                          {options.map((opt) => (
+                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                          ))}
+                        </select>
+                      </FormField>
+                    </FormRow>
+                    <div className="flex items-center justify-between mt-2">
+                      <Label className="text-sm">Tax</Label>
+                      <Switch checked={selectedRowData?.tax || false} onCheckedChange={handleServiceSwitch} />
+                    </div>
+                  </FormSection>
+                  <FormSection title="Category">
+                    <FormField label="Category Name">
+                      <select
+                        className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        value={selectedCategory?.value || ""}
+                        onChange={(e) => {
+                          const opt = categoryoptions.find(o => o.value === e.target.value);
+                          handleCategoryChange(null, opt || null);
+                        }}
+                      >
+                        <option value="">Select Category</option>
+                        {categoryoptions.map((opt) => (
+                          <option key={opt.value} value={opt.value}>{opt.label}</option>
+                        ))}
+                      </select>
+                    </FormField>
+                    <Button type="button" variant="outline" size="sm" onClick={setCategoryFormOpen} className="mt-2">
+                      <Plus className="h-4 w-4 mr-1" /> Create category
                     </Button>
-                    <Button variant="outlined" onClick={handleCategoryFormClose}  sx={{
-                  borderColor: 'var(--color-border-cancel-btn)',  // Normal background
-                 color:'var(--color-save-btn)',
-                  '&:hover': {
-                    backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                    color:'#fff',
-                    border:"none"
-                  },
-                  width:'80px',borderRadius:'15px'
-                }}>
-                      Cancel
-                    </Button>
-                  </Box>
-                </Drawer>
+                  </FormSection>
+                  <FormDrawerFooter>
+                    <Button variant="outline" onClick={handleNewDrawerClose}>Cancel</Button>
+                    <Button onClick={createservicetemp}>Save</Button>
+                  </FormDrawerFooter>
+                </FormDrawer>
 
-                {/* edit service */}
-                <Drawer
-                  anchor="right"
-                  open={isEditDrawerOpen}
-                  onClose={handleEditDrawerClose}
-                  PaperProps={{
-                    sx: {
-                      borderRadius: isSmallScreen ? "0" : "10px 0 0 10px",
-                      width: isSmallScreen ? "100%" : "650px",
-                      zIndex: 1000,
-                    },
-                  }}
-                >
-                  <Box role="presentation" sx={{ borderRadius: isSmallScreen ? "0" : "15px" }}>
-                    <Box>
-                      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", p: 2, borderBottom: "1px solid grey" }}>
-                        <Typography variant="h6">Edit Item</Typography>
-                        <RxCross2 onClick={handleEditDrawerClose} style={{ cursor: "pointer" }} />
-                      </Box>
-                      <Box p={2}>
-                        <Typography variant="h6" fontWeight="bold">
-                          Product or service
-                        </Typography>
-                        <TextField size="small" margin="normal" value={selectedRowData?.productName || ""} fullWidth onChange={(e) => setSelectedRowData({ ...selectedRowData, productName: e.target.value })} />
-                        <Box>
-                          <Typography>Description</Typography>
-                          <TextField size="small" margin="normal" value={selectedRowData?.description || ""} fullWidth multiline onChange={(e) => setSelectedRowData({ ...selectedRowData, description: e.target.value })} />
-                        </Box>
-                        <Box sx={{ display: "flex", alignItems: "center", gap: "10px", mt: 1 }}>
-                          <Box>
-                            <Typography>Rate</Typography>
-                            <TextField size="small" margin="normal" value={selectedRowData?.rate || ""} fullWidth onChange={(e) => setSelectedRowData({ ...selectedRowData, rate: e.target.value })} />
-                          </Box>
-                          <Box>
-                            <Typography>QTY</Typography>
-                            <TextField size="small" margin="normal" value={selectedRowData?.qty || ""} fullWidth onChange={(e) => setSelectedRowData({ ...selectedRowData, qty: e.target.value })} />
-                          </Box>
-                          <Box>
-                            <Typography>Amount</Typography>
-                            <TextField size="small" margin="normal" fullWidth disabled value={totalamount} />
-                          </Box>
-                        </Box>
-                        <Box mt={2}>
-                          <FormControlLabel control={<Switch checked={selectedRowData?.tax} onChange={(event) => handleServiceWitch(event.target.checked)} color="primary" />} label={"Tax"} />
-                        </Box>
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 2, mt: 2 }}>
-                          <Button variant="contained" onClick={handleSaveChanges} sx={{
-                      backgroundColor: 'var(--color-save-btn)',  // Normal background
-                     
-                      '&:hover': {
-                        backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                      },
-                      borderRadius:'15px', width:'80px'
-                    }}>
-                            Save
-                          </Button>
-                          <Button variant="outlined" onClick={handleEditDrawerClose} sx={{
-                  borderColor: 'var(--color-border-cancel-btn)',  // Normal background
-                 color:'var(--color-save-btn)',
-                  '&:hover': {
-                    backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                    color:'#fff',
-                    border:"none"
-                  },
-                  width:'80px',borderRadius:'15px'
-                }}>
-                            {" "}
-                            Cancel
-                          </Button>
-                        </Box>
-                      </Box>
-                    </Box>
-                  </Box>
-                </Drawer>
-                {/* <button onClick={isUpdating ? handleSaveInvoiceonUpdate : handleSaveInvoice}>
-                                {isUpdating ? "Update Invoice" : "Save Invoice"}
-                            </button> */}
-              </Box>
+                <FormDrawer open={isCategoryFormOpen} onClose={handleCategoryFormClose} title="Create Category" width="md">
+                  <FormSection>
+                    <FormField label="Category Name">
+                      <Input placeholder="Category Name" value={categorycreate} onChange={(e) => setcategorycreate(e.target.value)} />
+                    </FormField>
+                  </FormSection>
+                  <FormDrawerFooter>
+                    <Button variant="outline" onClick={handleCategoryFormClose}>Cancel</Button>
+                    <Button onClick={createCategory}>Create</Button>
+                  </FormDrawerFooter>
+                </FormDrawer>
+
+                <FormDrawer open={isEditDrawerOpen} onClose={handleEditDrawerClose} title="Edit Item" width="lg">
+                  <FormSection title="Product or Service">
+                    <FormField label="Product Name">
+                      <Input value={selectedRowData?.productName || ""} onChange={(e) => setSelectedRowData({ ...selectedRowData, productName: e.target.value })} />
+                    </FormField>
+                    <FormField label="Description">
+                      <Input value={selectedRowData?.description || ""} onChange={(e) => setSelectedRowData({ ...selectedRowData, description: e.target.value })} />
+                    </FormField>
+                    <div className="grid grid-cols-3 gap-3">
+                      <FormField label="Rate">
+                        <Input value={selectedRowData?.rate || ""} onChange={(e) => setSelectedRowData({ ...selectedRowData, rate: e.target.value })} />
+                      </FormField>
+                      <FormField label="QTY">
+                        <Input value={selectedRowData?.qty || ""} onChange={(e) => setSelectedRowData({ ...selectedRowData, qty: e.target.value })} />
+                      </FormField>
+                      <FormField label="Amount">
+                        <Input disabled value={totalamount} />
+                      </FormField>
+                    </div>
+                    <div className="flex items-center justify-between mt-2">
+                      <Label className="text-sm">Tax</Label>
+                      <Switch checked={selectedRowData?.tax || false} onCheckedChange={handleServiceWitch} />
+                    </div>
+                  </FormSection>
+                  <FormDrawerFooter>
+                    <Button variant="outline" onClick={handleEditDrawerClose}>Cancel</Button>
+                    <Button onClick={handleSaveChanges}>Save</Button>
+                  </FormDrawerFooter>
+                </FormDrawer>
+              </div>
             )}
-          </Box>
+          </div>
         );
 
       case steps.indexOf("Payments"):
         return (
-          <Box>
-            <Typography variant="h6">Payment Information</Typography>
-            <Box mt={1} mb={3}>
-              <TextField size="small" fullWidth margin="normal" placeholder="Payment terms" sx={{ backgroundColor: "#fff" }} onChange={handlePaymentTerms} value={paymentterms} />
-            </Box>
-            <Box mt={1} mb={3}>
-              <TextField size="small" fullWidth margin="normal" placeholder="Payment due date" sx={{ backgroundColor: "#fff" }} onChange={handlePaymentDueDate} value={paymentduedate} />
-            </Box>
-            <Box mt={1} mb={3}>
-              <TextField size="small" fullWidth margin="normal" placeholder="Payment amount" sx={{ backgroundColor: "#fff" }} onChange={handlePaymentAmount} value={paymentamount} />
-            </Box>
-            {/* Add more fields for payment details if necessary */}
-          </Box>
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Payment Information</h3>
+            <FormField label="Payment Terms">
+              <Input placeholder="Payment terms" onChange={handlePaymentTerms} value={paymentterms} />
+            </FormField>
+            <FormField label="Payment Due Date">
+              <Input placeholder="Payment due date" onChange={handlePaymentDueDate} value={paymentduedate} />
+            </FormField>
+            <FormField label="Payment Amount">
+              <Input placeholder="Payment amount" onChange={handlePaymentAmount} value={paymentamount} />
+            </FormField>
+          </div>
         );
 
       default:
-        return <Typography>Unknown Step</Typography>;
+        return <p className="text-sm text-muted-foreground">Unknown Step</p>;
     }
   };
 
   return (
-    <Box sx={{ width: "100%" }}>
-      <Box>
-        <Grid container spacing={3} mr={5} p={5}>
-          <Grid item xs={8}>
-            <Box sx={{ p: 2, backgroundColor: "#fff" }}>
-              <Stepper activeStep={activeStep}>
-                {steps.map((label, index) => (
-                  <Step key={index} onClick={() => handleStepClick(index)}>
-                    <StepLabel style={{ cursor: "pointer" }}>{label}</StepLabel>
-                  </Step>
-                ))}
-              </Stepper>
-            </Box>
-          </Grid>
-          <Grid item xs={4} sx={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              <Button variant="contained" onClick={activeStep === steps.length - 1 ? handleReset : handleNext} sx={{
-                      backgroundColor: 'var(--color-save-btn)',  // Normal background
-                     
-                      '&:hover': {
-                        backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                      },
-                      borderRadius:'15px', width:'200px'
-                    }}>
-                {activeStep === steps.length - 1 ? "Save Template" : "Next"}
-              </Button>
-              <Button disabled={activeStep === 0} onClick={handleBack} variant="outlined" sx={{
-                  borderColor: 'var(--color-border-cancel-btn)',  // Normal background
-                 color:'var(--color-save-btn)',
-                  '&:hover': {
-                    backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                    color:'#fff',
-                    border:"none"
-                  },
-                  width:'200px',borderRadius:'15px'
-                }}>
-                Back
-              </Button>
-            </Box>
-          </Grid>
-        </Grid>
-        <Box sx={{ pl: 2, pr: 5 }}>{renderStepContent(activeStep)}</Box>
-      </Box>
-    </Box>
+    <div className="w-full">
+      <div className="flex items-start gap-6 p-5">
+        {/* Stepper */}
+        <div className="flex-1">
+          <div className="rounded-xl border border-border bg-white p-4">
+            <div className="flex items-center gap-2">
+              {steps.map((label, index) => (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={() => handleStepClick(index)}
+                  className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors cursor-pointer ${
+                    index === activeStep
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : index < activeStep
+                      ? "bg-primary/10 text-primary"
+                      : "bg-muted text-muted-foreground hover:bg-accent"
+                  }`}
+                >
+                  <span className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
+                    index === activeStep
+                      ? "bg-white text-primary"
+                      : index < activeStep
+                      ? "bg-primary text-white"
+                      : "bg-muted-foreground/20 text-muted-foreground"
+                  }`}>
+                    {index + 1}
+                  </span>
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex flex-col gap-2">
+          <Button onClick={activeStep === steps.length - 1 ? handleReset : handleNext}>
+            {activeStep === steps.length - 1 ? "Save Template" : "Next"}
+            {activeStep < steps.length - 1 && <ChevronRight className="h-4 w-4 ml-1" />}
+          </Button>
+          <Button variant="outline" disabled={activeStep === 0} onClick={handleBack}>
+            <ChevronLeft className="h-4 w-4 mr-1" />
+            Back
+          </Button>
+        </div>
+      </div>
+
+      {/* Step Content */}
+      <div className="px-5 pb-8">{renderStepContent(activeStep)}</div>
+    </div>
   );
 };
 
