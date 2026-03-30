@@ -1,27 +1,14 @@
 
 
 
-import React, { useState, useEffect ,useRef} from "react";
-import {
-  Drawer,
-  Box,
-  Typography,
-  TextField,
-  Button,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Collapse,LinearProgress
-} from "@mui/material";
-import FolderIcon from "@mui/icons-material/Folder";
-import FolderOpenIcon from "@mui/icons-material/FolderOpen";
-import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
-import ExpandLess from "@mui/icons-material/ExpandLess";
-import ExpandMore from "@mui/icons-material/ExpandMore";
+import React, { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
 import JSZip from "jszip";
 import axios from "axios";
+import { FormDrawer, FormDrawerFooter, FormSection, FormField } from "../../components/ui/form-layout";
+import { Button } from "../../components/ui/button";
+import { FolderUp, ChevronRight, ChevronDown, Folder, FolderOpen, FileText } from "lucide-react";
+
 const FolderUploadDrawer = ({
   isOpen,
   onClose,
@@ -34,12 +21,10 @@ const FolderUploadDrawer = ({
   const [folderName, setFolderName] = useState("my-uploaded-folder");
   const [files, setFiles] = useState([]);
   const hiddenFileInput = useRef(null);
-  // open hidden input
   const handleClick = () => {
     hiddenFileInput.current.click();
   };
 
-  
   useEffect(() => {
     if (isOpen && selectedFolderForMenu) {
       setSelectedFolder(selectedFolderForMenu.path);
@@ -215,184 +200,142 @@ console.log("Target Folder Path:", targetFolderPath);
     }
   };
   return (
-    <Drawer anchor="right" open={isOpen} onClose={onClose}>
-      <Box sx={{ width: 400, p: 3, bgcolor: "#f0f8ff", height: "100%" }}>
-        <Typography variant="h6" gutterBottom>
-          📁 Upload Folder
-        </Typography>
-
-        
-        {/* <Button
-          variant="outlined"
-          component="label"
-          fullWidth
-          sx={{ mt: 1, mb: 2 }}
-        >
-          {files.length > 0 ? `${files.length} files selected` : "Select Folder"}
+    <FormDrawer open={isOpen} onClose={onClose} title="Upload Folder" width="md">
+      <FormSection title="Folder Selection" icon={<FolderUp className="h-4 w-4" />}>
+        <FormField label="Select Folder to Upload">
+          <div className="flex items-center gap-3">
+            <Button variant="outline" onClick={handleClick}>
+              <FolderUp className="h-4 w-4 mr-2" />
+              Select Folder
+            </Button>
+            {files.length > 0 && (
+              <span className="text-sm text-muted-foreground">
+                {files.length} file(s) from <strong>{folderName}</strong>
+              </span>
+            )}
+          </div>
           <input
             type="file"
-            webkitdirectory="true"
-            directory=""
-            multiple
-            hidden
+            ref={hiddenFileInput}
             onChange={handleUploadFolderSelect}
+            style={{ display: "none" }}
+            webkitdirectory="true"
+            directory="true"
+            multiple
           />
-        </Button> */}
-  {/* MUI Button instead of File Input */}
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleClick}
-        sx={{ mb: 2 }}
-      >
-        Select Folder
-      </Button>
+        </FormField>
 
-      {/* Hidden File Input */}
-      <input
-        type="file"
-        ref={hiddenFileInput}
-        onChange={handleUploadFolderSelect}
-        style={{ display: "none" }}
-        webkitdirectory="true"
-        directory="true"
-        multiple
-      />
-        <Button
-          variant="contained"
-          color="primary"
-          fullWidth
-          onClick={handleUpload}
-        >
-          🚀 Upload
-        </Button>
-{progress > 0 && progress < 100 && (
-  <Box sx={{ width: "100%", mt: 2 }}>
-    <LinearProgress variant="determinate" value={progress} />
-    <Typography align="center" sx={{ mt: 1 }}>
-      {progress}%
-    </Typography>
-  </Box>
-)}
-
-        {message && (
-          <Typography sx={{ mt: 2, fontWeight: "bold" }}>{message}</Typography>
+        {progress > 0 && progress < 100 && (
+          <div className="mt-3">
+            <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+              <div
+                className="bg-primary h-2 rounded-full transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+            <p className="text-xs text-center text-muted-foreground mt-1">{progress}%</p>
+          </div>
         )}
 
-        <Button variant="outlined" fullWidth sx={{ mt: 2 }} onClick={onClose}>
-          Close
-        </Button>
+        {message && (
+          <div className={`mt-3 rounded-lg border px-4 py-3 text-sm ${
+            message.toLowerCase().includes("fail") || message.toLowerCase().includes("error")
+              ? "border-red-200 bg-red-50 text-red-700"
+              : "border-green-200 bg-green-50 text-green-700"
+          }`}>
+            {message}
+          </div>
+        )}
+      </FormSection>
 
-        <Box sx={{ mt: 3 }}>
-          <Typography variant="subtitle1" gutterBottom>
-            Select Parent Folder from Tree
-          </Typography>
+      <FormSection title="Select Parent Folder">
+        <div className="max-h-[40vh] overflow-y-auto rounded-lg border border-border bg-white p-2">
           <FolderTreeSelector
             items={folderTree}
             onSelect={handleFolderSelect}
             selectedFolder={selectedFolder}
           />
-        </Box>
-      </Box>
-    </Drawer>
+        </div>
+      </FormSection>
+
+      <FormDrawerFooter>
+        <Button variant="outline" onClick={onClose}>Close</Button>
+        <Button onClick={handleUpload}>Upload</Button>
+      </FormDrawerFooter>
+    </FormDrawer>
   );
 };
 
-// Recursive folder tree
 const FolderTreeSelector = ({ items, onSelect, selectedFolder, level = 0 }) => {
   const [expanded, setExpanded] = useState({});
 
-  const toggleExpand = (path) => {
+  const toggleExpand = (e, path) => {
+    e.stopPropagation();
     setExpanded((prev) => ({ ...prev, [path]: !prev[path] }));
   };
 
   return (
-    <List disablePadding>
+    <div className="space-y-0.5" style={{ paddingLeft: level > 0 ? 16 : 0 }}>
       {items?.map((item) => {
-        const isExpanded = expanded[item.path];
-        const isSelected = selectedFolder === item.path;
-
         if (item.type !== "folder") return null;
 
+        const isSelected = selectedFolder === item.path;
+        const isExpanded = expanded[item.path];
+
         return (
-          <React.Fragment key={item.path}>
-            <ListItem
-              sx={{
-                pl: 2 + level * 2,
-                bgcolor: isSelected ? "#b2d8ff" : "transparent",
-                borderRadius: 1,
-                mb: 0.5,
-                "&:hover": { bgcolor: "#dbefff" },
-                cursor: item.meta?.readOnly ? "not-allowed" : "pointer",
-              }}
+          <div key={item.path}>
+            <div
+              className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-sm cursor-pointer transition-colors ${
+                isSelected
+                  ? "bg-primary/10 text-primary font-medium"
+                  : "hover:bg-accent text-foreground"
+              } ${item.meta?.readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
               onClick={() => {
                 if (!item.meta?.readOnly) onSelect(item.path);
               }}
             >
-              <ListItemIcon
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleExpand(item.path);
-                }}
+              <button
+                type="button"
+                onClick={(e) => toggleExpand(e, item.path)}
+                className="shrink-0 rounded p-0.5 hover:bg-accent"
               >
-                {isExpanded ? <FolderOpenIcon /> : <FolderIcon />}
-              </ListItemIcon>
-
-              <ListItemText
-                primary={item.name}
-                sx={{
-                  fontWeight: isSelected ? "bold" : "normal",
-                  color: isSelected ? "#0056b3" : "inherit",
-                }}
-              />
-
-              {item.children?.length > 0 &&
-                (isExpanded ? (
-                  <ExpandLess
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleExpand(item.path);
-                    }}
-                  />
+                {item.children?.length > 0 ? (
+                  isExpanded ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />
                 ) : (
-                  <ExpandMore
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleExpand(item.path);
-                    }}
-                  />
-                ))}
-            </ListItem>
+                  <span className="w-3.5" />
+                )}
+              </button>
+              {isExpanded ? (
+                <FolderOpen className="h-4 w-4 shrink-0 text-primary" />
+              ) : (
+                <Folder className="h-4 w-4 shrink-0 text-muted-foreground" />
+              )}
+              <span className="truncate">{item.name}</span>
+            </div>
 
-            <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-              {/* Subfolders */}
+            {isExpanded && item.children?.length > 0 && (
               <FolderTreeSelector
                 items={item.children}
                 onSelect={onSelect}
                 selectedFolder={selectedFolder}
                 level={level + 1}
               />
+            )}
 
-              {/* Files inside folder */}
-              {item.meta?.files?.length > 0 && (
-                <List sx={{ pl: 4 }}>
-                  {item.meta.files.map((file) => (
-                    <ListItem key={file.name} sx={{ pl: 2 }}>
-                      <ListItemIcon>
-                        <InsertDriveFileIcon fontSize="small" />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={`${file.name}${file.readOnly ? " (Read Only)" : ""}`}
-                      />
-                    </ListItem>
-                  ))}
-                </List>
-              )}
-            </Collapse>
-          </React.Fragment>
+            {isExpanded && item.meta?.files?.length > 0 && (
+              <div className="space-y-0.5" style={{ paddingLeft: 32 }}>
+                {item.meta.files.map((file) => (
+                  <div key={file.name} className="flex items-center gap-2 px-2 py-1 text-xs text-muted-foreground">
+                    <FileText className="h-3.5 w-3.5 shrink-0" />
+                    <span className="truncate">{file.name}{file.readOnly ? " (Read Only)" : ""}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         );
       })}
-    </List>
+    </div>
   );
 };
 

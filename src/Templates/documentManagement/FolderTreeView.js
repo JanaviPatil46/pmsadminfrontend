@@ -1,13 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
-  Button,
-  Typography,
   Box,
-  Paper,
+  Typography,
   IconButton,
   Menu,
   MenuItem,
-  Stack,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -18,16 +15,16 @@ import {
   Lock as LockIcon,
   LockOpen as LockOpenIcon,
 } from "@mui/icons-material";
-import { useParams, useLocation,useNavigate } from "react-router-dom";
+import UploadFileIcon from "@mui/icons-material/UploadFile";
+import DriveFolderUploadIcon from "@mui/icons-material/DriveFolderUpload";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import FileUploadDrawer from "./FileUploadDrawer";
 import FolderUploadDrawer from "./FolderUploadDrawer";
 import CreteFolderDrawer from "./CreteFolderDrawer";
 import RenameDrawer from "./RenameDrawer";
 import MoveDrawer from "./MoveDrawer";
-import UploadFileIcon from "@mui/icons-material/UploadFile";
-import DriveFolderUploadIcon from "@mui/icons-material/DriveFolderUpload";
-import { Eye, PenTool, Stamp, Lock } from "lucide-react";
-import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
+import { Button } from "../../components/ui/button";
+import { Eye, PenTool, Stamp, Lock, ArrowLeft, FolderPlus, Upload, FolderUp } from "lucide-react";
 import {
   Folder as FolderClosedIcon,
   FolderOpen as FolderOpenIcon,
@@ -558,68 +555,52 @@ console.log("hgjhg",templateId)
     );
   };
   return (
-
-<Box sx={{ margin: "auto", p: 3 }}>
-      {/* Template Name */}
-
-      <Box sx={{display:'flex', alignItems:'center',gap:"35%"}}> 
- <KeyboardBackspaceIcon
-          sx={{
-            cursor: "pointer",
-            fontSize: 28,
-            mr: 1,
-            "&:hover": { color: "#1976d2" },
-          }}
+    <div className="mx-auto p-4 md:p-6 space-y-6">
+      {/* Header */}
+      <div className="flex items-center gap-4">
+        <button
+          className="rounded-lg p-2 hover:bg-accent transition-colors"
           onClick={() => navigate("/firmtemp/templates/folders")}
-        />  <Typography variant="h5" sx={{  textAlign: "center" }}>
-        Template: {templateName}
-      </Typography>
-      </Box>
-    
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </button>
+        <h1 className="text-xl font-semibold text-foreground">
+          Template: {templateName}
+        </h1>
+      </div>
 
       {/* Action Buttons */}
-      <Box sx={{  maxWidth: "1000px", mx: "auto" }}>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: { xs: "column", sm: "row" },
-            gap: 1,
-            maxWidth: "600px",
-            width: "100%",
-            mx: "auto",
-            my: 3,
-          }}
-        >
+      <div className="max-w-[1000px] mx-auto">
+        <div className="flex flex-col sm:flex-row gap-2 max-w-[600px] mx-auto">
           <Button
-            variant="contained"
-            fullWidth
-            startIcon={<FolderIcon />}
+            className="flex-1"
             onClick={() => {
               setNewFolderDrawerOpen(true);
               handleMenuClose();
             }}
           >
+            <FolderPlus className="h-4 w-4 mr-2" />
             Create Folder
           </Button>
 
           <Button
-            variant="contained"
-            fullWidth
-            startIcon={<UploadFileIcon />}
+            className="flex-1"
+            variant="outline"
             onClick={() => setFileUploadDrawerOpen(true)}
           >
+            <Upload className="h-4 w-4 mr-2" />
             Upload File
           </Button>
 
           <Button
-            variant="contained"
-            fullWidth
-            startIcon={<DriveFolderUploadIcon />}
+            className="flex-1"
+            variant="outline"
             onClick={() => setFolderUploaDrawerOpen(true)}
           >
+            <FolderUp className="h-4 w-4 mr-2" />
             Upload Folder
           </Button>
-        </Box>
+        </div>
 
         {/* Drawers */}
         <FileUploadDrawer
@@ -670,19 +651,17 @@ console.log("hgjhg",templateId)
           fetchFolderTree={() => fetchFolderTree(templateId)}
           selectedFolderForMenu={selectedFolderForMenu}
         />
-      </Box>
+      </div>
 
       {/* Folder Explorer */}
-      <Paper elevation={3} sx={{ p: 2 }}>
-        <Typography variant="h6" gutterBottom>
-          📜 Folder Explorer
-        </Typography>
+      <div className="rounded-xl border border-border bg-white shadow-sm p-4">
+        <h2 className="text-base font-semibold text-foreground mb-3">Folder Explorer</h2>
         {folderTree ? (
           renderTree(folderTree)
         ) : (
-          <Typography>Loading folder data...</Typography>
+          <p className="text-sm text-muted-foreground">Loading folder data...</p>
         )}
-      </Paper>
+      </div>
 
       {/* Context Menu */}
       <Menu
@@ -864,7 +843,7 @@ const isRestricted =
           );
         })()}
       </Menu>
-    </Box>
+    </div>
   );
 };
 

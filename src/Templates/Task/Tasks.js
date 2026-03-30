@@ -4,15 +4,8 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import {
   Box,
-  Button,
   Typography,
-  Autocomplete,
-  TextField,
   IconButton,
-  Switch,
-  FormControlLabel,
-  Alert,
-  Checkbox,
   TableContainer,
   Table,
   TableBody,
@@ -21,24 +14,27 @@ import {
   TableRow,
   Paper,
   TablePagination,
-  InputLabel,MenuItem,Menu
+  Menu,
+  MenuItem,
+  CircularProgress,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import Editor from "../Texteditor/Editor";
-import Grid from "@mui/material/Unstable_Grid2";
 import Priority from "../Priority/Priority";
 import Status from "../Status/Status";
 import { toast } from "react-toastify";
 import axios from "axios";
 import debounce from "lodash.debounce";
-
 import { CiMenuKebab } from "react-icons/ci";
-import { RiDeleteBin6Line } from "react-icons/ri";
-import { FiPlusCircle } from "react-icons/fi";
-import { PiDotsSixVerticalBold } from "react-icons/pi";
-import { CircularProgress } from "@mui/material";
-import MultiSelectDropdown from "../MultiSelectDropdown"
-import TagsMultiSelectDropDown  from "../TagsMultiSelectDropDown"
+import MultiSelectDropdown from "../MultiSelectDropdown";
+import TagsMultiSelectDropDown from "../TagsMultiSelectDropDown";
+import { FormPage, FormSection, FormField, FormRow, FormGrid } from "../../components/ui/form-layout";
+import { Input } from "../../components/ui/input";
+import { Button } from "../../components/ui/button";
+import { Label } from "../../components/ui/label";
+import { Switch } from "../../components/ui/switch";
+import { Checkbox } from "../../components/ui/checkbox";
+import { Trash2, Plus, GripVertical, FileText, Calendar, ListChecks } from "lucide-react";
 
 const Tasks = () => {
   const TASK_API = process.env.REACT_APP_TASK_TEMP_URL;
@@ -598,20 +594,7 @@ const handleUserChange = (newSelectedUsers) => {
       <Box>
         {!showForm ? (
           <Box sx={{ mt: 2 }}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleCreateTask}
-              sx={{
-                backgroundColor: "var(--color-save-btn)", // Normal background
-
-                "&:hover": {
-                  backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                },
-                borderRadius: "15px",
-                mb: 3,
-              }}
-            >
+            <Button onClick={handleCreateTask} className="mb-3">
               Create Task Template
             </Button>
             {loading ? (
@@ -762,513 +745,208 @@ const handleUserChange = (newSelectedUsers) => {
           
           </Box>
         ) : (
-          <Box sx={{ mt: 2 }}>
-            <Box>
-              <form>
-                <Box className="box-b">
-                  <Typography variant="h5" gutterBottom>
-                    Create Task Template
-                  </Typography>
-                  <Box mt={2} mb={2}>
-                    <hr />
-                  </Box>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} sm={5.8}>
-                      <Box sx={{ width: "100%" }}>
-                        <Grid container spacing={2}>
-                          <Grid item xs={12} sm={6}>
-                            <Box>
-                              <label className="task-input-label">
-                                Template Name
-                              </label>
-                              <TextField
-                                fullWidth
-                                name="TemplateName"
-                                placeholder="Template Name"
-                                size="small"
-                               
-                                sx={{
-                                  background: "#fff",mt:2
-                                }}
-                                 value={templatename}
-                                onChange={(e) =>
-                                  settemplatename(e.target.value)
-                                }
-                                error={!!templateNameError}
-                              />
-                              {!!templateNameError && (
-                                <Alert
-                                  sx={{
-                                    width: "96%",
-                                    p: "0", // Adjust padding to control the size
-                                    pl: "4%",
-                                    height: "23px",
-                                    borderRadius: "10px",
-                                    borderTopLeftRadius: "0",
-                                    borderTopRightRadius: "0",
-                                    fontSize: "15px",
-                                    display: "flex",
-                                    alignItems: "center", // Center content vertically
-                                    "& .MuiAlert-icon": {
-                                      fontSize: "16px", // Adjust the size of the icon
-                                      mr: "8px", // Add margin to the right of the icon
-                                    },
-                                  }}
-                                  variant="filled"
-                                  severity="error"
-                                >
-                                  {templateNameError}
-                                </Alert>
-                              )}
-                            </Box>
-                          </Grid>
-                          <Grid item xs={12} sm={6}>
-                            <Box>
-                              <Status
-                                onStatusChange={handleStatusChange}
-                                selectedStatus={status}
-                              />
-                            </Box>
-                          </Grid>
-                        </Grid>
-                      </Box>
-                      <Box sx={{ width: "100%" }}>
-                        <Grid container spacing={2}>
-                          
-                          <Grid item xs={12} sm={6} pr={3}>
-  
-    <InputLabel sx={{color:'black',mb:2}}>Task Assignee</InputLabel>
-  
-<MultiSelectDropdown 
-  value={selectedUser}
-  onChange={handleUserChange}
-  placeholder="Assignees"
-/>
+          <FormPage
+            title="Create Task Template"
+            subtitle="Configure your task template settings"
+            actions={
+              <>
+                <Button variant="outline" onClick={handleTaskCancel}>Cancel</Button>
+                <Button variant="secondary" onClick={createSaveTaskTemp}>Save</Button>
+                <Button onClick={createTaskTemp}>Save & Exit</Button>
+              </>
+            }
+          >
+            <FormGrid>
+              {/* ===== LEFT COLUMN: Task Details ===== */}
+              <FormGrid.Main>
+                <FormSection title="General" icon={<FileText className="h-4 w-4" />}>
+                  <FormRow cols={2}>
+                    <FormField label="Template Name" error={templateNameError}>
+                      <Input
+                        name="TemplateName"
+                        placeholder="Template Name"
+                        value={templatename}
+                        onChange={(e) => settemplatename(e.target.value)}
+                        error={!!templateNameError}
+                      />
+                    </FormField>
+                    <div>
+                      <Status onStatusChange={handleStatusChange} selectedStatus={status} />
+                    </div>
+                  </FormRow>
 
-</Grid>
-                          <Grid item xs={12} sm={6}>
-                            <Box>
-                              <Priority
-                                onPriorityChange={handlePriorityChange}
-                                selectedPriority={priority}
-                              />
-                            </Box>
-                          </Grid>
-                        </Grid>
-                      </Box>
-                      <Box sx={{ mt: 3, mb: 7 }}>
-                        <Editor
-                          onChange={handleEditorChange}
-                          content={description}
-                        />
-                      </Box>
+                  <FormRow cols={2}>
+                    <FormField label="Task Assignee">
+                      <MultiSelectDropdown
+                        value={selectedUser}
+                        onChange={handleUserChange}
+                        placeholder="Assignees"
+                      />
+                    </FormField>
+                    <div>
+                      <Priority onPriorityChange={handlePriorityChange} selectedPriority={priority} />
+                    </div>
+                  </FormRow>
+                </FormSection>
 
-                      
-                      <Box mt={1} mr={1}>
-                        <InputLabel sx={{ color: "black", mb: 1 }}>
-                          Tags
-                        </InputLabel>
+                <FormSection title="Description">
+                  <Editor onChange={handleEditorChange} content={description} />
+                </FormSection>
 
-                       
-                        <TagsMultiSelectDropDown 
-  value={selectedTags}
-  onChange={handleTagChange}
-  placeholder="Tags"
-/>
-                      </Box>
-                      <Box mt={2}>
-                        <Box
-                          display={"flex"}
-                          alignItems={"center"}
-                          justifyContent={"space-between"}
-                        >
-                          <Typography variant="h6" className="task-input-label">
-                            Start and Due Date
-                          </Typography>
-                          <Box className="absolutes-dates">
-                            <FormControlLabel
-                              control={
-                                <Switch
-                                  checked={absoluteDate}
-                                  onChange={(event) =>
-                                    handleAbsolutesDates(event.target.checked)
-                                  }
-                                  color="primary"
-                                />
-                              }
-                              label={"Absolute Date"}
-                            />
-                          </Box>
-                        </Box>
-                      </Box>
-                      {absoluteDate && (
-                        <>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              mt: 2,
-                            }}
-                          >
-                            <Typography className="task-input-label">
-                              Start Date
-                            </Typography>
-                            <DatePicker
+                <FormSection title="Tags">
+                  <TagsMultiSelectDropDown
+                    value={selectedTags}
+                    onChange={handleTagChange}
+                    placeholder="Tags"
+                  />
+                </FormSection>
+
+                <FormSection title="Start and Due Date" icon={<Calendar className="h-4 w-4" />}>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-medium">Absolute Date</Label>
+                    <Switch
+                      checked={absoluteDate}
+                      onCheckedChange={handleAbsolutesDates}
+                    />
+                  </div>
+
+                  {absoluteDate && (
+                    <div className="space-y-4 mt-4">
+                      <FormField label="Start Date">
+                        <DatePicker
                           format="MM/DD/YYYY"
-                              sx={{ width: "100%", backgroundColor: "#fff" }}
-                              selected={startDate}
-                              onChange={handleStartDateChange}
-                              renderInput={(params) => (
-                                <TextField {...params} size="small" />
-                              )}
-                            />
-                          </Box>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              mt: 2,
-                            }}
-                          >
-                            <Typography className="task-input-label">
-                              Due Date
-                            </Typography>
-                            <DatePicker
-                            format="MM/DD/YYYY"
-                              sx={{ width: "100%", backgroundColor: "#fff" }}
-                              selected={dueDate}
-                              onChange={handleDueDateChange}
-                              renderInput={(params) => (
-                                <TextField {...params} size="small" />
-                              )}
-                            />
-                          </Box>
-                        </>
-                      )}
-                      {!absoluteDate && (
-                        <>
-                          <Grid container spacing={3} alignItems="center">
-                            <Grid item xs={12} sm={2}>
-                              <Typography className="task-input-label">
-                                Start In
-                              </Typography>
-                            </Grid>
-                            <Grid item xs={12} sm={5}>
-                              <TextField
-                                size="small"
-                                placeholder="0"
-                                defaultValue={0}
-                                value={startsin}
-                                sx={{ background: "#fff", width: "100%" }}
-                                onChange={(e) => setstartsin(e.target.value)}
-                              />
-                            </Grid>
-                            <Grid item xs={12} sm={5}>
-                              <Autocomplete
-                                options={dayOptions}
-                                size="small"
-                                getOptionLabel={(option) => option.label}
-                                onChange={handleStartInDateChange}
-                                renderInput={(params) => (
-                                  <>
-                                    <TextField
-                                      {...params}
-                                      variant="outlined"
-                                      sx={{ backgroundColor: "#fff" }}
-                                    />
-                                  </>
-                                )}
-                                value={
-                                  dayOptions.find(
-                                    (option) =>
-                                      option.value === startsInDuration
-                                  ) || null
-                                }
-                                className="job-template-select-dropdown"
-                              />
-                            </Grid>
-                          </Grid>
-                          <Grid container spacing={3} alignItems="center">
-                            <Grid item xs={12} sm={2}>
-                              <Typography className="task-input-label">
-                                Due In
-                              </Typography>
-                            </Grid>
-                            <Grid item xs={12} sm={5}>
-                              <TextField
-                                size="small"
-                                placeholder="0"
-                                value={duein}
-                                fullWidth
-                                sx={{ background: "#fff" }}
-                                onChange={(e) => setduein(e.target.value)}
-                              />
-                            </Grid>
-                            <Grid item xs={12} sm={5}>
-                              <Autocomplete
-                                options={dayOptions}
-                                getOptionLabel={(option) => option.label}
-                                onChange={handledueindateChange}
-                                size="small"
-                                renderInput={(params) => (
-                                  <>
-                                    <TextField
-                                      {...params}
-                                      variant="outlined"
-                                      sx={{ backgroundColor: "#fff" }}
-                                    />
-                                  </>
-                                )}
-                                value={
-                                  dayOptions.find(
-                                    (option) => option.value === dueinduration
-                                  ) || null
-                                }
-                                className="job-template-select-dropdown"
-                              />
-                            </Grid>
-                          </Grid>
-                        </>
-                      )}
-                    </Grid>
-                    <Grid
-                      item
-                      xs={12}
-                      sm={0.4}
-                      sx={{ display: { xs: "none", sm: "block" } }}
-                    >
-                      <Box
-                        sx={{
-                          borderLeft: "1px solid black",
-                          height: "100%",
-                          ml: 1.5,
-                        }}
-                      ></Box>
-                    </Grid>
-                    <Grid item xs={12} sm={5.8}>
-                      <div className="B">
-                        <DragDropContext onDragEnd={handleDragEnd}>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "space-between",
-                            }}
-                          >
-                            <Typography variant="h6">Subtasks</Typography>
-                            <FormControlLabel
-                              control={
-                                <Switch
-                                  onChange={(event) =>
-                                    handleSubtaskSwitch(event.target.checked)
-                                  }
-                                  checked={SubtaskSwitch}
-                                  color="primary"
-                                />
-                              }
-                            />
-                          </Box>
+                          sx={{ width: '100%', backgroundColor: '#fff' }}
+                          value={startDate}
+                          onChange={handleStartDateChange}
+                        />
+                      </FormField>
+                      <FormField label="Due Date">
+                        <DatePicker
+                          format="MM/DD/YYYY"
+                          sx={{ width: '100%', backgroundColor: '#fff' }}
+                          value={dueDate}
+                          onChange={handleDueDateChange}
+                        />
+                      </FormField>
+                    </div>
+                  )}
 
-                          {/* {SubtaskSwitch && (
-                            <Droppable droppableId="subtaskList">
-                              {(provided) => (
-                                <div
-                                  className="subtask-input"
-                                  {...provided.droppableProps}
-                                  ref={provided.innerRef}
-                                >
-                                  {(subtasks.length > 0
-                                    ? subtasks
-                                    : [{ id: "default", text: "" }]
-                                  ).map((subtask, index) => (
-                                    <Draggable
-                                      key={subtask.id}
-                                      draggableId={subtask.id}
-                                      index={index}
-                                    >
-                                      {(provided) => (
-                                        <div
-                                          ref={provided.innerRef}
-                                          {...provided.draggableProps}
-                                          {...provided.dragHandleProps}
-                                        >
-                                          <Box
-                                            display="flex"
-                                            gap="30px"
-                                            alignItems="center"
-                                          >
-                                            <Checkbox
-                                              style={{ cursor: "pointer" }}
-                                              checked={subtask.checked}
-                                              // checked={checkedSubtasks.includes(
-                                              //   subtask.id
-                                              // )}
-                                              onChange={() =>
-                                                handleCheckboxChange(
-                                                  subtask.id,
-                                                  // subtask.checked
-                                                )
-                                              }
-                                            />
-                                            <TextField
-                                              placeholder="Things To do"
-                                              value={subtask.text}
-                                              size="small"
-                                              margin="normal"
-                                              fullWidth
-                                              onChange={(e) =>
-                                                handleInputChange(
-                                                  subtask.id,
-                                                  e.target.value
-                                                )
-                                              }
-                                              variant="outlined"
-                                            />
-                                            <IconButton
-                                              onClick={() =>
-                                                handleDeleteSubtask(subtask.id)
-                                              }
-                                              style={{ cursor: "pointer" }}
-                                            >
-                                              <RiDeleteBin6Line />
-                                            </IconButton>
-                                            <IconButton
-                                              style={{ cursor: "move" }}
-                                            >
-                                              <PiDotsSixVerticalBold />
-                                            </IconButton>
-                                          </Box>
-                                        </div>
-                                      )}
-                                    </Draggable>
-                                  ))}
+                  {!absoluteDate && (
+                    <div className="space-y-4 mt-4">
+                      <div className="flex items-center gap-3">
+                        <Label className="w-20 shrink-0 text-sm">Start In</Label>
+                        <Input
+                          value={startsin}
+                          onChange={(e) => setstartsin(e.target.value)}
+                          placeholder="0"
+                          className="flex-1"
+                        />
+                        <select
+                          className="flex h-10 rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          value={startsInDuration || ""}
+                          onChange={(e) => setStartsInDuration(e.target.value)}
+                        >
+                          <option value="">Select</option>
+                          {dayOptions.map((opt) => (
+                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Label className="w-20 shrink-0 text-sm">Due In</Label>
+                        <Input
+                          value={duein}
+                          onChange={(e) => setduein(e.target.value)}
+                          placeholder="0"
+                          className="flex-1"
+                        />
+                        <select
+                          className="flex h-10 rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          value={dueinduration || ""}
+                          onChange={(e) => setdueinduration(e.target.value)}
+                        >
+                          <option value="">Select</option>
+                          {dayOptions.map((opt) => (
+                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  )}
+                </FormSection>
+              </FormGrid.Main>
 
-                                  {provided.placeholder}
-                                  <Box
-                                    sx={{ cursor: "pointer" }}
-                                    onClick={handleAddSubtask}
-                                    style={{ margin: "10px", color: "#1976d3" }}
+              {/* ===== RIGHT COLUMN: Subtasks ===== */}
+              <FormGrid.Sidebar>
+                <FormSection title="Subtasks" icon={<ListChecks className="h-4 w-4" />}>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-medium">Enable Subtasks</Label>
+                    <Switch
+                      checked={SubtaskSwitch}
+                      onCheckedChange={handleSubtaskSwitch}
+                    />
+                  </div>
+
+                  {SubtaskSwitch && (
+                    <DragDropContext onDragEnd={handleDragEnd}>
+                      <Droppable droppableId="subtaskList">
+                        {(provided) => (
+                          <div className="space-y-2 mt-3" {...provided.droppableProps} ref={provided.innerRef}>
+                            {subtasks.map((subtask, index) => (
+                              <Draggable key={subtask.id} draggableId={subtask.id} index={index}>
+                                {(provided) => (
+                                  <div
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    className="flex items-center gap-2 rounded-lg border border-border bg-white p-2 shadow-sm"
                                   >
-                                    <FiPlusCircle /> Add Subtasks
-                                  </Box>
-                                </div>
-                              )}
-                            </Droppable>
-                          )} */}
-                           {SubtaskSwitch && (
-                                                      <Droppable droppableId="subtaskList">
-                                                        {(provided) => (
-                                                          <div className="subtask-input" {...provided.droppableProps} ref={provided.innerRef}>
-                          
-                                                            
-                          {subtasks.map((subtask, index) => (
-                            <Draggable key={subtask.id} draggableId={subtask.id} index={index}>
-                              {(provided) => (
-                                <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                  <Box display="flex" gap="30px" alignItems="center">
                                     <Checkbox
                                       checked={checkedSubtasks.includes(subtask.id)}
-                                      onChange={() => handleCheckboxChange(subtask.id, subtask.checked)}
+                                      onCheckedChange={() => handleCheckboxChange(subtask.id)}
                                     />
-                                    <TextField
-                                      placeholder="Things To do"
+                                    <Input
+                                      placeholder="Things to do"
                                       value={subtask.text}
-                                      size="small"
-                                      margin="normal"
-                                      fullWidth
                                       onChange={(e) => handleInputChange(subtask.id, e.target.value)}
-                                      variant="outlined"
+                                      className="flex-1 border-0 shadow-none focus-visible:ring-0"
                                     />
-                                    <IconButton onClick={() => handleDeleteSubtask(subtask.id)}>
-                                      <RiDeleteBin6Line />
-                                    </IconButton>
-                                    <IconButton {...provided.dragHandleProps}>
-                                      <PiDotsSixVerticalBold />
-                                    </IconButton>
-                                  </Box>
-                                </div>
-                              )}
-                            </Draggable>
-                          ))}
-                          
-                          
-                                                            {provided.placeholder}
-                                                            <Box sx={{ cursor: 'pointer' }} onClick={handleAddSubtask} style={{ margin: "10px", color: "#1976d3" }}>
-                                                              <FiPlusCircle /> Add Subtasks
-                                                            </Box>
-                                                          </div>
-                                                        )}
-                                                      </Droppable>
-                                                    )}
-                          
-                        </DragDropContext>
-                      </div>
-                    </Grid>
-                  </Grid>
-                  <Box mt={2} mb={2}>
-                    <hr />
-                  </Box>
-                  <Box
-                    sx={{
-                      pt: 2,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 5,
-                    }}
-                  >
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={createTaskTemp}
-                      sx={{
-                        backgroundColor: "var(--color-save-btn)", // Normal background
-
-                        "&:hover": {
-                          backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                        },
-                        borderRadius: "15px",
-                      }}
-                    >
-                      Save & exit
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={createSaveTaskTemp}
-                      sx={{
-                        backgroundColor: "var(--color-save-btn)", // Normal background
-
-                        "&:hover": {
-                          backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                        },
-                        borderRadius: "15px",
-                        width: "80px",
-                      }}
-                    >
-                      Save
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      onClick={handleTaskCancel}
-                      sx={{
-                        borderColor: "var(--color-border-cancel-btn)", // Normal background
-                        color: "var(--color-save-btn)",
-                        "&:hover": {
-                          backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                          color: "#fff",
-                          border: "none",
-                        },
-                        width: "80px",
-                        borderRadius: "15px",
-                      }}
-                    >
-                      Cancel
-                    </Button>
-                  </Box>
-                </Box>
-              </form>
-            </Box>
-          </Box>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleDeleteSubtask(subtask.id)}
+                                      className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </button>
+                                    <div
+                                      {...provided.dragHandleProps}
+                                      className="cursor-grab rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent"
+                                    >
+                                      <GripVertical className="h-4 w-4" />
+                                    </div>
+                                  </div>
+                                )}
+                              </Draggable>
+                            ))}
+                            {provided.placeholder}
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={handleAddSubtask}
+                              className="mt-2 w-full text-primary"
+                            >
+                              <Plus className="h-4 w-4" />
+                              Add Subtask
+                            </Button>
+                          </div>
+                        )}
+                      </Droppable>
+                    </DragDropContext>
+                  )}
+                </FormSection>
+              </FormGrid.Sidebar>
+            </FormGrid>
+          </FormPage>
         )}
       </Box>
     </LocalizationProvider>

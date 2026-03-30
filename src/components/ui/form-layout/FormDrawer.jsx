@@ -1,6 +1,5 @@
 import React from "react"
 import { cn } from "../../../lib/utils"
-import { X } from "lucide-react"
 import {
   Sheet,
   SheetContent,
@@ -10,19 +9,18 @@ import {
 } from "../sheet"
 
 /**
- * FormDrawer — Right-side drawer for creating/editing forms (replaces MUI Drawer).
- * 
- * Usage:
- *   <FormDrawer open={open} onClose={onClose} title="New Task" description="Create a new task" width="lg">
- *     <FormSection>...</FormSection>
- *     <FormDrawerFooter>
- *       <Button variant="outline" onClick={onClose}>Cancel</Button>
- *       <Button onClick={handleSave}>Save</Button>
- *     </FormDrawerFooter>
- *   </FormDrawer>
- * 
+ * FormDrawer — Right-side drawer for creating/editing forms.
+ * Full-screen on mobile, configurable width on desktop.
+ *
  * Props:
- *   width — "sm" (400px) | "md" (500px) | "lg" (600px) | "xl" (800px) (default: "lg")
+ *   open        — Boolean controlling visibility
+ *   onClose     — Called when drawer should close
+ *   title       — Header title
+ *   description — Optional subtitle
+ *   width       — "sm" | "md" | "lg" | "xl" | "2xl" (default: "lg")
+ *   footer      — React node rendered as sticky footer (alternative to FormDrawerFooter)
+ *
+ * Children are split: <FormDrawerFooter> is automatically extracted and placed outside scroll area.
  */
 const widthMap = {
   sm: "sm:max-w-[400px]",
@@ -39,9 +37,19 @@ const FormDrawer = ({
   title,
   description,
   width = "lg",
+  footer,
   children,
   ...props
 }) => {
+  // Separate FormDrawerFooter from body children
+  const childArray = React.Children.toArray(children)
+  const footerChild = childArray.find(
+    (child) => React.isValidElement(child) && child.type?.displayName === "FormDrawerFooter"
+  )
+  const bodyChildren = childArray.filter(
+    (child) => !(React.isValidElement(child) && child.type?.displayName === "FormDrawerFooter")
+  )
+
   return (
     <Sheet open={open} onOpenChange={(isOpen) => !isOpen && onClose?.()}>
       <SheetContent
@@ -53,10 +61,14 @@ const FormDrawer = ({
         )}
         {...props}
       >
-        {/* Drawer Header */}
-        <div className="flex items-center justify-between border-b border-border px-6 py-4">
+        {/* Header */}
+        <div className="shrink-0 border-b border-border px-4 py-3 sm:px-6 sm:py-4">
           <SheetHeader className="space-y-0.5">
-            {title && <SheetTitle className="text-lg font-semibold">{title}</SheetTitle>}
+            {title && (
+              <SheetTitle className="text-base font-semibold sm:text-lg">
+                {title}
+              </SheetTitle>
+            )}
             {description && (
               <SheetDescription className="text-sm text-muted-foreground">
                 {description}
@@ -66,9 +78,12 @@ const FormDrawer = ({
         </div>
 
         {/* Scrollable body */}
-        <div className="flex-1 overflow-y-auto px-6 py-5">
-          <div className="space-y-6">{children}</div>
+        <div className="flex-1 overflow-y-auto custom-scrollbar px-4 py-4 sm:px-6 sm:py-5">
+          <div className="space-y-5 sm:space-y-6">{bodyChildren}</div>
         </div>
+
+        {/* Footer — either extracted child or footer prop */}
+        {footerChild || footer}
       </SheetContent>
     </Sheet>
   )
@@ -78,12 +93,13 @@ FormDrawer.displayName = "FormDrawer"
 
 /**
  * FormDrawerFooter — Sticky bottom action bar inside FormDrawer.
+ * Automatically extracted from children and placed below the scroll area.
  */
 const FormDrawerFooter = ({ className, children, ...props }) => {
   return (
     <div
       className={cn(
-        "sticky bottom-0 flex items-center gap-3 border-t border-border bg-white px-6 py-4",
+        "shrink-0 flex items-center gap-2 border-t border-border bg-white px-4 py-3 sm:gap-3 sm:px-6 sm:py-4",
         className
       )}
       {...props}

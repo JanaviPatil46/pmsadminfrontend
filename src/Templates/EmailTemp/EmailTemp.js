@@ -1,22 +1,9 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { toast } from "react-toastify";
 import {
   Box,
-  Button,
   Typography,
-  Container,
   IconButton,
-  Radio,
-  FormControlLabel,
-  RadioGroup,
-  FormControl,
-  List,
-  ListItem,
-  ListItemText,
-  Popover,
-  TextField,
-  Autocomplete,
-  Alert,
   TableContainer,
   Table,
   TableBody,
@@ -25,23 +12,22 @@ import {
   TableRow,
   Paper,
   TablePagination,
-  InputLabel,Menu,MenuItem
+  Menu,
+  MenuItem,
+  CircularProgress
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import {
-  MaterialReactTable,
-  useMaterialReactTable,
-} from "material-react-table";
 import { CiMenuKebab } from "react-icons/ci";
 import EditorShortcodes from "../Texteditor/EditorShortcodes";
-import Grid from "@mui/material/Unstable_Grid2";
-import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile"; // For file icon
-import DeleteIcon from "@mui/icons-material/Delete"; // For delete icon
-import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
-import { CircularProgress } from "@mui/material";
 import debounce from "lodash.debounce";
 import axios from "axios";
+import { FormPage, FormSection, FormField, FormRow, FormGrid, ShortcodePopover, FormSelect } from "../../components/ui/form-layout";
+import { Input } from "../../components/ui/input";
+import { Button } from "../../components/ui/button";
+import { Label } from "../../components/ui/label";
+import { RadioGroup, RadioGroupItem } from "../../components/ui/radio-group";
+import { Upload, Trash2, FileText, Mail, Paperclip, User } from "lucide-react";
 const EmailTemp = () => {
   const EMAIL_API = process.env.REACT_APP_EMAIL_TEMP_URL;
   const USER_API = process.env.REACT_APP_USER_URL;
@@ -799,20 +785,7 @@ const EmailTemp = () => {
     <Box>
       {!showForm ? (
         <Box sx={{ mt: 2 }}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleCreateTemplate}
-            sx={{
-              backgroundColor: "var(--color-save-btn)", // Normal background
-
-              "&:hover": {
-                backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-              },
-              borderRadius: "15px",
-              mb: 3,
-            }}
-          >
+          <Button onClick={handleCreateTemplate} className="mb-3">
             Create Template
           </Button>
           {/* <MaterialReactTable columns={columns} table={table} /> */}
@@ -1013,399 +986,149 @@ const EmailTemp = () => {
           )}
         </Box>
       ) : (
-        <>
-          <Box display="flex" alignItems="center">
-            <Typography variant="h6" gutterBottom>
-              Create Email Template
-            </Typography>
-          </Box>
-          <hr />
-          <Grid container spacing={2}>
-            <Grid xs={12} sm={5.8}>
-              <Box>
-                <form>
-                  <Box>
-                    <InputLabel sx={{ color: "black" }}>
-                      Template Name
-                    </InputLabel>
-                    <TextField
-                      sx={{ background: "#fff", mt: 2 }}
-                      fullWidth
-                      name="templateName"
-                      value={templateName}
-                      error={!!templateNameError}
-                      // helperText={templateNameError}
-                      onChange={(e) => setTemplateName(e.target.value)}
-                      placeholder="Template Name"
-                      size="small"
-                    />
-                    {!!templateNameError && (
-                      <Alert
-                        sx={{
-                          width: "96%",
-                          p: "0", // Adjust padding to control the size
-                          pl: "4%",
-                          height: "23px",
-                          borderRadius: "10px",
-                          borderTopLeftRadius: "0",
-                          borderTopRightRadius: "0",
-                          fontSize: "15px",
-                          display: "flex",
-                          alignItems: "center", // Center content vertically
-                          "& .MuiAlert-icon": {
-                            fontSize: "16px", // Adjust the size of the icon
-                            mr: "8px", // Add margin to the right of the icon
-                          },
-                        }}
-                        variant="filled"
-                        severity="error"
-                      >
-                        {templateNameError}
-                      </Alert>
-                    )}
-                  </Box>
-                  <Box mt={2}>
-                    <InputLabel sx={{ color: "black" }}>Mode</InputLabel>
-                    <FormControl>
-                      <RadioGroup
-                        aria-labelledby="demo-controlled-radio-buttons-group"
-                        name="controlled-radio-buttons-group"
-                        value={selectedOption}
-                        onChange={handleChange}
-                      >
-                        <FormControlLabel
-                          value="contacts"
-                          control={<Radio sx={{ color: "#ADD8E6" }} />}
-                          label="Contact Shortcodes"
-                        />
-                        <FormControlLabel
-                          value="account"
-                          control={<Radio sx={{ color: "#ADD8E6" }} />}
-                          label="Account Shortcodes"
-                        />
-                      </RadioGroup>
-                    </FormControl>
-                  </Box>
-                  <Box>
-                    <InputLabel sx={{ color: "black" }}>From</InputLabel>
-                    <Autocomplete
-                      options={options}
-                      sx={{ mt: 2, mb: 2, backgroundColor: "#fff" }}
-                      size="small"
-                      value={selecteduser}
-                      onChange={handleuserChange}
-                      isOptionEqualToValue={(option, value) =>
-                        option.value === value.value
-                      }
-                      getOptionLabel={(option) => option.label || ""}
-                      renderInput={(params) => (
-                        <>
-                          <TextField
-                            {...params}
-                            error={!!selectedUserError}
-                            // helperText={selectedUserError}
-                            placeholder="Form"
-                          />
-                          {!!selectedUserError && (
-                            <Alert
-                              sx={{
-                                width: "96%",
-                                p: "0", // Adjust padding to control the size
-                                pl: "4%",
-                                height: "23px",
-                                borderRadius: "10px",
-                                borderTopLeftRadius: "0",
-                                borderTopRightRadius: "0",
-                                fontSize: "15px",
-                                display: "flex",
-                                alignItems: "center", // Center content vertically
-                                "& .MuiAlert-icon": {
-                                  fontSize: "16px", // Adjust the size of the icon
-                                  mr: "8px", // Add margin to the right of the icon
-                                },
-                              }}
-                              variant="filled"
-                              severity="error"
-                            >
-                              {selectedUserError}
-                            </Alert>
-                          )}
-                        </>
-                      )}
-                      isClearable={true}
-                    />
-                  </Box>
-                  <Box>
-                    <InputLabel sx={{ color: "black" }}>Subject</InputLabel>
-                    <TextField
-                      fullWidth
-                      name="subject"
-                      // value={inputText + selectedShortcut}
-                      // onChange={handlechatsubject}
-                      onChange={handlesubject}
-                      inputRef={textFieldRef}
-                      value={inputText}
-                      onClick={(e) =>
-                        setCursorPosition(e.target.selectionStart)
-                      }
-                      placeholder="Subject"
-                      size="small"
-                      error={!!inputTextError}
-                      // helperText={inputTextError}
-                      sx={{ background: "#fff", mt: 2 }}
-                    />
-                    {!!inputTextError && (
-                      <Alert
-                        sx={{
-                          width: "96%",
-                          p: "0", // Adjust padding to control the size
-                          pl: "4%",
-                          height: "23px",
-                          borderRadius: "10px",
-                          borderTopLeftRadius: "0",
-                          borderTopRightRadius: "0",
-                          fontSize: "15px",
-                          display: "flex",
-                          alignItems: "center", // Center content vertically
-                          "& .MuiAlert-icon": {
-                            fontSize: "16px", // Adjust the size of the icon
-                            mr: "8px", // Add margin to the right of the icon
-                          },
-                        }}
-                        variant="filled"
-                        severity="error"
-                      >
-                        {inputTextError}
-                      </Alert>
-                    )}
-                  </Box>
-                  <Box>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={toggleDropdown}
-                      // sx={{ mt: 2 }}
-                      sx={{
-                        backgroundColor: "var(--color-save-btn)", // Normal background
-
-                        "&:hover": {
-                          backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                        },
-                        borderRadius: "15px",
-                        mt: 2,
-                      }}
-                    >
-                      Add Shortcode
-                    </Button>
-                    <Popover
-                      open={showDropdown}
-                      anchorEl={anchorEl}
-                      onClose={handleCloseDropdown}
-                      anchorOrigin={{
-                        vertical: "bottom",
-                        horizontal: "left",
-                      }}
-                      transformOrigin={{
-                        vertical: "top",
-                        horizontal: "left",
-                      }}
-                    >
-                      <Box>
-                        <List
-                          className="dropdown-list"
-                          sx={{
-                            width: "300px",
-                            height: "300px",
-                            cursor: "pointer",
-                          }}
-                        >
-                          {filteredShortcuts.map((shortcut, index) => (
-                            <ListItem
-                              key={index}
-                              onClick={() => handleAddShortcut(shortcut.value)}
-                            >
-                              <ListItemText
-                                primary={shortcut.title}
-                                primaryTypographyProps={{
-                                  style: {
-                                    fontWeight: shortcut.isBold
-                                      ? "bold"
-                                      : "normal",
-                                  },
-                                }}
-                              />
-                            </ListItem>
-                          ))}
-                        </List>
-                      </Box>
-                    </Popover>
-                  </Box>
-                  <Box sx={{ mt: 5 }}>
-                    <EditorShortcodes onChange={handleEditorChange} />
-                  </Box>
-                  <Box sx={{ mt: 5, display: "flex", gap: 2 }}>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={handleSaveExitTemplate}
-                      sx={{
-                        backgroundColor: "var(--color-save-btn)", // Normal background
-
-                        "&:hover": {
-                          backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                        },
-                        borderRadius: "15px",
-                      }}
-                    >
-                      Save & Exit
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={handleSaveTemplate}
-                      sx={{
-                        backgroundColor: "var(--color-save-btn)", // Normal background
-
-                        "&:hover": {
-                          backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                        },
-                        borderRadius: "15px",
-                        width: "80px",
-                      }}
-                    >
-                      Save
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      onClick={handleTempCancle}
-                      sx={{
-                        borderColor: "var(--color-border-cancel-btn)", // Normal background
-                        color: "var(--color-save-btn)",
-                        "&:hover": {
-                          backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                          color: "#fff",
-                          border: "none",
-                        },
-                        width: "80px",
-                        borderRadius: "15px",
-                      }}
-                    >
-                      Cancel
-                    </Button>
-                  </Box>
-                </form>
-              </Box>
-            </Grid>
-
-            <Grid
-              item
-              xs={12}
-              sm={0.4}
-              sx={{ display: { xs: "none", sm: "block" } }}
-            >
-              <Box
-                className="vertical-line"
-                sx={{
-                  // borderLeft: '1px solid black',
-                  height: "100%",
-                  ml: 1.5,
-                }}
-              ></Box>
-            </Grid>
-
-            <Grid xs={12} sm={5.8}>
-              <Box
-                sx={{
-                  alignItems: "center",
-                  display: "flex",
-                  justifyContent: "center",
-                  flexDirection: "column",
-                }}
-              >
-                {/* Upload Zone */}
-                
-
-                <Box
-                  {...getRootProps()} // Spread dropzone props here
-                  sx={{
-                    alignItems: "center",
-                    justifyContent: "center",
-                    display: "flex",
-                    flexDirection: "column",
-                    border: "2px dashed #ccc",
-                    padding: "20px",
-                    width: "100%",
-                    maxWidth: "500px",
-                    textAlign: "center",
-                    cursor: "pointer",
-                    marginBottom: "16px",
-                  }}
-                >
-                  <input
-                    id="file-input"
-                    {...getInputProps()} // Spread input props here
-                    style={{ display: "none" }} // Hide the default file input
-                    multiple // Enable multiple file selection
+        <FormPage
+          title="Create Email Template"
+          subtitle="Configure your new email template"
+          actions={
+            <>
+              <Button variant="outline" onClick={handleTempCancle}>
+                Cancel
+              </Button>
+              <Button variant="secondary" onClick={handleSaveTemplate}>
+                Save
+              </Button>
+              <Button onClick={handleSaveExitTemplate}>
+                Save & Exit
+              </Button>
+            </>
+          }
+        >
+          <FormGrid>
+            {/* ===== LEFT COLUMN: Email Form ===== */}
+            <FormGrid.Main>
+              <FormSection title="Template Details" icon={<Mail className="h-4 w-4" />}>
+                <FormField label="Template Name" error={templateNameError}>
+                  <Input
+                    name="templateName"
+                    value={templateName}
+                    onChange={(e) => setTemplateName(e.target.value)}
+                    placeholder="Template Name"
+                    error={!!templateNameError}
                   />
-                  <Typography variant="h6">Drag & drop file here</Typography>
-                  <Typography variant="body2">or</Typography>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    sx={{
-                      backgroundColor: "var(--color-save-btn)",
-                      "&:hover": {
-                        backgroundColor: "var(--color-save-hover-btn)",
-                      },
-                      borderRadius: "15px",
+                </FormField>
+
+                <FormField label="Mode">
+                  <RadioGroup value={selectedOption} onValueChange={(val) => handleChange({ target: { value: val } })}>
+                    <div className="flex items-center gap-6">
+                      <div className="flex items-center gap-2">
+                        <RadioGroupItem value="contacts" id="contacts" />
+                        <Label htmlFor="contacts" className="cursor-pointer text-sm">Contact Shortcodes</Label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <RadioGroupItem value="account" id="account" />
+                        <Label htmlFor="account" className="cursor-pointer text-sm">Account Shortcodes</Label>
+                      </div>
+                    </div>
+                  </RadioGroup>
+                </FormField>
+              </FormSection>
+
+              <FormSection title="Sender & Subject" icon={<User className="h-4 w-4" />}>
+                <FormField label="From" error={selectedUserError}>
+                  <FormSelect
+                    value={selecteduser?.value || ""}
+                    onChange={(e) => {
+                      const selected = options.find((o) => o.value === e.target.value) || null;
+                      handleuserChange(null, selected);
                     }}
+                    error={!!selectedUserError}
                   >
+                    <option value="">Select Sender</option>
+                    {options.map((opt) => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </FormSelect>
+                </FormField>
+
+                <FormField label="Subject" error={inputTextError}>
+                  <div className="space-y-2">
+                    <Input
+                      name="subject"
+                      onChange={handlesubject}
+                      ref={textFieldRef}
+                      value={inputText}
+                      onClick={(e) => setCursorPosition(e.target.selectionStart)}
+                      placeholder="Subject"
+                      error={!!inputTextError}
+                    />
+                    <ShortcodePopover
+                      shortcuts={filteredShortcuts}
+                      onSelect={handleAddShortcut}
+                    />
+                  </div>
+                </FormField>
+              </FormSection>
+
+              {/* Email Body */}
+              <FormSection title="Email Body">
+                <EditorShortcodes onChange={handleEditorChange} />
+              </FormSection>
+            </FormGrid.Main>
+
+            {/* ===== RIGHT COLUMN: Attachments ===== */}
+            <FormGrid.Sidebar>
+              <FormSection title="Attachments" icon={<Paperclip className="h-4 w-4" />}>
+                {/* Dropzone */}
+                <div
+                  {...getRootProps()}
+                  className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-muted/30 p-8 text-center transition-colors hover:border-primary/40 hover:bg-primary/5"
+                >
+                  <input id="file-input" {...getInputProps()} className="hidden" multiple />
+                  <Upload className="mb-3 h-8 w-8 text-muted-foreground" />
+                  <p className="text-sm font-medium text-foreground">Drag & drop files here</p>
+                  <p className="mt-1 text-xs text-muted-foreground">or</p>
+                  <Button type="button" variant="outline" size="sm" className="mt-3">
                     Browse Files
                   </Button>
-                  <Typography variant="body2" sx={{ marginTop: "8px" }}>
-                    20 MB file size limit. Supported file types: PDF, DOC, DOCX,
-                    XLS, XLSX, JPG, PNG.
-                  </Typography>
-                </Box>
+                  <p className="mt-3 text-xs text-muted-foreground">
+                    20 MB limit. PDF, DOC, DOCX, XLS, XLSX, JPG, PNG.
+                  </p>
+                </div>
 
+                {/* File List */}
                 {files.length > 0 && (
-                  <Box sx={{ width: "100%", marginTop: "16px" }}>
-                    <Typography variant="h6" sx={{ marginBottom: "8px" }}>
-                      Selected Files:
-                    </Typography>
+                  <div className="mt-4 space-y-1">
+                    <p className="text-sm font-medium text-foreground">Selected Files:</p>
                     {files.map((file, index) => (
-                      <Box
+                      <div
                         key={index}
-                        sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          padding: "8px",
-                          borderBottom: "1px solid #eee",
-                        }}
+                        className="flex items-center justify-between rounded-lg border border-border px-3 py-2"
                       >
-                        <Typography variant="body1">
-                          {file.name} ({(file.size / 1024).toFixed(2)} KB)
-                        </Typography>
-                        <IconButton
+                        <div className="flex items-center gap-2 text-sm">
+                          <FileText className="h-4 w-4 text-muted-foreground" />
+                          <span className="truncate">{file.name}</span>
+                          <span className="text-xs text-muted-foreground">
+                            ({(file.size / 1024).toFixed(2)} KB)
+                          </span>
+                        </div>
+                        <button
+                          type="button"
                           onClick={() => {
-                            const updatedFiles = files.filter(
-                              (_, i) => i !== index
-                            );
-                            setFiles(updatedFiles); // Remove the file from the list
+                            const updatedFiles = files.filter((_, i) => i !== index);
+                            setFiles(updatedFiles);
                           }}
-                          sx={{ color: "red" }}
+                          className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                         >
-                          <DeleteIcon />
-                        </IconButton>
-                      </Box>
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
                     ))}
-                  </Box>
+                  </div>
                 )}
-              </Box>
-            </Grid>
-          </Grid>
-        </>
+              </FormSection>
+            </FormGrid.Sidebar>
+          </FormGrid>
+        </FormPage>
       )}
     </Box>
   );

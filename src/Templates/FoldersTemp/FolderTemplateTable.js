@@ -57,7 +57,7 @@ function FolderTemplateTbel({
             mb: 3,
           }}
         >
-          Create Template
+          Create Temp
         </Button>
       </Box>
       <Box>

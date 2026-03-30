@@ -278,37 +278,21 @@
 
 // export default FolderTemplateList;
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
-import {
-  Button,
-  IconButton,
-  Menu,
-  MenuItem,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Typography,
-} from "@mui/material";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { MoreVertical, Pencil, PenLine, Trash2, FolderOpen } from "lucide-react";
 
 const FolderTemplateList = () => {
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [anchorEl, setAnchorEl] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(null);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const menuRef = useRef(null);
 
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
   const [renameValue, setRenameValue] = useState("");
@@ -317,7 +301,6 @@ const FolderTemplateList = () => {
 
   const navigate = useNavigate();
 
-  // 🔹 Fetch templates on mount
   useEffect(() => {
     const fetchTemplates = async () => {
       setLoading(true);
@@ -339,22 +322,31 @@ const FolderTemplateList = () => {
     fetchTemplates();
   }, []);
 
-  // 🔹 Create Template
+  // Close menu on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const handleCreateTemplate = () => {
     navigate("/firmtemp/templates/createfolder");
   };
 
-  // 🔹 Menu Handling
-  const handleMenuClick = (event, template) => {
-    setAnchorEl(event.currentTarget);
+  const handleMenuClick = (e, template) => {
+    e.stopPropagation();
     setSelectedTemplate(template);
+    setMenuOpen(menuOpen === template._id ? null : template._id);
   };
 
   const handleMenuClose = () => {
-    setAnchorEl(null);
+    setMenuOpen(null);
   };
 
-  // 🔹 Rename Template
   const handleRenameOpen = () => {
     if (!selectedTemplate) return;
     setRenameValue(selectedTemplate.templatename || "");
@@ -375,8 +367,7 @@ const FolderTemplateList = () => {
       );
       console.log("Rename response:", response.data);
 
-
-      toast.success("Template Renamed successfully")
+      toast.success("Template Renamed successfully");
       setTemplates((prev) =>
         prev.map((t) =>
           t._id === selectedTemplate._id
@@ -393,7 +384,6 @@ const FolderTemplateList = () => {
     }
   };
 
-  // 🔹 Delete Template
   const handleDeleteOpen = () => {
     setDeleteDialogOpen(true);
     handleMenuClose();
@@ -407,8 +397,7 @@ const FolderTemplateList = () => {
         `https://www.snptaxes.com/api/foldertemp/delete/${selectedTemplate._id}`
       );
 
-
-      toast.success("Template Deteleted successfully")
+      toast.success("Template Deleted successfully");
       setTemplates((prev) =>
         prev.filter((t) => t._id !== selectedTemplate._id)
       );
@@ -422,39 +411,35 @@ const FolderTemplateList = () => {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleCreateTemplate}
-        sx={{ mb: 2 }}
-      >
-        Create Template
-      </Button>
+    <div className="p-5 space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold text-foreground">Folder Templates</h2>
+        <Button onClick={handleCreateTemplate}>
+          Create Template
+        </Button>
+      </div>
 
-      {loading && <p>Loading templates...</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {loading && <p className="text-sm text-muted-foreground">Loading templates...</p>}
+      {error && <p className="text-sm text-red-600">{error}</p>}
 
       {!loading && !error && templates.length > 0 && (
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
-                <TableCell><strong>Template Name</strong></TableCell>
-              
-                <TableCell align="right"><strong>Actions</strong></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
+        <div className="rounded-xl border border-border bg-white shadow-sm overflow-hidden">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border bg-muted/40">
+                <th className="text-left px-4 py-3 font-medium text-muted-foreground">Template Name</th>
+                <th className="text-right px-4 py-3 font-medium text-muted-foreground w-20">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
               {templates.map((template) => (
-                <TableRow key={template._id}>
-                  <TableCell>
-                    <Typography
+                <tr key={template._id} className="border-b border-border last:border-0 hover:bg-muted/20 transition-colors">
+                  <td className="px-4 py-3">
+                    <button
+                      className="flex items-center gap-2 text-sm font-medium text-foreground hover:text-primary transition-colors cursor-pointer"
                       onClick={() =>
                         navigate(
-                          `/firmtemp/templates/tree/${encodeURIComponent(
-                            template._id
-                          )}`,
+                          `/firmtemp/templates/tree/${encodeURIComponent(template._id)}`,
                           {
                             state: {
                               templateId: template._id,
@@ -463,91 +448,97 @@ const FolderTemplateList = () => {
                           }
                         )
                       }
-                      sx={{cursor:'pointer'}}
                     >
+                      <FolderOpen className="h-4 w-4 text-muted-foreground" />
                       {template.templatename || "Unnamed Template"}
-                    </Typography>
-                  </TableCell>
-                 
-                  <TableCell align="right">
-                    <IconButton onClick={(e) => handleMenuClick(e, template)}>
-                      <MoreVertIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
+                    </button>
+                  </td>
+                  <td className="px-4 py-3 text-right relative">
+                    <button
+                      className="rounded-md p-1.5 hover:bg-accent transition-colors"
+                      onClick={(e) => handleMenuClick(e, template)}
+                    >
+                      <MoreVertical className="h-4 w-4 text-muted-foreground" />
+                    </button>
+
+                    {menuOpen === template._id && (
+                      <div
+                        ref={menuRef}
+                        className="absolute right-4 top-10 z-50 w-40 rounded-lg border border-border bg-white shadow-lg py-1 animate-in fade-in-0 zoom-in-95"
+                      >
+                        <button
+                          className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-accent transition-colors"
+                          onClick={() => {
+                            navigate(
+                              `/firmtemp/templates/tree/${encodeURIComponent(selectedTemplate?._id)}`,
+                              {
+                                state: {
+                                  templateId: selectedTemplate?._id,
+                                  templateName: selectedTemplate?.templatename,
+                                },
+                              }
+                            );
+                            handleMenuClose();
+                          }}
+                        >
+                          <Pencil className="h-3.5 w-3.5" /> Edit
+                        </button>
+                        <button
+                          className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-accent transition-colors"
+                          onClick={handleRenameOpen}
+                        >
+                          <PenLine className="h-3.5 w-3.5" /> Rename
+                        </button>
+                        <button
+                          className="flex w-full items-center gap-2 px-3 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors"
+                          onClick={handleDeleteOpen}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" /> Delete
+                        </button>
+                      </div>
+                    )}
+                  </td>
+                </tr>
               ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+            </tbody>
+          </table>
+        </div>
       )}
 
-      {/* 🔹 Three-dot Menu */}
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleMenuClose}
-      >
-        <MenuItem
-          onClick={() => {
-            navigate(
-              `/firmtemp/templates/tree/${encodeURIComponent(
-                selectedTemplate?._id
-              )}`,
-              {
-                state: {
-                  templateId: selectedTemplate?._id,
-                  templateName: selectedTemplate?.templatename,
-                },
-              }
-            );
-            handleMenuClose();
-          }}
-        >
-          Edit
-        </MenuItem>
-        <MenuItem onClick={handleRenameOpen}>Rename</MenuItem>
-        <MenuItem onClick={handleDeleteOpen}>Delete</MenuItem>
-      </Menu>
+      {/* Rename Dialog */}
+      {renameDialogOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="w-full max-w-md rounded-xl border border-border bg-white p-6 shadow-xl space-y-4">
+            <h3 className="text-lg font-semibold">Rename Template</h3>
+            <Input
+              autoFocus
+              placeholder="New Template Name"
+              value={renameValue}
+              onChange={(e) => setRenameValue(e.target.value)}
+            />
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setRenameDialogOpen(false)}>Cancel</Button>
+              <Button onClick={handleRenameSubmit}>Save</Button>
+            </div>
+          </div>
+        </div>
+      )}
 
-      {/* 🔹 Rename Dialog */}
-      <Dialog open={renameDialogOpen} onClose={() => setRenameDialogOpen(false)}>
-        <DialogTitle>Rename Template</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="New Template Name"
-            fullWidth
-            value={renameValue}
-            onChange={(e) => setRenameValue(e.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setRenameDialogOpen(false)}>Cancel</Button>
-          <Button onClick={handleRenameSubmit} variant="contained">
-            Save
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* 🔹 Delete Confirmation Dialog */}
-      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-        <DialogTitle>Delete Template</DialogTitle>
-        <DialogContent>
-          Are you sure you want to delete{" "}
-          <strong>{selectedTemplate?.templatename}</strong>?
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
-          <Button
-            color="error"
-            variant="contained"
-            onClick={handleDeleteConfirm}
-          >
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
+      {/* Delete Confirmation Dialog */}
+      {deleteDialogOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="w-full max-w-md rounded-xl border border-border bg-white p-6 shadow-xl space-y-4">
+            <h3 className="text-lg font-semibold">Delete Template</h3>
+            <p className="text-sm text-muted-foreground">
+              Are you sure you want to delete <strong>{selectedTemplate?.templatename}</strong>?
+            </p>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+              <Button variant="destructive" onClick={handleDeleteConfirm}>Delete</Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

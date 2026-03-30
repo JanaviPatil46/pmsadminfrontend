@@ -230,27 +230,12 @@
 // ============================
 
 import React, { useState, useEffect } from "react";
-import {
-  Drawer,
-  Box,
-  Typography,
-  TextField,
-  Button,
-  Divider,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-  Collapse,
-  Alert,
-  ListItemIcon,
-} from "@mui/material";
-import FolderIcon from "@mui/icons-material/Folder";
-import FolderOpenIcon from "@mui/icons-material/FolderOpen";
 import axios from "axios";
-import ExpandLess from "@mui/icons-material/ExpandLess";
-import ExpandMore from "@mui/icons-material/ExpandMore";
 import { toast } from "react-toastify";
+import { FormDrawer, FormDrawerFooter, FormSection, FormField } from "../../components/ui/form-layout";
+import { Input } from "../../components/ui/input";
+import { Button } from "../../components/ui/button";
+import { FolderInput, ChevronRight, ChevronDown, Folder, FolderOpen } from "lucide-react";
 
 const MoveDrawer = ({
   isOpen,
@@ -292,8 +277,6 @@ const MoveDrawer = ({
       onClose();
       fetchFolderTree?.();
     } catch (err) {
-      // if (err.response) setMessage(err.response.data.error || "Move failed");
-      // else setMessage("Server not reachable");
       if (err.response) {
         toast.error(err.response.data.error || "Move failed");
       } else {
@@ -303,70 +286,46 @@ const MoveDrawer = ({
   };
 
   return (
-    <Drawer anchor="right" open={isOpen} onClose={onClose}>
-      <Box sx={{ width: 360, p: 3, bgcolor: "#f8fff0", height: "100%" }}>
-        <Typography variant="h6" gutterBottom>
-          📁 Move Folder / File
-        </Typography>
+    <FormDrawer open={isOpen} onClose={onClose} title="Move Folder / File" width="md">
+      <FormSection title="Move Details" icon={<FolderInput className="h-4 w-4" />}>
+        <FormField label="Source Path">
+          <Input value={sourcePath} readOnly className="bg-muted/40" />
+        </FormField>
 
-        <TextField
-          label="Source Path"
-          value={sourcePath}
-          fullWidth
-          margin="dense"
-          InputProps={{ readOnly: true }}
-        />
-
-        <TextField
-          label="Destination Path"
-          value={destinationPath}
-          onChange={(e) => setDestinationPath(e.target.value)}
-          fullWidth
-          margin="dense"
-        />
-
-        <Button
-          variant="contained"
-          fullWidth
-          sx={{ mt: 2 }}
-          onClick={handleMove}
-        >
-          Move
-        </Button>
+        <FormField label="Destination Path">
+          <Input
+            value={destinationPath}
+            onChange={(e) => setDestinationPath(e.target.value)}
+            placeholder="Select from tree or type path"
+          />
+        </FormField>
 
         {message && (
-          <Alert
-            severity={message.includes("failed") ? "error" : "info"}
-            sx={{ mt: 2 }}
-          >
+          <div className={`mt-3 rounded-lg border px-4 py-3 text-sm ${
+            message.toLowerCase().includes("fail") || message.includes("Please")
+              ? "border-red-200 bg-red-50 text-red-700"
+              : "border-green-200 bg-green-50 text-green-700"
+          }`}>
             {message}
-          </Alert>
+          </div>
         )}
+      </FormSection>
 
-        <Divider sx={{ my: 2 }} />
-
-        <Typography variant="subtitle1" gutterBottom>
-          Select Destination Folder
-        </Typography>
-
-        <Box sx={{ maxHeight: "60vh", overflowY: "auto" }}>
+      <FormSection title="Select Destination Folder">
+        <div className="max-h-[45vh] overflow-y-auto rounded-lg border border-border bg-white p-2">
           <FolderTreeSelector
             items={folderTree}
             onSelect={(path) => setDestinationPath(path)}
             selectedFolder={destinationPath}
           />
-        </Box>
+        </div>
+      </FormSection>
 
-        <Button
-          onClick={onClose}
-          variant="outlined"
-          fullWidth
-          sx={{ mt: 2, color: "#555" }}
-        >
-          Close
-        </Button>
-      </Box>
-    </Drawer>
+      <FormDrawerFooter>
+        <Button variant="outline" onClick={onClose}>Close</Button>
+        <Button onClick={handleMove}>Move</Button>
+      </FormDrawerFooter>
+    </FormDrawer>
   );
 };
 
@@ -461,12 +420,13 @@ const MoveDrawer = ({
 const FolderTreeSelector = ({ items, onSelect, selectedFolder, level = 0 }) => {
   const [expanded, setExpanded] = useState({});
 
-  const toggleExpand = (path) => {
+  const toggleExpand = (e, path) => {
+    e.stopPropagation();
     setExpanded((prev) => ({ ...prev, [path]: !prev[path] }));
   };
 
   return (
-    <List disablePadding>
+    <div className="space-y-0.5" style={{ paddingLeft: level > 0 ? 16 : 0 }}>
       {items?.map((item) => {
         if (item.type !== "folder") return null;
 
@@ -474,67 +434,49 @@ const FolderTreeSelector = ({ items, onSelect, selectedFolder, level = 0 }) => {
         const isExpanded = expanded[item.path];
 
         return (
-          <React.Fragment key={item.path}>
-            <ListItem
-              sx={{
-                pl: 2 + level * 2,
-                bgcolor: isSelected ? "#b2d8ff" : "transparent",
-                borderRadius: 1,
-                mb: 0.5,
-                "&:hover": { bgcolor: "#dbefff" },
-                cursor: item.meta?.readOnly ? "not-allowed" : "pointer",
-              }}
+          <div key={item.path}>
+            <div
+              className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-sm cursor-pointer transition-colors ${
+                isSelected
+                  ? "bg-primary/10 text-primary font-medium"
+                  : "hover:bg-accent text-foreground"
+              } ${item.meta?.readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
               onClick={() => {
                 if (!item.meta?.readOnly) onSelect(item.path);
               }}
             >
-              <ListItemIcon
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleExpand(item.path);
-                }}
+              <button
+                type="button"
+                onClick={(e) => toggleExpand(e, item.path)}
+                className="shrink-0 rounded p-0.5 hover:bg-accent"
               >
-                {isExpanded ? <FolderOpenIcon /> : <FolderIcon />}
-              </ListItemIcon>
-              <ListItemText
-                primary={item.name}
-                sx={{
-                  fontWeight: isSelected ? "bold" : "normal",
-                  color: isSelected ? "#0056b3" : "inherit",
-                }}
-              />
-              {item.children?.length > 0 &&
-                (isExpanded ? (
-                  <ExpandLess
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleExpand(item.path);
-                    }}
-                  />
+                {item.children?.length > 0 ? (
+                  isExpanded ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />
                 ) : (
-                  <ExpandMore
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleExpand(item.path);
-                    }}
-                  />
-                ))}
-            </ListItem>
+                  <span className="w-3.5" />
+                )}
+              </button>
+              {isExpanded ? (
+                <FolderOpen className="h-4 w-4 shrink-0 text-primary" />
+              ) : (
+                <Folder className="h-4 w-4 shrink-0 text-muted-foreground" />
+              )}
+              <span className="truncate">{item.name}</span>
+            </div>
 
-            {item.children?.length > 0 && (
-              <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-                <FolderTreeSelector
-                  items={item.children}
-                  onSelect={onSelect}
-                  selectedFolder={selectedFolder}
-                  level={level + 1}
-                />
-              </Collapse>
+            {isExpanded && item.children?.length > 0 && (
+              <FolderTreeSelector
+                items={item.children}
+                onSelect={onSelect}
+                selectedFolder={selectedFolder}
+                level={level + 1}
+              />
             )}
-          </React.Fragment>
+          </div>
         );
       })}
-    </List>
+    </div>
   );
 };
+
 export default MoveDrawer;

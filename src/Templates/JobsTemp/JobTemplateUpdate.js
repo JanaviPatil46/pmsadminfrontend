@@ -3,22 +3,16 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import Priority from "../Priority/Priority";
 import EditorShortcodes from "../Texteditor/EditorShortcodes";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import MultiSelectDropdown from "../MultiSelectDropdown";
-import { FormPage, FormSection, FormField, FormRow, FormActions, FormGrid, ShortcodePopover } from "../../components/ui/form-layout";
+import { FormPage, FormSection, FormField, FormRow, FormActions, FormGrid, ShortcodePopover, FormSwitchRow, FormDatePicker, FormSelect, FormComment } from "../../components/ui/form-layout";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
-import { Switch } from "../../components/ui/switch";
 import { Label } from "../../components/ui/label";
 import { Textarea } from "../../components/ui/textarea";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../../components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "../../components/ui/popover";
-import { ScrollArea } from "../../components/ui/scroll-area";
-import { Trash2, MessageSquarePlus, FileText, Calendar, Users, Globe, Code } from "lucide-react";
+import { Trash2, MessageSquarePlus, FileText, Calendar, Users, Globe } from "lucide-react";
 dayjs.extend(customParseFormat);
 
 const JobTemplateUpdate = ({ charLimit = 4000 }) => {

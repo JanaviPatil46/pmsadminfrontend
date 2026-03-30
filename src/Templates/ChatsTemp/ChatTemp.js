@@ -2,23 +2,8 @@ import React, { useState, useEffect,useRef } from 'react';
 import { useNavigate, } from "react-router-dom";
 import {
   Box,
-  Button,
   Typography,
-  Container,
-  Grid,
-  TextField,
-  InputLabel,
-  Autocomplete,
-  Switch,
-  FormControlLabel,
-  Divider,
-  List,
-  ListItem,
-  ListItemText,
-  Popover,
   IconButton,
-  Alert,
-  Checkbox,
   TableContainer,
   Table,
   TableBody,
@@ -26,19 +11,24 @@ import {
   TableHead,
   TableRow,
   Paper,
-  TablePagination,Menu,MenuItem
+  TablePagination,
+  Menu,
+  MenuItem,
+  CircularProgress
 } from '@mui/material';
 import Editor from '../Texteditor/EditorShortcodes';
 import { CiMenuKebab } from "react-icons/ci";
 import { toast } from "react-toastify";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { RiDeleteBin6Line } from "react-icons/ri";
-import { FiPlusCircle } from "react-icons/fi";
-import { PiDotsSixVerticalBold } from "react-icons/pi";
-import { CircularProgress } from "@mui/material";
 import axios from "axios";
 import debounce from "lodash.debounce";
-import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
+import { FormPage, FormSection, FormField, FormRow, FormGrid, ShortcodePopover, FormSelect } from "../../components/ui/form-layout";
+import { Input } from "../../components/ui/input";
+import { Button } from "../../components/ui/button";
+import { Switch } from "../../components/ui/switch";
+import { Label } from "../../components/ui/label";
+import { Checkbox } from "../../components/ui/checkbox";
+import { Trash2, Plus, GripVertical, MessageCircle, Bell, ListChecks } from "lucide-react";
 const ChatTemp = () => {
   const navigate = useNavigate();
   const CHAT_API = process.env.REACT_APP_CHAT_TEMP_URL;
@@ -783,14 +773,7 @@ const checkTemplateName = async (name) => {
     <Box>
       {!showForm ? (
         <Box sx={{ mt: 2 }}>
-          <Button variant="contained" color="primary" onClick={handleCreateChat} sx={{
-              backgroundColor: 'var(--color-save-btn)',  // Normal background
-             
-              '&:hover': {
-                backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-              },
-              borderRadius:'15px', mb: 3
-            }}>
+          <Button onClick={handleCreateChat} className="mb-3">
             Create Chat Template
           </Button>
 {/* 
@@ -987,354 +970,181 @@ const checkTemplateName = async (name) => {
           }
         </Box>
       ) : (
-        <Box sx={{ mt: 2 }}>
-          <Box>
-            <form>
-              <Box>
-                <Typography variant='h5' gutterBottom>Create Chat Template</Typography>
-                <Box mt={2} mb={2}><hr /></Box>
-                <Grid container spacing={2} ml={1} mt={2}>
-                  <Grid item xs={12} sm={5}>
-                    <Box>
+        <FormPage
+          title="Create Chat Template"
+          subtitle="Configure your new chat template"
+          actions={
+            <>
+              <Button variant="outline" onClick={handleCloseChatTemp}>
+                Cancel
+              </Button>
+              <Button variant="secondary" onClick={saveSchat}>
+                Save
+              </Button>
+              <Button onClick={savechat}>
+                Save & Exit
+              </Button>
+            </>
+          }
+        >
+          <FormGrid>
+            {/* ===== LEFT COLUMN: Chat Form ===== */}
+            <FormGrid.Main>
+              <FormSection title="Template Details" icon={<MessageCircle className="h-4 w-4" />}>
+                <FormField label="Name" error={templateNameError}>
+                  <Input
+                    value={templateName}
+                    onChange={(e) => setTemplateName(e.target.value)}
+                    name="TemplateName"
+                    placeholder="Template Name"
+                    error={!!templateNameError}
+                  />
+                </FormField>
 
-                      <Box>
-                        <InputLabel sx={{ color: 'black' }}> Name</InputLabel>
-                        <TextField
-                          value={templateName}
-                          onChange={(e) => setTemplateName(e.target.value)}
-                          error={!!templateNameError}
+                <FormField label="From" error={selectedUserError}>
+                  <FormSelect
+                    value={selecteduser?.value || ""}
+                    onChange={(e) => {
+                      const selected = options.find((o) => o.value === e.target.value) || null;
+                      handleuserChange(null, selected);
+                    }}
+                    error={!!selectedUserError}
+                  >
+                    <option value="">Select Sender</option>
+                    {options.map((opt) => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </FormSelect>
+                </FormField>
 
-                          fullWidth
-                          name="TemplateName"
-                          placeholder="Template Name"
-                          size="small"
-                          sx={{ mt: 2 }}
-                        />
-                        {(!!templateNameError) && <Alert sx={{
-                          width: '96%',
-                          p: '0', // Adjust padding to control the size
-                          pl: '4%', height: '23px',
-                          borderRadius: '10px',
-                          borderTopLeftRadius: '0',
-                          borderTopRightRadius: '0',
-                          fontSize: '15px',
-                          display: 'flex',
-                          alignItems: 'center', // Center content vertically
-                          '& .MuiAlert-icon': {
-                            fontSize: '16px', // Adjust the size of the icon
-                            mr: '8px', // Add margin to the right of the icon
-                          },
-                        }} variant="filled" severity="error" >
-                          {templateNameError}
-                        </Alert>}
-                      </Box>
+                <FormField label="Subject" error={inputTextError}>
+                  <div className="space-y-2">
+                    <Input
+                      name="subject"
+                      ref={textFieldRef}
+                      value={inputText}
+                      onChange={handlesubject}
+                      onClick={(e) => setCursorPosition(e.target.selectionStart)}
+                      placeholder="Subject"
+                      error={!!inputTextError}
+                    />
+                    <ShortcodePopover
+                      shortcuts={filteredShortcuts}
+                      onSelect={handleAddShortcut}
+                    />
+                  </div>
+                </FormField>
+              </FormSection>
 
-                      <Box mt={2}>
+              {/* Description */}
+              <FormSection title="Description">
+                <Editor onChange={handleEditorChange} />
+              </FormSection>
 
+              {/* Reminders */}
+              <FormSection title="Reminders" icon={<Bell className="h-4 w-4" />}>
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm font-medium">Send reminders to clients</Label>
+                  <Switch
+                    checked={absoluteDate}
+                    onCheckedChange={handleAbsolutesDates}
+                  />
+                </div>
 
-                        <InputLabel sx={{ color: 'black' }}>From</InputLabel>
+                {absoluteDate && (
+                  <FormRow cols={2}>
+                    <FormField label="Days until next reminder">
+                      <Input
+                        name="Daysuntilnextreminder"
+                        value={daysuntilNextReminder}
+                        onChange={(e) => setDaysuntilNextReminder(e.target.value)}
+                        placeholder="Days until next reminder"
+                      />
+                    </FormField>
+                    <FormField label="No. of reminders">
+                      <Input
+                        name="NoOfreminders"
+                        value={noOfReminder}
+                        onChange={(e) => setNoOfReminder(e.target.value)}
+                        placeholder="Number of reminders"
+                      />
+                    </FormField>
+                  </FormRow>
+                )}
+              </FormSection>
+            </FormGrid.Main>
 
+            {/* ===== RIGHT COLUMN: Client Tasks ===== */}
+            <FormGrid.Sidebar>
+              <FormSection title="Client Tasks" icon={<ListChecks className="h-4 w-4" />}>
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm font-medium">Enable Client Tasks</Label>
+                  <Switch
+                    checked={SubtaskSwitch}
+                    onCheckedChange={handleSubtaskSwitch}
+                  />
+                </div>
 
-                        <Autocomplete
-
-                          options={options}
-                          sx={{ mt: 2, mb: 2 }}
-                          size="small"
-                          value={selecteduser}
-                          onChange={handleuserChange}
-                          isOptionEqualToValue={(option, value) => option.value === value.value}
-                          getOptionLabel={(option) => option.label || ""}
-                          renderInput={(params) => (
-                            <>
-                              <TextField
-                                {...params}
-                                error={!!selectedUserError}
-
-                                placeholder="Form"
-                              />
-                              {(!!selectedUserError) && <Alert sx={{
-                                width: '96%',
-                                p: '0', // Adjust padding to control the size
-                                pl: '4%', height: '23px',
-                                borderRadius: '10px',
-                                borderTopLeftRadius: '0',
-                                borderTopRightRadius: '0',
-                                fontSize: '15px',
-                                display: 'flex',
-                                alignItems: 'center', // Center content vertically
-                                '& .MuiAlert-icon': {
-                                  fontSize: '16px', // Adjust the size of the icon
-                                  mr: '8px', // Add margin to the right of the icon
-                                },
-                              }} variant="filled" severity="error" >
-                                {selectedUserError}
-                              </Alert>}
-                            </>
-                          )}
-                          isClearable={true}
-
-                        />
-
-                      </Box>
-
-                      <Box>
-
-                        <InputLabel sx={{ color: 'black' }}>Subject</InputLabel>
-
-                        <TextField
-                          sx={{ mt: 2 }}
-                          fullWidth
-                          name="subject"
-                         
-                          inputRef={textFieldRef}
-                          value={inputText}
-                          onChange={handlesubject}
-                          onClick={(e) => setCursorPosition(e.target.selectionStart)}
-                          placeholder="Subject"
-                          size="small"
-                          error={!!inputTextError}
-
-                        />
-                        {(!!inputTextError) && <Alert sx={{
-                          width: '96%',
-                          p: '0', // Adjust padding to control the size
-                          pl: '4%', height: '23px',
-                          borderRadius: '10px',
-                          borderTopLeftRadius: '0',
-                          borderTopRightRadius: '0',
-                          fontSize: '15px',
-                          display: 'flex',
-                          alignItems: 'center', // Center content vertically
-                          '& .MuiAlert-icon': {
-                            fontSize: '16px', // Adjust the size of the icon
-                            mr: '8px', // Add margin to the right of the icon
-                          },
-                        }} variant="filled" severity="error" >
-                          {inputTextError}
-                        </Alert>}
-                      </Box>
-                      <Box>
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          onClick={toggleDropdown}
-                          sx={{
-                            backgroundColor: 'var(--color-save-btn)',  // Normal background
-                           
-                            '&:hover': {
-                              backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                            },
-                            borderRadius:'15px', mt: 2
-                          }}
-                        >
-                          Add Shortcode
-                        </Button>
-
-                        <Popover
-                          open={showDropdown}
-                          anchorEl={anchorEl}
-                          onClose={handleCloseDropdown}
-                          anchorOrigin={{
-                            vertical: 'bottom',
-                            horizontal: 'left',
-                          }}
-                          transformOrigin={{
-                            vertical: 'top',
-                            horizontal: 'left',
-                          }}
-                        >
-                          <Box >
-                            <List className="dropdown-list" sx={{ width: '300px', height: '300px', cursor: 'pointer' }}>
-                              {filteredShortcuts.map((shortcut, index) => (
-                                <ListItem
-                                  key={index}
-                                  onClick={() => handleAddShortcut(shortcut.value)}
-                                >
-                                  <ListItemText
-                                    primary={shortcut.title}
-                                    primaryTypographyProps={{
-                                      style: {
-                                        fontWeight: shortcut.isBold ? 'bold' : 'normal',
-                                      },
-                                    }}
-                                  />
-                                </ListItem>
-                              ))}
-                            </List>
-                          </Box>
-                        </Popover>
-                      </Box>
-
-                      <Box sx={{ mt: 3, width: '100%',mb:6 }}>
-                        <Editor onChange={handleEditorChange} />
-                      </Box>
-
-                      <Box mt={2}>
-                        <Box display={'flex'} alignItems={'center'} >
-                          <Box>
-                            <FormControlLabel
-                              control={
-                                <Switch
-                                  checked={absoluteDate}
-                                  onChange={(event) => handleAbsolutesDates(event.target.checked)}
-                                  // checked={sendreminderstoclient}
-                                  // onChange={(event)=>handleDateSwitchChange(event.target.checked)}
-                                  color="primary"
-                                />
-                              }
-
-                            />
-                          </Box>
-                          <Typography variant='h6'>Send reminders to clients</Typography>
-
-                        </Box>
-                        {absoluteDate && (
-                          <Box mb={3}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, mt: 2 }}>
-
-                              <Box>
-                                <InputLabel sx={{ color: 'black' }}>Days until next reminder</InputLabel>
-                                <TextField
-                                  // margin="normal"
-                                  fullWidth
-                                  name="Daysuntilnextreminder"
-                                  value={daysuntilNextReminder}
-                                  onChange={(e) => setDaysuntilNextReminder(e.target.value)}
-                                  placeholder="Days until next reminder"
-                                  size="small"
-                                  sx={{ mt: 2 }}
-                                />
-                              </Box>
-
-                              <Box>
-                                <InputLabel sx={{ color: 'black' }}>No Of reminders</InputLabel>
-                                <TextField
-
-                                  fullWidth
-                                  name="No Of reminders"
-                                  value={noOfReminder}
-                                  onChange={(e) => setNoOfReminder(e.target.value)}
-
-                                  placeholder="NoOfreminders"
-                                  size="small"
-                                  sx={{ mt: 2 }}
-                                />
-                              </Box>
-
-                            </Box>
-                          </Box>
-                        )}
-                      </Box>
-                    </Box>
-                  </Grid>
-                  <Grid  item xs={12} sm={0.4} sx={{ display: { xs: 'none', sm: 'block' } }}>
-                    <Box
-                      sx={{
-                        borderLeft: '1px solid black',
-                        height: '100%',
-                        ml: 2.5
-                      }}
-                    ></Box>
-                  </Grid>
-               
-                  <Grid item xs={12} sm={5.8} ml={{ xs: 0, sm: 2 }}>
-                      <div className="B">
-
-                        <DragDropContext onDragEnd={handleDragEnd}>
-
-                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <Typography variant='h6'>Client tasks</Typography>
-                            <FormControlLabel
-                              control={
-                                <Switch onChange={(event) => handleSubtaskSwitch(event.target.checked)} checked={SubtaskSwitch} color="primary" />
-                              }
-
-                            />
-                          </Box>
-                         
-                          {SubtaskSwitch && (
-                            <Droppable droppableId="subtaskList">
+                {SubtaskSwitch && (
+                  <DragDropContext onDragEnd={handleDragEnd}>
+                    <Droppable droppableId="subtaskList">
+                      {(provided) => (
+                        <div className="space-y-2" {...provided.droppableProps} ref={provided.innerRef}>
+                          {subtasks.map((subtask, index) => (
+                            <Draggable key={subtask.id} draggableId={String(subtask.id)} index={index}>
                               {(provided) => (
-                                <div className="subtask-input" {...provided.droppableProps} ref={provided.innerRef}>
-
-                                  
-{subtasks.map((subtask, index) => (
-  <Draggable key={subtask.id} draggableId={subtask.id} index={index}>
-    {(provided) => (
-      <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-        <Box display="flex" gap="30px" alignItems="center">
-          <Checkbox
-            checked={checkedSubtasks.includes(subtask.id)}
-            onChange={() => handleCheckboxChange(subtask.id, subtask.checked)}
-          />
-          <TextField
-            placeholder="Things To do"
-            value={subtask.text}
-            size="small"
-            margin="normal"
-            fullWidth
-            onChange={(e) => handleInputChange(subtask.id, e.target.value)}
-            variant="outlined"
-          />
-          <IconButton onClick={() => handleDeleteSubtask(subtask.id)}>
-            <RiDeleteBin6Line />
-          </IconButton>
-          <IconButton {...provided.dragHandleProps}>
-            <PiDotsSixVerticalBold />
-          </IconButton>
-        </Box>
-      </div>
-    )}
-  </Draggable>
-))}
-
-
-                                  {provided.placeholder}
-                                  <Box sx={{ cursor: 'pointer' }} onClick={handleAddSubtask} style={{ margin: "10px", color: "#1976d3" }}>
-                                    <FiPlusCircle /> Add Subtasks
-                                  </Box>
+                                <div
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  className="flex items-center gap-2 rounded-lg border border-border bg-white p-2 shadow-sm"
+                                >
+                                  <Checkbox
+                                    checked={checkedSubtasks.includes(subtask.id)}
+                                    onCheckedChange={() => handleCheckboxChange(subtask.id, subtask.checked)}
+                                  />
+                                  <Input
+                                    placeholder="Things to do"
+                                    value={subtask.text}
+                                    onChange={(e) => handleInputChange(subtask.id, e.target.value)}
+                                    className="flex-1 border-0 shadow-none focus-visible:ring-0"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteSubtask(subtask.id)}
+                                    className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </button>
+                                  <div
+                                    {...provided.dragHandleProps}
+                                    className="cursor-grab rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent"
+                                  >
+                                    <GripVertical className="h-4 w-4" />
+                                  </div>
                                 </div>
                               )}
-                            </Droppable>
-                          )}
-
-                        </DragDropContext>
-                      </div>
-                    </Grid>
-                </Grid>
-                <Divider mt={2} />
-                <Box sx={{ pt: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
-                <Button variant="contained" color="primary" onClick={savechat} sx={{
-                      backgroundColor: 'var(--color-save-btn)',  // Normal background
-                     
-                      '&:hover': {
-                        backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                      },
-                      borderRadius:'15px', 
-                    }}>Save & exit</Button>
-                  <Button variant="contained" color="primary" onClick={saveSchat} sx={{
-                      backgroundColor: 'var(--color-save-btn)',  // Normal background
-                     
-                      '&:hover': {
-                        backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                      },
-                      borderRadius:'15px', width:'80px'
-                    }}>Save</Button>
-                  <Button variant="outlined" onClick={handleCloseChatTemp} sx={{
-                  borderColor: 'var(--color-border-cancel-btn)',  // Normal background
-                 color:'var(--color-save-btn)',
-                  '&:hover': {
-                    backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                    color:'#fff',
-                    border:"none"
-                  },
-                  width:'80px',borderRadius:'15px'
-                }}>Cancel</Button>
-                </Box>
-              </Box>
-            </form>
-          </Box>
-        </Box>
+                            </Draggable>
+                          ))}
+                          {provided.placeholder}
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleAddSubtask}
+                            className="mt-2 w-full text-primary"
+                          >
+                            <Plus className="h-4 w-4" />
+                            Add Subtask
+                          </Button>
+                        </div>
+                      )}
+                    </Droppable>
+                  </DragDropContext>
+                )}
+              </FormSection>
+            </FormGrid.Sidebar>
+          </FormGrid>
+        </FormPage>
       )}
     </Box>
   );

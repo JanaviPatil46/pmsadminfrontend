@@ -151,21 +151,23 @@
 // export default RenameDrawer;
 
 import React, { useState, useEffect } from "react";
-import { Drawer, Box, Typography, TextField, Button } from "@mui/material";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { FormDrawer, FormDrawerFooter, FormSection, FormField } from "../../components/ui/form-layout";
+import { Input } from "../../components/ui/input";
+import { Button } from "../../components/ui/button";
+import { PenLine } from "lucide-react";
 
 const RenameDrawer = ({
   isOpen,
   onClose,
   fetchFolderTree,
-  selectedFolderForMenu, // the selected file/folder to rename
+  selectedFolderForMenu,
 }) => {
   const [newName, setNewName] = useState("");
   const [currentPath, setCurrentPath] = useState("");
   const [message, setMessage] = useState("");
 
-  // ✅ Pre-fill selected item info
   useEffect(() => {
     if (isOpen && selectedFolderForMenu) {
       setCurrentPath(selectedFolderForMenu.path);
@@ -178,10 +180,9 @@ const RenameDrawer = ({
     }
   }, [isOpen, selectedFolderForMenu]);
 
-  // ✅ Rename function
   const handleRename = async () => {
     if (!newName.trim()) {
-      setMessage("⚠️ New name is required!");
+      setMessage("New name is required!");
       return;
     }
 
@@ -194,66 +195,44 @@ const RenameDrawer = ({
         }
       );
 
-      setMessage(`✅ ${res.data.message}`);
-      toast.success(res.data.message)
-         onClose();
-      fetchFolderTree(); // refresh folder structure
-     
+      setMessage(res.data.message);
+      toast.success(res.data.message);
+      onClose();
+      fetchFolderTree();
     } catch (err) {
       console.error("Rename error:", err);
-      toast.error(err.response?.data?.error)
-      setMessage(`❌ Error: ${err.response?.data?.error || "Server Error"}`);
+      toast.error(err.response?.data?.error);
+      setMessage(`Error: ${err.response?.data?.error || "Server Error"}`);
     }
   };
 
   return (
-    <Drawer anchor="right" open={isOpen} onClose={onClose}>
-      <Box sx={{ width: 400, p: 3, bgcolor: "#f0f8ff", height: "100%" }}>
-        <Typography variant="h6" gutterBottom>
-          ✏️ Rename Item
-        </Typography>
-
-        {/* <TextField
-          label="Current Path"
-          value={currentPath}
-          InputProps={{ readOnly: true }}
-          fullWidth
-          margin="dense"
-        /> */}
-
-        <TextField
-          label="New Name"
-          value={newName}
-          onChange={(e) => setNewName(e.target.value)}
-          placeholder="Enter new file or folder name"
-          fullWidth
-          margin="dense"
-        />
-
-        <Button
-          variant="contained"
-          color="primary"
-          fullWidth
-          sx={{ mt: 2 }}
-          onClick={handleRename}
-        >
-          Rename
-        </Button>
+    <FormDrawer open={isOpen} onClose={onClose} title="Rename Item" width="sm">
+      <FormSection title="Rename" icon={<PenLine className="h-4 w-4" />}>
+        <FormField label="New Name">
+          <Input
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            placeholder="Enter new file or folder name"
+          />
+        </FormField>
 
         {message && (
-          <Typography sx={{ mt: 2, fontWeight: "bold" }}>{message}</Typography>
+          <div className={`mt-3 rounded-lg border px-4 py-3 text-sm ${
+            message.toLowerCase().includes("error")
+              ? "border-red-200 bg-red-50 text-red-700"
+              : "border-green-200 bg-green-50 text-green-700"
+          }`}>
+            {message}
+          </div>
         )}
+      </FormSection>
 
-        <Button
-          variant="outlined"
-          fullWidth
-          sx={{ mt: 2 }}
-          onClick={onClose}
-        >
-          Close
-        </Button>
-      </Box>
-    </Drawer>
+      <FormDrawerFooter>
+        <Button variant="outline" onClick={onClose}>Close</Button>
+        <Button onClick={handleRename}>Rename</Button>
+      </FormDrawerFooter>
+    </FormDrawer>
   );
 };
 

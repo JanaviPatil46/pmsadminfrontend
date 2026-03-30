@@ -1,31 +1,38 @@
-import React, { useState, useEffect, useMemo ,useRef} from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import {  TableContainer,
+import {
+  Box,
+  Typography,
+  IconButton,
+  TableContainer,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
-  Paper,Menu,MenuItem,
-  TablePagination,Chip, InputLabel, InputAdornment, Box, Button, Typography, Container, Alert, Autocomplete, TextField, Switch, FormControlLabel, List, ListItem, ListItemText, Popover, IconButton } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
-import Grid from "@mui/material/Unstable_Grid2";
+  Paper,
+  Menu,
+  MenuItem,
+  TablePagination,
+  CircularProgress
+} from "@mui/material";
 import Priority from "../Priority/Priority";
 import EditorShortcodes from "../Texteditor/EditorShortcodes";
 import { toast } from "react-toastify";
-
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import { CircularProgress } from "@mui/material";
-import { MaterialReactTable, useMaterialReactTable } from "material-react-table";
 import { CiMenuKebab } from "react-icons/ci";
-import MultiSelectDropdown from "../MultiSelectDropdown"
+import MultiSelectDropdown from "../MultiSelectDropdown";
 import axios from "axios";
 import debounce from "lodash.debounce";
-import EditCalendarRoundedIcon from "@mui/icons-material/EditCalendarRounded";
+import { FormPage, FormSection, FormField, FormRow, FormActions, FormGrid, ShortcodePopover, FormDatePicker, FormSelect } from "../../components/ui/form-layout";
+import { Input } from "../../components/ui/input";
+import { Button } from "../../components/ui/button";
+import { Switch } from "../../components/ui/switch";
+import { Label } from "../../components/ui/label";
+import { Textarea } from "../../components/ui/textarea";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../../components/ui/select";
+import { Trash2, MessageSquarePlus, FileText, Calendar, Users, Globe } from "lucide-react";
 dayjs.extend(customParseFormat);
 
 const JobTemp = ({ charLimit = 4000 }) => {
@@ -833,18 +840,10 @@ console.log(raw)
   }, [templatename]);
   
      return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Box>
         {!showForm ? (
           <Box sx={{ mt: 2 }}>
-            <Button variant="contained" color="primary" onClick={handleCreateJobTemplate} sx={{
-              backgroundColor: 'var(--color-save-btn)',  // Normal background
-             
-              '&:hover': {
-                backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-              },
-              borderRadius:'15px', mb: 3
-            }}>
+            <Button onClick={handleCreateJobTemplate} className="mb-3">
               Job Template
             </Button>
             {loading ? (
@@ -984,507 +983,256 @@ onRowsPerPageChange={handleChangeRowsPerPage}
             {/* <MaterialReactTable columns={columns} table={table} /> */}
           </Box>
         ) : (
-          <Box sx={{ mt: 2 }}>
-            <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <Typography variant="h6" gutterBottom>
-                Create Job Template
-              </Typography>
-              <Button onClick={addCommentField}>Add comments</Button>
-            </Box>
-
-            <Box>
-              <hr />
-            </Box>
-            <Grid container spacing={2}>
-              <Grid xs={12} sm={5.8}>
-                <Box mt={1}>
-                  {/* <label className="jobtemp-input-label">Template Name</label> */}
-                    <InputLabel sx={{ color: "black", mb: 1 }}>Template Name</InputLabel>
-                  <TextField
-                    size="small"
-                    fullWidth
-                   error={!!templateNameError}
-                    // helperText={errors.templatename}
+        <FormPage
+          title="Create Job Template"
+          subtitle="Configure your new job template"
+          actions={
+            <>
+              <Button variant="outline" onClick={handleCloseJobTemp}>
+                Cancel
+              </Button>
+              <Button variant="secondary" onClick={createsavejobtemp}>
+                Save
+              </Button>
+              <Button onClick={createjobtemp}>
+                Save & Exit
+              </Button>
+            </>
+          }
+        >
+          <FormGrid>
+            {/* ===== LEFT COLUMN: Main Form ===== */}
+            <FormGrid.Main>
+              {/* General Info Section */}
+              <FormSection title="General Information" icon={<FileText className="h-4 w-4" />}>
+                <FormField label="Template Name" error={templateNameError}>
+                  <Input
                     placeholder="Template Name"
                     value={templatename}
                     onChange={(e) => settemplatename(e.target.value)}
-                    sx={{ backgroundColor: "#fff", mt: 1 }}
+                    error={!!templateNameError}
                   />
-                  {!!templateNameError && (
-                    <Alert
-                      sx={{
-                        width: "96%",
-                        p: "0", // Adjust padding to control the size
-                        pl: "4%",
-                        height: "23px",
-                        borderRadius: "10px",
-                        borderTopLeftRadius: "0",
-                        borderTopRightRadius: "0",
-                        fontSize: "15px",
-                        display: "flex",
-                        alignItems: "center", // Center content vertically
-                        "& .MuiAlert-icon": {
-                          fontSize: "16px", // Adjust the size of the icon
-                          mr: "8px", // Add margin to the right of the icon
-                        },
-                      }}
-                      variant="filled"
-                      severity="error"
-                    >
-                     {templateNameError}
-                    </Alert>
-                  )}
-                </Box>
-                <Box mt={2}>
-                <InputLabel sx={{ color: "black", mb: 1 }}>Job Name</InputLabel>
-                  <TextField
-                    sx={{ backgroundColor: "#fff", mt: 1 }}
-                    value={jobName}
-                    onChange={handlejobName}
-                    onClick={(e) => setCursorPosition(e.target.selectionStart)}
-                    size="small"
-                    fullWidth
-                    error={!!errors.jobName}
-                    // helperText={errors.jobName}
-                    placeholder="Job Name"
-                  />
-                  {!!errors.jobName && (
-                    <Alert
-                      sx={{
-                        width: "96%",
-                        p: "0", // Adjust padding to control the size
-                        pl: "4%",
-                        height: "23px",
-                        borderRadius: "10px",
-                        borderTopLeftRadius: "0",
-                        borderTopRightRadius: "0",
-                        fontSize: "15px",
-                        display: "flex",
-                        alignItems: "center", // Center content vertically
-                        "& .MuiAlert-icon": {
-                          fontSize: "16px", // Adjust the size of the icon
-                          mr: "8px", // Add margin to the right of the icon
-                        },
-                      }}
-                      variant="filled"
-                      severity="error"
-                    >
-                      {errors.jobName}
-                    </Alert>
-                  )}
-                </Box>
-                <Box>
-                  <Button variant="contained" color="primary" onClick={toggleDropdown} sx={{
-              backgroundColor: 'var(--color-save-btn)',  // Normal background
-             
-              '&:hover': {
-                backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-              },
-              borderRadius:'15px', mt: 2
-            }}>
-                    Add Shortcode
-                  </Button>
+                </FormField>
 
-                  <Popover
-                    open={showDropdown}
-                    anchorEl={anchorEl}
-                    onClose={handleCloseDropdown}
-                    anchorOrigin={{
-                      vertical: "bottom",
-                      horizontal: "left",
-                    }}
-                    transformOrigin={{
-                      vertical: "top",
-                      horizontal: "left",
-                    }}
-                  >
-                    <Box>
-                      <List className="dropdown-list" sx={{ width: "300px", height: "300px", cursor: "pointer" }}>
-                        {filteredShortcuts.map((shortcut, index) => (
-                          <ListItem key={index} onClick={() => handleAddShortcut(shortcut.value)}>
-                            <ListItemText
-                              primary={shortcut.title}
-                              primaryTypographyProps={{
-                                style: {
-                                  fontWeight: shortcut.isBold ? "bold" : "normal",
-                                },
-                              }}
-                            />
-                          </ListItem>
-                        ))}
-                      </List>
-                    </Box>
-                  </Popover>
-                </Box>
-                <Box mt={2}>
-                <InputLabel sx={{ color: "black", mb: 1 }}>Job Assignees</InputLabel>
-                  {/* <Autocomplete
-                    multiple
-                    sx={{ mt: 2, backgroundColor: "#FFF" }}
-                    options={options}
-                    size="small"
-                    getOptionLabel={(option) => option.label}
-                    value={selectedUser}
-                    onChange={handleUserChange}
-                    renderOption={(props, option) => (
-                      <Box
-                        component="li"
-                        {...props}
-                        sx={{ cursor: "pointer", margin: "5px 10px" }} // Add cursor pointer style
-                      >
-                        {option.label}
-                      </Box>
-                    )}
-                    renderInput={(params) => (
-                      <>
-                        <TextField {...params} variant="outlined" placeholder="Assignees" />
-                      </>
-                    )}
-                    isOptionEqualToValue={(option, value) => option.value === value.value}
-                  /> */}
-                  <MultiSelectDropdown 
+                <FormField label="Job Name" error={errors.jobName}>
+                  <div className="space-y-2">
+                    <Input
+                      value={jobName}
+                      ref={textFieldRef}
+                      onClick={(e) => setCursorPosition(e.target.selectionStart)}
+                      onChange={handlejobName}
+                      placeholder="Job Name"
+                      error={!!errors.jobName}
+                    />
+                    <ShortcodePopover
+                      shortcuts={filteredShortcuts}
+                      onSelect={handleAddShortcut}
+                    />
+                  </div>
+                </FormField>
+              </FormSection>
+
+              {/* Assignment Section */}
+              <FormSection title="Assignment" icon={<Users className="h-4 w-4" />}>
+                <FormField label="Job Assignees">
+                  <MultiSelectDropdown
                     value={selectedUser}
                     onChange={handleUserChange}
                     placeholder="Job Assignees"
                   />
-                </Box>
-                <Box mt={2}>
+                </FormField>
+
+                <FormField label="Priority">
                   <Priority onPriorityChange={handlePriorityChange} selectedPriority={priority} />
-                </Box>
-                <Box mt={2} mb={3}>
-                  <EditorShortcodes onChange={handleEditorChange} content={description} />
-                </Box>
-                <Box mt={5}>
-                  <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-                    <Typography variant="h6" className="jobtemp-input-label">
-                      Start and Due Date
-                    </Typography>
-                    <Box className="absolutes-dates">
-                      <FormControlLabel
-                        control={
-                          <Switch
-                            checked={absoluteDate}
-                            // onChange={handleAbsolutesDates}
-                            onChange={(event) => handleAbsolutesDates(event.target.checked)}
-                            color="primary"
-                          />
-                        }
-                        label={"Absolute Date"}
-                      />
-                    </Box>
-                  </Box>
-                </Box>
+                </FormField>
+              </FormSection>
+
+              {/* Description Section */}
+              <FormSection title="Description">
+                <EditorShortcodes onChange={handleEditorChange} content={description} />
+              </FormSection>
+
+              {/* Scheduling Section */}
+              <FormSection title="Start and Due Date" icon={<Calendar className="h-4 w-4" />}>
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm font-medium">Use Absolute Dates</Label>
+                  <Switch
+                    checked={absoluteDate}
+                    onCheckedChange={handleAbsolutesDates}
+                  />
+                </div>
 
                 {absoluteDate && (
-                  <>
-                    <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
-                 <Typography>Start Date</Typography>
-                      <DatePicker  format="MM/DD/YYYY" sx={{ width: "100%", backgroundColor: "#fff" }} selected={startDate} onChange={handleStartDateChange} renderInput={(params) => <TextField {...params} size="small" />} />
-                    </Box>
-                    <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
-                    <Typography >Due Date</Typography>
-                      <DatePicker  format="MM/DD/YYYY" sx={{ width: "100%", backgroundColor: "#fff" }} selected={dueDate} onChange={handleDueDateChange} renderInput={(params) => <TextField {...params} size="small" />} />
-                    </Box>
-                  </>
+                  <FormRow cols={2}>
+                    <FormField label="Start Date">
+                      <FormDatePicker
+                        value={startDate ? dayjs(startDate).format('YYYY-MM-DD') : ''}
+                        onChange={(e) => handleStartDateChange(dayjs(e.target.value))}
+                      />
+                    </FormField>
+                    <FormField label="Due Date">
+                      <FormDatePicker
+                        value={dueDate ? dayjs(dueDate).format('YYYY-MM-DD') : ''}
+                        onChange={(e) => handleDueDateChange(dayjs(e.target.value))}
+                      />
+                    </FormField>
+                  </FormRow>
                 )}
+
                 {!absoluteDate && (
-                  <>
-                    <Grid container spacing={3} alignItems="center">
-                      <Grid item xs={12} sm={2}>
-                      <InputLabel sx={{ color: "black", mb: 1 }}>Start In</InputLabel>
-                      </Grid>
-                      <Grid item xs={12} sm={5}>
-                        <TextField size="small"  value={startsin} sx={{ background: "#fff", width: "100%" }} onChange={(e) => setstartsin(e.target.value)} />
-                      </Grid>
-                      <Grid item xs={12} sm={5}>
-                        <Autocomplete
-                          options={dayOptions}
-                          size="small"
-                          getOptionLabel={(option) => option.label}
-                          onChange={handleStartInDateChange}
-                          renderInput={(params) => (
-                            <>
-                              <TextField {...params} variant="outlined" sx={{ backgroundColor: "#fff" }} />
-                            </>
-                          )}
-                          value={dayOptions.find((option) => option.value === startsInDuration) || null}
-                          className="job-template-select-dropdown"
-                        />
-                      </Grid>
-                    </Grid>
-                    <Grid container spacing={3} alignItems="center">
-                      <Grid item xs={12} sm={2}>
-                      <InputLabel sx={{ color: "black", mb: 1 }}>Due In</InputLabel>
-                      </Grid>
-                      <Grid item xs={12} sm={5}>
-                        <TextField size="small"  value={duein} fullWidth sx={{ background: "#fff" }} onChange={(e) => setduein(e.target.value)} />
-                      </Grid>
-                      <Grid item xs={12} sm={5}>
-                        <Autocomplete
-                          options={dayOptions}
-                          getOptionLabel={(option) => option.label}
-                          onChange={handledueindateChange}
-                          size="small"
-                          renderInput={(params) => (
-                            <>
-                              <TextField {...params} variant="outlined" sx={{ backgroundColor: "#fff" }} />
-                            </>
-                          )}
-                          value={dayOptions.find((option) => option.value === dueinduration) || null}
-                          className="job-template-select-dropdown"
-                        />
-                      </Grid>
-                    </Grid>
-                  </>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <Label className="w-16 shrink-0 text-sm">Start In</Label>
+                      <Input
+                        value={startsin}
+                        onChange={(e) => setstartsin(e.target.value)}
+                        className="flex-1"
+                      />
+                      <Select value={startsInDuration} onValueChange={(val) => handleStartInDateChange(null, dayOptions.find(o => o.value === val) || null)}>
+                        <SelectTrigger className="w-28">
+                          <SelectValue placeholder="Unit" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {dayOptions.map((opt) => (
+                            <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Label className="w-16 shrink-0 text-sm">Due In</Label>
+                      <Input
+                        value={duein}
+                        onChange={(e) => setduein(e.target.value)}
+                        className="flex-1"
+                      />
+                      <Select value={dueinduration} onValueChange={(val) => handledueindateChange(null, dayOptions.find(o => o.value === val) || null)}>
+                        <SelectTrigger className="w-28">
+                          <SelectValue placeholder="Unit" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {dayOptions.map((opt) => (
+                            <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
                 )}
-              </Grid>
-              <Grid item xs={12} sm={0.4} sx={{ display: { xs: "none", sm: "block" } }}>
-                <Box
-                  className="vertical-line"
-                  sx={{
-                    // borderLeft: '1px solid black',
-                    height: "100%",
-                    ml: 1.5,
-                  }}
-                ></Box>
-              </Grid>
-              <Grid xs={12} sm={5.8}>
-                <Box style={{ display: "flex", alignItems: "center" }}>
-                  {/* <EditCalendarRoundedIcon sx={{ fontSize: '120px', color: '#c6c7c7', }} /> */}
-                  <Box style={{ display: "flex", flexDirection: "column", gap: "8px", width: "100%" }}>
-                    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                      <Typography variant="body">
-                        <b>Client-facing status</b>
-                      </Typography>
-                      <FormControlLabel control={<Switch onChange={(event) => handleClientFacing(event.target.checked)} checked={clientFacingStatus} color="primary" />} label="Show in Client portal" />
-                    </Box>
-                    <Box>
-                      {clientFacingStatus && (
-                        <>
-                           <InputLabel sx={{ color: "black", }}>Job name for client</InputLabel>
-                          <TextField fullWidth name="subject" 
-                          inputRef={textFieldRef}
-                         value={inputText}
-                           onChange={handlechatsubject} 
-                           onClick={(e) => setCursorPosition(e.target.selectionStart)}
-                           placeholder="Job name for client" size="small" sx={{ background: "#fff", mt: 2 }} />
+              </FormSection>
+            </FormGrid.Main>
 
-                          <Box>
-                            <Button variant="contained" color="primary" onClick={toggleShortcodeDropdown} sx={{
-              backgroundColor: 'var(--color-save-btn)',  // Normal background
-             
-              '&:hover': {
-                backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-              },
-              borderRadius:'15px', mt: 2
-            }}>
-                              Add Shortcode
-                            </Button>
-                            <Popover
-                              open={showDropdownClientJob}
-                              anchorEl={anchorElClientJob}
-                              onClose={handleCloseDropdown}
-                              anchorOrigin={{
-                                vertical: "bottom",
-                                horizontal: "left",
-                              }}
-                              transformOrigin={{
-                                vertical: "top",
-                                horizontal: "left",
-                              }}
-                            >
-                              <Box>
-                                <List className="dropdown-list" sx={{ width: "300px", height: "300px", cursor: "pointer" }}>
-                                  {filteredShortcuts.map((shortcut, index) => (
-                                    <ListItem key={index} onClick={() => handleJobAddShortcut(shortcut.value)}>
-                                      <ListItemText
-                                        primary={shortcut.title}
-                                        primaryTypographyProps={{
-                                          style: {
-                                            fontWeight: shortcut.isBold ? "bold" : "normal",
-                                          },
-                                        }}
-                                      />
-                                    </ListItem>
-                                  ))}
-                                </List>
-                              </Box>
-                            </Popover>
-                          </Box>
-                          <Box mt={2}>
-                          <InputLabel sx={{ color: "black", mb: 1 }}>Status</InputLabel>
-                            <Autocomplete
-                              options={optionstatus}
-                              size="small"
-                              sx={{ mt: 1 }}
-                              value={selectedJob}
-                              onChange={handleJobChange}
-                              getOptionLabel={(option) => option.label}
-                              isOptionEqualToValue={(option, value) => option.value === value.value}
-                              renderOption={(props, option) => (
-                                <Box component="li" {...props}>
-                                  {/* Color dot */}
-                                  <Chip
-                                    size="small"
-                                    style={{
-                                      backgroundColor: option.clientfacingColour,
-                                      marginRight: 8,
-                                      marginLeft: 8,
-                                      borderRadius: "50%",
-                                      height: "15px",
-                                    }}
-                                  />
-                                  {option.label}
-                                </Box>
-                              )}
-                              renderInput={(params) => (
-                                <TextField
-                                  {...params}
-                                  placeholder="Select Client Facing Job"
-                                  InputProps={{
-                                    ...params.InputProps,
-                                    startAdornment:
-                                      params.inputProps.value && clientFacingJobs.length > 0 ? (
-                                        <Chip
-                                          size="small"
-                                          style={{
-                                            backgroundColor: clientFacingJobs.find((job) => job.clientfacingName === params.inputProps.value)?.clientfacingColour, // Set color from selection
-                                            marginRight: 8,
-                                            marginLeft: 2,
-                                            borderRadius: "50%",
-                                            height: "15px",
-                                          }}
-                                        />
-                                      ) : null,
-                                  }}
-                                />
-                              )}
-                            />
-                          </Box>
-                          <Box sx={{ position: "relative", mt: 2 }}>
-                            <InputLabel sx={{ color: "black" }}>Description</InputLabel>
-                            <TextField
-                              fullWidth
-                              size="small"
-                              margin="normal"
-                              type="text"
-                              multiline
-                              value={clientDescription}
-                              inputRef={descriptionFieldRef}
-                              onClick={(e) => setCursorPosition(e.target.selectionStart)}
-                              onChange={handleChange}
-                              placeholder="Description"
-                              InputProps={{
-                                endAdornment: (
-                                  <InputAdornment position="end">
-                                    <Typography sx={{ color: "gray", fontSize: "12px", position: "absolute", bottom: "15px", right: "15px" }}>
-                                      {charCount}/{charLimit}
-                                    </Typography>
-                                  </InputAdornment>
-                                ),
-                              }}
-                            />
-                          </Box>
-                          <Box>
-                            <Button variant="contained" color="primary" onClick={toggleDescriptionDropdown} sx={{
-              backgroundColor: 'var(--color-save-btn)',  // Normal background
-             
-              '&:hover': {
-                backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-              },
-              borderRadius:'15px', mt: 2
-            }}>
-                              Add Shortcode
-                            </Button>
+            {/* ===== RIGHT COLUMN: Sidebar ===== */}
+            <FormGrid.Sidebar>
+              {/* Client-Facing Section */}
+              <FormSection title="Client-Facing Status" icon={<Globe className="h-4 w-4" />}>
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm font-medium">Show in Client Portal</Label>
+                  <Switch
+                    checked={clientFacingStatus}
+                    onCheckedChange={handleClientFacing}
+                  />
+                </div>
 
-                            <Popover
-                              open={showDropdownDescription}
-                              anchorEl={anchorElDescription}
-                              onClose={handleCloseDropdown}
-                              anchorOrigin={{
-                                vertical: "bottom",
-                                horizontal: "left",
-                              }}
-                              transformOrigin={{
-                                vertical: "top",
-                                horizontal: "left",
-                              }}
-                            >
-                              <Box>
-                                <List className="dropdown-list" sx={{ width: "300px", height: "300px", cursor: "pointer" }}>
-                                  {filteredShortcuts.map((shortcut, index) => (
-                                    <ListItem key={index} onClick={() => handleDescriptionAddShortcut(shortcut.value)}>
-                                      <ListItemText
-                                        primary={shortcut.title}
-                                        primaryTypographyProps={{
-                                          style: {
-                                            fontWeight: shortcut.isBold ? "bold" : "normal",
-                                          },
-                                        }}
-                                      />
-                                    </ListItem>
-                                  ))}
-                                </List>
-                              </Box>
-                            </Popover>
-                          </Box>
-                        </>
-                      )}
-                    </Box>
-                    {comments.map((comment, index) => (
-                      <div key={index} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                        <TextField size="small" value={comment} onChange={(e) => handleCommentChange(index, e.target.value)} placeholder={`Comment ${index + 1}`} variant="outlined" fullWidth multiline />
-                        <IconButton onClick={() => deleteCommentField(index)}>
-                          <DeleteIcon />
-                        </IconButton>
+                {clientFacingStatus && (
+                  <div className="space-y-4 pt-2">
+                    <FormField label="Job Name for Client">
+                      <div className="space-y-2">
+                        <Input
+                          ref={textFieldRef}
+                          value={inputText}
+                          onChange={handlechatsubject}
+                          onClick={(e) => setCursorPosition(e.target.selectionStart)}
+                          placeholder="Job name for client"
+                        />
+                        <ShortcodePopover
+                          shortcuts={filteredShortcuts}
+                          onSelect={handleJobAddShortcut}
+                        />
                       </div>
-                    ))}
-                  </Box>
-                </Box>
-              </Grid>
-            </Grid>
-            <Box mt={3}>
-              <hr />
-            </Box>
+                    </FormField>
 
-            <Box sx={{ pt: 2, display: "flex", alignItems: "center", gap: 5 }}>
-              <Button variant="contained" onClick={createjobtemp} sx={{
-                      backgroundColor: 'var(--color-save-btn)',  // Normal background
-                     
-                      '&:hover': {
-                        backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                      },
-                      borderRadius:'15px', 
-                    }}>
-                Save & exit
-              </Button>
-              <Button variant="contained"  onClick={createsavejobtemp}  sx={{
-                      backgroundColor: 'var(--color-save-btn)',  // Normal background
-                     
-                      '&:hover': {
-                        backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                      },
-                      borderRadius:'15px', width:'80px'
-                    }}>
-                Save
-              </Button>
-              <Button variant="outlined" onClick={handleCloseJobTemp} sx={{
-                  borderColor: 'var(--color-border-cancel-btn)',  // Normal background
-                 color:'var(--color-save-btn)',
-                  '&:hover': {
-                    backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                    color:'#fff',
-                    border:"none"
-                  },
-                  width:'80px',borderRadius:'15px'
-                }}>
-                Cancel
-              </Button>
-            </Box>
-          </Box>
+                    <FormField label="Status">
+                      <FormSelect
+                        value={selectedJob?.value || ""}
+                        onChange={(e) => {
+                          const selected = optionstatus.find((s) => s.value === e.target.value);
+                          handleJobChange(null, selected || null);
+                        }}
+                      >
+                        <option value="">Select Client Facing Job</option>
+                        {optionstatus.map((opt) => (
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </FormSelect>
+                    </FormField>
+
+                    <FormField label="Description">
+                      <div className="relative">
+                        <Textarea
+                          ref={descriptionFieldRef}
+                          value={clientDescription}
+                          onClick={(e) => setCursorPosition(e.target.selectionStart)}
+                          onChange={handleChange}
+                          placeholder="Description"
+                          rows={4}
+                        />
+                        <span className="absolute bottom-2 right-3 text-xs text-muted-foreground">
+                          {charCount}/{charLimit}
+                        </span>
+                      </div>
+                      <ShortcodePopover
+                        shortcuts={filteredShortcuts}
+                        onSelect={handleDescriptionAddShortcut}
+                      />
+                    </FormField>
+                  </div>
+                )}
+              </FormSection>
+
+              {/* Comments Section */}
+              <FormSection
+                title="Comments"
+                icon={<MessageSquarePlus className="h-4 w-4" />}
+              >
+                <div className="space-y-3">
+                  {comments.map((comment, index) => (
+                    <div key={index} className="flex items-start gap-2">
+                      <Textarea
+                        value={comment}
+                        onChange={(e) => handleCommentChange(index, e.target.value)}
+                        placeholder={`Comment ${index + 1}`}
+                        rows={2}
+                        className="flex-1"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => deleteCommentField(index)}
+                        className="mt-1 rounded-lg p-2 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ))}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={addCommentField}
+                    className="w-full"
+                  >
+                    <MessageSquarePlus className="h-3.5 w-3.5" />
+                    Add Comment
+                  </Button>
+                </div>
+              </FormSection>
+            </FormGrid.Sidebar>
+          </FormGrid>
+        </FormPage>
         )}
       </Box>
-    </LocalizationProvider>
   );
 };
 

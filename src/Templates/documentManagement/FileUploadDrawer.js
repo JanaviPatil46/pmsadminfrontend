@@ -1,25 +1,9 @@
-
-
 import React, { useState, useEffect } from "react";
-import {
-  Drawer,
-  Box,
-  Typography,
-  TextField,
-  Button,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Collapse,
-} from "@mui/material";
-import FolderIcon from "@mui/icons-material/Folder";
-import FolderOpenIcon from "@mui/icons-material/FolderOpen";
-import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
-import ExpandLess from "@mui/icons-material/ExpandLess";
-import ExpandMore from "@mui/icons-material/ExpandMore";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { FormDrawer, FormDrawerFooter, FormSection, FormField } from "../../components/ui/form-layout";
+import { Button } from "../../components/ui/button";
+import { Upload, ChevronRight, ChevronDown, Folder, FolderOpen, FileText } from "lucide-react";
 
 const FileUploadDrawer = ({
   isOpen,
@@ -28,12 +12,12 @@ const FileUploadDrawer = ({
   fetchFolderTree,
   selectedFolderForMenu,
 }) => {
-
-  console.log("foldertree",folderTree)
+  console.log("foldertree", folderTree);
   const [file, setFile] = useState(null);
   const [selectedFolder, setSelectedFolder] = useState("");
   const [message, setMessage] = useState("");
-   const [files, setFiles] = useState([]);
+  const [files, setFiles] = useState([]);
+
   useEffect(() => {
     if (isOpen && selectedFolderForMenu) {
       setSelectedFolder(selectedFolderForMenu.path);
@@ -43,18 +27,19 @@ const FileUploadDrawer = ({
       setMessage("");
     }
   }, [isOpen, selectedFolderForMenu]);
-const handleFileChange = (e) => {
+
+  const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
-    const maxSize = 50 * 1024 * 1024; // 50 MB
+    const maxSize = 50 * 1024 * 1024;
     const forbiddenTypes = ["video/", "audio/"];
 
     const validFiles = selectedFiles.filter((file) => {
       if (file.size > maxSize) {
-        alert(`❌ ${file.name} exceeds 50 MB limit.`);
+        alert(`${file.name} exceeds 50 MB limit.`);
         return false;
       }
       if (forbiddenTypes.some((type) => file.type.startsWith(type))) {
-        alert(`❌ ${file.name} is an audio or video file — not allowed.`);
+        alert(`${file.name} is an audio or video file — not allowed.`);
         return false;
       }
       return true;
@@ -62,11 +47,10 @@ const handleFileChange = (e) => {
 
     setFiles(validFiles);
   };
-  // const handleFileChange = (e) => setFile(e.target.files[0]);
+
   const handleFolderSelect = (path) => setSelectedFolder(path);
 
-  
- const handleUpload = async () => {
+  const handleUpload = async () => {
     if (files.length === 0 || !selectedFolder) {
       setMessage("Please select files and a folder.");
       return;
@@ -77,192 +61,137 @@ const handleFileChange = (e) => {
       files.forEach((file) => formData.append("files", file));
 
       const res = await axios.post(
-              `https://www.snptaxes.com/api/docManagement/file/upload?folderPath=${encodeURIComponent(
+        `https://www.snptaxes.com/api/docManagement/file/upload?folderPath=${encodeURIComponent(
           selectedFolder
         )}`,
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
 
-      setMessage(`✅ ${res.data.message || "Files uploaded successfully"}`);
-      toast.success(`✅ ${res.data.message || "Files uploaded successfully"}`)
+      setMessage(res.data.message || "Files uploaded successfully");
+      toast.success(res.data.message || "Files uploaded successfully");
       setFiles([]);
       onClose();
-    await  fetchFolderTree();
+      await fetchFolderTree();
     } catch (err) {
       console.error(err);
-      setMessage("❌ Error uploading files");
+      setMessage("Error uploading files");
     }
   };
-  
+
   return (
-    <Drawer anchor="right" open={isOpen} onClose={onClose}>
-      <Box sx={{ width: 400, p: 3, bgcolor: "#f0f8ff", height: "100%" }}>
-        <Typography variant="h6" gutterBottom>
-          📄 Upload File
-        </Typography>
+    <FormDrawer open={isOpen} onClose={onClose} title="Upload File" width="md">
+      <FormSection title="File Selection" icon={<Upload className="h-4 w-4" />}>
+        <FormField label="Choose Files">
+          <label className="flex items-center justify-center gap-2 w-full cursor-pointer rounded-lg border-2 border-dashed border-border bg-muted/30 px-4 py-6 text-sm text-muted-foreground transition-colors hover:border-primary/40 hover:bg-muted/50">
+            <Upload className="h-5 w-5" />
+            {files.length > 0
+              ? `${files.length} file(s) selected`
+              : "Click to select files"}
+            <input type="file" hidden multiple onChange={handleFileChange} />
+          </label>
+        </FormField>
 
-        {/* <TextField
-          label="Selected Folder"
-          placeholder="Enter folder path or select from tree"
-          value={selectedFolder}
-          InputProps={{ readOnly: true }}
-          fullWidth
-          margin="dense"
-        /> */}
-
-        {/* <Button
-          variant="outlined"
-          component="label"
-          fullWidth
-          sx={{ mt: 1, mb: 2 }}
-        >
-          {file ? file.name : "Select File"}
-          <input type="file" hidden onChange={handleFileChange} />
-        </Button> */}
- <Button
-                  variant="outlined"
-                  component="label"
-                  fullWidth
-                  sx={{ mt: 1, mb: 2 }}
-                >
-                  {files.length > 0
-                    ? `${files.length} file(s) selected`
-                    : "Select Files"}
-                  <input type="file" hidden multiple onChange={handleFileChange} />
-                </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          fullWidth
-          onClick={handleUpload}
-        >
-          Upload
-        </Button>
-
-        {message && (
-          <Typography sx={{ mt: 2, fontWeight: "bold" }}>{message}</Typography>
+        {files.length > 0 && (
+          <div className="space-y-1 mt-2">
+            {files.map((f, i) => (
+              <div key={i} className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/40 rounded-md px-2 py-1">
+                <FileText className="h-3.5 w-3.5 shrink-0" />
+                <span className="truncate">{f.name}</span>
+                <span className="ml-auto shrink-0">{(f.size / 1024).toFixed(0)} KB</span>
+              </div>
+            ))}
+          </div>
         )}
 
-        <Button variant="outlined" fullWidth sx={{ mt: 2 }} onClick={onClose}>
-          Close
-        </Button>
+        {message && (
+          <div className={`mt-3 rounded-lg border px-4 py-3 text-sm ${
+            message.toLowerCase().includes("error") || message.includes("Please")
+              ? "border-red-200 bg-red-50 text-red-700"
+              : "border-green-200 bg-green-50 text-green-700"
+          }`}>
+            {message}
+          </div>
+        )}
+      </FormSection>
 
-        <Box sx={{ mt: 3 }}>
-          <Typography variant="subtitle1" gutterBottom>
-            Select Folder from Tree
-          </Typography>
+      <FormSection title="Select Destination Folder">
+        <div className="max-h-[40vh] overflow-y-auto rounded-lg border border-border bg-white p-2">
           <FolderTreeSelector
             items={folderTree}
             onSelect={handleFolderSelect}
             selectedFolder={selectedFolder}
           />
-        </Box>
-      </Box>
-    </Drawer>
+        </div>
+      </FormSection>
+
+      <FormDrawerFooter>
+        <Button variant="outline" onClick={onClose}>Close</Button>
+        <Button onClick={handleUpload}>Upload</Button>
+      </FormDrawerFooter>
+    </FormDrawer>
   );
 };
 
-// Recursive Folder Tree with files and MUI
 const FolderTreeSelector = ({ items, onSelect, selectedFolder, level = 0 }) => {
   const [expanded, setExpanded] = useState({});
 
-  const toggleExpand = (path) => {
+  const toggleExpand = (e, path) => {
+    e.stopPropagation();
     setExpanded((prev) => ({ ...prev, [path]: !prev[path] }));
   };
 
   return (
-    <List disablePadding>
+    <div className="space-y-0.5" style={{ paddingLeft: level > 0 ? 16 : 0 }}>
       {items?.map((item) => {
-        const isExpanded = expanded[item.path];
-        const isSelected = selectedFolder === item.path;
-
         if (item.type !== "folder") return null;
 
+        const isSelected = selectedFolder === item.path;
+        const isExpanded = expanded[item.path];
+
         return (
-          <React.Fragment key={item.path}>
-            <ListItem
-              sx={{
-                pl: 2 + level * 2,
-                bgcolor: isSelected ? "#b2d8ff" : "transparent",
-                borderRadius: 1,
-                mb: 0.5,
-                "&:hover": { bgcolor: "#dbefff" },
-                cursor: item.meta?.readOnly ? "not-allowed" : "pointer",
-              }}
+          <div key={item.path}>
+            <div
+              className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-sm cursor-pointer transition-colors ${
+                isSelected
+                  ? "bg-primary/10 text-primary font-medium"
+                  : "hover:bg-accent text-foreground"
+              } ${item.meta?.readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
               onClick={() => {
                 if (!item.meta?.readOnly) onSelect(item.path);
               }}
             >
-              <ListItemIcon
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleExpand(item.path);
-                }}
+              <button
+                type="button"
+                onClick={(e) => toggleExpand(e, item.path)}
+                className="shrink-0 rounded p-0.5 hover:bg-accent"
               >
-                {isExpanded ? <FolderOpenIcon /> : <FolderIcon />}
-              </ListItemIcon>
-
-              <ListItemText
-                primary={item.name}
-                sx={{
-                  fontWeight: isSelected ? "bold" : "normal",
-                  color: isSelected ? "#0056b3" : "inherit",
-                }}
-              />
-
-              {item.children?.length > 0 &&
-                (isExpanded ? (
-                  <ExpandLess
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleExpand(item.path);
-                    }}
-                  />
+                {item.children?.length > 0 ? (
+                  isExpanded ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />
                 ) : (
-                  <ExpandMore
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleExpand(item.path);
-                    }}
-                  />
-                ))}
-            </ListItem>
+                  <span className="w-3.5" />
+                )}
+              </button>
+              {isExpanded ? (
+                <FolderOpen className="h-4 w-4 shrink-0 text-primary" />
+              ) : (
+                <Folder className="h-4 w-4 shrink-0 text-muted-foreground" />
+              )}
+              <span className="truncate">{item.name}</span>
+            </div>
 
-            <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-              {/* Render subfolders recursively */}
+            {isExpanded && item.children?.length > 0 && (
               <FolderTreeSelector
                 items={item.children}
                 onSelect={onSelect}
                 selectedFolder={selectedFolder}
                 level={level + 1}
               />
-
-              {/* Render files inside folder */}
-              {item.meta?.files?.length > 0 && (
-                <List sx={{ pl: 4 }}>
-                  {item.meta.files.map((file) => (
-                    <ListItem
-                      key={file.name}
-                      sx={{ pl: 2 }}
-                    >
-                      <ListItemIcon>
-                        <InsertDriveFileIcon fontSize="small" />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={`${file.name}${
-                          file.readOnly ? " (Read Only)" : ""
-                        }`}
-                      />
-                    </ListItem>
-                  ))}
-                </List>
-              )}
-            </Collapse>
-          </React.Fragment>
+            )}
+          </div>
         );
       })}
-    </List>
+    </div>
   );
 };
 

@@ -2,27 +2,28 @@
 import React, { useState, useEffect } from "react";
 import TagsMultiSelectDropDown from "../Templates/TagsMultiSelectDropDown";
 import MultiSelectDropdown from "../Templates/MultiSelectDropdown";
-import { IoChevronBackOutline } from "react-icons/io5";
 import Editor from "../Templates/Texteditor/Editor";
 import Priority from "../Templates/Priority/Priority";
 import Status from "../Templates/Status/Status";
 import dayjs from "dayjs";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { PiDotsSixVerticalBold } from "react-icons/pi";
-import { RiDeleteBin6Line } from "react-icons/ri";
-import { FiPlusCircle } from "react-icons/fi";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { FormDrawer, FormDrawerFooter, FormSection, FormField, FormRow } from "../components/ui/form-layout";
+import {
+  FormDrawer,
+  FormDrawerFooter,
+  FormSection,
+  FormField,
+  FormRow,
+  FormSelect,
+  FormDatePicker,
+  FormSwitchRow,
+  FormSubtaskItem,
+  FormSubtaskAdd,
+} from "../components/ui/form-layout";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
-import { Switch } from "../components/ui/switch";
-import { Label } from "../components/ui/label";
-import { Checkbox } from "../components/ui/checkbox";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../components/ui/select";
-import { Trash2, Plus, GripVertical, ArrowLeft, ListChecks, Calendar, Users, FileText, Tag } from "lucide-react";
+import { ArrowLeft, ListChecks, Calendar, Users, FileText, Tag } from "lucide-react";
 const NewTaskDrawer = ({ open, onClose, isEditMode, taskData }) => {
 
  
@@ -651,209 +652,173 @@ console.log("rew",raw)
       description={isEditMode ? "Update task details" : "Create a new task"}
       width="lg"
     >
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        {/* Account, Job, Template */}
-        <FormSection title="Source" icon={<FileText className="h-4 w-4" />}>
-          <FormField label="Account" required error={errors.account ? "Account is required" : ""}>
-            <select
-              className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              value={selectedaccount?.value || ""}
-              onChange={(e) => {
-                const newValue = accountoptions.find((o) => o.value === e.target.value) || null;
-                handleAccountChange(newValue);
-                setErrors((prev) => ({ ...prev, account: !newValue }));
-              }}
-            >
-              <option value="">Select Account</option>
-              {accountoptions.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-          </FormField>
+      {/* ── Source Section ── */}
+      <FormSection title="Source" icon={<FileText className="h-4 w-4" />}>
+        <FormField label="Account" required error={errors.account ? "Account is required" : ""}>
+          <FormSelect
+            value={selectedaccount?.value || ""}
+            onChange={(e) => {
+              const newValue = accountoptions.find((o) => o.value === e.target.value) || null;
+              handleAccountChange(newValue);
+              setErrors((prev) => ({ ...prev, account: !newValue }));
+            }}
+            error={errors.account}
+          >
+            <option value="">Select Account</option>
+            {accountoptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </FormSelect>
+        </FormField>
 
-          <FormField label="Job">
-            <select
-              className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-              disabled={!selectedaccount}
-              value={selectedJob?.value || ""}
-              onChange={(e) => {
-                const newValue = jobsoptions.find((o) => o.value === e.target.value) || null;
-                handleJobChange(newValue);
-              }}
-            >
-              <option value="">Select Job</option>
-              {jobsoptions.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-          </FormField>
+        <FormField label="Job">
+          <FormSelect
+            disabled={!selectedaccount}
+            value={selectedJob?.value || ""}
+            onChange={(e) => {
+              const newValue = jobsoptions.find((o) => o.value === e.target.value) || null;
+              handleJobChange(newValue);
+            }}
+          >
+            <option value="">Select Job</option>
+            {jobsoptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </FormSelect>
+        </FormField>
 
-          <FormField label="Template" required error={errors.template ? "Template is required" : ""}>
-            <select
-              className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              value={selectedtemp?.value || ""}
-              onChange={(e) => {
-                const newValue = taskTemplateOptions.find((o) => o.value === e.target.value) || null;
-                handletemp(e, newValue);
-                setErrors((prev) => ({ ...prev, template: !newValue }));
-              }}
-            >
-              <option value="">Select Template</option>
-              {taskTemplateOptions.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-          </FormField>
-        </FormSection>
+        <FormField label="Template" required error={errors.template ? "Template is required" : ""}>
+          <FormSelect
+            value={selectedtemp?.value || ""}
+            onChange={(e) => {
+              const newValue = taskTemplateOptions.find((o) => o.value === e.target.value) || null;
+              handletemp(e, newValue);
+              setErrors((prev) => ({ ...prev, template: !newValue }));
+            }}
+            error={errors.template}
+          >
+            <option value="">Select Template</option>
+            {taskTemplateOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </FormSelect>
+        </FormField>
+      </FormSection>
 
-        {/* Assignment & Status */}
-        <FormSection title="Assignment" icon={<Users className="h-4 w-4" />}>
-          <FormRow cols={2}>
-            <FormField label="Task Assignee">
-              <MultiSelectDropdown
-                value={selectedUser}
-                onChange={handleUserChange}
-                placeholder="Assignees"
-              />
-            </FormField>
-            <FormField label="Status">
-              <Status
-                onStatusChange={handleStatusChange}
-                selectedStatus={status}
-              />
-            </FormField>
-          </FormRow>
-
-          <FormRow cols={2}>
-            <FormField label="Template Name">
-              <Input
-                name="TemplateName"
-                placeholder="Template Name"
-                onChange={(e) => setTempNameNew(e.target.value)}
-                value={tempNameNew}
-              />
-            </FormField>
-            <FormField label="Priority">
-              <Priority
-                onPriorityChange={handlePriorityChange}
-                selectedPriority={priority}
-              />
-            </FormField>
-          </FormRow>
-        </FormSection>
-
-        {/* Description */}
-        <FormSection title="Description">
-          <Editor
-            initialContent={taskDiscription}
-            onChange={handleEditorChange}
-          />
-        </FormSection>
-
-        {/* Tags */}
-        <FormSection title="Tags" icon={<Tag className="h-4 w-4" />}>
-          <TagsMultiSelectDropDown
-            value={tagsNew}
-            onChange={handleTagChange}
-            placeholder="Tags"
-          />
-        </FormSection>
-
-        {/* Dates */}
-        <FormSection title="Dates" icon={<Calendar className="h-4 w-4" />}>
-          <FormRow cols={2}>
-            <FormField label="Start Date">
-              <DatePicker
-                format="MM/DD/YYYY"
-                sx={{ width: "100%", backgroundColor: "#fff" }}
-                value={StartsDateNew}
-                onChange={handleStartDateChange}
-                slotProps={{ textField: { size: "small" } }}
-              />
-            </FormField>
-            <FormField label="Due Date">
-              <DatePicker
-                format="MM/DD/YYYY"
-                sx={{ width: "100%", backgroundColor: "#fff" }}
-                value={DueDateNew}
-                onChange={handleDueDateChange}
-                slotProps={{ textField: { size: "small" } }}
-              />
-            </FormField>
-          </FormRow>
-        </FormSection>
-
-        {/* Subtasks */}
-        <FormSection title="Subtasks" icon={<ListChecks className="h-4 w-4" />}>
-          <div className="flex items-center justify-between">
-            <Label className="text-sm font-medium">Enable Subtasks</Label>
-            <Switch
-              checked={SubtaskSwitch}
-              onCheckedChange={handleSubtaskSwitch}
+      {/* ── Assignment & Status ── */}
+      <FormSection title="Assignment" icon={<Users className="h-4 w-4" />}>
+        <FormRow cols={2}>
+          <FormField label="Task Assignee">
+            <MultiSelectDropdown
+              value={selectedUser}
+              onChange={handleUserChange}
+              placeholder="Assignees"
             />
-          </div>
+          </FormField>
+          <FormField label="Status">
+            <Status
+              onStatusChange={handleStatusChange}
+              selectedStatus={status}
+            />
+          </FormField>
+        </FormRow>
 
-          {SubtaskSwitch && (
-            <DragDropContext onDragEnd={handleDragEnd}>
-              <Droppable droppableId="subtaskList">
-                {(provided) => (
-                  <div className="space-y-2" {...provided.droppableProps} ref={provided.innerRef}>
-                    {subtasks.map((subtask, index) => (
-                      <Draggable key={subtask.id} draggableId={subtask.id} index={index}>
-                        {(provided) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            className="flex items-center gap-2 rounded-lg border border-border bg-white p-2 shadow-sm"
-                          >
-                            <Checkbox
-                              checked={subtask.checked}
-                              onCheckedChange={() => handleCheckboxChange(subtask.id)}
-                            />
-                            <Input
-                              placeholder="Things to do"
-                              value={subtask.text}
-                              onChange={(e) => handleInputChange(subtask.id, e.target.value)}
-                              disabled={subtask.checked}
-                              className={`flex-1 border-0 shadow-none focus-visible:ring-0 ${subtask.checked ? "line-through opacity-60" : ""}`}
-                            />
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteSubtask(subtask.id)}
-                              className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
-                            <div
-                              {...provided.dragHandleProps}
-                              className="cursor-grab rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent"
-                            >
-                              <GripVertical className="h-4 w-4" />
-                            </div>
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleAddSubtask}
-                      className="mt-2 w-full text-primary"
-                    >
-                      <Plus className="h-4 w-4" />
-                      Add Subtask
-                    </Button>
-                  </div>
-                )}
-              </Droppable>
-            </DragDropContext>
-          )}
-        </FormSection>
-      </LocalizationProvider>
+        <FormRow cols={2}>
+          <FormField label="Task Name">
+            <Input
+              name="TemplateName"
+              placeholder="Task Name"
+              onChange={(e) => setTempNameNew(e.target.value)}
+              value={tempNameNew}
+            />
+          </FormField>
+          <FormField label="Priority">
+            <Priority
+              onPriorityChange={handlePriorityChange}
+              selectedPriority={priority}
+            />
+          </FormField>
+        </FormRow>
+      </FormSection>
 
-      {/* Footer Actions */}
+      {/* ── Description ── */}
+      <FormSection title="Description">
+        <Editor
+          initialContent={taskDiscription}
+          onChange={handleEditorChange}
+        />
+      </FormSection>
+
+      {/* ── Tags ── */}
+      <FormSection title="Tags" icon={<Tag className="h-4 w-4" />}>
+        <TagsMultiSelectDropDown
+          value={tagsNew}
+          onChange={handleTagChange}
+          placeholder="Tags"
+        />
+      </FormSection>
+
+      {/* ── Dates ── */}
+      <FormSection title="Dates" icon={<Calendar className="h-4 w-4" />}>
+        <FormRow cols={2}>
+          <FormField label="Start Date">
+            <FormDatePicker
+              value={StartsDateNew ? dayjs(StartsDateNew).format("YYYY-MM-DD") : ""}
+              onChange={(val) => handleStartDateChange(val ? dayjs(val) : null)}
+            />
+          </FormField>
+          <FormField label="Due Date">
+            <FormDatePicker
+              value={DueDateNew ? dayjs(DueDateNew).format("YYYY-MM-DD") : ""}
+              onChange={(val) => handleDueDateChange(val ? dayjs(val) : null)}
+            />
+          </FormField>
+        </FormRow>
+      </FormSection>
+
+      {/* ── Subtasks ── */}
+      <FormSection title="Subtasks" icon={<ListChecks className="h-4 w-4" />}>
+        <FormSwitchRow
+          label="Enable Subtasks"
+          description="Break this task into smaller steps"
+          checked={SubtaskSwitch}
+          onCheckedChange={handleSubtaskSwitch}
+        />
+
+        {SubtaskSwitch && (
+          <DragDropContext onDragEnd={handleDragEnd}>
+            <Droppable droppableId="subtaskList">
+              {(provided) => (
+                <div className="space-y-2" {...provided.droppableProps} ref={provided.innerRef}>
+                  {subtasks.map((subtask, index) => (
+                    <Draggable key={subtask.id} draggableId={subtask.id} index={index}>
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                        >
+                          <FormSubtaskItem
+                            text={subtask.text}
+                            checked={subtask.checked}
+                            onTextChange={(val) => handleInputChange(subtask.id, val)}
+                            onCheckedChange={() => handleCheckboxChange(subtask.id)}
+                            onDelete={() => handleDeleteSubtask(subtask.id)}
+                            dragHandleProps={provided.dragHandleProps}
+                          />
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                  <FormSubtaskAdd onClick={handleAddSubtask} />
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
+        )}
+      </FormSection>
+
+      {/* ── Footer Actions ── */}
       <FormDrawerFooter>
         <Button variant="outline" onClick={onClose}>
           <ArrowLeft className="h-4 w-4" />

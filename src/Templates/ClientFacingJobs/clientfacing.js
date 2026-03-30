@@ -1,25 +1,11 @@
 import React, { useState, useEffect } from "react";
-import {
-  Container,
-  Box,
-  Button,
-  Typography,
-  Drawer,
-  Select,
-  MenuItem,
-  TextField,
-  FormControl,
-  InputLabel,
-  Chip,IconButton
-} from "@mui/material";
-import { useTheme } from "@mui/material/styles";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import { IoClose } from "react-icons/io5";
-import { GoDotFill } from "react-icons/go";
-import BorderColorIcon from "@mui/icons-material/BorderColor";
-import DeleteIcon from "@mui/icons-material/Delete";
+import { Box, Typography, CircularProgress } from "@mui/material";
 import { toast } from "react-toastify";
-import { CircularProgress } from "@mui/material";
+import { FormDrawer, FormDrawerFooter, FormSection, FormField } from "../../components/ui/form-layout";
+import { Input } from "../../components/ui/input";
+import { Button } from "../../components/ui/button";
+import { Label } from "../../components/ui/label";
+import { Pencil, Trash2, Circle } from "lucide-react";
 const Clientfacing = () => {
   const CLIENT_FACING_API = process.env.REACT_APP_CLIENT_FACING_URL;
   const [clientFacingJobs, setClientFacingJobs] = useState([]);
@@ -30,8 +16,6 @@ const Clientfacing = () => {
   const [isNewDrawerOpen, setIsNewDrawerOpen] = useState(false);
   const [jobId, setJobId] = useState(null);
   const [selectedColor, setSelectedColor] = useState("");
-  const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   
 
@@ -304,500 +288,199 @@ const validateForm = () => {
   };
   console.log(jobId);
   return (
-    <Box>
-      <Box className="tag-container">
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            mb: 2,
-          }}
-        >
-          <Button
-            variant="contained"
-            onClick={handleDrawerOpen}
-            sx={{
-              backgroundColor: "var(--color-save-btn)", // Normal background
-
-              "&:hover": {
-                backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-              },
-              borderRadius: "15px",
-              mb: 3,
-            }}
-          >
+    <div>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <Button onClick={handleDrawerOpen}>
             Create Status
           </Button>
-        </Box>
+        </div>
 
         {/* Display Current Status */}
         {loading ? (
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            {" "}
-            <CircularProgress style={{ fontSize: "300px", color: "blue" }} />
-          </Box>
+          <div className="flex items-center justify-center py-12">
+            <CircularProgress style={{ color: "blue" }} />
+          </div>
         ) : (
-         
-          <Box>
-      {clientFacingJobs.map((job) => (
-        <Box
-          key={job._id}
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            p: 2,
-            mb: 2,
-            border: "1px solid #e2e8f0",
-            borderRadius: "12px",
-            backgroundColor: "#ffffff",
-            boxShadow: "0px 2px 6px rgba(0, 0, 0, 0.1)",
-          }}
-        >
-          <Box sx={{ display: "flex", alignItems: "center", flex: 1, minWidth: 0 }}>
-            <GoDotFill
-              style={{
-                color: job.clientfacingColour,
-                fontSize: "28px",
-                flexShrink: 0, // Prevents size reduction
-                marginRight: "12px",
-              }}
-            />
-            <Box sx={{ minWidth: 0 }}>
-              <Typography variant="body1" fontWeight="600" noWrap>
-                {job.clientfacingName}
-              </Typography>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                
+          <div className="space-y-3">
+            {clientFacingJobs.map((job) => (
+              <div
+                key={job._id}
+                className="flex items-center justify-between p-4 rounded-xl border border-border bg-white shadow-sm transition-all hover:shadow-md"
               >
-                {job.clientfacingdescription}
-              </Typography>
-            </Box>
-          </Box>
-
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <IconButton onClick={() => handleEdit(job._id)} sx={{ color: "#1168bf" }}>
-              <BorderColorIcon />
-            </IconButton>
-            <IconButton onClick={() => deleteJobFacing(job._id)} sx={{ color: "#f52d2d" }}>
-              <DeleteIcon />
-            </IconButton>
-          </Box>
-        </Box>
-      ))}
-    </Box>
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <Circle
+                    className="h-5 w-5 shrink-0"
+                    fill={job.clientfacingColour}
+                    stroke={job.clientfacingColour}
+                  />
+                  <div className="min-w-0">
+                    <p className="font-semibold text-sm truncate">{job.clientfacingName}</p>
+                    <p className="text-xs text-muted-foreground">{job.clientfacingdescription}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => handleEdit(job._id)}
+                    className="rounded-md p-2 text-primary transition-colors hover:bg-primary/10"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => deleteJobFacing(job._id)}
+                    className="rounded-md p-2 text-destructive transition-colors hover:bg-destructive/10"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
-        <Drawer
-          anchor="right"
+
+        {/* ===== CREATE DRAWER ===== */}
+        <FormDrawer
           open={isDrawerOpen}
           onClose={handleDrawerClose}
-          PaperProps={{
-            id: "tag-drawer",
-            sx: {
-              borderRadius: isSmallScreen ? "0" : "10px 0 0 10px",
-              width: isSmallScreen ? "100%" : 500,
-              maxWidth: "100%",
-              [theme.breakpoints.down("sm")]: {
-                width: "100%",
-              },
-            },
-          }}
+          title="Create Client-Facing Job Status"
+          width="md"
         >
-          <Box
-            sx={{ borderRadius: isSmallScreen ? "0" : "15px" }}
-            role="presentation"
-          >
-            <Box>
-              <Box
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: "15px",
-                  borderBottom: "1px solid #e2e8f0",
-                }}
-              >
-                <Typography variant="h6">
-                  <b>Create client-facing job status template</b>
-                </Typography>
-                <IoClose
-                  onClick={handleDrawerClose}
-                  style={{ cursor: "pointer" }}
-                />
-              </Box>
-
-              <Box m={2}>
-               
-
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 2,
-                    width: "100%",
-                  }}
-                >
-                  {/* Color Selection */}
-                  <Box sx={{ flex: 1 }}>
-                    <InputLabel sx={{ color: "black" }}>Color</InputLabel>
-                    <FormControl fullWidth>
-                      <Select
-                        displayEmpty
-                        size="small"
-                        sx={{
-                          width: "100%",
-                          backgroundColor: "#fff",
-                          mt: 2,
-                        }}
-                        value={selectedColor}
-                        // onChange={handleColorChange}
-                        onChange={(e) => {
-      setSelectedColor(e.target.value);
-      if (e.target.value) {
-        setErrors((prev) => ({ ...prev, color: "" })); // clear error
-      }
-    }}
-                        renderValue={(selected) =>
-                          selected ? (
-                            <Chip
-                              sx={{
-                                backgroundColor: selected,
-                                width: "18px",
-                                height: "18px",
-                                // borderRadius: "50%",
-                              }}
-                            />
-                          ) : (
-                            <span style={{ color: "#9ca3af" }}>Select</span>
-                          )
-                        }
-                        MenuProps={{
-                          PaperProps: {
-                            sx: {
-                              maxHeight: 200,
-                              overflowY: "auto",
-                            },
-                          },
-                        }}
-                      >
-                        {colors.map((color) => (
-                          <MenuItem key={color} value={color}>
-                            <Box
-                              sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 1,
-                              }}
-                            >
-                              <Box
-                                sx={{
-                                  width: "18px",
-                                  height: "18px",
-                                  backgroundColor: color,
-                                  borderRadius: "50%",
-                                }}
-                              />
-                            </Box>
-                          </MenuItem>
-                        ))}
-                      </Select>
-                       {errors.color && <Typography variant="caption" color="error">{errors.color}</Typography>}
-                    </FormControl>
-                  </Box>
-
-                  {/* Name Input */}
-                  <Box sx={{ flex: 2 }}>
-                    <InputLabel sx={{ color: "black" }}>Name</InputLabel>
-                    <TextField
-                      placeholder="Enter a name"
-                      fullWidth
-                      size="small"
-                      sx={{
-                        backgroundColor: "#fff",
-                        mt: 2,
-                      }}
-                      value={clientFacingName}
-                      onChange={(e) => {
-    setClientFacingName(e.target.value);
-    if (e.target.value.trim()) {
-      setErrors((prev) => ({ ...prev, name: "" })); // clear error
-    }
-  }}
-                      // onChange={(e) => setClientFacingName(e.target.value)}
-                    error={!!errors.name}
-  helperText={errors.name}
+          <FormSection title="Status Details">
+            <div className="flex items-start gap-4">
+              <FormField label="Color" error={errors.color} className="w-1/3">
+                <div className="relative">
+                  <select
+                    className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    value={selectedColor}
+                    onChange={(e) => {
+                      setSelectedColor(e.target.value);
+                      if (e.target.value) {
+                        setErrors((prev) => ({ ...prev, color: "" }));
+                      }
+                    }}
+                    style={{ color: selectedColor || undefined }}
+                  >
+                    <option value="">Select</option>
+                    {colors.map((color) => (
+                      <option key={color} value={color} style={{ color: color, fontWeight: "bold" }}>
+                        ● {color}
+                      </option>
+                    ))}
+                  </select>
+                  {selectedColor && (
+                    <div
+                      className="absolute right-8 top-1/2 -translate-y-1/2 h-4 w-4 rounded-full border border-border"
+                      style={{ backgroundColor: selectedColor }}
                     />
-                  </Box>
-                </Box>
+                  )}
+                </div>
+              </FormField>
 
-                <Box sx={{ marginTop: 2 }}>
-                  <InputLabel sx={{ color: "black" }}>
-                    Status description for client
-                  </InputLabel>
-                  
-                  <TextField
-  sx={{ marginTop: 2 }}
-  fullWidth
-  size="small"
-  placeholder="Status description for client"
-  multiline
-  rows={5}
-  value={clientFacingDescription}
-  // onChange={(e) => setClientFacingDescription(e.target.value)}
-   onChange={(e) => {
-    setClientFacingDescription(e.target.value);
-    if (e.target.value.trim() && e.target.value.length <= 200) {
-      setErrors((prev) => ({ ...prev, description: "" })); // clear error
-    }
-  }}
-  inputProps={{ maxLength: 200 }}
-error={!!errors.description}
-  helperText={errors.description || `${clientFacingDescription.length}/200`}
+              <FormField label="Name" error={errors.name} className="flex-1">
+                <Input
+                  placeholder="Enter a name"
+                  value={clientFacingName}
+                  onChange={(e) => {
+                    setClientFacingName(e.target.value);
+                    if (e.target.value.trim()) {
+                      setErrors((prev) => ({ ...prev, name: "" }));
+                    }
+                  }}
+                  error={!!errors.name}
+                />
+              </FormField>
+            </div>
 
-/>
-                </Box>
+            <FormField label="Status Description" error={errors.description}>
+              <textarea
+                className="flex min-h-[120px] w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none"
+                placeholder="Status description for client"
+                maxLength={200}
+                rows={5}
+                value={clientFacingDescription}
+                onChange={(e) => {
+                  setClientFacingDescription(e.target.value);
+                  if (e.target.value.trim() && e.target.value.length <= 200) {
+                    setErrors((prev) => ({ ...prev, description: "" }));
+                  }
+                }}
+              />
+              <p className="text-xs text-muted-foreground mt-1 text-right">
+                {clientFacingDescription.length}/200
+              </p>
+            </FormField>
+          </FormSection>
 
-                <Box
-                  sx={{ pt: 5, display: "flex", alignItems: "center", gap: 5 }}
-                >
-                  <Button
-                    onClick={createJobFacing}
-                    variant="contained"
-                    color="primary"
-                    sx={{
-                      backgroundColor: "var(--color-save-btn)", // Normal background
+          <FormDrawerFooter>
+            <Button variant="outline" onClick={handleClearTemp}>Cancel</Button>
+            <Button onClick={createJobFacing}>Submit</Button>
+          </FormDrawerFooter>
+        </FormDrawer>
 
-                      "&:hover": {
-                        backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                      },
-                      borderRadius: "15px",
-                      width: "80px",
-                    }}
-                  >
-                    Submit
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    onClick={handleClearTemp}
-                    sx={{
-                      borderColor: "var(--color-border-cancel-btn)", // Normal background
-                      color: "var(--color-save-btn)",
-                      "&:hover": {
-                        backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                        color: "#fff",
-                        border: "none",
-                      },
-                      width: "80px",
-                      borderRadius: "15px",
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                </Box>
-              </Box>
-            </Box>
-          </Box>
-        </Drawer>
-
-        {/* new drawer for edit */}
-        <Drawer
-          anchor="right"
+        {/* ===== EDIT DRAWER ===== */}
+        <FormDrawer
           open={isNewDrawerOpen}
           onClose={handleNewDrawerClose}
-          PaperProps={{
-            id: "tag-drawer",
-            sx: {
-              borderRadius: isSmallScreen ? "0" : "10px 0 0 10px",
-              width: isSmallScreen ? "100%" : 500,
-              maxWidth: "100%",
-              [theme.breakpoints.down("sm")]: {
-                width: "100%",
-              },
-            },
-          }}
+          title="Update Client-Facing Job Status"
+          width="md"
         >
-          <Box
-            sx={{ borderRadius: isSmallScreen ? "0" : "15px" }}
-            role="presentation"
-          >
-            <Box>
-              <Box
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: "15px",
-                  borderBottom: "1px solid #e2e8f0",
-                }}
-              >
-                <Typography variant="h6">
-                  <b>Update client-facing job status template</b>
-                </Typography>
-                <IoClose
-                  onClick={handleNewDrawerClose}
-                  style={{ cursor: "pointer" }}
-                />
-              </Box>
-
-              <Box m={3}>
-               
- <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 2,
-                    width: "100%",
-                  }}
-                >
-                  {/* Color Selection */}
-                  <Box sx={{ flex: 1 }}>
-                    <InputLabel sx={{ color: "black" }}>Color</InputLabel>
-                    <FormControl fullWidth>
-                      <Select
-                        displayEmpty
-                        size="small"
-                        sx={{
-                          width: "100%",
-                          backgroundColor: "#fff",
-                          mt: 2,
-                        }}
-                        value={selectedColor}
-                        onChange={handleColorChange}
-                        renderValue={(selected) =>
-                          selected ? (
-                            <Chip
-                              sx={{
-                                backgroundColor: selected,
-                                width: "18px",
-                                height: "18px",
-                                // borderRadius: "50%",
-                              }}
-                            />
-                          ) : (
-                            <span style={{ color: "#9ca3af" }}>Select</span>
-                          )
-                        }
-                        MenuProps={{
-                          PaperProps: {
-                            sx: {
-                              maxHeight: 200,
-                              overflowY: "auto",
-                            },
-                          },
-                        }}
-                      >
-                        {colors.map((color) => (
-                          <MenuItem key={color} value={color}>
-                            <Box
-                              sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 1,
-                              }}
-                            >
-                              <Box
-                                sx={{
-                                  width: "18px",
-                                  height: "18px",
-                                  backgroundColor: color,
-                                  borderRadius: "50%",
-                                }}
-                              />
-                            </Box>
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  {/* Name Input */}
-                  <Box sx={{ flex: 2 }}>
-                    <InputLabel sx={{ color: "black" }}>Name</InputLabel>
-                    <TextField
-                      placeholder="Enter a name"
-                      fullWidth
-                      size="small"
-                      sx={{
-                        backgroundColor: "#fff",
-                        mt: 2,
-                      }}
-                      value={clientFacingName}
-                      onChange={(e) => setClientFacingName(e.target.value)}
+          <FormSection title="Status Details">
+            <div className="flex items-start gap-4">
+              <FormField label="Color" className="w-1/3">
+                <div className="relative">
+                  <select
+                    className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    value={selectedColor}
+                    onChange={handleColorChange}
+                    style={{ color: selectedColor || undefined }}
+                  >
+                    <option value="">Select</option>
+                    {colors.map((color) => (
+                      <option key={color} value={color} style={{ color: color, fontWeight: "bold" }}>
+                        ● {color}
+                      </option>
+                    ))}
+                  </select>
+                  {selectedColor && (
+                    <div
+                      className="absolute right-8 top-1/2 -translate-y-1/2 h-4 w-4 rounded-full border border-border"
+                      style={{ backgroundColor: selectedColor }}
                     />
-                  </Box>
-                </Box>
-                <Box sx={{ marginTop: 2 }}>
-                <InputLabel sx={{ color: "black" }}>
-                    Status description for client
-                  </InputLabel>
-                 
-                        <TextField
-  sx={{ marginTop: 2 }}
-  fullWidth
-  size="small"
-  placeholder="Status description for client"
-  multiline
+                  )}
+                </div>
+              </FormField>
 
-  rows={5}
-  value={clientFacingDescription}
-  onChange={(e) => setClientFacingDescription(e.target.value)}
-  inputProps={{ maxLength: 200 }}
-  helperText={`${clientFacingDescription.length}/200`}
-/>
-                </Box>
+              <FormField label="Name" className="flex-1">
+                <Input
+                  placeholder="Enter a name"
+                  value={clientFacingName}
+                  onChange={(e) => setClientFacingName(e.target.value)}
+                />
+              </FormField>
+            </div>
 
-                <Box
-                  sx={{ pt: 5, display: "flex", alignItems: "center", gap: 5 }}
-                >
-                  <Button
-                    onClick={handleupdateclientstatus}
-                    variant="contained"
-                    color="primary"
-                    sx={{
-                      backgroundColor: "var(--color-save-btn)", // Normal background
+            <FormField label="Status Description">
+              <textarea
+                className="flex min-h-[120px] w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none"
+                placeholder="Status description for client"
+                maxLength={200}
+                rows={5}
+                value={clientFacingDescription}
+                onChange={(e) => setClientFacingDescription(e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground mt-1 text-right">
+                {clientFacingDescription.length}/200
+              </p>
+            </FormField>
+          </FormSection>
 
-                      "&:hover": {
-                        backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                      },
-                      borderRadius: "15px",
-                      width: "80px",
-                    }}
-                  >
-                    Submit
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    onClick={handleNewDrawerClose}
-                    sx={{
-                      borderColor: "var(--color-border-cancel-btn)", // Normal background
-                      color: "var(--color-save-btn)",
-                      "&:hover": {
-                        backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                        color: "#fff",
-                        border: "none",
-                      },
-                      width: "80px",
-                      borderRadius: "15px",
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                </Box>
-              </Box>
-            </Box>
-          </Box>
-        </Drawer>
-      </Box>
-    </Box>
+          <FormDrawerFooter>
+            <Button variant="outline" onClick={handleNewDrawerClose}>Cancel</Button>
+            <Button onClick={handleupdateclientstatus}>Submit</Button>
+          </FormDrawerFooter>
+        </FormDrawer>
+      </div>
+    </div>
   );
 };
 

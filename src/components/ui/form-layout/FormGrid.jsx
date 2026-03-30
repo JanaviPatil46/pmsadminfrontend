@@ -2,22 +2,28 @@ import React from "react"
 import { cn } from "../../../lib/utils"
 
 /**
- * FormGrid — Two-column layout for full-page forms (main + sidebar).
- * 
- * Usage:
- *   <FormGrid>
- *     <FormGrid.Main>
- *       <FormSection title="General">...</FormSection>
- *     </FormGrid.Main>
- *     <FormGrid.Sidebar>
- *       <FormSection title="Client Facing">...</FormSection>
- *     </FormGrid.Sidebar>
- *   </FormGrid>
+ * FormGrid — Responsive two-column layout for full-page forms (main + sidebar).
+ *
+ * Props:
+ *   sidebarWidth — "sm" (320px) | "md" (380px) | "lg" (420px) (default: "md")
+ *
+ * On mobile: single column, sidebar stacks below main.
+ * On desktop (lg+): main content + sidebar side by side.
  */
-const FormGrid = ({ className, children, ...props }) => {
+const sidebarWidthMap = {
+  sm: "lg:grid-cols-[1fr_320px]",
+  md: "lg:grid-cols-[1fr_380px]",
+  lg: "lg:grid-cols-[1fr_420px]",
+}
+
+const FormGrid = ({ className, sidebarWidth = "md", children, ...props }) => {
   return (
     <div
-      className={cn("grid grid-cols-1 gap-6 lg:grid-cols-[1fr_380px]", className)}
+      className={cn(
+        "grid grid-cols-1 gap-4 sm:gap-6",
+        sidebarWidthMap[sidebarWidth] || sidebarWidthMap.md,
+        className
+      )}
       {...props}
     >
       {children}
@@ -27,7 +33,7 @@ const FormGrid = ({ className, children, ...props }) => {
 
 const FormGridMain = ({ className, children, ...props }) => {
   return (
-    <div className={cn("space-y-6", className)} {...props}>
+    <div className={cn("space-y-4 sm:space-y-6", className)} {...props}>
       {children}
     </div>
   )
@@ -35,7 +41,7 @@ const FormGridMain = ({ className, children, ...props }) => {
 
 const FormGridSidebar = ({ className, children, ...props }) => {
   return (
-    <div className={cn("space-y-6", className)} {...props}>
+    <div className={cn("space-y-4 sm:space-y-6", className)} {...props}>
       {children}
     </div>
   )
