@@ -221,182 +221,95 @@ useEffect(() => {
   const options = useMemo(() => countryList().getData(), []);
 console.log("country options", options);
   return (
-    <Box>
-      <FormControl component="fieldset" margin="normal" fullWidth>
-        <Typography sx={{ color: "black", fontSize: "20px" }}>
-          Client Type
-        </Typography>
-        <RadioGroup
-          row
-          name="clientType"
-          value={accountData.clientType || ""}
-          onChange={handleChange}
-        >
-          <FormControlLabel
-            value="Individual"
-            control={<Radio />}
-            label="Individual"
-          />
-          <FormControlLabel
-            value="Company"
-            control={<Radio />}
-            label="Company"
-          />
-        </RadioGroup>
-      </FormControl>
+    <div className="space-y-6">
+      {/* Client Type section */}
+      <div>
+        <h3 className="text-sm font-semibold text-slate-900 mb-2">Client Type</h3>
+        <FormControl component="fieldset" fullWidth>
+          <RadioGroup
+            row
+            name="clientType"
+            value={accountData.clientType || ""}
+            onChange={handleChange}
+          >
+            <FormControlLabel value="Individual" control={<Radio size="small" />} label={<span className="text-sm text-slate-700">Individual</span>} />
+            <FormControlLabel value="Company" control={<Radio size="small" />} label={<span className="text-sm text-slate-700">Company</span>} />
+          </RadioGroup>
+        </FormControl>
+      </div>
 
-      <FormLabel component="legend" sx={{ color: "black", fontSize: "20px" }}>
-        Account Info
-      </FormLabel>
-      
-      <TextField
-        size="small"
-        fullWidth
-        margin="normal"
-        label="Account Name"
-        name="accountName"
-        value={accountData.accountName || ""}
-        onChange={handleChange}
-        error={!!errors.accountName}
-        helperText={errors.accountName}
-        required
-      />
-
-      {accountData.clientType === "Company" && (
+      {/* Account Info section */}
+      <div className="space-y-3">
+        <h3 className="text-sm font-semibold text-slate-900">Account Info</h3>
         <TextField
-          fullWidth
-          margin="normal"
-          size="small"
-          label="Company Name"
-          name="companyName"
-          value={accountData.companyName || ""}
-          onChange={handleChange}
-          error={!!errors.companyName}
-          helperText={errors.companyName}
-          required
+          size="small" fullWidth label="Account Name" name="accountName"
+          value={accountData.accountName || ""} onChange={handleChange}
+          error={!!errors.accountName} helperText={errors.accountName} required
+          sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
         />
-      )}
+        {accountData.clientType === "Company" && (
+          <TextField
+            fullWidth size="small" label="Company Name" name="companyName"
+            value={accountData.companyName || ""} onChange={handleChange}
+            error={!!errors.companyName} helperText={errors.companyName} required
+            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+          />
+        )}
+      </div>
 
-      <MultiSelectDropdown
-        value={accountData.teamMembers || []}
-        onChange={(newValue) => dispatch(setAccountData({ teamMembers: newValue }))}
-        options={teamMembers}
-        placeholder="Select Team Members"
-        width="100%"
-      />
-
-      <TagsMultiSelectDropDown
-        value={accountData.tags || []}
-        onChange={(newValue) => dispatch(setAccountData({ tags: newValue }))}
-        options={tags}
-        placeholder="Select tags"
-      />
-
-      <Box mt={1}>
+      {/* Team & Tags */}
+      <div className="space-y-3">
+        <MultiSelectDropdown
+          value={accountData.teamMembers || []}
+          onChange={(newValue) => dispatch(setAccountData({ teamMembers: newValue }))}
+          options={teamMembers}
+          placeholder="Select Team Members"
+          width="100%"
+        />
+        <TagsMultiSelectDropDown
+          value={accountData.tags || []}
+          onChange={(newValue) => dispatch(setAccountData({ tags: newValue }))}
+          options={tags}
+          placeholder="Select tags"
+        />
         <Autocomplete
           options={folderTemp}
           getOptionLabel={(option) => option?.label || ""}
           value={accountData.folderTemp || null}
           onChange={(e, newValue) => handleAutocompleteChange('folderTemp', newValue)}
           renderInput={(params) => (
-            <TextField
-              {...params}
-              margin="normal"
-              label="Select Folder Template"
-              size="small"
-              required
-            />
+            <TextField {...params} label="Select Folder Template" size="small" required sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }} />
           )}
         />
-      </Box>
+      </div>
 
+      {/* Address section (Company only) */}
       {accountData.clientType === "Company" && (
-        <Box>
-          <FormLabel component="legend" sx={{ color: "black", fontSize: "20px" }}>
-            Address
-          </FormLabel>
-
-          {/* <Autocomplete
-            fullWidth
-            options={options}
-            getOptionLabel={(option) => option.label}
-            // value={accountData.country || null}
-              value={options.find(opt => opt.label === accountData.country?.name) || null} 
-            onChange={(event, newValue) =>
-              dispatch(setAccountData({ country: newValue }))
-            }
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                margin="normal"
-                label="Select Country"
-                size="small"
-              />
-            )}
-            sx={{ mt: 1 }}
-          /> */}
-<Autocomplete
-  fullWidth
-  options={options}
-  getOptionLabel={(option) => option.label}
-  value={options.find(opt => opt.label === accountData?.country?.label) || null}
-  onChange={(event, newValue) =>
-    dispatch(setAccountData({ country: newValue }))
-  }
-  isOptionEqualToValue={(option, value) =>
-    option.label === value?.label
-  }
-  renderInput={(params) => (
-    <TextField {...params} margin="normal" label="Select Country" size="small" />
-  )}
-  sx={{ mt: 1 }}
-/>
-
-          <TextField
-            fullWidth
-            margin="normal"
-            size="small"
-            label="Street Address"
-            name="streetAddress"
-            value={accountData.streetAddress  || ""}
-            onChange={handleChange}
+        <div className="space-y-3">
+          <h3 className="text-sm font-semibold text-slate-900">Address</h3>
+          <Autocomplete
+            fullWidth options={options} getOptionLabel={(option) => option.label}
+            value={options.find(opt => opt.label === accountData?.country?.label) || null}
+            onChange={(event, newValue) => dispatch(setAccountData({ country: newValue }))}
+            isOptionEqualToValue={(option, value) => option.label === value?.label}
+            renderInput={(params) => (<TextField {...params} label="Select Country" size="small" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }} />)}
           />
-
-          <TextField
-            fullWidth
-            margin="normal"
-            size="small"
-            label="City"
-            name="city"
-            value={accountData.city || ""}
-            onChange={handleChange}
-          />
-
-          <TextField
-            fullWidth
-            margin="normal"
-            size="small"
-            label="State"
-            name="state"
-            value={accountData.state || ""}
-            onChange={handleChange}
-          />
-
-          <TextField
-            fullWidth
-            margin="normal"
-            size="small"
-            label="Zip Code"
-            name="postalCode"
-            value={accountData.postalCode  || ""}
-            onChange={handleChange}
-          />
-        </Box>
+          <TextField fullWidth size="small" label="Street Address" name="streetAddress" value={accountData.streetAddress || ""} onChange={handleChange} sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }} />
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <TextField fullWidth size="small" label="City" name="city" value={accountData.city || ""} onChange={handleChange} sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }} />
+            <TextField fullWidth size="small" label="State" name="state" value={accountData.state || ""} onChange={handleChange} sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }} />
+            <TextField fullWidth size="small" label="Zip Code" name="postalCode" value={accountData.postalCode || ""} onChange={handleChange} sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }} />
+          </div>
+        </div>
       )}
 
-      <Button variant="contained" sx={{ mt: 2 }} onClick={onContinue}>
+      <button
+        className="inline-flex items-center px-5 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm"
+        onClick={onContinue}
+      >
         Continue
-      </Button>
-    </Box>
+        <svg className="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+      </button>
+    </div>
   );
 }

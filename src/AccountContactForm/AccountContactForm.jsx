@@ -581,15 +581,42 @@ export default function AccountContactForm({
   };
 
   return (
-    <Box sx={{ maxWidth: 800, margin: "auto", mt: 2 }}>
-      <Stepper activeStep={activeStep}>
-        {steps.map((label) => (
-          <Step key={label}>
-            <StepLabel>{label}</StepLabel>
-          </Step>
+    <div className="max-w-[800px] mx-auto mt-2">
+      {/* Modern step indicator */}
+      <div className="flex items-center gap-2 mb-6">
+        {steps.map((label, index) => (
+          <React.Fragment key={label}>
+            <div className="flex items-center gap-2">
+              <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold transition-all duration-200 ${
+                index < activeStep
+                  ? "bg-indigo-600 text-white"
+                  : index === activeStep
+                    ? "bg-indigo-600 text-white ring-4 ring-indigo-100"
+                    : "bg-slate-100 text-slate-400"
+              }`}>
+                {index < activeStep ? (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
+                ) : (
+                  index + 1
+                )}
+              </div>
+              <span className={`text-sm font-medium ${
+                index <= activeStep ? "text-slate-900" : "text-slate-400"
+              }`}>
+                {label}
+              </span>
+            </div>
+            {index < steps.length - 1 && (
+              <div className={`flex-1 h-0.5 rounded-full mx-2 ${
+                index < activeStep ? "bg-indigo-600" : "bg-slate-200"
+              }`} />
+            )}
+          </React.Fragment>
         ))}
-      </Stepper>
-      <Box sx={{ mt: 4, p: 3, border: "1px solid #ddd", borderRadius: 2 }}>
+      </div>
+
+      {/* Form content */}
+      <div className="border border-slate-200 rounded-xl bg-white p-5">
         {activeStep === 0 && (
           <AccountForm
             onContinue={() => setActiveStep(1)}
@@ -605,7 +632,7 @@ export default function AccountContactForm({
             setIsSubmitting={setIsSubmitting}
           />
         )}
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 }

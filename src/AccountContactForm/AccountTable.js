@@ -2128,60 +2128,53 @@ const isPageIndeterminate =
   };
 
   const renderLimitedChips = (items, getLabel, getColor) => {
-    if (!items || items.length === 0) return "—";
+    if (!items || items.length === 0) return <span className="text-slate-400 text-xs">—</span>;
 
     const first = items[0];
     const remainingCount = items.length - 1;
+    const colorStyle = getColor ? getColor(first) : {};
+    const inlineStyle = {};
+    if (colorStyle.backgroundColor) inlineStyle.backgroundColor = colorStyle.backgroundColor;
+    if (colorStyle.color) inlineStyle.color = colorStyle.color;
+    if (colorStyle.borderColor) {
+      inlineStyle.border = `1px solid`;
+      inlineStyle.borderColor = typeof colorStyle.borderColor === 'string' ? colorStyle.borderColor : '#6366f1';
+      inlineStyle.color = typeof colorStyle.color === 'string' ? colorStyle.color : '#6366f1';
+    }
 
     return (
-      <Stack
-        direction="row"
-        spacing={1}
-        flexWrap="wrap"
-        sx={{ cursor: "pointer" }}
-      >
-        {/* ✅ FIRST CHIP */}
+      <div className="flex items-center gap-1.5 flex-wrap">
         <Tooltip title={getLabel(first)} placement="top-end">
-          <Chip
-            label={getLabel(first)}
-            size="small"
-            sx={getColor ? getColor(first) : {}}
-          />
+          <span
+            className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium truncate max-w-[140px] cursor-default"
+            style={Object.keys(inlineStyle).length > 0 ? inlineStyle : { backgroundColor: '#f1f5f9', color: '#475569' }}
+          >
+            {getLabel(first)}
+          </span>
         </Tooltip>
 
-        {/* ✅ SHOW +N MORE if more than 1 */}
         {remainingCount > 0 && (
           <Tooltip
             title={items.map((i) => getLabel(i)).join(", ")}
             placement="top-end"
           >
-            <Chip
-              label={`+${remainingCount} more`}
-              size="small"
-              variant="outlined"
-            />
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-500 border border-slate-200 cursor-default">
+              +{remainingCount}
+            </span>
           </Tooltip>
         )}
-      </Stack>
+      </div>
     );
   };
 
   // Check if TeamMember has no permission to view accounts
   if (userRole === "TeamMember" && !viewAllAccounts && accountList.length === 0) {
     return (
-      <Box sx={{ p: 2 }}>
-        <Typography
-          sx={{
-            textAlign: "center",
-            fontSize: "18px",
-            fontWeight: "bold",
-            color: "red",
-            marginTop: "20px",
-          }}
-        >
+      <div className="flex items-center justify-center min-h-[200px] p-8">
+        <p className="text-red-500 font-semibold text-base">
           You do not have permission to view accounts.
-        </Typography>
-      </Box>
+        </p>
+      </div>
     );
   }
 
@@ -2229,664 +2222,362 @@ const handleConfirmDelete = async () => {
 };
 
   return (
-    <Box sx={{ p: 2 }}>
-      <Stack
-        direction="row"
-        alignItems="center"
-        justifyContent="space-between"
-        sx={{ mb: 2 }}
-      >
-        <ButtonGroup>
-          <Button
-            variant={filterStatus === "active" ? "contained" : "outlined"}
+    <div className="p-4 md:p-6 space-y-4">
+      {/* Header toolbar */}
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div className="inline-flex rounded-lg border border-slate-200 bg-slate-50 p-0.5">
+          <button
+            className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all duration-150 ${
+              filterStatus === "active"
+                ? "bg-white text-slate-900 shadow-sm"
+                : "text-slate-500 hover:text-slate-700"
+            }`}
             onClick={() => setFilterStatus("active")}
           >
             Active
-          </Button>
-          <Button
-            variant={filterStatus === "archived" ? "contained" : "outlined"}
+          </button>
+          <button
+            className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all duration-150 ${
+              filterStatus === "archived"
+                ? "bg-white text-slate-900 shadow-sm"
+                : "text-slate-500 hover:text-slate-700"
+            }`}
             onClick={() => setFilterStatus("archived")}
           >
             Archived
-          </Button>
-        </ButtonGroup>
+          </button>
+        </div>
 
-        <Button
-          variant="contained"
-          color="primary"
+        <button
+          className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm"
           onClick={() => setOpenDrawer(true)}
         >
+          <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
           Add Account
-        </Button>
-      </Stack>
-      
-      <Box
-        sx={{
-          width: "50px",
-          padding: "4px 8px",
-          cursor: "pointer",
-          color: "#3f51b5",
-          mb: 5
-        }}
-        onClick={handleFilterButtonClick}
-      >
-        Filters
-      </Box>
-      
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-      >
-        <MenuItem
-          onClick={() => {
-            toggleFilter("accountName");
-            handleClose();
-          }}
-        >
-          Account Name
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            toggleFilter("email");
-            handleClose();
-          }}
-        >
-          Email
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            toggleFilter("type");
-            handleClose();
-          }}
-        >
-          Type
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            toggleFilter("teamMember");
-            handleClose();
-          }}
-        >
-          Team Member
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            toggleFilter("tags");
-            handleClose();
-          }}
-        >
-          Tags
-        </MenuItem>
-      </Menu>
+        </button>
+      </div>
 
-      {/* Account Name Filter */}
-      {showFilters.accountName && (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-          }}
+      {/* Filters bar */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <button
+          className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+          onClick={handleFilterButtonClick}
         >
-          <TextField
-            name="accountName"
-            value={filters.accountName}
-            onChange={handleFilterChange}
-            placeholder="Filter by Account Name"
-            variant="outlined"
-            size="small"
-            style={{ marginRight: "10px" }}
-          />
-          <DeleteIcon
-            onClick={() => clearFilter("accountName")}
-            style={{ cursor: "pointer", color: "red" }}
-          />
-        </div>
-      )}
-      
-      {showFilters.email && (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          <TextField
-            name="email"
-            value={filters.email}
-            onChange={handleFilterChange}
-            placeholder="Filter by Email"
-            variant="outlined"
-            size="small"
-            style={{ marginRight: "10px" }}
-          />
-          <DeleteIcon
-            onClick={() => clearFilter("email")}
-            style={{ cursor: "pointer", color: "red" }}
-          />
-        </div>
-      )}
+          <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
+          Filters
+        </button>
 
-      {/* Type Filter */}
-      {showFilters.type && (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          <FormControl
-            variant="outlined"
-            size="small"
-            style={{ marginRight: "10px", width: "150px" }}
-          >
-            <InputLabel>Type</InputLabel>
-            <Select
-              name="type"
-              value={filters.type}
-              onChange={handleFilterChange}
-              label="Type"
-            >
-              <MenuItem value="">All</MenuItem>
-              <MenuItem value="Individual">Individual</MenuItem>
-              <MenuItem value="Company">Company</MenuItem>
-               <MenuItem value="Other">Other</MenuItem>
-            </Select>
-          </FormControl>
-          <DeleteIcon
-            onClick={() => clearFilter("type")}
-            style={{ cursor: "pointer", color: "red" }}
-          />
-        </div>
-      )}
-      
-      {/* Team Member Filter */}
-      {showFilters.teamMember && (
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <Box sx={{ mr: 3 }}>
+        <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
+          <MenuItem onClick={() => { toggleFilter("accountName"); handleClose(); }}>Account Name</MenuItem>
+          <MenuItem onClick={() => { toggleFilter("email"); handleClose(); }}>Email</MenuItem>
+          <MenuItem onClick={() => { toggleFilter("type"); handleClose(); }}>Type</MenuItem>
+          <MenuItem onClick={() => { toggleFilter("teamMember"); handleClose(); }}>Team Member</MenuItem>
+          <MenuItem onClick={() => { toggleFilter("tags"); handleClose(); }}>Tags</MenuItem>
+        </Menu>
+
+        {/* Active filter chips */}
+        {showFilters.accountName && (
+          <div className="inline-flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-2 py-1">
+            <TextField name="accountName" value={filters.accountName} onChange={handleFilterChange} placeholder="Account Name" variant="outlined" size="small" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px', fontSize: '13px' }, width: '160px' }} />
+            <button onClick={() => clearFilter("accountName")} className="text-slate-400 hover:text-red-500 transition-colors"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
+          </div>
+        )}
+        {showFilters.email && (
+          <div className="inline-flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-2 py-1">
+            <TextField name="email" value={filters.email} onChange={handleFilterChange} placeholder="Email" variant="outlined" size="small" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px', fontSize: '13px' }, width: '160px' }} />
+            <button onClick={() => clearFilter("email")} className="text-slate-400 hover:text-red-500 transition-colors"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
+          </div>
+        )}
+        {showFilters.type && (
+          <div className="inline-flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-2 py-1">
+            <FormControl variant="outlined" size="small" sx={{ width: '140px' }}>
+              <InputLabel>Type</InputLabel>
+              <Select name="type" value={filters.type} onChange={handleFilterChange} label="Type" sx={{ borderRadius: '8px', fontSize: '13px' }}>
+                <MenuItem value="">All</MenuItem>
+                <MenuItem value="Individual">Individual</MenuItem>
+                <MenuItem value="Company">Company</MenuItem>
+                <MenuItem value="Other">Other</MenuItem>
+              </Select>
+            </FormControl>
+            <button onClick={() => clearFilter("type")} className="text-slate-400 hover:text-red-500 transition-colors"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
+          </div>
+        )}
+        {showFilters.teamMember && (
+          <div className="inline-flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-2 py-1">
             <TeamMemberMultiSelectDropDown
               value={filters.teamMember}
-              onChange={(newValue) => {
-                setFilters(prev => ({
-                  ...prev,
-                  teamMember: newValue
-                }));
-                setPage(0);
-              }}
-              width="250px"
+              onChange={(newValue) => { setFilters(prev => ({ ...prev, teamMember: newValue })); setPage(0); }}
+              width="220px"
               LOGIN_API={LOGIN_API}
             />
-          </Box>
-
-          <DeleteIcon
-            onClick={() => clearFilter("teamMember")}
-            style={{ cursor: "pointer", color: "red", marginLeft: 5 }}
-          />
-        </div>
-      )}
-
-      {/* Tag Filter */}
-      {showFilters.tags && (
-        <div style={{ display: "flex", alignItems: "center", width: "250px" }}>
-          <Box mr={3}>
+            <button onClick={() => clearFilter("teamMember")} className="text-slate-400 hover:text-red-500 transition-colors"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
+          </div>
+        )}
+        {showFilters.tags && (
+          <div className="inline-flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-2 py-1">
             <TagsMultiSelectDropDown
               value={filters.tags}
-              onChange={(newValue) => {
-                setFilters(prev => ({
-                  ...prev,
-                  tags: newValue
-                }));
-                setPage(0);
-              }}
-              options={uniqueTags.map(tag => ({
-                value: tag._id,
-                label: tag.tagName,
-                colour: tag.tagColour
-              }))}
-              width="250px"
+              onChange={(newValue) => { setFilters(prev => ({ ...prev, tags: newValue })); setPage(0); }}
+              options={uniqueTags.map(tag => ({ value: tag._id, label: tag.tagName, colour: tag.tagColour }))}
+              width="220px"
               placeholder="Select Tags..."
             />
-          </Box>
+            <button onClick={() => clearFilter("tags")} className="text-slate-400 hover:text-red-500 transition-colors"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
+          </div>
+        )}
+      </div>
 
-          <DeleteIcon
-            onClick={() => clearFilter("tags")}
-            style={{ cursor: "pointer", color: "red" }}
-          />
+      {/* Selection bar */}
+      {selected.length > 0 && (
+        <div className="flex items-center gap-2 flex-wrap">
+          {isAnyFilterApplied ? (
+            <button className="px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition-colors" onClick={handleSelectAllFiltered}>
+              Select Filtered
+            </button>
+          ) : (
+            <button className="px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition-colors" onClick={handleSelectAllAccounts}>
+              Select All
+            </button>
+          )}
+          <button className="px-3 py-1.5 text-xs font-medium text-slate-500 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors" onClick={handleClearSelection}>
+            Clear ({selected.length})
+          </button>
         </div>
       )}
-{/* {selected.length === 0 && (
-  <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
-    <Button variant="outlined" onClick={handleSelectAllAccounts}>
-      Select All Accounts
-    </Button>
 
-    <Button variant="outlined" onClick={handleSelectAllFiltered}>
-      Select Filtered Accounts
-    </Button>
-  </Box>
-)}
-
-{selected.length > 0 && (
-  <Button
-    variant="outlined"
-    color="secondary"
-    onClick={handleClearSelection}
-    sx={{ mb: 2 }}
-  >
-    Clear Selection ({selected.length})
-  </Button>
-)} */}
-{selected.length > 0 && (
-  <Box sx={{ display: "flex", gap: 1, mb: 2,mt:2 }}>
-    {isAnyFilterApplied ? (
-      <Button variant="outlined" onClick={handleSelectAllFiltered}>
-        Select Filtered Accounts
-      </Button>
-    ) : (
-      <Button variant="outlined" onClick={handleSelectAllAccounts}>
-        Select All Accounts
-      </Button>
-    )}
-
-    <Button
-      variant="outlined"
-      color="secondary"
-      onClick={handleClearSelection}
-    >
-      Clear Selection ({selected.length})
-    </Button>
-  </Box>
-)}
-
+      {/* Bulk actions bar */}
       {selected.length > 0 && (
-        <Box data-test="clients-bulk-actions-panel" sx={{ mb: 2 }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-              padding: "10px",
-              backgroundColor: "#f5f5f5",
-              borderRadius: "4px",
-            }}
-          >
-            {/* Send Organizer */}
-            <Tooltip
-              title={
-                storedData?.teammember?.manageOrganizers === false
-                  ? "You don't have permission to send organizers"
-                  : ""
-              }
-              disableHoverListener={
-                storedData?.teammember?.manageOrganizers !== false
-              }
-            >
-              <span>
-                <Button
-                  variant="text"
-                  startIcon={<ListIcon />}
-                  onClick={handleAssignOrganizer}
-                  disabled={storedData?.teammember?.manageOrganizers === false}
-                >
-                  Send Organizer
-                </Button>
-              </span>
-            </Tooltip>
+        <div data-test="clients-bulk-actions-panel" className="flex items-center gap-1 p-2 bg-slate-50 border border-slate-200 rounded-xl flex-wrap">
+          <Tooltip title={storedData?.teammember?.manageOrganizers === false ? "You don't have permission to send organizers" : ""} disableHoverListener={storedData?.teammember?.manageOrganizers !== false}>
+            <span>
+              <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all disabled:opacity-40 disabled:cursor-not-allowed" onClick={handleAssignOrganizer} disabled={storedData?.teammember?.manageOrganizers === false}>
+                <ListIcon sx={{ fontSize: 16 }} /> Send Organizer
+              </button>
+            </span>
+          </Tooltip>
+          <Tooltip title={storedData?.teammember?.managePipelines === false ? "You don't have permission to add jobs" : ""} disableHoverListener={storedData?.teammember?.managePipelines !== false}>
+            <span>
+              <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all disabled:opacity-40 disabled:cursor-not-allowed" onClick={handleAddJob} disabled={storedData?.teammember?.managePipelines === false}>
+                <ListIcon sx={{ fontSize: 16 }} /> Add Job
+              </button>
+            </span>
+          </Tooltip>
+          <Tooltip title={storedData?.teammember?.assignTeamMates === false ? "You don't have permission to manage team" : ""} disableHoverListener={storedData?.teammember?.assignTeamMates !== false}>
+            <span>
+              <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all disabled:opacity-40 disabled:cursor-not-allowed" onClick={handleManageTeam} disabled={storedData?.teammember?.assignTeamMates === false}>
+                <PersonIcon sx={{ fontSize: 16 }} /> Manage Team
+              </button>
+            </span>
+          </Tooltip>
+          <Tooltip title="">
+            <span>
+              <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all" onClick={handleSendEmail}>
+                <EmailIcon sx={{ fontSize: 16 }} /> Send Email
+              </button>
+            </span>
+          </Tooltip>
+          <Tooltip title={storedData?.teammember?.manageTags === false ? "You don't have permission to manage tags" : ""} disableHoverListener={storedData?.teammember?.manageTags !== false}>
+            <span>
+              <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all disabled:opacity-40 disabled:cursor-not-allowed" onClick={handleManageTags} disabled={storedData?.teammember?.manageTags === false}>
+                <TagIcon sx={{ fontSize: 16 }} /> Manage Tags
+              </button>
+            </span>
+          </Tooltip>
+          <Tooltip title="">
+            <span>
+              <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all" onClick={handleMoreActionsClick}>
+                <MoreVertIcon sx={{ fontSize: 16 }} /> More
+              </button>
+            </span>
+          </Tooltip>
 
-            {/* Add Job */}
-            <Tooltip
-              title={
-                storedData?.teammember?.managePipelines === false
-                  ? "You don't have permission to add jobs"
-                  : ""
-              }
-              disableHoverListener={
-                storedData?.teammember?.managePipelines !== false
-              }
-            >
-              <span>
-                <Button
-                  variant="text"
-                  startIcon={<ListIcon />}
-                  onClick={handleAddJob}
-                  disabled={storedData?.teammember?.managePipelines === false}
-                >
-                  Add Job
-                </Button>
-              </span>
-            </Tooltip>
-
-            {/* Manage Team */}
-            <Tooltip
-              title={
-                storedData?.teammember?.assignTeamMates === false
-                  ? "You don't have permission to manage team"
-                  : ""
-              }
-              disableHoverListener={
-                storedData?.teammember?.assignTeamMates !== false
-              }
-            >
-              <span>
-                <Button
-                  variant="text"
-                  startIcon={<PersonIcon />}
-                  onClick={handleManageTeam}
-                  disabled={storedData?.teammember?.assignTeamMates === false}
-                >
-                  Manage Team
-                </Button>
-              </span>
-            </Tooltip>
-
-            {/* Send Email — no permission restriction? */}
-            <Tooltip title="">
-              <span>
-                <Button
-                  variant="text"
-                  startIcon={<EmailIcon />}
-                  onClick={handleSendEmail}
-                >
-                  Send Email
-                </Button>
-              </span>
-            </Tooltip>
-
-            {/* Manage Tags */}
-            <Tooltip
-              title={
-                storedData?.teammember?.manageTags === false
-                  ? "You don't have permission to manage tags"
-                  : ""
-              }
-              disableHoverListener={storedData?.teammember?.manageTags !== false}
-            >
-              <span>
-                <Button
-                  variant="text"
-                  startIcon={<TagIcon />}
-                  onClick={handleManageTags}
-                  disabled={storedData?.teammember?.manageTags === false}
-                >
-                  Manage Tags
-                </Button>
-              </span>
-            </Tooltip>
-
-            {/* More Actions */}
-            <Tooltip title="">
-              <span>
-                <Button
-                  variant="text"
-                  startIcon={<MoreVertIcon />}
-                  onClick={handleMoreActionsClick}
-                >
-                  More Actions
-                </Button>
-              </span>
-            </Tooltip>
-
-            {/* Menu Options */}
-            <Menu anchorEl={anchorE2} open={Boolean(anchorE2)} onClose={handleClose}>
-              {filterStatus === "active" ? (
-                <Tooltip
-                  title={
-                    storedData?.teammember?.manageAccounts === false
-                      ? "You don't have permission to archive accounts"
-                      : ""
-                  }
-                  disableHoverListener={storedData?.teammember?.manageAccounts !== false}
-                >
-                  <span>
-                    <MenuItem
-                      onClick={handleArchiveAccount}
-                      disabled={storedData?.teammember?.manageAccounts === false}
-                    >
-                      Archive Account
-                    </MenuItem>
-                  </span>
-                </Tooltip>
-              ) : (
-                <Tooltip
-                  title={
-                    storedData?.teammember?.manageAccounts === false
-                      ? "You don't have permission to activate accounts"
-                      : ""
-                  }
-                  disableHoverListener={storedData?.teammember?.manageAccounts !== false}
-                >
-                  <span>
-                    <MenuItem
-                      onClick={handleActivateAccount}
-                      disabled={storedData?.teammember?.manageAccounts === false}
-                    >
-                      Activate Account
-                    </MenuItem>
-                  </span>
-                </Tooltip>
-              )}
-
-              {filterStatus === "archived" && (
-                <Tooltip
-                  title={
-                    storedData?.teammember?.manageAccounts === false
-                      ? "You don't have permission to delete accounts"
-                      : ""
-                  }
-                  disableHoverListener={storedData?.teammember?.manageAccounts !== false}
-                >
-                  <span>
-                    <MenuItem
-                      onClick={handleDeleteClick}
-                      disabled={storedData?.teammember?.manageAccounts === false}
-                      sx={{ color: "error.main" }}
-                    >
-                      Delete Account
-                    </MenuItem>
-                  </span>
-                </Tooltip>
-              )}
-
-              {/* NEW: Edit login, notify, email sync menu item */}
-              {/* <Tooltip
-                title={
-                  storedData?.teammember?.manageAccounts === false
-                    ? "You don't have permission to edit account settings"
-                    : ""
-                }
-                disableHoverListener={storedData?.teammember?.manageAccounts !== false}
-              >
-                <span>
-                  <MenuItem
-                    onClick={handleEditSettingsClick}
-                    disabled={storedData?.teammember?.manageAccounts === false}
-                  >
-                    Edit login, notify, email sync
-                  </MenuItem>
-                </span>
-              </Tooltip> */}
-            </Menu>
-          </div>
-        </Box>
+          <Menu anchorEl={anchorE2} open={Boolean(anchorE2)} onClose={handleClose}>
+            {filterStatus === "active" ? (
+              <Tooltip title={storedData?.teammember?.manageAccounts === false ? "You don't have permission to archive accounts" : ""} disableHoverListener={storedData?.teammember?.manageAccounts !== false}>
+                <span><MenuItem onClick={handleArchiveAccount} disabled={storedData?.teammember?.manageAccounts === false}>Archive Account</MenuItem></span>
+              </Tooltip>
+            ) : (
+              <Tooltip title={storedData?.teammember?.manageAccounts === false ? "You don't have permission to activate accounts" : ""} disableHoverListener={storedData?.teammember?.manageAccounts !== false}>
+                <span><MenuItem onClick={handleActivateAccount} disabled={storedData?.teammember?.manageAccounts === false}>Activate Account</MenuItem></span>
+              </Tooltip>
+            )}
+            {filterStatus === "archived" && (
+              <Tooltip title={storedData?.teammember?.manageAccounts === false ? "You don't have permission to delete accounts" : ""} disableHoverListener={storedData?.teammember?.manageAccounts !== false}>
+                <span><MenuItem onClick={handleDeleteClick} disabled={storedData?.teammember?.manageAccounts === false} sx={{ color: "error.main" }}>Delete Account</MenuItem></span>
+              </Tooltip>
+            )}
+          </Menu>
+        </div>
       )}
 
+      {/* Table */}
       {loading ? (
-        <Typography sx={{ textAlign: "center", p: 3 }}>
-          Loading accounts...
-        </Typography>
+        <div className="flex items-center justify-center py-12">
+          <div className="flex items-center gap-3 text-slate-500">
+            <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+            <span className="text-sm font-medium">Loading accounts...</span>
+          </div>
+        </div>
       ) : (
-        <TableContainer component={Paper} sx={{mt:2}}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell padding="checkbox">
-                  {/* <Checkbox
-                    color="primary"
-                    indeterminate={
-                      selected.length > 0 && selected.length < accountList.length
-                    }
-                    checked={
-                      accountList.length > 0 &&
-                      selected.length === accountList.length
-                    }
-                    onChange={handleSelectAllClick}
-                  /> */}
-                   <Checkbox
-                    color="primary"
-                    indeterminate={
-                      selected.length > 0 && selected.length < accountList.length
-                    }
-                    checked={
-                      accountList.length > 0 &&
-                      selected.length === accountList.length
-                    }
-                    onChange={handleSelectAllClick}
-                  />
-                </TableCell>
-                <TableCell>Account Code</TableCell>
-                <TableCell
-                  sortDirection={orderBy === "accountName" ? order : false}
-                  width={"500px"}
-                >
-                  <TableSortLabel
-                    active={orderBy === "accountName"}
-                    direction={orderBy === "accountName" ? order : "asc"}
-                    onClick={() => handleRequestSort("accountName")}
-                  >
-                    Account Name
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell
-                  sortDirection={orderBy === "clientType" ? order : false}
-                >
-                  <TableSortLabel
-                    active={orderBy === "clientType"}
-                    direction={orderBy === "clientType" ? order : "asc"}
-                    onClick={() => handleRequestSort("clientType")}
-                  >
-                    Client Type
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell
-                  sortDirection={orderBy === "companyName" ? order : false}
-                >
-                  <TableSortLabel
-                    active={orderBy === "companyName"}
-                    direction={orderBy === "companyName" ? order : "asc"}
-                    onClick={() => handleRequestSort("companyName")}
-                  >
-                    Company Name
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell>Tags</TableCell>
-                <TableCell>Team Members</TableCell>
-                <TableCell>Contact Emails</TableCell>
-              </TableRow>
-            </TableHead>
-
-            <TableBody>
-              {paginatedList.length > 0 ? (
-                paginatedList.map((account) => (
-                  <TableRow key={account._id} selected={isSelected(account._id)}>
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        color="primary"
-                        checked={isSelected(account._id)}
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-slate-100 bg-slate-50/60">
+                  <th className="w-12 px-4 py-3">
+                    <Checkbox
+                      color="primary"
+                      size="small"
+                      indeterminate={isPageIndeterminate}
+                      checked={isPageAllSelected}
+                      onChange={handleSelectAllClick}
+                      sx={{ padding: '2px' }}
+                    />
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Code</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider min-w-[200px] cursor-pointer select-none" onClick={() => handleRequestSort("accountName")}>
+                    <span className="inline-flex items-center gap-1">
+                      Account Name
+                      {orderBy === "accountName" && (
+                        <svg className={`w-3.5 h-3.5 transition-transform ${order === "desc" ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" /></svg>
+                      )}
+                    </span>
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer select-none" onClick={() => handleRequestSort("clientType")}>
+                    <span className="inline-flex items-center gap-1">
+                      Client Type
+                      {orderBy === "clientType" && (
+                        <svg className={`w-3.5 h-3.5 transition-transform ${order === "desc" ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" /></svg>
+                      )}
+                    </span>
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer select-none" onClick={() => handleRequestSort("companyName")}>
+                    <span className="inline-flex items-center gap-1">
+                      Company Name
+                      {orderBy === "companyName" && (
+                        <svg className={`w-3.5 h-3.5 transition-transform ${order === "desc" ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" /></svg>
+                      )}
+                    </span>
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Tags</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Team Members</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Contact Emails</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {paginatedList.length > 0 ? (
+                  paginatedList.map((account) => (
+                    <tr
+                      key={account._id}
+                      className={`transition-colors duration-100 hover:bg-slate-50/80 ${isSelected(account._id) ? "bg-indigo-50/40" : ""}`}
+                    >
+                      <td className="w-12 px-4 py-3">
+                        <Checkbox
+                          color="primary"
+                          size="small"
+                          checked={isSelected(account._id)}
                           onClick={(e) => e.stopPropagation()}
-                        onChange={() => handleClick(account)}
-                      />
-                    </TableCell>
-                    <TableCell>
-  <Chip
-    label={account.importId}
-    size="small"
-    color="success"
-  />
-</TableCell>
+                          onChange={() => handleClick(account)}
+                          sx={{ padding: '2px' }}
+                        />
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          {account.importId}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <Link
+                          to={`/clients/accounts/accountsdash/overview/${account._id}`}
+                          className="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors no-underline"
+                        >
+                          {account.accountName}
+                        </Link>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-slate-600">{account.clientType}</td>
+                      <td className="px-4 py-3 text-sm text-slate-600">{account.companyName || <span className="text-slate-300">—</span>}</td>
+                      <td className="px-4 py-3">
+                        {renderLimitedChips(
+                          account.tags,
+                          (t) => t.tagName,
+                          (t) => ({ backgroundColor: t.tagColour, color: "#fff", fontWeight: 600 })
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        {renderLimitedChips(
+                          account.teamMember,
+                          (tm) => tm.username,
+                          () => ({ borderColor: "primary.main", color: "primary.main" })
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        {renderLimitedChips(
+                          account.contacts?.map((c) => c.contact)?.filter((c) => c?.email?.trim()),
+                          (c) => c.email
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={8} className="px-4 py-12 text-center text-sm text-slate-400">
+                      No accounts found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
 
-                    <TableCell>
-                      {/* <Link
-                        component="button"
-                        underline="hover"
-                        color="primary"
-                        onClick={() =>
-                          navigate(`/clients/accounts/accountsdash/overview/${account._id}`)
-                        }
-                      >
-                        {account.accountName}
-                      </Link> */}
-                       <Link
-                                                  to={`/clients/accounts/accountsdash/overview/${account._id}`}
-                                                  style={{ textDecoration: "none", color: "#3f51b5",cursor: "pointer" }}
-                                                >
-                                                  {account.accountName}
-                                                </Link>
-                    </TableCell>
-                    <TableCell>{account.clientType}</TableCell>
-                    <TableCell>{account.companyName || "—"}</TableCell>
-
-                    <TableCell>
-                      {renderLimitedChips(
-                        account.tags,
-                        (t) => t.tagName,
-                        (t) => ({
-                          backgroundColor: t.tagColour,
-                          color: "#fff",
-                          fontWeight: 600,
-                        })
-                      )}
-                    </TableCell>
-
-                    <TableCell>
-                      {renderLimitedChips(
-                        account.teamMember,
-                        (tm) => tm.username,
-                        () => ({
-                          border: "1px solid",
-                          borderColor: "primary.main",
-                          color: "primary.main",
-                        })
-                      )}
-                    </TableCell>
-
-                    <TableCell>
-                      {/* {renderLimitedChips(
-                        account.contacts?.map((c) => c.contact),
-                        (c) => c.email
-                      )} */}
-                      {renderLimitedChips(
-  account.contacts
-    ?.map((c) => c.contact)
-    ?.filter((c) => c?.email?.trim()),
-  (c) => c.email
-)}
-
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={7} align="center">
-                    No accounts found
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-          <TablePagination
-            component="div"
-            // count={accountList.length}
-             count={sortedList.length}
-            page={page}
-            onPageChange={(e, newPage) => setPage(newPage)}
-            rowsPerPage={rowsPerPage}
-            rowsPerPageOptions={[5, 10, 25, 30, 50, 100,500]}
-            onRowsPerPageChange={(e) => {
-              setRowsPerPage(parseInt(e.target.value));
-              setPage(0);
-            }}
-          />
-        </TableContainer>
+          {/* Pagination */}
+          <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100 bg-slate-50/40">
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-slate-500">Rows per page:</span>
+              <select
+                value={rowsPerPage}
+                onChange={(e) => { setRowsPerPage(parseInt(e.target.value)); setPage(0); }}
+                className="text-xs border border-slate-200 rounded-md px-2 py-1 bg-white text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              >
+                {[5, 10, 25, 30, 50, 100, 500].map(opt => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
+              </select>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="text-xs text-slate-500 mr-2">
+                {sortedList.length === 0 ? "0 of 0" : `${page * rowsPerPage + 1}–${Math.min((page + 1) * rowsPerPage, sortedList.length)} of ${sortedList.length}`}
+              </span>
+              <button
+                onClick={() => setPage(0)}
+                disabled={page === 0}
+                className="p-1 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" /></svg>
+              </button>
+              <button
+                onClick={() => setPage(Math.max(0, page - 1))}
+                disabled={page === 0}
+                className="p-1 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7 7" /></svg>
+              </button>
+              <button
+                onClick={() => setPage(Math.min(Math.ceil(sortedList.length / rowsPerPage) - 1, page + 1))}
+                disabled={page >= Math.ceil(sortedList.length / rowsPerPage) - 1}
+                className="p-1 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+              </button>
+              <button
+                onClick={() => setPage(Math.ceil(sortedList.length / rowsPerPage) - 1)}
+                disabled={page >= Math.ceil(sortedList.length / rowsPerPage) - 1}
+                className="p-1 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" /></svg>
+              </button>
+            </div>
+          </div>
+        </div>
       )}
       
       <AccountContactDrawer open={openDrawer} onClose={handleDrawerClose} fetchAccountsList={fetchAccountsList}/>
@@ -3280,7 +2971,7 @@ const handleConfirmDelete = async () => {
           )}
         </Box>
       </Drawer>
-    </Box>
+    </div>
   );
 };
 

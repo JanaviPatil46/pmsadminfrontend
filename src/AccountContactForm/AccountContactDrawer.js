@@ -40,16 +40,18 @@ useEffect(() => {
     }
   }, [open, accountId, dispatch, onClose]);
   return (
-    <Drawer anchor="right" open={open} onClose={onClose} PaperProps={{ sx: { width: 700, maxWidth: '100vw' } }}>
-      <Box sx={{ display: "flex", alignItems: "center", p: 2, borderBottom: '1px solid #eee' }}>
-        <Typography variant="h6" flex={1}>
-          {accountId ? "Update  Account" : "Create Account"}
-        </Typography>
-        <IconButton onClick={onClose}><CloseIcon /></IconButton>
-      </Box>
-      <Box sx={{ p: 3 }}>
+    <Drawer anchor="right" open={open} onClose={onClose} PaperProps={{ sx: { width: { xs: '100%', sm: 700 }, maxWidth: '100vw', borderRadius: { sm: '12px 0 0 12px' } } }}>
+      <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200">
+        <h2 className="text-lg font-semibold text-slate-900">
+          {accountId ? "Update Account" : "Create Account"}
+        </h2>
+        <button onClick={onClose} className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors">
+          <CloseIcon fontSize="small" />
+        </button>
+      </div>
+      <div className="p-5 overflow-y-auto flex-1">
         <AccountContactForm isEditing={!!accountId} accountId={accountId} onCloseDrawer={onClose} fetchAccountsList={fetchAccountsList} handleDrawerClose={handleDrawerClose}/>
-      </Box>
+      </div>
     </Drawer>
   );
 }

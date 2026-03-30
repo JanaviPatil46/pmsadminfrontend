@@ -47,67 +47,74 @@ export default function ContactSelectionDialog({ open, onClose, onSelectContacts
   );
 
   return (
-    <Dialog open={open} onClose={handleCancel} maxWidth="md" fullWidth>
-      <DialogTitle>Select Existing Contacts</DialogTitle>
+    <Dialog open={open} onClose={handleCancel} maxWidth="md" fullWidth PaperProps={{ sx: { borderRadius: '12px' } }}>
+      <div className="px-5 py-4 border-b border-slate-200">
+        <h2 className="text-lg font-semibold text-slate-900">Select Existing Contacts</h2>
+      </div>
       <DialogContent>
-        <Box sx={{ mt: 1 }}>
+        <div className="mt-1">
           <TextField
             autoFocus margin="dense" label="Search by email or name" type="text"
-            fullWidth variant="outlined"
+            fullWidth variant="outlined" size="small"
             value={searchTerm} onChange={handleSearchChange}
+            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
             InputProps={{
-              startAdornment: (
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mr: 1 }}>
+              startAdornment: selectedContacts.length > 0 ? (
+                <div className="flex flex-wrap gap-1 mr-2">
                   {selectedContacts.map(contact => (
-                    <Chip
-                      key={contact._id} size="small"
-                      label={contact.contactName || `${contact.firstName} ${contact.lastName}`}
-                      onDelete={() => handleRemoveChip(contact._id)}
-                    />
+                    <span key={contact._id} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-200">
+                      {contact.contactName || `${contact.firstName} ${contact.lastName}`}
+                      <button onClick={() => handleRemoveChip(contact._id)} className="text-indigo-400 hover:text-indigo-600">
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                      </button>
+                    </span>
                   ))}
-                </Box>
-              ),
+                </div>
+              ) : null,
             }}
           />
-        </Box>
-        <Box sx={{ mt: 2, height: 300, overflow: 'auto' }}>
+        </div>
+        <div className="mt-3 h-[300px] overflow-y-auto border border-slate-100 rounded-lg">
           {loading ? (
-            <Typography>Loading contacts...</Typography>
+            <div className="flex items-center justify-center py-8 text-slate-400 text-sm">Loading contacts...</div>
           ) : filteredContacts.length === 0 ? (
-            <Typography sx={{ p: 2, textAlign: 'center', color: 'text.secondary' }}>
+            <div className="flex items-center justify-center py-8 text-slate-400 text-sm">
               {searchTerm ? 'No contacts found' : 'No contacts available'}
-            </Typography>
+            </div>
           ) : (
-            <List>
+            <div className="divide-y divide-slate-50">
               {filteredContacts.map((contact) => {
                 const isSelected = selectedContacts.some(c => c._id === contact._id);
                 return (
-                  <ListItem key={contact._id} disablePadding>
-                    <ListItemButton onClick={() => handleToggleContact(contact)}>
-                      <Checkbox
-                        edge="start"
-                        checked={isSelected}
-                        tabIndex={-1}
-                        disableRipple
-                      />
-                      <ListItemText
-                        primary={contact.contactName || `${contact.firstName} ${contact.lastName}`}
-                        secondary={contact.email}
-                      />
-                    </ListItemButton>
-                  </ListItem>
+                  <div
+                    key={contact._id}
+                    className={`flex items-center gap-3 px-3 py-2.5 cursor-pointer transition-colors hover:bg-slate-50 ${isSelected ? "bg-indigo-50/50" : ""}`}
+                    onClick={() => handleToggleContact(contact)}
+                  >
+                    <Checkbox checked={isSelected} size="small" sx={{ padding: '2px' }} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-slate-900 truncate">{contact.contactName || `${contact.firstName} ${contact.lastName}`}</p>
+                      <p className="text-xs text-slate-500 truncate">{contact.email}</p>
+                    </div>
+                  </div>
                 );
               })}
-            </List>
+            </div>
           )}
-        </Box>
+        </div>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={handleCancel}>Cancel</Button>
-        <Button onClick={handleSubmit} variant="contained" disabled={selectedContacts.length === 0}>
-          Add Selected Contacts
-        </Button>
-      </DialogActions>
+      <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-slate-200">
+        <button onClick={handleCancel} className="px-4 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
+          Cancel
+        </button>
+        <button
+          onClick={handleSubmit}
+          disabled={selectedContacts.length === 0}
+          className="px-4 py-1.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          Add Selected ({selectedContacts.length})
+        </button>
+      </div>
     </Dialog>
   );
 }

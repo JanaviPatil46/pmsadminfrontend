@@ -1041,475 +1041,186 @@ const ContactForm = ({ open, onClose, contact, onSave }) => {
       anchor="right"
       open={open}
       onClose={handleClose}
-      sx={{
-        "& .MuiDrawer-paper": {
-          width: isSmallScreen ? "100%" : "600px",
-          maxWidth: "100vw",
-        },
-      }}
+      PaperProps={{ sx: { width: { xs: '100%', sm: 600 }, maxWidth: '100vw', borderRadius: { sm: '12px 0 0 12px' } } }}
     >
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          p: 2,
-          borderBottom: "1px solid grey",
-        }}
-      >
-        <Typography sx={{ fontWeight: "550", fontSize: "20px" }}>
+      {/* Header */}
+      <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200">
+        <h2 className="text-lg font-semibold text-slate-900">
           {contact ? 'Edit Contact' : 'New Contact'}
-        </Typography>
-        <RxCross2
-          onClick={handleClose}
-          style={{ cursor: "pointer" }}
-        />
-      </Box>
-      
-      <Box
-        component="form"
-        onSubmit={sendingData}
-        sx={{
-          padding: "0 3%",
-          height: "calc(100vh - 64px)",
-          overflowY: "auto",
-        }}
-        className="contact-form"
-      >
-        {/* Form fields remain the same as before */}
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: isSmallScreen ? "column" : "row",
-            gap: isSmallScreen ? 2 : 5,
-            padding: "1px 5px 0 2px",
-            mt: 1,
-          }}
-        >
-          <Box sx={{ flex: 1 }}>
-            <InputLabel
-              sx={{
-                color: "black",
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              First Name
-              <Typography sx={{ color: "red", ml: 0.5 }}>*</Typography>
-            </InputLabel>
-            <TextField
-              fullWidth
-              name="firstName"
-              value={firstName}
-              sx={{ mt: 1.5, backgroundColor: "#fff" }}
-              onChange={(e) => {
-                const value = e.target.value;
-                setFirstName(value);
-                if (value.trim() !== "") {
-                  setFirstNameError("");
-                }
-              }}
-              placeholder="First Name"
-              size="small"
-              error={!!firstNameError}
+        </h2>
+        <button onClick={handleClose} className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors">
+          <RxCross2 size={18} />
+        </button>
+      </div>
+
+      {/* Form */}
+      <form onSubmit={sendingData} className="p-5 overflow-y-auto flex-1 space-y-4">
+        {/* Name row */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">First Name <span className="text-red-500">*</span></label>
+            <TextField fullWidth size="small" name="firstName" value={firstName} placeholder="First Name" error={!!firstNameError}
+              sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+              onChange={(e) => { setFirstName(e.target.value); if (e.target.value.trim()) setFirstNameError(""); }}
             />
-          </Box>
-          
-          <Box sx={{ flex: 1 }}>
-            <InputLabel
-              sx={{
-                color: "black",
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              Middle Name
-            </InputLabel>
-            <TextField
-              sx={{ mt: 1.5, backgroundColor: "#fff" }}
-              fullWidth
-              name="middleName"
-              value={middleName}
+            {!!firstNameError && <p className="text-xs text-red-500 mt-0.5">{firstNameError}</p>}
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">Middle Name</label>
+            <TextField fullWidth size="small" name="middleName" value={middleName} placeholder="Middle Name"
+              sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
               onChange={(e) => setMiddleName(e.target.value)}
-              placeholder="Middle Name"
-              size="small"
             />
-          </Box>
-          
-          <Box sx={{ flex: 1 }}>
-            <InputLabel
-              sx={{
-                color: "black",
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              Last Name
-              <Typography sx={{ color: "red", ml: 0.5 }}>*</Typography>
-            </InputLabel>
-            <TextField
-              fullWidth
-              name="lastName"
-              value={lastName}
-              placeholder="Last name"
-              size="small"
-              sx={{ mt: 1.5, backgroundColor: "#fff" }}
-              onChange={(e) => {
-                const value = e.target.value;
-                setLastName(value);
-                if (value.trim() !== "") {
-                  setLastNameError("");
-                }
-              }}
-              error={!!lastNameError}
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">Last Name <span className="text-red-500">*</span></label>
+            <TextField fullWidth size="small" name="lastName" value={lastName} placeholder="Last Name" error={!!lastNameError}
+              sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+              onChange={(e) => { setLastName(e.target.value); if (e.target.value.trim()) setLastNameError(""); }}
             />
-            {!!lastNameError && (
-              <Alert
-                sx={{
-                  width: "96%",
-                  p: "0",
-                  pl: "4%",
-                  height: "23px",
-                  borderRadius: "10px",
-                  borderTopLeftRadius: "0",
-                  borderTopRightRadius: "0",
-                  fontSize: "11px",
-                  display: "flex",
-                  alignItems: "center",
-                  "& .MuiAlert-icon": {
-                    fontSize: "16px",
-                    mr: "8px",
-                  },
-                }}
-                variant="filled"
-                severity="error"
-              >
-                {lastNameError}
-              </Alert>
-            )}
-          </Box>
-        </Box>
-        
-        {/* Rest of the form fields (same as before) */}
-        <Box mt={1}>
-          <InputLabel sx={{ color: "black" }}>Contact Name</InputLabel>
-          <TextField
-            name="contactName"
-            value={contactName}
+            {!!lastNameError && <p className="text-xs text-red-500 mt-0.5">{lastNameError}</p>}
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-slate-700 mb-1">Contact Name</label>
+          <TextField fullWidth size="small" name="contactName" value={contactName} placeholder="Contact Name"
+            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
             onChange={(e) => setContactName(e.target.value)}
-            fullWidth
-            placeholder="Contact Name"
-            margin="normal"
-            size="small"
           />
-        </Box>
-        
-        <Box mt={1}>
-          <InputLabel sx={{ color: "black" }}>Company Name</InputLabel>
-          <TextField
-            fullWidth
-            name="companyName"
-            value={companyName}
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-slate-700 mb-1">Company Name</label>
+          <TextField fullWidth size="small" name="companyName" value={companyName} placeholder="Company Name"
+            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
             onChange={(e) => setCompanyName(e.target.value)}
-            margin="normal"
-            placeholder="Company Name"
-            size="small"
           />
-        </Box>
-        
-        <Box mt={1}>
-          <InputLabel
-            sx={{
-              color: "black",
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            Email
-            <Typography sx={{ color: "red", ml: 0.5 }}>*</Typography>
-          </InputLabel>
-          <TextField
-            fullWidth
-            name="email"
-            value={email}
-            placeholder="Email"
-            size="small"
-            sx={{ mt: 1.5, backgroundColor: "#fff" }}
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-slate-700 mb-1">Email <span className="text-red-500">*</span></label>
+          <TextField fullWidth size="small" name="email" value={email} placeholder="Email" error={!!emailError}
+            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
             onChange={(e) => {
               const value = e.target.value;
               setEmail(value);
-              if (!value.trim()) {
-                setEmailError("Email is required.");
-              } else if (!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(value)) {
-                setEmailError("Please enter a valid email address.");
-              } else {
-                setEmailError("");
-              }
+              if (!value.trim()) setEmailError("Email is required.");
+              else if (!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(value)) setEmailError("Please enter a valid email address.");
+              else setEmailError("");
             }}
-            error={!!emailError}
           />
-          {!!emailError && (
-            <Alert
-              sx={{
-                width: "96%",
-                p: "0",
-                pl: "4%",
-                height: "23px",
-                borderRadius: "10px",
-                borderTopLeftRadius: "0",
-                borderTopRightRadius: "0",
-                fontSize: "11px",
-                display: "flex",
-                alignItems: "center",
-                "& .MuiAlert-icon": {
-                  fontSize: "16px",
-                  mr: "8px",
-                },
-              }}
-              variant="filled"
-              severity="error"
-            >
-              {emailError}
-            </Alert>
-          )}
-        </Box>
-        
-        <Box mt={1} mr={2}>
-          <InputLabel sx={{ color: "black", mb: 1 }}>Tags</InputLabel>
-          <TagsMultiSelectDropDown 
-            value={selectedTags}
-            onChange={handleTagChange}
-            placeholder="Tags"
-          />
-        </Box>
-        
-        <Box mt={1}>
-          <InputLabel sx={{ color: "black" }}>Note</InputLabel>
-          <TextField
-            fullWidth
-            name="note"
-            value={note}
-            multiline
-            rows={3}
-            onChange={(e) => setNote(e.target.value)}
-            margin="normal"
-            placeholder="Note"
-            size="small"
-          />
-        </Box>
-        
-        <Box mt={1}>
-          <InputLabel sx={{ color: "black" }}>SSN</InputLabel>
-          <TextField
-            fullWidth
-            name="ssn"
-            value={ssn}
-            onChange={(e) => setSsn(e.target.value)}
-            margin="normal"
-            placeholder="SSN"
-            size="small"
-          />
-        </Box>
+          {!!emailError && <p className="text-xs text-red-500 mt-0.5">{emailError}</p>}
+        </div>
 
-        <Typography
-          variant="h6"
-          gutterBottom
-          sx={{ ml: 1, fontWeight: "bold", mt: 3 }}
-        >
-          Phone Numbers
-        </Typography>
-        
-        {phoneNumbers.map((phone) => (
-          <Box
-            key={phone.id}
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 2,
-              ml: 1,
-              mb: 2,
-            }}
-          >
-            {phone.isPrimary && (
-              <Chip
-                label="Primary phone"
-                color="primary"
-                size="small"
-                sx={{ position: "absolute", mt: -3 }}
+        <div>
+          <label className="block text-xs font-semibold text-slate-700 mb-1">Tags</label>
+          <TagsMultiSelectDropDown value={selectedTags} onChange={handleTagChange} placeholder="Tags" />
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-slate-700 mb-1">Note</label>
+          <TextField fullWidth size="small" name="note" value={note} multiline rows={3} placeholder="Note"
+            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+            onChange={(e) => setNote(e.target.value)}
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-slate-700 mb-1">SSN</label>
+          <TextField fullWidth size="small" name="ssn" value={ssn} placeholder="SSN"
+            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+            onChange={(e) => setSsn(e.target.value)}
+          />
+        </div>
+
+        {/* Phone Numbers */}
+        <div>
+          <h3 className="text-sm font-semibold text-slate-900 mb-2">Phone Numbers</h3>
+          <div className="space-y-2">
+            {phoneNumbers.map((phone) => (
+              <div key={phone.id} className="flex items-center gap-2 relative">
+                {phone.isPrimary && (
+                  <span className="absolute -top-2 left-0 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-indigo-50 text-indigo-700 border border-indigo-200">Primary</span>
+                )}
+                <div className="flex-1">
+                  <PhoneInput
+                    country={"us"}
+                    value={phone.phone}
+                    onChange={(value, country) => handlePhoneNumberChange(value, country, phone.id)}
+                    inputStyle={{ width: "100%", borderRadius: "8px" }}
+                    buttonStyle={{ borderTopLeftRadius: "8px", borderBottomLeftRadius: "8px" }}
+                    containerStyle={{ display: "flex", alignItems: "center", gap: "8px" }}
+                  />
+                </div>
+                <button type="button" onClick={() => handleDeletePhoneNumber(phone.id)} className="p-1.5 rounded-md text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors">
+                  <AiOutlineDelete size={16} />
+                </button>
+              </div>
+            ))}
+          </div>
+          <button type="button" onClick={handleAddPhoneNumber} className="inline-flex items-center gap-1.5 mt-2 text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors">
+            <AiOutlinePlusCircle size={16} />
+            Add phone number
+          </button>
+        </div>
+
+        {/* Address */}
+        <div className="space-y-3">
+          <h3 className="text-sm font-semibold text-slate-900">Address</h3>
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">Country</label>
+            <Autocomplete options={options} size="small" getOptionLabel={(option) => option.label}
+              value={selectedCountry} onChange={(event, newValue) => setSelectedCountry(newValue)}
+              renderInput={(params) => (<TextField {...params} placeholder="Select Country" variant="outlined" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }} />)}
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">Street Address</label>
+            <TextField fullWidth size="small" name="streetAddress" value={streetAddress} placeholder="Street address"
+              sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+              onChange={(e) => setStreetAddress(e.target.value)}
+            />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">City</label>
+              <TextField fullWidth size="small" name="city" value={city} placeholder="City"
+                sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                onChange={(e) => setCity(e.target.value)}
               />
-            )}
-            
-            <PhoneInput
-              country={"us"}
-              value={phone.phone}
-              onChange={(value, country) => handlePhoneNumberChange(value, country, phone.id)}
-              inputStyle={{
-                width: "100%",
-              }}
-              buttonStyle={{
-                borderTopLeftRadius: "8px",
-                borderBottomLeftRadius: "8px",
-              }}
-              containerStyle={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
-            />
-            <AiOutlineDelete
-              onClick={() => handleDeletePhoneNumber(phone.id)}
-              style={{ cursor: "pointer", color: "red" }}
-            />
-          </Box>
-        ))}
-        
-        <Box
-          sx={{
-            display: "flex",
-            gap: 2,
-            alignItems: isSmallScreen ? "center" : "flex-start",
-            ml: 1,
-            cursor: "pointer",
-            color: "blue",
-            fontWeight: 600,
-          }}
-          onClick={handleAddPhoneNumber}
-        >
-          <AiOutlinePlusCircle style={{ marginTop: "20px" }} />
-          <p>Add phone number</p>
-        </Box>
-        
-        <Typography
-          variant="h6"
-          gutterBottom
-          sx={{ ml: 1, fontWeight: "bold", mt: 3 }}
-        >
-          Address
-        </Typography>
-        
-        <Box>
-          <InputLabel sx={{ color: "black" }}>Country</InputLabel>
-          <Autocomplete
-            options={options}
-            size="small"
-            getOptionLabel={(option) => option.label}
-            value={selectedCountry}
-            onChange={(event, newValue) => setSelectedCountry(newValue)}
-            renderInput={(params) => (
-              <TextField {...params} placeholder="Select Country" variant="outlined" />
-            )}
-          />
-        </Box>
-        
-        <Box>
-          <InputLabel sx={{ color: "black", mt: 2 }}>Street address</InputLabel>
-          <TextField
-            fullWidth
-            name="streetAddress"
-            value={streetAddress}
-            onChange={(e) => setStreetAddress(e.target.value)}
-            margin="normal"
-            placeholder="Street address"
-            size="small"
-          />
-        </Box>
-        
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: isSmallScreen ? "column" : "row",
-            gap: isSmallScreen ? 2 : 5,
-            mt: 2,
-          }}
-        >
-          <Box sx={{ flex: 1 }}>
-            <InputLabel sx={{ color: "black" }}>City</InputLabel>
-            <TextField
-              fullWidth
-              margin="normal"
-              name="city"
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              placeholder="City"
-              size="small"
-            />
-          </Box>
-          
-          <Box sx={{ flex: 1 }}>
-            <InputLabel sx={{ color: "black" }}>State/Province</InputLabel>
-            <TextField
-              margin="normal"
-              name="state"
-              fullWidth
-              value={state}
-              onChange={(e) => setState(e.target.value)}
-              placeholder="State/Province"
-              size="small"
-            />
-          </Box>
-          
-          <Box sx={{ flex: 1 }}>
-            <InputLabel sx={{ color: "black" }}>ZIP/Postal Code</InputLabel>
-            <TextField
-              margin="normal"
-              fullWidth
-              name="postalCode"
-              value={postalCode}
-              onChange={(e) => setPostalCode(e.target.value)}
-              placeholder="ZIP/Postal Code"
-              size="small"
-            />
-          </Box>
-        </Box>
-        
-        <Box
-          sx={{
-            display: "flex",
-            gap: 4,
-            padding: "1px 5px 15px 5px",
-            mt: 3,
-          }}
-        >
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            disabled={isSubmitting}
-            sx={{
-              backgroundColor: "var(--color-save-btn)",
-              "&:hover": {
-                backgroundColor: "var(--color-save-hover-btn)",
-              },
-              borderRadius: "15px",
-              width: isSmallScreen ? "100%" : "auto",
-            }}
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">State/Province</label>
+              <TextField fullWidth size="small" name="state" value={state} placeholder="State/Province"
+                sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                onChange={(e) => setState(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">ZIP/Postal Code</label>
+              <TextField fullWidth size="small" name="postalCode" value={postalCode} placeholder="ZIP/Postal Code"
+                sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                onChange={(e) => setPostalCode(e.target.value)}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex items-center gap-3 pt-4 pb-4">
+          <button type="submit" disabled={isSubmitting}
+            className="px-5 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? 'Saving...' : (contact ? 'Update' : 'Create')}
-          </Button>
-          
-          <Button
-            type="button"
-            variant="outlined"
-            color="primary"
-            onClick={handleClose}
-            disabled={isSubmitting}
-            sx={{
-              borderColor: "var(--color-border-cancel-btn)",
-              color: "var(--color-save-btn)",
-              "&:hover": {
-                backgroundColor: "var(--color-save-hover-btn)",
-                color: "#fff",
-                border: "none",
-              },
-              width: isSmallScreen ? "100%" : "auto",
-              borderRadius: "15px",
-            }}
+          </button>
+          <button type="button" onClick={handleClose} disabled={isSubmitting}
+            className="px-5 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-50"
           >
             Cancel
-          </Button>
-        </Box>
-      </Box>
+          </button>
+        </div>
+      </form>
     </Drawer>
   );
 };

@@ -109,71 +109,46 @@ const TeamMemberMultiSelectDropDown = ({
     });
 
   return (
-    <Box sx={{ width }}>
-      <Box
+    <div style={{ width }}>
+      <div
         ref={containerRef}
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          border: "1px solid #ccc",
-          borderRadius: "8px",
-          padding: "4px",
-          cursor: "pointer",
-          bgcolor: "background.paper",
-          width: "100%",
-          minHeight: "40px"
-        }}
+        className="flex items-center justify-between border border-slate-200 rounded-lg px-2 py-1 cursor-pointer bg-white min-h-[38px] hover:border-slate-300 transition-colors"
         onClick={handleClick}
       >
-        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, flex: 1 }}>
+        <div className="flex flex-wrap gap-1 flex-1">
           {value && value.length > 0 ? (
             value.map((item) => {
               if (!item) return null;
               return (
-                <Chip
+                <span
                   key={item.value}
-                  label={item.label || ''}
-                  onDelete={() => handleSelect(item.value)}
-                  size="small"
-                  sx={{
-                    backgroundColor: '#f0f0f0',
-                    color: "text.primary",
-                    fontWeight: 500,
-                    borderRadius: "16px",
-                    height: "28px",
-                    cursor: "pointer",
-                    "& .MuiChip-deleteIcon": {
-                      color: "text.secondary",
-                      opacity: 0.7,
-                      transition: "opacity 0.2s",
-                      "&:hover": { opacity: 1 },
-                    },
-                  }}
-                />
+                  className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200"
+                >
+                  {item.label || ''}
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleSelect(item.value); }}
+                    className="ml-0.5 text-slate-400 hover:text-slate-600 transition-colors"
+                  >
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                  </button>
+                </span>
               );
             })
           ) : (
-            <Typography variant="body2" color="textSecondary" sx={{ pl: 1 }}>
-              {placeholder}
-            </Typography>
+            <span className="text-sm text-slate-400 pl-1">{placeholder}</span>
           )}
-        </Box>
-        <Box sx={{ display: "flex", alignItems: "center" }}>
+        </div>
+        <div className="flex items-center gap-0.5 ml-1">
           {value && value.length > 0 && (
-            <IconButton
-              onClick={clearSelection}
-              size="small"
-              sx={{ color: "text.secondary" }}
-            >
-              <FaTimes />
-            </IconButton>
+            <button onClick={clearSelection} className="p-0.5 text-slate-400 hover:text-slate-600 transition-colors">
+              <FaTimes size={10} />
+            </button>
           )}
-          <IconButton size="small">
-            {anchorEl ? <FaCaretUp /> : <FaCaretDown />}
-          </IconButton>
-        </Box>
-      </Box>
+          <span className="text-slate-400">
+            {anchorEl ? <FaCaretUp size={12} /> : <FaCaretDown size={12} />}
+          </span>
+        </div>
+      </div>
 
       <Menu
         anchorEl={anchorEl}
@@ -181,66 +156,41 @@ const TeamMemberMultiSelectDropDown = ({
         onClose={handleClose}
         anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
         transformOrigin={{ vertical: "top", horizontal: "left" }}
-        PaperProps={{
-          style: {
-            width: menuWidth || "auto",
-            maxHeight: "250px",
-          }
-        }}
+        PaperProps={{ style: { width: menuWidth || "auto", maxHeight: "250px", borderRadius: '8px' } }}
       >
-        <Box sx={{ p: 1 }}>
+        <div className="p-2">
           <TextField
-            fullWidth
-            size="small"
-            placeholder="Search team members..."
-            value={searchQuery}
-            onChange={handleSearchChange}
-            variant="outlined"
-            autoComplete="off"
-            autoFocus
+            fullWidth size="small" placeholder="Search team members..." value={searchQuery}
+            onChange={handleSearchChange} variant="outlined" autoComplete="off" autoFocus
+            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '6px', fontSize: '13px' } }}
           />
-        </Box>
-
+        </div>
         {loading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
-            <CircularProgress size={24} />
-          </Box>
+          <div className="flex items-center justify-center py-4">
+            <CircularProgress size={20} />
+          </div>
         ) : error ? (
-          <Typography sx={{ p: 2, color: "error.main" }}>
-            {error}
-          </Typography>
+          <div className="px-3 py-4 text-center text-sm text-red-500">{error}</div>
         ) : filteredOptions && filteredOptions.length > 0 ? (
           filteredOptions.map((option) => (
-            <Box
+            <div
               key={option.value}
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                p: "4px 8px",
-                cursor: "pointer",
-                "&:hover": {
-                  backgroundColor: 'action.hover'
-                }
-              }}
+              className="flex items-center gap-2 px-2 py-1.5 cursor-pointer hover:bg-slate-50 transition-colors"
               onClick={() => handleSelect(option.value)}
             >
               <Checkbox
                 checked={value.some(item => item && item.value === option.value)}
                 size="small"
-                sx={{ padding: "4px" }}
+                sx={{ padding: "2px" }}
               />
-              <Typography variant="body2" sx={{ ml: 1 }}>
-                {option.label || ''}
-              </Typography>
-            </Box>
+              <span className="text-sm text-slate-700">{option.label || ''}</span>
+            </div>
           ))
         ) : (
-          <Typography sx={{ p: 2, color: "text.secondary" }}>
-            No team members found
-          </Typography>
+          <div className="px-3 py-4 text-center text-sm text-slate-400">No team members found</div>
         )}
       </Menu>
-    </Box>
+    </div>
   );
 };
 

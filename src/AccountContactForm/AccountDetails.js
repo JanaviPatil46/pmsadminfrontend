@@ -147,128 +147,129 @@ const assignedMembers = teamMemberList.filter(user =>
   account.teamMember.includes(user._id)
 );
 
-  if (!account) return <Typography>Loading...</Typography>;
+  if (!account) return (
+    <div className="flex items-center justify-center py-12">
+      <div className="flex items-center gap-3 text-slate-500">
+        <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+        <span className="text-sm font-medium">Loading...</span>
+      </div>
+    </div>
+  );
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Button component={RouterLink} to="/" variant="outlined" sx={{ mb: 2 }}>
-        ← Back to Accounts
-      </Button>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() => setDrawerOpen(true)}
-        sx={{ ml: 2 }}
-      >
-        Edit Account
-      </Button>
+    <div className="p-4 md:p-6 space-y-4">
+      {/* Header actions */}
+      <div className="flex items-center gap-3 flex-wrap">
+        <RouterLink to="/" className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors no-underline">
+          <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+          Back to Accounts
+        </RouterLink>
+        <button
+          className="inline-flex items-center px-4 py-1.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm"
+          onClick={() => setDrawerOpen(true)}
+        >
+          <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+          Edit Account
+        </button>
+      </div>
 
-      <Paper sx={{ p: 3 }}>
-        <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Typography variant="h5">{account.accountName}</Typography>
-        </Box>
-        <Divider sx={{ my: 2 }} />
+      {/* Account detail card */}
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        {/* Account header */}
+        <div className="px-5 py-4 border-b border-slate-100">
+          <h2 className="text-xl font-semibold text-slate-900">{account.accountName}</h2>
+        </div>
 
-        <Typography variant="body1">
-          <b>Client Type:</b> {account.clientType}
-        </Typography>
-        <Typography variant="body1">
-          <b>Company Name:</b> {account.companyName || "—"}
-        </Typography>
-<Divider sx={{ my: 2 }} />
+        <div className="p-5 space-y-5">
+          {/* Info grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Client Type</p>
+              <p className="text-sm text-slate-900">{account.clientType}</p>
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Company Name</p>
+              <p className="text-sm text-slate-900">{account.companyName || <span className="text-slate-300">—</span>}</p>
+            </div>
+          </div>
 
-<Typography variant="body1" sx={{ mt: 2 }}><b>Tags:</b></Typography>
-<Box sx={{ mt: 1, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-  {accountTags.length > 0 ? (
-    accountTags.map(tag => (
-      <Chip 
-        key={tag._id} 
-        label={tag.tagName} 
-        sx={{ background: tag.tagColour, color: "#fff" }}
-      />
-    ))
-  ) : (
-    <Typography>—</Typography>
-  )}
-</Box>
+          <hr className="border-slate-100" />
 
-<Typography variant="body1" sx={{ mt: 2 }}><b>Team Members:</b></Typography>
-<Box sx={{ mt: 1, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-  {assignedMembers.length > 0 ? (
-    assignedMembers.map(member => (
-      <Chip 
-        key={member._id} 
-        label={member.username} 
-        variant="outlined"
-      />
-    ))
-  ) : (
-    <Typography>—</Typography>
-  )}
-</Box>
+          {/* Tags */}
+          <div>
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Tags</p>
+            <div className="flex flex-wrap gap-1.5">
+              {accountTags.length > 0 ? (
+                accountTags.map(tag => (
+                  <span key={tag._id} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" style={{ backgroundColor: tag.tagColour, color: "#fff" }}>
+                    {tag.tagName}
+                  </span>
+                ))
+              ) : (
+                <span className="text-sm text-slate-400">—</span>
+              )}
+            </div>
+          </div>
 
-        <Typography variant="h6" sx={{ mt: 3 }}>
-          Contacts
-        </Typography>
-        <Stack spacing={1}>
-          {account.contacts?.length > 0 ? (
-            account.contacts.map((c) => (
-              <Box
-                key={c.contact._id}
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-              >
-                <Typography>
-                  {c.contact.firstName} {c.contact.lastName} — {c.contact.email}
-                </Typography>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={c.canLogin}
-                      onClick={() => handleSwitchClick(c)}
-                      color="primary"
-                   
-                    />
-                  }
-                  label="Login"
-                />
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={c.canNotify}
-                      onClick={() => handleNotifyToggle(c)} // ✅ no dialog
-                      color="primary"
-                     
-                    />
-                  }
-                  label="Notify"
-                />
+          {/* Team Members */}
+          <div>
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Team Members</p>
+            <div className="flex flex-wrap gap-1.5">
+              {assignedMembers.length > 0 ? (
+                assignedMembers.map(member => (
+                  <span key={member._id} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
+                    {member.username}
+                  </span>
+                ))
+              ) : (
+                <span className="text-sm text-slate-400">—</span>
+              )}
+            </div>
+          </div>
 
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={c.canEmailSync}
-                      onClick={() => handleEmailSyncToggle(c)} // ✅ no dialog
-                      color="primary"
-                      
-                    />
-                  }
-                  label="EmailSync"
-                />
-              </Box>
-            ))
-          ) : (
-            <Typography>No contacts found</Typography>
-          )}
-        </Stack>
-      </Paper>
+          <hr className="border-slate-100" />
+
+          {/* Contacts */}
+          <div>
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Contacts</p>
+            {account.contacts?.length > 0 ? (
+              <div className="space-y-2">
+                {account.contacts.map((c) => (
+                  <div key={c.contact._id} className="flex items-center justify-between flex-wrap gap-2 p-3 rounded-lg bg-slate-50 border border-slate-100">
+                    <div className="text-sm text-slate-700">
+                      <span className="font-medium">{c.contact.firstName} {c.contact.lastName}</span>
+                      <span className="text-slate-400 mx-1.5">—</span>
+                      <span className="text-slate-500">{c.contact.email}</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <FormControlLabel
+                        control={<Switch size="small" checked={c.canLogin} onClick={() => handleSwitchClick(c)} color="primary" />}
+                        label={<span className="text-xs text-slate-600">Login</span>}
+                      />
+                      <FormControlLabel
+                        control={<Switch size="small" checked={c.canNotify} onClick={() => handleNotifyToggle(c)} color="primary" />}
+                        label={<span className="text-xs text-slate-600">Notify</span>}
+                      />
+                      <FormControlLabel
+                        control={<Switch size="small" checked={c.canEmailSync} onClick={() => handleEmailSyncToggle(c)} color="primary" />}
+                        label={<span className="text-xs text-slate-600">EmailSync</span>}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-slate-400">No contacts found</p>
+            )}
+          </div>
+        </div>
+      </div>
+
       <AccountContactDrawer
         open={drawerOpen}
-        // onClose={() => setDrawerOpen(false)}
         onClose={() => {
           setDrawerOpen(false);
-          fetchAccountDetails(); // ✅ call here
+          fetchAccountDetails();
         }}
         accountId={account._id}
       />
@@ -283,19 +284,11 @@ const assignedMembers = teamMemberList.filter(user =>
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCancelToggle} variant="outlined">
-            Cancel
-          </Button>
-          <Button
-            onClick={handleConfirmToggle}
-            variant="contained"
-            color="primary"
-          >
-            Confirm
-          </Button>
+          <Button onClick={handleCancelToggle} variant="outlined">Cancel</Button>
+          <Button onClick={handleConfirmToggle} variant="contained" color="primary">Confirm</Button>
         </DialogActions>
       </Dialog>
-    </Box>
+    </div>
   );
 };
 

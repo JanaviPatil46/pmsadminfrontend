@@ -53,50 +53,28 @@ const PersonalizationDialog = ({
   onConfirm,
 }) => {
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Add portal access</DialogTitle>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: '12px' } }}>
+      <div className="px-5 py-4 border-b border-slate-200">
+        <h2 className="text-lg font-semibold text-slate-900">Add portal access</h2>
+      </div>
       <DialogContent>
-        <Typography variant="body2" gutterBottom sx={{ fontWeight: "bold" }}>
-          This message will be sent to:
-        </Typography>
-
-        <Box
-          sx={{
-            maxHeight: 150,
-            overflow: "auto",
-            border: "1px solid #eee",
-            borderRadius: 1,
-            p: 1,
-            mb: 2,
-            backgroundColor: "#f9f9f9",
-          }}
-        >
+        <p className="text-sm font-semibold text-slate-700 mb-2">This message will be sent to:</p>
+        <div className="max-h-[150px] overflow-y-auto border border-slate-100 rounded-lg p-3 mb-3 bg-slate-50">
           {contactEmails.map((email, index) => (
-            <Typography key={index} variant="body2" sx={{ mb: 0.5 }}>
-              • {email}
-            </Typography>
+            <p key={index} className="text-sm text-slate-600 mb-0.5">• {email}</p>
           ))}
-        </Box>
-
+        </div>
         <TextField
-          autoFocus
-          margin="dense"
-          type="text"
-          fullWidth
-          multiline
-          rows={3}
-          variant="outlined"
-          value={message}
-          onChange={onMessageChange}
+          autoFocus margin="dense" type="text" fullWidth multiline rows={3} variant="outlined"
+          value={message} onChange={onMessageChange}
           placeholder="Enter a message that will be sent to all contacts"
+          sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
         />
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={onConfirm} variant="contained">
-          Send
-        </Button>
-      </DialogActions>
+      <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-slate-200">
+        <button onClick={onClose} className="px-4 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Cancel</button>
+        <button onClick={onConfirm} className="px-4 py-1.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm">Send</button>
+      </div>
     </Dialog>
   );
 };
@@ -339,18 +317,20 @@ const handleCancelPersonalization = () => {
   const options = useMemo(() => countryList().getData(), []);
 
   return (
-    <Box>
-      <Typography variant="h6" gutterBottom>
-        Contact Form
-      </Typography>
-      <Button
-        variant="outlined"
-        startIcon={<AddCircle />}
-        onClick={() => setDialogOpen(true)}
-        sx={{ mb: 3, mr: 2 }}
-      >
-        Select Existing Contacts
-      </Button>
+    <div className="space-y-5">
+      {/* Header & existing contacts selector */}
+      <div>
+        <h3 className="text-sm font-semibold text-slate-900 mb-3">Contact Form</h3>
+        <button
+          type="button"
+          onClick={() => setDialogOpen(true)}
+          className="inline-flex items-center gap-1.5 px-4 py-1.5 text-sm font-medium text-indigo-600 bg-white border border-indigo-200 rounded-lg hover:bg-indigo-50 transition-colors"
+        >
+          <AddCircle fontSize="small" />
+          Select Existing Contacts
+        </button>
+      </div>
+
       <ContactSelectionDialog
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
@@ -362,385 +342,162 @@ const handleCancelPersonalization = () => {
         onUpdateField={handleUpdateSelectedContactField}
         isEditing={isEditing}
       />
-      <Typography variant="h6" gutterBottom>
-        Add New Contacts
-      </Typography>
+
+      {/* Add new contacts */}
+      <h3 className="text-sm font-semibold text-slate-900">Add New Contacts</h3>
       {showContactForm && (
-        <>
+        <div className="space-y-4">
           {contacts.map((contact, contactIndex) => (
-            <Box
-              key={contactIndex}
-              sx={{
-                border: "1px solid #ccc",
-                borderRadius: 2,
-                p: 2,
-                mb: 3,
-                background: "#fafafa",
-              }}
-            >
-              <Typography variant="subtitle1" gutterBottom>
-                Contact #{contactIndex + 1}
+            <div key={contactIndex} className="border border-slate-200 rounded-xl p-4 bg-slate-50/50 space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-semibold text-slate-700">Contact #{contactIndex + 1}</span>
                 {newFormContacts.includes(contactIndex) && (
-                  <Chip 
-                    label="New" 
-                    size="small" 
-                    color="primary" 
-                    sx={{ ml: 1 }} 
-                  />
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-indigo-50 text-indigo-700 border border-indigo-200">New</span>
                 )}
-              </Typography>
-              <Grid container spacing={2} mt={2}>
-                <Grid item xs={3.7} ml={2}>
-                  <TextField
-                    fullWidth
-                    label="First Name"
-                    name="firstName"
-                    value={contact.firstName || ""}
-                    onChange={(e) => handleChange(contactIndex, e)}
-                    error={!!contactErrors[contactIndex]?.firstName}
-                    helperText={contactErrors[contactIndex]?.firstName}
-                    required
-                  />
-                </Grid>
-                <Grid item xs={3.7} ml={1}>
-                  <TextField
-                    fullWidth
-                    label="Middle Name"
-                    name="middleName"
-                    value={contact.middleName || ""}
-                    onChange={(e) => handleChange(contactIndex, e)}
-                  />
-                </Grid>
-                <Grid item xs={3.9} ml={1}>
-                  <TextField
-                    fullWidth
-                    label="Last Name"
-                    name="lastName"
-                    value={contact.lastName || ""}
-                    onChange={(e) => handleChange(contactIndex, e)}
-                    error={!!contactErrors[contactIndex]?.lastName}
-                    helperText={contactErrors[contactIndex]?.lastName}
-                    required
-                  />
-                </Grid>
-              </Grid>
-              <TextField
-                fullWidth
-                margin="normal"
-                label="Contact Name"
-                value={contact.contactName || ""}
-                disabled
-              />
-              <TextField
-                fullWidth
-                margin="normal"
-                label="Company Name"
-                name="companyName"
-                value={contact.companyName || ""}
-                onChange={(e) => handleChange(contactIndex, e)}
-              />
-              <TextField
-                fullWidth
-                margin="normal"
-                label="Note"
-                name="note"
-                multiline
-                value={contact.note || ""}
-                onChange={(e) => handleChange(contactIndex, e)}
-              />
+              </div>
 
-              <TextField
-                fullWidth
-                margin="normal"
-                label="SSN"
-                name="ssn"
-                value={contact.ssn || ""}
+              {/* Name fields */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <TextField fullWidth size="small" label="First Name" name="firstName" value={contact.firstName || ""}
+                  onChange={(e) => handleChange(contactIndex, e)} error={!!contactErrors[contactIndex]?.firstName}
+                  helperText={contactErrors[contactIndex]?.firstName} required
+                  sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                />
+                <TextField fullWidth size="small" label="Middle Name" name="middleName" value={contact.middleName || ""}
+                  onChange={(e) => handleChange(contactIndex, e)}
+                  sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                />
+                <TextField fullWidth size="small" label="Last Name" name="lastName" value={contact.lastName || ""}
+                  onChange={(e) => handleChange(contactIndex, e)} error={!!contactErrors[contactIndex]?.lastName}
+                  helperText={contactErrors[contactIndex]?.lastName} required
+                  sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                />
+              </div>
+
+              <TextField fullWidth size="small" label="Contact Name" value={contact.contactName || ""} disabled
+                sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+              />
+              <TextField fullWidth size="small" label="Company Name" name="companyName" value={contact.companyName || ""}
+                onChange={(e) => handleChange(contactIndex, e)}
+                sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+              />
+              <TextField fullWidth size="small" label="Note" name="note" multiline value={contact.note || ""}
+                onChange={(e) => handleChange(contactIndex, e)}
+                sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+              />
+              <TextField fullWidth size="small" label="SSN" name="ssn" value={contact.ssn || ""}
                 onChange={(e) => handleSSNChange(contactIndex, e)}
-                inputProps={{
-                  maxLength: 11,
-                  inputMode: "numeric",
-                  pattern: "[0-9]*",
-                }}
-                helperText={
-                  contact.ssnError ? contact.ssnError : "Format: 123-45-6789"
-                }
+                inputProps={{ maxLength: 11, inputMode: "numeric", pattern: "[0-9]*" }}
+                helperText={contact.ssnError ? contact.ssnError : "Format: 123-45-6789"}
                 error={!!contact.ssnError}
+                sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+              />
+              <TextField fullWidth size="small" label="Email" name="email" value={contact.email || ""}
+                onChange={(e) => handleChange(contactIndex, e)} error={!!contactErrors[contactIndex]?.email}
+                helperText={contactErrors[contactIndex]?.email} required
+                sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
               />
 
-              <TextField
-                fullWidth
-                margin="normal"
-                label="Email"
-                name="email"
-                value={contact.email || ""}
-                onChange={(e) => handleChange(contactIndex, e)}
-                error={!!contactErrors[contactIndex]?.email}
-                helperText={contactErrors[contactIndex]?.email}
-                required
-              />
-              <FormGroup row sx={{ mt: 2 }}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={contact.login || false}
-                      disabled
-                      onChange={(e) =>
-                        dispatch(
-                          updateContactField({
-                            index: contactIndex,
-                            field: "login",
-                            value: e.target.checked,
-                          })
-                        )
-                      }
-                    />
-                  }
-                  label="Login"
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={contact.notify || false}
-                      disabled
-                      onChange={(e) =>
-                        dispatch(
-                          updateContactField({
-                            index: contactIndex,
-                            field: "notify",
-                            value: e.target.checked,
-                          })
-                        )
-                      }
-                    />
-                  }
-                  label="Notify"
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={contact.emailSync || false}
-                      disabled
-                      onChange={(e) =>
-                        dispatch(
-                          updateContactField({
-                            index: contactIndex,
-                            field: "emailSync",
-                            value: e.target.checked,
-                          })
-                        )
-                      }
-                    />
-                  }
-                  label="Email Sync"
-                />
-              </FormGroup>
+              {/* Permissions */}
+              <div className="flex items-center gap-4 mt-1">
+                <FormControlLabel control={<Checkbox size="small" checked={contact.login || false} disabled onChange={(e) => dispatch(updateContactField({ index: contactIndex, field: "login", value: e.target.checked }))} sx={{ padding: '2px' }} />} label={<span className="text-xs text-slate-600">Login</span>} />
+                <FormControlLabel control={<Checkbox size="small" checked={contact.notify || false} disabled onChange={(e) => dispatch(updateContactField({ index: contactIndex, field: "notify", value: e.target.checked }))} sx={{ padding: '2px' }} />} label={<span className="text-xs text-slate-600">Notify</span>} />
+                <FormControlLabel control={<Checkbox size="small" checked={contact.emailSync || false} disabled onChange={(e) => dispatch(updateContactField({ index: contactIndex, field: "emailSync", value: e.target.checked }))} sx={{ padding: '2px' }} />} label={<span className="text-xs text-slate-600">Email Sync</span>} />
+              </div>
+
+              {/* Tags */}
               <Autocomplete
-                multiple
-                options={tags}
-                getOptionLabel={(option) => option.label}
+                multiple options={tags} getOptionLabel={(option) => option.label}
                 value={contact.tags || []}
-                onChange={(e, newValue) =>
-                  dispatch(
-                    setContactTags({ index: contactIndex, tags: newValue })
-                  )
-                }
+                onChange={(e, newValue) => dispatch(setContactTags({ index: contactIndex, tags: newValue }))}
                 filterSelectedOptions
                 renderTags={(selected, getTagProps) =>
                   selected.map((option, index) => (
-                    <Chip
-                      {...getTagProps({ index })}
-                      key={option.value}
-                      label={option.label}
-                      sx={{
-                        backgroundColor: option.colour,
-                        color: "#fff",
-                        fontWeight: 500,
-                        cursor: "pointer",
-                        fontSize: "12px",
-                      }}
-                    />
+                    <span {...getTagProps({ index })} key={option.value} className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium text-white mr-1 mb-1" style={{ backgroundColor: option.colour }}>
+                      {option.label}
+                    </span>
                   ))
                 }
                 renderOption={(props, option) => (
-                  <Box
-                    component="li"
-                    {...props}
-                    sx={{
-                      backgroundColor: option.colour,
-                      color: "#fff",
-                      borderRadius: "15px",
-                      px: 1,
-                      py: 0.5,
-                      my: 0.5,
-                      width: "fit-content",
-                      fontSize: "10px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    {option.label}
-                  </Box>
+                  <li {...props}>
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium text-white" style={{ backgroundColor: option.colour }}>{option.label}</span>
+                  </li>
                 )}
                 renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    margin="normal"
-                    label="Select Tags"
-                    size="small"
-                  />
+                  <TextField {...params} label="Select Tags" size="small" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }} />
                 )}
               />
-              <Typography variant="subtitle1" sx={{ mt: 2 }}>
-                Phone Numbers
-              </Typography>
-              {contact.phoneNumbers &&
-                contact.phoneNumbers.map((phone, phoneIndex) => (
-                  <Box
-                    key={phoneIndex}
-                    sx={{ display: "flex", alignItems: "center", mt: 1 }}
-                  >
-                    <PhoneInput
-                      country={"us"}
-                      value={phone}
-                      onChange={(value) =>
-                        dispatch(
-                          updatePhoneNumber({ contactIndex, phoneIndex, value })
-                        )
-                      }
-                      inputStyle={{ width: "100%" }}
-                    />
-                    <IconButton
-                      color="error"
-                      onClick={() =>
-                        dispatch(
-                          removePhoneNumber({ contactIndex, phoneIndex })
-                        )
-                      }
+
+              {/* Phone Numbers */}
+              <div>
+                <p className="text-xs font-semibold text-slate-700 mb-2">Phone Numbers</p>
+                {contact.phoneNumbers && contact.phoneNumbers.map((phone, phoneIndex) => (
+                  <div key={phoneIndex} className="flex items-center gap-2 mb-2">
+                    <div className="flex-1">
+                      <PhoneInput country={"us"} value={phone}
+                        onChange={(value) => dispatch(updatePhoneNumber({ contactIndex, phoneIndex, value }))}
+                        inputStyle={{ width: "100%", borderRadius: "8px" }}
+                      />
+                    </div>
+                    <button type="button" onClick={() => dispatch(removePhoneNumber({ contactIndex, phoneIndex }))}
                       disabled={contact.phoneNumbers.length === 1}
-                    >
-                      <RemoveCircle />
-                    </IconButton>
+                      className="p-1.5 rounded-md text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-30">
+                      <RemoveCircle fontSize="small" />
+                    </button>
                     {phoneIndex === contact.phoneNumbers.length - 1 && (
-                      <IconButton
-                        color="primary"
-                        onClick={() => dispatch(addPhoneNumber(contactIndex))}
-                      >
-                        <AddCircle />
-                      </IconButton>
+                      <button type="button" onClick={() => dispatch(addPhoneNumber(contactIndex))}
+                        className="p-1.5 rounded-md text-indigo-500 hover:text-indigo-700 hover:bg-indigo-50 transition-colors">
+                        <AddCircle fontSize="small" />
+                      </button>
                     )}
-                  </Box>
+                  </div>
                 ))}
+              </div>
 
-              <Box>
-                <FormLabel
-                  component="legend"
-                  sx={{ color: "black", fontSize: "20px" }}
-                >
-                  Address
-                </FormLabel>
-
-                {/* Country */}
-                <Autocomplete
-                  options={options}
-                  getOptionLabel={(option) => option.label}
-                  value={contact.country || null}
-                  onChange={(e, newValue) =>
-                    dispatch(
-                      setContactCountry({
-                        index: contactIndex,
-                        country: newValue,
-                      })
-                    )
-                  }
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      margin="normal"
-                      label="Select Country"
-                    />
-                  )}
+              {/* Address */}
+              <div className="space-y-3">
+                <p className="text-xs font-semibold text-slate-700">Address</p>
+                <Autocomplete options={options} getOptionLabel={(option) => option.label}
+                  value={contact.country || null} size="small"
+                  onChange={(e, newValue) => dispatch(setContactCountry({ index: contactIndex, country: newValue }))}
+                  renderInput={(params) => (<TextField {...params} label="Select Country" size="small" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }} />)}
                 />
+                <TextField fullWidth size="small" label="Street Address" name="streetAdd" value={contact.streetAdd || ""} onChange={(e) => handleChange(contactIndex, e)} sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }} />
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <TextField fullWidth size="small" label="City" name="city" value={contact.city || ""} onChange={(e) => handleChange(contactIndex, e)} sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }} />
+                  <TextField fullWidth size="small" label="State" name="state" value={contact.state || ""} onChange={(e) => handleChange(contactIndex, e)} sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }} />
+                  <TextField fullWidth size="small" label="Zip Code" name="zipCode" value={contact.zipCode || ""} onChange={(e) => handleChange(contactIndex, e)} sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }} />
+                </div>
+              </div>
 
-                {/* Street Address */}
-                <TextField
-                  fullWidth
-                  margin="normal"
-                  size="small"
-                  label="Street Address"
-                  name="streetAdd"
-                  value={contact.streetAdd || ""}
-                  onChange={(e) => handleChange(contactIndex, e)}
-                />
-
-                {/* City */}
-                <TextField
-                  fullWidth
-                  margin="normal"
-                  size="small"
-                  label="City"
-                  name="city"
-                  value={contact.city || ""}
-                  onChange={(e) => handleChange(contactIndex, e)}
-                />
-
-                {/* State */}
-                <TextField
-                  fullWidth
-                  margin="normal"
-                  size="small"
-                  label="State"
-                  name="state"
-                  value={contact.state || ""}
-                  onChange={(e) => handleChange(contactIndex, e)}
-                />
-
-                {/* Zip Code */}
-                <TextField
-                  fullWidth
-                  margin="normal"
-                  size="small"
-                  label="Zip Code"
-                  name="zipCode"
-                  value={contact.zipCode || ""}
-                  onChange={(e) => handleChange(contactIndex, e)}
-                />
-              </Box>
-              {/* {contacts.length > 1 && ( */}
-                <Button
-                  color="error"
-                  sx={{ mt: 2 }}
-                  onClick={() => handleRemoveContact(contactIndex)}
-                >
-                  Remove Contact
-                </Button>
-              {/* )} */}
-            </Box>
+              <button type="button" onClick={() => handleRemoveContact(contactIndex)}
+                className="inline-flex items-center gap-1 text-sm font-medium text-red-500 hover:text-red-700 transition-colors mt-2">
+                <RemoveCircle fontSize="small" /> Remove Contact
+              </button>
+            </div>
           ))}
-        </>
+        </div>
       )}
-      <Button
-        variant="outlined"
-        startIcon={<AddCircle />}
-        onClick={handleAddContact}
-        sx={{ mb: 3 }}
-      >
-        Add Another Contact
-      </Button>
-      <Divider sx={{ my: 2 }} />
-      <Box sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}>
-        <Button variant="outlined" onClick={onBack}>
+
+      <button type="button" onClick={handleAddContact}
+        className="inline-flex items-center gap-1.5 px-4 py-1.5 text-sm font-medium text-indigo-600 bg-white border border-indigo-200 rounded-lg hover:bg-indigo-50 transition-colors">
+        <AddCircle fontSize="small" /> Add Another Contact
+      </button>
+
+      <hr className="border-slate-200" />
+
+      {/* Actions */}
+      <div className="flex items-center justify-between pt-2">
+        <button type="button" onClick={onBack}
+          className="px-5 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
+          <svg className="w-4 h-4 mr-1.5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
           Back
-        </Button>
-        {/* <Button variant="contained" onClick={handleSubmitWithPersonalization}>
-          Submit
-        </Button> */}
-        <Button 
-  variant="contained" 
-  onClick={handleSubmitWithPersonalization}
-  disabled={isSubmitting} // Add disabled state
->
-  {isSubmitting ? "Submitting..." : "Submit"}
-</Button>
-      </Box>
+        </button>
+        <button type="button" onClick={handleSubmitWithPersonalization} disabled={isSubmitting}
+          className="px-5 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+          {isSubmitting ? "Submitting..." : "Submit"}
+        </button>
+      </div>
 
       <PersonalizationDialog
         open={personalizationDialogOpen}
@@ -750,6 +507,6 @@ const handleCancelPersonalization = () => {
         onMessageChange={(e) => setPersonalMessage(e.target.value)}
         onConfirm={handleConfirmPersonalization}
       />
-    </Box>
+    </div>
   );
 }
