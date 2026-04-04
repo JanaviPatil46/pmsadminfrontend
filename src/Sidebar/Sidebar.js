@@ -1,85 +1,36 @@
 import React, { useState, useEffect, useContext } from "react";
-import {
-  Box,
-  IconButton,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Collapse,
-  Typography,
-  Drawer,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  CircularProgress,
-} from "@mui/material";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Brightness4,
-  Brightness7,
-  Task,
-  NotificationAddRounded,
-} from "@mui/icons-material";
-import ExpandLess from "@mui/icons-material/ExpandLess";
-import ExpandMore from "@mui/icons-material/ExpandMore";
-import { Outlet, Link } from "react-router-dom";
+import { IconButton, Collapse, Drawer } from "@mui/material";
+import { ChevronLeft, ChevronRight } from "@mui/icons-material";
+import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import "./Sidebar.css";
 import iconMapping from "./icons/index";
-// import Logo from "../Images/Logo.svg";
-import { FaBars } from "react-icons/fa6";
-import { FaPlus } from "react-icons/fa6";
-// import { AiOutlinePlusCircle } from "react-icons/ai";
-import { FaPlusCircle } from "react-icons/fa";
+import { FaBars, FaPlus } from "react-icons/fa6";
 import { RxCross2 } from "react-icons/rx";
-import { useNavigate } from "react-router-dom";
 import ContactForm from "../Contact/ContactForm";
-import AccountForm from "../Contact/AccountForm";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import { AiOutlineLogout } from "react-icons/ai";
 import { LoginContext } from "../Sidebar/Context/Context";
-import { useLocation } from "react-router-dom";
 import TaskForm from "../Tasks/AccountTask";
-import { IoMoonOutline } from "react-icons/io5";
-import { MdOutlineWbSunny } from "react-icons/md";
-import { VscColorMode } from "react-icons/vsc";
-import user from "../Images/user.jpg";
 import { styled } from "@mui/material/styles";
 import Badge from "@mui/material/Badge";
-import CloseIcon from "@mui/icons-material/Close";
-import Stack from "@mui/material/Stack";
 import SearchComponent from "./Search";
 import { useDispatch } from "react-redux";
 import { Avatar as ShadAvatar, AvatarImage, AvatarFallback } from "../components/ui/avatar";
 import { Popover as ShadPopover, PopoverTrigger, PopoverContent } from "../components/ui/popover";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../components/ui/sheet";
-import { Badge as ShadBadge } from "../components/ui/badge";
 import { Separator } from "../components/ui/separator";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "../components/ui/tooltip";
 import ClientSelectionDialog from "../Billing/ClientSelectionDialog";
-import { faL } from "@fortawesome/free-solid-svg-icons";
 import OrganizerDialog from "../Pages/Organizers/ClientSelectionDialog";
 import ChatForm from "../Pages/ChatForm";
 import FullLogo from "../Images/snp.png";
 import Logo from "../Images/only s.png";
 import JobDrawer from "../Jobs/JobDrawer";
-import NotificationsIcon from "@mui/icons-material/Notifications";
 import InvoiceDrawer from "../Billing/InvoiceDrawer";
-import {
-  resetForm,
-  setAccountData,
-  setSelectedContacts,
-  removeSelectedContact,
-} from "../redux/accountContactSlice";
-import AccountDrawer from "../components/AccountContactForm/Drawer";
+import { resetForm } from "../redux/accountContactSlice";
 import AccountContactDrawer from "../AccountContactForm/AccountContactDrawer";
-import { use } from "react";
 
 const getInitials = (str = "") => {
   const clean = str.replace(/<.*?>/g, "").trim();
@@ -830,589 +781,242 @@ axios.request(config)
   return (
     <TooltipProvider delayDuration={200}>
     <div className="grid-container">
+      {/* Mobile overlay */}
+      {isSmallScreen && isSidebarVisible && (
+        <div className="sidebar-mobile-overlay visible" onClick={() => setIsSidebarVisible(false)} />
+      )}
+
       <header className="header">
-        <Box
-          component="header"
-          sx={{
-            px: 2.5,
-            py: 1,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            gap: 2,
-          }}
-        >
-          <Box className="bar-icon">
-            <FaBars
-              onClick={handleToggleSidebar}
-              style={{ fontSize: "1.5rem", cursor: "pointer" }}
-            />
-          </Box>
+        <div className="flex items-center justify-between w-full h-full px-4 gap-3">
+          {/* Mobile hamburger */}
+          <div className="bar-icon">
+            <button onClick={handleToggleSidebar} className="p-1.5 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors">
+              <FaBars size={18} />
+            </button>
+          </div>
 
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-            <FaPlusCircle className="add-icon" onClick={handleDrawerOpen} />
-          </Box>
+          {/* Create new button */}
+          <button onClick={handleDrawerOpen} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-all shadow-sm hover:shadow-md">
+            <FaPlus size={10} />
+            <span className="hidden sm:inline">New</span>
+          </button>
 
-          <Box sx={{ flex: 1, maxWidth: 420 }}>
+          {/* Search */}
+          <div className="flex-1 max-w-[420px]">
             <SearchComponent />
-          </Box>
+          </div>
 
-          <Box ml="auto" sx={{ display: "flex", alignItems: "center" }}>
+          {/* User chip */}
+          <div className="ml-auto flex items-center">
             <ShadPopover open={isDropdownOpen} onOpenChange={setDropdownOpen}>
               <PopoverTrigger asChild>
                 <div className="header-user-chip">
-                  <StyledBadge
-                    overlap="circular"
-                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                    variant="dot"
-                  >
-                    <ShadAvatar className="h-9 w-9 border-2 border-[rgba(0,172,193,0.25)]">
+                  <StyledBadge overlap="circular" anchorOrigin={{ vertical: "bottom", horizontal: "right" }} variant="dot">
+                    <ShadAvatar className="h-8 w-8 border-2 border-indigo-100">
                       <AvatarImage src={preview || currentImage} alt={username} />
-                      <AvatarFallback className="bg-[rgba(0,172,193,0.15)] text-[#00ACC1] text-xs font-semibold">
+                      <AvatarFallback className="bg-indigo-50 text-indigo-600 text-[11px] font-semibold">
                         {getInitials(username)}
                       </AvatarFallback>
                     </ShadAvatar>
                   </StyledBadge>
-                  <Box>
-                    <Typography sx={{ fontWeight: 600, fontSize: "12px", lineHeight: 1.3 }}>
-                      {username}
-                    </Typography>
-                    <Typography sx={{ fontSize: "10px", color: "#888", lineHeight: 1.2 }}>
-                      {userData}
-                    </Typography>
-                  </Box>
+                  <div className="hidden sm:block">
+                    <p className="text-xs font-semibold text-slate-800 leading-tight">{username}</p>
+                    <p className="text-[10px] text-slate-400 leading-tight">{userData}</p>
+                  </div>
                 </div>
               </PopoverTrigger>
-              <PopoverContent
-                align="end"
-                sideOffset={8}
-                className="p-0 w-[230px] rounded-xl shadow-xl overflow-hidden border border-[rgba(0,172,193,0.15)]"
-              >
+              <PopoverContent align="end" sideOffset={8} className="p-0 w-[240px] rounded-xl shadow-xl overflow-hidden border border-slate-200/80">
                 <div className="popover-header">
-                  <StyledBadge
-                    overlap="circular"
-                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                    variant="dot"
-                  >
-                    <ShadAvatar className="h-11 w-11 border-2 border-[rgba(0,172,193,0.3)]">
+                  <StyledBadge overlap="circular" anchorOrigin={{ vertical: "bottom", horizontal: "right" }} variant="dot">
+                    <ShadAvatar className="h-10 w-10 border-2 border-indigo-100">
                       <AvatarImage src={preview || currentImage} alt={username} />
-                      <AvatarFallback className="bg-[rgba(0,172,193,0.15)] text-[#00ACC1] text-sm font-semibold">
+                      <AvatarFallback className="bg-indigo-50 text-indigo-600 text-sm font-semibold">
                         {getInitials(username)}
                       </AvatarFallback>
                     </ShadAvatar>
                   </StyledBadge>
                   <div>
-                    <p className="font-semibold text-[13px] leading-tight">{username}</p>
-                    <p className="text-[11px] text-gray-500 leading-tight">{userEmail}</p>
+                    <p className="font-semibold text-[13px] text-slate-800 leading-tight">{username}</p>
+                    <p className="text-[11px] text-slate-400 leading-tight">{userEmail}</p>
                   </div>
                 </div>
                 <Separator className="opacity-40" />
                 <div className="popover-logout-row" onClick={logoutuser}>
-                  <AiOutlineLogout size={17} />
-                  <span style={{ fontSize: "13px", fontWeight: 500 }}>Log out</span>
+                  <AiOutlineLogout size={16} />
+                  <span className="text-[13px] font-medium">Log out</span>
                 </div>
               </PopoverContent>
             </ShadPopover>
-          </Box>
-        </Box>
+          </div>
+        </div>
       </header>
 
       <aside
         className={`sidebar ${isCollapsed ? "collapsed" : ""} ${isSidebarVisible ? "show" : ""}`}
+        style={{ width: isCollapsed ? 64 : 240 }}
       >
-        <IconButton onClick={handleToggleSidebar} className="toggle-button">
-          {isCollapsed ? (
-            <ChevronRight className="toggle-icon" />
-          ) : (
-            <ChevronLeft className="toggle-icon" />
-          )}
-        </IconButton>
-        <Box
-          component="aside"
+        {/* Collapse toggle */}
+        {!isSmallScreen && (
+          <IconButton onClick={handleToggleSidebar} className="toggle-button">
+            {isCollapsed ? (
+              <ChevronRight className="toggle-icon" />
+            ) : (
+              <ChevronLeft className="toggle-icon" />
+            )}
+          </IconButton>
+        )}
+
+        {/* Logo */}
+        <div
+          className="flex items-center border-b border-slate-100 shrink-0"
           style={{
-            width: isCollapsed ? "58px" : "230px",
-            padding: isCollapsed ? "0 4px" : "0 8px",
-            transition: "width 0.25s ease",
+            height: 56,
+            padding: isCollapsed ? "0 8px" : "0 16px",
+            justifyContent: isCollapsed ? "center" : "flex-start",
           }}
         >
-          <Box
-            sx={{
-              pt: 2.5,
-              pb: 1.5,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: isCollapsed ? "center" : "flex-start",
-              px: isCollapsed ? 0 : 0.5,
-              borderBottom: "1px solid rgba(0,172,193,0.1)",
-              mb: 1,
-            }}
-          >
-            {isCollapsed ? (
-              <img
-                src={Logo}
-                alt="logo"
-                style={{ height: "36px", display: "block" }}
-              />
-            ) : (
-              <img
-                src={FullLogo}
-                alt="logo"
-                style={{ height: "56px", display: "block", width: "88%" }}
-              />
-            )}
-          </Box>
+          {isCollapsed ? (
+            <img src={Logo} alt="logo" className="h-7 w-auto object-contain" />
+          ) : (
+            <img src={FullLogo} alt="logo" className="h-8 w-auto object-contain max-w-[140px]" />
+          )}
+        </div>
 
-          {/* <Box
-            className="sidebar-contents"
-            sx={{ mt: 2, height: "85vh", overflowY: "auto" }}
-          >
-            <List sx={{ cursor: "pointer" }}>
-              {sidebarItems.map((item) => {
-                const isActiveMenu =
-                  (item.path !== "/" &&
-                    location.pathname.startsWith(item.path)) ||
-                  (item.path === "/" && location.pathname === "/") ||
-                  item.submenu.some((subItem) =>
-                    location.pathname.startsWith(subItem.path)
-                  );
+        {/* Navigation label */}
+        {!isCollapsed && (
+          <div className="px-4 pt-4 pb-1">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Navigation</span>
+          </div>
+        )}
 
-                return (
-                  <Box key={item._id}>
-                    <ListItem
-                      onClick={() => handleToggleSubmenu(item._id, item.label)}
-                      component={Link}
-                      to={item.path}
-                      className="menu-item"
-                      sx={{
-                        mt: 1,
-                        borderRadius: "10px",
-                        padding: "4px 6px",
-                        // border:'1px solid red',
-                        backgroundColor: isActiveMenu
-                          ? "#E0F7FA"
-                          : "transparent",
-                        transition: "background-color 0.3s, color 0.3s",
-                        "&:hover": {
-                          color: "#fff",
-                          backgroundColor: "#00ACC1",
-                          ".menu-icon": { color: "#fff" },
-                          ".menu-text": { color: "#fff" },
-                        },
-                      }}
-                    >
-                      <ListItemIcon
-                        sx={{ fontSize: "1.2rem" }}
-                        className="menu-icon"
+        {/* Menu items */}
+        <div className="sidebar-contents" style={{ marginTop: isCollapsed ? 8 : 0 }}>
+          <nav className="px-2 py-1">
+            {sidebarItems.map((item) => {
+              const isActiveMenu =
+                (item.path !== "/" && location.pathname.startsWith(item.path)) ||
+                (item.path === "/" && location.pathname === "/") ||
+                item.submenu.some((subItem) => location.pathname.startsWith(subItem.path));
+
+              return (
+                <div key={item._id} className="mb-0.5">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Link
+                        to={item.path}
+                        onClick={() => handleToggleSubmenu(item._id, item.label)}
+                        className={`
+                          group flex items-center gap-2.5 rounded-lg transition-all duration-150 no-underline
+                          ${isCollapsed ? "justify-center px-2 py-2.5" : "px-3 py-2"}
+                          ${isActiveMenu
+                            ? "bg-indigo-50 text-indigo-700"
+                            : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
+                          }
+                        `}
                       >
-                        {iconMapping[item.icon]
-                          ? React.createElement(iconMapping[item.icon])
-                          : null}
-                      </ListItemIcon>
-                      {!isCollapsed && (
-                        <ListItemText
-                          primary={item.label}
-                          primaryTypographyProps={{
-                            fontSize: "0.9rem", // Adjust size for submenu text
-                            fontWeight: 400, // Optional: control weight
-                          }}
-                          sx={{ ml: -3 }}
-                          className="menu-text"
-                        />
-                      )}
-                      {!isCollapsed && item.submenu.length > 0 && (
-                        <ListItemIcon sx={{ justifyContent: "end" }}>
-                          {openMenu === item._id ? (
-                            <ExpandLess className="menu-icon" />
-                          ) : (
-                            <ExpandMore className="menu-icon" />
-                          )}
-                        </ListItemIcon>
-                      )}
-                    </ListItem>
+                        {/* Icon */}
+                        <span className={`text-[1.1rem] shrink-0 transition-colors duration-150 ${isActiveMenu ? "text-indigo-600" : "text-slate-400 group-hover:text-slate-600"}`}>
+                          {iconMapping[item.icon] ? React.createElement(iconMapping[item.icon]) : null}
+                        </span>
 
-                    {item.submenu.length > 0 && (
-                      <Collapse in={openMenu === item._id}>
-                        <List component="div" disablePadding>
-                          {item.submenu.map((subItem) => {
-                            const isActiveSubmenu =
-                              location.pathname.startsWith(subItem.path);
-
-                            return (
-                              <ListItem
-                                key={subItem.path}
-                                component={Link}
-                                to={subItem.path}
-                                className="menu-item"
-                                sx={{
-                                  mt: 1,
-                                  padding: "4px 6px",
-                                  borderRadius: "10px",
-                                  backgroundColor: isActiveSubmenu
-                                    ? "#E0F7FA"
-                                    : "transparent",
-                                  color: "black",
-                                  pl: 4,
-                                  transition:
-                                    "background-color 0.3s, color 0.3s",
-                                  "&:hover": {
-                                    color: "#fff",
-                                    backgroundColor: "#00ACC1",
-                                    ".menu-icon": { color: "#fff" },
-                                    ".menu-text": { color: "#fff" },
-                                  },
-                                }}
-                              >
-                                <ListItemIcon
-                                  sx={{ fontSize: "1.2rem" }}
-                                  className="menu-icon"
-                                >
-                                  {iconMapping[subItem.icon]
-                                    ? React.createElement(
-                                        iconMapping[subItem.icon]
-                                      )
-                                    : null}
-                                </ListItemIcon>
-                                {!isCollapsed && (
-                                  <ListItemText
-                                    primary={subItem.label}
-                                    primaryTypographyProps={{
-                                      fontSize: "0.9rem", // Adjust size for submenu text
-                                      fontWeight: 400, // Optional: control weight
-                                    }}
-                                    sx={{ ml: -2 }}
-                                    className="menu-text"
-                                  />
+                        {/* Label */}
+                        {!isCollapsed && (
+                          <span className={`flex-1 text-[13px] truncate ${isActiveMenu ? "font-semibold" : "font-medium"}`}>
+                            {item.label === "Inbox +" ? (
+                              <span className="flex items-center gap-1.5">
+                                <span>{item.label}</span>
+                                {inboxCount > 0 && (
+                                  <span className="inline-flex items-center justify-center h-[18px] min-w-[18px] px-1 text-[10px] font-bold text-white bg-emerald-500 rounded-full">{inboxCount}</span>
                                 )}
-                              </ListItem>
-                            );
-                          })}
-                        </List>
-                      </Collapse>
-                    )}
-                  </Box>
-                );
-              })}
-            </List>
-          </Box> */}
+                              </span>
+                            ) : item.label}
+                          </span>
+                        )}
 
-          {/* inbox with badge */}
-
-          {/* <Box
-            className="sidebar-contents"
-            sx={{ mt: 2, height: "85vh", overflowY: "auto" }}
-          >
-            <List sx={{ cursor: "pointer" }}>
-              {sidebarItems.map((item) => {
-                const isActiveMenu =
-                  (item.path !== "/" &&
-                    location.pathname.startsWith(item.path)) ||
-                  (item.path === "/" && location.pathname === "/") ||
-                  item.submenu.some((subItem) =>
-                    location.pathname.startsWith(subItem.path)
-                  );
-
-                return (
-                  <Box key={item._id}>
-                    <ListItem
-                      onClick={() => handleToggleSubmenu(item._id, item.label)}
-                      component={Link}
-                      to={item.path}
-                      className="menu-item"
-                      sx={{
-                        mt: 1,
-                        borderRadius: "10px",
-                        padding: "4px 6px",
-                        // border:'1px solid red',
-                        backgroundColor: isActiveMenu
-                          ? "#E0F7FA"
-                          : "transparent",
-                        transition: "background-color 0.3s, color 0.3s",
-                        "&:hover": {
-                          color: "#fff",
-                          backgroundColor: "#00ACC1",
-                          ".menu-icon": { color: "#fff" },
-                          ".menu-text": { color: "#fff" },
-                        },
-                      }}
-                    >
-                      <ListItemIcon
-                        sx={{ fontSize: "1.2rem" }}
-                        className="menu-icon"
-                      >
-                        {iconMapping[item.icon]
-                          ? React.createElement(iconMapping[item.icon])
-                          : null}
-                      </ListItemIcon>
-                      {!isCollapsed && (
-                        <ListItemText
-                          primary={item.label}
-                          primaryTypographyProps={{
-                            fontSize: "0.9rem", // Adjust size for submenu text
-                            fontWeight: 400, // Optional: control weight
-                          }}
-                          sx={{ ml: -3 }}
-                          className="menu-text"
-                        />
-                      )}
-                      {!isCollapsed && item.submenu.length > 0 && (
-                        <ListItemIcon sx={{ justifyContent: "end" }}>
-                          {openMenu === item._id ? (
-                            <ExpandLess className="menu-icon" />
-                          ) : (
-                            <ExpandMore className="menu-icon" />
-                          )}
-                        </ListItemIcon>
-                      )}
-                    </ListItem>
-
-                    {item.submenu.length > 0 && (
-                      <Collapse in={openMenu === item._id}>
-                        <List component="div" disablePadding>
-                          {item.submenu.map((subItem) => {
-                            const isActiveSubmenu =
-                              location.pathname.startsWith(subItem.path);
-
-                            return (
-                              <ListItem
-                                key={subItem.path}
-                                component={Link}
-                                to={subItem.path}
-                                className="menu-item"
-                                sx={{
-                                  mt: 1,
-                                  padding: "4px 6px",
-                                  borderRadius: "10px",
-                                  backgroundColor: isActiveSubmenu
-                                    ? "#E0F7FA"
-                                    : "transparent",
-                                  color: "black",
-                                  pl: 4,
-                                  transition:
-                                    "background-color 0.3s, color 0.3s",
-                                  "&:hover": {
-                                    color: "#fff",
-                                    backgroundColor: "#00ACC1",
-                                    ".menu-icon": { color: "#fff" },
-                                    ".menu-text": { color: "#fff" },
-                                  },
-                                }}
-                              >
-                                <ListItemIcon
-                                  sx={{ fontSize: "1.2rem" }}
-                                  className="menu-icon"
-                                >
-                                  {iconMapping[subItem.icon]
-                                    ? React.createElement(
-                                        iconMapping[subItem.icon]
-                                      )
-                                    : null}
-                                </ListItemIcon>
-                                {!isCollapsed && (
-                                  <ListItemText
-                                    primary={subItem.label}
-                                    primaryTypographyProps={{
-                                      fontSize: "0.9rem", // Adjust size for submenu text
-                                      fontWeight: 400, // Optional: control weight
-                                    }}
-                                    sx={{ ml: -2 }}
-                                    className="menu-text"
-                                  />
-                                )}
-                              </ListItem>
-                            );
-                          })}
-                        </List>
-                      </Collapse>
-                    )}
-                  </Box>
-                );
-              })}
-            </List>
-          </Box>  */}
-
-          <Box
-            className="sidebar-contents"
-            sx={{ mt: 1, height: "85vh", overflowY: "auto" }}
-          >
-            <List sx={{ cursor: "pointer", px: 0.5 }}>
-              {sidebarItems.map((item) => {
-                const isActiveMenu =
-                  (item.path !== "/" &&
-                    location.pathname.startsWith(item.path)) ||
-                  (item.path === "/" && location.pathname === "/") ||
-                  item.submenu.some((subItem) =>
-                    location.pathname.startsWith(subItem.path)
-                  );
-
-                return (
-                  <Box key={item._id}>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <ListItem
-                          onClick={() => handleToggleSubmenu(item._id, item.label)}
-                          component={Link}
-                          to={item.path}
-                          className={`menu-item ${isActiveMenu ? "menu-item-active" : ""}`}
-                          sx={{
-                            mt: 0.5,
-                            borderRadius: "8px",
-                            padding: "6px 8px",
-                            backgroundColor: isActiveMenu
-                              ? "rgba(0,172,193,0.09)"
-                              : "transparent",
-                            transition: "background-color 0.2s ease, color 0.2s ease",
-                            "&:hover": {
-                              backgroundColor: isActiveMenu
-                                ? "rgba(0,172,193,0.15)"
-                                : "rgba(0,172,193,0.07)",
-                              ".menu-icon": { color: "#00ACC1" },
-                            },
-                          }}
-                        >
-                          <ListItemIcon
-                            sx={{ fontSize: "1.15rem", minWidth: isCollapsed ? "auto" : 36 }}
-                            className="menu-icon"
+                        {/* Expand arrow */}
+                        {!isCollapsed && item.submenu.length > 0 && (
+                          <svg
+                            className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${openMenu === item._id ? "rotate-180" : ""} ${isActiveMenu ? "text-indigo-400" : "text-slate-300"}`}
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24"
                           >
-                            {iconMapping[item.icon]
-                              ? React.createElement(iconMapping[item.icon])
-                              : null}
-                          </ListItemIcon>
-
-                          {!isCollapsed && (
-                            <ListItemText
-                              primary={
-                                item.label === "Inbox +" ? (
-                                  <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                    <span>{item.label}</span>
-                                    <ShadBadge className="bg-green-500 text-white border-0 h-4 text-[10px] px-1.5 rounded-full font-semibold">
-                                      {inboxCount}
-                                    </ShadBadge>
-                                  </span>
-                                ) : (
-                                  item.label
-                                )
-                              }
-                              primaryTypographyProps={{
-                                fontSize: "0.875rem",
-                                fontWeight: isActiveMenu ? 600 : 400,
-                              }}
-                              sx={{ ml: -1 }}
-                              className="menu-text"
-                            />
-                          )}
-
-                          {!isCollapsed && item.submenu.length > 0 && (
-                            <ListItemIcon sx={{ justifyContent: "flex-end", minWidth: "auto" }}>
-                              {openMenu === item._id ? (
-                                <ExpandLess sx={{ fontSize: "1.1rem" }} className="menu-icon" />
-                              ) : (
-                                <ExpandMore sx={{ fontSize: "1.1rem" }} className="menu-icon" />
-                              )}
-                            </ListItemIcon>
-                          )}
-                        </ListItem>
-                      </TooltipTrigger>
-                      {isCollapsed && (
-                        <TooltipContent side="right" className="text-xs font-medium bg-[#00ACC1] text-white border-0">
-                          {item.label}
-                        </TooltipContent>
-                      )}
-                    </Tooltip>
-
-                    {item.submenu.length > 0 && (
-                      <Collapse in={openMenu === item._id}>
-                        <List component="div" disablePadding sx={{ pl: 0.5 }}>
-                          {item.submenu.map((subItem) => {
-                            const isActiveSubmenu =
-                              location.pathname.startsWith(subItem.path);
-
-                            return (
-                              <ListItem
-                                key={subItem.path}
-                                component={Link}
-                                to={subItem.path}
-                                className={`menu-item ${isActiveSubmenu ? "menu-item-active" : ""}`}
-                                sx={{
-                                  mt: 0.5,
-                                  padding: "5px 8px",
-                                  borderRadius: "8px",
-                                  backgroundColor: isActiveSubmenu
-                                    ? "rgba(0,172,193,0.09)"
-                                    : "transparent",
-                                  pl: isCollapsed ? 1 : 3.5,
-                                  transition: "background-color 0.2s ease",
-                                  "&:hover": {
-                                    backgroundColor: isActiveSubmenu
-                                      ? "rgba(0,172,193,0.15)"
-                                      : "rgba(0,172,193,0.07)",
-                                    ".menu-icon": { color: "#00ACC1" },
-                                  },
-                                }}
-                              >
-                                <ListItemIcon
-                                  sx={{ fontSize: "1rem", minWidth: isCollapsed ? "auto" : 30 }}
-                                  className="menu-icon"
-                                >
-                                  {iconMapping[subItem.icon]
-                                    ? React.createElement(
-                                        iconMapping[subItem.icon]
-                                      )
-                                    : null}
-                                </ListItemIcon>
-
-                                {!isCollapsed && (
-                                  <ListItemText
-                                    primary={subItem.label}
-                                    primaryTypographyProps={{
-                                      fontSize: "0.85rem",
-                                      fontWeight: isActiveSubmenu ? 600 : 400,
-                                    }}
-                                    sx={{ ml: -1 }}
-                                    className="menu-text"
-                                  />
-                                )}
-                              </ListItem>
-                            );
-                          })}
-                        </List>
-                      </Collapse>
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        )}
+                      </Link>
+                    </TooltipTrigger>
+                    {isCollapsed && (
+                      <TooltipContent side="right" className="text-xs font-medium bg-slate-800 text-white border-0 shadow-lg">
+                        {item.label}
+                      </TooltipContent>
                     )}
-                  </Box>
-                );
-              })}
-            </List>
-          </Box>
-        </Box>
+                  </Tooltip>
+
+                  {/* Submenu */}
+                  {item.submenu.length > 0 && (
+                    <Collapse in={openMenu === item._id}>
+                      <div className={`mt-0.5 ${isCollapsed ? "" : "ml-4 pl-3 border-l border-slate-100"}`}>
+                        {item.submenu.map((subItem) => {
+                          const isActiveSubmenu = location.pathname.startsWith(subItem.path);
+
+                          return (
+                            <Link
+                              key={subItem.path}
+                              to={subItem.path}
+                              className={`
+                                group flex items-center gap-2 rounded-md transition-all duration-150 no-underline mb-0.5
+                                ${isCollapsed ? "justify-center px-2 py-2" : "px-2.5 py-1.5"}
+                                ${isActiveSubmenu
+                                  ? "bg-indigo-50/70 text-indigo-700"
+                                  : "text-slate-400 hover:bg-slate-50 hover:text-slate-600"
+                                }
+                              `}
+                            >
+                              <span className={`text-[0.95rem] shrink-0 transition-colors ${isActiveSubmenu ? "text-indigo-500" : "text-slate-300 group-hover:text-slate-500"}`}>
+                                {iconMapping[subItem.icon] ? React.createElement(iconMapping[subItem.icon]) : null}
+                              </span>
+                              {!isCollapsed && (
+                                <span className={`text-[12.5px] truncate ${isActiveSubmenu ? "font-semibold" : "font-medium"}`}>
+                                  {subItem.label}
+                                </span>
+                              )}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    </Collapse>
+                  )}
+                </div>
+              );
+            })}
+          </nav>
+        </div>
       </aside>
       <main className="main">
-        <Box component="main">
-          <Outlet />
-        </Box>
+        <Outlet />
       </main>
+
+      {/* ─── Create New Sheet ────────────────────────────── */}
       <Sheet open={isDrawerOpen} onOpenChange={(open) => !open && handleDrawerClose()}>
         <SheetContent
           side="left"
-          className="newSidebar p-0 w-[210px] flex flex-col [&>button]:hidden"
+          className="newSidebar p-0 w-[220px] flex flex-col [&>button]:hidden"
         >
           <SheetHeader className="new-drawer-header">
             <SheetTitle className="new-drawer-title">
-              <FaPlus size={12} style={{ color: "#00ACC1" }} />
-              <span style={{ fontSize: "0.9rem" }}>Create New</span>
+              <span className="flex items-center justify-center w-5 h-5 rounded-md bg-indigo-50">
+                <FaPlus size={9} className="text-indigo-600" />
+              </span>
+              <span className="text-sm font-semibold text-slate-800">Create New</span>
             </SheetTitle>
-            <RxCross2
-              size={17}
-              className="new-drawer-close"
-              onClick={handleDrawerClose}
-            />
+            <button onClick={handleDrawerClose} className="new-drawer-close">
+              <RxCross2 size={16} />
+            </button>
           </SheetHeader>
-          <List sx={{ px: 1, pt: 0.5, flex: 1, overflowY: "auto" }}>
+          <nav className="flex-1 overflow-y-auto px-2 py-2">
             {newSidebarItems.map((item) => (
-              <ListItem
+              <Link
                 key={item._id}
-                component={Link}
                 to={item.path}
-                className="menu-item"
                 onClick={(e) => {
                   if (item.restricted) {
                     e.preventDefault();
@@ -1421,95 +1025,45 @@ axios.request(config)
                     handleNewItemClick(item.label);
                   }
                 }}
-                sx={{
-                  mt: 0.5,
-                  borderRadius: "8px",
-                  padding: "7px 10px",
-                  opacity: item.restricted ? 0.5 : 1,
-                  transition: "background-color 0.2s ease",
-                  "&:hover": {
-                    backgroundColor: item.restricted
-                      ? "transparent"
-                      : "rgba(0,172,193,0.09)",
-                    ".menu-icon": {
-                      color: item.restricted ? "grey" : "#00ACC1",
-                    },
-                  },
-                }}
+                className={`
+                  group flex items-center gap-2.5 px-3 py-2 rounded-lg mb-0.5 no-underline transition-all duration-150
+                  ${item.restricted
+                    ? "opacity-40 cursor-not-allowed text-slate-400"
+                    : "text-slate-600 hover:bg-indigo-50 hover:text-indigo-700"
+                  }
+                `}
               >
-                <ListItemIcon
-                  sx={{
-                    fontSize: "1.1rem",
-                    minWidth: 34,
-                    color: item.restricted ? "#aaa" : "#00ACC1",
-                  }}
-                  className="menu-icon"
-                >
-                  {iconMapping[item.icon]
-                    ? React.createElement(iconMapping[item.icon])
-                    : null}
-                </ListItemIcon>
-                <ListItemText
-                  primary={item.label}
-                  className="menu-text"
-                  primaryTypographyProps={{
-                    fontSize: "0.875rem",
-                    fontWeight: 400,
-                    color: item.restricted ? "#aaa" : "inherit",
-                  }}
-                />
-              </ListItem>
+                <span className={`text-[1rem] shrink-0 transition-colors ${item.restricted ? "text-slate-300" : "text-slate-400 group-hover:text-indigo-500"}`}>
+                  {iconMapping[item.icon] ? React.createElement(iconMapping[item.icon]) : null}
+                </span>
+                <span className="text-[13px] font-medium">{item.label}</span>
+              </Link>
             ))}
-          </List>
+          </nav>
         </SheetContent>
       </Sheet>
+
+      {/* ─── Right Drawer ────────────────────────────────── */}
       <Drawer
         anchor="right"
         open={isRightDrawerOpen}
         onClose={handleNewDrawerClose}
-        classes={{ paper: "custom-right-drawer" }}
+        PaperProps={{ sx: { width: { xs: '100vw', sm: 650 }, borderRadius: { sm: '16px 0 0 16px' } } }}
       >
-        <Box sx={{ width: isSmallScreen ? "100vw" : 650 }}>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          ></Box>
-          {/* {rightDrawerContent === "Account" && (
-            <AccountDrawer
-              handleNewDrawerClose={handleNewDrawerClose}
-              handleDrawerClose={handleDrawerClose}
-              // onClose={handleCloseDrawers}
-            />
-          )} */}
+        <div style={{ width: "100%" }}>
           {rightDrawerContent === "Contact" && (
-            <ContactForm
-              handleNewDrawerClose={handleNewDrawerClose}
-              handleDrawerClose={handleDrawerClose}
-            />
+            <ContactForm handleNewDrawerClose={handleNewDrawerClose} handleDrawerClose={handleDrawerClose} />
           )}
           {rightDrawerContent === "Task" && (
-            <TaskForm
-              handleNewDrawerClose={handleNewDrawerClose}
-              handleDrawerClose={handleDrawerClose}
-            />
+            <TaskForm handleNewDrawerClose={handleNewDrawerClose} handleDrawerClose={handleDrawerClose} />
           )}
           {rightDrawerContent === "Chat" && (
-            <ChatForm
-              handleNewDrawerClose={handleNewDrawerClose}
-              handleDrawerClose={handleDrawerClose}
-            />
+            <ChatForm handleNewDrawerClose={handleNewDrawerClose} handleDrawerClose={handleDrawerClose} />
           )}
-
           {rightDrawerContent === "Jobs" && (
-            <JobDrawer
-              handleNewDrawerClose={handleNewDrawerClose}
-              handleDrawerClose={handleDrawerClose}
-            />
+            <JobDrawer handleNewDrawerClose={handleNewDrawerClose} handleDrawerClose={handleDrawerClose} />
           )}
-        </Box>
+        </div>
       </Drawer>
 
       <ClientSelectionDialog

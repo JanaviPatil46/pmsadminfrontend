@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, CircularProgress } from "@mui/material";
 import { toast } from "react-toastify";
 import { FormDrawer, FormDrawerFooter, FormSection, FormField } from "../../components/ui/form-layout";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { Label } from "../../components/ui/label";
-import { Pencil, Trash2, Circle } from "lucide-react";
+import { Pencil, Trash2, Circle, Loader2 } from "lucide-react";
 const Clientfacing = () => {
   const CLIENT_FACING_API = process.env.REACT_APP_CLIENT_FACING_URL;
   const [clientFacingJobs, setClientFacingJobs] = useState([]);
@@ -292,20 +291,20 @@ const validateForm = () => {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <Button onClick={handleDrawerOpen}>
-            Create Status
+            Create status
           </Button>
         </div>
 
         {/* Display Current Status */}
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <CircularProgress style={{ color: "blue" }} />
+            <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
           </div>
         ) : (
           <div className="space-y-3">
-            {clientFacingJobs.map((job) => (
+      {clientFacingJobs.map((job) => (
               <div
-                key={job._id}
+          key={job._id}
                 className="flex items-center justify-between p-4 rounded-xl border border-border bg-white shadow-sm transition-all hover:shadow-md"
               >
                 <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -351,17 +350,17 @@ const validateForm = () => {
                 <div className="relative">
                   <select
                     className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    value={selectedColor}
-                    onChange={(e) => {
-                      setSelectedColor(e.target.value);
-                      if (e.target.value) {
+                        value={selectedColor}
+                        onChange={(e) => {
+      setSelectedColor(e.target.value);
+      if (e.target.value) {
                         setErrors((prev) => ({ ...prev, color: "" }));
                       }
                     }}
                     style={{ color: selectedColor || undefined }}
                   >
                     <option value="">Select</option>
-                    {colors.map((color) => (
+                        {colors.map((color) => (
                       <option key={color} value={color} style={{ color: color, fontWeight: "bold" }}>
                         ● {color}
                       </option>
@@ -378,15 +377,15 @@ const validateForm = () => {
 
               <FormField label="Name" error={errors.name} className="flex-1">
                 <Input
-                  placeholder="Enter a name"
-                  value={clientFacingName}
-                  onChange={(e) => {
-                    setClientFacingName(e.target.value);
-                    if (e.target.value.trim()) {
+                      placeholder="Enter a name"
+                      value={clientFacingName}
+                      onChange={(e) => {
+    setClientFacingName(e.target.value);
+    if (e.target.value.trim()) {
                       setErrors((prev) => ({ ...prev, name: "" }));
-                    }
-                  }}
-                  error={!!errors.name}
+    }
+  }}
+                    error={!!errors.name}
                 />
               </FormField>
             </div>
@@ -394,13 +393,13 @@ const validateForm = () => {
             <FormField label="Status Description" error={errors.description}>
               <textarea
                 className="flex min-h-[120px] w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none"
-                placeholder="Status description for client"
+  placeholder="Status description for client"
                 maxLength={200}
-                rows={5}
-                value={clientFacingDescription}
-                onChange={(e) => {
-                  setClientFacingDescription(e.target.value);
-                  if (e.target.value.trim() && e.target.value.length <= 200) {
+  rows={5}
+  value={clientFacingDescription}
+   onChange={(e) => {
+    setClientFacingDescription(e.target.value);
+    if (e.target.value.trim() && e.target.value.length <= 200) {
                     setErrors((prev) => ({ ...prev, description: "" }));
                   }
                 }}
@@ -430,12 +429,12 @@ const validateForm = () => {
                 <div className="relative">
                   <select
                     className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    value={selectedColor}
-                    onChange={handleColorChange}
+                        value={selectedColor}
+                        onChange={handleColorChange}
                     style={{ color: selectedColor || undefined }}
                   >
                     <option value="">Select</option>
-                    {colors.map((color) => (
+                        {colors.map((color) => (
                       <option key={color} value={color} style={{ color: color, fontWeight: "bold" }}>
                         ● {color}
                       </option>
@@ -452,21 +451,21 @@ const validateForm = () => {
 
               <FormField label="Name" className="flex-1">
                 <Input
-                  placeholder="Enter a name"
-                  value={clientFacingName}
-                  onChange={(e) => setClientFacingName(e.target.value)}
-                />
+                      placeholder="Enter a name"
+                      value={clientFacingName}
+                      onChange={(e) => setClientFacingName(e.target.value)}
+                    />
               </FormField>
             </div>
 
             <FormField label="Status Description">
               <textarea
                 className="flex min-h-[120px] w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none"
-                placeholder="Status description for client"
+  placeholder="Status description for client"
                 maxLength={200}
-                rows={5}
-                value={clientFacingDescription}
-                onChange={(e) => setClientFacingDescription(e.target.value)}
+  rows={5}
+  value={clientFacingDescription}
+  onChange={(e) => setClientFacingDescription(e.target.value)}
               />
               <p className="text-xs text-muted-foreground mt-1 text-right">
                 {clientFacingDescription.length}/200

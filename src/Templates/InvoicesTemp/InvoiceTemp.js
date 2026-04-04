@@ -1,23 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
-import {
-  Box,
-  Typography,
-  IconButton,
-  TableContainer,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  Paper,
-  Menu,
-  MenuItem,
-  TablePagination,
-  CircularProgress
-} from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { CiMenuKebab } from "react-icons/ci";
 import CreatableSelect from "react-select/creatable";
 import Editor from "../Texteditor/Editor";
 import axios from "axios";
@@ -27,7 +10,7 @@ import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { Label } from "../../components/ui/label";
 import { Switch } from "../../components/ui/switch";
-import { Eye, X, FileText, Receipt, MoreVertical, Plus, Percent } from "lucide-react";
+import { Eye, X, FileText, Receipt, MoreVertical, Plus, Percent, Pencil, Trash2, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 const InvoiceTemp = () => {
   const INVOICE_API = process.env.REACT_APP_INVOICE_TEMP_URL;
   const SERVICE_API = process.env.REACT_APP_SERVICES_URL;
@@ -1056,201 +1039,119 @@ const InvoiceTemp = () => {
  
  
      return (
-    <Box>
+    <div>
       {!showForm ? (
-        <Box sx={{ mt: 2 }}>
-          <Button onClick={handleCreateInvoiceTemp} className="mb-3">
-            Create Invoice Template
-          </Button>
+        <div className="mt-4 space-y-4">
+          <div className="flex items-center justify-between">
+            <Button onClick={handleCreateInvoiceTemp}>
+              <Receipt className="mr-2 h-4 w-4" /> Create Invoice Template
+            </Button>
+          </div>
+
           {loading ? (
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}> <CircularProgress style={{ fontSize: '300px', color: 'blue' }} /></Box>
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
+            </div>
           ) : (
-         
-            // <MaterialReactTable columns={columns} table={table} />
-        
-            <Box>
-<TableContainer component={Paper} sx={{ overflow: "visible" }}>
-            <Table sx={{ width: "100%" }}>
-              <TableHead>
-                <TableRow>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="250"
-                  >
-                    Name
-                  </TableCell>
-
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="100"
-                  >
-                    Settings
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {paginatedInvoices.map((row) => (
-                  <TableRow key={row._id}>
-                    <TableCell>
-                      <Typography
-                        style={{
-                          fontSize: "12px",
-                          padding: "4px 8px",
-                          lineHeight: "1",
-                          cursor: "pointer",
-                          color: "#3f51b5",
-                        }}
-                        onClick={() => handleEdit(row._id)}
-                      >
-                        {row.templatename}
-                      </Typography>
-                    </TableCell>
-
-                    {/* <TableCell
-                      style={{
-                        fontSize: "12px",
-                        padding: "4px 8px",
-                        lineHeight: "1",
-                        cursor: "pointer",
-                      }}
-                    >
-                      <IconButton
-                        onClick={() => toggleMenu(row._id)}
-                        style={{ color: "#2c59fa" }}
-                      >
-                        <CiMenuKebab />
-                        {openMenuId === row._id && (
-                          <Box
-                            sx={{
-                              position: "absolute",
-                              zIndex: 1,
-                              backgroundColor: "#fff",
-                              boxShadow: 1,
-                              borderRadius: 1,
-                              p: 1,
-                              left: "20px",
-
-                              m: 2,
-                              top: "10px",
-                              textAlign: "start",
-                            }}
-                          >
-                          
-                            <Typography
-                              sx={{ fontSize: "12px", fontWeight: "bold" }}
+            <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="border-b border-slate-100 bg-slate-50/60">
+                      <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Name</th>
+                      <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 w-24 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {paginatedInvoices.length === 0 ? (
+                      <tr>
+                        <td colSpan={2} className="px-5 py-10 text-center text-sm text-slate-400">No invoice templates found.</td>
+                      </tr>
+                    ) : (
+                      paginatedInvoices.map((row) => (
+                        <tr key={row._id} className="group transition-colors hover:bg-slate-50/70">
+                          <td className="px-5 py-3">
+                            <button
                               onClick={() => handleEdit(row._id)}
+                              className="text-sm font-medium text-indigo-600 hover:text-indigo-800 hover:underline transition-colors"
                             >
-                              Edit 
-                            </Typography>
-                            <Typography
-                              sx={{
-                                fontSize: "12px",
-                                color: "red",
-                                fontWeight: "bold",
-                              }}
-                              onClick={() => handleDelete(row._id)}
-                            >
-                              Delete
-                            </Typography>
-                          </Box>
-                        )}
-                      </IconButton>
-                    </TableCell> */}
-                                          <TableCell
-                                                           style={{
-                                                             fontSize: "12px",
-                                                             padding: "4px 8px",
-                                                             lineHeight: "1",
-                                                           }}
-                                                         >
-                                                           <IconButton
-                                                             onClick={(event) => toggleMenu(event, row._id)}
-                                                             style={{ color: "#2c59fa" }}
-                                                             size="small"
-                                                           >
-                                                             <CiMenuKebab />
-                                                           </IconButton>
-                                         
-                                                           {/* MUI Menu */}
-                                                         
-                                                         </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
- <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleCloseOptions}
-        anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
-        }}
-        PaperProps={{
-          sx: {
-            mt: 3,
-            ml: 1,
-            boxShadow: 3,
-            borderRadius: 1,
-            minWidth: 120,
-            '& .MuiMenuItem-root': {
-              fontSize: '12px',
-              padding: '8px 16px',
-            }
-          }
-        }}
-      >
-        <MenuItem 
-          onClick={() => handleEdit(tempIdget)}
-          sx={{ 
-            fontWeight: "bold",
-            '&:hover': {
-              backgroundColor: '#f5f5f5'
-            }
-          }}
-        >
-          Edit
-        </MenuItem>
-        <MenuItem 
-          onClick={() => handleDelete(tempIdget)}
-          sx={{ 
-            color: "error.main", 
-            fontWeight: "bold",
-            '&:hover': {
-              backgroundColor: '#ffebee'
-            }
-          }}
-        >
-          Delete
-        </MenuItem>
-      </Menu>
-<TablePagination
-rowsPerPageOptions={[30,40,50,60,100]}
-component="div"
-count={invoiceTemplates.length}
-rowsPerPage={rowsPerPage}
-page={page}
-onPageChange={handleChangePage}
-onRowsPerPageChange={handleChangeRowsPerPage}
-/>
-</Box>
-          )
-          }
-          {/* <MaterialReactTable columns={columns} table={table} /> */}
-        </Box>
+                              {row.templatename}
+                            </button>
+                          </td>
+                          <td className="px-5 py-3 text-right">
+                            <div className="relative inline-block">
+                              <button
+                                onClick={(event) => toggleMenu(event, row._id)}
+                                className="inline-flex items-center justify-center rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                              >
+                                <MoreVertical className="h-4 w-4" />
+                              </button>
+                              {openMenuId === row._id && (
+                                <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-slate-200 bg-white py-1 shadow-lg animate-in fade-in-0 zoom-in-95">
+                                  <button
+                                    onClick={() => { handleEdit(tempIdget); handleCloseOptions(); }}
+                                    className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                                  >
+                                    <Pencil className="h-3.5 w-3.5" /> Edit
+                                  </button>
+                                  <button
+                                    onClick={() => { handleDelete(tempIdget); }}
+                                    className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+                                  >
+                                    <Trash2 className="h-3.5 w-3.5" /> Delete
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {invoiceTemplates.length > 0 && (
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-100 bg-slate-50/40 px-5 py-3">
+                  <p className="text-xs text-slate-500">
+                    Showing <span className="font-semibold text-slate-700">{page * rowsPerPage + 1}</span>–<span className="font-semibold text-slate-700">{Math.min((page + 1) * rowsPerPage, invoiceTemplates.length)}</span> of{" "}
+                    <span className="font-semibold text-slate-700">{invoiceTemplates.length}</span>
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={rowsPerPage}
+                      onChange={(e) => handleChangeRowsPerPage({ target: { value: e.target.value } })}
+                      className="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-600 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    >
+                      {[30, 40, 50, 60, 100].map((opt) => (
+                        <option key={opt} value={opt}>{opt} / page</option>
+                      ))}
+                    </select>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => handleChangePage(null, page - 1)}
+                        disabled={page === 0}
+                        className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 text-slate-500 shadow-sm transition-colors hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </button>
+                      <span className="min-w-[3rem] text-center text-xs font-medium text-slate-600">
+                        {page + 1} / {Math.max(1, Math.ceil(invoiceTemplates.length / rowsPerPage))}
+                      </span>
+                      <button
+                        onClick={() => handleChangePage(null, page + 1)}
+                        disabled={(page + 1) * rowsPerPage >= invoiceTemplates.length}
+                        className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 text-slate-500 shadow-sm transition-colors hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       ) : (
         <>
         <FormPage
@@ -1695,7 +1596,7 @@ onRowsPerPageChange={handleChangeRowsPerPage}
         </FormDrawer>
         </>
       )}
-    </Box>
+    </div>
   );
 };
 

@@ -415,8 +415,8 @@ const FolderTemplateList = () => {
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-foreground">Folder Templates</h2>
         <Button onClick={handleCreateTemplate}>
-          Create Template
-        </Button>
+        Create Templa
+      </Button>
       </div>
 
       {loading && <p className="text-sm text-muted-foreground">Loading templates...</p>}
@@ -468,19 +468,19 @@ const FolderTemplateList = () => {
                       >
                         <button
                           className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-accent transition-colors"
-                          onClick={() => {
-                            navigate(
+          onClick={() => {
+            navigate(
                               `/firmtemp/templates/tree/${encodeURIComponent(selectedTemplate?._id)}`,
-                              {
-                                state: {
-                                  templateId: selectedTemplate?._id,
-                                  templateName: selectedTemplate?.templatename,
-                                },
-                              }
-                            );
-                            handleMenuClose();
-                          }}
-                        >
+              {
+                state: {
+                  templateId: selectedTemplate?._id,
+                  templateName: selectedTemplate?.templatename,
+                },
+              }
+            );
+            handleMenuClose();
+          }}
+        >
                           <Pencil className="h-3.5 w-3.5" /> Edit
                         </button>
                         <button
@@ -511,11 +511,11 @@ const FolderTemplateList = () => {
           <div className="w-full max-w-md rounded-xl border border-border bg-white p-6 shadow-xl space-y-4">
             <h3 className="text-lg font-semibold">Rename Template</h3>
             <Input
-              autoFocus
+            autoFocus
               placeholder="New Template Name"
-              value={renameValue}
-              onChange={(e) => setRenameValue(e.target.value)}
-            />
+            value={renameValue}
+            onChange={(e) => setRenameValue(e.target.value)}
+          />
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setRenameDialogOpen(false)}>Cancel</Button>
               <Button onClick={handleRenameSubmit}>Save</Button>

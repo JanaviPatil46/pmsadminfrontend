@@ -2,24 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import Section from "./organizertempSection";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import {
-  Box,
-  Typography,
-  IconButton,
-  TableContainer,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  Paper,
-  Menu,
-  MenuItem,
-  TablePagination,
-  CircularProgress,
-} from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { CiMenuKebab } from "react-icons/ci";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -32,7 +15,7 @@ import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { Label } from "../../components/ui/label";
 import { Switch } from "../../components/ui/switch";
-import { GripVertical, Settings, Eye, Plus, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { GripVertical, Settings, Eye, Plus, ChevronLeft, ChevronRight, X, MoreVertical, Pencil, Trash2, Loader2, ClipboardList } from "lucide-react";
 
 // Section Item Component (Draggable)
 // Section Item Component (Draggable)
@@ -1422,242 +1405,127 @@ const [repeatedSections, setRepeatedSections] = useState({});
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <Box p={3}>
+      <div className="p-4">
         {!showOrganizerTemplateForm && (
-          <Box>
-            <Button onClick={handleCreateInvoiceClick} className="mb-2">
-              Create Template
-            </Button>
-            {/* <MaterialReactTable columns={columns} table={table} /> */}
-            <Box>
-              {loading ? (
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  {" "}
-                  <CircularProgress
-                    style={{ fontSize: "300px", color: "blue" }}
-                  />
-                </Box>
-              ) : (
-                <Box>
-                  <TableContainer
-                    component={Paper}
-                    sx={{ overflow: "visible" }}
-                  >
-                    <Table sx={{ width: "100%" }} aria-label="simple table">
-                      <TableHead>
-                        <TableRow>
-                          <TableCell
-                            style={{
-                              fontSize: "12px",
-                              fontWeight: "bold",
-                              padding: "16px",
-                            }}
-                            width="200"
-                          >
-                            Template Name
-                          </TableCell>
-                          <TableCell
-                            style={{
-                              fontSize: "12px",
-                              fontWeight: "bold",
-                              padding: "16px",
-                            }}
-                            width="100"
-                          >
-                            Used in Pipelines
-                          </TableCell>
-                          <TableCell
-                            style={{
-                              fontSize: "12px",
-                              fontWeight: "bold",
-                              padding: "16px",
-                            }}
-                            width="100"
-                          >
-                            Settings
-                          </TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {paginatedOrganizers.map((row) => (
-                          <TableRow key={row._id}>
-                            <TableCell>
-                              <Typography
-                                style={{
-                                  fontSize: "12px",
-                                  padding: "4px 8px",
-                                  lineHeight: "1",
-                                  cursor: "pointer",
-                                  color: "#3f51b5",
-                                }}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <Button onClick={handleCreateInvoiceClick}>
+                <ClipboardList className="mr-2 h-4 w-4" /> Create Template
+              </Button>
+            </div>
+
+            {loading ? (
+              <div className="flex items-center justify-center py-20">
+                <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
+              </div>
+            ) : (
+              <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left">
+                    <thead>
+                      <tr className="border-b border-slate-100 bg-slate-50/60">
+                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Template Name</th>
+                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Used in Pipelines</th>
+                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 w-24 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {paginatedOrganizers.length === 0 ? (
+                        <tr>
+                          <td colSpan={3} className="px-5 py-10 text-center text-sm text-slate-400">No organizer templates found.</td>
+                        </tr>
+                      ) : (
+                        paginatedOrganizers.map((row) => (
+                          <tr key={row._id} className="group transition-colors hover:bg-slate-50/70">
+                            <td className="px-5 py-3">
+                              <button
                                 onClick={() => handleEdit(row._id)}
+                                className="text-sm font-medium text-indigo-600 hover:text-indigo-800 hover:underline transition-colors"
                               >
                                 {row.templatename}
-                              </Typography>
-                            </TableCell>
-                            <TableCell></TableCell>
+                              </button>
+                            </td>
+                            <td className="px-5 py-3 text-sm text-slate-500">—</td>
+                            <td className="px-5 py-3 text-right">
+                              <div className="relative inline-block">
+                                <button
+                                  onClick={(event) => toggleMenu(event, row._id)}
+                                  className="inline-flex items-center justify-center rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                                >
+                                  <MoreVertical className="h-4 w-4" />
+                                </button>
+                                {openMenuId === row._id && (
+                                  <div className="absolute right-0 top-full z-50 mt-1 w-40 rounded-lg border border-slate-200 bg-white py-1 shadow-lg animate-in fade-in-0 zoom-in-95">
+                                    <button
+                                      onClick={() => { handleEdit(tempIdget); handleMenuClose(); }}
+                                      className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                                    >
+                                      <Pencil className="h-3.5 w-3.5" /> Edit
+                                    </button>
+                                    <button
+                                      onClick={() => { handleDuplicateTemplate(tempIdget); handleMenuClose(); }}
+                                      className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-50 transition-colors"
+                                    >
+                                      <ClipboardList className="h-3.5 w-3.5" /> Duplicate
+                                    </button>
+                                    <button
+                                      onClick={() => { handleDelete(tempIdget); }}
+                                      className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+                                    >
+                                      <Trash2 className="h-3.5 w-3.5" /> Delete
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
 
-                            {/* <TableCell
-                          style={{
-                            fontSize: "12px",
-                            padding: "4px 8px",
-                            lineHeight: "1",
-                            cursor: "pointer",
-                          }}
-                        >
-                          <IconButton
-                            onClick={handleClick}
-                            style={{ color: "#2c59fa" }}
-                          >
-                            <CiMenuKebab />
-                          </IconButton>
-                    
-                          <Menu
-                            anchorEl={anchorEl}
-                            open={open}
-                            onClose={handleClose}
-                            PaperProps={{
-                              style: {
-                                minWidth: "100px",
-                              },
-                            }}
-                          >
-                            <MenuItem sx={{ color: "blue" }}>
-                             Publice to Marketplace</MenuItem>
-                            <MenuItem
-                              onClick={() => {
-                                handleEdit(row._id);
-                                handleClose();
-                              }}
-                              sx={{ color: "blue" }}
-                            >
-                               Edit
-                            </MenuItem>
-                     <MenuItem 
-                             onClick={() => {
-                                handleDuplicateTemplate(row._id);
-                                handleClose();
-                              }}
-                                sx={{ color: "blue" }}
-                            // onClick={() => handleDuplicateTemplate(row._id)}
-                            >
-Duplicate
-                            </MenuItem>
-                            <MenuItem
-                              onClick={() => {
-                                handleDelete(row._id);
-                                handleClose();
-                              }}
-                              sx={{ color: "red" }}
-                            >
-                               Delete
-                            </MenuItem>
-                    
-                           
-                    
-                            
-                          </Menu>
-                        </TableCell> */}
-                            <TableCell
-                              style={{
-                                fontSize: "12px",
-                                padding: "4px 8px",
-                                lineHeight: "1",
-                              }}
-                            >
-                              <IconButton
-                                onClick={(event) => toggleMenu(event, row._id)}
-                                style={{ color: "#2c59fa" }}
-                                size="small"
-                              >
-                                <CiMenuKebab />
-                              </IconButton>
-
-                              {/* MUI Menu */}
-                            </TableCell>
-                          </TableRow>
+                {organizerTemplatesData.length > 0 && (
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-100 bg-slate-50/40 px-5 py-3">
+                    <p className="text-xs text-slate-500">
+                      Showing <span className="font-semibold text-slate-700">{page * rowsPerPage + 1}</span>–<span className="font-semibold text-slate-700">{Math.min((page + 1) * rowsPerPage, organizerTemplatesData.length)}</span> of{" "}
+                      <span className="font-semibold text-slate-700">{organizerTemplatesData.length}</span>
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <select
+                        value={rowsPerPage}
+                        onChange={(e) => handleChangeRowsPerPage({ target: { value: e.target.value } })}
+                        className="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-600 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      >
+                        {[30, 40, 50, 60, 100].map((opt) => (
+                          <option key={opt} value={opt}>{opt} / page</option>
                         ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                  <Menu
-                    anchorEl={anchorEl}
-                    open={Boolean(anchorEl)}
-                    onClose={handleMenuClose}
-                    anchorOrigin={{
-                      vertical: "top",
-                      horizontal: "right",
-                    }}
-                    transformOrigin={{
-                      vertical: "top",
-                      horizontal: "left",
-                    }}
-                    PaperProps={{
-                      sx: {
-                        mt: 3,
-                        ml: 1,
-                        boxShadow: 3,
-                        borderRadius: 1,
-                        minWidth: 120,
-                        "& .MuiMenuItem-root": {
-                          fontSize: "12px",
-                          padding: "8px 16px",
-                        },
-                      },
-                    }}
-                  >
-                    <MenuItem
-                      onClick={() => handleEdit(tempIdget)}
-                      sx={{
-                        fontWeight: "bold",
-                        "&:hover": {
-                          backgroundColor: "#f5f5f5",
-                        },
-                      }}
-                    >
-                      Edit
-                    </MenuItem>
-                    <MenuItem
-                      onClick={() => {
-                        handleDuplicateTemplate(tempIdget);
-                        handleMenuClose();
-                      }}
-                      sx={{ color: "blue" }}
-                    >
-                      Duplicate
-                    </MenuItem>
-                    <MenuItem
-                      onClick={() => handleDelete(tempIdget)}
-                      sx={{
-                        color: "error.main",
-                        fontWeight: "bold",
-                        "&:hover": {
-                          backgroundColor: "#ffebee",
-                        },
-                      }}
-                    >
-                      Delete
-                    </MenuItem>
-                  </Menu>
-                  <TablePagination
-                    rowsPerPageOptions={[30, 40, 50, 60, 100]}
-                    component="div"
-                    count={organizerTemplatesData.length}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                  />
-                </Box>
-              )}
-            </Box>
-          </Box>
+                      </select>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => handleChangePage(null, page - 1)}
+                          disabled={page === 0}
+                          className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 text-slate-500 shadow-sm transition-colors hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                        </button>
+                        <span className="min-w-[3rem] text-center text-xs font-medium text-slate-600">
+                          {page + 1} / {Math.max(1, Math.ceil(organizerTemplatesData.length / rowsPerPage))}
+                        </span>
+                        <button
+                          onClick={() => handleChangePage(null, page + 1)}
+                          disabled={(page + 1) * rowsPerPage >= organizerTemplatesData.length}
+                          className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 text-slate-500 shadow-sm transition-colors hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         )}
         {showOrganizerTemplateForm && (
           <>
@@ -2035,7 +1903,7 @@ Duplicate
             )}
           </>
         )}
-      </Box>
+      </div>
     </DndProvider>
   );
 };
