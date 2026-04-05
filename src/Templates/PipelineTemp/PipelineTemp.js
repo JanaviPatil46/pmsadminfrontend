@@ -38,7 +38,8 @@ import { AiOutlineSearch } from "react-icons/ai";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import Grid from "@mui/material/Unstable_Grid2";
 import { RiDeleteBin6Line } from "react-icons/ri";
-import { LuPlusCircle, LuPenLine } from "react-icons/lu";
+import {  LuPenLine } from "react-icons/lu";
+import { FiPlusCircle } from "react-icons/fi";
 import { RxDragHandleDots2 } from "react-icons/rx";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -4578,7 +4579,7 @@ useEffect(() => {
                   <Typography variant="h6">Stages</Typography>
                   <Button
                     variant="contained"
-                    startIcon={<LuPlusCircle />}
+                    startIcon={<FiPlusCircle />}
                     onClick={() => handleAddStage(stages.length)}
                     sx={{
                       backgroundColor: "var(--color-save-btn)", // Normal background
@@ -5214,7 +5215,7 @@ useEffect(() => {
                             <IconButton
                               onClick={() => handleAddStage(index + 1)}
                             >
-                              <LuPlusCircle
+                              <FiPlusCircle
                                 style={{
                                   color: "var(--color-save-btn",
                                   width: "25px",
@@ -5230,7 +5231,7 @@ useEffect(() => {
                     <Box mt={3} sx={{ flexShrink: 0 }}>
                       <Button
                         variant="contained"
-                        startIcon={<LuPlusCircle />}
+                        startIcon={<FiPlusCircle />}
                         onClick={() => handleAddStage(stages.length)}
                         sx={{
                           backgroundColor: "var(--color-save-btn)", // Normal background

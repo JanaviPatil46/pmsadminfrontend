@@ -16,7 +16,8 @@ import {
   Drawer,
   Grid,Chip,Autocomplete,Checkbox,InputLabel
 } from "@mui/material";
-import { LuPlusCircle, LuPenLine } from "react-icons/lu";
+import { FiPlusCircle } from "react-icons/fi";
+import {  LuPenLine } from "react-icons/lu";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { RxCross2, RxDragHandleDots2 } from "react-icons/rx";
 import {IoMdArrowRoundBack} from "react-icons/io";
@@ -1511,7 +1512,7 @@ case "Update client-facing job status":
 
         <Button
           variant="contained"
-          startIcon={<LuPlusCircle />}
+          startIcon={<FiPlusCircle />}
           onClick={() => handleAddStage(stages.length)}
           sx={{
             backgroundColor: "var(--color-save-btn)",
@@ -1973,7 +1974,7 @@ case "Update client-facing job status":
                     ) : (
                       <Button
                         variant="outlined"
-                        startIcon={<LuPlusCircle />}
+                        startIcon={<FiPlusCircle />}
                         fullWidth
                         sx={{ mt: 1, borderRadius: "8px" }}
                         onClick={(event) => handleAutomationMenuOpen(event, index)}
@@ -1987,7 +1988,7 @@ case "Update client-facing job status":
 
               {index < stages.length - 1 && (
                 <IconButton onClick={() => handleAddStage(index + 1)}>
-                  <LuPlusCircle
+                  <FiPlusCircle
                     style={{
                       color: "var(--color-save-btn)",
                       width: "25px",
@@ -2122,7 +2123,7 @@ case "Update client-facing job status":
             <Box sx={{ mb: 2, display: "flex", justifyContent: "center" ,}}>
               <Button
                 variant="outlined"
-                startIcon={<LuPlusCircle />}
+                startIcon={<FiPlusCircle />}
                 onClick={handleDrawerMenuOpen}
                 sx={{ borderRadius: "8px" }}
               >

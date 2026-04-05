@@ -1041,7 +1041,8 @@ import { IoMdArrowRoundBack } from "react-icons/io";
 import Select from "react-select";
 import Grid from "@mui/material/Unstable_Grid2";
 import { RiDeleteBin6Line } from "react-icons/ri";
-import { LuPlusCircle, LuPenLine } from "react-icons/lu";
+import {  LuPenLine } from "react-icons/lu";
+import { FiPlusCircle } from "react-icons/fi";
 import { RxDragHandleDots2 } from "react-icons/rx";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -2146,7 +2147,7 @@ const PipelineTemp = () => {
                 </Grid>
                 <Box mt={5} display={"flex"} justifyContent={"space-between"} alignItems={"center"}>
                   <Typography variant="h6">Stages</Typography>
-                  <Button variant="contained" startIcon={<LuPlusCircle />} onClick={handleAddStage}>
+                  <Button variant="contained" startIcon={<FiPlusCircle />} onClick={handleAddStage}>
                     Add stage
                   </Button>
                 </Box>
@@ -2273,7 +2274,7 @@ const PipelineTemp = () => {
                                       margin: "15px 0",
                                     }}
                                   >
-                                    <LuPlusCircle style={{ color: "blue" }} />
+                                    <FiPlusCircle style={{ color: "blue" }} />
                                     <li
                                       style={{
                                         listStyle: "none",
@@ -2310,7 +2311,7 @@ const PipelineTemp = () => {
                       </Paper>
                     ))}
                     <Box mt={3}>
-                      <Button variant="contained" startIcon={<LuPlusCircle />} onClick={handleAddStage}>
+                      <Button variant="contained" startIcon={<FiPlusCircle />} onClick={handleAddStage}>
                         Add stage
                       </Button>
                     </Box>

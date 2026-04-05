@@ -4,6 +4,9 @@ import { toast } from "react-toastify";
 import Priority from "../Priority/Priority";
 import EditorShortcodes from "../Texteditor/EditorShortcodes";
 import dayjs from "dayjs";
+import { Switch } from "@mui/material";
+import DatePicker from "react-datepicker";
+
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import MultiSelectDropdown from "../MultiSelectDropdown";
 import { FormPage, FormSection, FormField, FormRow, FormActions, FormGrid, ShortcodePopover, FormSwitchRow, FormDatePicker, FormSelect, FormComment } from "../../components/ui/form-layout";
@@ -634,7 +637,7 @@ const [selectedUser, setSelectedUser] = useState([]);
   };
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
+   
       <FormPage
         title="Edit Job Template"
         subtitle="Update your job template configuration"
@@ -876,7 +879,7 @@ const [selectedUser, setSelectedUser] = useState([]);
           </FormGrid.Sidebar>
         </FormGrid>
       </FormPage>
-    </LocalizationProvider>
+   
   );
 };
 
