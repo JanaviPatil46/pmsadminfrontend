@@ -1,31 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
-import {
-  Box,
-  TextField,
-  Typography,
-  FormGroup,
-  FormControlLabel,
-  Autocomplete,
-  CircularProgress,
-  Switch,
-  Button,
-  Paper,
-  Card,
-  CardContent,
-  Alert,
-  Chip,
-  Checkbox,
-  MenuItem,
-  Menu,
-  InputAdornment,
-  IconButton,
-  Popover,
-  List,
-  ListItem,
-  ListItemText,
-} from "@mui/material";
 import { FaCaretUp, FaCaretDown, FaTimes, FaSearch } from "react-icons/fa";
-import { InfoOutlined } from "@mui/icons-material";
+import { Info } from "lucide-react";
 import MultiSelectDropdown from "../../Templates/MultiSelectDropdown"
 const GeneralStep = ({
   formData,
@@ -219,263 +194,96 @@ const GeneralStep = ({
 
   // Step Card Component
   const StepCard = ({ title, description, checked, onChange, name }) => (
-    <Card
-      variant="outlined"
-      sx={{
-        mb: 2,
-        borderColor: checked ? "primary.main" : "grey.300",
-        borderWidth: checked ? 2 : 1,
-        backgroundColor: checked ? "primary.50" : "background.paper",
-        transition: "all 0.2s ease-in-out",
-        "&:hover": {
-          borderColor: "primary.light",
-          boxShadow: 1,
-        },
-      }}
-    >
-      <CardContent sx={{ "&:last-child": { pb: 2 } }}>
-        <FormControlLabel
-          control={
-            <Switch
-              checked={checked}
-              onChange={(e) => onChange(name, e.target.checked)}
-              color="primary"
-            />
-          }
-          label={
-            <Typography variant="h6" component="span" color="text.primary">
-              {title}
-            </Typography>
-          }
-          sx={{ width: "100%", mb: 1 }}
+    <div className={`rounded-xl border p-4 mb-3 transition-all hover:shadow-sm ${checked ? 'border-indigo-400 bg-indigo-50/50 border-2' : 'border-slate-200 bg-white'}`}>
+      <div className="flex items-center gap-3 mb-2">
+        <input
+          type="checkbox"
+          checked={checked}
+          onChange={(e) => onChange(name, e.target.checked)}
+          className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
         />
-        <Box sx={{ display: "flex", alignItems: "flex-start", ml: 6 }}>
-          <InfoOutlined
-            sx={{
-              fontSize: 16,
-              color: "text.secondary",
-              mr: 1,
-              mt: 0.25,
-            }}
-          />
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            sx={{ lineHeight: 1.5 }}
-          >
-            {description}
-          </Typography>
-        </Box>
-      </CardContent>
-    </Card>
+        <span className="text-base font-semibold text-slate-800">{title}</span>
+      </div>
+      <div className="flex items-start gap-1.5 ml-7">
+        <Info className="h-4 w-4 text-slate-400 mt-0.5 shrink-0" />
+        <p className="text-xs text-slate-500 leading-relaxed">{description}</p>
+      </div>
+    </div>
   );
 
   return (
-    <Box>
-      <Typography
-        variant="h4"
-        gutterBottom
-        color="primary"
-        fontWeight="600"
-        sx={{ mb: 4 }}
-      >
-        General Information
-      </Typography>
+    <div className="space-y-6">
+      <h2 className="text-2xl font-semibold text-indigo-600">General Information</h2>
 
-      <Paper elevation={0} sx={{ p: 3, mb: 4, backgroundColor: "grey.50" }}>
-        <Typography variant="h6" gutterBottom color="primary" sx={{ mb: 3 }}>
-          Basic Details
-        </Typography>
+      <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-6 space-y-4">
+        <h3 className="text-base font-semibold text-indigo-600 mb-3">Basic Details</h3>
 
-        <TextField
-          fullWidth
-          label="Template Name"
-          value={formData.general.templateName || ""}
-          onChange={(e) => handleInputChange("templateName", e.target.value)}
-          onBlur={() => handleBlur("templateName")}
-          error={!!stepErrors.templateName}
-          helperText={stepErrors.templateName}
-          margin="normal"
-          required
-          sx={{ mb: 2 }}
-        />
-       
-        <TextField
-          fullWidth
-          // label="Proposal Name"
-          label="Proposal name (visible to clients)"
-          value={formData.general.proposalName || ""}
-          onChange={(e) => {
-            handleInputChange("proposalName", e.target.value);
-            handleTextFieldClick();
-          }}
-          onClick={handleTextFieldClick}
-          inputRef={textFieldRef}
-          margin="normal"
-          required
-          sx={{ mb: 2 }}
-          error={!!stepErrors.proposalName}
-          helperText={stepErrors.proposalName}
-        />
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-slate-700">Template Name *</label>
+          <input
+            type="text"
+            value={formData.general.templateName || ""}
+            onChange={(e) => handleInputChange("templateName", e.target.value)}
+            onBlur={() => handleBlur("templateName")}
+            placeholder="Template Name"
+            required
+            className={`flex h-10 w-full rounded-lg border bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${stepErrors.templateName ? 'border-red-400' : 'border-slate-200'}`}
+          />
+          {stepErrors.templateName && <p className="text-xs text-red-500">{stepErrors.templateName}</p>}
+        </div>
 
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={toggleDropdown}
-          sx={{
-            backgroundColor: "var(--color-save-btn)",
-            "&:hover": { backgroundColor: "var(--color-save-hover-btn)" },
-            borderRadius: "15px",
-            mt: 1,
-          }}
-        >
-          Add Shortcode
-        </Button>
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-slate-700">Proposal name (visible to clients) *</label>
+          <input
+            type="text"
+            value={formData.general.proposalName || ""}
+            onChange={(e) => { handleInputChange("proposalName", e.target.value); handleTextFieldClick(); }}
+            onClick={handleTextFieldClick}
+            ref={textFieldRef}
+            placeholder="Proposal name (visible to clients)"
+            required
+            className={`flex h-10 w-full rounded-lg border bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${stepErrors.proposalName ? 'border-red-400' : 'border-slate-200'}`}
+          />
+          {stepErrors.proposalName && <p className="text-xs text-red-500">{stepErrors.proposalName}</p>}
+        </div>
 
-        <Popover
-          open={showDropdown}
-          anchorEl={anchorEl}
-          onClose={handleCloseDropdown}
-          anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-          transformOrigin={{ vertical: "top", horizontal: "left" }}
-        >
-          <Box>
-            <List
-              sx={{
-                width: "300px",
-                height: "300px",
-                overflow: "auto",
-                cursor: "pointer",
-              }}
-            >
+        <div className="relative">
+          <button type="button" onClick={toggleDropdown} className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-2 text-xs font-medium text-white shadow-sm transition-colors hover:bg-indigo-700">
+            Add Shortcode
+          </button>
+          {showDropdown && (
+            <div className="absolute left-0 top-full z-50 mt-1 w-72 max-h-72 overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-lg">
               {filteredShortcuts.map((shortcut, index) => (
-                <ListItem
+                <button
                   key={index}
-                  onClick={() =>
-                    !shortcut.isBold && handleAddShortcut(shortcut.value)
-                  }
-                  sx={{
-                    backgroundColor: shortcut.isBold
-                      ? "grey.100"
-                      : "transparent",
-                    fontWeight: shortcut.isBold ? "bold" : "normal",
-                    "&:hover": shortcut.isBold
-                      ? {}
-                      : { backgroundColor: "grey.200" },
-                  }}
+                  onClick={() => !shortcut.isBold && handleAddShortcut(shortcut.value)}
+                  className={`block w-full text-left px-4 py-2 text-sm transition-colors ${shortcut.isBold ? 'font-bold text-slate-800 bg-slate-50 cursor-default' : 'text-slate-600 hover:bg-slate-50 cursor-pointer'}`}
                 >
-                  <ListItemText
-                    primary={shortcut.title}
-                    primaryTypographyProps={{
-                      style: {
-                        fontWeight: shortcut.isBold ? "bold" : "normal",
-                      },
-                    }}
-                  />
-                </ListItem>
+                  {shortcut.title}
+                </button>
               ))}
-            </List>
-          </Box>
-        </Popover>
+            </div>
+          )}
+        </div>
 
-        <Box sx={{ mt: 2 }}>
-          <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
-            Team Members *
-          </Typography>
-
-          {/* <Autocomplete
-            multiple
-            options={internalOptions}
+        <div className="mt-4 space-y-1.5">
+          <label className="text-sm font-semibold text-slate-700">Team Members *</label>
+          <MultiSelectDropdown
             value={getSelectedUsers()}
             onChange={handleTeamMembersChange}
-            loading={loading}
-            disableCloseOnSelect
-            getOptionLabel={(option) => option.label}
-            isOptionEqualToValue={(option, value) =>
-              option.value === value.value
-            }
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                placeholder="Select team members..."
-                variant="outlined"
-                error={!!stepErrors.teamMembers}
-                helperText={
-                  stepErrors.teamMembers ||
-                  "Select team members who will be involved in this proposal"
-                }
-                InputProps={{
-                  ...params.InputProps,
-                  endAdornment: (
-                    <React.Fragment>
-                      {loading ? (
-                        <CircularProgress color="inherit" size={20} />
-                      ) : null}
-                      {params.InputProps.endAdornment}
-                    </React.Fragment>
-                  ),
-                }}
-              />
-            )}
-            renderTags={(value, getTagProps) =>
-              value.map((option, index) => (
-                <Chip
-                  label={option.label}
-                  {...getTagProps({ index })}
-                  size="small"
-                  sx={{
-                    fontWeight: 500,
-                    borderRadius: "12px",
-                    height: "24px",
-                  }}
-                />
-              ))
-            }
-            // renderOption={(props, option, { selected }) => (
-            //   <li {...props}>
-            //     <Checkbox
-            //       checked={selected}
-            //       sx={{ mr: 1 }}
-            //     />
-            //     <Typography variant="body2">{option.label}</Typography>
-            //   </li>
-            // )}
-            renderOption={(props, option, { selected }) => (
-              <Box
-                component="li"
-                {...props}
-                sx={{ display: "flex", alignItems: "center" }}
-              >
-                <Checkbox checked={selected} sx={{ mr: 1 }} />
-                <Typography variant="body2">{option.label}</Typography>
-              </Box>
-            )}
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                padding: "8px",
-                minHeight: "40px",
-              },
-            }}
-          /> */}
-           <MultiSelectDropdown
-                          value={getSelectedUsers()}
-                          onChange={handleTeamMembersChange}
-                          placeholder="Team Member"
-                        />
-        </Box>
-      </Paper>
+            placeholder="Team Member"
+          />
+        </div>
+      </div>
 
-      <Paper elevation={0} sx={{ p: 3, border: 1, borderColor: "divider" }}>
-        <Typography variant="h6" gutterBottom color="primary" sx={{ mb: 3 }}>
-          Configure Proposal Steps
-        </Typography>
-
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+      <div className="rounded-xl border border-slate-200 p-6">
+        <h3 className="text-base font-semibold text-indigo-600 mb-2">Configure Proposal Steps</h3>
+        <p className="text-xs text-slate-500 mb-4">
           Customize which steps to include in your proposal. Each step helps
           communicate different aspects of your service to clients.
-        </Typography>
+        </p>
 
-        <FormGroup>
+        <div>
           <StepCard
             title="Introduction Step"
             description="Explain to your clients who you are, what services you provide, the value you bring, and any other information you want to share"
@@ -483,7 +291,6 @@ const GeneralStep = ({
             onChange={handleVisibilityChange}
             name="introductionEnabled"
           />
-
           <StepCard
             title="Terms Step"
             description="Engagement letter or contractual agreement that outlines the terms of the relationship between your firm and clients. The section title can be renamed."
@@ -491,7 +298,6 @@ const GeneralStep = ({
             onChange={handleVisibilityChange}
             name="termsEnabled"
           />
-
           <StepCard
             title="Services & Invoices Step"
             description="Specify the services your firm will provide. Add one-time or recurring invoices to get paid automatically."
@@ -499,9 +305,9 @@ const GeneralStep = ({
             onChange={handleVisibilityChange}
             name="servicesEnabled"
           />
-        </FormGroup>
-      </Paper>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 };
 export default GeneralStep;

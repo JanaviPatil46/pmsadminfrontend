@@ -1,22 +1,7 @@
 
 
 import React, { useState, useEffect } from 'react';
-import {
-  Box,
-  Stepper,
-  Step,
-  StepLabel,
-  Button,
-  Typography,
-  CircularProgress,
-  Alert,
-  Paper,
-  Container,
-  AppBar,
-  Toolbar,
-  IconButton
-} from '@mui/material';
-import { ArrowBack, NavigateNext, NavigateBefore } from '@mui/icons-material';
+import { ArrowLeft, ChevronRight, ChevronLeft, Check, AlertCircle } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 // Import your step components (make sure they're also converted to MUI)
@@ -732,12 +717,10 @@ const findFirstErrorStep = (validationErrors) => {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
-        <CircularProgress />
-        <Typography variant="h6" sx={{ ml: 2 }}>
-          Loading proposal data...
-        </Typography>
-      </Box>
+      <div className="flex items-center justify-center min-h-screen gap-3">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
+        <span className="text-base font-medium text-slate-500">Loading proposal data...</span>
+      </div>
     );
   }
 
@@ -747,54 +730,81 @@ const findFirstErrorStep = (validationErrors) => {
       setCurrentStep(0);
     }
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
-        <Typography>Loading...</Typography>
-      </Box>
+      <div className="flex items-center justify-center min-h-screen">
+        <span className="text-sm text-slate-500">Loading...</span>
+      </div>
     );
   }
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static" elevation={0} sx={{ backgroundColor: 'white', color: 'text.primary' }}>
-        <Toolbar>
-          <IconButton
-            edge="start"
-            color="inherit"
-            onClick={handleBackToList}
-            sx={{ mr: 2 }}
-          >
-            <ArrowBack />
-          </IconButton>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+    <div className="min-h-screen bg-slate-50/50">
+      {/* Top Header Bar */}
+      <div className="sticky top-0 z-30 border-b border-slate-200 bg-white/80 backdrop-blur-lg">
+        <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6 lg:px-8">
+          <button onClick={handleBackToList} className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700">
+            <ArrowLeft className="h-5 w-5" />
+          </button>
+          <h1 className="text-lg font-semibold text-slate-900 truncate">
             {proposalId ? `Edit Proposal: ${formData.general.proposalName}` : 'Create New Proposal'}
-          </Typography>
-        </Toolbar>
-      </AppBar>
+          </h1>
+        </div>
+      </div>
 
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
         {error && (
-          <Alert severity="error" sx={{ mb: 3 }}>
-            {error}
-          </Alert>
+          <div className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
+            <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
+            <span className="text-sm text-red-700">{error}</span>
+          </div>
         )}
 
-        <Paper elevation={0} sx={{ p: 3, mb: 3 }}>
-          <Stepper activeStep={currentStep} >
-            {availableSteps.map((step, index) => (
-              <Step key={step.key}>
-                <StepLabel 
-                  onClick={() => goToStep(index)}
-                  sx={{ cursor: 'pointer' }}
-                   error={hasStepError(step.key)}
-                >
-                  {step.name}
-                </StepLabel>
-              </Step>
-            ))}
-          </Stepper>
-        </Paper>
+        {/* Stepper */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
+          <nav aria-label="Progress">
+            <ol className="flex items-center flex-wrap gap-y-3">
+              {availableSteps.map((step, index) => {
+                const isActive = index === currentStep;
+                const isCompleted = index < currentStep;
+                const hasError = hasStepError(step.key);
+                return (
+                  <li key={step.key} className="flex items-center">
+                    <button
+                      onClick={() => goToStep(index)}
+                      className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                        isActive
+                          ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200'
+                          : isCompleted
+                          ? 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
+                          : hasError
+                          ? 'bg-red-50 text-red-600 hover:bg-red-100'
+                          : 'bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700'
+                      }`}
+                    >
+                      <span className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
+                        isActive
+                          ? 'bg-white/20 text-white'
+                          : isCompleted
+                          ? 'bg-indigo-600 text-white'
+                          : hasError
+                          ? 'bg-red-500 text-white'
+                          : 'bg-slate-300 text-white'
+                      }`}>
+                        {isCompleted ? <Check className="h-3.5 w-3.5" /> : hasError ? <AlertCircle className="h-3.5 w-3.5" /> : index + 1}
+                      </span>
+                      <span className="hidden sm:inline">{step.name}</span>
+                    </button>
+                    {index < availableSteps.length - 1 && (
+                      <ChevronRight className="mx-1 h-4 w-4 text-slate-300 shrink-0" />
+                    )}
+                  </li>
+                );
+              })}
+            </ol>
+          </nav>
+        </div>
 
-        <Paper elevation={1} sx={{ p: 4 }}>
+        {/* Step Content */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
           <CurrentStepComponent
             formData={formData}
             updateFormData={updateFormData}
@@ -809,29 +819,27 @@ const findFirstErrorStep = (validationErrors) => {
             stepErrors={stepErrors[currentStepKey] || {}}
             setStepErrors={(errors) => setStepErrors(prev => ({ ...prev, [currentStepKey]: errors }))}
           />
-        </Paper>
+        </div>
 
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
-          <Button
-            startIcon={<NavigateBefore />}
+        {/* Navigation Buttons */}
+        <div className="flex items-center justify-between">
+          <button
             onClick={prevStep}
             disabled={currentStep === 0}
-            variant="outlined"
+            className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition-all hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
           >
-            Previous
-          </Button>
-          
-          <Button
-            endIcon={isLastStep ? null : <NavigateNext />}
+            <ChevronLeft className="h-4 w-4" /> Previous
+          </button>
+          <button
             onClick={nextStep}
-            variant="contained"
-            color="primary"
+            className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 hover:shadow-md active:scale-[0.98]"
           >
             {isLastStep ? (proposalId ? 'Update Proposal' : 'Submit Proposal') : 'Next'}
-          </Button>
-        </Box>
-      </Container>
-    </Box>
+            {!isLastStep && <ChevronRight className="h-4 w-4" />}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 export default ProposalForm;

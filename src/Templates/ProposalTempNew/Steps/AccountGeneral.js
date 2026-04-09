@@ -1,18 +1,6 @@
 import React, { useState,useEffect } from 'react';
-import {
-  Box,
-  TextField,
-  Typography,
-  FormGroup,
-  FormControlLabel,
-  Switch,
-  Button,
-  Paper,
-  Card,
-  CardContent,
-  Alert,CircularProgress,FormControl,InputLabel,FormHelperText,Autocomplete,Grid
-} from '@mui/material';
-import { InfoOutlined } from '@mui/icons-material';
+import { Info } from 'lucide-react';
+import Select from 'react-select';
 
 const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL || 'https://www.snptaxes.com';
 const GeneralStep = ({ formData, updateFormData, nextStep, stepErrors, setStepErrors }) => {
@@ -384,55 +372,16 @@ const handleAccountChange = (selectedAccount) => {
   };
 
   const StepCard = ({ title, description, checked, onChange, name }) => (
-    <Card 
-      variant="outlined" 
-      sx={{ 
-        mb: 2,
-        borderColor: checked ? 'primary.main' : 'grey.300',
-        borderWidth: checked ? 2 : 1,
-        backgroundColor: checked ? 'primary.50' : 'background.paper',
-        transition: 'all 0.2s ease-in-out',
-        '&:hover': {
-          borderColor: 'primary.light',
-          boxShadow: 1
-        }
-      }}
-    >
-      <CardContent sx={{ '&:last-child': { pb: 2 } }}>
-        <FormControlLabel
-          control={
-            <Switch
-              checked={checked}
-              onChange={(e) => onChange(name, e.target.checked)}
-              color="primary"
-            />
-          }
-          label={
-            <Typography variant="h6" component="span" color="text.primary">
-              {title}
-            </Typography>
-          }
-          sx={{ width: '100%', mb: 1 }}
-        />
-        <Box sx={{ display: 'flex', alignItems: 'flex-start', ml: 6 }}>
-          <InfoOutlined 
-            sx={{ 
-              fontSize: 16, 
-              color: 'text.secondary', 
-              mr: 1, 
-              mt: 0.25 
-            }} 
-          />
-          <Typography 
-            variant="body2" 
-            color="text.secondary"
-            sx={{ lineHeight: 1.5 }}
-          >
-            {description}
-          </Typography>
-        </Box>
-      </CardContent>
-    </Card>
+    <div className={`rounded-xl border p-4 mb-3 transition-all hover:shadow-sm ${checked ? 'border-indigo-400 bg-indigo-50/50 border-2' : 'border-slate-200 bg-white'}`}>
+      <div className="flex items-center gap-3 mb-2">
+        <input type="checkbox" checked={checked} onChange={(e) => onChange(name, e.target.checked)} className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+        <span className="text-base font-semibold text-slate-800">{title}</span>
+      </div>
+      <div className="flex items-start gap-1.5 ml-7">
+        <Info className="h-4 w-4 text-slate-400 mt-0.5 shrink-0" />
+        <p className="text-xs text-slate-500 leading-relaxed">{description}</p>
+      </div>
+    </div>
   );
 
   // Prepare options for autocomplete
@@ -451,126 +400,80 @@ const handleAccountChange = (selectedAccount) => {
   }));
 
   return (
-    <Box>
-      <Typography 
-        variant="h4" 
-        gutterBottom 
-        color="primary" 
-        fontWeight="600"
-        sx={{ mb: 4 }}
-      >
-        General Information
-      </Typography>
+    <div className="space-y-6">
+      <h2 className="text-2xl font-semibold text-indigo-600">General Information</h2>
 
       {loading && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
-          <CircularProgress />
-          <Typography sx={{ ml: 2 }}>Loading...</Typography>
-        </Box>
+        <div className="flex items-center justify-center gap-2 py-4">
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
+          <span className="text-sm text-slate-500">Loading...</span>
+        </div>
       )}
 
-      <Paper elevation={0} sx={{ p: 3, mb: 4, backgroundColor: 'grey.50' }}>
-        <Typography variant="h6" gutterBottom color="primary" sx={{ mb: 3 }}>
-          Basic Details
-        </Typography>
-        
+      <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-6 space-y-4">
+        <h3 className="text-base font-semibold text-indigo-600 mb-3">Basic Details</h3>
+
         {/* Account Selection */}
-        <FormControl fullWidth error={!!stepErrors.account} sx={{ mb: 3 }}>
-          {/* <InputLabel sx={{ color: "black" }}>Select Account *</InputLabel> */}
-          <Autocomplete
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-slate-700">Select Account *</label>
+          <Select
             options={accountOptions}
             value={formData.general.account || null}
-            onChange={(event, value) => handleAccountChange(value)}
-            isOptionEqualToValue={(option, value) => option?.value === value?.value}
-            getOptionLabel={(option) => option?.label || ""}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Select Account *"
-                error={!!stepErrors.account}
-                helperText={stepErrors.account}
-                placeholder="Search for an account..."
-              />
-            )}
-            loading={loading}
-            renderOption={(props, option) => (
-              <li {...props}>
-                <Box>
-                  <Typography variant="body1">{option.label}</Typography>
-                
-                </Box>
-              </li>
-            )}
+            onChange={(value) => handleAccountChange(value)}
+            isClearable
+            placeholder="Search for an account..."
+            isLoading={loading}
+            styles={{
+              control: (provided) => ({ ...provided, borderColor: stepErrors.account ? 'red' : '#e2e8f0', borderRadius: '0.5rem', minHeight: '38px', fontSize: '0.875rem' }),
+              menuPortal: (provided) => ({ ...provided, zIndex: 9999 }),
+            }}
+            menuPortalTarget={document.body}
           />
-          {stepErrors.account && (
-            <FormHelperText error>{stepErrors.account}</FormHelperText>
-          )}
-        </FormControl>
+          {stepErrors.account && <p className="text-xs text-red-500">{stepErrors.account}</p>}
+        </div>
 
         {/* Template Selection */}
-        <FormControl fullWidth error={!!stepErrors.template} sx={{ mb: 3 }}>
-          {/* <InputLabel sx={{ color: "black" }}>Select Template (Optional)</InputLabel> */}
-          <Autocomplete
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-slate-700">Select Template (Optional)</label>
+          <Select
             options={templateOptions}
             value={formData.general.template || null}
-            onChange={(event, value) => handleTemplateChange(value)}
-            isOptionEqualToValue={(option, value) => option?.value === value?.value}
-            getOptionLabel={(option) => option?.label || ""}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Select Template (Optional)"
-                error={!!stepErrors.proposalTemp}
-                helperText={stepErrors.proposalTemp || "Choose a template to pre-fill the proposal"}
-                placeholder="Search for a template..."
-              />
-            )}
-            loading={loading}
-            renderOption={(props, option) => (
-              <li {...props}>
-                <Box>
-                  <Typography variant="body1">{option.label}</Typography>
-                  {option.general?.proposalName && (
-                    <Typography variant="body2" color="text.secondary">
-                      Proposal: {option.general.proposalName}
-                    </Typography>
-                  )}
-                </Box>
-              </li>
-            )}
+            onChange={(value) => handleTemplateChange(value)}
+            isClearable
+            placeholder="Search for a template..."
+            isLoading={loading}
+            styles={{
+              control: (provided) => ({ ...provided, borderColor: stepErrors.proposalTemp ? 'red' : '#e2e8f0', borderRadius: '0.5rem', minHeight: '38px', fontSize: '0.875rem' }),
+              menuPortal: (provided) => ({ ...provided, zIndex: 9999 }),
+            }}
+            menuPortalTarget={document.body}
           />
-          {stepErrors.proposalTemp && (
-            <FormHelperText error>{stepErrors.proposalTemp}</FormHelperText>
-          )}
-        </FormControl>
+          <p className="text-xs text-slate-400">{stepErrors.proposalTemp || 'Choose a template to pre-fill the proposal'}</p>
+        </div>
 
-        {/* Proposal Name - This will be auto-filled when template is selected */}
-        <TextField
-          fullWidth
-          label="Proposal Name *"
-          value={formData.general.proposalName || ''}
-          onChange={(e) => handleInputChange('proposalName', e.target.value)}
-          onBlur={() => handleBlur('proposalName')}
-          error={!!stepErrors.proposalName}
-          helperText={stepErrors.proposalName || "Enter a name for this proposal"}
-          margin="normal"
-          required
-          sx={{ mb: 2 }}
-        />
+        {/* Proposal Name */}
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-slate-700">Proposal Name *</label>
+          <input
+            type="text"
+            value={formData.general.proposalName || ''}
+            onChange={(e) => handleInputChange('proposalName', e.target.value)}
+            onBlur={() => handleBlur('proposalName')}
+            placeholder="Enter a name for this proposal"
+            required
+            className={`flex h-10 w-full rounded-lg border bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${stepErrors.proposalName ? 'border-red-400' : 'border-slate-200'}`}
+          />
+          <p className="text-xs text-slate-400">{stepErrors.proposalName || 'Enter a name for this proposal'}</p>
+        </div>
+      </div>
 
-       
-      </Paper>
-
-      <Paper elevation={0} sx={{ p: 3, border: 1, borderColor: 'divider' }}>
-        <Typography variant="h6" gutterBottom color="primary" sx={{ mb: 3 }}>
-          Configure Proposal Steps
-        </Typography>
-        
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+      <div className="rounded-xl border border-slate-200 p-6">
+        <h3 className="text-base font-semibold text-indigo-600 mb-2">Configure Proposal Steps</h3>
+        <p className="text-xs text-slate-500 mb-4">
           Customize which steps to include in your proposal. Each step helps communicate different aspects of your service to clients.
-        </Typography>
-        
-        <FormGroup>
+        </p>
+
+        <div>
           <StepCard
             title="Introduction Step"
             description="Explain to your clients who you are, what services you provide, the value you bring, and any other information you want to share"
@@ -578,7 +481,6 @@ const handleAccountChange = (selectedAccount) => {
             onChange={handleVisibilityChange}
             name="introductionEnabled"
           />
-          
           <StepCard
             title="Terms Step"
             description="Engagement letter or contractual agreement that outlines the terms of the relationship between your firm and clients. The section title can be renamed."
@@ -586,7 +488,6 @@ const handleAccountChange = (selectedAccount) => {
             onChange={handleVisibilityChange}
             name="termsEnabled"
           />
-          
           <StepCard
             title="Services & Invoices Step"
             description="Specify the services your firm will provide. Add one-time or recurring invoices to get paid automatically."
@@ -594,7 +495,6 @@ const handleAccountChange = (selectedAccount) => {
             onChange={handleVisibilityChange}
             name="servicesEnabled"
           />
-
           <StepCard
             title="Payment Step"
             description="Configure payment methods and terms for your proposal."
@@ -602,11 +502,9 @@ const handleAccountChange = (selectedAccount) => {
             onChange={handleVisibilityChange}
             name="paymentsEnabled"
           />
-        </FormGroup>
-      </Paper>
-
-    
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 };
 

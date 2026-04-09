@@ -1162,39 +1162,12 @@
 // };
 // export default InvoiceComponent;
 import React, { useState,useEffect } from 'react';
-import {
-  Box,
-  Paper,
-  Typography,
-  IconButton,
-  Button,
-  Grid,
-  InputLabel,
-  FormControl,
-  TextField,
-  Autocomplete,
-  Checkbox,
-  Chip,
-  FormHelperText,
-  InputAdornment,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  Alert,
-  AlertTitle,
-  Menu,
-  MenuItem
-} from '@mui/material';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { RiCloseLine } from 'react-icons/ri';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 import { CiDiscount1 } from 'react-icons/ci';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { BsThreeDotsVertical } from 'react-icons/bs';
 import CreatableSelect from 'react-select/creatable';
+import Select from 'react-select';
 import Editor from '../components/Editor';
 import SaveAsServiceDrawer from "./SaveAsServiceDrawer"
 import EditServiceDrawer from "./EditServiceDrawer"
@@ -1974,23 +1947,17 @@ const handleSaveChanges = (updatedRowData = null) => {
       }
       
       return invoice.teamMembers.map(member => {
-        // If member is already a full object with label, return it
         if (member && typeof member === 'object' && member.label) {
           return member;
         }
-        
-        // If member is just an ID (string), find the full object
         if (typeof member === 'string') {
           const user = teammemberoption.find(opt => opt.value === member);
           return user || { value: member, label: `User ${member}` };
         }
-        
-        // If member is an object but missing label, try to find it
         if (member && member.value) {
           const user = teammemberoption.find(opt => opt.value === member.value);
           return user || { value: member.value, label: member.value };
         }
-        
         return member;
       }).filter(Boolean);
     };
@@ -1998,557 +1965,275 @@ const handleSaveChanges = (updatedRowData = null) => {
     const selectedTeamMembers = getSelectedTeamMembers();
     
     return (
-      <Box sx={{ mt: 1 }}>
-        <InputLabel sx={{ color: "black" }}>Team Members *</InputLabel>
-        <FormControl error={!!getInvoiceError(invoice.id, 'teamMembers')} fullWidth>
-          <Autocomplete
-            multiple
-            size='small'
-            options={teammemberoption}
-            value={selectedTeamMembers}
-            onChange={(event, newValue) => {
-              console.log("🎯 Autocomplete onChange:", newValue);
-              handleTeamMembersChange(invoice.id, newValue);
-            }}
-            disableCloseOnSelect
-            getOptionLabel={(option) => {
-              // Handle both option formats
-              return option.label || option.username || String(option);
-            }}
-            isOptionEqualToValue={(option, value) => {
-              // Compare by value property if available
-              return option.value === value.value;
-            }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                placeholder="Select team members..."
-                variant="outlined"
-                error={!!getInvoiceError(invoice.id, 'teamMembers')}
-              />
-            )}
-            renderTags={(value, getTagProps) =>
-              value.map((option, index) => (
-                <Chip
-                  label={option.label || option.username || String(option)}
-                  {...getTagProps({ index })}
-                  size="small"
-                  sx={{
-                    fontWeight: 500,
-                    borderRadius: "12px",
-                    height: "24px",
-                  }}
-                />
-              ))
-            }
-            renderOption={(props, option, { selected }) => (
-              <li {...props}>
-                <Checkbox
-                  checked={selected}
-                  sx={{ mr: 1 }}
-                />
-                <Typography variant="body2">
-                  {option.label}
-                </Typography>
-              </li>
-            )}
-          />
-          {getInvoiceError(invoice.id, 'teamMembers') && (
-            <FormHelperText error>
-              {getInvoiceError(invoice.id, 'teamMembers')}
-            </FormHelperText>
-          )}
-          <Typography variant="caption" color="textSecondary" sx={{ mt: 0.5, display: 'block' }}>
-            {selectedTeamMembers.length} team member(s) selected
-          </Typography>
-        </FormControl>
-      </Box>
+      <div className="mt-1 space-y-1.5">
+        <label className="text-sm font-medium text-slate-700">Team Members *</label>
+        <Select
+          isMulti
+          options={teammemberoption}
+          value={selectedTeamMembers}
+          onChange={(newValue) => {
+            console.log("🎯 Select onChange:", newValue);
+            handleTeamMembersChange(invoice.id, newValue || []);
+          }}
+          placeholder="Select team members..."
+          styles={{
+            control: (provided) => ({ ...provided, borderColor: getInvoiceError(invoice.id, 'teamMembers') ? 'red' : '#e2e8f0', borderRadius: '0.5rem', minHeight: '38px', fontSize: '0.875rem' }),
+            menuPortal: (provided) => ({ ...provided, zIndex: 9999 }),
+          }}
+          menuPortalTarget={document.body}
+        />
+        {getInvoiceError(invoice.id, 'teamMembers') && (
+          <p className="text-xs text-red-500">{getInvoiceError(invoice.id, 'teamMembers')}</p>
+        )}
+        <p className="text-xs text-slate-400">{selectedTeamMembers.length} team member(s) selected</p>
+      </div>
     );
   };
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Box sx={{ mt: 2 }}>
-        {/* Show validation errors */}
-        {(stepErrors.invoices || stepErrors.invoiceDetails) && (
-          <Alert severity="error" sx={{ mb: 3 }}>
-            {stepErrors.invoices && <Box>- {stepErrors.invoices}</Box>}
-            {stepErrors.invoiceDetails && <Box>- {stepErrors.invoiceDetails}</Box>}
-          </Alert>
-        )}
-        
-        {/* Show warning if no invoices exist */}
-        {invoices.length === 0 && (
-          <Alert severity="warning" sx={{ mb: 3 }}>
-            <AlertTitle>No Invoices Added</AlertTitle>
-            You need to add at least one invoice to proceed. Click the "Add invoice" button below to get started.
-          </Alert>
-        )}
-        
-        {invoices.map((invoice, invoiceIndex) => (
-          <Paper key={invoice.id} elevation={2} sx={{ p: 2, mt: 2, position: 'relative' }}>
-            {invoices.length > 1 && (
-              <IconButton 
-                sx={{ position: 'absolute', top: 8, right: 8 }}
-                onClick={() => removeInvoice(invoice.id)}
-              >
-                <RiCloseLine />
-              </IconButton>
-            )}
-            
-            <Typography variant="h6" gutterBottom>
-              Invoice #{invoiceIndex + 1}
-            </Typography>
-            
-            <Box padding={2}>
-              <Box sx={{ flexGrow: 1 }}>
-                <Grid container spacing={2}>
-                  <Grid size={6}>
-                    <InputLabel sx={{ color: "black", textAlign: 'left', mb: 1 }}>
-                      Invoice Template *
-                    </InputLabel>
-                    <FormControl 
-                      error={!!getInvoiceError(invoice.id, 'invoiceTemplate')} 
-                      fullWidth
-                    >
-                      <Autocomplete 
-                        options={invoiceOptions}
-                        sx={{ backgroundColor: "#fff" }} 
-                        size="small"
-                        value={invoice.invoiceTemplate}
-                        onChange={(event, value) => handleInvoiceTemplateChange(invoice.id, value)}
-                        isOptionEqualToValue={(option, value) => option?.value === value?.value}
-                        getOptionLabel={(option) => option?.label || ""}
-                        renderInput={(params) => (
-                          <TextField 
-                            {...params} 
-                            placeholder="Invoice Template" 
-                            error={!!getInvoiceError(invoice.id, 'invoiceTemplate')}
-                          />
-                        )}
-                        isClearable={true} 
-                      />
-                      {getInvoiceError(invoice.id, 'invoiceTemplate') && (
-                        <FormHelperText error>
-                          {getInvoiceError(invoice.id, 'invoiceTemplate')}
-                        </FormHelperText>
-                      )}
-                    </FormControl>
-                  </Grid>
-                  
-                  <Grid size={6}>
-                    <TeamMembersSelector invoice={invoice} />
-                  </Grid>
-                </Grid>
-              </Box>
+    <div className="mt-4 space-y-4">
+      {/* Show validation errors */}
+      {(stepErrors.invoices || stepErrors.invoiceDetails) && (
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {stepErrors.invoices && <div>- {stepErrors.invoices}</div>}
+          {stepErrors.invoiceDetails && <div>- {stepErrors.invoiceDetails}</div>}
+        </div>
+      )}
 
-              {/* Rest of the invoice component */}
-              <Box>
-                <Grid container spacing={2}>
-                  <Grid item xs={12} md={4}>
-                    <InputLabel sx={{ color: "black" }}>Issue invoice</InputLabel>
-                    <Autocomplete
-                      sx={{ mt: 1, mb: 2, backgroundColor: "#fff" }}
-                      size="small"
-                      options={invoiceissueoptions}
-                      value={invoice.issueInvoice}
-                      onChange={(event, value) => handleIssueChange(invoice.id, value)}
-                      renderInput={(params) => <TextField {...params} placeholder="Issue invoice" />}
-                    />
-                  </Grid>
-                  {invoice.issueInvoice === "specific date" && (
-                    <>
-                      <Grid item xs={12} md={4}>
-                        <InputLabel>Date</InputLabel>
-                        <DatePicker 
-                          format="MM/DD/YYYY" 
-                          sx={{ width: "100%", backgroundColor: "#fff" }} 
-                          value={invoice.specificDate}
-                          onChange={(date) => handleDateChange(invoice.id, date)}
-                          renderInput={(params) => <TextField {...params} size="small" />} 
-                        />
-                      </Grid>
-                      <Grid item xs={12} md={4}>
-                        <InputLabel>Time</InputLabel>
-                        <Autocomplete 
-                          sx={{ mt: 1, mb: 2, backgroundColor: "#fff" }} 
-                          options={timeOptions} 
-                          size="small" 
-                          value={invoice.selectedTime}
-                          onChange={(event, value) => handleTimeChange(invoice.id, value)}
-                          renderInput={(params) => <TextField {...params} placeholder="Select Time" variant="outlined" />} 
-                          fullWidth 
-                        />
-                      </Grid>
-                    </>
-                  )}
-                </Grid>
-              </Box>
+      {/* Show warning if no invoices exist */}
+      {invoices.length === 0 && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+          <p className="text-sm font-semibold text-amber-800">No Invoices Added</p>
+          <p className="text-xs text-amber-700 mt-1">You need to add at least one invoice to proceed. Click the "Add invoice" button below to get started.</p>
+        </div>
+      )}
 
-              <Box sx={{ position: "relative", mt: 2 }}>
-                <InputLabel sx={{ color: "black" }}>Description</InputLabel>
-                <TextField
-                  fullWidth
-                  size="small"
-                  margin="normal"
-                  type="text"
-                  value={invoice.description}
-                  onChange={(e) => handleDescriptionChange(invoice.id, e)}
-                  placeholder="Description"
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <Typography sx={{ color: "gray", fontSize: "12px" }}>
-                          {invoice.charCount}/{invoice.charLimit}
-                        </Typography>
-                      </InputAdornment>
-                    ),
+      {invoices.map((invoice, invoiceIndex) => (
+        <div key={invoice.id} className="relative rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          {invoices.length > 1 && (
+            <button type="button" onClick={() => removeInvoice(invoice.id)} className="absolute top-3 right-3 rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600">
+              <RiCloseLine className="h-5 w-5" />
+            </button>
+          )}
+
+          <h4 className="text-base font-semibold text-slate-800 mb-4">Invoice #{invoiceIndex + 1}</h4>
+
+          <div className="space-y-4">
+            {/* Invoice Template & Team Members */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-slate-700">Invoice Template *</label>
+                <Select
+                  options={invoiceOptions}
+                  value={invoice.invoiceTemplate}
+                  onChange={(value) => handleInvoiceTemplateChange(invoice.id, value)}
+                  isClearable
+                  placeholder="Invoice Template"
+                  styles={{
+                    control: (provided) => ({ ...provided, borderColor: getInvoiceError(invoice.id, 'invoiceTemplate') ? 'red' : '#e2e8f0', borderRadius: '0.5rem', minHeight: '38px', fontSize: '0.875rem' }),
+                    menuPortal: (provided) => ({ ...provided, zIndex: 9999 }),
                   }}
+                  menuPortalTarget={document.body}
                 />
-              </Box>
+                {getInvoiceError(invoice.id, 'invoiceTemplate') && <p className="text-xs text-red-500">{getInvoiceError(invoice.id, 'invoiceTemplate')}</p>}
+              </div>
+              <TeamMembersSelector invoice={invoice} />
+            </div>
 
-              {/* Line Items Table */}
-              <Box>
-                <Box sx={{ margin: "20px 0 10px 0" }}>
-                  <Typography variant="h6">Line items</Typography>
-                  <Typography variant="body2">Client-facing itemized list of products and services</Typography>
-                  {getInvoiceError(invoice.id, 'rows') && (
-                    <Typography color="error" variant="body2">
-                      {getInvoiceError(invoice.id, 'rows')}
-                    </Typography>
-                  )}
-                </Box>
-                <Box sx={{ overflow: "auto", width: "100%" }}>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Product or service</TableCell>
-                        <TableCell>Description</TableCell>
-                        <TableCell>Rate</TableCell>
-                        <TableCell>Qty</TableCell>
-                        <TableCell>Amount</TableCell>
-                        <TableCell>Tax</TableCell>
-                        <TableCell></TableCell>
-                        <TableCell></TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
+            {/* Issue Invoice, Date, Time */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-slate-700">Issue invoice</label>
+                <select value={invoice.issueInvoice || ''} onChange={(e) => handleIssueChange(invoice.id, e.target.value)} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                  {invoiceissueoptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                </select>
+              </div>
+              {invoice.issueInvoice === "specific date" && (
+                <>
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium text-slate-700">Date</label>
+                    <input type="date" value={invoice.specificDate ? (typeof invoice.specificDate === 'string' ? invoice.specificDate : invoice.specificDate.format?.('YYYY-MM-DD') || '') : ''} onChange={(e) => handleDateChange(invoice.id, e.target.value)} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium text-slate-700">Time</label>
+                    <select value={invoice.selectedTime || ''} onChange={(e) => handleTimeChange(invoice.id, e.target.value)} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                      <option value="">Select Time</option>
+                      {timeOptions.map(t => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Description */}
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-slate-700">Description</label>
+              <div className="relative">
+                <input type="text" value={invoice.description} onChange={(e) => handleDescriptionChange(invoice.id, e)} placeholder="Description" className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 pr-20 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">{invoice.charCount}/{invoice.charLimit}</span>
+              </div>
+            </div>
+
+            {/* Line Items Table */}
+            <div>
+              <div className="mb-2">
+                <h5 className="text-sm font-semibold text-slate-800">Line items</h5>
+                <p className="text-xs text-slate-500">Client-facing itemized list of products and services</p>
+                {getInvoiceError(invoice.id, 'rows') && <p className="text-xs text-red-500 mt-1">{getInvoiceError(invoice.id, 'rows')}</p>}
+              </div>
+              <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left">
+                    <thead>
+                      <tr className="border-b border-slate-100 bg-slate-50/60">
+                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Product / Service</th>
+                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Description</th>
+                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Rate</th>
+                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Qty</th>
+                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Amount</th>
+                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Tax</th>
+                        <th className="px-4 py-3"></th>
+                        <th className="px-4 py-3"></th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
                       {invoice.rows.map((row, rowIndex) => (
-                        <TableRow key={rowIndex}>
-                          <TableCell>
-                            <FormControl error={!!getInvoiceRowError(invoice.id, rowIndex, 'productorService')}>
-                              {/* <CreatableSelect
-                                placeholder={row.isDiscount ? "Reason for discount" : "Product or Service"}
-                                options={serviceoptions}
-                                value={row.productorService ? serviceoptions.find((option) => option.label === row.productorService) || { label: row.productorService, value: row.productorService } : null}
-                                onChange={(selectedOption) => handleServiceChange(invoice.id, rowIndex, selectedOption)}
-                                onInputChange={(inputValue, actionMeta) => handleServiceInputChange(invoice.id, rowIndex, inputValue, actionMeta)}
-                                isClearable
-                                styles={{
-                                  container: (provided) => ({ 
-                                    ...provided, 
-                                    width: "180px",
-                                    borderColor: getInvoiceRowError(invoice.id, rowIndex, 'productorService') ? 'red' : 'inherit'
-                                  }),
-                                  control: (provided, state) => ({ 
-                                    ...provided, 
-                                    width: "180px",
-                                    borderColor: getInvoiceRowError(invoice.id, rowIndex, 'productorService') ? 'red' : state.isFocused ? '#2684ff' : '#ccc',
-                                    boxShadow: getInvoiceRowError(invoice.id, rowIndex, 'productorService') ? '0 0 0 1px red' : state.isFocused ? '0 0 0 1px #2684ff' : 'none',
-                                    '&:hover': {
-                                      borderColor: getInvoiceRowError(invoice.id, rowIndex, 'productorService') ? 'red' : '#999'
-                                    }
-                                  }),
-                                  menuPortal: (provided) => ({ ...provided, zIndex: 9999 }),
-                                }}
-                                menuPortalTarget={document.body}
-                              /> */}
-                                <Autocomplete
-                                                    size='small'
-                                value={row.productorService ? 
-                                  (typeof row.productorService === 'string' ? 
-                                    { title: row.productorService } : 
-                                    { title: row.productorService.label }
-                                  ) : 
-                                  null
-                                }
-                                onChange={(event, newValue) => {
-                                  if (typeof newValue === 'string') {
-                                    // User typed and pressed enter
-                                    handleServiceChange(rowIndex, { label: newValue, value: newValue });
-                                  } else if (newValue && newValue.inputValue) {
-                                    // User clicked "Add" option
-                                    handleServiceChange(rowIndex, { 
-                                      label: newValue.inputValue, 
-                                      value: newValue.inputValue 
-                                    });
-                                  } else if (newValue) {
-                                    // User selected from existing options
-                                    handleServiceChange(rowIndex, { 
-                                      label: newValue.title, 
-                                      value: newValue.value || newValue.title 
-                                    });
-                                  } else {
-                                    // User cleared the selection
-                                    handleServiceChange(rowIndex, null);
-                                  }
-                                }}
-                                onInputChange={(event, inputValue, reason) => {
-                                  if (reason === 'input') {
-                                    handleServiceInputChange(inputValue, { action: 'input-change' }, rowIndex);
-                                  }
-                                }}
-                                filterOptions={(options, params) => {
-                                  const filtered = options.filter(option => 
-                                    option.title.toLowerCase().includes(params.inputValue.toLowerCase())
-                                  );
-                              
-                                  const { inputValue } = params;
-                                  // Suggest the creation of a new value
-                                  const isExisting = options.some((option) => 
-                                    inputValue.toLowerCase() === option.title.toLowerCase()
-                                  );
-                                  
-                                  if (inputValue !== '' && !isExisting) {
-                                    filtered.push({
-                                      inputValue,
-                                      title: `Add "${inputValue}"`,
-                                    });
-                                  }
-                              
-                                  return filtered;
-                                }}
-                                selectOnFocus
-                                clearOnBlur
-                                handleHomeEndKeys
-                                options={serviceoptions.map(option => ({
-                                  title: option.label,
-                                  value: option.value
-                                }))}
-                                getOptionLabel={(option) => {
-                                  // Value selected with enter, right from the input
-                                  if (typeof option === 'string') {
-                                    return option;
-                                  }
-                                  // Add "xxx" option created dynamically
-                                  if (option.inputValue) {
-                                    return option.inputValue;
-                                  }
-                                  // Regular option
-                                  return option.title;
-                                }}
-                                renderOption={(props, option) => {
-                                  const { key, ...optionProps } = props;
-                                  return (
-                                    <li key={key} {...optionProps}>
-                                      {option.title}
-                                    </li>
-                                  );
-                                }}
-                                sx={{ 
-                                  width: 180,
-                                  '& .MuiOutlinedInput-root': {
-                                    borderColor: getInvoiceRowError(rowIndex, 'productorService') ? 'red' : 'inherit',
-                                    '& .MuiOutlinedInput-notchedOutline': {
-                                      borderColor: getInvoiceRowError(rowIndex, 'productorService') ? 'red' : undefined,
-                                    },
-                                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                                      borderColor: getInvoiceRowError(rowIndex, 'productorService') ? 'red' : '#999',
-                                    },
-                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                      borderColor: getInvoiceRowError(rowIndex, 'productorService') ? 'red' : '#2684ff',
-                                      boxShadow: getInvoiceRowError(rowIndex, 'productorService') ? '0 0 0 1px red' : '0 0 0 1px #2684ff',
-                                    }
-                                  }
-                                }}
-                                freeSolo
-                                renderInput={(params) => (
-                                  <TextField 
-                                    {...params} 
-                                    placeholder={row.isDiscount ? "Reason for discount" : "Product or Service"}
-                                    error={!!getInvoiceRowError(rowIndex, 'productorService')}
-                                    helperText={getInvoiceRowError(rowIndex, 'productorService')}
-                                  />
-                                )}
-                              />
-                              {getInvoiceRowError(invoice.id, rowIndex, 'productorService') && (
-                                <FormHelperText error sx={{ mt: 0.5 }}>
-                                  {getInvoiceRowError(invoice.id, rowIndex, 'productorService')}
-                                </FormHelperText>
+                        <tr key={rowIndex} className="hover:bg-slate-50/70">
+                          <td className="px-4 py-2 min-w-[200px]">
+                            <CreatableSelect
+                              placeholder={row.isDiscount ? "Reason for discount" : "Product or Service"}
+                              options={serviceoptions}
+                              value={row.productorService ? serviceoptions.find((option) => option.label === row.productorService) || { label: row.productorService, value: row.productorService } : null}
+                              onChange={(selectedOption) => handleServiceChange(invoice.id, rowIndex, selectedOption)}
+                              onInputChange={(inputValue, actionMeta) => handleServiceInputChange(invoice.id, rowIndex, inputValue, actionMeta)}
+                              isClearable
+                              styles={{
+                                control: (provided) => ({ ...provided, minWidth: 180, borderColor: getInvoiceRowError(invoice.id, rowIndex, 'productorService') ? 'red' : '#e2e8f0' }),
+                                menuPortal: (provided) => ({ ...provided, zIndex: 9999 }),
+                              }}
+                              menuPortalTarget={document.body}
+                            />
+                            {getInvoiceRowError(invoice.id, rowIndex, 'productorService') && <p className="text-xs text-red-500 mt-0.5">{getInvoiceRowError(invoice.id, rowIndex, 'productorService')}</p>}
+                          </td>
+                          <td className="px-4 py-2">
+                            <input type="text" name="description" value={row.description} onChange={(e) => handleInputChange(invoice.id, rowIndex, e)} placeholder="Description" className="w-full border-0 bg-transparent text-sm focus:outline-none focus:ring-0" />
+                          </td>
+                          <td className="px-4 py-2">
+                            <input type="text" name="rate" value={row.rate} onChange={(e) => handleInputChange(invoice.id, rowIndex, e)} className={`w-20 rounded border bg-transparent px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 ${getInvoiceRowError(invoice.id, rowIndex, 'rate') ? 'border-red-400' : 'border-slate-200'}`} />
+                            {getInvoiceRowError(invoice.id, rowIndex, 'rate') && <p className="text-xs text-red-500 mt-0.5">{getInvoiceRowError(invoice.id, rowIndex, 'rate')}</p>}
+                          </td>
+                          <td className="px-4 py-2">
+                            <input type="text" name="quantity" value={row.quantity} onChange={(e) => handleInputChange(invoice.id, rowIndex, e)} className={`w-16 rounded border bg-transparent px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 ${getInvoiceRowError(invoice.id, rowIndex, 'quantity') ? 'border-red-400' : 'border-slate-200'}`} />
+                            {getInvoiceRowError(invoice.id, rowIndex, 'quantity') && <p className="text-xs text-red-500 mt-0.5">{getInvoiceRowError(invoice.id, rowIndex, 'quantity')}</p>}
+                          </td>
+                          <td className="px-4 py-2 text-sm text-slate-700">${row.amount}</td>
+                          <td className="px-4 py-2">
+                            <input type="checkbox" name="tax" checked={row.tax} onChange={(e) => handleInputChange(invoice.id, rowIndex, e)} className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+                          </td>
+                          <td className="px-4 py-2">
+                            <div className="relative">
+                              <button type="button" onClick={(event) => handleMenuOpen(event, rowIndex, invoice.id)} className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600">
+                                <BsThreeDotsVertical className="h-4 w-4" />
+                              </button>
+                              {isMenuOpen(rowIndex, invoice.id) && (
+                                <div className="absolute right-0 top-full z-50 mt-1 w-44 rounded-lg border border-slate-200 bg-white py-1 shadow-lg">
+                                  <button type="button" onClick={() => { handleEditService(row, rowIndex, invoice.id); handleMenuClose(); }} className="block w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">Edit</button>
+                                  <button type="button" onClick={() => { handleDuplicate(invoice.id, rowIndex); handleMenuClose(); }} className="block w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">Duplicate</button>
+                                  <button type="button" onClick={() => { deleteRow(invoice.id, rowIndex); handleMenuClose(); }} className="block w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50">Delete</button>
+                                  <button type="button" onClick={() => { setSelectedRowData(row); setIsNewServiceDrawerOpen(true); handleMenuClose(); }} className="block w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">Save as new service</button>
+                                </div>
                               )}
-                            </FormControl>
-                          </TableCell>
-                          <TableCell>
-                            <TextField
-                              size="small"
-                              name="description"
-                              value={row.description}
-                              onChange={(e) => handleInputChange(invoice.id, rowIndex, e)}
-                              placeholder="Description"
-                              fullWidth
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <TextField
-                              size="small"
-                              name="rate"
-                              value={row.rate}
-                              onChange={(e) => handleInputChange(invoice.id, rowIndex, e)}
-                              sx={{ width: "80px" }}
-                              error={!!getInvoiceRowError(invoice.id, rowIndex, 'rate')}
-                              helperText={getInvoiceRowError(invoice.id, rowIndex, 'rate')}
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <TextField
-                              size="small"
-                              name="quantity"
-                              value={row.quantity}
-                              onChange={(e) => handleInputChange(invoice.id, rowIndex, e)}
-                              sx={{ width: "60px" }}
-                              error={!!getInvoiceRowError(invoice.id, rowIndex, 'quantity')}
-                              helperText={getInvoiceRowError(invoice.id, rowIndex, 'quantity')}
-                            />
-                          </TableCell>
-                          <TableCell>${row.amount}</TableCell>
-                          <TableCell>
-                            <Checkbox 
-                              name="tax" 
-                              checked={row.tax} 
-                              onChange={(e) => handleInputChange(invoice.id, rowIndex, e)} 
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <IconButton onClick={(event) => handleMenuOpen(event, rowIndex, invoice.id)}>
-                              <MoreVertIcon />
-                            </IconButton>
-                            <Menu 
-                              anchorEl={menuAnchor?.anchorEl || null}
-                              open={isMenuOpen(rowIndex, invoice.id)}
-                              onClose={handleMenuClose}
-                              anchorOrigin={{ vertical: "top", horizontal: "left" }}
-                              transformOrigin={{ vertical: "top", horizontal: "left" }}
-                              sx={{mt:5}}
-                            >
-                              <MenuItem onClick={() => {
-                                handleEditService(row, rowIndex, invoice.id);
-                                handleMenuClose();
-                              }}>
-                                Edit
-                              </MenuItem>
-                              <MenuItem onClick={() => {
-                                handleDuplicate(invoice.id, rowIndex);
-                                handleMenuClose();
-                              }}>
-                                Duplicate
-                              </MenuItem>
-                              <MenuItem onClick={() => {deleteRow(invoice.id, rowIndex);
-                                handleMenuClose();
-                              }
-
-                              }>
-                              Delete</MenuItem>
-                              <MenuItem onClick={() => {
-    setSelectedRowData(row);
-    setIsNewServiceDrawerOpen(true);
-    handleMenuClose();
-  }}>
-    Save as new service
-  </MenuItem>
-                            </Menu>
-                          </TableCell>
-                          <TableCell>
-                            <IconButton onClick={() => deleteRow(invoice.id, rowIndex)}>
-                              <RiCloseLine />
-                            </IconButton>
-                          </TableCell>
-                        </TableRow>
+                            </div>
+                          </td>
+                          <td className="px-4 py-2">
+                            <button type="button" onClick={() => deleteRow(invoice.id, rowIndex)} className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-red-500">
+                              <RiCloseLine className="h-4 w-4" />
+                            </button>
+                          </td>
+                        </tr>
                       ))}
-                    </TableBody>
-                  </Table>
-                </Box>
-                <Box sx={{ display: "flex", alignItems: "center", gap: "20px", marginTop: "10px" }}>
-                  <Button onClick={() => addRow(invoice.id)} startIcon={<AiOutlinePlusCircle />} sx={{ color: "blue", fontSize: "15px" }}>
-                    Line item
-                  </Button>
-                  <Button onClick={() => addRow(invoice.id, true)} startIcon={<CiDiscount1 />} sx={{ color: "blue", fontSize: "15px" }}>
-                    Discount
-                  </Button>
-                </Box>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
 
-                {/* Summary */}
-                <Typography variant="h6" sx={{ mt: 2 }}>Summary</Typography>
-                <Table sx={{ backgroundColor: "#fff", width: "50%" }}>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Subtotal</TableCell>
-                      <TableCell>Tax Rate</TableCell>
-                      <TableCell>Tax Total</TableCell>
-                      <TableCell>Total</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell>${invoice.subtotal}</TableCell>
-                      <TableCell>
-                        <TextField
-                          size="small"
-                          value={invoice.taxRate}
-                          onChange={(e) => handleTaxRateChange(invoice.id, e.target.value)}
-                          sx={{ width: "60px" }}
-                        />%
-                      </TableCell>
-                      <TableCell>${invoice.taxTotal}</TableCell>
-                      <TableCell>${invoice.totalAmount}</TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </Box>
+              {/* Add Row Buttons */}
+              <div className="flex items-center gap-4 mt-2">
+                <button type="button" onClick={() => addRow(invoice.id)} className="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-700">
+                  <AiOutlinePlusCircle className="h-4 w-4" /> Line item
+                </button>
+                <button type="button" onClick={() => addRow(invoice.id, true)} className="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-700">
+                  <CiDiscount1 className="h-4 w-4" /> Discount
+                </button>
+              </div>
 
-              {/* Client Note Editor */}
-              <Box sx={{ width: "100%", mt: 3, mb: 3 }}>
-                <InputLabel sx={{ color: "black", mb: 1 }}>Note for Client</InputLabel>
-                <Editor 
-                  onChange={(content) => handleEditorChange(invoice.id, content)} 
-                  initialContent={invoice.clientNote} 
-                />
-              </Box>
-            </Box>
-          </Paper>
-        ))}
+              {/* Summary */}
+              <h5 className="text-sm font-semibold text-slate-800 mt-4">Summary</h5>
+              <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden max-w-lg mt-2">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="border-b border-slate-100 bg-slate-50/60">
+                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Subtotal</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Tax Rate</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Tax Total</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td className="px-4 py-3 text-sm font-medium text-slate-700">${invoice.subtotal}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-1">
+                          <input type="text" value={invoice.taxRate} onChange={(e) => handleTaxRateChange(invoice.id, e.target.value)} className="w-16 rounded border border-slate-200 bg-transparent px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500" />
+                          <span className="text-sm text-slate-500">%</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-slate-700">${invoice.taxTotal}</td>
+                      <td className="px-4 py-3 text-sm font-bold text-slate-900">${invoice.totalAmount}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
 
-        {/* Add Invoice Button */}
-        <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
-          <Button variant="outlined" onClick={addInvoice}>
-            Add invoice
-          </Button>
-        </Box>
+            {/* Client Note Editor */}
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-slate-700">Note for Client</label>
+              <Editor
+                onChange={(content) => handleEditorChange(invoice.id, content)}
+                initialContent={invoice.clientNote}
+              />
+            </div>
+          </div>
+        </div>
+      ))}
 
-        {/* Invoice Count Display */}
-        <Box sx={{ mt: 1 }}>
-          <Typography variant="body2" color="text.secondary">
-            {invoices.length} invoice(s) added
-          </Typography>
-        </Box>
-      </Box>
+      {/* Add Invoice Button */}
+      <div className="flex items-center gap-3 mt-2">
+        <button type="button" onClick={addInvoice} className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-200 bg-white px-4 py-2 text-sm font-medium text-indigo-600 shadow-sm transition-colors hover:bg-indigo-50">
+          Add invoice
+        </button>
+      </div>
+
+      {/* Invoice Count Display */}
+      <p className="text-xs text-slate-400">{invoices.length} invoice(s) added</p>
+
       <SaveAsServiceDrawer
-  open={isNewServiceDrawerOpen}
-  onClose={() => setIsNewServiceDrawerOpen(false)}
-  selectedRowData={selectedRowData}
-  // onSave={handleSaveAsNewService}
-  categoryOptions={categoryoptions} // Pass your actual category options here
-  // onCategoryCreate={handleCreateCategory}
-   onServiceCreated={handleServiceCreated}
-  onCategoryCreated={handleCategoryCreated}
-/>
- <EditServiceDrawer
+        open={isNewServiceDrawerOpen}
+        onClose={() => setIsNewServiceDrawerOpen(false)}
+        selectedRowData={selectedRowData}
+        categoryOptions={categoryoptions}
+        onServiceCreated={handleServiceCreated}
+        onCategoryCreated={handleCategoryCreated}
+      />
+      <EditServiceDrawer
         open={isEditDrawerOpen}
         onClose={closeEditDrawer}
         selectedRowData={selectedRowData}
         setSelectedRowData={setSelectedRowData}
-       onSave={(updatedData) => handleSaveChanges(updatedData)}
+        onSave={(updatedData) => handleSaveChanges(updatedData)}
       />
-    </LocalizationProvider>
+    </div>
   );
 };
 

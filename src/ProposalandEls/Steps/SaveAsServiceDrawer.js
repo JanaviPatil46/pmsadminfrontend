@@ -514,22 +514,7 @@
 
 
 import React, { useState, useEffect } from 'react';
-import {
-  Drawer,
-  Box,
-  Typography,
-  TextField,
-
-  FormControlLabel,
-  Switch,
-  Button,
-  Autocomplete,
-
-  useTheme,
-  useMediaQuery,
-  IconButton,
-} from '@mui/material';
-import { Close as CloseIcon, ArrowBack as ArrowBackIcon } from '@mui/icons-material';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '../../components/ui/sheet';
 import { toast } from 'react-toastify';
 
 const SaveAsServiceDrawer = ({
@@ -540,8 +525,6 @@ const SaveAsServiceDrawer = ({
   onServiceCreated,
   onCategoryCreated,
 }) => {
-  const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   // API endpoints
   const SERVICE_API = process.env.REACT_APP_SERVICE_API || 'https://www.snptaxes.com';
@@ -784,226 +767,85 @@ const SaveAsServiceDrawer = ({
 
   return (
     <>
-      {/* Main Service Drawer */}
-      <Drawer
-        anchor="right"
-        open={open}
-        onClose={handleDrawerClose}
-        PaperProps={{
-          sx: {
-            borderRadius: isSmallScreen ? 0 : '10px 0 0 10px',
-            width: isSmallScreen ? '100%' : 650,
-          },
-        }}
-      >
-        <Box sx={{ p: 0 }}>
-          <Box sx={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: 'center', 
-            p: 2, 
-            borderBottom: `1px solid ${theme.palette.divider}` 
-          }}>
-            <Typography variant="h6" component="h2">
-              Create Service
-            </Typography>
-            <IconButton 
-              onClick={handleDrawerClose}
-              disabled={isLoading}
-              size="small"
-            >
-              <CloseIcon />
-            </IconButton>
-          </Box>
-          
-          <Box component="form" sx={{ p: 2 }}>
-            <TextField
-              fullWidth
-              label="Service Name"
-              placeholder="Service Name"
-              size="small"
-              margin="normal"
-              value={formData.serviceName}
-              onChange={(e) => handleInputChange('serviceName', e.target.value)}
-              required
-              disabled={isLoading}
-            />
-            
-            <TextField
-              fullWidth
-              label="Description"
-              placeholder="Description"
-              size="small"
-              margin="normal"
-              value={formData.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
-              multiline
-              rows={3}
-              disabled={isLoading}
-            />
+      {/* Main Service Sheet */}
+      <Sheet open={open} onOpenChange={(o) => { if (!o) handleDrawerClose(); }}>
+        <SheetContent className="sm:max-w-lg overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>Create Service</SheetTitle>
+          </SheetHeader>
+          <form className="mt-4 space-y-4">
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-slate-700">Service Name *</label>
+              <input type="text" placeholder="Service Name" value={formData.serviceName} onChange={(e) => handleInputChange('serviceName', e.target.value)} disabled={isLoading} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50" />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-slate-700">Description</label>
+              <textarea rows={3} placeholder="Description" value={formData.description} onChange={(e) => handleInputChange('description', e.target.value)} disabled={isLoading} className="flex min-h-[80px] w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-slate-700">Rate *</label>
+                <input type="number" step="0.01" min="0" placeholder="0.00" value={formData.rate} onChange={(e) => handleInputChange('rate', e.target.value)} disabled={isLoading} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50" />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-slate-700">Rate Type *</label>
+                <select value={formData.rateType?.value || ''} onChange={(e) => { const opt = rateTypeOptions.find(o => o.value === e.target.value); handleRateTypeChange(null, opt || null); }} disabled={isLoading} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50">
+                  <option value="">Select Rate Type</option>
+                  {rateTypeOptions.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                </select>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 mt-2">
+              <input type="checkbox" checked={formData.tax} onChange={handleTaxChange} disabled={isLoading} className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+              <label className="text-sm text-slate-700">Taxable</label>
+            </div>
 
-            <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
-              <TextField
-                fullWidth
-                label="Rate"
-                placeholder="0.00"
-                size="small"
-                value={formData.rate}
-                onChange={(e) => handleInputChange('rate', e.target.value)}
-                type="number"
-                inputProps={{ step: "0.01", min: "0" }}
-                required
-                disabled={isLoading}
-              />
+            <h4 className="text-base font-semibold text-slate-800 pt-2">Category</h4>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-slate-700">Category Name</label>
+              <select value={formData.category?.value || ''} onChange={(e) => { const opt = categoryOptions.find(o => o.value === e.target.value); handleCategoryChange(null, opt || null); }} disabled={isLoading} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50">
+                <option value="">Select Category</option>
+                {categoryOptions.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+              </select>
+            </div>
+            <button type="button" onClick={handleCategoryFormOpen} disabled={isLoading} className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-2 text-xs font-medium text-white shadow-sm hover:bg-indigo-700 disabled:opacity-50">
+              Create category
+            </button>
 
-              <Autocomplete
-                size="small"
-                fullWidth
-                options={rateTypeOptions}
-                getOptionLabel={(option) => option?.label || ""}
-                value={formData.rateType}
-                onChange={handleRateTypeChange}
-                renderInput={(params) => (
-                  <TextField 
-                    {...params} 
-                    label="Rate Type"
-                    required
-                  />
-                )}
-                isOptionEqualToValue={(option, value) => option.value === value.value}
-                disabled={isLoading}
-              />
-            </Box>
-
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={formData.tax}
-                  onChange={handleTaxChange}
-                  color="primary"
-                  disabled={isLoading}
-                />
-              }
-              label="Taxable"
-              sx={{ mt: 2 }}
-            />
-
-            <Box sx={{ mt: 3 }}>
-              <Typography variant="h6" gutterBottom>
-                Category
-              </Typography>
-              
-              <Autocomplete
-                size="small"
-                fullWidth
-                options={categoryOptions}
-                getOptionLabel={(option) => option.label}
-                value={formData.category}
-                onChange={handleCategoryChange}
-                renderInput={(params) => (
-                  <TextField {...params} label="Category Name" />
-                )}
-                isOptionEqualToValue={(option, value) => option.value === value.value}
-                disabled={isLoading}
-              />
-              
-              <Button 
-                variant="contained" 
-                onClick={handleCategoryFormOpen}
-                disabled={isLoading}
-                sx={{ mt: 2 }}
-              >
-                Create category
-              </Button>
-            </Box>
-
-            <Box sx={{ pt: 4, display: 'flex', gap: 1 }}>
-              <Button 
-                variant="contained" 
-                onClick={handleSaveService}
-                disabled={isLoading}
-                sx={{ flex: 1 }}
-              >
+            <div className="flex items-center gap-3 pt-4">
+              <button type="button" onClick={handleSaveService} disabled={isLoading} className="flex-1 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 disabled:opacity-50">
                 {isLoading ? 'Saving...' : 'Save'}
-              </Button>
-              <Button 
-                variant="outlined" 
-                onClick={handleDrawerClose}
-                disabled={isLoading}
-                sx={{ flex: 1 }}
-              >
+              </button>
+              <button type="button" onClick={handleDrawerClose} disabled={isLoading} className="flex-1 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50">
                 Cancel
-              </Button>
-            </Box>
-          </Box>
-        </Box>
-      </Drawer>
+              </button>
+            </div>
+          </form>
+        </SheetContent>
+      </Sheet>
 
-      {/* Category Creation Drawer */}
-      <Drawer
-        anchor="right"
-        open={isCategoryFormOpen}
-        onClose={handleCategoryFormClose}
-        PaperProps={{
-          sx: {
-            borderRadius: isSmallScreen ? 0 : '10px 0 0 10px',
-            width: isSmallScreen ? '100%' : 650,
-          },
-        }}
-      >
-        <Box>
-          <Box sx={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            p: 2, 
-            borderBottom: `1px solid ${theme.palette.divider}` 
-          }}>
-            <IconButton 
-              onClick={handleCategoryFormClose}
-              disabled={isCategoryLoading}
-              sx={{ mr: 1 }}
-            >
-              <ArrowBackIcon />
-            </IconButton>
-            <Typography variant="h6" component="h2" sx={{ flex: 1 }}>
-              Create Category
-            </Typography>
-            <Box width={40} /> {/* Spacer for alignment */}
-          </Box>
-          
-          <Box sx={{ p: 3 }}>
-            <TextField 
-              fullWidth 
-              label="Category Name"
-              placeholder="Category Name" 
-              size="small"
-              value={newCategoryName}
-              onChange={(e) => setNewCategoryName(e.target.value)}
-              required
-              disabled={isCategoryLoading}
-            />
-          </Box>
-          
-          <Box sx={{ p: 2, display: 'flex', gap: 1 }}>
-            <Button 
-              variant="contained" 
-              onClick={handleCreateCategory}
-              disabled={isCategoryLoading}
-              sx={{ flex: 1 }}
-            >
-              {isCategoryLoading ? 'Creating...' : 'Create'}
-            </Button>
-            <Button 
-              variant="outlined" 
-              onClick={handleCategoryFormClose}
-              disabled={isCategoryLoading}
-              sx={{ flex: 1 }}
-            >
-              Cancel
-            </Button>
-          </Box>
-        </Box>
-      </Drawer>
+      {/* Category Creation Sheet */}
+      <Sheet open={isCategoryFormOpen} onOpenChange={(o) => { if (!o) handleCategoryFormClose(); }}>
+        <SheetContent className="sm:max-w-md overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>Create Category</SheetTitle>
+          </SheetHeader>
+          <div className="mt-4 space-y-4">
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-slate-700">Category Name *</label>
+              <input type="text" placeholder="Category Name" value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} disabled={isCategoryLoading} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50" />
+            </div>
+            <div className="flex items-center gap-3">
+              <button type="button" onClick={handleCreateCategory} disabled={isCategoryLoading} className="flex-1 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 disabled:opacity-50">
+                {isCategoryLoading ? 'Creating...' : 'Create'}
+              </button>
+              <button type="button" onClick={handleCategoryFormClose} disabled={isCategoryLoading} className="flex-1 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50">
+                Cancel
+              </button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
     </>
   );
 };

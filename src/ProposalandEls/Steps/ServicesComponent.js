@@ -1,21 +1,5 @@
-
-
 import React,{useState,useEffect} from 'react';
-import {
-  Box,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  Checkbox,
-  Button,
-  IconButton,
-  Typography,
-  InputLabel,
-  TextField,Alert,FormControl,FormHelperText,Menu,MenuItem,Autocomplete
-} from '@mui/material';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { BsThreeDotsVertical } from 'react-icons/bs';
 import { RiCloseLine } from 'react-icons/ri';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 import { CiDiscount1 } from 'react-icons/ci';
@@ -1048,39 +1032,38 @@ const [categoryData, setCategoryData] = useState([]);
   };
 
   return (
-    <div className="itemized-section">
-      <h3>Itemized Service</h3>
-      <div className="info-message">
-        <p>⚠️ No Payment step will be shown for itemized services</p>
+    <div className="space-y-6">
+      <h3 className="text-lg font-semibold text-slate-800">Itemized Service</h3>
+      <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+        <p className="text-sm text-amber-700">⚠️ No Payment step will be shown for itemized services</p>
       </div>
 
       {/* Line Items Section */}
-      <Box sx={{ mt: 3 }}>
-        <Box sx={{ margin: "20px 0 10px 0" }}>
-          <Typography variant="h6">Line items</Typography>
-          <Typography variant="body2">Client-facing itemized list of products and services</Typography>
-        </Box>
-        
-        <Box sx={{ overflow: "auto", width: "100%" }}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Product or service</TableCell>
-                <TableCell>Description</TableCell>
-                <TableCell>Rate</TableCell>
-                <TableCell>Qty</TableCell>
-                <TableCell>Amount</TableCell>
-                <TableCell>Tax</TableCell>
-                <TableCell></TableCell>
-                <TableCell></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {itemizedData.rows && itemizedData.rows.map((row, rowIndex) => (
-                <TableRow key={rowIndex}>
-                  <TableCell>
-                    <FormControl error={!!getRowError(rowIndex, 'productorService')}>
-                      {/* <CreatableSelect
+      <div className="space-y-3">
+        <div>
+          <h4 className="text-base font-semibold text-slate-800">Line items</h4>
+          <p className="text-xs text-slate-500">Client-facing itemized list of products and services</p>
+        </div>
+
+        <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="border-b border-slate-100 bg-slate-50/60">
+                  <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Product / Service</th>
+                  <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Description</th>
+                  <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Rate</th>
+                  <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Qty</th>
+                  <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Amount</th>
+                  <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Tax</th>
+                  <th className="px-4 py-3"></th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {itemizedData.rows && itemizedData.rows.map((row, rowIndex) => (
+                  <tr key={rowIndex} className="hover:bg-slate-50/70">
+                    <td className="px-4 py-2 min-w-[200px]">
+                      <CreatableSelect
                         placeholder={row.isDiscount ? "Reason for discount" : "Product or Service"}
                         options={serviceoptions}
                         value={row.productorService ? serviceoptions.find((option) => option.label === row.productorService) || { label: row.productorService, value: row.productorService } : null}
@@ -1088,269 +1071,88 @@ const [categoryData, setCategoryData] = useState([]);
                         onInputChange={(inputValue, actionMeta) => handleServiceInputChange(inputValue, actionMeta, rowIndex)}
                         isClearable
                         styles={{
-                          container: (provided) => ({ 
-                            ...provided, 
-                            width: "180px",
-                            borderColor: getRowError(rowIndex, 'productorService') ? 'red' : 'inherit'
-                          }),
-                          control: (provided, state) => ({ 
-                            ...provided, 
-                            width: "180px",
-                            borderColor: getRowError(rowIndex, 'productorService') ? 'red' : state.isFocused ? '#2684ff' : '#ccc',
-                            boxShadow: getRowError(rowIndex, 'productorService') ? '0 0 0 1px red' : state.isFocused ? '0 0 0 1px #2684ff' : 'none',
-                            '&:hover': {
-                              borderColor: getRowError(rowIndex, 'productorService') ? 'red' : '#999'
-                            }
-                          }),
+                          control: (provided) => ({ ...provided, minWidth: 180, borderColor: getRowError(rowIndex, 'productorService') ? 'red' : '#e2e8f0' }),
                           menuPortal: (provided) => ({ ...provided, zIndex: 9999 }),
                         }}
                         menuPortalTarget={document.body}
-                      /> */}
-                      <Autocomplete
-                      size='small'
-  value={row.productorService ? 
-    (typeof row.productorService === 'string' ? 
-      { title: row.productorService } : 
-      { title: row.productorService.label }
-    ) : 
-    null
-  }
-  onChange={(event, newValue) => {
-    if (typeof newValue === 'string') {
-      // User typed and pressed enter
-      handleServiceChange(rowIndex, { label: newValue, value: newValue });
-    } else if (newValue && newValue.inputValue) {
-      // User clicked "Add" option
-      handleServiceChange(rowIndex, { 
-        label: newValue.inputValue, 
-        value: newValue.inputValue 
-      });
-    } else if (newValue) {
-      // User selected from existing options
-      handleServiceChange(rowIndex, { 
-        label: newValue.title, 
-        value: newValue.value || newValue.title 
-      });
-    } else {
-      // User cleared the selection
-      handleServiceChange(rowIndex, null);
-    }
-  }}
-  onInputChange={(event, inputValue, reason) => {
-    if (reason === 'input') {
-      handleServiceInputChange(inputValue, { action: 'input-change' }, rowIndex);
-    }
-  }}
-  filterOptions={(options, params) => {
-    const filtered = options.filter(option => 
-      option.title.toLowerCase().includes(params.inputValue.toLowerCase())
-    );
-
-    const { inputValue } = params;
-    // Suggest the creation of a new value
-    const isExisting = options.some((option) => 
-      inputValue.toLowerCase() === option.title.toLowerCase()
-    );
-    
-    if (inputValue !== '' && !isExisting) {
-      filtered.push({
-        inputValue,
-        title: `Add "${inputValue}"`,
-      });
-    }
-
-    return filtered;
-  }}
-  selectOnFocus
-  clearOnBlur
-  handleHomeEndKeys
-  options={serviceoptions.map(option => ({
-    title: option.label,
-    value: option.value
-  }))}
-  getOptionLabel={(option) => {
-    // Value selected with enter, right from the input
-    if (typeof option === 'string') {
-      return option;
-    }
-    // Add "xxx" option created dynamically
-    if (option.inputValue) {
-      return option.inputValue;
-    }
-    // Regular option
-    return option.title;
-  }}
-  renderOption={(props, option) => {
-    const { key, ...optionProps } = props;
-    return (
-      <li key={key} {...optionProps}>
-        {option.title}
-      </li>
-    );
-  }}
-  sx={{ 
-    width: 180,
-    '& .MuiOutlinedInput-root': {
-      borderColor: getRowError(rowIndex, 'productorService') ? 'red' : 'inherit',
-      '& .MuiOutlinedInput-notchedOutline': {
-        borderColor: getRowError(rowIndex, 'productorService') ? 'red' : undefined,
-      },
-      '&:hover .MuiOutlinedInput-notchedOutline': {
-        borderColor: getRowError(rowIndex, 'productorService') ? 'red' : '#999',
-      },
-      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-        borderColor: getRowError(rowIndex, 'productorService') ? 'red' : '#2684ff',
-        boxShadow: getRowError(rowIndex, 'productorService') ? '0 0 0 1px red' : '0 0 0 1px #2684ff',
-      }
-    }
-  }}
-  freeSolo
-  renderInput={(params) => (
-    <TextField 
-      {...params} 
-      placeholder={row.isDiscount ? "Reason for discount" : "Product or Service"}
-      error={!!getRowError(rowIndex, 'productorService')}
-      helperText={getRowError(rowIndex, 'productorService')}
-    />
-  )}
-/>
-                      {getRowError(rowIndex, 'productorService') && (
-                        <FormHelperText error sx={{ mt: 0.5 }}>
-                          {getRowError(rowIndex, 'productorService')}
-                        </FormHelperText>
-                      )}
-                    </FormControl>
-                  </TableCell>
-                  <TableCell>
-                    <TextField
-                      size="small"
-                      name="description"
-                      value={row.description}
-                      onChange={(e) => handleInputChange(rowIndex, e)}
-                      placeholder="Description"
-                      fullWidth
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <TextField
-                      size="small"
-                      name="rate"
-                      value={row.rate}
-                      onChange={(e) => handleInputChange(rowIndex, e)}
-                      sx={{ width: "80px" }}
-                      error={!!getRowError(rowIndex, 'rate')}
-                      helperText={getRowError(rowIndex, 'rate')}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <TextField
-                      size="small"
-                      name="quantity"
-                      value={row.quantity}
-                      onChange={(e) => handleInputChange(rowIndex, e)}
-                      sx={{ width: "60px" }}
-                      error={!!getRowError(rowIndex, 'quantity')}
-                      helperText={getRowError(rowIndex, 'quantity')}
-                    />
-                  </TableCell>
-                  <TableCell>${row.amount}</TableCell>
-                  <TableCell>
-                    <Checkbox 
-                      name="tax" 
-                      checked={row.tax} 
-                      onChange={(e) => handleInputChange(rowIndex, e)} 
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <IconButton onClick={(event) => handleMenuOpen(event, rowIndex)}>
-                      <MoreVertIcon />
-                    </IconButton>
-                    <Menu 
-                      anchorEl={menuAnchor?.anchorEl || null}
-                      open={isMenuOpen(rowIndex)}
-                      onClose={handleMenuClose}
-                      anchorOrigin={{ vertical: "top", horizontal: "left" }}
-                      transformOrigin={{ vertical: "top", horizontal: "left" }}
-                      sx={{ mt: 5 }}
-                    >
-                      <MenuItem onClick={() => handleEditService(row, rowIndex)}>
-                        Edit
-                      </MenuItem>
-                      <MenuItem onClick={() => handleDuplicate(rowIndex)}>
-                        Duplicate
-                      </MenuItem>
-                      <MenuItem onClick={() => deleteRow(rowIndex)}>
-                        Delete
-                      </MenuItem>
-                      <MenuItem onClick={() => {
-                        setSelectedRowData(row);
-                        setIsNewServiceDrawerOpen(true);
-                        handleMenuClose();
-                      }}>
-                        Save as new service
-                      </MenuItem>
-                    </Menu>
-                  </TableCell>
-                  <TableCell>
-                   
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </Box>
+                      />
+                      {getRowError(rowIndex, 'productorService') && <p className="text-xs text-red-500 mt-0.5">{getRowError(rowIndex, 'productorService')}</p>}
+                    </td>
+                    <td className="px-4 py-2">
+                      <input type="text" name="description" value={row.description} onChange={(e) => handleInputChange(rowIndex, e)} placeholder="Description" className="w-full border-0 bg-transparent text-sm focus:outline-none focus:ring-0" />
+                    </td>
+                    <td className="px-4 py-2">
+                      <input type="text" name="rate" value={row.rate} onChange={(e) => handleInputChange(rowIndex, e)} className={`w-20 rounded border bg-transparent px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 ${getRowError(rowIndex, 'rate') ? 'border-red-400' : 'border-slate-200'}`} />
+                      {getRowError(rowIndex, 'rate') && <p className="text-xs text-red-500 mt-0.5">{getRowError(rowIndex, 'rate')}</p>}
+                    </td>
+                    <td className="px-4 py-2">
+                      <input type="text" name="quantity" value={row.quantity} onChange={(e) => handleInputChange(rowIndex, e)} className={`w-16 rounded border bg-transparent px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 ${getRowError(rowIndex, 'quantity') ? 'border-red-400' : 'border-slate-200'}`} />
+                      {getRowError(rowIndex, 'quantity') && <p className="text-xs text-red-500 mt-0.5">{getRowError(rowIndex, 'quantity')}</p>}
+                    </td>
+                    <td className="px-4 py-2 text-sm text-slate-700">${row.amount}</td>
+                    <td className="px-4 py-2">
+                      <input type="checkbox" name="tax" checked={row.tax} onChange={(e) => handleInputChange(rowIndex, e)} className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+                    </td>
+                    <td className="px-4 py-2">
+                      <div className="relative">
+                        <button type="button" onClick={(event) => handleMenuOpen(event, rowIndex)} className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600">
+                          <BsThreeDotsVertical className="h-4 w-4" />
+                        </button>
+                        {isMenuOpen(rowIndex) && (
+                          <div className="absolute right-0 top-full z-50 mt-1 w-44 rounded-lg border border-slate-200 bg-white py-1 shadow-lg">
+                            <button type="button" onClick={() => handleEditService(row, rowIndex)} className="block w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">Edit</button>
+                            <button type="button" onClick={() => handleDuplicate(rowIndex)} className="block w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">Duplicate</button>
+                            <button type="button" onClick={() => deleteRow(rowIndex)} className="block w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50">Delete</button>
+                            <button type="button" onClick={() => { setSelectedRowData(row); setIsNewServiceDrawerOpen(true); handleMenuClose(); }} className="block w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">Save as new service</button>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
 
         {/* Add Row Buttons */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: "20px", marginTop: "10px" }}>
-          <Button 
-            onClick={() => addRow()} 
-            startIcon={<AiOutlinePlusCircle />} 
-            sx={{ color: "blue", fontSize: "15px" }}
-          >
-            Line item
-          </Button>
-          <Button 
-            onClick={() => addRow(true)} 
-            startIcon={<CiDiscount1 />} 
-            sx={{ color: "blue", fontSize: "15px" }}
-          >
-            Discount
-          </Button>
-        </Box>
+        <div className="flex items-center gap-4">
+          <button type="button" onClick={() => addRow()} className="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-700">
+            <AiOutlinePlusCircle className="h-4 w-4" /> Line item
+          </button>
+          <button type="button" onClick={() => addRow(true)} className="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-700">
+            <CiDiscount1 className="h-4 w-4" /> Discount
+          </button>
+        </div>
 
         {/* Summary Section */}
-        <Box sx={{ mt: 3 }}>
-          <Typography variant="h6">Summary</Typography>
-          <Table sx={{ backgroundColor: "#fff", width: "50%" }}>
-            <TableHead>
-              <TableRow>
-                <TableCell>Subtotal</TableCell>
-                <TableCell>Tax Rate</TableCell>
-                <TableCell>Tax Total</TableCell>
-                <TableCell>Total</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              <TableRow>
-                <TableCell>${itemizedData.subtotal || '0.00'}</TableCell>
-                <TableCell>
-                  <TextField
-                    size="small"
-                    value={itemizedData.taxRate || '0'}
-                    onChange={handleTaxRateChange}
-                    sx={{ width: "60px" }}
-                    InputProps={{
-                      endAdornment: '%',
-                    }}
-                  />
-                </TableCell>
-                <TableCell>${itemizedData.taxTotal || '0.00'}</TableCell>
-                <TableCell>${itemizedData.totalAmount || '0.00'}</TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </Box>
-      </Box>
+        <h4 className="text-base font-semibold text-slate-800">Summary</h4>
+        <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden max-w-lg">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-b border-slate-100 bg-slate-50/60">
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Subtotal</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Tax Rate</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Tax Total</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="px-4 py-3 text-sm font-medium text-slate-700">${itemizedData.subtotal || '0.00'}</td>
+                <td className="px-4 py-3">
+                  <div className="flex items-center gap-1">
+                    <input type="text" value={itemizedData.taxRate || '0'} onChange={handleTaxRateChange} className="w-16 rounded border border-slate-200 bg-transparent px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500" />
+                    <span className="text-sm text-slate-500">%</span>
+                  </div>
+                </td>
+                <td className="px-4 py-3 text-sm text-slate-700">${itemizedData.taxTotal || '0.00'}</td>
+                <td className="px-4 py-3 text-sm font-bold text-slate-900">${itemizedData.totalAmount || '0.00'}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
       {/* Drawers */}
       <SaveAsServiceDrawer
@@ -1359,9 +1161,9 @@ const [categoryData, setCategoryData] = useState([]);
         selectedRowData={selectedRowData}
         onServiceCreated={handleServiceCreated}
         onCategoryCreated={handleCategoryCreated}
-         categoryOptions={categoryoptions}// You'll need to pass these if available
+        categoryOptions={categoryoptions}
       />
-      
+
       <EditServiceDrawer
         open={isEditDrawerOpen}
         onClose={closeEditDrawer}

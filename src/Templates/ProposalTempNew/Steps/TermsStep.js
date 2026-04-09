@@ -1,19 +1,7 @@
 
 
 import React, { useState } from 'react';
-import {
-  Box,
-  TextField,
-  Typography,
-  Button,
-  Paper,
-  Alert,
-  FormControl,
-  FormHelperText,
-  InputLabel
-} from '@mui/material';
-
-import Editor from '../components/Editor'; // Adjust the import path as needed
+import Editor from '../components/Editor';
 
 // const TermsStep = ({ formData, updateFormData, nextStep, prevStep }) => {
 //   const [errors, setErrors] = useState({});
@@ -190,45 +178,40 @@ const TermsStep = ({ formData, updateFormData, nextStep, prevStep, stepErrors, s
   };
 
   return (
-    <Box>
-      <Typography variant="h4" gutterBottom color="primary" fontWeight="600" sx={{ mb: 4 }}>
-        Terms & Conditions
-      </Typography>
+    <div className="space-y-6">
+      <h2 className="text-2xl font-semibold text-indigo-600">Terms & Conditions</h2>
 
-      <Paper elevation={0} sx={{ p: 3, mb: 3, backgroundColor: 'grey.50' }}>
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-          Engagement letter or contractual agreement that outlines the terms of the relationship 
+      <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-6 space-y-4">
+        <p className="text-sm text-slate-500">
+          Engagement letter or contractual agreement that outlines the terms of the relationship
           between your firm and clients. The section title can be renamed.
-        </Typography>
+        </p>
 
-        <TextField
-          fullWidth
-          label="Terms Title"
-          value={formData.terms?.title || ''}
-          onChange={handleTitleChange}
-          onBlur={() => handleBlur('title')}
-          error={!!stepErrors.title}
-          helperText={stepErrors.title}
-          placeholder="Enter terms title"
-          required
-          margin="normal"
-          sx={{ mb: 3 }}
-        />
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-slate-700">Terms Title *</label>
+          <input
+            type="text"
+            value={formData.terms?.title || ''}
+            onChange={handleTitleChange}
+            onBlur={() => handleBlur('title')}
+            placeholder="Enter terms title"
+            required
+            className={`flex h-10 w-full rounded-lg border bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${stepErrors.title ? 'border-red-400' : 'border-slate-200'}`}
+          />
+          {stepErrors.title && <p className="text-xs text-red-500">{stepErrors.title}</p>}
+        </div>
 
-        <FormControl fullWidth error={!!stepErrors.description}>
-          <Box sx={{ mt: 2, mb: 1 }}>
-            <Editor
-              initialContent={formData.terms?.description || ''}
-              onChange={handleDescriptionChange}
-              onBlur={() => handleBlur('description')}
-            />
-          </Box>
-          {stepErrors.description && (
-            <FormHelperText error>{stepErrors.description}</FormHelperText>
-          )}
-        </FormControl>
-      </Paper>
-    </Box>
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-slate-700">Terms & Conditions</label>
+          <Editor
+            initialContent={formData.terms?.description || ''}
+            onChange={handleDescriptionChange}
+            onBlur={() => handleBlur('description')}
+          />
+          {stepErrors.description && <p className="text-xs text-red-500">{stepErrors.description}</p>}
+        </div>
+      </div>
+    </div>
   );
 };
 

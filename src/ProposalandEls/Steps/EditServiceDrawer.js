@@ -277,20 +277,8 @@
 
 // export default EditServiceDrawer;
 import React, { useState, useEffect } from 'react';
-import {
-  Drawer,
-  Box,
-  Typography,
-  TextField,
-  Button,
-  FormControlLabel,
-  Checkbox,
-  InputLabel,
-  IconButton,
-  Divider,
-  Alert
-} from '@mui/material';
-import { Close } from '@mui/icons-material';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '../../components/ui/sheet';
+import { X } from 'lucide-react';
 
 const EditServiceDrawer = ({
   open,
@@ -426,169 +414,100 @@ const handleSave = () => {
   };
 
   return (
-    <Drawer
-      anchor="right"
-      open={open}
-      onClose={handleClose}
-      sx={{
-        '& .MuiDrawer-paper': {
-          width: 400,
-          maxWidth: '90vw'
-        }
-      }}
-    >
-      <Box sx={{ p: 2 }}>
-        {/* Header */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-          <Typography variant="h6">
-            Edit Line Item
-          </Typography>
-          <IconButton onClick={handleClose}>
-            <Close />
-          </IconButton>
-        </Box>
+    <Sheet open={open} onOpenChange={(o) => { if (!o) handleClose(); }}>
+      <SheetContent className="sm:max-w-md overflow-y-auto">
+        <SheetHeader>
+          <SheetTitle>Edit Line Item</SheetTitle>
+        </SheetHeader>
 
-        <Divider sx={{ mb: 3 }} />
-
-        {/* Form */}
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <div className="mt-4 space-y-4">
           {/* Product/Service */}
-          <Box>
-            <InputLabel sx={{ color: 'black', mb: 1 }}>
-              Product or Service *
-            </InputLabel>
-            <TextField
-              fullWidth
-              size="small"
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-slate-700">Product or Service *</label>
+            <input
+              type="text"
               value={formData.productorService}
               onChange={(e) => handleInputChange('productorService', e.target.value)}
               placeholder="Enter product or service name"
-              error={!!errors.productorService}
-              helperText={errors.productorService}
+              className={`flex h-10 w-full rounded-lg border bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.productorService ? 'border-red-400' : 'border-slate-200'}`}
             />
-          </Box>
+            {errors.productorService && <p className="text-xs text-red-500">{errors.productorService}</p>}
+          </div>
 
           {/* Description */}
-          <Box>
-            <InputLabel sx={{ color: 'black', mb: 1 }}>
-              Description
-            </InputLabel>
-            <TextField
-              fullWidth
-              size="small"
-              multiline
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-slate-700">Description</label>
+            <textarea
               rows={3}
               value={formData.description}
               onChange={(e) => handleInputChange('description', e.target.value)}
               placeholder="Enter description"
+              className="flex min-h-[80px] w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
-          </Box>
+          </div>
 
           {/* Rate and Quantity */}
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <Box sx={{ flex: 1 }}>
-              <InputLabel sx={{ color: 'black', mb: 1 }}>
-                Rate *
-              </InputLabel>
-              <TextField
-                fullWidth
-                size="small"
-                type="number"
-                step="0.01"
-                value={formData.rate}
-                onChange={(e) => handleInputChange('rate', e.target.value)}
-                placeholder="0.00"
-                error={!!errors.rate}
-                helperText={errors.rate}
-                InputProps={{
-                  startAdornment: <Typography sx={{ mr: 1, color: 'text.primary' }}>$</Typography>
-                }}
-              />
-            </Box>
-            <Box sx={{ flex: 1 }}>
-              <InputLabel sx={{ color: 'black', mb: 1 }}>
-                Quantity *
-              </InputLabel>
-              <TextField
-                fullWidth
-                size="small"
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-slate-700">Rate *</label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">$</span>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={formData.rate}
+                  onChange={(e) => handleInputChange('rate', e.target.value)}
+                  placeholder="0.00"
+                  className={`flex h-10 w-full rounded-lg border bg-white pl-7 pr-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.rate ? 'border-red-400' : 'border-slate-200'}`}
+                />
+              </div>
+              {errors.rate && <p className="text-xs text-red-500">{errors.rate}</p>}
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-slate-700">Quantity *</label>
+              <input
                 type="number"
                 step="1"
                 value={formData.quantity}
                 onChange={(e) => handleInputChange('quantity', e.target.value)}
                 placeholder="1"
-                error={!!errors.quantity}
-                helperText={errors.quantity}
+                className={`flex h-10 w-full rounded-lg border bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.quantity ? 'border-red-400' : 'border-slate-200'}`}
               />
-            </Box>
-          </Box>
+              {errors.quantity && <p className="text-xs text-red-500">{errors.quantity}</p>}
+            </div>
+          </div>
 
-          {/* Calculated Amount Display */}
-          <Box sx={{ 
-            p: 2, 
-            backgroundColor: '#f5f5f5', 
-            borderRadius: 1,
-            border: '1px solid #e0e0e0'
-          }}>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-              Calculated Amount
-            </Typography>
-            <Typography variant="h6" color="primary">
-              ${calculateAmount()}
-            </Typography>
-          </Box>
+          {/* Calculated Amount */}
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+            <p className="text-xs text-slate-500 mb-1">Calculated Amount</p>
+            <p className="text-lg font-semibold text-indigo-600">${calculateAmount()}</p>
+          </div>
 
           {/* Tax Checkbox */}
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={formData.tax}
-                onChange={(e) => handleInputChange('tax', e.target.checked)}
-                color="primary"
-              />
-            }
-            label="Taxable"
-          />
+          <div className="flex items-center gap-2">
+            <input type="checkbox" checked={formData.tax} onChange={(e) => handleInputChange('tax', e.target.checked)} className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+            <label className="text-sm text-slate-700">Taxable</label>
+          </div>
 
           {/* Discount Checkbox */}
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={formData.isDiscount}
-                onChange={(e) => handleInputChange('isDiscount', e.target.checked)}
-                color="primary"
-              />
-            }
-            label="This is a discount"
-          />
+          <div className="flex items-center gap-2">
+            <input type="checkbox" checked={formData.isDiscount} onChange={(e) => handleInputChange('isDiscount', e.target.checked)} className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+            <label className="text-sm text-slate-700">This is a discount</label>
+          </div>
 
           {/* Validation Alert */}
           {Object.keys(errors).length > 0 && (
-            <Alert severity="error" sx={{ mt: 2 }}>
-              Please fix the errors above before saving.
-            </Alert>
+            <p className="text-xs text-red-500 mt-2">Please fix the errors above before saving.</p>
           )}
-        </Box>
+        </div>
 
         {/* Action Buttons */}
-        <Box sx={{ display: 'flex', gap: 2, mt: 4 }}>
-          <Button
-            variant="outlined"
-            onClick={handleClose}
-            fullWidth
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="contained"
-            onClick={handleSave}
-            fullWidth
-          >
-            Save Changes
-          </Button>
-        </Box>
-      </Box>
-    </Drawer>
+        <div className="flex items-center gap-3 mt-6">
+          <button type="button" onClick={handleClose} className="flex-1 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">Cancel</button>
+          <button type="button" onClick={handleSave} className="flex-1 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700">Save Changes</button>
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 };
 

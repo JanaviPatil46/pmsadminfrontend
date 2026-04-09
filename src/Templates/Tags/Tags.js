@@ -1,22 +1,13 @@
-import React, { useState, useEffect, useMemo ,useContext} from 'react';
+import React, { useState, useEffect, useMemo, useContext } from 'react';
 import './tag.css'
-import {  TableContainer,
-  Paper,Chip,
-  Table,
-  TableHead,
-  TableRow,Menu,
-  TableCell,
-  TableBody,TablePagination,Box, Button, Typography, Drawer, Select, MenuItem, IconButton, TextField,Alert, 
-  InputLabel} from '@mui/material';
-import { FiSettings } from "react-icons/fi";
-import { CiMenuKebab } from "react-icons/ci";
-import { useTheme } from '@mui/material/styles';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import { IoClose } from "react-icons/io5";
-import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
-import { CircularProgress } from "@mui/material";
 import { toast } from 'react-toastify';
 import { LoginContext } from "../../Sidebar/Context/Context";
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import { Label } from '../../components/ui/label';
+import { Badge } from '../../components/ui/badge';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from '../../components/ui/sheet';
+import { MoreVertical, Pencil, Trash2, Loader2, ChevronLeft, ChevronRight, Plus, Search, Settings, X, Tag, AlertCircle } from 'lucide-react';
 const Tags = () => {
 
  const { logindata } = useContext(LoginContext);
@@ -41,8 +32,6 @@ const Tags = () => {
   // ];
 
   const colors = ["#0d6efd", "#6c757d","#198754","#dc3545","#ffc107","#0dcaf0","#FF5722","#212529"];
-  const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const [loading, setLoading] = useState(true); // Loader state
   useEffect(() => {
     fetchData();
@@ -342,72 +331,6 @@ const Tags = () => {
   };
 
 
-  const columns = useMemo(() => [
-    {
-      accessorKey: 'tagName',
-      header: 'Tag',
-      Cell: ({ cell }) => (
-        <span
-          style={{
-            backgroundColor: cell.row.original.tagColour,
-            color: "#fff",
-            borderRadius: "60px",
-            padding: "0.1rem 0.8rem",
-            fontSize: "10px",
-          }}
-        >
-          {cell.getValue()}
-        </span>
-      ),
-    },
-    { accessorKey: 'count', header: 'Accounts',
-
-     },
-    { accessorKey: 'archivedAccounts', header: 'Archived accounts' },
-    { accessorKey: 'pendingTasks', header: 'Pending tasks' },
-    { accessorKey: 'completedTasks', header: 'Completed tasks' },
-    { accessorKey: 'pipelines', header: 'Pipelines' },
-    {
-      accessorKey: 'settings',
-      header: <FiSettings />,
-
-      Cell: ({ row }) => (
-        <IconButton onClick={() => toggleMenu(row.original._id)} style={{ color: "#2c59fa" }}>
-          <CiMenuKebab style={{ fontSize: "20px" }} />
-          {openMenuId === row.original._id && (
-            <Box sx={{ position: 'absolute', zIndex: 1, backgroundColor: '#fff', boxShadow: 1, borderRadius: 1, p: 1, left: '30px', m: 2, }}>
-              <Typography sx={{ fontSize: '12px', fontWeight: 'bold' }} onClick={() => {
-                handleEdit(row.original._id);
-                handleUpdateDrawerOpen();
-              }}>Edit</Typography>
-              <Typography sx={{ fontSize: '12px', color: 'red', fontWeight: 'bold' }} onClick={() => handleDelete(row.original._id)}>Delete</Typography>
-            </Box>
-          )}
-        </IconButton>
-      ),
-    },
-  ], [openMenuId, tags]);
-
-  const table = useMaterialReactTable({
-    columns,
-    data: tags,
-    enableBottomToolbar: true,
-    enableStickyHeader: true,
-    columnFilterDisplayMode: "custom", // Render own filtering UI
-    enableRowSelection: true, // Enable row selection
-    enablePagination: true,
-    muiTableContainerProps: { sx: { maxHeight: "400px" } },
-    initialState: {
-      columnPinning: { left: ["mrt-row-select", "tagName"], right: ['settings'], },
-    },
-    muiTableBodyCellProps: {
-      sx: (theme) => ({
-        backgroundColor: theme.palette.mode === "dark-theme" ? theme.palette.grey[900] : theme.palette.grey[50],
-      }),
-    },
-    
-  });
-
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(30); // Default rows per page
 
@@ -433,653 +356,272 @@ const Tags = () => {
  // Slice data for pagination
 //  const paginatedTags = tags.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
   return (
-    <div className="tag-container">
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          mb: 2,
-        }}
-      >
-        <Typography variant="h6">Tags</Typography>
-        <Box sx={{display:'flex', alignItems:'center', gap:3}}>
-          {/* Search Input */}
-   <TextField
-        placeholder="Search Tag "
-        variant="outlined"
-        size="small"
-        // fullWidth
-        margin="normal"
-        value={searchTerm}
-        onChange={handleSearchChange}
-      />
-       <Button variant="contained" onClick={handleDrawerOpen}  sx={{
-                  backgroundColor: 'var(--color-save-btn)',  // Normal background
-                 
-                  '&:hover': {
-                    backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                  },
-  borderRadius:'15px', 
-                }} >Add Tag</Button>
-        </Box>
-       
-      </Box>
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <h2 className="text-lg font-semibold text-slate-800">Tags</h2>
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="relative flex-1 sm:flex-initial">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Input
+              placeholder="Search tags..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+              className="pl-9 w-full sm:w-64"
+            />
+          </div>
+          <Button onClick={handleDrawerOpen}>
+            <Plus className="mr-2 h-4 w-4" /> Add Tag
+          </Button>
+        </div>
+      </div>
 
-<Box >
-{loading ? (
-  <Box sx={{display:'flex',alignItems:'center', justifyContent:'center'}}> <CircularProgress style={{fontSize:'300px', color:'blue'}}/></Box>
-  ):( 
-  // <MaterialReactTable columns={columns} table={table} />
-<Box>
-   
-  <TableContainer component={Paper} sx={{  overflowY: "auto" }}>
-      <Table sx={{ width: "100%" }} stickyHeader>
-        <TableHead>
-          <TableRow>
-            <TableCell  style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="100">Tag</TableCell>
-            <TableCell  style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="100">Accounts</TableCell>
-            <TableCell  style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="100">Archived Accounts</TableCell>
-            <TableCell  style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="100">Pending Tasks</TableCell>
-            <TableCell  style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="100">Completed Tasks</TableCell>
-            <TableCell  style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="100">Pipelines</TableCell>
-            <TableCell  style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                     
-                    }}
-                    width="100">
-              <FiSettings />
-            </TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {paginatedTags.map((row) => (
-            <TableRow key={row._id}>
-              {/* Tag Name with Color */}
-              <TableCell>
-                <span
-                  style={{
-                    backgroundColor: row.tagColour,
-                    color: "#fff",
-                    borderRadius: "60px",
-                    padding: "0.1rem 0.8rem",
-                    fontSize: "10px",
-                  }}
+      {/* Table */}
+      {loading ? (
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
+        </div>
+      ) : (
+        <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="border-b border-slate-100 bg-slate-50/60">
+                  <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Tag</th>
+                  <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Accounts</th>
+                  <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 hidden md:table-cell">Archived</th>
+                  <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 hidden lg:table-cell">Pending Tasks</th>
+                  <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 hidden lg:table-cell">Completed Tasks</th>
+                  <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 hidden xl:table-cell">Pipelines</th>
+                  <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 w-20 text-right">
+                    <Settings className="h-4 w-4 ml-auto text-slate-400" />
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {paginatedTags.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="px-5 py-10 text-center text-sm text-slate-400">No tags found.</td>
+                  </tr>
+                ) : (
+                  paginatedTags.map((row) => (
+                    <tr key={row._id} className="group transition-colors hover:bg-slate-50/70">
+                      <td className="px-5 py-3">
+                        <span
+                          className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-semibold text-white shadow-sm"
+                          style={{ backgroundColor: row.tagColour }}
+                        >
+                          {row.tagName}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3 text-sm text-slate-600">{row.count}</td>
+                      <td className="px-5 py-3 text-sm text-slate-600 hidden md:table-cell">{row.archivedAccounts}</td>
+                      <td className="px-5 py-3 text-sm text-slate-600 hidden lg:table-cell">{row.pendingTasks}</td>
+                      <td className="px-5 py-3 text-sm text-slate-600 hidden lg:table-cell">{row.completedTasks}</td>
+                      <td className="px-5 py-3 text-sm text-slate-600 hidden xl:table-cell">{row.pipelines}</td>
+                      <td className="px-5 py-3 text-right">
+                        <div className="relative inline-block">
+                          <button
+                            onClick={(event) => toggleMenu(event, row._id)}
+                            className="inline-flex items-center justify-center rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                          >
+                            <MoreVertical className="h-4 w-4" />
+                          </button>
+                          {openMenuId === row._id && (
+                            <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-slate-200 bg-white py-1 shadow-lg animate-in fade-in-0 zoom-in-95">
+                              <button
+                                onClick={() => { handleEdit(tempIdget); handleUpdateDrawerOpen(); handleMenuClose(); }}
+                                className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                              >
+                                <Pencil className="h-3.5 w-3.5" /> Edit
+                              </button>
+                              <button
+                                onClick={() => { handleDelete(tempIdget); }}
+                                className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" /> Delete
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination */}
+          {filteredTags.length > 0 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-100 bg-slate-50/40 px-5 py-3">
+              <p className="text-xs text-slate-500">
+                Showing <span className="font-semibold text-slate-700">{page * rowsPerPage + 1}</span>–<span className="font-semibold text-slate-700">{Math.min((page + 1) * rowsPerPage, filteredTags.length)}</span> of{" "}
+                <span className="font-semibold text-slate-700">{filteredTags.length}</span>
+              </p>
+              <div className="flex items-center gap-2">
+                <select
+                  value={rowsPerPage}
+                  onChange={(e) => handleChangeRowsPerPage({ target: { value: e.target.value } })}
+                  className="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-600 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
-                  {row.tagName}
-                </span>
-              </TableCell>
-              <TableCell style={{
-                        fontSize: "12px",
-                        padding: "4px 8px",
-                        lineHeight: "1",
-                        cursor: "pointer",
-                        
-                      }}>{row.count}</TableCell>
-              <TableCell style={{
-                        fontSize: "12px",
-                        padding: "4px 8px",
-                        lineHeight: "1",
-                        cursor: "pointer",
-                      }}>{row.archivedAccounts}</TableCell>
-              <TableCell style={{
-                        fontSize: "12px",
-                        padding: "4px 8px",
-                        lineHeight: "1",
-                        cursor: "pointer",
-                      }}>{row.pendingTasks}</TableCell>
-              <TableCell style={{
-                        fontSize: "12px",
-                        padding: "4px 8px",
-                        lineHeight: "1",
-                        cursor: "pointer",
-                      }}>{row.completedTasks}</TableCell>
-              <TableCell style={{
-                        fontSize: "12px",
-                        padding: "4px 8px",
-                        lineHeight: "1",
-                        cursor: "pointer",
-                        
-                      }}>{row.pipelines}</TableCell>
-  <TableCell
-                  style={{
-                    fontSize: "12px",
-                    padding: "4px 8px",
-                    lineHeight: "1",
-                  }}
-                >
-                  <IconButton
-                    onClick={(event) => toggleMenu(event, row._id)}
-                    style={{ color: "#2c59fa" }}
-                    size="small"
-                  >
-                    <CiMenuKebab />
-                  </IconButton>
-
-                  {/* MUI Menu */}
-                
-                </TableCell>
-               {/* <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <IconButton
-                      onClick={handleClick}
-                      style={{ color: "#2c59fa" }}
-                    >
-                      <CiMenuKebab />
-                    </IconButton>
-              
-                    <Menu
-                      anchorEl={anchorEl}
-                      open={open}
-                      onClose={handleClose}
-                      PaperProps={{
-                        style: {
-                          minWidth: "100px",
-                        },
-                      }}
-                    >
-                      <MenuItem
-                        
-                         onClick={() => {
-                        handleEdit(row._id);
-                        handleUpdateDrawerOpen();
-                        handleClose();
-                      }}
-                        sx={{ color: "blue" }}
-                      >
-                         Edit
-                      </MenuItem>
-              
-                      <MenuItem
-                        onClick={() => {
-                          handleDelete(row._id);
-                          handleClose();
-                        }}
-                        sx={{ color: "red" }}
-                      >
-                         Delete
-                      </MenuItem>
-              
-                      
-              
-                      
-                    </Menu>
-                  </TableCell> */}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-
-       <Menu
-              anchorEl={anchorEl}
-              open={Boolean(anchorEl)}
-              onClose={handleMenuClose}
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'left',
-              }}
-              PaperProps={{
-                sx: {
-                  mt: 3,
-                  ml: 1,
-                  boxShadow: 3,
-                  borderRadius: 1,
-                  minWidth: 120,
-                  '& .MuiMenuItem-root': {
-                    fontSize: '12px',
-                    padding: '8px 16px',
-                  }
-                }
-              }}
-            >
-              <MenuItem 
-               onClick={() => {
-                        handleEdit(tempIdget);
-                        handleUpdateDrawerOpen();
-                        handleClose();
-                      }}
-                sx={{ 
-                  fontWeight: "bold",
-                  '&:hover': {
-                    backgroundColor: '#f5f5f5'
-                  }
-                }}
-              >
-                Edit
-              </MenuItem>
-              <MenuItem 
-                onClick={() => handleDelete(tempIdget)}
-                sx={{ 
-                  color: "error.main", 
-                  fontWeight: "bold",
-                  '&:hover': {
-                    backgroundColor: '#ffebee'
-                  }
-                }}
-              >
-                Delete
-              </MenuItem>
-            </Menu>
-    </TableContainer>
-    {/* Pagination */}
-    <TablePagination
-    component="div"
-    count={tags.length}
-    page={page}
-    onPageChange={handleChangePage}
-    rowsPerPage={rowsPerPage}
-    onRowsPerPageChange={handleChangeRowsPerPage}
-    rowsPerPageOptions={[5, 10, 25]}
-  />
-  </Box>
-  )
-}
-      </Box>
-      <Drawer
-        anchor='right'
-        open={isDrawerOpen}
-        onClose={handleDrawerClose}
-        PaperProps={{
-          id: 'tag-drawer',
-          sx: {
-            borderRadius: isSmallScreen ? '0' : '10px 0 0 10px',
-            width: isSmallScreen ? '100%' : 500,
-            maxWidth: '100%',
-            [theme.breakpoints.down('sm')]: {
-              width: '100%',
-            },
-
-          }
-        }}
-      >
-        <Box sx={{ borderRadius: isSmallScreen ? '0' : '15px' }} role="presentation">
-          <Box>
-            <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '15px', background: "#EEEEEE" }}>
-              <Typography variant="h6" >
-                Create Tag
-              </Typography>
-              <IoClose onClick={handleDrawerClose} style={{ cursor: 'pointer' }} />
-            </Box>
-            <Box sx={{ pr: 2, pl: 2, pt: 2 }}>
-              <Box>
-                <InputLabel sx={{color:'black'}}>Name</InputLabel>
-
-                <TextField
-                  placeholder="Tag Name"
-                  value={inputValue}
-                  onChange={(e) => handleInputChange(e.target.value)}
-                  fullWidth
-                  // margin="normal"
-                  size="small"
-                  sx={{ backgroundColor: '#fff', mt:1 }}
-
-                error={!!tagNameError}
-                />
-                {(!!tagNameError) && <Alert sx={{
-                  width: '96%',
-                  p: '0', // Adjust padding to control the size
-                  pl: '4%', height: '23px',
-                  borderRadius: '10px',
-                  borderTopLeftRadius: '0',
-                  borderTopRightRadius: '0',
-                  fontSize: '15px',
-                  display: 'flex',
-                  alignItems: 'center', // Center content vertically
-                  '& .MuiAlert-icon': {
-                    fontSize: '16px', // Adjust the size of the icon
-                    mr: '8px', // Add margin to the right of the icon
-                  },
-                }} variant="filled" severity="error" >
-                  Tag Name can't be blank
-                </Alert>}
-
-              </Box>
-              <Box sx={{ mt: 3 }}>
-                <InputLabel sx={{color:'black'}}>Color</InputLabel>
-                <Select
-                  value={selectedOption ? selectedOption.tagColour : ''}
-                  onChange={handleChange}
-                  labelId="color-select-label"
-                  id="color-select"
-                  size="small"
-                  sx={{ width: '100%', marginTop: '10px', backgroundColor: '#fff' }}
-                  renderValue={(selected) => (
-                    <Chip
-                      label={options.find((option) => option.tagColour === selected)?.tagName || ''}
-                      sx={{
-                        backgroundColor: selected,
-                        color: "#fff",
-                  fontWeight: 500,
-                  fontSize: "10px",
-                  borderRadius: "16px",
-                  height: "20px",
-                  cursor: "pointer",
-                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)",
-                  "& .MuiChip-deleteIcon": {
-                    color: "#fff",
-                    opacity: 0.7,
-                    transition: "opacity 0.2s",
-                    "&:hover": { opacity: 1 },
-                  },
-                      }}
-                    />
-                  )}
-                  MenuProps={{
-                    PaperProps: {
-                      sx: {
-                        maxHeight: 200,  // Adjust the dropdown height as per your requirement
-                        overflowY: 'auto',  // Enable scrolling if the content exceeds the height
-                      },
-                    },
-                  }}
-                >
-                  {options.map((option) => (
-                    <MenuItem key={option.value} value={option.tagColour}>
-                      <Box sx={{
-                        backgroundColor: option.tagColour,
-                        color: "#fff",
-                        fontSize:'10px',
-                        borderRadius: "10px",
-                        textAlign:'center',
-                        width: selectWidth,
-                        
-                      }}>
-                        {option.tagName}
-                      </Box>
-                    </MenuItem>
+                  {[5, 10, 25, 50].map((opt) => (
+                    <option key={opt} value={opt}>{opt} / page</option>
                   ))}
-                </Select>
-{/* Validation Error */}
-{tagColourError && (
-        <Alert
-          sx={{
-            width: "96%",
-            p: "0",
-            pl: "4%",
-            height: "23px",
-            borderRadius: "10px",
-            borderTopLeftRadius: "0",
-            borderTopRightRadius: "0",
-            fontSize: "15px",
-            display: "flex",
-            alignItems: "center",
-            // mt: 1,
-            "& .MuiAlert-icon": {
-              fontSize: "16px",
-              mr: "8px",
-            },
-          }}
-          variant="filled"
-          severity="error"
-        >
-          {tagColourError}
-        </Alert>
+                </select>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => handleChangePage(null, page - 1)}
+                    disabled={page === 0}
+                    className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 text-slate-500 shadow-sm transition-colors hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
+                  <span className="min-w-[3rem] text-center text-xs font-medium text-slate-600">
+                    {page + 1} / {Math.max(1, Math.ceil(filteredTags.length / rowsPerPage))}
+                  </span>
+                  <button
+                    onClick={() => handleChangePage(null, page + 1)}
+                    disabled={(page + 1) * rowsPerPage >= filteredTags.length}
+                    className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 text-slate-500 shadow-sm transition-colors hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       )}
 
-{/* <Select
-  value={selectedOption ? selectedOption.tagColour : ""}
-  onChange={handleChange}
-  labelId="color-select-label"
-  id="color-select"
-  size="small"
-  sx={{ width: "100%", marginTop: "10px", backgroundColor: "#fff" }}
-  MenuProps={{
-    PaperProps: {
-      sx: {
-        maxHeight: 200, // Adjust the dropdown height as per your requirement
-        overflowY: "auto", // Enable scrolling if the content exceeds the height
-      },
-    },
-  }}
-  renderValue={(selected) => (
-    <Chip
-      label={options.find((opt) => opt.tagColour === selected)?.tagName || ""}
-      sx={{
-        backgroundColor: selected,
-        color: "#fff",
-                  fontWeight: 500,
-                  fontSize: "10px",
-                  borderRadius: "16px",
-                  height: "20px",
-                  cursor: "pointer",
-                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)",
-                  "& .MuiChip-deleteIcon": {
-                    color: "#fff",
-                    opacity: 0.7,
-                    transition: "opacity 0.2s",
-                    "&:hover": { opacity: 1 },
-                  },
-      }}
-    />
-  )}
->
-  {options.map((option) => (
-    <MenuItem key={option.value} value={option.tagColour}>
-      <Chip
-        label={option.tagName}
-        sx={{
-          backgroundColor: option.tagColour,
-          color: "#fff",
-            fontSize: "10px",
-            borderRadius: "10px",
-            // margin: "5px",
-            textAlign: "center",
-            display: "flex",
-            justifyContent: "center",
-            padding: "2px",
-            // alignItems: "center",
-            // paddingLeft: "10px",
-            whiteSpace: "nowrap", 
-             "&:hover": {
-              backgroundColor: option.colour,
-              color: "#fff",
-            },
-        }}
-      />
-    </MenuItem>
-  ))}
-</Select> */}
+      {/* ===== CREATE TAG SHEET ===== */}
+      <Sheet open={isDrawerOpen} onOpenChange={(open) => { if (!open) handleDrawerClose(); }}>
+        <SheetContent className="sm:max-w-md overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-2">
+              <Tag className="h-5 w-5 text-indigo-500" /> Create Tag
+            </SheetTitle>
+            <SheetDescription>Add a new tag with a name and color.</SheetDescription>
+          </SheetHeader>
 
-              </Box>
-              {/* <Box sx={{ pt: 5, display: 'flex', alignItems: 'center', gap: 5 }}>
-                <Button onClick={handleSubmit} variant="contained" color="primary">Submit</Button>
-                <Button onClick={handleClear} variant="outlined">Clear</Button>
-              </Box> */}
-               <Box sx={{ pt: 5, display: "flex", alignItems: "center", gap: 5 }}>
-              <Button onClick={handleSubmit} variant="contained"  disabled={loading}  sx={{
-                  backgroundColor: 'var(--color-save-btn)',  // Normal background
-                 
-                  '&:hover': {
-                    backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                  },
-  borderRadius:'15px', width:'80px'
-                }} >
-                {loading ? <CircularProgress size={24} sx={{ color: "#fff" }} /> : "Submit"}
-              </Button>
-              <Button onClick={handleClear} variant="outlined" disabled={loading} sx={{
-                  borderColor: 'var(--color-border-cancel-btn)',  // Normal background
-                 color:'var(--color-save-btn)',
-                  '&:hover': {
-                    backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                    color:'#fff',
-                    border:"none"
-                  },
-                  width:'80px',borderRadius:'15px'
-                }}>
-                Clear
-              </Button>
-            </Box>
-            </Box>
-          </Box>
-        </Box>
-      </Drawer>
-      <Drawer
-        anchor='right'
-        open={isUpdateDrawerOpen}
-        onClose={handleUpdateDrawerClose}
-        PaperProps={{
-          sx: {
+          <div className="mt-6 space-y-5">
+            <div className="space-y-2">
+              <Label>Name</Label>
+              <Input
+                placeholder="Tag Name"
+                value={inputValue}
+                onChange={(e) => handleInputChange(e.target.value)}
+                className={tagNameError ? 'border-red-400 focus-visible:ring-red-400' : ''}
+              />
+              {tagNameError && (
+                <p className="flex items-center gap-1 text-xs text-red-500 mt-1">
+                  <AlertCircle className="h-3 w-3" /> {tagNameError}
+                </p>
+              )}
+            </div>
 
-            borderRadius: isSmallScreen ? '0' : '10px 0 0 10px',
-            width: isSmallScreen ? '100%' : 500,
-            maxWidth: '100%',
-            [theme.breakpoints.down('sm')]: {
-              width: '100%',
-            },
-            id: 'tag-drawer',
-          }
-        }}
-      >
-        <Box sx={{ borderRadius: isSmallScreen ? '0' : '15px' }} role="presentation">
-          <Box>
-            <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '15px', background: "#EEEEEE" }}>
-              <Typography variant="h6" >
-                Edit Tag
-              </Typography>
-              <IoClose onClick={handleUpdateDrawerClose} style={{ cursor: 'pointer' }} />
-            </Box>
-            <Box sx={{ pr: 2, pl: 2, pt: 2 }}>
-              <Box>
+            <div className="space-y-2">
+              <Label>Color</Label>
+              {selectedOption && (
+                <div className="mb-2">
+                  <span
+                    className="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold text-white shadow-sm"
+                    style={{ backgroundColor: selectedOption.tagColour }}
+                  >
+                    {selectedOption.tagName || inputValue}
+                  </span>
+                </div>
+              )}
+              <div className="flex flex-wrap gap-2">
+                {colors.map((color) => (
+                  <button
+                    key={color}
+                    type="button"
+                    onClick={() => {
+                      const opt = options.find(o => o.tagColour === color) || { value: `${inputValue}-${color}`, tagName: inputValue, tagColour: color };
+                      setSelectedOption(opt);
+                      if (color) setTagColourError('');
+                    }}
+                    className={`h-8 w-8 rounded-full border-2 transition-all hover:scale-110 ${selectedOption?.tagColour === color ? 'border-slate-800 ring-2 ring-offset-2 ring-slate-400' : 'border-transparent'}`}
+                    style={{ backgroundColor: color }}
+                  />
+                ))}
+              </div>
+              {tagColourError && (
+                <p className="flex items-center gap-1 text-xs text-red-500 mt-1">
+                  <AlertCircle className="h-3 w-3" /> {tagColourError}
+                </p>
+              )}
+            </div>
+          </div>
 
-                <InputLabel sx={{color:'black'}}>Name</InputLabel>
+          <SheetFooter className="mt-8 flex gap-3 sm:justify-start">
+            <Button onClick={handleSubmit} disabled={loading}>
+              {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Submit
+            </Button>
+            <Button variant="outline" onClick={handleClear} disabled={loading}>
+              Clear
+            </Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
 
-                <TextField
+      {/* ===== EDIT TAG SHEET ===== */}
+      <Sheet open={isUpdateDrawerOpen} onOpenChange={(open) => { if (!open) handleUpdateDrawerClose(); }}>
+        <SheetContent className="sm:max-w-md overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-2">
+              <Pencil className="h-5 w-5 text-indigo-500" /> Edit Tag
+            </SheetTitle>
+            <SheetDescription>Update the tag name and color.</SheetDescription>
+          </SheetHeader>
 
-                  placeholder="Tag Name"
-                  value={inputValue}
-                  onChange={(e) => handleInputChange(e.target.value)}
-                  fullWidth
-                  margin="normal"
-                  size="small"
-                  sx={{ width: '100%' }}
-               
-                />
-              </Box>
-              <Box sx={{ mt: 3 }}>
-                <InputLabel >Color</InputLabel>
+          <div className="mt-6 space-y-5">
+            <div className="space-y-2">
+              <Label>Name</Label>
+              <Input
+                placeholder="Tag Name"
+                value={inputValue}
+                onChange={(e) => handleInputChange(e.target.value)}
+              />
+            </div>
 
-                <Select
-                  value={selectedOption ? selectedOption.tagColour : ''}
-                  onChange={handleChange}
-                  
-                  size="small"
-                  sx={{ width: '100%', marginTop: '10px', backgroundColor: '#fff' }}
-                  renderValue={(selected) => (
-                    <Chip
-                      label={options.find((option) => option.tagColour === selected)?.tagName || ''}
-                      sx={{
-                        backgroundColor: selected,
-                        color: "#fff",
-                  fontWeight: 500,
-                  fontSize: "10px",
-                  borderRadius: "16px",
-                  height: "20px",
-                  cursor: "pointer",
-                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)",
-                  "& .MuiChip-deleteIcon": {
-                    color: "#fff",
-                    opacity: 0.7,
-                    transition: "opacity 0.2s",
-                    "&:hover": { opacity: 1 },
-                  },
-                      }}
-                    />
-                  )}
-                  MenuProps={{
-                    PaperProps: {
-                      sx: {
-                        maxHeight: 200,  // Adjust the dropdown height as per your requirement
-                        overflowY: 'auto',  // Enable scrolling if the content exceeds the height
-                      },
-                    },
-                  }}
-                >
-                  {options.map((option) => (
-                    <MenuItem key={option.value} value={option.tagColour}>
-                      <Box sx={{
-                        backgroundColor: option.tagColour,
-                        color: "#fff",
-                        fontSize:'10px',
-                        borderRadius: "10px",
-                        textAlign:'center',
-                        width: selectWidth,
-                        
-                      }}>
-                        {option.tagName}
-                      </Box>
-                    </MenuItem>
-                  ))}
-                </Select>
+            <div className="space-y-2">
+              <Label>Color</Label>
+              {selectedOption && (
+                <div className="mb-2">
+                  <span
+                    className="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold text-white shadow-sm"
+                    style={{ backgroundColor: selectedOption.tagColour }}
+                  >
+                    {selectedOption.tagName || inputValue}
+                  </span>
+                </div>
+              )}
+              <div className="flex flex-wrap gap-2">
+                {colors.map((color) => (
+                  <button
+                    key={color}
+                    type="button"
+                    onClick={() => {
+                      const opt = options.find(o => o.tagColour === color) || { value: `${inputValue}-${color}`, tagName: inputValue, tagColour: color };
+                      setSelectedOption(opt);
+                    }}
+                    className={`h-8 w-8 rounded-full border-2 transition-all hover:scale-110 ${selectedOption?.tagColour === color ? 'border-slate-800 ring-2 ring-offset-2 ring-slate-400' : 'border-transparent'}`}
+                    style={{ backgroundColor: color }}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
 
-
-              </Box>
-              <Box sx={{ pt: 5, display: 'flex', alignItems: 'center', gap: 5 }}>
-                <Button onClick={handleUpdatesumbit} variant="contained" sx={{
-                backgroundColor: 'var(--color-save-btn)',  // Normal background
-               
-                '&:hover': {
-                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                },
-                borderRadius:'15px', width:'80px'
-              }}>Save</Button>
-                <Button onClick={handleFormClose} variant="outlined" sx={{
-                  borderColor: 'var(--color-border-cancel-btn)',  // Normal background
-                 color:'var(--color-save-btn)',
-                  '&:hover': {
-                    backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                    color:'#fff',
-                    border:"none"
-                  },
-                  width:'80px',borderRadius:'15px'
-                }}>Cancel</Button>
-              </Box>
-            </Box>
-
-          </Box>
-        </Box>
-      </Drawer>
+          <SheetFooter className="mt-8 flex gap-3 sm:justify-start">
+            <Button onClick={handleUpdatesumbit}>Save</Button>
+            <Button variant="outline" onClick={handleFormClose}>Cancel</Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };

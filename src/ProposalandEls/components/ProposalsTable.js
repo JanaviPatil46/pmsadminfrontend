@@ -1,32 +1,17 @@
 
 
-import React, { useState, useEffect } from 'react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Typography,
-  CircularProgress,
-  Box,
-  Alert,
-  Chip,
-  Button
-} from '@mui/material';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { IconButton, Menu, MenuItem } from "@mui/material";
+import { MoreVertical, Plus, FileText } from 'lucide-react';
 import { toast } from 'react-toastify';
 const ProposalsTable = () => {
   const [proposals, setProposals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const [anchorEl, setAnchorEl] = useState(null);              // menu anchor
+  const [menuOpen, setMenuOpen] = useState(null);              // proposal id for open menu
   const [selectedProposal, setSelectedProposal] = useState(null); // which row clicked
+  const menuRef = useRef(null);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -65,15 +50,25 @@ const ProposalsTable = () => {
     navigate('/firmtemp/templates/proposals/proposal-form');
   };
 
-   // ✅ Open menu for selected row
-  const handleMenuOpen = (event, proposal) => {
-    setAnchorEl(event.currentTarget);
+  // Click outside to close menu
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(null);
+        setSelectedProposal(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleMenuOpen = (proposal) => {
+    setMenuOpen(menuOpen === proposal._id ? null : proposal._id);
     setSelectedProposal(proposal);
   };
 
-  // ✅ Close menu
   const handleMenuClose = () => {
-    setAnchorEl(null);
+    setMenuOpen(null);
     setSelectedProposal(null);
   };
 
@@ -104,118 +99,108 @@ toast.success("Proposal deleted successfully")
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-        <CircularProgress />
-        <Typography variant="body1" sx={{ ml: 2 }}>
-          Loading proposals...
-        </Typography>
-      </Box>
+      <div className="flex items-center justify-center min-h-[200px] gap-3">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
+        <span className="text-sm text-slate-500">Loading proposals...</span>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <Alert severity="error" sx={{ mt: 2 }}>
-        Error: {error}
-      </Alert>
+      <div className="mx-auto max-w-4xl px-4 mt-4">
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          Error: {error}
+        </div>
+      </div>
     );
   }
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h4">
-          Proposals List
-        </Typography>
-        <Button 
-          variant="contained" 
-          color="primary"
+    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Proposals</h1>
+          <p className="mt-1 text-sm text-slate-500">{proposals.length} proposal(s) available</p>
+        </div>
+        <button
           onClick={handleCreateNew}
+          className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 hover:shadow-md active:scale-[0.98]"
         >
-          Create New Proposal
-        </Button>
-      </Box>
-      
-      <TableContainer component={Paper} elevation={3}>
-        <Table sx={{ minWidth: 650 }} size="medium">
-          <TableHead sx={{ bgcolor: 'primary.main' }}>
-            <TableRow>
-              
-             
-              <TableCell sx={{ color: 'white', fontWeight: 'bold', fontSize: '1rem' }}>
-                Template Name
-              </TableCell>
-              <TableCell sx={{ color: 'white', fontWeight: 'bold', fontSize: '1rem' }}>
-                Actions
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {proposals.map((proposal) => (
-              <TableRow
-                key={proposal._id}
-                sx={{
-                  '&:nth-of-type(odd)': { backgroundColor: 'action.hover' },
-                  '&:hover': { backgroundColor: 'action.selected' }
-                }}
-              >
-               
-                
-                <TableCell>
-               
-                 <Link  to={`/firmtemp/templates/proposals/proposal-form?edit=${proposal._id}`}
-                      style={{
-                        textDecoration: "none",
-                        color: "blue",
-                        fontWeight: 500,
-                      }}> {proposal.templatename} </Link>
-                 
-                </TableCell>
-                  <TableCell>
-                  <IconButton onClick={(e) => handleMenuOpen(e, proposal)}>
-                    <MoreVertIcon />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-        {/* ✅ MENU FOR EDIT / DELETE */}
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleMenuClose}
-      >
-        <MenuItem
-          onClick={() => {
-            handleTemplateClick(selectedProposal);
-            handleMenuClose();
-          }}
-        >
-          Edit
-        </MenuItem>
+          <Plus className="h-4 w-4" /> Create New Proposal
+        </button>
+      </div>
 
-        <MenuItem sx={{ color: "red" }} onClick={handleDelete}>
-          Delete
-        </MenuItem>
-      </Menu>
-      {proposals.length === 0 && (
-        <Box textAlign="center" sx={{ mt: 4 }}>
-          <Typography variant="h6" color="text.secondary">
-            No proposals available
-          </Typography>
-          <Button 
-            variant="contained" 
-            color="primary"
+      {proposals.length === 0 ? (
+        <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/50 py-16 px-6 text-center">
+          <div className="rounded-full bg-indigo-100 p-4 mb-4">
+            <FileText className="h-8 w-8 text-indigo-600" />
+          </div>
+          <h3 className="text-lg font-semibold text-slate-800">No proposals yet</h3>
+          <p className="mt-1 text-sm text-slate-500 max-w-sm">Get started by creating your first proposal template.</p>
+          <button
             onClick={handleCreateNew}
-            sx={{ mt: 2 }}
+            className="mt-6 inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 hover:shadow-md"
           >
-            Create Your First Proposal
-          </Button>
-        </Box>
+            <Plus className="h-4 w-4" /> Create Your First Proposal
+          </button>
+        </div>
+      ) : (
+        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="border-b border-slate-100 bg-gradient-to-r from-indigo-600 to-indigo-700">
+                  <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-white">Template Name</th>
+                  <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-white text-right w-24">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {proposals.map((proposal, idx) => (
+                  <tr key={proposal._id} className={`transition-colors hover:bg-indigo-50/40 ${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'}`}>
+                    <td className="px-6 py-4">
+                      <Link
+                        to={`/firmtemp/templates/proposals/proposal-form?edit=${proposal._id}`}
+                        className="text-sm font-medium text-indigo-600 hover:text-indigo-800 hover:underline transition-colors"
+                      >
+                        {proposal.templatename}
+                      </Link>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="relative inline-block" ref={menuOpen === proposal._id ? menuRef : null}>
+                        <button
+                          onClick={() => handleMenuOpen(proposal)}
+                          className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                        >
+                          <MoreVertical className="h-4 w-4" />
+                        </button>
+                        {menuOpen === proposal._id && (
+                          <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-slate-200 bg-white py-1 shadow-lg animate-in fade-in slide-in-from-top-1">
+                            <button
+                              onClick={() => { handleTemplateClick(selectedProposal); handleMenuClose(); }}
+                              className="flex w-full items-center px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={handleDelete}
+                              className="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       )}
-    </Box>
+    </div>
   );
 };
 
