@@ -1,24 +1,7 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import { Link } from "react-router-dom";
-import {
-  MaterialReactTable,
-  useMaterialReactTable,
-} from "material-react-table";
-import {
-  TableContainer,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  Paper,
-  TablePagination,
-  IconButton,
-  Box,
-  Typography,
-} from "@mui/material";
-import { CiMenuKebab } from "react-icons/ci";
-import { toast, ToastContainer } from "react-toastify";
+import { MoreVertical, ChevronLeft, ChevronRight } from "lucide-react";
+import { toast } from "react-toastify";
 const DeactivateMember = () => {
   const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
   const handleRestoreMember = async (id) => {
@@ -96,323 +79,122 @@ const DeactivateMember = () => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-  const columns = useMemo(
-    () => [
-      {
-        accessorKey: "FirstName",
-        header: "Name",
-        Cell: ({ row }) => {
-          const firstName = row.original?.FirstName;
-          const middleName = row.original?.MiddleName;
-          const lastName = row.original?.LastName;
-          const initials = `${firstName ? firstName[0] : ""}${lastName ? lastName[0] : ""}`;
-          return (
-            <div>
-              <div className="circle">{initials}</div>
-              <Link
-                to={`/updateteammember/${row.original?.id}`}
-              >{`${firstName ? firstName : ""}  ${middleName ? middleName : ""} ${lastName ? lastName : ""}`}</Link>{" "}
-            </div>
-          );
-        },
-      },
-      { accessorKey: "Email", header: "Email" },
-      { accessorKey: "Role", header: "Role" },
-      {
-        accessorKey: "Created",
-        header: "Created",
-        Cell: ({ cell }) => {
-          const dateValue = cell.getValue();
-          const date = new Date(dateValue);
+  const menuRef = useRef(null);
+  const totalPages = Math.ceil(teamMembers.length / rowsPerPage);
 
-          if (isNaN(date)) {
-            return "Invalid Date";
-          }
-
-          return date
-            .toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "short",
-              day: "2-digit",
-            })
-            .replace(",", "");
-        },
-      },
-      {
-        accessorKey: "has2FA",
-        header: "2FA",
-        Cell: ({ value }) => (value ? "Enabled" : "Disabled"),
-      },
-      {
-        accessorKey: "Actions",
-        header: "Actions",
-        Cell: ({ row }) => (
-          <IconButton
-            onClick={() => toggleMenu(row.original.id)}
-            style={{ color: "#2c59fa", position: "relative" }} // Added position relative for proper positioning
-          >
-            <CiMenuKebab style={{ fontSize: "25px" }} />
-            {openMenuId === row.original.id && (
-              <Box
-                sx={{
-                  position: "absolute",
-                  zIndex: 10, // Ensure it's on top of other elements
-                  backgroundColor: "#fff",
-                  boxShadow: 1,
-                  borderRadius: 1,
-                  p: 1,
-                  left: "30px",
-                  m: 2,
-                }}
-              >
-                <Typography
-                  onClick={() => {
-                    handleRestoreMember(row.original.id);
-                  }}
-                  sx={{ fontSize: "12px", color: "blue", fontWeight: "bold" }}
-                >
-                  Restore
-                </Typography>
-              </Box>
-            )}
-          </IconButton>
-        ),
-      },
-    ],
-    [openMenuId]
-  );
-
-  const table = useMaterialReactTable({
-    columns,
-    data: teamMembers,
-  });
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setOpenMenuId(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center py-20 gap-3">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
+        <span className="text-sm text-slate-500">Loading members...</span>
+      </div>
+    );
   }
 
   return (
-    <div>
-      {/* <MaterialReactTable table={table} /> */}
-      <TableContainer component={Paper} sx={{ overflow: "visible" }}>
-        <Table sx={{ width: "100%" }}>
-          {/* Table Head */}
-          <TableHead>
-            <TableRow>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Name
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="150"
-              >
-                Email
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Role
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Created
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                2FA
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Actions
-              </TableCell>
-            </TableRow>
-          </TableHead>
+    <div className="space-y-4">
+      <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-b border-slate-100 bg-slate-50/80">
+                <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Name</th>
+                <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Email</th>
+                <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Role</th>
+                <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Created</th>
+                <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">2FA</th>
+                <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500 text-right w-20"></th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {teamMembers
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((member, index) => {
+                  const firstName = member?.FirstName || "";
+                  const middleName = member?.MiddleName || "";
+                  const lastName = member?.LastName || "";
+                  const initials = `${firstName ? firstName[0] : ""}${lastName ? lastName[0] : ""}`;
+                  const linkPath = `/updateteammember/${member?.id}`;
+                  const formattedDate = new Date(member.Created);
+                  const displayDate = isNaN(formattedDate)
+                    ? "Invalid Date"
+                    : formattedDate.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "2-digit" }).replace(",", "");
 
-          {/* Table Body */}
-          <TableBody>
-            {teamMembers
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((member, index) => {
-                const firstName = member?.FirstName || "";
-                const middleName = member?.MiddleName || "";
-                const lastName = member?.LastName || "";
-                const initials = `${firstName ? firstName[0] : ""}${lastName ? lastName[0] : ""}`;
-                const isLoggedInUser = index === 0;
-
-                const linkPath = isLoggedInUser
-                  ? `/settings/myaccount`
-                  : `/updateteammember/${member?.id}`;
-
-                const formattedDate = new Date(member.Created);
-                const displayDate = isNaN(formattedDate)
-                  ? "Invalid Date"
-                  : formattedDate
-                      .toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "short",
-                        day: "2-digit",
-                      })
-                      .replace(",", "");
-
-                return (
-                  <TableRow key={member.id}>
-                    {/* Name Column */}
-                    <TableCell
-                      style={{
-                        fontSize: "12px",
-                        padding: "4px 8px",
-                        lineHeight: "1",
-                        cursor: "pointer",
-                        color: "#3f51b5",
-                      }}
-                    >
-                      <div style={{ display: "flex", flexDirection: "column" }}>
-                        <div className="circle">{initials}</div>
-                        <br />
-                        <Link to={linkPath} style={{ textDecoration: "none" }}>
-                          {`${firstName} ${middleName} ${lastName}`}
-                        </Link>
-                      </div>
-                    </TableCell>
-
-                    {/* Email */}
-                    <TableCell>{member.Email}</TableCell>
-
-                    {/* Role */}
-                    <TableCell>{member.Role}</TableCell>
-
-                    {/* Created */}
-                    <TableCell>{displayDate}</TableCell>
-
-                    {/* 2FA */}
-                    <TableCell>
-                      {member.has2FA ? "Enabled" : "Disabled"}
-                    </TableCell>
-
-                    {/* Actions */}
-                    {/* <TableCell>
-                    <IconButton onClick={() => toggleMenu(member.id)} style={{ color: "#2c59fa" }}>
-                      <CiMenuKebab style={{ fontSize: "25px" }} />
-                    </IconButton>
-                    {openMenuId === member.id && (
-                      <Box
-                        sx={{
-                          position: "absolute",
-                          zIndex: 10,
-                          backgroundColor: "#fff",
-                          boxShadow: 1,
-                          borderRadius: 1,
-                          p: 1,
-                          left: "30px",
-                          m: 2,
-                        }}
-                      >
-                        
-                        <Typography
-                          sx={{ fontSize: "12px", color: "red", fontWeight: "bold" }}
-                          onClick={() => handleRestoreMember(member.id)}
-                        >
-                          Restore
-                        </Typography>
-                        
-                      </Box>
-                    )}
-                  </TableCell> */}
-                    <TableCell
-                      style={{
-                        fontSize: "12px",
-                        padding: "4px 8px",
-                        lineHeight: "1",
-                        cursor: "pointer",
-                      }}
-                    >
-                      <IconButton
-                        onClick={() => toggleMenu(member.id)}
-                        style={{ color: "#2c59fa" }}
-                      >
-                        <CiMenuKebab style={{ fontSize: "25px" }} />
-                        {openMenuId === member.id && (
-                          <Box
-                            sx={{
-                              position: "absolute",
-                              zIndex: 1,
-                              backgroundColor: "#fff",
-                              boxShadow: 1,
-                              borderRadius: 1,
-                              p: 1,
-                              left: 0,
-                              // right: '10px',
-                              m: 2,
-                              top: "10px",
-                              textAlign: "start",
-                            }}
-                          >
-                            <Typography
-                              sx={{
-                                fontSize: "12px",
-                                color: "red",
-                                fontWeight: "bold",
-                              }}
-                              onClick={() => handleRestoreMember(member.id)}
-                            >
-                              Restore
-                            </Typography>
-                          </Box>
-                        )}
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-          </TableBody>
-        </Table>
+                  return (
+                    <tr key={member.id} className={`transition-colors hover:bg-indigo-50/40 ${index % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'}`}>
+                      <td className="px-5 py-3.5">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-200 text-xs font-semibold text-slate-600 shrink-0">
+                            {initials}
+                          </div>
+                          <Link to={linkPath} className="text-sm font-medium text-indigo-600 hover:text-indigo-800 hover:underline transition-colors">
+                            {`${firstName} ${middleName} ${lastName}`.trim()}
+                          </Link>
+                        </div>
+                      </td>
+                      <td className="px-5 py-3.5 text-sm text-slate-600">{member.Email}</td>
+                      <td className="px-5 py-3.5">
+                        <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700 capitalize">{member.Role}</span>
+                      </td>
+                      <td className="px-5 py-3.5 text-sm text-slate-600">{displayDate}</td>
+                      <td className="px-5 py-3.5">
+                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${member.has2FA ? 'bg-green-50 text-green-700' : 'bg-slate-100 text-slate-500'}`}>
+                          {member.has2FA ? "Enabled" : "Disabled"}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3.5 text-right">
+                        <div className="relative inline-block" ref={openMenuId === member.id ? menuRef : null}>
+                          <button onClick={() => toggleMenu(member.id)} className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600">
+                            <MoreVertical className="h-4 w-4" />
+                          </button>
+                          {openMenuId === member.id && (
+                            <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-slate-200 bg-white py-1 shadow-lg">
+                              <button onClick={() => handleRestoreMember(member.id)} className="flex w-full items-center px-4 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-50 transition-colors">
+                                Restore
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              {teamMembers.length === 0 && (
+                <tr><td colSpan={6} className="px-5 py-12 text-center text-sm text-slate-400">No deactivated members found.</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
 
         {/* Pagination */}
-      </TableContainer>
-      <TablePagination
-        rowsPerPageOptions={[30, 40, 50, 60, 100]}
-        component="div"
-        count={teamMembers.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
-      <ToastContainer />
+        <div className="flex items-center justify-between border-t border-slate-100 px-5 py-3">
+          <div className="flex items-center gap-2 text-sm text-slate-500">
+            <span>Rows per page:</span>
+            <select value={rowsPerPage} onChange={handleChangeRowsPerPage} className="rounded-md border border-slate-200 bg-white px-2 py-1 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              {[30, 40, 50, 60, 100].map(n => <option key={n} value={n}>{n}</option>)}
+            </select>
+            <span className="ml-2">{teamMembers.length > 0 ? `${page * rowsPerPage + 1}–${Math.min((page + 1) * rowsPerPage, teamMembers.length)} of ${teamMembers.length}` : '0 results'}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <button onClick={(e) => handleChangePage(e, page - 1)} disabled={page === 0} className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed">
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <button onClick={(e) => handleChangePage(e, page + 1)} disabled={page >= totalPages - 1} className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed">
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

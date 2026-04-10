@@ -1,27 +1,7 @@
 import React, { useState, useEffect } from "react";
-import {
-  Container,
-  Button,
-  Box,
-  Typography,
-  Divider,
-  Paper,
-  TextField,
-  IconButton,
-  FilledInput,
-  OutlinedInput,
-  Input,
-  InputLabel,
-  InputAdornment,
-  FormHelperText,
-  FormControl,
-} from "@mui/material";
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import { Eye, EyeOff, CheckCircle2 } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
-import { IoIosCheckmarkCircleOutline } from "react-icons/io";
-import "./ActiveAccount.css";
+import { toast } from "react-toastify";
 
 const ActiveAccounts = () => {
   const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
@@ -303,157 +283,125 @@ const ActiveAccounts = () => {
   };
 
   return (
-    <Container maxWidth="sm">
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: "100vh",
-        }}
-      >
-        <Paper elevation={3} sx={{ width: "100%", p: 3 }}>
-          <Typography variant="h5" gutterBottom>
-            Set Up Your Account
-          </Typography>
-          <Divider sx={{ mb: 2 }} />
-          <Typography variant="body1" sx={{ mb: 2 }}>
-            To activate your account, please fill in the requested information.
-          </Typography>
-          <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
-            <TextField
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-12">
+      <div className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-8 shadow-xl">
+        <h1 className="text-2xl font-bold text-slate-900">Set Up Your Account</h1>
+        <div className="my-4 h-px bg-slate-200" />
+        <p className="mb-6 text-sm text-slate-600">
+          To activate your account, please fill in the requested information.
+        </p>
+
+        {/* Name Fields */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+          <div>
+            <input
+              type="text"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               placeholder="First Name"
-              fullWidth
-              margin="normal"
-              size="small"
-              variant="outlined"
-              sx={{ backgroundColor: "#fff" }}
+              className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
             />
-            <Box style={{ color: "red", fontSize: "9px" }}>
-              {firstNameValidation}
-            </Box>
-
-            <TextField
+            {firstNameValidation && <p className="mt-1 text-xs text-red-500">{firstNameValidation}</p>}
+          </div>
+          <div>
+            <input
+              type="text"
               placeholder="Middle Name"
               value={middleName}
               onChange={(e) => setMiddleName(e.target.value)}
-              fullWidth
-              margin="normal"
-              size="small"
-              variant="outlined"
-              sx={{ backgroundColor: "#fff" }}
+              className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
             />
-
-            <TextField
+          </div>
+          <div>
+            <input
+              type="text"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               placeholder="Last Name"
-              fullWidth
-              margin="normal"
-              size="small"
-              variant="outlined"
-              sx={{ backgroundColor: "#fff" }}
+              className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
             />
-            <Box style={{ color: "red", fontSize: "9px" }}>
-              {lastNameValidation}
-            </Box>
-          </Box>
-
-          <Box display={"flex"} alignItems={"center"} gap={1} mt={3}>
-            <Box>
-              <FormControl variant="outlined">
-                <InputLabel htmlFor="outlined-adornment-password">
-                  Password
-                </InputLabel>
-                <OutlinedInput
-                  size="small"
-                  id="outlined-adornment-password"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={handlePasswordChange} // onChange should be on the input, not IconButton
-                  endAdornment={
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label="toggle password visibility"
-                        onClick={handleClickShowPassword}
-                        onMouseDown={handleMouseDownPassword}
-                        onMouseUp={handleMouseUpPassword}
-                        edge="end"
-                      >
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  }
-                  label="Password"
-                />
-              </FormControl>
-              <div style={{ color: "red", fontSize: "9px" }}>
-                {passwordValidation}
-              </div>
-            </Box>
-
-            <Box>
-              <FormControl variant="outlined">
-                <InputLabel htmlFor="outlined-adornment-password">
-                  {" "}
-                  Confirm Password
-                </InputLabel>
-                <OutlinedInput
-                  size="small"
-                  id="outlined-adornment-password"
-                  type={showConfirmPassword ? "text" : "password"}
-                  // onChange = {handleConfirmPasswordChange}
-                  onChange={handleConfirmPasswordChange}
-                  endAdornment={
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label="toggle password visibility"
-                        onClick={handleClickConfirmShowPassword}
-                        onMouseDown={handleMouseDownConfirmPassword}
-                        onMouseUp={handleMouseUpConfirmPassword}
-                        edge="end"
-                      >
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  }
-                  label="Password"
-                />
-              </FormControl>
-              <div style={{ color: "red", fontSize: "9px" }}>
-                {confirmPasswordValidation || passwordMatchValidation}
-              </div>
-            </Box>
-          </Box>
-          <div className="password-validation-checklist">
-            <p>Your password must contain:</p>
-            <ul>
-              <li className={password.length >= 8 ? "valid" : ""}>
-                <IoIosCheckmarkCircleOutline className="check-icon" /> Minimum 8
-                characters
-              </li>
-              <li className={/\d/.test(password) ? "valid" : ""}>
-                <IoIosCheckmarkCircleOutline className="check-icon" /> At least
-                one number
-              </li>
-              <li className={/[a-zA-Z]/.test(password) ? "valid" : ""}>
-                <IoIosCheckmarkCircleOutline className="check-icon" /> At least
-                one letter
-              </li>
-            </ul>
+            {lastNameValidation && <p className="mt-1 text-xs text-red-500">{lastNameValidation}</p>}
           </div>
+        </div>
 
-          <Box mt={3} float={"right"}>
-            <Button onClick={submitvalidation} variant="contained">
-              Submit
-            </Button>
-          </Box>
-        </Paper>
-      </Box>
-      <ToastContainer />
-    </Container>
+        {/* Password Fields */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">Password</label>
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={handlePasswordChange}
+                placeholder="Password"
+                className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 pr-10 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+              />
+              <button
+                type="button"
+                onClick={handleClickShowPassword}
+                onMouseDown={handleMouseDownPassword}
+                onMouseUp={handleMouseUpPassword}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            {passwordValidation && <p className="mt-1 text-xs text-red-500">{passwordValidation}</p>}
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">Confirm Password</label>
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                onChange={handleConfirmPasswordChange}
+                placeholder="Confirm Password"
+                className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 pr-10 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+              />
+              <button
+                type="button"
+                onClick={handleClickConfirmShowPassword}
+                onMouseDown={handleMouseDownConfirmPassword}
+                onMouseUp={handleMouseUpConfirmPassword}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+              >
+                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            {(confirmPasswordValidation || passwordMatchValidation) && (
+              <p className="mt-1 text-xs text-red-500">{confirmPasswordValidation || passwordMatchValidation}</p>
+            )}
+          </div>
+        </div>
+
+        {/* Password Checklist */}
+        <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-4 mb-6">
+          <p className="text-sm font-medium text-slate-700 mb-2">Your password must contain:</p>
+          <ul className="space-y-1.5">
+            <li className={`flex items-center gap-2 text-sm ${password.length >= 8 ? 'text-green-600' : 'text-slate-400'}`}>
+              <CheckCircle2 className={`h-4 w-4 shrink-0 ${password.length >= 8 ? 'text-green-500' : 'text-slate-300'}`} />
+              Minimum 8 characters
+            </li>
+            <li className={`flex items-center gap-2 text-sm ${/\d/.test(password) ? 'text-green-600' : 'text-slate-400'}`}>
+              <CheckCircle2 className={`h-4 w-4 shrink-0 ${/\d/.test(password) ? 'text-green-500' : 'text-slate-300'}`} />
+              At least one number
+            </li>
+            <li className={`flex items-center gap-2 text-sm ${/[a-zA-Z]/.test(password) ? 'text-green-600' : 'text-slate-400'}`}>
+              <CheckCircle2 className={`h-4 w-4 shrink-0 ${/[a-zA-Z]/.test(password) ? 'text-green-500' : 'text-slate-300'}`} />
+              At least one letter
+            </li>
+          </ul>
+        </div>
+
+        <div className="flex justify-end">
+          <button
+            onClick={submitvalidation}
+            className="rounded-lg bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          >
+            Submit
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 

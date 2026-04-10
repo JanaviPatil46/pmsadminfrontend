@@ -1,45 +1,10 @@
-import React, { useEffect, useState, useMemo, useContext } from "react";
-import { Link } from "react-router-dom";
-// import { useNavigate, useParams } from "react-router-dom";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { SlQuestion } from "react-icons/sl";
-import { styled } from "@mui/material/styles";
-import {
-  MaterialReactTable,
-  useMaterialReactTable,
-} from "material-react-table";
-import Drawer from "@mui/material/Drawer";
-import { useOutletContext } from "react-router-dom";
-import {
-  Select,
-  Menu,
-  MenuItem,
-  IconButton,
-  Paper,
-  Box,
-  Typography,
-  useTheme,
-  useMediaQuery,
-  Button,
-  InputLabel,
-  TextField,
-  Divider,
-  TableContainer,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  TablePagination,
-  // Paper,
-} from "@mui/material";
-import { CiMenuKebab } from "react-icons/ci";
+import React, { useEffect, useState, useMemo, useContext, useRef } from "react";
+import { Link, useOutletContext, useNavigate } from "react-router-dom";
+import { MoreVertical, X, HelpCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import Switch from "react-switch";
 import { LoginContext } from "../Sidebar/Context/Context";
-import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
-import { ToastContainer, toast } from "react-toastify";
-import Grid from "@mui/material/Unstable_Grid2";
-import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 const ActiveMember = () => {
   // http://68.251.138.236:8880
@@ -67,8 +32,7 @@ const ActiveMember = () => {
   const USER_API = process.env.REACT_APP_USER_URL;
   const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
   const WINDOWS_PORT = process.env.REACT_APP_SERVER_URI;
-  const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const menuRef = useRef(null);
   // const [isNewDrawerOpen, setIsNewDrawerOpen] = useState(false);
   const handleNewDrawerClose = () => {
     setIsUpdateDrawerOpen(false);
@@ -519,16 +483,56 @@ const ActiveMember = () => {
   const [lastNameValidation, setLastNameValidation] = useState("");
   const [emailValidation, setEmailValidation] = useState("");
 
-  const Item = styled("Box")(({ theme }) => ({
-    backgroundColor: "#fff",
-    ...theme.typography.body2,
-    padding: theme.spacing(1),
-    textAlign: "center",
-    color: theme.palette.text.secondary,
-    ...theme.applyStyles("dark", {
-      backgroundColor: "#1A2027",
-    }),
-  }));
+  // Access rights arrays for rendering
+  const leftColumnRights = [
+    { label: "Manage payments", checked: isCheckedPayments, handler: handleSwitchPayments, disabled: true },
+    { label: "Manage pipelines", checked: isCheckedPipelines, handler: handleSwitchPipelines },
+    { label: "Manage time entries", checked: isCheckedTimeEntries, handler: handleSwitchTime, disabled: true },
+    { label: "Manage accounts", checked: isCheckedAccounts, handler: handleSwitchAccounts },
+    { label: "Manage tags", checked: isCheckedTags, handler: handleSwitchTags },
+    { label: "Manage organizers", checked: isCheckedOrganizers, handler: handleSwitchOrganizers },
+    { label: "Manage firm balance", checked: isCheckedFirmBalance, handler: handleSwitchFirmBalance, disabled: true },
+    { label: "Manage contacts", checked: isCheckedContacts, handler: handleSwitchContacts },
+    { label: "Manage site", checked: isCheckedSite, handler: handleSwitchSite, disabled: true },
+    { label: "Manage services", checked: isCheckedServices, handler: handleSwitchServices },
+    { label: "Manage public filter templates", checked: isCheckedFilterTemplates, handler: handleSwitchFilterTemplates, disabled: true },
+    { label: "Manage templates", checked: isCheckedTemplates, handler: handleSwitchTemplates },
+    { label: "Manage marketplace", checked: isCheckedMarketplace, handler: handleSwitchMarketplace, disabled: true },
+  ];
+  const rightColumnRights = [
+    { label: "Manage invoices", checked: isCheckedInvoices, handler: handleSwitchInvoices },
+    { label: "Manage job recurrences", checked: isCheckedJobRecurrences, handler: handleSwitchJobRecurrences, disabled: true },
+    { label: "Manage rates in time entries", checked: isCheckedRatesTimeEntries, handler: handleSwitchRatesTimeEntries, disabled: true },
+    { label: "View all accounts", checked: isCheckedAllAccounts, handler: handleSwitchAllAccounts },
+    { label: "Manage custom fields", checked: isCheckedCustomFields, handler: handleSwitchCustomFields, disabled: true },
+    { label: "Manage teammates", checked: isCheckedTeammates, handler: handleSwitchTeammates, disabled: true },
+    { label: "View all contacts", checked: isCheckedAllContacts, handler: handleSwitchAllContacts },
+    { label: "Manage proposals", checked: isCheckedProposals, handler: handleSwitchProposals },
+    { label: "Mute emails", checked: isCheckedEmail, handler: handleSwitchEmail, disabled: true },
+    { label: "Edit organizer answers", checked: isCheckedOrgnizerAnswers, handler: handleSwitchOrgnizerAnswers, disabled: true },
+    { label: "Manage documents", checked: isCheckedDocuments, handler: handleSwitchDocuments, disabled: true },
+    { label: "Manage IRS Transcripts", checked: isCheckedTranscripts, handler: handleSwitchTranscripts, disabled: true },
+    { label: "View reporting", checked: isCheckedViewReporting, handler: handleSwitchViewReporting, disabled: true },
+  ];
+
+  const renderSwitchRow = (item, index) => (
+    <div key={index} className={`flex items-center gap-3 py-2 ${item.disabled ? 'opacity-50' : ''}`}>
+      <Switch
+        onChange={item.handler}
+        checked={item.checked}
+        onColor="#4f46e5"
+        onHandleColor="#FFF"
+        handleDiameter={10}
+        uncheckedIcon={false}
+        checkedIcon={false}
+        height={20}
+        width={32}
+        disabled={item.disabled}
+        className="react-switch"
+      />
+      <span className="text-sm text-slate-700">{item.label}</span>
+    </div>
+  );
 
   // Function to check if email exists
   // const newUser = () => {
@@ -834,1733 +838,207 @@ const ActiveMember = () => {
   //   [openMenuId]
   // );
 
-  // const table = useMaterialReactTable({
-  //   columns,
-  //   data: teamMembers,
-  // });
+  const totalPages = Math.ceil(teamMembers.length / rowsPerPage);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setOpenMenuId(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center py-20 gap-3">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
+        <span className="text-sm text-slate-500">Loading members...</span>
+      </div>
+    );
   }
 
   return (
-    <>
-      {/* <MaterialReactTable table={table} /> */}
+    <div className="space-y-4">
+      {/* Table */}
+      <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-b border-slate-100 bg-slate-50/80">
+                <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Name</th>
+                <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Email</th>
+                <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Role</th>
+                <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Created</th>
+                <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">2FA</th>
+                <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500 text-right w-20"></th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {teamMembers
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((member, index) => {
+                  const fName = member?.FirstName || "";
+                  const mName = member?.MiddleName || "";
+                  const lName = member?.LastName || "";
+                  const initials = `${fName ? fName[0] : ""}${lName ? lName[0] : ""}`;
+                  const isLoggedInUser = index === 0;
+                  const linkPath = isLoggedInUser ? `/settings/myaccount` : `/updateteammember/${member?.id}`;
+                  const formattedDate = new Date(member.Created);
+                  const displayDate = isNaN(formattedDate)
+                    ? "Invalid Date"
+                    : formattedDate.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "2-digit" }).replace(",", "");
 
-      <TableContainer component={Paper} sx={{ overflow: "visible" }}>
-        <Table sx={{ width: "100%" }}>
-          {/* Table Head */}
-          <TableHead>
-            <TableRow>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Name
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="150"
-              >
-                Email
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Role
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Created
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                2FA
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Actions
-              </TableCell>
-            </TableRow>
-          </TableHead>
-
-          {/* Table Body */}
-          <TableBody>
-            {teamMembers
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((member, index) => {
-                const firstName = member?.FirstName || "";
-                const middleName = member?.MiddleName || "";
-                const lastName = member?.LastName || "";
-                const initials = `${firstName ? firstName[0] : ""}${lastName ? lastName[0] : ""}`;
-                const isLoggedInUser = index === 0;
-
-                const linkPath = isLoggedInUser
-                  ? `/settings/myaccount`
-                  : `/updateteammember/${member?.id}`;
-
-                const formattedDate = new Date(member.Created);
-                const displayDate = isNaN(formattedDate)
-                  ? "Invalid Date"
-                  : formattedDate
-                      .toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "short",
-                        day: "2-digit",
-                      })
-                      .replace(",", "");
-
-                return (
-                  <TableRow key={member.id}>
-                    {/* Name Column */}
-                    <TableCell
-                      style={{
-                        fontSize: "12px",
-                        padding: "4px 8px",
-                        lineHeight: "1",
-                        cursor: "pointer",
-                        color: "#3f51b5",
-                      }}
-                    >
-                      <div style={{ display: "flex", flexDirection: "column" }}>
-                        <div className="circle">{initials}</div>
-                        <br />
-                        <Link to={linkPath} style={{ textDecoration: "none" }}>
-                          {`${firstName} ${middleName} ${lastName}`}
-                        </Link>
-                      </div>
-                    </TableCell>
-
-                    {/* Email */}
-                    <TableCell>{member.Email}</TableCell>
-
-                    {/* Role */}
-                    <TableCell>{member.Role}</TableCell>
-
-                    {/* Created */}
-                    <TableCell>{displayDate}</TableCell>
-
-                    {/* 2FA */}
-                    <TableCell>
-                      {member.has2FA ? "Enabled" : "Disabled"}
-                    </TableCell>
-
-                    {/* Actions */}
-                    {/* <TableCell>
-                    <IconButton onClick={() => toggleMenu(member.id)} style={{ color: "#2c59fa" }}>
-                      <CiMenuKebab style={{ fontSize: "25px" }} />
-                    </IconButton>
-                    {openMenuId === member.id && (
-                      <Box
-                        sx={{
-                          position: "absolute",
-                          zIndex: 10,
-                          backgroundColor: "#fff",
-                          boxShadow: 1,
-                          borderRadius: 1,
-                          p: 1,
-                          left: "30px",
-                          m: 2,
-                        }}
-                      >
-                        <Typography
-                          sx={{ fontSize: "12px", fontWeight: "bold" }}
-                          onClick={() => {
-                            handleEdit(member._id);
-                            handleUpdateDrawerOpen();
-                          }}
-                        >
-                          Edit
-                        </Typography>
-                        <Typography
-                          sx={{ fontSize: "12px", color: "red", fontWeight: "bold" }}
-                          onClick={() => handleDeleteMember(member.id)}
-                        >
-                          Deactivate
-                        </Typography>
-                        <Typography
-                          sx={{ fontSize: "12px", color: "red", fontWeight: "bold" }}
-                          onClick={() => handleTeamMemberDelete(member.id)}
-                        >
-                          Delete
-                        </Typography>
-                      </Box>
-                    )}
-                  </TableCell> */}
-
-                    <TableCell
-                      style={{
-                        fontSize: "12px",
-                        padding: "4px 8px",
-                        lineHeight: "1",
-                        cursor: "pointer",
-                      }}
-                    >
-                      <IconButton
-                        onClick={() => toggleMenu(member.id)}
-                        style={{ color: "#2c59fa" }}
-                      >
-                        <CiMenuKebab style={{ fontSize: "25px" }} />
-                        {openMenuId === member.id && (
-                          <Box
-                            sx={{
-                              position: "absolute",
-                              zIndex: 1,
-                              backgroundColor: "#fff",
-                              boxShadow: 1,
-                              borderRadius: 1,
-                              p: 1,
-                              left: 0,
-                              // right: '10px',
-                              m: 2,
-                              top: "10px",
-                              textAlign: "start",
-                            }}
-                          >
-                            <Typography
-                              sx={{ fontSize: "12px", fontWeight: "bold" }}
-                              onClick={() => {
-                                handleEdit(member._id);
-                                handleUpdateDrawerOpen();
-                              }}
-                            >
-                              Edit
-                            </Typography>
-                            <Typography
-                              sx={{
-                                fontSize: "12px",
-                                color: "red",
-                                fontWeight: "bold",
-                              }}
-                              onClick={() => handleDeleteMember(member.id)}
-                            >
-                              Deactivate
-                            </Typography>
-                            <Typography
-                              sx={{
-                                fontSize: "12px",
-                                color: "red",
-                                fontWeight: "bold",
-                              }}
-                              onClick={() => handleTeamMemberDelete(member.id)}
-                            >
-                              Delete
-                            </Typography>
-                          </Box>
-                        )}
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-          </TableBody>
-        </Table>
+                  return (
+                    <tr key={member.id} className={`transition-colors hover:bg-indigo-50/40 ${index % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'}`}>
+                      <td className="px-5 py-3.5">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-100 text-xs font-semibold text-indigo-700 shrink-0">
+                            {initials}
+                          </div>
+                          <Link to={linkPath} className="text-sm font-medium text-indigo-600 hover:text-indigo-800 hover:underline transition-colors">
+                            {`${fName} ${mName} ${lName}`.trim()}
+                          </Link>
+                        </div>
+                      </td>
+                      <td className="px-5 py-3.5 text-sm text-slate-600">{member.Email}</td>
+                      <td className="px-5 py-3.5">
+                        <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700 capitalize">{member.Role}</span>
+                      </td>
+                      <td className="px-5 py-3.5 text-sm text-slate-600">{displayDate}</td>
+                      <td className="px-5 py-3.5">
+                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${member.has2FA ? 'bg-green-50 text-green-700' : 'bg-slate-100 text-slate-500'}`}>
+                          {member.has2FA ? "Enabled" : "Disabled"}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3.5 text-right">
+                        <div className="relative inline-block" ref={openMenuId === member.id ? menuRef : null}>
+                          <button onClick={() => toggleMenu(member.id)} className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600">
+                            <MoreVertical className="h-4 w-4" />
+                          </button>
+                          {openMenuId === member.id && (
+                            <div className="absolute right-0 top-full z-50 mt-1 w-40 rounded-lg border border-slate-200 bg-white py-1 shadow-lg animate-in fade-in slide-in-from-top-1">
+                              <button onClick={() => { handleEdit(member._id); handleUpdateDrawerOpen(); }} className="flex w-full items-center px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">Edit</button>
+                              <button onClick={() => handleDeleteMember(member.id)} className="flex w-full items-center px-4 py-2 text-sm text-amber-600 hover:bg-amber-50 transition-colors">Deactivate</button>
+                              <button onClick={() => handleTeamMemberDelete(member.id)} className="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">Delete</button>
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              {teamMembers.length === 0 && (
+                <tr><td colSpan={6} className="px-5 py-12 text-center text-sm text-slate-400">No active members found.</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
 
         {/* Pagination */}
-      </TableContainer>
-      <TablePagination
-        rowsPerPageOptions={[30, 40, 50, 60, 100]}
-        component="div"
-        count={teamMembers.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
-      <Box>
-        <Drawer
-          anchor="right"
-          open={isUpdateDrawerOpen}
-          onClose={handleNewDrawerClose}
-          PaperProps={{
-            sx: {
-              borderRadius: isSmallScreen ? "0" : "10px 0 0 10px",
-              width: isSmallScreen ? "100%" : "650px",
-            },
-          }}
-        >
-          <Box
-            role="presentation"
-            sx={{ borderRadius: isSmallScreen ? "0" : "15px" }}
-          >
-            <Box>
-              <Box
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: "20px",
-                }}
-              >
-                <Typography variant="h6">
-                  {" "}
-                  update Team Member {firstName} {middleName} {lastName}
-                </Typography>
-                <CloseRoundedIcon
-                  onClick={handleNewDrawerClose}
-                  style={{ cursor: "pointer" }}
-                />
-              </Box>
-              <Divider />
-            </Box>
-            <form>
-              <Box
-                sx={{ height: "80vh", overflowY: "auto", p: 2 }}
-                className="bulk-job-form"
-              >
-                <Box sx={{ width: "100%" }}>
-                  <Grid container spacing={2}>
-                    <Grid xs={12} sm={4}>
-                      <Box>
-                        <InputLabel sx={{ color: "black" }}>
-                          First name
-                        </InputLabel>
-                        <TextField
-                          fullWidth
-                          onChange={handleFirstName}
-                          id="firstname"
-                          name="firstname"
-                          placeholder="First name"
-                          size="small"
-                          sx={{ mt: 1 }}
-                          value={firstName}
-                        />
-                      </Box>
-                      <Box style={{ color: "red", fontSize: "9px" }}>
-                        {firstNameValidation}
-                      </Box>
-                    </Grid>
-                    <Grid xs={12} sm={4}>
-                      <Box sx={{ mr: "15px" }}>
-                        <InputLabel sx={{ color: "black" }}>
-                          Middle Name
-                        </InputLabel>
-                        <TextField
-                          fullWidth
-                          onChange={handleMiddleName}
-                          name="middlename"
-                          id="middlename"
-                          placeholder="Middle Name"
-                          size="small"
-                          sx={{ mt: 1 }}
-                          value={middleName} // Bind value
-                        />
-                      </Box>
-                    </Grid>
+        <div className="flex items-center justify-between border-t border-slate-100 px-5 py-3">
+          <div className="flex items-center gap-2 text-sm text-slate-500">
+            <span>Rows per page:</span>
+            <select value={rowsPerPage} onChange={handleChangeRowsPerPage} className="rounded-md border border-slate-200 bg-white px-2 py-1 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              {[30, 40, 50, 60, 100].map(n => <option key={n} value={n}>{n}</option>)}
+            </select>
+            <span className="ml-2">{page * rowsPerPage + 1}–{Math.min((page + 1) * rowsPerPage, teamMembers.length)} of {teamMembers.length}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <button onClick={(e) => handleChangePage(e, page - 1)} disabled={page === 0} className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed">
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <button onClick={(e) => handleChangePage(e, page + 1)} disabled={page >= totalPages - 1} className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed">
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      </div>
 
-                    <Grid xs={12} sm={4}>
-                      <Box sx={{ mr: "15px" }}>
-                        <InputLabel sx={{ color: "black" }}>
-                          Last Name
-                        </InputLabel>
-                        <TextField
-                          fullWidth
-                          name="lastname"
-                          id="lastname"
-                          value={lastName}
-                          onChange={handleLastName}
-                          placeholder="Last Name"
-                          size="small"
-                          sx={{ mt: 1 }}
-                        />
-                      </Box>
-                      <Box style={{ color: "red", fontSize: "9px" }}>
-                        {lastNameValidation}
-                      </Box>
-                    </Grid>
-                  </Grid>
-                </Box>
+      {/* Update Team Member Drawer */}
+      {isUpdateDrawerOpen && (
+        <div className="fixed inset-0 z-50 flex justify-end">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={handleNewDrawerClose} />
+          <div className="relative w-full max-w-[650px] bg-white shadow-2xl flex flex-col animate-in slide-in-from-right">
+            {/* Drawer Header */}
+            <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+              <h2 className="text-lg font-semibold text-slate-900">Update Team Member — {firstName} {middleName} {lastName}</h2>
+              <button onClick={handleNewDrawerClose} className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
 
-                <Box sx={{ mt: 3 }}>
-                  <InputLabel sx={{ color: "black" }}>Email</InputLabel>
-                  <TextField
-                    // margin="normal"
-                    fullWidth
-                    value={email}
-                    name="email"
-                    id="email"
-                    onChange={handleEmail}
-                    placeholder="Email"
-                    size="small"
-                    sx={{ mt: 2 }}
-                  />
-                </Box>
-                <Box style={{ color: "red", fontSize: "9px" }}>
-                  {emailValidation}
-                </Box>
+            {/* Drawer Body */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-5">
+              {/* Name Fields */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1.5">First Name</label>
+                  <input type="text" id="firstname" name="firstname" placeholder="First name" value={firstName} onChange={handleFirstName} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow" />
+                  {firstNameValidation && <p className="mt-1 text-xs text-red-500">{firstNameValidation}</p>}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1.5">Middle Name</label>
+                  <input type="text" id="middlename" name="middlename" placeholder="Middle Name" value={middleName} onChange={handleMiddleName} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1.5">Last Name</label>
+                  <input type="text" id="lastname" name="lastname" placeholder="Last Name" value={lastName} onChange={handleLastName} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow" />
+                  {lastNameValidation && <p className="mt-1 text-xs text-red-500">{lastNameValidation}</p>}
+                </div>
+              </div>
 
-                <Box>
-                  <Select
-                    size="small"
-                    sx={{ width: "100%", mt: 2 }}
-                    value={selectedOption}
-                    // onChange={handleOptionChange}
-                    onChange={(e) => setSelectedOption(e.target.value)}
-                    displayEmpty
-                  >
-                    {options.map((option) => (
-                      <MenuItem key={option.value} value={option.value}>
-                        {option.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </Box>
-
-                {selectedOption === "employee" && (
-                  <Box className="rights" style={{ marginTop: "10px" }}>
-                    <Box
-                      style={{
-                        display: "flex",
-                        gap: "8px",
-                        alignItems: "center",
-                      }}
-                    >
-                      <p>Access Rights</p>
-                      <SlQuestion
-                        style={{ color: "blue", cursor: "pointer" }}
-                      />
-                    </Box>
-
-                    {/* <Box sx={{ flexGrow: 1 }}>
-                      <Grid container spacing={2} columns={16}>
-                        <Grid xs={8}>
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchPayments}
-                              checked={isCheckedPayments}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>Manage payments</p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchPipelines}
-                              checked={isCheckedPipelines}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>Manage pipelines</p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchTime}
-                              checked={isCheckedTimeEntries}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>
-                              Manage time entries
-                            </p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchAccounts}
-                              checked={isCheckedAccounts}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>Manage accounts</p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchTags}
-                              checked={isCheckedTags}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>Manage tags</p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchOrganizers}
-                              checked={isCheckedOrganizers}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>Manage organizers</p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchFirmBalance}
-                              checked={isCheckedFirmBalance}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>
-                              Manage firm balance
-                            </p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchContacts}
-                              checked={isCheckedContacts}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>Manage contacts</p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchSite}
-                              checked={isCheckedSite}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>Manage site</p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchServices}
-                              checked={isCheckedServices}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>Manage services</p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchFilterTemplates}
-                              checked={isCheckedFilterTemplates}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>
-                              Manage public filter templates
-                            </p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchTemplates}
-                              checked={isCheckedTemplates}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>Manage templates</p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchMarketplace}
-                              checked={isCheckedMarketplace}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>Manage marketplace</p>
-                          </Box>
-                        </Grid>
-                        <Grid xs={8}>
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchInvoices}
-                              checked={isCheckedInvoices}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>Manage invoices</p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchJobRecurrences}
-                              checked={isCheckedJobRecurrences}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>
-                              Manage job recurrences
-                            </p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchRatesTimeEntries}
-                              checked={isCheckedRatesTimeEntries}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>
-                              Manage rates in time entries
-                            </p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchAllAccounts}
-                              checked={isCheckedAllAccounts}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>View all accounts</p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchCustomFields}
-                              checked={isCheckedCustomFields}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>
-                              Manage custome fields
-                            </p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchTeammates}
-                              checked={isCheckedTeammates}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>Manage teammates</p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchAllContacts}
-                              checked={isCheckedAllContacts}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>View all contacts</p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchProposals}
-                              checked={isCheckedProposals}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>Manage proposals</p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchEmail}
-                              checked={isCheckedEmail}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>Mute emails</p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchOrgnizerAnswers}
-                              checked={isCheckedOrgnizerAnswers}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>
-                              Edit orgnizer answers
-                            </p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchDocuments}
-                              checked={isCheckedDocuments}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>Manage documents</p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchTranscripts}
-                              checked={isCheckedTranscripts}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>
-                              Manage IRS Transcripts
-                            </p>
-                          </Box>
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchViewReporting}
-                              checked={isCheckedViewReporting}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>View reporting</p>
-                          </Box>
-                        </Grid>
-                      </Grid>
-                    </Box> */}
-                    <Box sx={{ p: 2 }}>
-                      <Grid container spacing={2} columns={16}>
-                        <Grid xs={8}>
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchPayments}
-                              checked={isCheckedPayments}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              disabled
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>Manage payments</p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchPipelines}
-                              checked={isCheckedPipelines}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>Manage pipelines</p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchTime}
-                              checked={isCheckedTimeEntries}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                              disabled
-                            />
-                            <p style={{ color: "black" }}>
-                              Manage time entries
-                            </p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchAccounts}
-                              checked={isCheckedAccounts}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>Manage accounts</p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchTags}
-                              checked={isCheckedTags}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>Manage tags</p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchOrganizers}
-                              checked={isCheckedOrganizers}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                              //  disabled
-                            />
-                            <p style={{ color: "black" }}>Manage organizers</p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchFirmBalance}
-                              checked={isCheckedFirmBalance}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                              disabled
-                            />
-                            <p style={{ color: "black" }}>
-                              Manage firm balance
-                            </p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchContacts}
-                              checked={isCheckedContacts}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>Manage contacts</p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchSite}
-                              checked={isCheckedSite}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                              disabled
-                            />
-                            <p style={{ color: "black" }}>Manage site</p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchServices}
-                              checked={isCheckedServices}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>Manage services</p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchFilterTemplates}
-                              checked={isCheckedFilterTemplates}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                              disabled
-                            />
-                            <p style={{ color: "black" }}>
-                              Manage public filter templates
-                            </p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchTemplates}
-                              checked={isCheckedTemplates}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>Manage templates</p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchMarketplace}
-                              checked={isCheckedMarketplace}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                              disabled
-                            />
-                            <p style={{ color: "black" }}>Manage marketplace</p>
-                          </Box>
-                        </Grid>
-                        <Grid xs={8}>
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchInvoices}
-                              checked={isCheckedInvoices}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                              // disabled
-                            />
-                            <p style={{ color: "black" }}>Manage invoices</p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchJobRecurrences}
-                              checked={isCheckedJobRecurrences}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                              disabled
-                            />
-                            <p style={{ color: "black" }}>
-                              Manage job recurrences
-                            </p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchRatesTimeEntries}
-                              checked={isCheckedRatesTimeEntries}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                              disabled
-                            />
-                            <p style={{ color: "black" }}>
-                              Manage rates in time entries
-                            </p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchAllAccounts}
-                              checked={isCheckedAllAccounts}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>View all accounts</p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchCustomFields}
-                              checked={isCheckedCustomFields}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                              disabled
-                            />
-                            <p style={{ color: "black" }}>
-                              Manage custome fields
-                            </p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchTeammates}
-                              checked={isCheckedTeammates}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                              disabled
-                            />
-                            <p style={{ color: "black" }}>Manage teammates</p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchAllContacts}
-                              checked={isCheckedAllContacts}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>View all contacts</p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchProposals}
-                              checked={isCheckedProposals}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                            />
-                            <p style={{ color: "black" }}>Manage proposals</p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchEmail}
-                              checked={isCheckedEmail}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                              disabled
-                            />
-                            <p style={{ color: "black" }}>Mute emails</p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchOrgnizerAnswers}
-                              checked={isCheckedOrgnizerAnswers}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                              disabled
-                            />
-                            <p style={{ color: "black" }}>
-                              Edit orgnizer answers
-                            </p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchDocuments}
-                              checked={isCheckedDocuments}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                              disabled
-                            />
-                            <p style={{ color: "black" }}>Manage documents</p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchTranscripts}
-                              checked={isCheckedTranscripts}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                              disabled
-                            />
-                            <p style={{ color: "black" }}>
-                              Manage IRS Transcripts
-                            </p>
-                          </Box>
-
-                          <Box
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              marginBottom: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Switch
-                              onChange={handleSwitchViewReporting}
-                              checked={isCheckedViewReporting}
-                              onColor="#3A91F5"
-                              onHandleColor="#FFF"
-                              handleDiameter={10}
-                              uncheckedIcon={false}
-                              checkedIcon={false}
-                              height={20}
-                              width={32}
-                              className="react-switch"
-                              disabled
-                            />
-                            <p style={{ color: "black" }}>View reporting</p>
-                          </Box>
-                        </Grid>
-                      </Grid>
-                    </Box>
-                  </Box>
+              {/* Email */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
+                <input type="email" id="email" name="email" placeholder="Email" value={email} onChange={handleEmail} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow" />
+                {emailValidation && (
+                  <div className="mt-1.5 flex items-center gap-2 rounded-lg bg-red-50 px-3 py-2 text-xs font-medium text-red-600">
+                    <span className="h-1.5 w-1.5 rounded-full bg-red-500 shrink-0" />
+                    {emailValidation}
+                  </div>
                 )}
-              </Box>
-            </form>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 5,
-                // margin: "8px",
-                ml: 3,
-                mt: 1,
-              }}
-            >
-              <Button
-                //  onClick={handleSubmitTeamMember}
-                variant="contained"
-                onClick={handleUpdateTeamMember}
-                sx={{
-                  backgroundColor: "var(--color-save-btn)", // Normal background
+              </div>
 
-                  "&:hover": {
-                    backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                  },
-                  width: "80px",
-                  borderRadius: "15px",
-                }}
-              >
-                Save
-              </Button>
-              <Button
-                variant="outlined"
-                onClick={handleNewDrawerClose}
-                sx={{
-                  borderColor: "var(--color-border-cancel-btn)", // Normal background
-                  color: "var(--color-save-btn)",
-                  "&:hover": {
-                    backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                    color: "#fff",
-                    border: "none",
-                  },
-                  width: "80px",
-                  borderRadius: "15px",
-                }}
-              >
-                Cancel
-              </Button>
-            </Box>
-          </Box>
-        </Drawer>
-        <ToastContainer />
-      </Box>
-    </>
+              {/* Role */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Role</label>
+                <select value={selectedOption} onChange={(e) => setSelectedOption(e.target.value)} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow">
+                  {options.map((option) => (
+                    <option key={option.value} value={option.value}>{option.label}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Access Rights */}
+              {selectedOption === "employee" && (
+                <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-5 space-y-4">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-semibold text-slate-900">Access Rights</h3>
+                    <HelpCircle className="h-4 w-4 text-indigo-500 cursor-pointer" />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+                    <div className="space-y-0.5">
+                      {leftColumnRights.map((item, i) => renderSwitchRow(item, i))}
+                    </div>
+                    <div className="space-y-0.5">
+                      {rightColumnRights.map((item, i) => renderSwitchRow(item, i))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Drawer Footer */}
+            <div className="flex items-center gap-3 border-t border-slate-200 px-6 py-4">
+              <button onClick={handleUpdateTeamMember} className="rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition-colors">Save</button>
+              <button onClick={handleNewDrawerClose} className="rounded-lg border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 transition-colors">Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 export default ActiveMember;

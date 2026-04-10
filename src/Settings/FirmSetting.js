@@ -1,30 +1,14 @@
 import React, { useEffect, useState, useMemo, useContext } from "react";
 import { LoginContext } from "../Sidebar/Context/Context";
-import { styled } from "@mui/material/styles";
-import { Box, Button, InputLabel, TextField, Divider, FormControlLabel, FormControl, Select, Chip, OutlinedInput, MenuItem, Container, Typography, Checkbox, InputAdornment, Autocomplete } from "@mui/material";
-import FacebookIcon from "@mui/icons-material/Facebook";
-import Switch from "@mui/material/Switch";
-import Grid from "@mui/material/Unstable_Grid2";
-import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import XIcon from "@mui/icons-material/X";
-import InstagramIcon from "@mui/icons-material/Instagram";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import Drawer from "@mui/material/Drawer";
-import CloseIcon from "@mui/icons-material/Close";
-import Texteditor from "../Templates/Texteditor/Editor";
-import { useTheme, useMediaQuery } from "@mui/material";
-import { toast, ToastContainer } from "react-toastify";
+import { Facebook, Linkedin, Twitter, Instagram, PlusCircle, Upload } from "lucide-react";
+import Switch from "react-switch";
+import { toast } from "react-toastify";
 import axios from "axios";
 import dayjs from "dayjs";
 const FirmSetting = () => {
   // const {id} = useParams();
   // console.log(id)
-  const theme = useTheme();
   const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const [selectedFile, setSelectedFile] = useState(null);
   const handleFileChange = (e) => {
     setSelectedFile(e.target.files[0]);
@@ -40,15 +24,22 @@ const FirmSetting = () => {
   const handleButtonClick = () => {
     document.getElementById("fileInput").click();
   };
-  const Item = styled("div")(({ theme }) => ({
-    backgroundColor: "#fff",
-    ...theme.typography.body2,
-    padding: theme.spacing(1),
-    textAlign: "center",
-    ...theme.applyStyles("dark", {
-      backgroundColor: "#1A2027",
-    }),
-  }));
+  // Helper: reusable switch component for settings
+  const SettingsSwitch = ({ checked, onChange, disabled }) => (
+    <Switch
+      onChange={onChange}
+      checked={checked}
+      onColor="#4f46e5"
+      onHandleColor="#FFF"
+      handleDiameter={10}
+      uncheckedIcon={false}
+      checkedIcon={false}
+      height={20}
+      width={32}
+      disabled={disabled}
+      className="react-switch"
+    />
+  );
 
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
@@ -881,924 +872,347 @@ const FirmSetting = () => {
     fetchAllStates();
   }, [state]);
 
+  // Reusable card wrapper
+  const SettingsCard = ({ title, children }) => (
+    <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+      <div className="border-b border-slate-100 px-5 py-3.5">
+        <h3 className="text-sm font-semibold text-slate-900">{title}</h3>
+      </div>
+      <div className="p-5 space-y-4">{children}</div>
+    </div>
+  );
+
+  const SaveBtn = ({ onClick }) => (
+    <button onClick={onClick} className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition-colors">
+      Save
+    </button>
+  );
+
+  const InputField = ({ label, value, onChange, placeholder, type = "text", endAdornment, icon: Icon, iconColor }) => (
+    <div>
+      {label && <label className="block text-sm font-medium text-slate-700 mb-1.5">{label}</label>}
+      <div className="relative">
+        {Icon && (
+          <div className="absolute left-3 top-1/2 -translate-y-1/2">
+            <Icon className="h-4 w-4" style={{ color: iconColor || '#6b7280' }} />
+          </div>
+        )}
+        <input
+          type={type}
+          value={value || ""}
+          onChange={onChange}
+          placeholder={placeholder}
+          className={`flex h-10 w-full rounded-lg border border-slate-200 bg-white ${Icon ? 'pl-10' : 'px-3'} ${endAdornment ? 'pr-12' : 'px-3'} py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow`}
+        />
+        {endAdornment && (
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">{endAdornment}</span>
+        )}
+      </div>
+    </div>
+  );
+
+  const SwitchRow = ({ checked, onChange, label, disabled }) => (
+    <div className="flex items-center gap-3 py-1.5">
+      <SettingsSwitch checked={checked || false} onChange={onChange} disabled={disabled} />
+      <span className="text-sm text-slate-700">{label}</span>
+    </div>
+  );
+
+  const CheckboxRow = ({ checked, onChange, label }) => (
+    <label className="flex items-center gap-2.5 cursor-pointer py-1">
+      <input type="checkbox" checked={checked || false} onChange={(e) => onChange(e.target.checked)} className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 transition" />
+      <span className="text-sm text-slate-700">{label}</span>
+    </label>
+  );
+
   return (
-    <Container>
-      <Box>
-        <Typography variant="h3">Firm settings</Typography>
-        <Box sx={{ flexGrow: 1 }}>
-          <Grid container spacing={2} columns={16}>
-            <Grid item xs={8}>
-              <Box border={"1px solid #c7c7c7"} borderRadius={"10px"}>
-                <Box borderBottom={"1px solid #c7c7c7"}>
-                  <Typography p={2} textAlign={"left"}>
-                    {" "}
-                    <b>Contact details </b>{" "}
-                  </Typography>
-                </Box>
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold text-slate-900 mb-8">Firm Settings</h1>
 
-                <Box display={"flex"} alignItems={"center"} m={2} gap={2}>
-                  <Box flex={1}>
-                    <InputLabel sx={{ color: "black", textAlign: "left", mb: 1, width: "100%" }}>Firm Name</InputLabel>
-                    <TextField fullWidth value={firmName} onChange={(e) => setFirmName(e.target.value)} name="Firm Name" placeholder="Enter Your Firm Name" size="small" id="Firm Name" />
-                  </Box>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Left Column */}
+        <div className="space-y-6">
+          {/* Contact Details */}
+          <SettingsCard title="Contact details">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <InputField label="Firm Name" value={firmName} onChange={(e) => setFirmName(e.target.value)} placeholder="Enter Your Firm Name" />
+              <InputField label="Firm Email" value={firmEmail} onChange={(e) => setFirmEmail(e.target.value)} placeholder="Enter Your Firm Email" />
+            </div>
+            <InputField label="Street address" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Street address" />
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <InputField label="City" value={City} onChange={(e) => setCity(e.target.value)} placeholder="City" />
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">State</label>
+                <select
+                  value={selectedState?.label || ""}
+                  onChange={(e) => {
+                    const match = states.find((s) => s.name === e.target.value);
+                    setSelectedState(match ? { label: match.name } : null);
+                  }}
+                  className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+                >
+                  <option value="">Select State</option>
+                  {states.map((s) => (
+                    <option key={s.name} value={s.name}>{s.name}</option>
+                  ))}
+                </select>
+              </div>
+              <InputField label="Zip/Postal code" value={zipCode} onChange={(e) => setZipCode(e.target.value)} placeholder="Zip/Postal code" />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <InputField label="Firm phone number" value={firmPhoneNumber} onChange={(e) => setFirmPhoneNumber(e.target.value)} placeholder="Enter Your Firm phone number" />
+              <InputField label="Firm Website" value={firmwebsite} onChange={(e) => setFirmWebsite(e.target.value)} placeholder="Firm Website" />
+            </div>
+            <InputField label="Default reply-to address for system emails" value={defaultreplytoemails} onChange={(e) => setDefaultreplytoemails(e.target.value)} placeholder="Default reply-to address for system emails" />
+            <div className="flex items-start gap-3 rounded-lg bg-slate-50 p-3">
+              <span className="text-xs text-slate-600 flex-1">Receive copies (BCC) of system emails sent to clients. These emails include requests and reminders to fill out forms, upload documents, and complete other pending actions.</span>
+              <SettingsSwitch checked={false} onChange={() => {}} />
+            </div>
+            <SaveBtn onClick={Contactdetails} />
+          </SettingsCard>
 
-                  <Box flex={1}>
-                    <InputLabel sx={{ color: "black", textAlign: "left", mb: 1, width: "100%" }}>Firm Email</InputLabel>
-                    <TextField fullWidth value={firmEmail} onChange={(e) => setFirmEmail(e.target.value)} placeholder="Enter Your Firm Email" size="small" />
-                  </Box>
-                </Box>
+          {/* About Us */}
+          <SettingsCard title="About us">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Description</label>
+              <textarea
+                value={discription || ""}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={3}
+                className="flex w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow resize-none"
+              />
+            </div>
+            <CheckboxRow checked={showfirmownerphototologin} onChange={handleAboutusCheckbox} label="Show firm owner photo on the login page" />
+            <SaveBtn onClick={AboutUs} />
+          </SettingsCard>
 
-                <Box m={2}>
-                  <InputLabel sx={{ color: "black", textAlign: "left", mb: 1 }}>Street address</InputLabel>
-                  <TextField fullWidth value={address} onChange={(e) => setAddress(e.target.value)} name="Firm Name" placeholder="Street address" size="small" id="Firm Name" />
-                </Box>
+          {/* Firm Portal URL */}
+          <SettingsCard title="Firm portal URL">
+            <p className="text-sm text-slate-600">Your firm's TaxDome portal URL:</p>
+            <p className="text-sm font-medium text-indigo-600">https://anuja.taxdome.com/</p>
+            <p className="text-xs text-slate-500">To modify this address, please contact support.</p>
+          </SettingsCard>
 
-                <Box display={"flex"} alignItems={"center"} m={2} gap={1} sx={{ flexWrap: "wrap" }}>
-                  <Box flex={1} m={1}>
-                    <InputLabel sx={{ color: "black", textAlign: "left", mb: 1 }}>City</InputLabel>
-                    <TextField fullWidth value={City} onChange={(e) => setCity(e.target.value)} name="City" placeholder="City" size="small" id="City" />
-                  </Box>
+          {/* Custom Domain */}
+          <SettingsCard title="Custom domain">
+            <p className="text-sm text-slate-600">
+              You can white-label your TaxDome portal with your own domain name (for example, anuja.com instead of anuja.taxdome.com). Before adding your domain name, please see <span className="text-indigo-600 cursor-pointer hover:underline">how to configure DNS</span>.
+            </p>
+            <InputField label="Domain name" value={domainname} onChange={(e) => setDomainName(e.target.value)} placeholder="Domain name" />
+            <button onClick={CustomDomain} className="rounded-lg border border-indigo-200 bg-white px-4 py-2 text-sm font-medium text-indigo-600 shadow-sm hover:bg-indigo-50 transition-colors">
+              Link Custom Domain
+            </button>
+          </SettingsCard>
 
-                  <Box flex={1} m={1}>
-                    {/* State Autocomplete */}
-                    <InputLabel sx={{ color: "black", textAlign: "left", mb: 1 }}>State</InputLabel>
-                    <Autocomplete
-                      size="small"
-                      value={selectedState}
-                      onChange={(event, newValue) => {
-                        setSelectedState(newValue);
-                      }}
-                      options={states.map((state) => ({ label: state.name }))}
-                      getOptionLabel={(option) => option.label}
-                      renderInput={(params) => <TextField {...params} placeholder="State" variant="outlined" fullWidth />}
-                    />
-                  </Box>
+          {/* Two-factor Authentication */}
+          <SettingsCard title="Two-factor authentication (2FA)">
+            <InputField label="Email address to receive manual 2FA disable requests" value={defaultreplytoemails} onChange={(e) => setDefaultreplytoemails(e.target.value)} placeholder="Email address" />
+            <CheckboxRow checked={require2FAforallteam} onChange={handlefor2FA} label="Require 2FA for all team members" />
+            <p className="text-xs text-slate-500 ml-6">2FA will be turned on for team members at next login.</p>
+            <SaveBtn onClick={TwoFactorAuthentication} />
+          </SettingsCard>
 
-                  <Box flex={1} m={1}>
-                    <InputLabel sx={{ color: "black", textAlign: "left", mb: 1 }}>Zip/Postal code</InputLabel>
-                    <TextField fullWidth name="Zip/Postal code" value={zipCode} onChange={(e) => setZipCode(e.target.value)} placeholder="Zip/Postal code" size="small" id="ZipPostalCode" />
-                  </Box>
-                </Box>
+          {/* Chats */}
+          <SettingsCard title="Chats">
+            <p className="text-sm text-slate-600">Chats are a secure way to communicate and exchange documents with your clients. You can allow clients to start new chats, or have them only respond to messages sent by your firm.</p>
+            <SwitchRow checked={allowclienttocreatenewchat} onChange={handlechat} label="Allow clients to create new chat threads" />
+            <SaveBtn onClick={chat} />
+          </SettingsCard>
+        </div>
 
-                <Box display={"flex"} alignItems={"center"} m={2} gap={2}>
-                  <Box flex={1}>
-                    <InputLabel sx={{ color: "black", textAlign: "left", mb: 1, width: "100%" }}>Firm phone number</InputLabel>
-                    <TextField fullWidth value={firmPhoneNumber} onChange={(e) => setFirmPhoneNumber(e.target.value)} name="Firm phone number" placeholder="Enter Your Firm phone number" size="small" id="Firm phone number" />
-                  </Box>
+        {/* Right Column */}
+        <div className="space-y-6">
+          {/* Social Media Links */}
+          <SettingsCard title="Social media links">
+            <InputField label="Facebook" value={facebooklink} onChange={(e) => setFacebooklink(e.target.value)} placeholder="Facebook URL" icon={Facebook} iconColor="#1877f2" />
+            <InputField label="LinkedIn" value={linkedinlink} onChange={(e) => setLinkedinlink(e.target.value)} placeholder="LinkedIn URL" icon={Linkedin} iconColor="#0077b5" />
+            <InputField label="X" value={xlink} onChange={(e) => setXlink(e.target.value)} placeholder="X URL" icon={Twitter} iconColor="#000" />
+            <InputField label="Instagram" value={instagramlink} onChange={(e) => setInstagramlink(e.target.value)} placeholder="Instagram URL" icon={Instagram} iconColor="#da2b79" />
+            <SaveBtn onClick={SocialMediaLinks} />
+          </SettingsCard>
 
-                  <Box flex={1}>
-                    <InputLabel sx={{ color: "black", textAlign: "left", mb: 1, width: "100%" }}>Firm Website</InputLabel>
-                    <TextField
-                      fullWidth
-                      name="Firm Website"
-                      // value={firmURL}
-                      // onChange={(e) => setFirmURL(e.target.value)}
-                      value={firmwebsite}
-                      onChange={(e) => setFirmWebsite(e.target.value)}
-                      placeholder="Firm Website"
-                      size="small"
-                      id="Firm Website"
-                    />
-                  </Box>
-                </Box>
+          {/* Logo Upload */}
+          <SettingsCard title="Logo upload">
+            <div
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+              className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-slate-50/50 p-8 gap-3 transition-colors hover:border-indigo-400 hover:bg-indigo-50/30"
+            >
+              <Upload className="h-8 w-8 text-slate-400" />
+              <p className="text-sm text-slate-500">Drag & Drop file here</p>
+              <button onClick={handleButtonClick} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition-colors">
+                Browse Files
+              </button>
+              <input id="fileInput" type="file" className="hidden" onChange={handleFileChange} />
+              {selectedFile && <p className="mt-2 text-xs text-slate-600 break-all">Selected file: {selectedFile.name}</p>}
+            </div>
+          </SettingsCard>
 
-                <Box m={2}>
-                  <InputLabel sx={{ color: "black", textAlign: "left", mb: 1 }}>Default reply-to address for system emails</InputLabel>
-                  <TextField fullWidth value={defaultreplytoemails} onChange={(e) => setDefaultreplytoemails(e.target.value)} name="Default reply-to address for system emails" placeholder="Default reply-to address for system emails" size="small" id="Default reply-to address for system emails" />
-                </Box>
+          {/* International Settings */}
+          <SettingsCard title="International settings">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Default language</label>
+              <select
+                value={selectedLanguage?.value || ""}
+                onChange={(e) => {
+                  const lang = languages.find(l => l.value === e.target.value);
+                  handleLanguageChange(lang);
+                }}
+                className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+              >
+                {languages.map((lang) => (
+                  <option key={lang.value} value={lang.value}>{lang.label}</option>
+                ))}
+              </select>
+            </div>
+            <InputField label="Time Zone" placeholder="Time Zone" />
+            <SaveBtn onClick={InternationalSettings} />
+          </SettingsCard>
 
-                <Box display={"flex"} alignItems={"center"} textAlign={"left"} m={2}>
-                  <Box varient="body">Receive copies (BCC) of system emails sent to clients These emails include requests and reminders to fill out forms, upload documents, and complete other pending actions.</Box>
-                  {<Switch />}
-                </Box>
+          {/* Contact Name Formatting */}
+          <SettingsCard title="Contact name formatting">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">The next generated contact name will have the following format</label>
+              <select
+                value={selectedFormat || ""}
+                onChange={(e) => setSelectedFormat(e.target.value)}
+                className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+              >
+                {contactNameOptions.map((opt) => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
+              </select>
+            </div>
+            <CheckboxRow checked={applytoallcontacts} onChange={handleapplytoallcontacts} label="Apply to all Contacts" />
+            <SaveBtn onClick={ContactNameFormatting} />
+          </SettingsCard>
 
-                <Box display="flex" justifyContent="flex-start" padding={2}>
-                  <Button onClick={Contactdetails} variant="contained"  sx={{
-                          backgroundColor: "var(--color-save-btn)", // Normal background
-      
-                          "&:hover": {
-                            backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                          },
-                          borderRadius: "15px",
-                          width: "80px",
-                          mt: 2,
-                        }}>
-                    Save
-                  </Button>
-                </Box>
+          {/* Signatures */}
+          <SettingsCard title="Signatures">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Default date format for e-signature</label>
+              <select
+                value={selectedSignatures || ""}
+                onChange={(e) => setSelectedSignatures(e.target.value)}
+                className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+              >
+                {SignaturesOptions.map((opt) => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
+              </select>
+            </div>
+            <SwitchRow checked={showKBAverification} onChange={handleshowKBAverification} label="Show KBA verification as option" />
+            <SwitchRow checked={showQESAdESverification} onChange={handleshowQESAdESverification} label="Show QES/AdES verification as option" />
+            <SaveBtn onClick={Signatures} />
+          </SettingsCard>
 
-                <ToastContainer />
-              </Box>
+          {/* Default Account Access */}
+          <SettingsCard title="Default account access">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Team Members</label>
+              <select
+                multiple
+                value={combinedValues}
+                onChange={(e) => {
+                  const selected = Array.from(e.target.selectedOptions, (opt) => opt.value);
+                  setCombinedValues(selected);
+                  const selectedOpts = options.filter(o => selected.includes(o.value));
+                  setSelectedUser(selectedOpts);
+                }}
+                className="flex min-h-[80px] w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+              >
+                {options.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+              {selectedUser.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {selectedUser.map((u) => (
+                    <span key={u.value} className="inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-700">{u.label}</span>
+                  ))}
+                </div>
+              )}
+            </div>
+            <SaveBtn onClick={teammember} />
+          </SettingsCard>
 
-              <Box border={"1px solid #c7c7c7"} borderRadius={"10px"} mt={2}>
-                <Box borderBottom={"1px solid #c7c7c7"}>
-                  <Typography p={2} textAlign={"left"}>
-                    <b>About us</b>
-                  </Typography>
-                </Box>
-
-                <Box m={2}>
-                  <InputLabel sx={{ color: "black", textAlign: "left", mb: 1 }}>Description</InputLabel>
-                  <Box component="form" sx={{ "& .MuiTextField-root": { width: "25ch" } }} noValidate autoComplete="off">
-                    <TextField fullWidth id="outlined-multiline-static" multiline value={discription} onChange={(e) => setDescription(e.target.value)} rows={2} borderRadius={5} />
-                  </Box>
-                </Box>
-
-                <Box textAlign={"left"}>
-                  <Checkbox
-                    checked={showfirmownerphototologin} // `checked` prop controls the checkbox state
-                    onChange={(e) => handleAboutusCheckbox(e.target.checked)} // `e.target.checked` gives true/false
+          {/* Editor Access */}
+          <SettingsCard title="Editor access">
+            <div className="space-y-3">
+              <SwitchRow checked={allowsupportteamsetuplanding} onChange={handleallowsupportteamsetuplanding} label="Allow the support team to set up landing" />
+              {allowsupportteamsetuplanding && (
+                <div className="ml-11">
+                  <label className="block text-sm font-medium text-slate-700 mb-1.5">Until</label>
+                  <input
+                    type="date"
+                    value={allowsupportteamsetuplandingdate ? dayjs(allowsupportteamsetuplandingdate).format("YYYY-MM-DD") : ""}
+                    onChange={(e) => setAllowsupportteamsetuplandingdate(e.target.value ? dayjs(e.target.value) : null)}
+                    className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
                   />
-                  Show firm owner photo on the login page
-                </Box>
-
-                <Box display="flex" justifyContent="flex-start" padding={2}>
-                  <Button onClick={AboutUs} variant="contained"  sx={{
-                          backgroundColor: "var(--color-save-btn)", // Normal background
-      
-                          "&:hover": {
-                            backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                          },
-                          borderRadius: "15px",
-                          width: "80px",
-                          mt: 2,
-                        }}>
-                    Save
-                  </Button>
-                </Box>
-              </Box>
-
-              <Box border={"1px solid #c7c7c7"} borderRadius={"10px"} mt={2}>
-                <Box borderBottom={"1px solid #c7c7c7"}>
-                  <Typography p={2} textAlign={"left"}>
-                    <b>Firm portal URL</b>
-                  </Typography>
-                </Box>
-
-                <Box p={3}>
-                  <Typography textAlign={"left"} fontSize={15} mb={2}>
-                    Your firm's TaxDome portal URL:
-                  </Typography>
-                  <Box textAlign={"left"} color={"#1976d3"}>
-                    {" "}
-                    https://anuja.taxdome.com/
-                  </Box>
-                  <Box textAlign={"left"}>To modify this address, please contact support.</Box>
-                </Box>
-              </Box>
-
-              <Box border={"1px solid #c7c7c7"} borderRadius={"10px"} mt={2}>
-                <Box borderBottom={"1px solid #c7c7c7"}>
-                  <Typography p={2} textAlign={"left"}>
-                    <b>Custom domain</b>
-                  </Typography>
-                </Box>
-                <Box p={3}>
-                  <Box textAlign={"left"}>
-                    You can white-label your TaxDome portal with your own domain name (for example, anuja.com instead of anuja.taxdome.com). Before adding your domain name, please see <span style={{ color: "#1976d3" }}>how to configure DNS</span>.
-                  </Box>
-                  <Box mt={2}>
-                    <Box>
-                      <InputLabel sx={{ color: "black", textAlign: "left" }}>Domain name</InputLabel>
-                      <TextField fullWidth name="Domain name" value={domainname} onChange={(e) => setDomainName(e.target.value)} placeholder="Domain name" size="small" sx={{ mt: 1 }} id="Domain name" />
-                    </Box>
-
-                    <Box mt={2}>
-                      <Button onClick={CustomDomain} variant="outlined" size="small">
-                        Link Custom Domain
-                      </Button>
-                    </Box>
-                  </Box>
-                </Box>
-              </Box>
-
-              <Box border={"1px solid #c7c7c7"} borderRadius={"10px"} mt={2}>
-                <Box borderBottom={"1px solid #c7c7c7"}>
-                  <Typography p={2} textAlign={"left"}>
-                    <b>Two-factor authentication (2FA)</b>
-                  </Typography>
-                </Box>
-
-                <Box>
-                  <Box m={3}>
-                    <InputLabel sx={{ color: "black", textAlign: "left" }}>Email address to receive manual 2FA disable requests</InputLabel>
-                    <TextField fullWidth name="Email address to receive manual 2FA disable requests" placeholder="Email address to receive manual 2FA disable requests" size="small" sx={{ mt: 1 }} id="Domain name" value={defaultreplytoemails} onChange={(e) => setDefaultreplytoemails(e.target.value)} />
-                  </Box>
-
-                  <Box textAlign={"left"} ml={2} alignItems={"center"}>
-                    <Checkbox checked={require2FAforallteam} onChange={(e) => handlefor2FA(e.target.checked)} />
-                    Require 2FA for all team members
-                  </Box>
-                  <Box textAlign={"left"} ml={3}>
-                    2FA will be turned on for team members at next login.
-                  </Box>
-
-                  <Box display="flex" justifyContent="flex-start" padding={2}>
-                    <Button onClick={TwoFactorAuthentication} variant="contained"  sx={{
-                          backgroundColor: "var(--color-save-btn)", // Normal background
-      
-                          "&:hover": {
-                            backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                          },
-                          borderRadius: "15px",
-                          width: "80px",
-                          mt: 2,
-                        }}>
-                      Save
-                    </Button>
-                  </Box>
-                </Box>
-              </Box>
-              <Box border={"1px solid #c7c7c7"} borderRadius={"10px"} mt={2}>
-                <Box borderBottom={"1px solid #c7c7c7"}>
-                  <Typography p={2} textAlign={"left"}>
-                    <b>Chats</b>
-                  </Typography>
-                </Box>
-
-                <Box>
-                  <Box m={2} textAlign={"left"}>
-                    Chats are a secure way to communicate and exchange documents with your clients. You can allow clients to start new chats, or have them only respond to messages sent by your firm.
-                  </Box>
-
-                  <Box textAlign={"left"}>
-                    <Switch checked={allowclienttocreatenewchat} onChange={(e) => handlechat(e.target.checked)} />
-                    Allow clients to create new chat threads
-                  </Box>
-
-                  <Box display="flex" justifyContent="flex-start" padding={2}>
-                    <Button onClick={chat} variant="contained"  sx={{
-                          backgroundColor: "var(--color-save-btn)", // Normal background
-      
-                          "&:hover": {
-                            backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                          },
-                          borderRadius: "15px",
-                          width: "80px",
-                          mt: 2,
-                        }}>
-                      Save
-                    </Button>
-                  </Box>
-                </Box>
-              </Box>
-            </Grid>
-
-            <Grid xs={8}>
-              <Box border={"1px solid #c7c7c7"} borderRadius={"10px"}>
-                <Box borderBottom={"1px solid #c7c7c7"}>
-                  <Typography p={2} textAlign={"left"}>
-                    <b>Social media links</b>
-                  </Typography>
-                </Box>
-
-                <Box m={2}>
-                  <Box flex={1}>
-                    <InputLabel sx={{ color: "black", textAlign: "left", mb: 1, width: "100%" }}>Facebook</InputLabel>
-                    <TextField
-                      fullWidth
-                      name="Facebook"
-                      value={facebooklink}
-                      onChange={(e) => setFacebooklink(e.target.value)}
-                      placeholder="Facebook"
-                      size="small"
-                      id="Facebook"
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <FacebookIcon sx={{ color: "blue" }} />
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Box>
-
-                  <Box flex={1}>
-                    <InputLabel sx={{ color: "black", textAlign: "left", mb: 1, mt: 1, width: "100%" }}>LinkedIn</InputLabel>
-                    <TextField
-                      fullWidth
-                      name="LinkedIn"
-                      placeholder="LinkedIn"
-                      value={linkedinlink}
-                      onChange={(e) => setLinkedinlink(e.target.value)}
-                      size="small"
-                      id="LinkedIn"
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <LinkedInIcon sx={{ color: "#0077b5" }} />
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Box>
-
-                  <Box flex={1}>
-                    <InputLabel sx={{ color: "black", textAlign: "left", mb: 1, mt: 1, width: "100%" }}>X</InputLabel>
-                    <TextField
-                      fullWidth
-                      name="X"
-                      value={xlink}
-                      onChange={(e) => setXlink(e.target.value)}
-                      placeholder="X"
-                      size="small"
-                      id="X"
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <XIcon sx={{ color: "black" }} />
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Box>
-
-                  <Box flex={1}>
-                    <InputLabel sx={{ color: "black", textAlign: "left", mb: 1, mt: 1, width: "100%" }}>Instagram</InputLabel>
-                    <TextField
-                      fullWidth
-                      name="Instagram"
-                      placeholder="Instagram"
-                      value={instagramlink}
-                      onChange={(e) => setInstagramlink(e.target.value)}
-                      size="small"
-                      id="Instagram"
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <InstagramIcon sx={{ color: "#da2b79" }} />
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Box>
-                </Box>
-
-                <Box>
-                  <Box display="flex" justifyContent="flex-start" padding={2}>
-                    <Button onClick={SocialMediaLinks} variant="contained"  sx={{
-                          backgroundColor: "var(--color-save-btn)", // Normal background
-      
-                          "&:hover": {
-                            backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                          },
-                          borderRadius: "15px",
-                          width: "80px",
-                          mt: 2,
-                        }}>
-                      Save
-                    </Button>
-                  </Box>
-                </Box>
-              </Box>
-
-              <Box border={"1px solid #c7c7c7"} borderRadius={"10px"} mt={2}>
-                <Box borderBottom={"1px solid #c7c7c7"}>
-                  <Typography p={2} textAlign={"left"}>
-                    <b>Logo upload</b>
-                  </Typography>
-                </Box>
-
-                <Box sx={{ m: 2, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", border: "2px dotted black", p: 3, gap: 2 }} onDrop={handleDrop} onDragOver={handleDragOver}>
-                  <Typography>Drag & Drop file here</Typography>
-
-                  <Button variant="contained" onClick={handleButtonClick}  sx={{
-                          backgroundColor: "var(--color-save-btn)", // Normal background
-      
-                          "&:hover": {
-                            backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                          },
-                          borderRadius: "15px",
-                          // width: "80px",
-                          // mt: 2,
-                        }}>
-                    Browse Files
-                  </Button>
-
-                  {/* Hidden input for file selection */}
-                  <input id="fileInput" type="file" style={{ display: "none" }} onChange={handleFileChange} />
-
-                  {/* Display the selected file name */}
-                  {selectedFile && <Typography sx={{ mt: 2, wordBreak: "break-all" }}>Selected file: {selectedFile.name}</Typography>}
-                </Box>
-                <Box></Box>
-              </Box>
-              <Box border={"1px solid #c7c7c7"} borderRadius={"10px"} mt={2}>
-                <Box borderBottom={"1px solid #c7c7c7"}>
-                  <Typography p={2} textAlign={"left"}>
-                    <b>International settings</b>
-                  </Typography>
-                </Box>
-
-                <Box>
-                  <Box m={2}>
-                    <InputLabel sx={{ color: "black", textAlign: "left", mb: 1 }}>Default language</InputLabel>
-                    {/* <Autocomplete
-                                                fullWidth
-                                                value={defaultlanguage}
-                                                onChange={(e) => setDefaultlanguage(e.target.value)}
-                                                options={languages}
-                                                getOptionLabel={(option) => option.label}
-                                                renderInput={(params) => (
-                                                    <TextField
-                                                        {...params}
-                                                        placeholder="Default language"
-                                                        size="small"
-                                                        variant="outlined"
-                                                    />
-                                                )}
-                                                id="default-language"
-                                            /> */}
-                    <Autocomplete size="small" margin="normal" value={selectedLanguage} onChange={(event, newValue) => handleLanguageChange(newValue)} options={languages} getOptionLabel={(option) => option.label || ""} renderInput={(params) => <TextField {...params} placeholder="Select a language" />} />
-                  </Box>
-
-                  <Box m={2}>
-                    <InputLabel sx={{ color: "black", textAlign: "left", mb: 1 }}>Time Zone </InputLabel>
-                    <TextField fullWidth name="Time Zone" placeholder="Time Zone" size="small" id="Time Zone" />
-                  </Box>
-                  <Box display="flex" justifyContent="flex-start" padding={2}>
-                    <Button onClick={InternationalSettings} variant="contained"  sx={{
-                          backgroundColor: "var(--color-save-btn)", // Normal background
-      
-                          "&:hover": {
-                            backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                          },
-                          borderRadius: "15px",
-                          width: "80px",
-                          mt: 2,
-                        }}>
-                      Save
-                    </Button>
-                  </Box>
-                </Box>
-              </Box>
-              <Box border={"1px solid #c7c7c7"} borderRadius={"10px"} mt={2}>
-                <Box borderBottom={"1px solid #c7c7c7"}>
-                  <Typography p={2} textAlign={"left"}>
-                    <b>Contact name formatting</b>
-                  </Typography>
-                </Box>
-
-                <Box>
-                  <Box m={2}>
-                    <InputLabel sx={{ color: "black", textAlign: "left", mb: 1 }}>The next generated contact name will have the following format </InputLabel>
-                    <Autocomplete
-                      fullWidth
-                      options={contactNameOptions}
-                      value={selectedFormat} // Set the default selected value
-                      onChange={(event, newValue) => {
-                        setSelectedFormat(newValue); // Update the selected value when user selects an option
-                      }}
-                      renderInput={(params) => <TextField {...params} placeholder="Select format" size="small" />}
-                    />
-                  </Box>
-                  <Box textAlign={"left"} ml={3}>
-                    <FormControlLabel control={<Checkbox checked={applytoallcontacts} onChange={(e) => handleapplytoallcontacts(e.target.checked)} />} label="Apply to all Contacts" />
-                  </Box>
-                </Box>
-
-                <Box>
-                  <Box display="flex" justifyContent="flex-start" padding={2}>
-                    <Button onClick={ContactNameFormatting} variant="contained"  sx={{
-                          backgroundColor: "var(--color-save-btn)", // Normal background
-      
-                          "&:hover": {
-                            backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                          },
-                          borderRadius: "15px",
-                          width: "80px",
-                          mt: 2,
-                        }}>
-                      Save
-                    </Button>
-                  </Box>
-                </Box>
-              </Box>
-              <Box border={"1px solid #c7c7c7"} borderRadius={"10px"} mt={2}>
-                <Box borderBottom={"1px solid #c7c7c7"}>
-                  <Typography p={2} textAlign={"left"}>
-                    <b>Signatures</b>
-                  </Typography>
-                </Box>
-
-                <Box>
-                  <Box m={2}>
-                    <InputLabel sx={{ color: "black", textAlign: "left", mb: 1 }}>Default date format for e-signature </InputLabel>
-                    <Autocomplete
-                      fullWidth
-                      options={SignaturesOptions}
-                      value={selectedSignatures}
-                      onChange={(event, newValue) => {
-                        setSelectedSignatures(newValue);
-                      }}
-                      renderInput={(params) => <TextField {...params} placeholder="Select Signature" size="small" />}
-                    />
-                  </Box>
-
-                  <Box textAlign={"left"} ml={2}>
-                    <FormControlLabel control={<Switch checked={showKBAverification} onChange={(event) => handleshowKBAverification(event.target.checked)} />} label="Show KBA verification as option" />
-                  </Box>
-
-                  <Box textAlign={"left"} ml={2}>
-                    <FormControlLabel control={<Switch checked={showQESAdESverification} onChange={(event) => handleshowQESAdESverification(event.target.checked)} />} label="Show QES/AdES verification as option" />
-                  </Box>
-                </Box>
-
-                <Box>
-                  <Box display="flex" justifyContent="flex-start" padding={2}>
-                    <Button onClick={Signatures} variant="contained"  sx={{
-                          backgroundColor: "var(--color-save-btn)", // Normal background
-      
-                          "&:hover": {
-                            backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                          },
-                          borderRadius: "15px",
-                          width: "80px",
-                          mt: 2,
-                        }}>
-                      Save
-                    </Button>
-                  </Box>
-                </Box>
-              </Box>
-
-              <Box border={"1px solid #c7c7c7"} borderRadius={"10px"} mt={2}>
-                <Box borderBottom={"1px solid #c7c7c7"}>
-                  <Typography p={2} textAlign={"left"}>
-                    <b>Default account access</b>
-                  </Typography>
-                </Box>
-                <Box>
-                  <Box sx={{ m: 2 }}>
-                    <label className="task-input-label">Team Members</label>
-                    <Autocomplete
-                      multiple
-                      sx={{ background: "#fff", mt: 1 }}
-                      options={options}
-                      size="small"
-                      getOptionLabel={(option) => option.label}
-                      value={selectedUser}
-                      onChange={handleUserChange}
-                      renderOption={(props, option) => (
-                        <Box
-                          component="li"
-                          {...props}
-                          sx={{ cursor: "pointer", margin: "5px 10px" }} // Add cursor pointer style
-                        >
-                          {option.label}
-                        </Box>
-                      )}
-                      renderInput={(params) => <TextField {...params} variant="outlined" placeholder="Assignees" />}
-                      isOptionEqualToValue={(option, value) => option.value === value.value}
-                    />
-                  </Box>
-                </Box>
-                <Box>
-                  <Box display="flex" justifyContent="flex-start" padding={2}>
-                    <Button onClick={teammember} variant="contained"  sx={{
-                          backgroundColor: "var(--color-save-btn)", // Normal background
-      
-                          "&:hover": {
-                            backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                          },
-                          borderRadius: "15px",
-                          width: "80px",
-                          mt: 2,
-                        }}>
-                      Save
-                    </Button>
-                  </Box>
-                </Box>
-              </Box>
-
-              <Box border={"1px solid #c7c7c7"} borderRadius={"10px"} mt={2}>
-                <Box borderBottom={"1px solid #c7c7c7"}>
-                  <Typography p={2} textAlign={"left"}>
-                    <b>Editor access</b>
-                  </Typography>
-                </Box>
-
-                <Box>
-                  <Box textAlign="left" ml={2}>
-                    <FormControlLabel control={<Switch checked={allowsupportteamsetuplanding} onChange={(e) => handleallowsupportteamsetuplanding(e.target.checked)} />} label="Allow the support team to set up landing" />
-
-                    {/* Conditionally render DatePicker when switch is toggled */}
-                    {allowsupportteamsetuplanding && (
-                      <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <Box display={"flex"} flexDirection={"column"}>
-                          <label>Until</label>
-                          <DatePicker
-                            // label="Select Date"
-                            value={allowsupportteamsetuplandingdate}
-                            onChange={(newValue) => setAllowsupportteamsetuplandingdate(newValue)}
-                            renderInput={(params) => <TextField {...params} size="small" margin="normal" />}
-                          />
-                        </Box>
-                      </LocalizationProvider>
-                    )}
-                  </Box>
-
-                  <Box textAlign="left" ml={2}>
-                    <FormControlLabel control={<Switch checked={allowsupportteamownerlikepermission} onChange={(e) => handleallowsupportteamownerlikepermission(e.target.checked)} />} label="Allow the support team to log in with owner-like permissions" />
-
-                    {/* Conditionally render DatePicker when switch is toggled */}
-                    {allowsupportteamownerlikepermission && (
-                      <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <Box display="flex" flexDirection="column">
-                          <Typography variant="body1" gutterBottom>
-                            Until
-                          </Typography>
-                          <DatePicker value={allowsupportteamownerlikepermissiondate} onChange={(newValue) => setAllowsupportteamownerlikepermissiondate(newValue)} renderInput={(params) => <TextField {...params} margin="normal" />} />
-                        </Box>
-                      </LocalizationProvider>
-                    )}
-                  </Box>
-                </Box>
-
-                <Box>
-                  <Box display="flex" justifyContent="flex-start" padding={2}>
-                    <Button onClick={EditorAccess} variant="contained"  sx={{
-                          backgroundColor: "var(--color-save-btn)", // Normal background
-      
-                          "&:hover": {
-                            backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                          },
-                          borderRadius: "15px",
-                          width: "80px",
-                          mt: 2,
-                        }}>
-                      Save
-                    </Button>
-                  </Box>
-                </Box>
-              </Box>
-
-              <Box border={"1px solid #c7c7c7"} borderRadius={"10px"} mt={2}>
-                <Box borderBottom={"1px solid #c7c7c7"}>
-                  <Typography p={2} textAlign={"left"}>
-                    <b>Default folder template</b>
-                  </Typography>
-                </Box>
-
-                <Box>
-                  <Box m={2}>
-                    <InputLabel sx={{ color: "black", textAlign: "left", mb: 1 }}>Folder Templates </InputLabel>
-                    <FormControl fullWidth>
-                      <Select
-                        size="small"
-                        multiple
-                        input={<OutlinedInput id="select-multiple" />}
-                        renderValue={(selected) => selected.join(", ")} // Display as a comma-separated string
-                      >
-                        {/* Uncomment and use your team members here */}
-                        {/* {teamMembers.map((member) => (
-      <MenuItem key={member} value={member}>
-        {member}
-      </MenuItem>
-    ))} */}
-                      </Select>
-                    </FormControl>
-                  </Box>
-                </Box>
-
-                <Box>
-                  <Box display="flex" justifyContent="flex-start" padding={2}>
-                    <Button variant="contained"  sx={{
-                          backgroundColor: "var(--color-save-btn)", // Normal background
-      
-                          "&:hover": {
-                            backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                          },
-                          borderRadius: "15px",
-                          width: "80px",
-                          mt: 2,
-                        }}>Save</Button>
-                  </Box>
-                </Box>
-              </Box>
-
-              <Box border={"1px solid #c7c7c7"} borderRadius={"10px"} mt={2}>
-                <Box borderBottom={"1px solid #c7c7c7"}>
-                  <Typography p={2} textAlign={"left"}>
-                    <b>System-generated emails</b>
-                  </Typography>
-                </Box>
-
-                <Box>
-                  <Box textAlign={"left"} ml={2}>
-                    <FormControlLabel control={<Switch checked={showfirmcontactdetails} onChange={(event) => handleshowfirmcontactdetails(event.target.checked)} />} label="Show firm contact details" />
-                  </Box>
-
-                  <Box textAlign={"left"} ml={2}>
-                    <FormControlLabel control={<Switch checked={showsocialnetworklinks} onChange={(event) => handleshowsocialnetworklinks(event.target.checked)} />} label="Show social network links" />
-                  </Box>
-
-                  <Box textAlign={"left"} ml={2}>
-                    <FormControlLabel control={<Switch checked={showfirmlogo} onChange={(event) => handleshowfirmlogo(event.target.checked)} />} label="Show firm logo" />
-                  </Box>
-
-                  <Box textAlign={"left"} ml={2}>
-                    <FormControlLabel control={<Switch checked={showmesscontextinternalnotification} onChange={(event) => handleshowmesscontextinternalnotification(event.target.checked)} />} label="Show firm message context in internal notifications" />
-                  </Box>
-
-                  <Box textAlign={"left"} ml={2}>
-                    <FormControlLabel control={<Switch checked={showmesscontextclientfacingnotification} onChange={(event) => handleshowmesscontextclientfacingnotification(event.target.checked)} />} label="Show firm message context in client facing notifications" />
-                  </Box>
-                </Box>
-
-                <Box>
-                  <Box display="flex" justifyContent="flex-start" padding={2}>
-                    <Button onClick={SystemGeneratedEmails} variant="contained"  sx={{
-                          backgroundColor: "var(--color-save-btn)", // Normal background
-      
-                          "&:hover": {
-                            backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                          },
-                          borderRadius: "15px",
-                          width: "80px",
-                          mt: 2,
-                        }}>
-                      Save
-                    </Button>
-                  </Box>
-                </Box>
-              </Box>
-
-              <Box border={"1px solid #c7c7c7"} borderRadius={"10px"} mt={2}>
-                <Box borderBottom={"1px solid #c7c7c7"}>
-                  <Typography p={2} textAlign={"left"}>
-                    <b>Sending limit</b>
-                  </Typography>
-                </Box>
-
-                <Box>
-                  <Box m={2}>
-                    <InputLabel sx={{ color: "black", textAlign: "left", mb: 1, width: "100%" }}>Emails each firm member can send (max 10,000)</InputLabel>
-                    <TextField
-                      fullWidth
-                      name="Emails each firm member can send (max 10,000)"
-                      value={emailfirmmembercansend}
-                      onChange={(e) => setEmailfirmmembercansend(e.target.value)}
-                      size="small"
-                      id="Emails each firm member can send (max 10,000)"
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <Typography>per</Typography>
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Box>
-                </Box>
-
-                <Box>
-                  <Box display="flex" justifyContent="flex-start" padding={2}>
-                    <Button onClick={SendingLimit} variant="contained"  sx={{
-                          backgroundColor: "var(--color-save-btn)", // Normal background
-      
-                          "&:hover": {
-                            backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                          },
-                          borderRadius: "15px",
-                          width: "80px",
-                          mt: 2,
-                        }}>
-                      Save
-                    </Button>
-                  </Box>
-                </Box>
-              </Box>
-
-              <Box border={"1px solid #c7c7c7"} borderRadius={"10px"} mt={2}>
-                <Box borderBottom={"1px solid #c7c7c7"}>
-                  <Typography p={2} textAlign={"left"}>
-                    <b>Client portal settings</b>
-                  </Typography>
-                </Box>
-
-                <Box>
-                  <Box textAlign={"left"} ml={2}>
-                    <FormControlLabel control={<Switch checked={showdoneuploadingbutton} onChange={(event) => handleshowdoneuploadingbutton(event.target.checked)} />} label="Show 'Done uploading' button in interface" />
-                  </Box>
-
-                  <Box textAlign={"left"} ml={2}>
-                    <FormControlLabel control={<Switch checked={showdoneuploadingcheckbox} onChange={(event) => handleshowdoneuploadingcheckbox(event.target.checked)} />} label="Show 'Done uploading' checkbox in document upload menu " />
-                  </Box>
-                </Box>
-
-                <Box>
-                  <Box display="flex" justifyContent="flex-start" padding={2}>
-                    <Button onClick={ClientPortalSettingst} variant="contained"  sx={{
-                          backgroundColor: "var(--color-save-btn)", // Normal background
-      
-                          "&:hover": {
-                            backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                          },
-                          borderRadius: "15px",
-                          width: "80px",
-                          mt: 2,
-                        }}>
-                      Save
-                    </Button>
-                  </Box>
-                </Box>
-              </Box>
-
-              <Box border={"1px solid #c7c7c7"} borderRadius={"10px"} mt={2}>
-                <Box borderBottom={"1px solid #c7c7c7"}>
-                  <Typography p={2} textAlign={"left"}>
-                    <b>Client portal announcement</b>
-                  </Typography>
-                </Box>
-                <Box mt={2} mr={8}>
-                  Announcement is visible in the client portal and mobile app upon login.
-                </Box>
-
-                {/* right form */}
-                {/* <Drawer
-                                    anchor="right"
-                                    open={isNewChatOpen}
-                                    onClose={handleNewDrawerClose}
-                                    PaperProps={{
-                                        sx: {
-                                            borderRadius: isSmallScreen ? '0' : '10px 0 0 10px',
-                                            width: isSmallScreen ? '100%' : '600px',
-                                            maxWidth: '95%',
-                                        },
-                                    }}
-                                >
-                                    <Box m={2}>
-                                        <Box>
-                                            <Box
-                                                style={{
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'space-between',
-                                                    padding: '20px',
-                                                }}
-                                            >
-                                                <Typography><b>Create Announcement</b></Typography>
-                                                <CloseIcon onClick={handleNewDrawerClose} style={{ cursor: 'pointer' }} />
-                                            </Box>
-                                            <Divider />
-                                        </Box>
-
-                                        <Box flex={1} m={2}>
-                                            <InputLabel sx={{ color: 'black', textAlign: 'left', mb: 1, }}>
-                                                Tittle
-                                            </InputLabel>
-                                            <TextField
-                                                fullWidth
-                                                name="Tittle"
-                                                placeholder="Tittle"
-                                                size="small"
-                                                id="firmName"
-                                            />
-                                        </Box>
-
-                                        <Box display="flex" alignItems="center" m={2} gap={2}>
-
-
-                                            <Box sx={{ mt: 3, width: '100%' }}>
-                                                <Texteditor initialContent={content} onChange={handleContentChange} />
-                                            </Box>
-
-
-                                        </Box>
-
-                                        <Box sx={{ pt: 2, display: 'flex', alignItems: 'center', gap: 5, margin: "8px", ml: 3 }}>
-                                            <Button variant="contained" color="primary">Create</Button>
-                                            <Button variant="outlined" onClick={handleNewDrawerClose}>Cancel</Button>
-                                        </Box>
-                                    </Box>
-                                </Drawer> */}
-
-                <Box onClick={() => setNewChat(true)} mt={2} display="flex" alignItems="center" color="#135ea9" marginLeft={2}>
-                  <AddCircleOutlineIcon />
-                  <Typography sx={{ cursor: "pointer" }}>create announcement</Typography>
-                </Box>
-
-                <Box>
-                  <Box display="flex" justifyContent="flex-start" padding={2}>
-                    <Button variant="contained"  sx={{
-                          backgroundColor: "var(--color-save-btn)", // Normal background
-      
-                          "&:hover": {
-                            backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                          },
-                          borderRadius: "15px",
-                          width: "80px",
-                          mt: 2,
-                        }}>Save</Button>
-                  </Box>
-                </Box>
-              </Box>
-            </Grid>
-          </Grid>
-        </Box>
-      </Box>
-    </Container>
+                </div>
+              )}
+              <SwitchRow checked={allowsupportteamownerlikepermission} onChange={handleallowsupportteamownerlikepermission} label="Allow the support team to log in with owner-like permissions" />
+              {allowsupportteamownerlikepermission && (
+                <div className="ml-11">
+                  <label className="block text-sm font-medium text-slate-700 mb-1.5">Until</label>
+                  <input
+                    type="date"
+                    value={allowsupportteamownerlikepermissiondate ? dayjs(allowsupportteamownerlikepermissiondate).format("YYYY-MM-DD") : ""}
+                    onChange={(e) => setAllowsupportteamownerlikepermissiondate(e.target.value ? dayjs(e.target.value) : null)}
+                    className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+                  />
+                </div>
+              )}
+            </div>
+            <SaveBtn onClick={EditorAccess} />
+          </SettingsCard>
+
+          {/* Default Folder Template */}
+          <SettingsCard title="Default folder template">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Folder Templates</label>
+              <select multiple className="flex min-h-[80px] w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow">
+                {/* Add folder template options here */}
+              </select>
+            </div>
+            <SaveBtn />
+          </SettingsCard>
+
+          {/* System-generated Emails */}
+          <SettingsCard title="System-generated emails">
+            <SwitchRow checked={showfirmcontactdetails} onChange={handleshowfirmcontactdetails} label="Show firm contact details" />
+            <SwitchRow checked={showsocialnetworklinks} onChange={handleshowsocialnetworklinks} label="Show social network links" />
+            <SwitchRow checked={showfirmlogo} onChange={handleshowfirmlogo} label="Show firm logo" />
+            <SwitchRow checked={showmesscontextinternalnotification} onChange={handleshowmesscontextinternalnotification} label="Show firm message context in internal notifications" />
+            <SwitchRow checked={showmesscontextclientfacingnotification} onChange={handleshowmesscontextclientfacingnotification} label="Show firm message context in client facing notifications" />
+            <SaveBtn onClick={SystemGeneratedEmails} />
+          </SettingsCard>
+
+          {/* Sending Limit */}
+          <SettingsCard title="Sending limit">
+            <InputField label="Emails each firm member can send (max 10,000)" value={emailfirmmembercansend} onChange={(e) => setEmailfirmmembercansend(e.target.value)} placeholder="400" endAdornment="per day" />
+            <SaveBtn onClick={SendingLimit} />
+          </SettingsCard>
+
+          {/* Client Portal Settings */}
+          <SettingsCard title="Client portal settings">
+            <SwitchRow checked={showdoneuploadingbutton} onChange={handleshowdoneuploadingbutton} label="Show 'Done uploading' button in interface" />
+            <SwitchRow checked={showdoneuploadingcheckbox} onChange={handleshowdoneuploadingcheckbox} label="Show 'Done uploading' checkbox in document upload menu" />
+            <SaveBtn onClick={ClientPortalSettingst} />
+          </SettingsCard>
+
+          {/* Client Portal Announcement */}
+          <SettingsCard title="Client portal announcement">
+            <p className="text-sm text-slate-600">Announcement is visible in the client portal and mobile app upon login.</p>
+            <button onClick={() => setNewChat(true)} className="flex items-center gap-2 text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors">
+              <PlusCircle className="h-4 w-4" />
+              Create announcement
+            </button>
+            <SaveBtn />
+          </SettingsCard>
+        </div>
+      </div>
+    </div>
   );
 };
 

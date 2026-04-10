@@ -1,26 +1,14 @@
-import { Menu,MenuItem,Box, FormControlLabel, Button, Autocomplete, InputLabel, TextField,IconButton, Divider,Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material'
-import React, { useState, useEffect } from 'react';
-import Drawer from '@mui/material/Drawer';
-import { useTheme, useMediaQuery, Typography } from '@mui/material';
-import Switch from '@mui/material/Switch';
-import Grid from '@mui/material/Unstable_Grid2';
-import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
-import { RxCross2 } from "react-icons/rx";
+import React, { useState, useEffect, useRef } from 'react';
+import { X, Plus, MoreVertical, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useNavigate } from "react-router-dom";
-import {MaterialReactTable,useMaterialReactTable} from 'material-react-table';
-import { CiMenuKebab } from "react-icons/ci";
-
-import { CircularProgress } from "@mui/material";
-import TablePagination from "@mui/material/TablePagination";
 
 const Service = () => {
 
     const SERVICE_API = process.env.REACT_APP_SERVICES_URL;
     const CATEGORY_API = process.env.REACT_APP_CATEGORY_URL;
     const navigate = useNavigate();
-    const theme = useTheme();
-    const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+    const menuRef = useRef(null);
     const [isNewDrawerOpen, setIsNewDrawerOpen] = useState(false);
     const [servicename, setservicename] = useState("");
     const [discription, setdiscription] = useState("");
@@ -227,25 +215,23 @@ const paginatedServices = ServiceTemplates.slice(
       const [tempIdget, setTempIdGet] = useState("");
       const [openMenuId, setOpenMenuId] = useState(null);
         const toggleMenu = (event, _id) => {
-    setAnchorEl(event.currentTarget);
-    setOpenMenuId(_id);
+    setOpenMenuId(openMenuId === _id ? null : _id);
     setTempIdGet(_id);
   };
     const handleMenuClose = () => {
-    setAnchorEl(null);
     setOpenMenuId(null);
     setTempIdGet(null);
   };
-      const [anchorEl, setAnchorEl] = useState(null);
-        const open = Boolean(anchorEl);
-      
-        const handleClick = (event) => {
-          setAnchorEl(event.currentTarget);
-        };
-      
-        const handleClose = () => {
-          setAnchorEl(null);
-        };
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        handleMenuClose();
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
       const handleEdit = (_id) => {
 
         navigate("/servicesUpdate/" + _id);
@@ -283,547 +269,250 @@ const paginatedServices = ServiceTemplates.slice(
       };
       
     
+    const totalPages = Math.ceil(ServiceTemplates.length / rowsPerPage);
+
     return (
-        <Box>
-            <Button onClick={setIsNewDrawerOpen} variant="contained" color="primary"   sx={{
-                backgroundColor: 'var(--color-save-btn)',  // Normal background
-               
-                '&:hover': {
-                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                },
-                borderRadius:'15px',mb:3
-              }}>
-                Create Service
-            </Button>
-            <Box>
-           {loading ? (
-             <Box sx={{display:'flex',alignItems:'center', justifyContent:'center'}}> <CircularProgress style={{fontSize:'300px', color:'blue'}}/></Box>
-            ):(
-              <Box>
-               {/* <MaterialReactTable columns={columns} table={table} /> */}
-              
+        <div className="space-y-6">
+            {/* Header */}
+            <div className="flex items-center justify-between">
+                <h1 className="text-xl font-semibold text-slate-900">Services</h1>
+                <button
+                    onClick={() => setIsNewDrawerOpen(true)}
+                    className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 hover:shadow-md active:scale-[0.98]"
+                >
+                    <Plus className="h-4 w-4" />
+                    Create Service
+                </button>
+            </div>
 
-              <TableContainer component={Paper} sx={{ overflow: "visible" }}>
-                      <Table sx={{ width: "100%" }}>
-                        <TableHead>
-                          <TableRow>
-                            <TableCell
-                              style={{
-                                fontSize: "12px",
-                                fontWeight: "bold",
-                                padding: "16px",
-                              }}
-                              width="150"
-                            >
-                              Name
-                            </TableCell>
-                            <TableCell
-                              style={{
-                                fontSize: "12px",
-                                fontWeight: "bold",
-                                padding: "16px",
-                              }}
-                              width="150"
-                            >
-                              Description
-                            </TableCell>
-                            <TableCell
-                              style={{
-                                fontSize: "12px",
-                                fontWeight: "bold",
-                                padding: "16px",
-                              }}
-                              width="100"
-                            >
-                              Rate
-                            </TableCell>
-                            <TableCell
-                              style={{
-                                fontSize: "12px",
-                                fontWeight: "bold",
-                                padding: "16px",
-                              }}
-                              width="100"
-                            >
-                              Rate Type
-                            </TableCell>
-                            
-                            <TableCell
-                              style={{
-                                fontSize: "12px",
-                                fontWeight: "bold",
-                                padding: "16px",
-                              }}
-                              width="150"
-                            >
-                              Category
-                            </TableCell>
-                           
-                          
-                            <TableCell
-                              style={{
-                                fontSize: "12px",
-                                fontWeight: "bold",
-                                padding: "16px",
-                              }}
-                              width="100"
-                            >
-                              Settings
-                            </TableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {ServiceTemplates.map((row) => (
-                            <TableRow key={row._id}>
-                              <TableCell>
-                                <Typography
-                                  style={{
-                                    fontSize: "12px",
-                                    padding: "4px 8px",
-                                    lineHeight: "1",
-                                    cursor: "pointer",
-                                    color: "#3f51b5",
-                                  }}
-                                  onClick={() => handleEdit(row._id)}
-                                >
-                                  {row.serviceName}
-                                </Typography>
-                              </TableCell>
-                              <TableCell>
-                                <Typography
-                                  style={{
-                                    fontSize: "12px",
-                                    padding: "4px 8px",
-                                    lineHeight: "1",
-                                    cursor: "pointer",
-                                    color: "#3f51b5",
-                                  }}
-                                  onClick={() => handleEdit(row._id, row.accountid._id)}
-                                >
-                                  {row.description}
-                                </Typography>
-                              </TableCell>
-                              <TableCell
-                                style={{
-                                  fontSize: "12px",
-                                  padding: "4px 8px",
-                                  lineHeight: "1",
-                                  cursor: "pointer",
-                                }}
-                              >
-                                {row.rate}
-                              </TableCell>
-                              <TableCell
-                                style={{
-                                  fontSize: "12px",
-                                  padding: "4px 8px",
-                                  lineHeight: "1",
-                                  cursor: "pointer",
-                                }}
-                              >
-                                {row.ratetype}
-                              </TableCell>
-                              <TableCell
-                                style={{
-                                  fontSize: "12px",
-                                  padding: "4px 8px",
-                                  lineHeight: "1",
-                                  cursor: "pointer",
-                                }}
-                              >
-                                {/* {row.category.categoryName}  */}
-                                {row.category?.categoryName || ""}
-                              </TableCell>
-                             
-{/* 
-                              <TableCell
-      style={{
-        fontSize: "12px",
-        padding: "4px 8px",
-        lineHeight: "1",
-        cursor: "pointer",
-      }}
-    >
-      <IconButton
-        onClick={handleClick}
-        style={{ color: "#2c59fa" }}
-      >
-        <CiMenuKebab />
-      </IconButton>
-
-      <Menu
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-        PaperProps={{
-          style: {
-            minWidth: "100px",
-          },
-        }}
-      >
-        <MenuItem
-          onClick={() => {
-            handleEdit(row._id);
-            handleClose();
-          }}
-          sx={{ color: "blue" }}
-        >
-           Edit
-        </MenuItem>
-
-        <MenuItem
-          onClick={() => {
-            handleDelete(row._id);
-            handleClose();
-          }}
-          sx={{ color: "red" }}
-        >
-           Delete
-        </MenuItem>
-
-        
-
-        
-      </Menu>
-    </TableCell> */}
-    <TableCell
-                      style={{
-                        fontSize: "12px",
-                        padding: "4px 8px",
-                        lineHeight: "1",
-                      }}
-                    >
-                      <IconButton
-                        onClick={(event) => toggleMenu(event, row._id)}
-                        style={{ color: "#2c59fa" }}
-                        size="small"
-                      >
-                        <CiMenuKebab />
-                      </IconButton>
-    
-                      {/* MUI Menu */}
-                    
-                    </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                     
-                    </TableContainer>
-                     <Menu
-                            anchorEl={anchorEl}
-                            open={Boolean(anchorEl)}
-                            onClose={handleMenuClose}
-                            anchorOrigin={{
-                              vertical: 'top',
-                              horizontal: 'right',
-                            }}
-                            transformOrigin={{
-                              vertical: 'top',
-                              horizontal: 'left',
-                            }}
-                            PaperProps={{
-                              sx: {
-                                mt: 3,
-                                ml: 1,
-                                boxShadow: 3,
-                                borderRadius: 1,
-                                minWidth: 120,
-                                '& .MuiMenuItem-root': {
-                                  fontSize: '12px',
-                                  padding: '8px 16px',
-                                }
-                              }
-                            }}
-                          >
-                            <MenuItem 
-                              onClick={() => handleEdit(tempIdget)}
-                              sx={{ 
-                                fontWeight: "bold",
-                                '&:hover': {
-                                  backgroundColor: '#f5f5f5'
-                                }
-                              }}
-                            >
-                              Edit
-                            </MenuItem>
-                            <MenuItem 
-                              onClick={() => handleDelete(tempIdget)}
-                              sx={{ 
-                                color: "error.main", 
-                                fontWeight: "bold",
-                                '&:hover': {
-                                  backgroundColor: '#ffebee'
-                                }
-                              }}
-                            >
-                              Delete
-                            </MenuItem>
-                          </Menu>
-                    <TablePagination
-    rowsPerPageOptions={[30,40,50,60,100]}
-      component="div"
-      count={ServiceTemplates.length}
-      rowsPerPage={rowsPerPage}
-      page={page}
-      onPageChange={handleChangePage}
-      onRowsPerPageChange={handleChangeRowsPerPage}
-    />
-              </Box>
-              )
-           }
-            {/* <MaterialReactTable
-            columns={columns}
-            
-            table={table}
-          /> */}
-            </Box>
-            <Drawer
-                anchor="right"
-                open={isNewDrawerOpen}
-                onClose={handleNewDrawerClose}
-                PaperProps={{
-                    sx: {
-                        borderRadius: isSmallScreen ? '0' : '10px 0 0 10px',
-                        width: isSmallScreen ? '100%' : '650px',
-
-                    },
-                }}>
-                <Box role="presentation" sx={{ borderRadius: isSmallScreen ? '0' : '15px' }}>
-                    <Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 2, borderBottom: '1px solid grey' }}>
-                            <Typography variant='h6'>Create Service</Typography>
-                            <RxCross2 onClick={handleNewDrawerClose} style={{ cursor: 'pointer' }} />
-                        </Box>
-
-
-
-                    </Box>
-                    <form  >
-
-                        <Box sx={{height:'85vh',overflowY:'auto',p:2}} className="bulk-job-form">
-                            <Box >
-                                <InputLabel sx={{ color: 'black' }}>Service Name</InputLabel>
-                                <TextField
-                                    // margin="normal"
-                                    fullWidth
-                                    name="ServiceName"
-                                    placeholder="Service Name"
-                                    size="small"
-                                    margin='normal'
-                                    onChange={(e) => setservicename(e.target.value)}
-                                />
-                            </Box>
-                            <Box sx={{ mt: 1 }}>
-                                <InputLabel sx={{ color: 'black' }}>Description</InputLabel>
-                                <TextField
-                                    onChange={(e) => setdiscription(e.target.value)}
-                                    fullWidth
-                                    name="Description"
-                                    placeholder="Description"
-                                    size="small"
-                                    margin='normal'
-                                />
-                            </Box>
-                            <Box sx={{ width: '100%', mt: 2 }}>
-                                <Grid container spacing={2}>
-                                    <Grid item xs={12} sm={6}>
-                                        <Box>
-                                            <InputLabel sx={{ color: 'black' }}>Rate</InputLabel>
-                                            <TextField
-                                                fullWidth
-                                                name="Rate"
-                                                placeholder="Rate"
-                                                size="small"
-                                                margin='normal'
-                                                value={rate}
-                                                // onChange={(e) => setrate(e.target.value)}
-                                                onChange={handleRateChange}
-
-                                            />
-                                        </Box>
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                        <Box sx={{ mr: '15px' }}>
-                                            <InputLabel sx={{ color: 'black' }}>Rate Type</InputLabel>
-                                            <Autocomplete
-                                                size="small"
-                                                fullWidth
-                                                sx={{ mt: 2 }}
-                                                options={options}
-                                                getOptionLabel={(option) => option?.label || ""}
-                                                value={selectedOption}
-                                                onChange={handleRateTypeChange}
-                                                renderInput={(params) => (
-                                                    <TextField {...params} variant="outlined" placeholder="Select Rate Type" />
-                                                )}
-                                                isOptionEqualToValue={(option, value) => option.value === value.value}
-                                                renderOption={(props, option) => (
-                                                    <Box
-                                                        component="li"
-                                                        {...props}
-                                                        sx={{
-
-                                                            margin: '4px',
-                                                            cursor: 'pointer',
-
-                                                        }}
+            {/* Table */}
+            <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                {loading ? (
+                    <div className="flex items-center justify-center py-20 gap-3">
+                        <div className="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
+                        <span className="text-sm text-slate-500">Loading services...</span>
+                    </div>
+                ) : (
+                    <>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left">
+                                <thead>
+                                    <tr className="border-b border-slate-100 bg-slate-50/80">
+                                        <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Name</th>
+                                        <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Description</th>
+                                        <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Rate</th>
+                                        <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Rate Type</th>
+                                        <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Category</th>
+                                        <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500 text-right w-20"></th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100">
+                                    {paginatedServices.map((row, idx) => (
+                                        <tr key={row._id} className={`transition-colors hover:bg-indigo-50/40 ${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'}`}>
+                                            <td className="px-5 py-3.5">
+                                                <button onClick={() => handleEdit(row._id)} className="text-sm font-medium text-indigo-600 hover:text-indigo-800 hover:underline transition-colors">
+                                                    {row.serviceName}
+                                                </button>
+                                            </td>
+                                            <td className="px-5 py-3.5 text-sm text-slate-600 max-w-[200px] truncate">{row.description}</td>
+                                            <td className="px-5 py-3.5 text-sm text-slate-700 font-medium">{row.rate}</td>
+                                            <td className="px-5 py-3.5">
+                                                <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700">{row.ratetype}</span>
+                                            </td>
+                                            <td className="px-5 py-3.5 text-sm text-slate-600">{row.category?.categoryName || ""}</td>
+                                            <td className="px-5 py-3.5 text-right">
+                                                <div className="relative inline-block" ref={openMenuId === row._id ? menuRef : null}>
+                                                    <button
+                                                        onClick={(e) => toggleMenu(e, row._id)}
+                                                        className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
                                                     >
-                                                        <Typography >
-                                                            {option.label}
-                                                        </Typography>
-                                                    </Box>
-                                                )}
-                                            />
-                                        </Box>
-                                    </Grid>
-                                </Grid>
-                            </Box>
+                                                        <MoreVertical className="h-4 w-4" />
+                                                    </button>
+                                                    {openMenuId === row._id && (
+                                                        <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-slate-200 bg-white py-1 shadow-lg animate-in fade-in slide-in-from-top-1">
+                                                            <button onClick={() => { handleEdit(row._id); handleMenuClose(); }} className="flex w-full items-center px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">Edit</button>
+                                                            <button onClick={() => { handleDelete(row._id); handleMenuClose(); }} className="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">Delete</button>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    {ServiceTemplates.length === 0 && (
+                                        <tr>
+                                            <td colSpan={6} className="px-5 py-12 text-center text-sm text-slate-400">No services found.</td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
 
-                            <Box mt={2} >
-                                <FormControlLabel
-                                    control={
-                                        <Switch
-                                            checked={service}
-                                            onChange={(event) => handleServiceWitch(event.target.checked)}
-                                            color="primary"
-                                        />
-                                    }
-                                    label={"Tax"}
-                                />
-                            </Box>
-                            <Box>
-                                <Box>
-                                    <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', mt: 2 }}>
-                                        Category
-                                    </Typography>
-                                </Box>
-                                <Box >
-                                    <InputLabel sx={{ color: 'black', mt: 2 }}>Category Name</InputLabel>
-                                    <Autocomplete
-                                     size="small"
-                                     fullWidth
-                                     sx={{ mt: 2 }}
-                                        options={categoryoptions}
-                                        getOptionLabel={(option) => option.label} // Adjust based on your data structure
-                                        value={selectedCategory}
-                                        onChange={handleCategoryChange}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                placeholder="Category Name"
-                                                variant="outlined"
-                                            />
-                                        )}
-                                        clearOnEscape // Equivalent to isClearable
-                                        isOptionEqualToValue={(option, value) => option.value === value.value} // Compare options for equality
-                                    />
-                                </Box>
-                            </Box>
-                            <Box>
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    onClick={setCategoryFormOpen}
-                                    sx={{
-                                      backgroundColor: 'var(--color-save-btn)',  // Normal background
-                                     
-                                      '&:hover': {
-                                        backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                                      },
-                                      borderRadius:'15px',mt: 4, ml: 1
-                                    }}
-                                   
+                        {/* Pagination */}
+                        <div className="flex items-center justify-between border-t border-slate-100 px-5 py-3">
+                            <div className="flex items-center gap-2 text-sm text-slate-500">
+                                <span>Rows per page:</span>
+                                <select
+                                    value={rowsPerPage}
+                                    onChange={handleChangeRowsPerPage}
+                                    className="rounded-md border border-slate-200 bg-white px-2 py-1 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                 >
+                                    {[30, 40, 50, 60, 100].map(n => <option key={n} value={n}>{n}</option>)}
+                                </select>
+                                <span className="ml-2">{page * rowsPerPage + 1}–{Math.min((page + 1) * rowsPerPage, ServiceTemplates.length)} of {ServiceTemplates.length}</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                                <button onClick={(e) => handleChangePage(e, page - 1)} disabled={page === 0} className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed">
+                                    <ChevronLeft className="h-4 w-4" />
+                                </button>
+                                <button onClick={(e) => handleChangePage(e, page + 1)} disabled={page >= totalPages - 1} className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed">
+                                    <ChevronRight className="h-4 w-4" />
+                                </button>
+                            </div>
+                        </div>
+                    </>
+                )}
+            </div>
+
+            {/* Create Service Drawer */}
+            {isNewDrawerOpen && (
+                <div className="fixed inset-0 z-50 flex justify-end">
+                    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={handleNewDrawerClose} />
+                    <div className="relative w-full max-w-[650px] bg-white shadow-2xl flex flex-col animate-in slide-in-from-right">
+                        {/* Drawer Header */}
+                        <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+                            <h2 className="text-lg font-semibold text-slate-900">Create Service</h2>
+                            <button onClick={handleNewDrawerClose} className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors">
+                                <X className="h-5 w-5" />
+                            </button>
+                        </div>
+
+                        {/* Drawer Body */}
+                        <div className="flex-1 overflow-y-auto p-6 space-y-5">
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1.5">Service Name</label>
+                                <input
+                                    type="text"
+                                    placeholder="Service Name"
+                                    onChange={(e) => setservicename(e.target.value)}
+                                    className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1.5">Description</label>
+                                <input
+                                    type="text"
+                                    placeholder="Description"
+                                    onChange={(e) => setdiscription(e.target.value)}
+                                    className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+                                />
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Rate</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Rate"
+                                        value={rate}
+                                        onChange={handleRateChange}
+                                        className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Rate Type</label>
+                                    <select
+                                        value={selectedOption?.value || ''}
+                                        onChange={(e) => {
+                                            const opt = options.find(o => o.value === e.target.value);
+                                            handleRateTypeChange(null, opt);
+                                        }}
+                                        className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+                                    >
+                                        <option value="">Select Rate Type</option>
+                                        {options.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                                    </select>
+                                </div>
+                            </div>
+
+                            {/* Tax Toggle */}
+                            <div className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50/50 px-4 py-3">
+                                <span className="text-sm font-medium text-slate-700">Tax</span>
+                                <button
+                                    type="button"
+                                    role="switch"
+                                    aria-checked={service}
+                                    onClick={() => handleServiceWitch(!service)}
+                                    className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors ${service ? 'bg-indigo-600' : 'bg-slate-200'}`}
+                                >
+                                    <span className={`pointer-events-none inline-block h-3.5 w-3.5 rounded-full bg-white shadow-sm transition-transform ${service ? 'translate-x-4' : 'translate-x-0.5'}`} />
+                                </button>
+                            </div>
+
+                            {/* Category Section */}
+                            <div className="pt-2">
+                                <h3 className="text-base font-semibold text-slate-900 mb-3">Category</h3>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Category Name</label>
+                                    <select
+                                        value={selectedCategory?.value || ''}
+                                        onChange={(e) => {
+                                            const opt = categoryoptions.find(o => o.value === e.target.value);
+                                            handleCategoryChange(null, opt || null);
+                                        }}
+                                        className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+                                    >
+                                        <option value="">Select Category</option>
+                                        {categoryoptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                                    </select>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setCategoryFormOpen(true)}
+                                    className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 transition-colors"
+                                >
+                                    <Plus className="h-4 w-4" />
                                     Create category
-                                </Button>
+                                </button>
+                            </div>
+                        </div>
 
-                                {/* category form */}
-                                <Drawer
-                                    anchor="right"
-                                    open={isCategoryFormOpen}
-                                    onClose={handleCategoryFormClose}
-                                    PaperProps={{
-                                        sx: {
-                                            borderRadius: isSmallScreen ? '0' : '10px 0 0 10px',
-                                            width: isSmallScreen ? '100%' : '650px',
-                                            maxWidth: '100%',
-                                        },
-                                    }} >
+                        {/* Drawer Footer */}
+                        <div className="flex items-center gap-3 border-t border-slate-200 px-6 py-4">
+                            <button onClick={createservicetemp} className="rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition-colors">Save</button>
+                            <button onClick={handleNewDrawerClose} className="rounded-lg border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 transition-colors">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
-                                    <Box>
-
-                                        <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px', }}>
-
-                                            <ArrowBackRoundedIcon onClick={handleCategoryFormClose} style={{ cursor: 'pointer' }} />
-                                        </Box>
-                                        <Divider />
-                                    </Box>
-                                    <Box p={3} >
-                                        <InputLabel sx={{ color: 'black', mt: 2 }}>Category Name</InputLabel>
-
-                                        <TextField
-                                            fullWidth
-                                            name="Rate"
-                                            placeholder="Category Name"
-                                            size="small"
-                                            margin='normal'
-                                            value={categorycreate} onChange={(e) => setcategorycreate(e.target.value)}
-                                        />
-                                    </Box>
-                                    <Box sx={{ pt: 2, display: 'flex', alignItems: 'center', gap: 5, margin: "8px", ml: 3 }}>
-                                        <Button variant="contained" color="primary" onClick={createCategory}  sx={{
-                        backgroundColor: 'var(--color-save-btn)',  // Normal background
-                       
-                        '&:hover': {
-                          backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                        },
-                        width:'80px',borderRadius:'15px'
-                      }} >Create</Button>
-                                        <Button variant="outlined" onClick={handleCategoryFormClose} sx={{
-                        borderColor: 'var(--color-border-cancel-btn)',  // Normal background
-                       color:'var(--color-save-btn)',
-                        '&:hover': {
-                          backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                          color:'#fff',
-                          border:"none"
-                        },
-                        width:'80px',borderRadius:'15px'
-                      }}>Cancel</Button>
-                                    </Box>
-                                </Drawer >
-                            </Box>
-                            <Box sx={{ pt: 5, display: 'flex', alignItems: 'center', gap: 5, ml: 1 }}>
-                                <Button variant="contained" color="primary" onClick={createservicetemp}    sx={{
-                        backgroundColor: 'var(--color-save-btn)',  // Normal background
-                       
-                        '&:hover': {
-                          backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                        },
-                        width:'80px',borderRadius:'15px'
-                      }} >Save</Button>
-                                <Button variant="outlined" onClick={handleNewDrawerClose} sx={{
-                        borderColor: 'var(--color-border-cancel-btn)',  // Normal background
-                       color:'var(--color-save-btn)',
-                        '&:hover': {
-                          backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                          color:'#fff',
-                          border:"none"
-                        },
-                        width:'80px',borderRadius:'15px'
-                      }}>Cancel</Button>
-                            </Box>
-                        </Box>
-
-                    </form>
-
-
-
-                </Box>
-
-
-            </Drawer>
-        </Box>
+            {/* Create Category Drawer */}
+            {isCategoryFormOpen && (
+                <div className="fixed inset-0 z-[60] flex justify-end">
+                    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={handleCategoryFormClose} />
+                    <div className="relative w-full max-w-[500px] bg-white shadow-2xl flex flex-col animate-in slide-in-from-right">
+                        <div className="flex items-center gap-3 border-b border-slate-200 px-6 py-4">
+                            <button onClick={handleCategoryFormClose} className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors">
+                                <ArrowLeft className="h-5 w-5" />
+                            </button>
+                            <h2 className="text-lg font-semibold text-slate-900">Create Category</h2>
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-6">
+                            <label className="block text-sm font-medium text-slate-700 mb-1.5">Category Name</label>
+                            <input
+                                type="text"
+                                placeholder="Category Name"
+                                value={categorycreate || ''}
+                                onChange={(e) => setcategorycreate(e.target.value)}
+                                className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+                            />
+                        </div>
+                        <div className="flex items-center gap-3 border-t border-slate-200 px-6 py-4">
+                            <button onClick={createCategory} className="rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition-colors">Create</button>
+                            <button onClick={handleCategoryFormClose} className="rounded-lg border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 transition-colors">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
     )
 }
 

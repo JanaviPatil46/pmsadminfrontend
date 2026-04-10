@@ -1,24 +1,6 @@
-import React, { useState, useEffect } from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  IconButton,
-  Menu,
-  MenuItem,
-  Typography,
-  Button,
-  Stack,
-  Tab,
-} from "@mui/material";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { Box } from "lucide-react";
-
+import { MoreVertical, Plus } from "lucide-react";
 import axios from "axios";
 import { toast } from "react-toastify";
 const PIPELINE_API = process.env.REACT_APP_PIPELINE_TEMP_URL;
@@ -47,8 +29,20 @@ const PipelineTable = () => {
     }
   };
 
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        handleMenuClose();
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const handleMenuOpen = (event, pipeline) => {
-    setAnchorEl(event.currentTarget);
+    setAnchorEl(anchorEl === pipeline._id ? null : pipeline._id);
     setSelectedPipeline(pipeline);
   };
 
@@ -100,79 +94,75 @@ const PipelineTable = () => {
     navigate(`/firmtemp/pipelineform`);
   };
   return (
-    <>
-      <Stack
-        direction="row"
-        justifyContent="space-between"
-        alignItems="center"
-        mb={2}
-      >
-        <Typography variant="h6" component="div">
-          Pipeline Templates
-        </Typography>
-        <Button variant="contained" color="primary" onClick={handelCreateNew}>
-          Create New Pipeline
-        </Button>
-      </Stack>
-      <TableContainer component={Paper} elevation={2}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{ fontWeight: 600 }}>Pipeline Name</TableCell>
-              <TableCell sx={{ fontWeight: 600 }}>Total Stages</TableCell>
-              <TableCell sx={{ fontWeight: 600, textAlign: "right" }}>
-                Actions
-              </TableCell>
-            </TableRow>
-          </TableHead>
-
-          <TableBody>
-            {pipelineData?.length > 0 ? (
-              pipelineData.map((pipeline, index) => (
-                <TableRow key={pipeline._id}>
-                  {/* <TableCell>{pipeline.pipelineName}</TableCell> */}
-                  <TableCell>
-                    <Link
-                      to={`/firmtemp/pipelineform?edit=${pipeline._id}`}
-                      style={{
-                        textDecoration: "none",
-                        color: "blue",
-                        fontWeight: 500,
-                      }}
-                    >
-                      {pipeline.pipelineName}
-                    </Link>
-                  </TableCell>
-                  <TableCell>{pipeline.stages?.length}</TableCell>
-
-                  <TableCell sx={{ textAlign: "right" }}>
-                    <IconButton onClick={(e) => handleMenuOpen(e, pipeline)}>
-                      <MoreVertIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={4} sx={{ textAlign: "center", py: 3 }}>
-                  No pipelines found.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-
-        {/* Three-dot Menu */}
-        <Menu
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={handleMenuClose}
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-semibold text-slate-900">Pipeline Templates</h1>
+        <button
+          onClick={handelCreateNew}
+          className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 hover:shadow-md active:scale-[0.98]"
         >
-          <MenuItem onClick={handleEdit}>Edit</MenuItem>
-          <MenuItem onClick={handleDelete}>Delete</MenuItem>
-        </Menu>
-      </TableContainer>
-    </>
+          <Plus className="h-4 w-4" />
+          Create New Pipeline
+        </button>
+      </div>
+
+      {/* Table */}
+      <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-b border-slate-100 bg-slate-50/80">
+                <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Pipeline Name</th>
+                <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Total Stages</th>
+                <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500 text-right w-20"></th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {pipelineData?.length > 0 ? (
+                pipelineData.map((pipeline, idx) => (
+                  <tr key={pipeline._id} className={`transition-colors hover:bg-indigo-50/40 ${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'}`}>
+                    <td className="px-5 py-3.5">
+                      <Link
+                        to={`/firmtemp/pipelineform?edit=${pipeline._id}`}
+                        className="text-sm font-medium text-indigo-600 hover:text-indigo-800 hover:underline transition-colors"
+                      >
+                        {pipeline.pipelineName}
+                      </Link>
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700">
+                        {pipeline.stages?.length || 0}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3.5 text-right">
+                      <div className="relative inline-block" ref={anchorEl === pipeline._id ? menuRef : null}>
+                        <button
+                          onClick={(e) => handleMenuOpen(e, pipeline)}
+                          className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                        >
+                          <MoreVertical className="h-4 w-4" />
+                        </button>
+                        {anchorEl === pipeline._id && (
+                          <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-slate-200 bg-white py-1 shadow-lg animate-in fade-in slide-in-from-top-1">
+                            <button onClick={handleEdit} className="flex w-full items-center px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">Edit</button>
+                            <button onClick={handleDelete} className="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">Delete</button>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={3} className="px-5 py-12 text-center text-sm text-slate-400">No pipelines found.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   );
 };
 
