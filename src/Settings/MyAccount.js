@@ -1,67 +1,22 @@
 import React, { useState, useRef, useEffect, useContext } from "react";
 import "./myaccount.css";
-import Box from "@mui/material/Box";
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import {
-  OutlinedInput,
-  InputAdornment,
-  Typography,
-  useMediaQuery,
-  Button,
-  Select,
-  MenuItem,
-  TextField,
-  Divider,
-  CircularProgress,
-} from "@mui/material";
-import { unstable_ClassNameGenerator as ClassNameGenerator } from "@mui/material/className";
-import BorderColorRoundedIcon from "@mui/icons-material/BorderColorRounded";
-import { useTheme } from "@mui/material/styles";
-import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
-import VisibilityRoundedIcon from "@mui/icons-material/VisibilityRounded";
-import VisibilityOffRoundedIcon from "@mui/icons-material/VisibilityOffRounded";
+import { Eye, EyeOff, Pencil, X, Upload, HelpCircle, Loader2 } from "lucide-react";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Checkbox } from "../components/ui/checkbox";
+import { Switch } from "../components/ui/switch";
 import user from "../Images/user.jpg";
-import { Switch, FormControlLabel, Checkbox } from "@mui/material";
-import HelpOutlineRoundedIcon from "@mui/icons-material/HelpOutlineRounded";
 import { NavLink } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import { LoginContext } from "../Sidebar/Context/Context";
 import { gapi } from "gapi-script";
 import Cookies from "js-cookie";
-import { styled } from "@mui/material/styles";
-import Badge from "@mui/material/Badge";
-import Avatar from "@mui/material/Avatar";
-import Stack from "@mui/material/Stack";
-import EditIcon from "@mui/icons-material/Edit";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import axios from "axios";
 import ImageCropper from "./ImageCropper";
-// Configure ClassNameGenerator
-ClassNameGenerator.configure((componentName) => `foo-bar-${componentName}`);
 
 const MyAccount = () => {
-  const StyledBadge = styled(Badge)(({ theme }) => ({
-    "& .MuiBadge-badge": {
-      backgroundColor: "#44b700", // Green color for active status
-      color: "#44b700",
-      width: 12,
-      height: 12,
-      borderRadius: "50%",
-      border: "2px solid white", // White border to separate it from the avatar
-    },
-  }));
-
-  const SmallAvatar = styled(Avatar)(({ theme }) => ({
-    width: 22,
-    height: 22,
-    border: `2px solid ${theme.palette.background.paper}`,
-  }));
   const [isActive, setIsActive] = useState(true);
-  // console.log("jjj", isActive);
-  const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
   const [showSaveButtons, setShowSaveButtons] = useState(false);
   const [showUpdatePassButton, setShowUpdatePassButton] = useState(false);
@@ -1448,1290 +1403,258 @@ const MyAccount = () => {
       .join("")
       .toUpperCase();
   };
+  const notificationRows = [
+    { label: "Invoices", inboxChecked: isChecked, onInboxChange: handleCheckboxChange, emailChecked: isEmailChecked, onEmailChange: handleEmailCheckboxChange },
+    { label: "Payments", inboxChecked: isPaymentsChecked, onInboxChange: handlePaymentsCheckboxChange, emailChecked: isPaymentsEmailChecked, onEmailChange: handlePaymentsEmailCheckboxChange },
+    { label: "Organizers", inboxChecked: isOrganizersChecked, onInboxChange: handleOrganizersCheckboxChange, emailChecked: isOrganizersEmailChecked, onEmailChange: handleOrganizersEmailCheckboxChange },
+    { label: "Documents", isSpacer: true },
+    { label: "Uploads", indent: true, inboxChecked: isUploadsChecked, onInboxChange: handleUploadsCheckboxChange, emailChecked: isUploadsEmailChecked, onEmailChange: handleUploadsEmailCheckboxChange },
+    { label: "E-signatures", indent: true, inboxChecked: isSignaturesChecked, onInboxChange: handleSignaturesCheckboxChange, emailChecked: isSignaturesEmailChecked, onEmailChange: handleSignaturesEmailCheckboxChange },
+    { label: "Approvals", indent: true, inboxChecked: isApprovalsChecked, onInboxChange: handleApprovalsCheckboxChange, emailChecked: isApprovalsEmailChecked, onEmailChange: handleApprovalsEmailCheckboxChange },
+    { label: "Done uploading", indent: true, inboxChecked: isUploadingChecked, onInboxChange: handleUploadingCheckboxChange, emailChecked: isUploadingEmailChecked, onEmailChange: handleUploadingEmailCheckboxChange },
+    { label: "Tasks", inboxChecked: isTasksChecked, onInboxChange: handleTasksCheckboxChange, emailChecked: isTasksEmailChecked, onEmailChange: handleTasksEmailCheckboxChange },
+    { label: "Messages", inboxChecked: isMessagesChecked, onInboxChange: handleMessagesCheckboxChange, emailChecked: isMessagesEmailChecked, onEmailChange: handleMessagesEmailCheckboxChange },
+    { label: "New mail", inboxChecked: isNewEmailChecked, onInboxChange: handleNewEmailCheckboxChange, emailChecked: isNewEmailEmailChecked, onEmailChange: handleNewEmailEmailCheckboxChange },
+    { label: "Proposals", inboxChecked: isProposalsChecked, onInboxChange: handleProposalsCheckboxChange, emailChecked: isProposalsEmailChecked, onEmailChange: handleProposalsEmailCheckboxChange },
+    { label: "Jobs", inboxChecked: isJobsChecked, onInboxChange: handleJobsCheckboxChange, emailChecked: isJobsEmailChecked, onEmailChange: handleJobsEmailCheckboxChange },
+    { label: "Mentions", inboxChecked: isMentionsChecked, onInboxChange: handleMentionsCheckboxChange, emailChecked: isMentionsEmailChecked, onEmailChange: handleMentionsEmailCheckboxChange },
+    { label: "SMS", inboxChecked: isSmsChecked, onInboxChange: handleSmsCheckboxChange, emailChecked: isSmsEmailChecked, onEmailChange: handleSmsEmailCheckboxChange },
+  ];
+
   return (
     <>
-      <Box>
-        <Typography variant="h4">Account Settings</Typography>
-      </Box>
-      <Box className="account-settings">
-        <Box className="accounts-details-user">
-          <Box sx={{ ml: 1 }}>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                mt: 1,
-              }}
-            >
-              <Box>
-                {" "}
-                <Typography variant="h6">Personal Details</Typography>
-              </Box>
-              <Box>
-                <BorderColorRoundedIcon
-                  sx={{
-                    float: "right",
-                    marginBottom: "10px",
-                    cursor: "pointer",
-                    color: "#1168bf",
-                  }}
-                  onClick={handleEditClick}
-                />
-              </Box>
-            </Box>
-            <Box>
-              <Divider sx={{ mt: 1.5 }} />
-            </Box>
+      <div>
+        <h1 className="text-2xl font-bold text-foreground mb-6">Account Settings</h1>
+      </div>
+      <div className="account-settings space-y-6">
+        {/* ===== PERSONAL DETAILS ===== */}
+        <div className="accounts-details-user rounded-xl border bg-card p-5 shadow-sm">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-semibold text-foreground">Personal Details</h2>
+            <button onClick={handleEditClick} className="text-primary hover:text-primary/80 transition-colors">
+              <Pencil className="h-4 w-4" />
+            </button>
+          </div>
+          <hr className="border-border mb-4" />
 
-            {!isEditable && (
-              <Box
-                mt={3}
-                sx={{ display: "flex", alignItems: "center", gap: 5 }}
-              >
-                <Avatar
-                  src={preview || currentImage}
-                  sx={{
-                    width: 120,
-                    height: 120,
-                    border: "2px solid #eee",
-                  }}
-                />
-                <Box>
-                  <Typography variant="h5">
-                    {firstName} {lastname}
-                  </Typography>
-                  <Typography variant="body1">{phonenumber}</Typography>
-                </Box>
-              </Box>
-            )}
-            {isEditable && (
-              <Box mt={3}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: 2,
-                  }}
-                >
-                  <Box sx={{ position: "relative" }}>
-                    <Avatar
-                      src={preview || currentImage}
-                      sx={{
-                        width: 120,
-                        height: 120,
-                        border: "2px solid #eee",
-                      }}
-                    />
-                    <input
-                      accept="image/*"
-                      style={{ display: "none" }}
-                      id="profile-picture-upload"
-                      type="file"
-                      onChange={handleImageChange}
-                    />
-                    <label htmlFor="profile-picture-upload">
-                      <Box
-                        // color="primary"
-                        aria-label="upload picture"
-                        component="span"
-                        sx={{
-                          position: "absolute",
-                          bottom: 0,
-                          right: 0,
-                          borderRadius: "10px",
-                          cursor: "pointer",
-                          padding: "6px 8px",
-                          backgroundColor: "primary.main",
-                          "&:hover": {
-                            backgroundColor: "primary.dark",
-                          },
-                        }}
-                      >
-                        <EditIcon sx={{ color: "white" }} fontSize="small" />
-                      </Box>
-                    </label>
-                  </Box>
+          {!isEditable && (
+            <div className="flex items-center gap-5 mt-4">
+              <img src={preview || currentImage || user} alt="Profile" className="w-[120px] h-[120px] rounded-full border-2 border-muted object-cover" />
+              <div>
+                <h3 className="text-xl font-semibold text-foreground">{firstName} {lastname}</h3>
+                <p className="text-sm text-muted-foreground">{phonenumber}</p>
+              </div>
+            </div>
+          )}
 
-                  {image && (
-                    <>
-                      <Typography variant="body2" sx={{ mt: 1 }}>
-                        {image.name} ({Math.round(image.size / 1024)} KB)
-                      </Typography>
-
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        startIcon={<CloudUploadIcon />}
-                        onClick={handleUpload}
-                        disabled={isUploading}
-                        fullWidth
-                        sx={{ mt: 2 }}
-                      >
-                        {isUploading ? (
-                          <>
-                            <CircularProgress size={24} color="inherit" />
-                            <Box sx={{ ml: 1 }}>Uploading...</Box>
-                          </>
-                        ) : (
-                          "Upload Profile Picture"
-                        )}
-                      </Button>
-                    </>
-                  )}
-                </Box>
-                <Box className="contact-details">
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: isSmallScreen ? "column" : "row",
-                      gap: 5,
-                      padding: "1px 25px 0 5px",
-                    }}
-                  >
-                    <Box>
-                      <Box className="base-TextField-root">
-                        <label htmlFor="first-name">First name</label>
-                        <TextField
-                          name="firstName"
-                          disabled={!isEditable}
-                          size="small"
-                          margin="normal"
-                          fullWidth
-                          sx={{ backgroundColor: "#fff" }}
-                          placeholder="First Name"
-                          value={firstName}
-                          onChange={(e) => setFirstName(e.target.value)}
-                        />
-                      </Box>
-                    </Box>
-                    <Box>
-                      <Box className="base-TextField-root">
-                        <label htmlFor="middle-name">Middle Name</label>
-                        <TextField
-                          name="middleName"
-                          disabled={!isEditable}
-                          value={middleName}
-                          onChange={(e) => setMiddleName(e.target.value)}
-                          size="small"
-                          margin="normal"
-                          fullWidth
-                          placeholder="Middle Name"
-                          sx={{ backgroundColor: "#fff" }}
-                        />
-                      </Box>
-                    </Box>
-                    <Box>
-                      <Box className="base-TextField-root">
-                        <label htmlFor="last-name">Last name</label>
-                        <TextField
-                          disabled={!isEditable}
-                          name="lastName"
-                          value={lastname}
-                          onChange={(e) => setLastName(e.target.value)}
-                          size="small"
-                          margin="normal"
-                          fullWidth
-                          sx={{ backgroundColor: "#fff" }}
-                          placeholder="Last name"
-                        />
-                      </Box>
-                    </Box>
-                  </Box>
-
-                  <Box sx={{ width: "94%", margin: "8px" }}>
-                    <Box className="base-TextField-root">
-                      <label htmlFor="last-name">Phone Number</label>
-                      <TextField
-                        disabled={!isEditable}
-                        value={phonenumber}
-                        onChange={(e) => {
-                          const onlyNums = e.target.value.replace(/\D/g, ""); // Remove non-digits
-                          setPhoneNumber(onlyNums);
-                        }}
-                        // onChange={(e) => setPhoneNumber(e.target.value)}
-                        name="Phone Number"
-                        sx={{ backgroundColor: "#fff" }}
-                        size="small"
-                        margin="normal"
-                        fullWidth
-                        placeholder="Phone Number"
-                      />
-                    </Box>
-                  </Box>
-                </Box>
-              </Box>
-            )}
-
-            {showSaveButtons && (
-              <Box
-                sx={{
-                  display: "flex",
-                  gap: 4,
-                  padding: "1px 5px 0 5px",
-                }}
-              >
-                <Button
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                  onClick={handleSaveButtonClick}
-                  sx={{
-                    backgroundColor: "var(--color-save-btn)", // Normal background
-
-                    "&:hover": {
-                      backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                    },
-                    borderRadius: "15px",
-                    width: "80px",
-                    mt: 2,
-                  }}
-                >
-                  Save
-                </Button>
-                <Button
-                  type="button"
-                  variant="outlined"
-                  color="primary"
-                  onClick={handleCancelButtonClick}
-                  sx={{
-                    borderColor: "var(--color-border-cancel-btn)", // Normal background
-                    color: "var(--color-save-btn)",
-                    "&:hover": {
-                      backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                      color: "#fff",
-                      border: "none",
-                    },
-                    width: "80px",
-                    borderRadius: "15px",
-                    mt: 2,
-                  }}
-                >
-                  Cancel
-                </Button>
-              </Box>
-            )}
-          </Box>
-
-          <Box></Box>
-          <Box className="login-details-user">
-            <Box className="login-header">
-              <Typography variant="h6" ml={1}>
-                Login Details
-              </Typography>
-              <BorderColorRoundedIcon
-                onClick={toggleAlert}
-                sx={{ color: "#1168bf", cursor: "pointer", mr: 2 }}
-              />
-              {showAlert && (
-                <Box className="overlay">
-                  <Box className="overlay-login-container">
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Typography variant="h6">Authentication</Typography>
-                      <CloseRoundedIcon onClick={handleCloseAlert} />
-                    </Box>
-                    <hr style={{ margin: "15px 0" }} />
-                    <Box>
-                      <Typography>
-                        In order to change your login details you must provide
-                        your current password.
-                      </Typography>
-                    </Box>
-                    <Box
-                      className="password-TextField"
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        position: "relative",
-                        marginTop: "3%",
-                      }}
-                    >
-                      <Box className="TextFieldfield-container">
-                        <Box sx={{ width: "94%", margin: "8px" }}>
-                          <Box className="base-TextField-root">
-                            <label className="custom-input-label">
-                              Password
-                            </label>
-                            <TextField
-                              name="lastName"
-                              type={!passShow ? "password" : "text"}
-                              placeholder="Enter Your Password"
-                              id="password"
-                              size="small"
-                              margin="normal"
-                              fullWidth
-                            />
-                          </Box>
-                        </Box>
-                        <Box
-                          className="showpass"
-                          onClick={() => setPassShow(!passShow)}
-                          style={{
-                            position: "absolute",
-                            top: "65%",
-                            transform: "translateY(-50%)",
-                            right: "20px",
-                            cursor: "pointer",
-                          }}
-                        >
-                          {!passShow ? (
-                            <VisibilityRoundedIcon />
-                          ) : (
-                            <VisibilityOffRoundedIcon />
-                          )}
-                        </Box>
-                      </Box>
-                    </Box>
-                    <Box>
-                      <NavLink
-                        to="/forgotpass"
-                        style={{
-                          color: "rgb(100, 149, 237)",
-                          textDecoration: "none",
-                        }}
-                      >
-                        Forgot Password?
-                      </NavLink>
-                    </Box>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        gap: 4,
-                        padding: "1px 5px 0 5px",
-                      }}
-                    >
-                      <Button
-                        type="submit"
-                        variant="contained"
-                        color="primary"
-                        sx={{
-                          backgroundColor: "var(--color-save-btn)", // Normal background
-
-                          "&:hover": {
-                            backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                          },
-                          borderRadius: "15px",
-                          width: "80px",
-                          mt: 2,
-                        }}
-                        onClick={handleUpdatePasswordClick}
-                      >
-                        Submit
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="outlined"
-                        color="primary"
-                        onClick={handleCloseAlert}
-                        sx={{
-                          borderColor: "var(--color-border-cancel-btn)", // Normal background
-                          color: "var(--color-save-btn)",
-                          "&:hover": {
-                            backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                            color: "#fff",
-                            border: "none",
-                          },
-                          width: "80px",
-                          borderRadius: "15px",
-                          mt: 2,
-                        }}
-                      >
-                        Cancel
-                      </Button>
-                    </Box>
-                  </Box>
-                </Box>
-              )}
-            </Box>
-            <Box className="hr" style={{ marginTop: "10px" }}></Box>
-            <Box sx={{ width: "94%", margin: "8px" }}>
-              <Box className="base-TextField-root">
-                <label htmlFor="last-name">Email</label>
-                <TextField
-                  name="Email"
-                  disabled
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  type="email"
-                  placeholder="Enter Your Password"
-                  id="password"
-                  size="small"
-                  margin="normal"
-                  fullWidth
-                  sx={{ backgroundColor: "#fff" }}
-                />
-              </Box>
-            </Box>
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: isSmallScreen ? "column" : "row",
-                gap: 5,
-                padding: "1px 25px 0 5px",
-              }}
-            >
-              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                <Box mt={2}>
-                  <Typography htmlFor="password">Password</Typography>
-                  <OutlinedInput
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    size="small"
-                    disabled={!isLoginEditable}
-                    placeholder="Password"
-                    // onChange={handlePasswordChange}
-                    sx={{ width: "100%", borderRadius: "10px", mt: 1 }}
-                    endAdornment={
-                      <InputAdornment
-                        position="end"
-                        sx={{ cursor: "pointer" }}
-                        onClick={handleTogglePasswordVisibility}
-                      >
-                        {showPassword ? <Visibility /> : <VisibilityOff />}
-                      </InputAdornment>
-                    }
-                  />
-                            
-                </Box>
-                <Box>
-                  <Typography htmlFor="confirmPassword">
-                    Confirm Password
-                  </Typography>
-                  <OutlinedInput
-                    type={showConfirmPassword ? "text" : "password"}
-                    value={cpassword}
-                    onChange={(e) => setCpassword(e.target.value)}
-                    size="small"
-                    disabled={!isLoginEditable}
-                    placeholder="Confirm Password"
-                    sx={{ width: "100%", borderRadius: "10px", mt: 1 }}
-                    endAdornment={
-                      <InputAdornment
-                        position="end"
-                        sx={{ cursor: "pointer" }}
-                        onClick={handleToggleCPasswordVisibility}
-                      >
-                        {showConfirmPassword ? (
-                          <Visibility />
-                        ) : (
-                          <VisibilityOff />
-                        )}
-                      </InputAdornment>
-                    }
-                  />
-                </Box>
-              </Box>
-            </Box>
-            <Box sx={{ width: "94%", margin: "8px" }}>
-              <Box className="base-TextField-root">
-                <label htmlFor="last-name">Stay signed in for</label>
-                <TextField
-                  name="Staysigned"
-                  size="small"
-                  margin="normal"
-                  fullWidth
-                  sx={{ backgroundColor: "#fff" }}
-                  value={signedtime}
-                  onChange={(e) => setSignedTime(e.target.value)}
-                  placeholder="Stay signed in for"
-                  disabled={true}
-                />
-              </Box>
-            </Box>
-            {showUpdatePassButton && (
-              <Button variant="contained" onClick={updatePassword}>
-                Update Password
-              </Button>
-            )}
-          </Box>
-          {/* <Box></Box> */}
-          <Box className="authentication">
-            <Box className="authentication-header">
-              <Typography variant="h6" ml={1}>
-                Two-factor authentication
-              </Typography>
-            </Box>
-            <Box className="hr" style={{ marginTop: "10px" }}></Box>
-            <Box
-              style={{
-                display: "flex",
-                gap: "10px",
-                marginTop: "25px",
-                cursor: "pointer",
-                alignItems: "center",
-              }}
-            >
-              <Switch onChange={handleAuthentication} />
-              <Box
-                style={{ display: "flex", gap: "10px", alignItems: "center" }}
-              >
-                <p onClick={handleAuthentication}>
-                  Turn on two-factor authencation
-                </p>
-                <HelpOutlineRoundedIcon style={{ color: "blue" }} />
-              </Box>
-            </Box>
-          </Box>
-        </Box>
-
-        <Box className="notifiaction-details">
-          <Box className="preferences">
-            <Box className="preferences-header">
-              <Typography variant="h6"> Notification preferences</Typography>
-              <HelpOutlineRoundedIcon style={{ color: "blue" }} />
-            </Box>
-            <Box className="hr" style={{ marginTop: "10px" }}></Box>
-            <Box sx={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr" }}>
-              <Box>
-                <Box style={{ padding: "20px" }}></Box>
-                <hr />
-                <div className="lists">
-                  <div style={{ margin: "10px 0" }}>
-                    <p>Invoices</p>
-                  </div>
-                  <hr />
-                  <div style={{ margin: "10px 0" }}>
-                    <p>Payments</p>
-                  </div>
-                  <hr />
-                  <div style={{ margin: "10px 0" }}>
-                    <p>Organizers</p>
-                  </div>
-                  <hr />
-                  <div style={{ margin: "10px 0" }}>
-                    <p>Documents</p>
-                  </div>
-                  <hr />
-                  <div style={{ margin: "10px 0 10px 15px" }}>
-                    <p>Uploads</p>
-                  </div>
-                  <hr />
-                  <div style={{ margin: "10px 0 10px 15px" }}>
-                    <p>E-signatures</p>
-                  </div>
-                  <hr />
-                  <div style={{ margin: "10px 0 10px 15px" }}>
-                    <p>Approvals</p>
-                  </div>
-                  <hr />
-                  <div style={{ margin: "10px 0 10px 15px" }}>
-                    <p>"Done uploading"</p>
-                  </div>
-                  <hr />
-                  <div style={{ margin: "10px 0" }}>
-                    <p>Tasks</p>
-                  </div>
-                  <hr />
-                  <div style={{ margin: "10px 0" }}>
-                    <p>Messages</p>
-                  </div>
-                  <hr />
-                  <div style={{ margin: "10px 0" }}>
-                    <p>New mail</p>
-                  </div>
-                  <hr />
-                  <div style={{ margin: "10px 0" }}>
-                    <p>Proposals</p>
-                  </div>
-                  <hr />
-                  <div style={{ margin: "10px 0" }}>
-                    <p>Jobs</p>
-                  </div>
-                  <hr />
-                  <div style={{ margin: "10px 0" }}>
-                    <p>Mentions</p>
-                  </div>
-                  <hr />
-                  <div style={{ margin: "10px 0" }}>
-                    <p>SMS</p>
-                  </div>
-                  <hr />
+          {isEditable && (
+            <div className="mt-4 space-y-5">
+              <div className="flex flex-col items-center gap-3">
+                <div className="relative">
+                  <img src={preview || currentImage || user} alt="Profile" className="w-[120px] h-[120px] rounded-full border-2 border-muted object-cover" />
+                  <input accept="image/*" className="hidden" id="profile-picture-upload" type="file" onChange={handleImageChange} />
+                  <label htmlFor="profile-picture-upload" className="absolute bottom-0 right-0 rounded-lg bg-primary p-1.5 cursor-pointer hover:bg-primary/90 transition-colors">
+                    <Pencil className="h-3.5 w-3.5 text-white" />
+                  </label>
                 </div>
-              </Box>
+                {image && (
+                  <div className="text-center space-y-2">
+                    <p className="text-xs text-muted-foreground">{image.name} ({Math.round(image.size / 1024)} KB)</p>
+                    <Button onClick={handleUpload} disabled={isUploading} className="gap-1.5">
+                      {isUploading ? <><Loader2 className="h-4 w-4 animate-spin" /> Uploading...</> : <><Upload className="h-4 w-4" /> Upload Profile Picture</>}
+                    </Button>
+                  </div>
+                )}
+              </div>
 
-              <Box sx={{ textAlign: "center" }}>
-                <Box style={{ padding: "9.5px" }}>INBOX+</Box>
-                <hr />
-                <Box className="lists">
-                  <Box style={{ margin: "15px " }}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          sx={{
-                            width: 10, // Width of the checkbox
-                            height: 20, // Height of the checkbox
-                            color: "#ADD8E6",
-                            "& .MuiSvgIcon-root": {
-                              fontSize: 20, // Size of the checkmark inside the checkbox
-                            },
-                          }}
-                          checked={isChecked}
-                          onChange={handleCheckboxChange}
-                          inputProps={{ "aria-label": "controlled" }}
-                        />
-                      }
-                    />
-                  </Box>
-                  <hr />
-                  <Box style={{ margin: "15px " }}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          sx={{
-                            width: 10, // Width of the checkbox
-                            height: 20, // Height of the checkbox
-                            color: "#ADD8E6",
-                            "& .MuiSvgIcon-root": {
-                              fontSize: 20, // Size of the checkmark inside the checkbox
-                            },
-                          }}
-                          checked={isPaymentsChecked}
-                          onChange={handlePaymentsCheckboxChange}
-                          inputProps={{ "aria-label": "controlled" }}
-                        />
-                      }
-                    />
-                  </Box>
-                  <hr />
-                  <Box style={{ margin: "15px " }}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          sx={{
-                            width: 10, // Width of the checkbox
-                            height: 20, // Height of the checkbox
-                            color: "#ADD8E6",
-                            "& .MuiSvgIcon-root": {
-                              fontSize: 20, // Size of the checkmark inside the checkbox
-                            },
-                          }}
-                          checked={isOrganizersChecked}
-                          onChange={handleOrganizersCheckboxChange}
-                          inputProps={{ "aria-label": "controlled" }}
-                        />
-                      }
-                    />
-                  </Box>
-                  <hr />
-                  <Box style={{ margin: "11.5px ", padding: "15px" }}></Box>
-                  <hr />
-                  <Box style={{ margin: "15px " }}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          sx={{
-                            width: 10, // Width of the checkbox
-                            height: 20, // Height of the checkbox
-                            color: "#ADD8E6",
-                            "& .MuiSvgIcon-root": {
-                              fontSize: 20, // Size of the checkmark inside the checkbox
-                            },
-                          }}
-                          checked={isUploadsChecked}
-                          onChange={handleUploadsCheckboxChange}
-                          inputProps={{ "aria-label": "controlled" }}
-                        />
-                      }
-                    />
-                  </Box>
-                  <hr />
-                  <Box style={{ margin: "15px " }}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          sx={{
-                            width: 10, // Width of the checkbox
-                            height: 20, // Height of the checkbox
-                            color: "#ADD8E6",
-                            "& .MuiSvgIcon-root": {
-                              fontSize: 20, // Size of the checkmark inside the checkbox
-                            },
-                          }}
-                          checked={isSignaturesChecked}
-                          onChange={handleSignaturesCheckboxChange}
-                          inputProps={{ "aria-label": "controlled" }}
-                        />
-                      }
-                    />
-                  </Box>
-                  <hr />
-                  <Box style={{ margin: "15px " }}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          sx={{
-                            width: 10, // Width of the checkbox
-                            height: 20, // Height of the checkbox
-                            color: "#ADD8E6",
-                            "& .MuiSvgIcon-root": {
-                              fontSize: 20, // Size of the checkmark inside the checkbox
-                            },
-                          }}
-                          checked={isApprovalsChecked}
-                          onChange={handleApprovalsCheckboxChange}
-                          inputProps={{ "aria-label": "controlled" }}
-                        />
-                      }
-                    />
-                  </Box>
-                  <hr />
-                  <Box style={{ margin: "15px " }}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          sx={{
-                            width: 10, // Width of the checkbox
-                            height: 20, // Height of the checkbox
-                            color: "#ADD8E6",
-                            "& .MuiSvgIcon-root": {
-                              fontSize: 20, // Size of the checkmark inside the checkbox
-                            },
-                          }}
-                          checked={isUploadingChecked}
-                          onChange={handleUploadingCheckboxChange}
-                          inputProps={{ "aria-label": "controlled" }}
-                        />
-                      }
-                    />
-                  </Box>
-                  <hr />
-                  <Box style={{ margin: "15px " }}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          sx={{
-                            width: 10, // Width of the checkbox
-                            height: 20, // Height of the checkbox
-                            color: "#ADD8E6",
-                            "& .MuiSvgIcon-root": {
-                              fontSize: 20, // Size of the checkmark inside the checkbox
-                            },
-                          }}
-                          checked={isTasksChecked}
-                          onChange={handleTasksCheckboxChange}
-                          inputProps={{ "aria-label": "controlled" }}
-                        />
-                      }
-                    />
-                  </Box>
-                  <hr />
-                  <Box style={{ margin: "15px " }}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          sx={{
-                            width: 10, // Width of the checkbox
-                            height: 20, // Height of the checkbox
-                            color: "#ADD8E6",
-                            "& .MuiSvgIcon-root": {
-                              fontSize: 20, // Size of the checkmark inside the checkbox
-                            },
-                          }}
-                          checked={isMessagesChecked}
-                          onChange={handleMessagesCheckboxChange}
-                          inputProps={{ "aria-label": "controlled" }}
-                        />
-                      }
-                    />
-                  </Box>
-                  <hr />
-                  <Box style={{ margin: "15px " }}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          sx={{
-                            width: 10, // Width of the checkbox
-                            height: 20, // Height of the checkbox
-                            color: "#ADD8E6",
-                            "& .MuiSvgIcon-root": {
-                              fontSize: 20, // Size of the checkmark inside the checkbox
-                            },
-                          }}
-                          checked={isNewEmailChecked}
-                          onChange={handleNewEmailCheckboxChange}
-                          inputProps={{ "aria-label": "controlled" }}
-                        />
-                      }
-                    />
-                  </Box>
-                  <hr />
-                  <Box style={{ margin: "15px " }}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          sx={{
-                            width: 10, // Width of the checkbox
-                            height: 20, // Height of the checkbox
-                            color: "#ADD8E6",
-                            "& .MuiSvgIcon-root": {
-                              fontSize: 20, // Size of the checkmark inside the checkbox
-                            },
-                          }}
-                          checked={isProposalsChecked}
-                          onChange={handleProposalsCheckboxChange}
-                          inputProps={{ "aria-label": "controlled" }}
-                        />
-                      }
-                    />
-                  </Box>
-                  <hr />
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1.5">First name</label>
+                  <Input disabled={!isEditable} placeholder="First Name" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1.5">Middle Name</label>
+                  <Input disabled={!isEditable} placeholder="Middle Name" value={middleName} onChange={(e) => setMiddleName(e.target.value)} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1.5">Last name</label>
+                  <Input disabled={!isEditable} placeholder="Last name" value={lastname} onChange={(e) => setLastName(e.target.value)} />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1.5">Phone Number</label>
+                <Input disabled={!isEditable} placeholder="Phone Number" value={phonenumber} onChange={(e) => { const onlyNums = e.target.value.replace(/\D/g, ""); setPhoneNumber(onlyNums); }} />
+              </div>
+            </div>
+          )}
 
-                  <Box style={{ margin: "15px " }}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          sx={{
-                            width: 10, // Width of the checkbox
-                            height: 20, // Height of the checkbox
-                            color: "#ADD8E6",
-                            "& .MuiSvgIcon-root": {
-                              fontSize: 20, // Size of the checkmark inside the checkbox
-                            },
-                          }}
-                          checked={isJobsChecked}
-                          onChange={handleJobsCheckboxChange}
-                          inputProps={{ "aria-label": "controlled" }}
-                        />
-                      }
-                    />
-                  </Box>
-                  <hr />
-                  <Box style={{ margin: "15px " }}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          sx={{
-                            width: 10, // Width of the checkbox
-                            height: 20, // Height of the checkbox
-                            color: "#ADD8E6",
-                            "& .MuiSvgIcon-root": {
-                              fontSize: 20, // Size of the checkmark inside the checkbox
-                            },
-                          }}
-                          checked={isMentionsChecked}
-                          onChange={handleMentionsCheckboxChange}
-                          inputProps={{ "aria-label": "controlled" }}
-                        />
-                      }
-                    />
-                  </Box>
-                  <hr />
-                  <Box style={{ margin: "15px " }}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          sx={{
-                            width: 10, // Width of the checkbox
-                            height: 20, // Height of the checkbox
-                            color: "#ADD8E6",
-                            "& .MuiSvgIcon-root": {
-                              fontSize: 20, // Size of the checkmark inside the checkbox
-                            },
-                          }}
-                          checked={isSmsChecked}
-                          onChange={handleSmsCheckboxChange}
-                          inputProps={{ "aria-label": "controlled" }}
-                        />
-                      }
-                    />
-                  </Box>
-                  <hr />
-                </Box>
-              </Box>
-              <Box sx={{ textAlign: "center" }}>
-                <Box style={{ padding: "9.5px" }}>EMAIL</Box>
-                <hr />
-                <Box className="lists">
-                  <Box style={{ margin: "15px " }}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          sx={{
-                            width: 10, // Width of the checkbox
-                            height: 20, // Height of the checkbox
-                            color: "#ADD8E6",
-                            "& .MuiSvgIcon-root": {
-                              fontSize: 20, // Size of the checkmark inside the checkbox
-                            },
-                          }}
-                          checked={isEmailChecked}
-                          onChange={handleEmailCheckboxChange}
-                          inputProps={{ "aria-label": "controlled" }}
-                        />
-                      }
-                    />
-                  </Box>
-                  <hr />
-                  <Box style={{ margin: "15px " }}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          sx={{
-                            width: 10, // Width of the checkbox
-                            height: 20, // Height of the checkbox
-                            color: "#ADD8E6",
-                            "& .MuiSvgIcon-root": {
-                              fontSize: 20, // Size of the checkmark inside the checkbox
-                            },
-                          }}
-                          checked={isPaymentsEmailChecked}
-                          onChange={handlePaymentsEmailCheckboxChange}
-                          inputProps={{ "aria-label": "controlled" }}
-                        />
-                      }
-                    />
-                  </Box>
-                  <hr />
-                  <Box style={{ margin: "15px " }}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          sx={{
-                            width: 10, // Width of the checkbox
-                            height: 20, // Height of the checkbox
-                            color: "#ADD8E6",
-                            "& .MuiSvgIcon-root": {
-                              fontSize: 20, // Size of the checkmark inside the checkbox
-                            },
-                          }}
-                          checked={isOrganizersEmailChecked}
-                          onChange={handleOrganizersEmailCheckboxChange}
-                          inputProps={{ "aria-label": "controlled" }}
-                        />
-                      }
-                    />
-                  </Box>
-                  <hr />
-                  <Box style={{ margin: "11.5px ", padding: "15px" }}></Box>
-                  <hr />
-                  <Box style={{ margin: "15px " }}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          sx={{
-                            width: 10, // Width of the checkbox
-                            height: 20, // Height of the checkbox
-                            color: "#ADD8E6",
-                            "& .MuiSvgIcon-root": {
-                              fontSize: 20, // Size of the checkmark inside the checkbox
-                            },
-                          }}
-                          checked={isUploadsEmailChecked}
-                          onChange={handleUploadsEmailCheckboxChange}
-                          inputProps={{ "aria-label": "controlled" }}
-                        />
-                      }
-                    />
-                  </Box>
-                  <hr />
-                  <Box style={{ margin: "15px " }}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          sx={{
-                            width: 10, // Width of the checkbox
-                            height: 20, // Height of the checkbox
-                            color: "#ADD8E6",
-                            "& .MuiSvgIcon-root": {
-                              fontSize: 20, // Size of the checkmark inside the checkbox
-                            },
-                          }}
-                          checked={isSignaturesEmailChecked}
-                          onChange={handleSignaturesEmailCheckboxChange}
-                          inputProps={{ "aria-label": "controlled" }}
-                        />
-                      }
-                    />
-                  </Box>
-                  <hr />
-                  <Box style={{ margin: "15px " }}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          sx={{
-                            width: 10, // Width of the checkbox
-                            height: 20, // Height of the checkbox
-                            color: "#ADD8E6",
-                            "& .MuiSvgIcon-root": {
-                              fontSize: 20, // Size of the checkmark inside the checkbox
-                            },
-                          }}
-                          checked={isApprovalsEmailChecked}
-                          onChange={handleApprovalsEmailCheckboxChange}
-                          inputProps={{ "aria-label": "controlled" }}
-                        />
-                      }
-                    />
-                  </Box>
-                  <hr />
-                  <Box style={{ margin: "15px " }}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          sx={{
-                            width: 10, // Width of the checkbox
-                            height: 20, // Height of the checkbox
-                            color: "#ADD8E6",
-                            "& .MuiSvgIcon-root": {
-                              fontSize: 20, // Size of the checkmark inside the checkbox
-                            },
-                          }}
-                          checked={isUploadingEmailChecked}
-                          onChange={handleUploadingEmailCheckboxChange}
-                          inputProps={{ "aria-label": "controlled" }}
-                        />
-                      }
-                    />
-                  </Box>
-                  <hr />
-                  <Box style={{ margin: "15px " }}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          sx={{
-                            width: 10, // Width of the checkbox
-                            height: 20, // Height of the checkbox
-                            color: "#ADD8E6",
-                            "& .MuiSvgIcon-root": {
-                              fontSize: 20, // Size of the checkmark inside the checkbox
-                            },
-                          }}
-                          checked={isTasksEmailChecked}
-                          onChange={handleTasksEmailCheckboxChange}
-                          inputProps={{ "aria-label": "controlled" }}
-                        />
-                      }
-                    />
-                  </Box>
-                  <hr />
-                  <Box style={{ margin: "15px " }}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          sx={{
-                            width: 10, // Width of the checkbox
-                            height: 20, // Height of the checkbox
-                            color: "#ADD8E6",
-                            "& .MuiSvgIcon-root": {
-                              fontSize: 20, // Size of the checkmark inside the checkbox
-                            },
-                          }}
-                          checked={isMessagesEmailChecked}
-                          onChange={handleMessagesEmailCheckboxChange}
-                          inputProps={{ "aria-label": "controlled" }}
-                        />
-                      }
-                    />
-                  </Box>
-                  <hr />
-                  <Box style={{ margin: "15px " }}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          sx={{
-                            width: 10, // Width of the checkbox
-                            height: 20, // Height of the checkbox
-                            color: "#ADD8E6",
-                            "& .MuiSvgIcon-root": {
-                              fontSize: 20, // Size of the checkmark inside the checkbox
-                            },
-                          }}
-                          checked={isNewEmailEmailChecked}
-                          onChange={handleNewEmailEmailCheckboxChange}
-                          inputProps={{ "aria-label": "controlled" }}
-                        />
-                      }
-                    />
-                  </Box>
-                  <hr />
-                  <Box style={{ margin: "15px " }}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          sx={{
-                            width: 10, // Width of the checkbox
-                            height: 20, // Height of the checkbox
-                            color: "#ADD8E6",
-                            "& .MuiSvgIcon-root": {
-                              fontSize: 20, // Size of the checkmark inside the checkbox
-                            },
-                          }}
-                          checked={isProposalsEmailChecked}
-                          onChange={handleProposalsEmailCheckboxChange}
-                          inputProps={{ "aria-label": "controlled" }}
-                        />
-                      }
-                    />
-                  </Box>
-                  <hr />
+          {showSaveButtons && (
+            <div className="flex items-center gap-3 mt-4">
+              <Button onClick={handleSaveButtonClick}>Save</Button>
+              <Button variant="outline" onClick={handleCancelButtonClick}>Cancel</Button>
+            </div>
+          )}
+        </div>
 
-                  <Box style={{ margin: "15px " }}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          sx={{
-                            width: 10, // Width of the checkbox
-                            height: 20, // Height of the checkbox
-                            color: "#ADD8E6",
-                            "& .MuiSvgIcon-root": {
-                              fontSize: 20, // Size of the checkmark inside the checkbox
-                            },
-                          }}
-                          checked={isJobsEmailChecked}
-                          onChange={handleJobsEmailCheckboxChange}
-                          inputProps={{ "aria-label": "controlled" }}
-                        />
-                      }
-                    />
-                  </Box>
-                  <hr />
-                  <Box style={{ margin: "15px " }}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          sx={{
-                            width: 10, // Width of the checkbox
-                            height: 20, // Height of the checkbox
-                            color: "#ADD8E6",
-                            "& .MuiSvgIcon-root": {
-                              fontSize: 20, // Size of the checkmark inside the checkbox
-                            },
-                          }}
-                          checked={isMentionsEmailChecked}
-                          onChange={handleMentionsEmailCheckboxChange}
-                          inputProps={{ "aria-label": "controlled" }}
-                        />
-                      }
-                    />
-                  </Box>
-                  <hr />
-                  <Box style={{ margin: "15px " }}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          sx={{
-                            width: 10, // Width of the checkbox
-                            height: 20, // Height of the checkbox
-                            color: "#ADD8E6",
-                            "& .MuiSvgIcon-root": {
-                              fontSize: 20, // Size of the checkmark inside the checkbox
-                            },
-                          }}
-                          checked={isSmsEmailChecked}
-                          onChange={handleSmsEmailCheckboxChange}
-                          inputProps={{ "aria-label": "controlled" }}
-                        />
-                      }
-                    />
-                  </Box>
-                  <hr />
-                </Box>
-              </Box>
-            </Box>
-          </Box>
-          <Box className="emailsyns">
-            <Box>
-              <Typography variant="h6"> Email Sync</Typography>
-            </Box>
-            <Box className="hr" style={{ marginTop: "10px" }}></Box>
-            <Box
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "5px",
-                marginTop: "20px",
-              }}
-            >
-              <p>
-                Sync your existing email with TaxDome — all your client messages
-                in one place.
-              </p>
-              <HelpOutlineRoundedIcon style={{ color: "blue" }} />
-            </Box>
-            <Box style={{ marginTop: "25px" }}>
-              <Box sx={{ width: "94%", margin: "8px" }}>
-                <Box className="base-TextField-root">
-                  <label htmlFor="last-name">Email for sync</label>
-                  <TextField
-                    name="Email for sync"
-                    // value={emailId}
-                    value={emailsync}
-                    onChange={(e) => setEmailSync(e.target.value)}
-                    //                    onChange={(e) => {
-                    //   const newValue = e.target.value;
-                    //   setEmailSync(newValue);
-                    //   updateEmailSync(newValue);
-                    // }}
-                    size="small"
-                    margin="normal"
-                    fullWidth
-                    placeholder="Email for sync"
-                  />
-                </Box>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                  // onClick={handleEmailIdSubmit}
-                  onClick={handleEmailSync}
-                  sx={{
-                    mt: 2,
-                    width: isSmallScreen ? "100%" : "auto",
-                    borderRadius: "10px",
-                  }}
-                >
-                  Sync your email
-                </Button>
-              </Box>
-            </Box>
-          </Box>
-          <Box className="emailsyns" style={{ marginTop: "20px" }}>
-            <Box>
-              <Typography variant="h6">Download Windows app</Typography>
-            </Box>
-            <Box className="hr" style={{ marginTop: "10px" }}></Box>
-            <Box style={{ marginTop: "20px" }}>
-              <p>TaxDome Windows App help</p>
-              <Link to="#">
-                https://help.taxdome.com/article/164-taxdome-windows-application
-              </Link>
-            </Box>
-          </Box>
+        {/* ===== LOGIN DETAILS ===== */}
+        <div className="login-details-user rounded-xl border bg-card p-5 shadow-sm">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-semibold text-foreground">Login Details</h2>
+            <button onClick={toggleAlert} className="text-primary hover:text-primary/80 transition-colors">
+              <Pencil className="h-4 w-4" />
+            </button>
+          </div>
 
-          <Box className="emailsyns">
-            <Box>
-              <Typography variant="h6">International settings</Typography>
-            </Box>
-            <Box className="hr" style={{ marginTop: "10px" }}></Box>
+          {showAlert && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center">
+              <div className="fixed inset-0 bg-black/40" onClick={handleCloseAlert} />
+              <div className="relative z-50 w-full max-w-md rounded-xl bg-background p-6 shadow-2xl space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold">Authentication</h3>
+                  <button onClick={handleCloseAlert}><X className="h-4 w-4" /></button>
+                </div>
+                <hr className="border-border" />
+                <p className="text-sm text-muted-foreground">In order to change your login details you must provide your current password.</p>
+                <div className="relative">
+                  <label className="block text-sm font-medium text-foreground mb-1.5">Password</label>
+                  <div className="relative">
+                    <Input type={passShow ? "text" : "password"} placeholder="Enter Your Password" />
+                    <button type="button" onClick={() => setPassShow(!passShow)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                      {passShow ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                </div>
+                <NavLink to="/forgotpass" className="text-sm text-primary hover:underline">Forgot Password?</NavLink>
+                <div className="flex items-center gap-3 pt-2">
+                  <Button onClick={handleUpdatePasswordClick}>Submit</Button>
+                  <Button variant="outline" onClick={handleCloseAlert}>Cancel</Button>
+                </div>
+              </div>
+            </div>
+          )}
 
-            <Box>
-              <Box className="base-TextField-root">
-                <label htmlFor="subject">From</label>
-                <Select
-                  value={SystemLang}
-                  onChange={(e) => setSystemLang(e.target.value)}
-                  sx={{ width: "100%", mt: 2, mb: 2 }}
-                  size="small"
-                >
-                  {options.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </Box>
-            </Box>
-          </Box>
-        </Box>
-      </Box>
+          <hr className="border-border mb-4" />
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-1.5">Email</label>
+              <Input disabled value={email} onChange={(e) => setEmail(e.target.value)} type="email" />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1.5">Password</label>
+                <div className="relative">
+                  <Input type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} disabled={!isLoginEditable} placeholder="Password" />
+                  <button type="button" onClick={handleTogglePasswordVisibility} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1.5">Confirm Password</label>
+                <div className="relative">
+                  <Input type={showConfirmPassword ? "text" : "password"} value={cpassword} onChange={(e) => setCpassword(e.target.value)} disabled={!isLoginEditable} placeholder="Confirm Password" />
+                  <button type="button" onClick={handleToggleCPasswordVisibility} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-1.5">Stay signed in for</label>
+              <Input disabled value={signedtime} placeholder="Stay signed in for" />
+            </div>
+            {showUpdatePassButton && (
+              <Button onClick={updatePassword}>Update Password</Button>
+            )}
+          </div>
+        </div>
+
+        {/* ===== TWO-FACTOR AUTH ===== */}
+        <div className="authentication rounded-xl border bg-card p-5 shadow-sm">
+          <h2 className="text-lg font-semibold text-foreground mb-3">Two-factor authentication</h2>
+          <hr className="border-border mb-4" />
+          <div className="flex items-center gap-3 cursor-pointer">
+            <Switch onCheckedChange={handleAuthentication} />
+            <span className="text-sm text-foreground" onClick={handleAuthentication}>Turn on two-factor authentication</span>
+            <HelpCircle className="h-4 w-4 text-primary" />
+          </div>
+        </div>
+
+        {/* ===== NOTIFICATION PREFERENCES ===== */}
+        <div className="preferences rounded-xl border bg-card p-5 shadow-sm">
+          <div className="flex items-center gap-2 mb-3">
+            <h2 className="text-lg font-semibold text-foreground">Notification preferences</h2>
+            <HelpCircle className="h-4 w-4 text-primary" />
+          </div>
+          <hr className="border-border mb-4" />
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="border-b">
+                  <th className="py-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-1/2"></th>
+                  <th className="py-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground text-center">INBOX+</th>
+                  <th className="py-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground text-center">EMAIL</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {notificationRows.map((row) => (
+                  <tr key={row.label}>
+                    <td className={`py-2.5 px-3 text-sm text-foreground ${row.indent ? "pl-8" : ""}`}>{row.label}</td>
+                    <td className="py-2.5 px-3 text-center">
+                      {!row.isSpacer && <Checkbox checked={row.inboxChecked} onCheckedChange={row.onInboxChange} />}
+                    </td>
+                    <td className="py-2.5 px-3 text-center">
+                      {!row.isSpacer && <Checkbox checked={row.emailChecked} onCheckedChange={row.onEmailChange} />}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* ===== EMAIL SYNC ===== */}
+        <div className="emailsyns rounded-xl border bg-card p-5 shadow-sm">
+          <h2 className="text-lg font-semibold text-foreground mb-3">Email Sync</h2>
+          <hr className="border-border mb-4" />
+          <div className="flex items-center gap-1.5 mb-4">
+            <p className="text-sm text-muted-foreground">Sync your existing email with TaxDome — all your client messages in one place.</p>
+            <HelpCircle className="h-4 w-4 text-primary shrink-0" />
+          </div>
+          <div className="space-y-3">
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-1.5">Email for sync</label>
+              <Input value={emailsync} onChange={(e) => setEmailSync(e.target.value)} placeholder="Email for sync" />
+            </div>
+            <Button onClick={handleEmailSync}>Sync your email</Button>
+          </div>
+        </div>
+
+        {/* ===== DOWNLOAD APP ===== */}
+        <div className="emailsyns rounded-xl border bg-card p-5 shadow-sm">
+          <h2 className="text-lg font-semibold text-foreground mb-3">Download Windows app</h2>
+          <hr className="border-border mb-4" />
+          <p className="text-sm text-muted-foreground">TaxDome Windows App help</p>
+          <Link to="#" className="text-sm text-primary hover:underline">
+            https://help.taxdome.com/article/164-taxdome-windows-application
+          </Link>
+        </div>
+
+        {/* ===== INTERNATIONAL SETTINGS ===== */}
+        <div className="emailsyns rounded-xl border bg-card p-5 shadow-sm">
+          <h2 className="text-lg font-semibold text-foreground mb-3">International settings</h2>
+          <hr className="border-border mb-4" />
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1.5">From</label>
+            <select value={SystemLang} onChange={(e) => setSystemLang(e.target.value)} className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring">
+              <option value="">Select Language</option>
+              {options.map((option) => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
       <ToastContainer/>
     </>
   );

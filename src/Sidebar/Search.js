@@ -1,29 +1,13 @@
 
 
 
-import React, { useState, useEffect } from "react";
-import {
-  Box,
-  TextField,
-  Stack,
-  Typography,
-  Divider,
-  CircularProgress,
-  List,
-  ListItem,
-  ListItemAvatar,
-  Avatar,
-  ListItemText,
-  Chip,
-  IconButton,
-  Drawer,
-} from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import { RxCross2 } from "react-icons/rx";
-import CloseIcon from "@mui/icons-material/Close";
+import { Search, X, Loader2, User, Building2 } from "lucide-react";
 import ContactForm from "../Pages/UpdateContact";
 import { useNavigate } from "react-router-dom";
+
+const FILTER_TYPES = ["All", "Accounts", "Contacts"];
 
 const SearchComponent = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -33,18 +17,27 @@ const SearchComponent = () => {
   const [selectedContact, setSelectedContact] = useState(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [error, setError] = useState(null);
+  const [isFocused, setIsFocused] = useState(false);
+  const containerRef = useRef(null);
 
   const navigate = useNavigate();
-  const CONTACT_API = process.env.REACT_APP_CONTACTS_URL;
 
   const isEmail = (value) => /\S+@\S+\.\S+/.test(value);
 
-  // -------------------------------
-  // FINAL UPDATED SEARCH LOGIC
-  // -------------------------------
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        setIsFocused(false);
+      }
+    };
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, []);
+
   const handleSearchChange = async (event) => {
     const query = event.target.value.trim();
-    setSearchQuery(query);
+    setSearchQuery(event.target.value);
 
     if (!query) {
       setOptions([]);
@@ -57,9 +50,6 @@ const SearchComponent = () => {
     try {
       let combinedOptions = [];
 
-      // ------------------------------------
-      // ✔ EMAIL SEARCH LOGIC
-      // ------------------------------------
       if (isEmail(query)) {
         const [accountsRes, contactsRes] = await Promise.all([
           axios.get(
@@ -70,16 +60,13 @@ const SearchComponent = () => {
             params: { email: query },
           }),
         ]);
-
         const accounts = accountsRes.data.accountlist || [];
         const contacts = contactsRes.data.data || [];
-
         combinedOptions = [
           ...accounts.map((a) => ({
             id: a._id,
             label: a.accountName,
-            subLabel:
-              a.emails?.length > 0 ? a.emails.join(", ") : "No Email Listed",
+            subLabel: a.emails?.length > 0 ? a.emails.join(", ") : "No Email Listed",
             type: "Accounts",
           })),
           ...contacts.map((c) => ({
@@ -89,12 +76,7 @@ const SearchComponent = () => {
             type: "Contacts",
           })),
         ];
-      }
-
-      // ------------------------------------
-      // ✔ NAME SEARCH LOGIC
-      // ------------------------------------
-      else {
+      } else {
         const [accountsRes, contactsRes] = await Promise.all([
           axios.get(
             "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true",
@@ -104,16 +86,13 @@ const SearchComponent = () => {
             params: { search: query },
           }),
         ]);
-
         const accounts = accountsRes.data.accountlist || [];
         const contacts = contactsRes.data.data || [];
-
         combinedOptions = [
           ...accounts.map((a) => ({
             id: a._id,
             label: a.accountName,
-            subLabel:
-              a.emails?.length > 0 ? a.emails.join(", ") : "No Email Listed",
+            subLabel: a.emails?.length > 0 ? a.emails.join(", ") : "No Email Listed",
             type: "Accounts",
           })),
           ...contacts.map((c) => ({
@@ -133,36 +112,23 @@ const SearchComponent = () => {
     }
   };
 
-  // -------------------------------
-  // FILTER LOGIC
-  // -------------------------------
   const filteredOptions = options
     .filter((option) => {
-      const labelMatch = option.label
-        ?.toLowerCase()
-        .includes(searchQuery.toLowerCase());
-      const subLabelMatch = option.subLabel
-        ?.toLowerCase()
-        .includes(searchQuery.toLowerCase());
-      return labelMatch || subLabelMatch;
+      const q = searchQuery.toLowerCase();
+      return option.label?.toLowerCase().includes(q) || option.subLabel?.toLowerCase().includes(q);
     })
     .filter((option) => filterType === "All" || option.type === filterType);
 
-  // -------------------------------
-  // OPEN CONTACT EDIT DRAWER
-  // -------------------------------
   const handleClick = async (id) => {
     try {
       const url = `https://www.snptaxes.com/api/contacts/contact/${id}`;
       const response = await fetch(url);
       const data = await response.json();
-
       setSelectedContact(data.data);
       setIsDrawerOpen(true);
-
-      // Clear input + options after click
       setSearchQuery("");
       setOptions([]);
+      setIsFocused(false);
     } catch (error) {
       console.error("Fetch error:", error);
     }
@@ -172,166 +138,151 @@ const SearchComponent = () => {
     setIsDrawerOpen(false);
     setSelectedContact(null);
   };
-    const handleContactUpdated = () => {
+
+  const handleContactUpdated = () => {
     handleCloseDrawer();
   };
 
+  const typeCount = (type) =>
+    options.filter((o) => type === "All" || o.type === type).length;
+
+  const showDropdown = isFocused && searchQuery.trim();
+
   return (
-    <Box sx={{ position: "relative", width: 300, margin: "0 auto" }}>
-      {/* Search Input */}
-      <TextField
-        value={searchQuery}
-        onChange={handleSearchChange}
-        placeholder="Search..."
-        size="small"
-        fullWidth
-        
-        InputProps={{
-          startAdornment: <SearchIcon sx={{ mr: 1, color: "gray" }} />,
-          endAdornment: (
-            <>
-              {loading ? (
-                <CircularProgress size={20} />
-              ) : (
-                searchQuery && (
-                  <IconButton onClick={() => setSearchQuery("")} size="small">
-                    <RxCross2 />
-                  </IconButton>
-                )
-              )}
-            </>
-          ),
-        }}
-      />
+    <>
+      <div ref={containerRef} className="relative w-72">
+        {/* Search input */}
+        <div className={`flex items-center gap-2 rounded-xl border bg-white px-3 py-2 shadow-sm transition-all duration-200 ${isFocused ? "border-indigo-400 ring-2 ring-indigo-500/15 shadow-md" : "border-slate-200 hover:border-slate-300"}`}>
+          {loading
+            ? <Loader2 className="h-4 w-4 text-slate-400 shrink-0 animate-spin" />
+            : <Search className="h-4 w-4 text-slate-400 shrink-0" />
+          }
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            onFocus={() => setIsFocused(true)}
+            placeholder="Search accounts & contacts..."
+            className="flex-1 bg-transparent text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none min-w-0"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => { setSearchQuery(""); setOptions([]); }}
+              className="shrink-0 rounded-full p-0.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          )}
+        </div>
 
-      {/* Dropdown */}
-      {searchQuery && (
-        <Box
-          sx={{
-            position: "absolute",
-            top: "100%",
-            left: 0,
-            right: 0,
-            bgcolor: "white",
-            border: "1px solid #ddd",
-            borderRadius: "8px",
-            boxShadow: 2,
-            mt: 1,
-            zIndex: 10,
-            maxHeight: 400,
-            overflowY: "auto",
-          }}
-        >
-          {/* Filter Tabs */}
-          <Stack
-            direction="row"
-            spacing={1}
-            sx={{ p: 2, justifyContent: "center" }}
-          >
-            {["All", "Accounts", "Contacts"].map((type) => {
-              const count = filteredOptions.filter(
-                (opt) => type === "All" || opt.type === type
-              ).length;
-
-              return (
-                <Box
-                  key={type}
-                  sx={{ display: "flex", gap: 1, alignItems: "center" }}
-                >
-                  <Typography
+        {/* Dropdown results */}
+        {showDropdown && (
+          <div className="absolute left-0 right-0 top-full z-50 mt-1.5 rounded-xl border border-slate-200 bg-white shadow-xl ring-1 ring-black/5 overflow-hidden">
+            {/* Filter tabs */}
+            <div className="flex items-center gap-1 border-b border-slate-100 px-3 py-2">
+              {FILTER_TYPES.map((type) => {
+                const count = typeCount(type);
+                return (
+                  <button
+                    key={type}
+                    type="button"
                     onClick={() => setFilterType(type)}
-                    sx={{
-                      fontWeight: filterType === type ? "bold" : "light",
-                      cursor: "pointer",
-                    }}
+                    className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium transition-all ${
+                      filterType === type
+                        ? "bg-indigo-600 text-white shadow-sm"
+                        : "text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+                    }`}
                   >
                     {type}
-                  </Typography>
-                  {count > 0 && (
-                    <Chip
-                      label={count}
-                      size="small"
-                      sx={{
-                        backgroundColor: "#00ACC1",
-                        color: "white",
-                        fontWeight: "bold",
-                      }}
-                    />
-                  )}
-                </Box>
-              );
-            })}
-          </Stack>
+                    {count > 0 && (
+                      <span className={`rounded-full px-1.5 py-0 text-[10px] font-semibold ${filterType === type ? "bg-white/25 text-white" : "bg-slate-200 text-slate-600"}`}>
+                        {count}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
 
-          <Divider />
-
-          {/* Results List */}
-          {filteredOptions.length > 0 ? (
-            <List>
-              {filteredOptions.map((option) => (
-                <ListItem
-                  key={option.id}
-                  button
-                  onClick={() => {
-                    if (option.type === "Accounts") {
-                      navigate(
-                        `/clients/accounts/accountsdash/overview/${option.id}`
-                      );
-                      setSearchQuery("");
-                    } else {
-                      handleClick(option.id);
-                    }
-                  }}
-                >
-                  <ListItemAvatar>
-                    <Avatar>{option.label.charAt(0).toUpperCase()}</Avatar>
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary={option.label}
-                    secondary={option.subLabel}
-                    primaryTypographyProps={{ fontWeight: "bold" }}
-                  />
-                </ListItem>
-              ))}
-            </List>
-          ) : (
-            <Typography sx={{ p: 2, color: "gray", textAlign: "center" }}>
-              No results found
-            </Typography>
-          )}
-        </Box>
-      )}
+            {/* Results */}
+            <div className="max-h-80 overflow-y-auto">
+              {error ? (
+                <p className="px-4 py-5 text-center text-sm text-red-500">{error}</p>
+              ) : filteredOptions.length === 0 ? (
+                <p className="px-4 py-6 text-center text-sm text-slate-400">No results found</p>
+              ) : (
+                <ul>
+                  {filteredOptions.map((option) => (
+                    <li key={option.id}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (option.type === "Accounts") {
+                            navigate(`/clients/accounts/accountsdash/overview/${option.id}`);
+                            setSearchQuery("");
+                            setOptions([]);
+                            setIsFocused(false);
+                          } else {
+                            handleClick(option.id);
+                          }
+                        }}
+                        className="flex w-full items-center gap-3 px-3 py-2.5 text-left transition-colors hover:bg-slate-50"
+                      >
+                        <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-white text-xs font-semibold ${option.type === "Accounts" ? "bg-indigo-500" : "bg-emerald-500"}`}>
+                          {option.type === "Accounts"
+                            ? <Building2 className="h-4 w-4" />
+                            : <User className="h-4 w-4" />
+                          }
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-semibold text-slate-800">{option.label}</p>
+                          <p className="truncate text-xs text-slate-500">{option.subLabel}</p>
+                        </div>
+                        <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ${option.type === "Accounts" ? "bg-indigo-50 text-indigo-600" : "bg-emerald-50 text-emerald-600"}`}>
+                          {option.type === "Accounts" ? "Account" : "Contact"}
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Contact Edit Drawer */}
-      <Drawer anchor="right" open={isDrawerOpen} onClose={handleCloseDrawer}>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            p: 2,
-            alignItems: "center",
-            // width: 420,
-          }}
-        >
-          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-            Edit Contact
-          </Typography>
-          <IconButton onClick={handleCloseDrawer}>
-            <CloseIcon />
-          </IconButton>
-        </Box>
-
-        <Divider />
-
-        {selectedContact && (
-          <ContactForm
-            selectedContact={selectedContact}
-            handleClose={handleCloseDrawer}
-             onContactUpdated={handleContactUpdated}
+      {isDrawerOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm transition-opacity"
+            onClick={handleCloseDrawer}
           />
-        )}
-      </Drawer>
-    </Box>
+          <div className="fixed right-0 top-0 z-50 flex h-full w-full max-w-lg flex-col bg-white shadow-2xl transition-transform duration-300">
+            <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+              <h2 className="text-base font-semibold text-slate-900">Edit Contact</h2>
+              <button
+                type="button"
+                onClick={handleCloseDrawer}
+                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto">
+              {selectedContact && (
+                <ContactForm
+                  selectedContact={selectedContact}
+                  handleClose={handleCloseDrawer}
+                  onContactUpdated={handleContactUpdated}
+                />
+              )}
+            </div>
+          </div>
+        </>
+      )}
+    </>
   );
 };
 

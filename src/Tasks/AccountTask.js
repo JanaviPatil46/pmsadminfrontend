@@ -1,40 +1,19 @@
 import React, { useState, useEffect } from "react";
-import {
-  Drawer,
-  Box,
-  Typography,
-  InputLabel,
-  IconButton,
-  Autocomplete,
-  TextField,
-  FormControl,
-  Select,
-  MenuItem,
-  OutlinedInput,
-  Chip,
-  Checkbox,
-  FormControlLabel,
-  Switch,
-  Button,
-} from "@mui/material";
 import TagsMultiSelectDropDown from "../Templates/TagsMultiSelectDropDown";
 import MultiSelectDropdown from "../Templates/MultiSelectDropdown";
-import { IoChevronBackOutline } from "react-icons/io5";
-import CloseIcon from "@mui/icons-material/Close";
 import Editor from "../Templates/Texteditor/Editor";
-import Grid from "@mui/material/Unstable_Grid2";
 import Priority from "../Templates/Priority/Priority";
 import Status from "../Templates/Status/Status";
 import dayjs from "dayjs";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { PiDotsSixVerticalBold } from "react-icons/pi";
-import { RiDeleteBin6Line } from "react-icons/ri";
-import { FiPlusCircle } from "react-icons/fi";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import { X, ArrowLeft, GripVertical, Trash2, PlusCircle } from "lucide-react";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Checkbox } from "../components/ui/checkbox";
+import { Switch } from "../components/ui/switch";
 const AccountTask = ({ handleNewDrawerClose, handleDrawerClose }) => {
   const handleClose = () => {
     handleNewDrawerClose();
@@ -588,401 +567,188 @@ const [errors, setErrors] = useState({ account: false, template: false });
       .catch((error) => console.error(error));
   };
   return (
-    <>
-      <Box>
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          padding={1.5}
-        >
-          <Typography variant="h6">Create Task</Typography>
-          <IconButton onClick={handleClose}>
-            <CloseIcon />
-          </IconButton>
-        </Box>
-        <Box sx={{ padding: "0 10px", height: "83vh", overflowY: "auto" }}>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <Box mt={2}>
-              <Box>
-                <InputLabel sx={{ color: "black" }}>Accounts</InputLabel>
+    <div className="flex flex-col h-full">
+      {/* Header */}
+      <div className="flex items-center justify-between px-5 py-4 border-b">
+        <h2 className="text-lg font-semibold text-foreground">Create Task</h2>
+        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleClose}>
+          <X className="h-4 w-4" />
+        </Button>
+      </div>
 
-                <Autocomplete
-                  options={accountoptions}
-                  getOptionLabel={(option) => option.label}
-                  value={selectedaccount}
-                  onChange={(event, newValue) => {
-    handleAccountChange(newValue);
-    // clear error if value selected
-    setErrors((prev) => ({ ...prev, account: !newValue }));
-  }}
-                  // onChange={(event, newValue) => handleAccountChange(newValue)}
-                  isOptionEqualToValue={(option, value) =>
-                    option.value === value.value
-                  }
-                  renderOption={(props, option) => (
-                    <Box
-                      component="li"
-                      {...props}
-                      sx={{ cursor: "pointer", margin: "5px 10px" }} // Add cursor pointer style
-                    >
-                      {option.label}
-                    </Box>
-                  )}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      placeholder="Select Account"
-                      variant="outlined"
-                      size="small"
-                      sx={{ backgroundColor: "#fff" }}
-                      error={errors.account}
-      helperText={errors.account ? "Account is required" : ""}
-                    />
-                  )}
-                  sx={{ width: "100%", marginTop: "8px" }}
-                />
-              </Box>
-              <Box mt={2}>
-                <InputLabel sx={{ color: "black" }}>Job</InputLabel>
-                <Autocomplete
-                  options={jobsoptions}
-                  groupBy={(option) => option.group} // Group by pipeline name
-                  value={selectedJob}
-                  disabled={!selectedaccount}
-                  onChange={(event, newValue) => handleJobChange(newValue)}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      placeholder="Select Job"
-                      variant="outlined"
-                      size="small"
-                    />
-                  )}
-                  getOptionLabel={(option) => option.label}
-                  sx={{ width: "100%", mt: 1 }}
-                />
-              </Box>
-              <Box mt={2}>
-                <InputLabel sx={{ color: "black" }}>Template</InputLabel>
-                <Autocomplete
-                  options={taskTemplateOptions}
-                  getOptionLabel={(option) => option.label}
-                  value={selectedtemp}
-                  // onChange={handletemp}
-                  onChange={(event, newValue) => {
-    handletemp(event, newValue); // pass both args properly
-    // clear error if value selected
-    setErrors((prev) => ({ ...prev, template: !newValue }));
-  }}
-                  isOptionEqualToValue={(option, value) =>
-                    option.value === value.value
-                  }
-                  renderOption={(props, option) => (
-                    <Box
-                      component="li"
-                      {...props}
-                      sx={{ cursor: "pointer", margin: "5px 10px" }} // Add cursor pointer style
-                    >
-                      {option.label}
-                    </Box>
-                  )}
-                  renderInput={(params) => (
-                    <>
-                      <TextField
-                        {...params}
-                        // helperText={templateError}
-                        sx={{ backgroundColor: "#fff" }}
-                        placeholder="Select Template"
-                        variant="outlined"
-                        size="small"
-                        error={errors.template}
-      helperText={errors.template ? "Template is required" : ""}
-                      />
-                    </>
-                  )}
-                  sx={{ width: "100%", marginTop: "8px" }}
-                  clearOnEscape // Enable clearable functionality
-                />
-              </Box>
-
-              <Box sx={{ width: "100%", mt: 2 }}>
-                <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6} pr={3}>
-                    <Box>
-                      <InputLabel sx={{ color: "black" }}>
-                        Task Assignee
-                      </InputLabel>
-                      
-                      <MultiSelectDropdown
-                        value={selectedUser}
-                        onChange={handleUserChange}
-                        placeholder="Assignees"
-                      />
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Box>
-                      <Status
-                        onStatusChange={handleStatusChange}
-                        selectedStatus={status}
-                      />
-                    </Box>
-                  </Grid>
-                </Grid>
-              </Box>
-
-              <Box sx={{ width: "100%", mt: 2 }}>
-                <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
-                    <Box>
-                      <label className="task-input-label">Template Name</label>
-                      <TextField
-                        fullWidth
-                        name="TemplateName"
-                        placeholder="Template Name"
-                        size="small"
-                        margin="normal"
-                        sx={{ background: "#fff" }}
-                        onChange={(e) => setTempNameNew(e.target.value)}
-                        value={tempNameNew}
-                      />
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Box>
-                      <Priority
-                        onPriorityChange={handlePriorityChange}
-                        selectedPriority={priority}
-                      />
-                    </Box>
-                  </Grid>
-                </Grid>
-              </Box>
-              <Box sx={{ mt: 2, mb: 7 }}>
-                <InputLabel sx={{ color: "black", mb: 2 }}>
-                  Description
-                </InputLabel>
-                <Editor
-                  initialContent={taskDiscription}
-                  onChange={handleEditorChange}
-                />
-              </Box>
-              <Box mt={2} mr={1}>
-                <InputLabel sx={{ color: "black", mb: 1 }}>Tags</InputLabel>
-                
-                <TagsMultiSelectDropDown
-                  value={tagsNew}
-                  onChange={handleTagChange}
-                  placeholder="Tags"
-                />
-              </Box>
-              <Box mt={2}>
-                <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
-                  <Typography className="task-input-label">
-                    Start Date
-                  </Typography>
-                  <DatePicker
-                     format="MM/DD/YYYY"
-                    sx={{ width: "100%", backgroundColor: "#fff" }}
-                    value={StartsDateNew}
-                    onChange={handleStartDateChange}
-                    renderInput={(params) => (
-                      <TextField {...params} size="small" />
-                    )}
-                  />
-                </Box>
-                <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
-                  <Typography className="task-input-label">Due Date</Typography>
-                  <DatePicker
-                     format="MM/DD/YYYY"
-                    sx={{ width: "100%", backgroundColor: "#fff" }}
-                    value={DueDateNew}
-                    onChange={handleDueDateChange}
-                    renderInput={(params) => (
-                      <TextField {...params} size="small" />
-                    )}
-                  />
-                </Box>
-              </Box>
-              <Box mt={2}>
-                <DragDropContext onDragEnd={handleDragEnd}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Typography variant="h6">Subtasks</Typography>
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          onChange={(event) =>
-                            handleSubtaskSwitch(event.target.checked)
-                          }
-                          checked={SubtaskSwitch}
-                          color="primary"
-                        />
-                      }
-                    />
-                  </Box>
-
-                  {/* {SubtaskSwitch && (
-                    <Droppable droppableId="subtaskList">
-                      {(provided) => (
-                        <div
-                          className="subtask-input"
-                          {...provided.droppableProps}
-                          ref={provided.innerRef}
-                        >
-                          {(subtasks.length > 0
-                            ? subtasks
-                            : [{ id: "default", text: "" }]
-                          ).map((subtask, index) => (
-                            <Draggable
-                              key={subtask.id}
-                              draggableId={subtask.id}
-                              index={index}
-                            >
-                              {(provided) => (
-                                <div
-                                  ref={provided.innerRef}
-                                  {...provided.draggableProps}
-                                  {...provided.dragHandleProps}
-                                >
-                                  <Box
-                                    display="flex"
-                                    gap="30px"
-                                    alignItems="center"
-                                  >
-                                    <Checkbox
-                                      style={{ cursor: "pointer" }}
-                                      // checked={checkedSubtasks.includes(subtask.id)}
-                                      checked={subtask.checked}
-                                      onChange={() =>
-                                        handleCheckboxChange(subtask.id)
-                                      }
-                                    />
-                                    <TextField
-                                      placeholder="Things To do"
-                                      value={subtask.text}
-                                      size="small"
-                                      margin="normal"
-                                      fullWidth
-                                      onChange={(e) =>
-                                        handleInputChange(
-                                          subtask.id,
-                                          e.target.value
-                                        )
-                                      }
-                                      variant="outlined"
-                                    />
-                                    <IconButton
-                                      onClick={() =>
-                                        handleDeleteSubtask(subtask.id)
-                                      }
-                                      style={{ cursor: "pointer" }}
-                                    >
-                                      <RiDeleteBin6Line />
-                                    </IconButton>
-                                    <IconButton style={{ cursor: "move" }}>
-                                      <PiDotsSixVerticalBold />
-                                    </IconButton>
-                                  </Box>
-                                </div>
-                              )}
-                            </Draggable>
-                          ))}
-
-                          {provided.placeholder}
-                          <Box
-                            sx={{ cursor: "pointer" }}
-                            onClick={handleAddSubtask}
-                            style={{ margin: "10px", color: "#1976d3" }}
-                          >
-                            <FiPlusCircle /> Add Subtasks
-                          </Box>
-                        </div>
-                      )}
-                    </Droppable>
-                  )} */}
-                   {SubtaskSwitch && (
-<Droppable droppableId="subtaskList">
-{(provided) => (
-<div className="subtask-input" {...provided.droppableProps} ref={provided.innerRef}>
-{subtasks.map((subtask, index) => (
-                                      <Draggable key={subtask.id} draggableId={subtask.id} index={index}>
-                                        {(provided) => (
-                                          <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                            <Box display="flex" gap="30px" alignItems="center">
-                                              {/* <Checkbox
-                                                checked={checkedSubtasks.includes(subtask.id)}
-                                                onChange={() => handleCheckboxChange(subtask.id, subtask.checked)}
-                                              /> */}
-                                              <Checkbox
-              checked={subtask.checked}
-              onChange={() => handleCheckboxChange(subtask.id)}
-            />
-            
-                                              <TextField
-                                                placeholder="Things To do"
-                                                value={subtask.text}
-                                                size="small"
-                                                margin="normal"
-                                                fullWidth
-                                                onChange={(e) => handleInputChange(subtask.id, e.target.value)}
-                                                variant="outlined"
-                                              />
-                                              <IconButton onClick={() => handleDeleteSubtask(subtask.id)}>
-                                                <RiDeleteBin6Line />
-                                              </IconButton>
-                                              <IconButton {...provided.dragHandleProps}>
-                                                <PiDotsSixVerticalBold />
-                                              </IconButton>
-                                            </Box>
-                                          </div>
-                                        )}
-                                      </Draggable>
-))}                                    
-{provided.placeholder}
-<Box sx={{ cursor: 'pointer' }} onClick={handleAddSubtask} style={{ margin: "10px", color: "#1976d3" }}>
-<FiPlusCircle /> Add Subtasks
-</Box>
-</div>
-)}
-</Droppable>
-)}
-                </DragDropContext>
-              </Box>
-            </Box>
-          </LocalizationProvider>
-        </Box>
-        <Box mt={2} sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Button onClick={handleClose}>
-            <Typography sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              {" "}
-              <IoChevronBackOutline />
-              Back
-            </Typography>
-          </Button>
-          <Button
-            variant="contained"
-            sx={{
-              backgroundColor: "var(--color-save-btn)", // Normal background
-
-              "&:hover": {
-                backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-              },
-              borderRadius: "15px",
+      {/* Scrollable Body */}
+      <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
+        {/* Account */}
+        <div>
+          <label className="block text-sm font-medium text-foreground mb-1.5">Account</label>
+          <select
+            value={selectedaccount?.value || ""}
+            onChange={(e) => {
+              const match = accountoptions.find((a) => a.value === e.target.value);
+              handleAccountChange(match || null);
+              setErrors((prev) => ({ ...prev, account: !match }));
             }}
-            onClick={createTask}
+            className={`flex h-10 w-full rounded-lg border bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow ${errors.account ? "border-destructive" : "border-input"}`}
           >
-            Create Task
-          </Button>
-        </Box>
-      </Box>
-    </>
+            <option value="">Select Account</option>
+            {accountoptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+          {errors.account && <p className="mt-1 text-xs text-destructive">Account is required</p>}
+        </div>
+
+        {/* Job */}
+        <div>
+          <label className="block text-sm font-medium text-foreground mb-1.5">Job</label>
+          <select
+            value={selectedJob?.value || ""}
+            disabled={!selectedaccount}
+            onChange={(e) => {
+              const match = jobsoptions.find((j) => j.value === e.target.value);
+              handleJobChange(match || null);
+            }}
+            className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <option value="">Select Job</option>
+            {jobsoptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Template */}
+        <div>
+          <label className="block text-sm font-medium text-foreground mb-1.5">Template</label>
+          <select
+            value={selectedtemp?.value || ""}
+            onChange={(e) => {
+              const match = taskTemplateOptions.find((t) => t.value === e.target.value);
+              handletemp(e, match || null);
+              setErrors((prev) => ({ ...prev, template: !match }));
+            }}
+            className={`flex h-10 w-full rounded-lg border bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow ${errors.template ? "border-destructive" : "border-input"}`}
+          >
+            <option value="">Select Template</option>
+            {taskTemplateOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+          {errors.template && <p className="mt-1 text-xs text-destructive">Template is required</p>}
+        </div>
+
+        {/* Assignee + Status Row */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1.5">Task Assignee</label>
+            <MultiSelectDropdown value={selectedUser} onChange={handleUserChange} placeholder="Assignees" />
+          </div>
+          <div>
+            <Status onStatusChange={handleStatusChange} selectedStatus={status} />
+          </div>
+        </div>
+
+        {/* Template Name + Priority Row */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1.5">Template Name</label>
+            <Input placeholder="Template Name" value={tempNameNew} onChange={(e) => setTempNameNew(e.target.value)} />
+          </div>
+          <div>
+            <Priority onPriorityChange={handlePriorityChange} selectedPriority={priority} />
+          </div>
+        </div>
+
+        {/* Description */}
+        <div>
+          <label className="block text-sm font-medium text-foreground mb-1.5">Description</label>
+          <Editor initialContent={taskDiscription} onChange={handleEditorChange} />
+        </div>
+
+        {/* Tags */}
+        <div>
+          <label className="block text-sm font-medium text-foreground mb-1.5">Tags</label>
+          <TagsMultiSelectDropDown value={tagsNew} onChange={handleTagChange} placeholder="Tags" />
+        </div>
+
+        {/* Dates */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1.5">Start Date</label>
+            <input
+              type="date"
+              value={StartsDateNew ? dayjs(StartsDateNew).format("YYYY-MM-DD") : ""}
+              onChange={(e) => handleStartDateChange(e.target.value ? dayjs(e.target.value) : null)}
+              className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1.5">Due Date</label>
+            <input
+              type="date"
+              value={DueDateNew ? dayjs(DueDateNew).format("YYYY-MM-DD") : ""}
+              onChange={(e) => handleDueDateChange(e.target.value ? dayjs(e.target.value) : null)}
+              className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow"
+            />
+          </div>
+        </div>
+
+        {/* Subtasks */}
+        <div>
+          <DragDropContext onDragEnd={handleDragEnd}>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-base font-semibold text-foreground">Subtasks</h3>
+              <Switch checked={SubtaskSwitch} onCheckedChange={handleSubtaskSwitch} />
+            </div>
+
+            {SubtaskSwitch && (
+              <Droppable droppableId="subtaskList">
+                {(provided) => (
+                  <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
+                    {subtasks.map((subtask, index) => (
+                      <Draggable key={subtask.id} draggableId={subtask.id} index={index}>
+                        {(provided) => (
+                          <div ref={provided.innerRef} {...provided.draggableProps} className="flex items-center gap-2 rounded-lg border bg-card p-2">
+                            <Checkbox
+                              checked={subtask.checked || false}
+                              onCheckedChange={() => handleCheckboxChange(subtask.id)}
+                            />
+                            <Input
+                              placeholder="Things to do"
+                              value={subtask.text}
+                              onChange={(e) => handleInputChange(subtask.id, e.target.value)}
+                              className="flex-1"
+                            />
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => handleDeleteSubtask(subtask.id)}>
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                            <div {...provided.dragHandleProps} className="cursor-grab text-muted-foreground hover:text-foreground">
+                              <GripVertical className="h-4 w-4" />
+                            </div>
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                    <button onClick={handleAddSubtask} className="flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors mt-2">
+                      <PlusCircle className="h-4 w-4" /> Add Subtask
+                    </button>
+                  </div>
+                )}
+              </Droppable>
+            )}
+          </DragDropContext>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="flex items-center gap-3 px-5 py-4 border-t bg-muted/30">
+        <Button variant="outline" onClick={handleClose}>
+          <ArrowLeft className="h-4 w-4 mr-1.5" /> Back
+        </Button>
+        <Button onClick={createTask}>Create Task</Button>
+      </div>
+    </div>
   );
 };
 

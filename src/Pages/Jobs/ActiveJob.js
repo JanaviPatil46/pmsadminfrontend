@@ -1,66 +1,21 @@
 import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
-import CloseIcon from "@mui/icons-material/Close";
-import {
-  MaterialReactTable,
-  useMaterialReactTable,
-} from "material-react-table";
 import { format, formatDistanceToNow } from "date-fns";
-import {
-  Menu,
-  Switch,
-  FormControlLabel,
-  InputLabel,
-  InputAdornment,
-  Button,
-  Box,
-  Typography,
-  Drawer,
-  Chip,
-  Divider,
-  Stack,
-  Select,
-  MenuItem,
-  Paper,
-  IconButton,
-} from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { useMediaQuery } from "@mui/material";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { Autocomplete, TextField } from "@mui/material";
-import { MRT_TableHeadCellFilterContainer } from "material-react-table";
-import { useTheme } from "@mui/material/styles";
+import dayjs from "dayjs";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { X, MoreVertical, Trash2, Archive, Loader2 } from "lucide-react";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Checkbox } from "../../components/ui/checkbox";
+import { Switch } from "../../components/ui/switch";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "../../components/ui/dropdown-menu";
 import Priority from "../../Templates/Priority/Priority";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import Editor from "../../Templates/Texteditor/Editor";
 import UpdateJob from "../UpdateJob";
-import { toast } from "react-toastify";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import dayjs from "dayjs";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  // Paper,
-  // IconButton,
-  // Menu,
-  // MenuItem,
-  Checkbox,
-  FormControl,
-  OutlinedInput,
-  ListItemText,
-} from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import { MdOutlineArchive } from "react-icons/md";
-import TablePagination from "@mui/material/TablePagination";
 import { GoDotFill } from "react-icons/go";
 import TagsMultiSelectDropDown from "../../Templates/TagsMultiSelectDropDown";
 import MultiSelectDropdown from "../../Templates/MultiSelectDropdown";
-import CircularProgress from "@mui/material/CircularProgress"; // MUI Loader
 import FilterDropdown from "./JobFilter";
 const Example = ({ charLimit = 4000 }) => {
   const ITEM_HEIGHT = 48;
@@ -79,9 +34,7 @@ const Example = ({ charLimit = 4000 }) => {
   const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
   const CLIENT_FACING_API = process.env.REACT_APP_CLIENT_FACING_URL;
   // const PIPELINE_API = process.env.REACT_APP_PIPELINE_TEMP_URL;
-  const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
-  const isMobile = useMediaQuery("(max-width: 1000px)");
+  // Responsive handled via Tailwind
   const [jobData, setJobData] = useState([]);
   const [isActiveTrue, setIsActiveTrue] = useState(true);
 
@@ -902,7 +855,7 @@ const [jobName,setJobName]=useState("")
       .then((response) => response.json())
       .then((result) => {
         console.log(result);
-        setAnchorEl(null);
+        setOpenMenuId(null);
 
         if (action === "Archive") {
           handleArchivedClick(); // Call the handleArchivedClick function
@@ -914,14 +867,13 @@ const [jobName,setJobName]=useState("")
       .catch((error) => console.error(error));
   };
 
-  const [anchorEl, setAnchorEl] = useState(null);
+  const [openMenuId, setOpenMenuId] = useState(null);
 
-  const handleMenuClick = (event, id) => {
-    setAnchorEl(event.currentTarget);
-    setSelectedJob(id);
+  const handleMenuClick = (id) => {
+    setOpenMenuId(openMenuId === id ? null : id);
   };
   const handleClose = () => {
-    setAnchorEl(null);
+    setOpenMenuId(null);
     setSelectedJob(null);
   };
 
@@ -1271,928 +1223,306 @@ const getPriorityStyle = (priority) => {
 };
 
  
+  const columns = [
+    { key: "Name", label: "Name", sticky: true },
+    { key: "JobAssignee", label: "Job Assignee" },
+    { key: "Pipeline", label: "Pipeline" },
+    { key: "Stage", label: "Stage" },
+    { key: "Account", label: "Account" },
+    { key: "ClientFacing", label: "Client-Facing Status" },
+    { key: "Priority", label: "Priority" },
+    { key: "StartDate", label: "Start Date" },
+    { key: "DueDate", label: "Due Date" },
+    { key: "updatedAt", label: "Time in Stage" },
+  ];
+
+  const getPriorityClasses = (priority) => {
+    switch (priority?.toLowerCase()) {
+      case "urgent": return "bg-black text-white";
+      case "high": return "bg-red-400 text-white";
+      case "medium": return "bg-yellow-400 text-white";
+      case "low": return "bg-green-400 text-white";
+      default: return "bg-gray-400 text-white";
+    }
+  };
+
+  const renderCell = (row, col) => {
+    switch (col.key) {
+      case "Name":
+        return (
+          <button className="text-sm font-medium text-primary hover:underline" onClick={(e) => { e.stopPropagation(); handleClick(row.id); }}>
+            {row.Name}
+          </button>
+        );
+      case "Stage":
+        return <span className="text-sm text-muted-foreground">{row.Stages?.name || "-"}</span>;
+      case "ClientFacing":
+        return row.visibilityForClient ? (
+          row.clientfacingstatus?.statusName ? (
+            <span className="flex items-center gap-1.5 text-sm">
+              <GoDotFill style={{ color: row.clientfacingstatus.statusColor, fontSize: "16px" }} />
+              {row.clientfacingstatus.statusName}
+            </span>
+          ) : null
+        ) : <span className="text-sm text-muted-foreground">-</span>;
+      case "Priority":
+        return row.Priority ? (
+          <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${getPriorityClasses(row.Priority)}`}>
+            {row.Priority}
+          </span>
+        ) : null;
+      default:
+        return <span className="text-sm text-muted-foreground">{row[col.key] || "-"}</span>;
+    }
+  };
+
   return (
     <>
-      <Drawer
-        anchor="right"
-        open={isDrawerOpen}
-        onClose={() => setIsDrawerOpen(false)}
-        PaperProps={{
-          sx: {
-            borderRadius: isSmallScreen ? "0" : "10px 0 0 10px",
-            width: isSmallScreen ? "100%" : 600,
-            maxWidth: "100%",
-            [theme.breakpoints.down("sm")]: {
-              width: "100%",
-            },
-            id: "tag-drawer",
-          },
-        }}
-      >
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "20px",
-              ml: 1,
-            }}
-          >
-            <Typography sx={{ fontWeight: "bold" }} variant="h6">
-              Edit Job
-            </Typography>
-            <IconButton onClick={() => setIsDrawerOpen(false)}>
-              <CloseIcon />
-            </IconButton>
-          </Box>
-          <Divider />
-          <Box
-            padding={2}
-            height="83vh"
-            sx={{ overflowY: "auto" }}
-            className="bulk-job-form"
-          >
-            <Box>
-              <InputLabel sx={{ color: "black" }}>Account</InputLabel>
+      {/* ===== DRAWER ===== */}
+      {isDrawerOpen && (
+        <div className="fixed inset-0 z-50 flex justify-end">
+          <div className="fixed inset-0 bg-black/40" onClick={() => setIsDrawerOpen(false)} />
+          <div className="relative z-50 flex h-full w-full max-w-[600px] flex-col bg-background shadow-2xl animate-in slide-in-from-right">
+            {/* Drawer Header */}
+            <div className="flex items-center justify-between px-5 py-4 border-b">
+              <h2 className="text-lg font-semibold text-foreground">Edit Job</h2>
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setIsDrawerOpen(false)}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
 
-              <TextField
-                value={selectedAccount}
-                size="small"
-                fullWidth
-                margin="normal"
-              />
-            </Box>
+            {/* Drawer Body */}
+            <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
+              {/* Account */}
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1.5">Account</label>
+                <Input value={selectedAccount || ""} readOnly />
+              </div>
 
-            <Box>
-                        <InputLabel sx={{ color: "black" }}>Job Name</InputLabel>
-                        <TextField
-                          value={jobName}
-                           onChange={(e) => setJobName(e.target.value)}
-                          size="small"
-                          fullWidth
-                          margin="normal"
-                        />
-                      </Box>
-            <Box>
-              <InputLabel sx={{ color: "black" }}>Pipeline</InputLabel>
+              {/* Job Name */}
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1.5">Job Name</label>
+                <Input value={jobName} onChange={(e) => setJobName(e.target.value)} />
+              </div>
 
-              <Autocomplete
-              disabled
-                options={optionpipeline}
-                getOptionLabel={(option) => option.label}
-                value={selectedPipeline}
-                onChange={(event, newValue) => handlePipelineChange(newValue)}
-                isOptionEqualToValue={(option, value) =>
-                  option.value === value.value
-                }
-                renderOption={(props, option) => (
-                  <Box
-                    component="li"
-                    {...props}
-                    sx={{ cursor: "pointer", margin: "5px 10px" }} // Add cursor pointer style
-                  >
-                    {option.label}
-                  </Box>
-                )}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    sx={{ backgroundColor: "#fff" }}
-                    placeholder="Pipeline"
-                    variant="outlined"
-                    size="small"
-                  />
-                )}
-                sx={{ width: "100%", marginTop: "8px" }}
-                clearOnEscape // Enable clearable functionality
-              />
-            </Box>
-            
-            <Box mt={2}>
-              <InputLabel sx={{ color: "black", mb: 1 }}>
-                Account Tags
-              </InputLabel>
-            
-              <TagsMultiSelectDropDown
-                value={selectedTags}
-                onChange={handleTagChange}
-                placeholder="Tags"
-              />
-            </Box>
-            <Box mt={2} mr={2.5}>
-              <InputLabel sx={{ color: "black" }}>Job Assignee</InputLabel>
-              
+              {/* Pipeline */}
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1.5">Pipeline</label>
+                <select disabled value={selectedPipeline?.value || ""} className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                  <option value="">Select Pipeline</option>
+                  {optionpipeline.map((opt) => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+              </div>
 
-              <MultiSelectDropdown
-                value={selectedUser}
-                onChange={handleUserChange}
-                placeholder="Job Assignees"
-              />
-            </Box>
-            <Box mt={2}>
-              <InputLabel sx={{ color: "black" }}>Stage</InputLabel>
-              <Autocomplete
-                options={stages || []}
-                getOptionLabel={(option) => option.label}
-                value={selectedstage}
-                onChange={(event, newValue) => handleStageChange(newValue)}
-                isOptionEqualToValue={(option, value) =>
-                  option.value === value.value
-                }
-                renderOption={(props, option) => (
-                  <Box
-                    component="li"
-                    {...props}
-                    sx={{ cursor: "pointer", margin: "5px 10px" }} // Add cursor pointer style
-                  >
-                    {option.label}
-                  </Box>
-                )}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    sx={{ backgroundColor: "#fff" }}
-                    placeholder="Select stages"
-                    variant="outlined"
-                    size="small"
-                  />
-                )}
-                clearOnEscape // Enable clearable functionality
-                sx={{ width: "100%", marginTop: "8px" }}
-              />
-            </Box>
-            <Box mt={2}>
-              <Priority
-                onPriorityChange={handlePriorityChange}
-                selectedPriority={priority}
-              />
-            </Box>
+              {/* Account Tags */}
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1.5">Account Tags</label>
+                <TagsMultiSelectDropDown value={selectedTags} onChange={handleTagChange} placeholder="Tags" />
+              </div>
 
-            <Box mt={2}>
-              <InputLabel sx={{ color: "black" }}>Start Date</InputLabel>
-              <DatePicker
-                 format="MM/DD/YYYY"
-                sx={{ width: "100%", backgroundColor: "#fff", mt: 2 }}
-                // value={startDate}
-                // onChange={handleStartDateChange}
-                value={startDate}
-                onChange={handleStartDateChange}
-                renderInput={(params) => <TextField {...params} size="small" />}
-              />
-            </Box>
+              {/* Job Assignee */}
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1.5">Job Assignee</label>
+                <MultiSelectDropdown value={selectedUser} onChange={handleUserChange} placeholder="Job Assignees" />
+              </div>
 
-            <Box mt={2}>
-              <InputLabel sx={{ color: "black" }}>Due Date</InputLabel>
-              <DatePicker
-                 format="MM/DD/YYYY"
-                sx={{ width: "100%", backgroundColor: "#fff", mt: 2 }}
-                // value={dueDate}
-                // onChange={handleDueDateChange}
-                value={dueDate}
-                onChange={handleDueDateChange}
-                renderInput={(params) => <TextField {...params} size="small" />}
-              />
-            </Box>
-            <Box mt={2}>
-              <Editor
-                initialContent={description}
-                onChange={handleEditorChange}
-              />
-            </Box>
-
-            <Box mt={3}>
-              <Box style={{ display: "flex", alignItems: "center" }}>
-                {/* <EditCalendarRoundedIcon sx={{ fontSize: '120px', color: '#c6c7c7', }} /> */}
-                <Box
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "8px",
-                    width: "100%",
-                  }}
+              {/* Stage */}
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1.5">Stage</label>
+                <select
+                  value={selectedstage?.value || ""}
+                  onChange={(e) => { const match = (stages || []).find((s) => s.value === e.target.value); handleStageChange(match || null); }}
+                  className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
                 >
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Typography variant="body">
-                      <b>Client-facing status</b>
-                    </Typography>
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          onChange={(event) =>
-                            handleClientFacing(event.target.checked)
-                          }
-                          checked={clientFacingStatus}
-                          color="primary"
-                        />
-                      }
-                      label="Show in Client portal"
-                    />
-                  </Box>
-                  <Box>
-                    {clientFacingStatus && (
-                      <>
-                        <InputLabel sx={{ color: "black" }}>
-                          Job name for client
-                        </InputLabel>
-                        <TextField
-                          fullWidth
-                          name="subject"
-                          value={inputText + selectedJobShortcut}
-                          onChange={handlechatsubject}
-                          placeholder="Job name for client"
-                          size="small"
-                          sx={{ background: "#fff", mt: 2 }}
-                        />
+                  <option value="">Select Stage</option>
+                  {(stages || []).map((opt) => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+              </div>
 
-                        <Box mt={2}>
-                          <InputLabel sx={{ color: "black" }}>
-                            Status
-                          </InputLabel>
-                          <Autocomplete
-                            options={optionstatus}
-                            size="small"
-                            sx={{ mt: 1 }}
-                            value={selectedjob}
-                            onChange={handleJobChange}
-                            getOptionLabel={(option) => option.label}
-                            isOptionEqualToValue={(option, value) =>
-                              option.value === value.value
-                            }
-                            renderOption={(props, option) => (
-                              <Box component="li" {...props}>
-                                {/* Color dot */}
-                                <Chip
-                                  size="small"
-                                  style={{
-                                    backgroundColor: option.clientfacingColour,
-                                    marginRight: 8,
-                                    marginLeft: 8,
-                                    borderRadius: "50%",
-                                    height: "15px",
-                                  }}
-                                />
-                                {option.label}
-                              </Box>
-                            )}
-                            renderInput={(params) => (
-                              <TextField
-                                {...params}
-                                placeholder="Select Client Facing Job"
-                                InputProps={{
-                                  ...params.InputProps,
-                                  startAdornment:
-                                    params.inputProps.value &&
-                                    clientFacingJobs.length > 0 ? (
-                                      <Chip
-                                        size="small"
-                                        style={{
-                                          backgroundColor:
-                                            clientFacingJobs.find(
-                                              (job) =>
-                                                job.clientfacingName ===
-                                                params.inputProps.value
-                                            )?.clientfacingColour, // Set color from selection
-                                          marginRight: 8,
-                                          marginLeft: 2,
-                                          borderRadius: "50%",
-                                          height: "15px",
-                                        }}
-                                      />
-                                    ) : null,
-                                }}
-                              />
-                            )}
-                          />
-                        </Box>
-                        <Box sx={{ position: "relative", mt: 2 }}>
-                          <InputLabel sx={{ color: "black" }}>
-                            Description
-                          </InputLabel>
-                          <TextField
-                            fullWidth
-                            size="small"
-                            margin="normal"
-                            type="text"
-                            multiline
-                            value={clientDescription}
-                            onChange={handleChange}
-                            placeholder="Description"
-                            InputProps={{
-                              endAdornment: (
-                                <InputAdornment position="end">
-                                  <Typography
-                                    sx={{
-                                      color: "gray",
-                                      fontSize: "12px",
-                                      position: "absolute",
-                                      bottom: "15px",
-                                      right: "15px",
-                                    }}
-                                  >
-                                    {charCount}/{charLimit}
-                                  </Typography>
-                                </InputAdornment>
-                              ),
-                            }}
-                          />
-                        </Box>
-                      </>
-                    )}
-                  </Box>
-                </Box>
-              </Box>
-            </Box>
+              {/* Priority */}
+              <div>
+                <Priority onPriorityChange={handlePriorityChange} selectedPriority={priority} />
+              </div>
 
-            <Box mt={5} display="flex" alignItems="center" gap={2}>
-              <Button
-                variant="contained"
-                onClick={handleSaveExitClick}
-                sx={{
-                  backgroundColor: "var(--color-save-btn)", // Normal background
+              {/* Dates */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1.5">Start Date</label>
+                  <input type="date" value={startDate ? dayjs(startDate).format("YYYY-MM-DD") : ""} onChange={(e) => handleStartDateChange(e.target.value ? dayjs(e.target.value) : null)} className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1.5">Due Date</label>
+                  <input type="date" value={dueDate ? dayjs(dueDate).format("YYYY-MM-DD") : ""} onChange={(e) => handleDueDateChange(e.target.value ? dayjs(e.target.value) : null)} className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                </div>
+              </div>
 
-                  "&:hover": {
-                    backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                  },
-                  borderRadius: "15px",
-                }}
-              >
-                Save & Exit
-              </Button>
-              <Button
-                variant="contained"
-                onClick={handleSaveClick}
-                sx={{
-                  backgroundColor: "var(--color-save-btn)", // Normal background
+              {/* Description */}
+              <div>
+                <Editor initialContent={description} onChange={handleEditorChange} />
+              </div>
 
-                  "&:hover": {
-                    backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                  },
-                  width: "80px",
-                  borderRadius: "15px",
-                }}
-              >
-                Save
-              </Button>
-              <Button
-                variant="outlined"
-                onClick={handleFormClose}
-                sx={{
-                  borderColor: "var(--color-border-cancel-btn)", // Normal background
-                  color: "var(--color-save-btn)",
-                  "&:hover": {
-                    backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                    color: "#fff",
-                    border: "none",
-                  },
-                  width: "80px",
-                  borderRadius: "15px",
-                  ml: 2,
-                }}
-              >
-                Cancel
-              </Button>
-            </Box>
-          </Box>
-        </LocalizationProvider>
-      </Drawer>
-      {/* <Box
-          className="client-document-nav"
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between", // Add this line
-            alignItems: "center", // Vertically align items
-            // mt: 5,
-            width: "100%",
-            // margin: "20px",
-            gap: "10px",
-            "& a": {
-              textDecoration: "none",
-              padding: "10px 16px",
-              borderRadius: "4px",
-              // color: "primary.main",
-              "&:hover": {
-                backgroundColor: "var(--color-save-btn)",
-                color: "white",
-              },
-              "&.active": {
-                backgroundColor: "var(--color-save-btn)",
-                color: "white",
-              },
-            },
-          }}
-        >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <Typography
-              style={{
-                backgroundColor:
-                  activeButton === "active"
-                    ? "var(--color-save-btn)"
-                    : "transparent",
-                color: activeButton === "active" ? "white" : "black",
-                fontWeight: activeButton === "active" ? "bold" : "normal",
-                padding: "4px 8px",
-                borderRadius: "10px",
-                fontSize: "14px",
-                cursor: "pointer",
-              }}
-              onClick={handleActiveClick}
-            >
-              Active Jobs
-            </Typography>
+              {/* Client-facing status */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-semibold text-foreground">Client-facing status</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground">Show in Client portal</span>
+                    <Switch checked={clientFacingStatus} onCheckedChange={handleClientFacing} />
+                  </div>
+                </div>
+                {clientFacingStatus && (
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-foreground mb-1.5">Job name for client</label>
+                      <Input value={inputText + selectedJobShortcut} onChange={handlechatsubject} placeholder="Job name for client" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-foreground mb-1.5">Status</label>
+                      <select
+                        value={selectedjob?.value || ""}
+                        onChange={(e) => { const match = optionstatus.find((s) => s.value === e.target.value); handleJobChange(e, match || null); }}
+                        className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                      >
+                        <option value="">Select Client Facing Job</option>
+                        {optionstatus.map((opt) => (
+                          <option key={opt.value} value={opt.value}>{opt.label}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="relative">
+                      <label className="block text-sm font-medium text-foreground mb-1.5">Description</label>
+                      <textarea
+                        value={clientDescription}
+                        onChange={handleChange}
+                        placeholder="Description"
+                        rows={3}
+                        className="flex w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+                      />
+                      <span className="absolute bottom-2 right-3 text-xs text-muted-foreground">{charCount}/{charLimit}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
 
-            <Typography
-              style={{
-                backgroundColor:
-                  activeButton === "archived"
-                    ? "var(--color-save-btn)"
-                    : "transparent",
-                color: activeButton === "archived" ? "white" : "black",
-                fontWeight: activeButton === "archived" ? "bold" : "normal",
-                padding: "4px 8px",
-                borderRadius: "10px",
-                fontSize: "14px",
-                cursor: "pointer",
-              }}
-              onClick={handleArchivedClick}
-            >
-              Archived Jobs
-            </Typography>
-            <Box>
-              {selected.length > 0 && (
-                <IconButton
-                  sx={{ color: "red" }}
-                  onClick={handleDeleteJob} // Pass selected job IDs
-                >
-                  <DeleteIcon />
-                </IconButton>
-              )}
-            </Box>
-          </Box>
-        </Box> */}
-      {/* <Box
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        backgroundColor: "#EBF0F5", // Light grayish-blue background
-        borderRadius: "12px",
-        padding: "4px",
-        width: "fit-content",
-      }}
-    >
-      <Typography
-        onClick={handleActiveClick}
-        sx={{
-          backgroundColor: activeButton === "active" ? "#FFFFFF" : "transparent",
-          color: activeButton === "active" ? "var(--color-save-btn)" : "#333",
-          fontWeight: activeButton === "active" ? "bold" : "normal",
-          padding: "6px 12px",
-          borderRadius: "8px",
-          fontSize: "15px",
-          cursor: "pointer",
-          transition: "all 0.3s ease",
-        }}
-      >
-        Active
-      </Typography>
+            {/* Drawer Footer */}
+            <div className="flex items-center gap-3 px-5 py-4 border-t bg-muted/30">
+              <Button onClick={handleSaveExitClick}>Save & Exit</Button>
+              <Button onClick={handleSaveClick}>Save</Button>
+              <Button variant="outline" onClick={handleFormClose}>Cancel</Button>
+            </div>
+          </div>
+        </div>
+      )}
 
-      <Typography
-        onClick={handleArchivedClick}
-        sx={{
-          backgroundColor: activeButton === "archived" ? "#FFFFFF" : "transparent",
-          color: activeButton === "archived" ? "var(--color-save-btn)" : "#333",
-          fontWeight: activeButton === "archived" ? "bold" : "normal",
-          padding: "6px 12px",
-          borderRadius: "8px",
-          fontSize: "15px",
-          cursor: "pointer",
-          transition: "all 0.3s ease",
-        }}
-      >
-        Archived
-      </Typography>
-    </Box> */}
+      {/* ===== ACTION BAR ===== */}
+      {selected.length > 0 && (
+        <div className="flex items-center gap-3 rounded-lg border bg-muted/50 px-4 py-2 mb-3">
+          <span className="text-sm font-medium text-muted-foreground">{selected.length} selected</span>
+          <button onClick={handleArchive} className="flex items-center gap-1.5 text-sm font-semibold text-foreground hover:text-primary transition-colors">
+            <Archive className="h-4 w-4" /> Archive
+          </button>
+          <Button variant="ghost" size="icon" onClick={handleDeleteJob} className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10">
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
 
-      <Box>
-        {/* Render action panel when items are selected */}
-        {selected.length > 0 && (
-          <Box
-            sx={{
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: 2,
-            }}
-          >
-            <MdOutlineArchive />
-            <Typography
-              sx={{ fontSize: "15px", fontWeight: "bold" }}
-              onClick={handleArchive}
-            >
-              Archive
-            </Typography>
-          </Box>
-        )}
-      </Box>
-
+      {/* ===== LOADING / TABLE ===== */}
       {loading ? (
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          {" "}
-          <CircularProgress style={{ fontSize: "300px", color: "blue" }} />
-        </Box>
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
       ) : (
-        <Box>
-          <Box >
-            <FilterDropdown onFilterChange={handleFilterChange} />
-          </Box>
-          <TableContainer component={Paper}>
-            <Table style={{ tableLayout: "fixed", width: "100%" }}>
-              <TableHead>
-                <TableRow>
-                  <TableCell
-                    padding="checkbox"
-                    style={{
-                      position: "sticky",
-                      left: 0,
-                      zIndex: 1,
-                      background: "#fff",
-                      fontSize: "2px", // Set a professional font size
-                      fontWeight: "bold",
-                      textAlign: "center",
-                    }}
-                  >
-                    <Checkbox
-                      checked={selected.length === jobData.length}
-                      onChange={() => {
-                        if (selected.length === jobData.length) {
-                          setSelected([]);
-                        } else {
-                          const allSelected = jobData.map((item) => item.id);
-                          setSelected(allSelected);
-                        }
-                      }}
-                    />
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      cursor: "pointer",
-                      position: "sticky",
-                      left: 50,
-                      zIndex: 1,
-                      background: "#fff",
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px", // Add more padding for better spacing
-                    }}
-                    width="200"
-                  >
-                    Name
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="100"
-                  >
-                    Job Assignee
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="100"
-                    height="60"
-                  >
-                    Pipeline
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="100"
-                  >
-                    Stage
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="100"
-                  >
-                    Account
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="200"
-                  >
-                    Client-Facing Status
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="200"
-                  >
-                    Priority
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="100"
-                  >
-                    Start Date
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="100"
-                  >
-                    Due Date
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="200"
-                  >
-                    Time in Current Stage
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      position: "sticky",
-                      right: 0, // Stick to the right side
-                      zIndex: 2, // Ensure it appears above other elements
-                      background: "#fff",
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="100"
-                  >
-                    Settings
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {paginatedChats.map((row) => {
-                  const isSelected = selected.indexOf(row.id) !== -1;
-                  return (
-                    <TableRow
-                      key={row.id}
-                      hover
-                      onClick={() => handleSelect(row.id)}
-                      role="checkbox"
-                      tabIndex={-1}
-                      selected={isSelected}
-                      style={{
-                        cursor: "pointer",
-                        transition: "background-color 0.3s ease",
-                        "&:hover": {
-                          backgroundColor: "#f4f4f4", // Add hover effect
-                        },
-                      }}
-                    >
-                      <TableCell
-                        padding="checkbox"
-                        style={{
-                          position: "sticky",
-                          left: 0,
-                          zIndex: 1,
-                          background: "#fff",
-                          fontSize: "12px",
-                          textAlign: "center",
-                          padding: "4px 8px",
-                          lineHeight: "1",
-                          // padding: "2px", // Adjust padding for better spacing
+        <div className="space-y-3">
+          <FilterDropdown onFilterChange={handleFilterChange} />
+          <div className="rounded-xl border bg-card shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="border-b bg-muted/40">
+                    <th className="sticky left-0 z-10 bg-muted/40 w-10 px-3 py-3">
+                      <Checkbox
+                        checked={filteredData.length > 0 && selected.length === filteredData.length}
+                        onCheckedChange={(checked) => {
+                          if (checked) { setSelected(filteredData.map((item) => item.id)); } else { setSelected([]); }
                         }}
-                      >
-                        <Checkbox checked={isSelected} />
-                      </TableCell>
-                      <TableCell
-                        style={{
-                          position: "sticky",
-                          left: 50,
-                          zIndex: 1,
-                          background: "#fff",
-                          fontSize: "12px",
-                          fontWeight: "normal",
-                          // padding: "12px 16px", // Add padding for better spacing
-                        }}
-                      >
-                        <span
-                          style={{ cursor: "pointer", color: "#3f51b5" }}
-                          // onClick={() => handleClick(row.id)}
-                          onClick={(e) => {
-                            e.stopPropagation(); // Prevent row click action when clicking on name
-                            handleClick(row.id);
-                          }}
-                        >
-                          {row.Name}
-                        </span>
-                      </TableCell>
-                      <TableCell
-                        style={{
-                          fontSize: "12px",
-                          padding: "4px 8px",
-                          lineHeight: "1",
-                        }}
-                      >
-                        {row.JobAssignee}
-                      </TableCell>
-                      <TableCell
-                        style={{
-                          fontSize: "12px",
-                          padding: "4px 8px",
-                          lineHeight: "1",
-                        }}
-                      >
-                        {row.Pipeline}
-                      </TableCell>
-                      <TableCell
-                        style={{
-                          fontSize: "12px",
-                          padding: "4px 8px",
-                          lineHeight: "1",
-                        }}
-                      >
-                        {/* {.Stage} */}
-                        {row.Stages?.name || "-"}
-                      </TableCell>
-                      <TableCell
-                        style={{
-                          fontSize: "12px",
-                          padding: "4px 8px",
-                          lineHeight: "1",
-                        }}
-                      >
-                        {row.Account}
-                      </TableCell>
-                      <TableCell
-                        style={{
-                          fontSize: "12px",
-                          padding: "4px 8px",
-                          lineHeight: "1",
-                        }}
-                      >
-                        {row.visibilityForClient === true ? (
-                          <>
-                           {row.clientfacingstatus?.statusName && (
-                          <span
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "8px",
-                            }}
-                          >
-                            <GoDotFill
-                              style={{
-                                color: row.clientfacingstatus.statusColor,
-                                fontSize: "20px",
-                              }}
-                            />
-                            {row.clientfacingstatus.statusName}
-                          </span>
-                        )}</>
-                        ) : (
-                          <> -</>
-                   
-                        )}
-                       
-                      </TableCell>
-                      <TableCell
-                        style={{
-                          fontSize: "12px",
-                          padding: "4px 8px",
-                          lineHeight: "1",
-                        }}
-                      >
-                        <Box sx={getPriorityStyle(row.Priority)}>
-    {row.Priority}
-  </Box>
-                      </TableCell>
-                      <TableCell
-                        style={{
-                          fontSize: "12px",
-                          padding: "4px 8px",
-                          lineHeight: "1",
-                        }}
-                      >
-                        {row.StartDate}
-                      </TableCell>
-                      <TableCell
-                        style={{
-                          fontSize: "12px",
-                          padding: "4px 8px",
-                          lineHeight: "1",
-                        }}
-                      >
-                        {row.DueDate}
-                      </TableCell>
-                      <TableCell
-                        style={{
-                          fontSize: "12px",
-                          padding: "4px 8px",
-                          lineHeight: "1",
-                        }}
-                      >
-                        {row.updatedAt}
-                      </TableCell>
-                      <TableCell
-                        // style={{
-                        //   fontSize: "12px",
-                        //   padding: "4px 8px",
-                        //   lineHeight: "1",
-                        // }}
-                        style={{
-                          position: "sticky",
-                          right: 0, // Stick to the right side
-                          zIndex: 1, // Keep it above the table content
-                          background: "#fff",
-                          fontSize: "12px",
-                          padding: "4px 8px",
-                          lineHeight: "1",
-                        }}
-                      >
-                        <IconButton
-                          onClick={(event) => handleMenuClick(event, row.id)}
-                        >
-                          <MoreVertIcon />
-                        </IconButton>
-                        <Menu
-                          anchorEl={anchorEl}
-                          open={Boolean(anchorEl && selectedJob === row.id)}
-                          onClose={handleClose}
-                        >
-                          {/* <MenuItem onClick={handleEditClick}>
-                          {isActiveTrue ? "Archive" : "Make Active"}
-                        </MenuItem> */}
-                          <MenuItem onClick={() => handleSubmit(row.id)}>
-                            Archive
-                          </MenuItem>
+                      />
+                    </th>
+                    {columns.map((col) => (
+                      <th key={col.key} className={`px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-nowrap ${col.sticky ? "sticky left-10 z-10 bg-muted/40" : ""}`}>
+                        {col.label}
+                      </th>
+                    ))}
+                    <th className="sticky right-0 z-10 bg-muted/40 w-14 px-3 py-3" />
+                  </tr>
+                </thead>
+                <tbody className="divide-y">
+                  {paginatedChats.length === 0 ? (
+                    <tr>
+                      <td colSpan={columns.length + 2} className="px-4 py-12 text-center text-sm text-muted-foreground">
+                        No active jobs found.
+                      </td>
+                    </tr>
+                  ) : (
+                    paginatedChats.map((row) => {
+                      const isSelected = selected.includes(row.id);
+                      return (
+                        <tr key={row.id} onClick={() => handleSelect(row.id)} className={`cursor-pointer transition-colors hover:bg-muted/30 ${isSelected ? "bg-primary/5" : ""}`}>
+                          <td className="sticky left-0 z-[5] bg-card px-3 py-2.5">
+                            <Checkbox checked={isSelected} onCheckedChange={() => handleSelect(row.id)} />
+                          </td>
+                          {columns.map((col) => (
+                            <td key={col.key} className={`px-4 py-2.5 whitespace-nowrap ${col.sticky ? "sticky left-10 z-[5] bg-card" : ""}`}>
+                              {renderCell(row, col)}
+                            </td>
+                          ))}
+                          <td className="sticky right-0 z-[5] bg-card px-2 py-2.5">
+                            <DropdownMenu open={openMenuId === row.id} onOpenChange={(open) => setOpenMenuId(open ? row.id : null)}>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); handleMenuClick(row.id); }}>
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleSubmit(row.id); }}>Archive</DropdownMenuItem>
+                                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleClose(); handleDeleteJob(); }} className="text-destructive">Delete</DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
 
-                          <MenuItem onClick={handleDelete}>Delete</MenuItem>
-                        </Menu>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <TablePagination
-            rowsPerPageOptions={[25,30, 40, 50, 60, 100]}
-            component="div"
-            count={jobData.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          />
-        </Box>
+          {/* Pagination */}
+          <div className="flex items-center justify-between px-2 py-2">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span>Rows per page:</span>
+              <select value={rowsPerPage} onChange={handleChangeRowsPerPage} className="rounded border border-input bg-white px-2 py-1 text-sm">
+                {[25, 30, 40, 50, 60, 100].map((opt) => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
+              </select>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span>{page * rowsPerPage + 1}–{Math.min((page + 1) * rowsPerPage, filteredData.length)} of {filteredData.length}</span>
+              <Button variant="outline" size="sm" disabled={page === 0} onClick={() => setPage(page - 1)}>Prev</Button>
+              <Button variant="outline" size="sm" disabled={(page + 1) * rowsPerPage >= filteredData.length} onClick={() => setPage(page + 1)}>Next</Button>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );
 };
 
 export default Example;
-// {selectedJob && <UpdateJob selectedJob={selectedJob} handleClose={() => setIsDrawerOpen(false)} />}
-{
-  /* <Stack direction={isMobile ? "column-reverse" : "column"} gap="8px">
-          <MaterialReactTable columns={columns} table={table} />
-        </Stack> */
-}

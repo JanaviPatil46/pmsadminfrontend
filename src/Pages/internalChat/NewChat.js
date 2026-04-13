@@ -1,9 +1,9 @@
 import React ,{useState,useEffect,useContext}from 'react'
-import {Box,Drawer,Typography,Divider,Button,Autocomplete,TextField} from "@mui/material"
-import CloseIcon from "@mui/icons-material/Close";
+import { X } from "lucide-react";
 import Editor from "../../Templates/Texteditor/Editor"
 import {toast} from "react-toastify"
 import { LoginContext } from "../../Sidebar/Context/Context";
+import { Button } from "../../components/ui/button";
 const NewChat = ({ open, handleClose, getsChatlist}) => {
   const INTERNALCHAT = process.env.REACT_APP_INTERNALCHAT_API
     const { logindata } = useContext(LoginContext);
@@ -177,122 +177,68 @@ const NewChat = ({ open, handleClose, getsChatlist}) => {
 
 
   return (
-    <Drawer
-    anchor="right"
-    open={open}
-    onClose={handleClose}
-    PaperProps={{
-      sx: {
-        width: 600,
-      },
-    }}
-  >
-    <Box>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          padding: 2,
-        }}
-      >
-        <Typography variant="h6">New chat</Typography>
-        <Box
-          onClick={handleClose}
-          sx={{ cursor: "pointer", color: "#1976d3" }}
-        >
-          <CloseIcon />
-        </Box>
-      </Box>
-      <Divider />
+    <>
+      {open && (
+        <div className="fixed inset-0 z-50 flex">
+          <div className="fixed inset-0 bg-black/40" onClick={handleClose} />
+          <div className="ml-auto relative z-50 w-full max-w-[600px] bg-background h-full flex flex-col shadow-2xl">
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+              <h2 className="text-lg font-semibold text-foreground">New Chat</h2>
+              <button
+                onClick={handleClose}
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
 
-      <Box p={3} height={"75vh"} overflow={"auto"}>
-        <Typography>To</Typography>
-        <Box mr={2}>
-        <Autocomplete
-                      options={options}
-                      sx={{ mt: 2, mb: 2, backgroundColor: "#fff" }}
-                      size="small"
-                      value={selecteduser}
-                      onChange={handleuserChange}
-                      isOptionEqualToValue={(option, value) =>
-                        option.value === value.value
-                      }
-                      getOptionLabel={(option) => option.label || ""}
-                      renderInput={(params) => (
-                        <>
-                          <TextField
-                            {...params}
-                           
-                            placeholder="Select Teammember"
-                          />
-                        
-                        </>
-                      )}
-                      isClearable={true}
-                    />
-        </Box>
-     
-      
+            {/* Body */}
+            <div className="flex-1 overflow-y-auto p-5 space-y-5">
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">To</label>
+                <select
+                  value={selecteduser?.value || ""}
+                  onChange={(e) => {
+                    const found = options.find(o => o.value === e.target.value);
+                    setSelectedUser(found || null);
+                  }}
+                  className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                >
+                  <option value="">Select Teammember</option>
+                  {options.map((opt) => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+              </div>
 
-        <Box sx={{ mt: 2 }}>
-          <Editor
-            initialContent={description}
-            onChange={handleEditorChange}
-          />
-        </Box>
-       
-       
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">Message</label>
+                <Editor initialContent={description} onChange={handleEditorChange} />
+              </div>
+            </div>
 
-        
-   
-      </Box>
-      <Box
-        sx={{
-          display: "flex",
-          // justifyContent: "space-between",
-          alignItems: "center",
-          padding: 2,
-          gap: 2,
-        }}
-      >
-        <Button
-          variant="contained"
-          onClick={saveChat}
-          sx={{
-            backgroundColor: "var(--color-save-btn)", // Normal background
-
-            "&:hover": {
-              backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-            },
-
-            borderRadius: "15px",
-          }}
-          
-          
-        >
-          Create chat
-        </Button>
-        <Button
-          onClick={handleCloseDrawer}
-          variant="outlined"
-          sx={{
-            borderColor: "var(--color-border-cancel-btn)", // Normal background
-            color: "var(--color-save-btn)",
-            "&:hover": {
-              backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-              color: "#fff",
-              border: "none",
-            },
-            width: "80px",
-            borderRadius: "15px",
-          }}
-        >
-          Cancel
-        </Button>
-      </Box>
-    </Box>
-  </Drawer>
+            {/* Footer */}
+            <div className="flex items-center gap-3 px-5 py-4 border-t border-border">
+              <Button
+                onClick={saveChat}
+                className="rounded-full px-5"
+                style={{ backgroundColor: "var(--color-save-btn)" }}
+              >
+                Create Chat
+              </Button>
+              <Button
+                onClick={handleCloseDrawer}
+                variant="outline"
+                className="rounded-full px-5"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   )
 }
 

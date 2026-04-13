@@ -2,7 +2,6 @@
 
 
 import React, { useEffect, useState, useRef } from 'react';
-import { Box, Button, Popover, List, ListItem, ListItemText } from '@mui/material';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css'; // Quill Snow theme
 import 'quill-emoji/dist/quill-emoji.css'; // Emoji styles
@@ -212,85 +211,76 @@ export default function Editor({ initialContent, onChange }) {
   ];
 
   return (
-    // <Box sx={{ height: '250px' }}>
-         
-      //     <ReactQuill
-      //   ref={quillRef}
-      //   value={editorContent}
-      //   onChange={(content) => {
-      //     setEditorContent(content);
-      //     onChange(content);
-      //   }}
-      //   modules={modules}
-      //   formats={formats}
-      //   theme="snow"
-      //   style={{ height: '150px' }}
-      // />
-    <Box sx={{
-  "& .ql-editor": {
-    minHeight: "150px",
-    height: "auto",
-    overflowY: "visible"
-  }
-}}>
-  <ReactQuill
-  ref={quillRef}
-    value={editorContent}
-       onChange={(content) => {
+    <div className="[&_.ql-editor]:min-h-[150px] [&_.ql-editor]:h-auto [&_.ql-editor]:overflow-y-visible relative">
+      <ReactQuill
+        ref={quillRef}
+        value={editorContent}
+        onChange={(content) => {
           setEditorContent(content);
           onChange(content);
         }}
-    modules={modules}
-    formats={formats}
-    theme="snow"
-  />
+        modules={modules}
+        formats={formats}
+        theme="snow"
+      />
 
+      {/* Insert Shortcode button */}
+      <div className="relative mt-2 mb-1 inline-block">
+        <button
+          type="button"
+          onClick={handleOpenDropdown}
+          className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm transition-all hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+        >
+          <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" />
+          </svg>
+          Insert Shortcode
+        </button>
 
-      {/* Shortcodes Button */}
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleOpenDropdown}
-        sx={{
-          backgroundColor: "var(--color-save-btn)",
-          "&:hover": { backgroundColor: "var(--color-save-hover-btn)" },
-          borderRadius: "15px",
-          mb: 1,
-        mt:2
-        }}
-      >
-        Insert Shortcode
-      </Button>
-
-      {/* Popover Dropdown */}
-      <Popover
-        open={Boolean(popoverAnchor)}
-        anchorEl={popoverAnchor}
-        onClose={handleCloseDropdown}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left',
-        }}
-      >
-        <Box sx={{ p: 1 }}>
-          <List sx={{ width: "250px", maxHeight: "200px", overflowY: "auto" }}>
-            {filteredShortcuts.map((shortcut, index) => (
-              <ListItem key={index} onClick={() => insertShortcode(shortcut.value)} button>
-                <ListItemText
-                  primary={shortcut.title}
-                  primaryTypographyProps={{
-                    style: {
-                      fontWeight: shortcut.isBold ? "bold" : "normal",
-                    },
-                  }}
-                />
-              </ListItem>
-            ))}
-          </List>
-        </Box>
-      </Popover>
-
-  
-    </Box>
+        {/* Dropdown — fixed to viewport so it never overflows */}
+        {Boolean(popoverAnchor) && (() => {
+          const rect = popoverAnchor.getBoundingClientRect();
+          const spaceBelow = window.innerHeight - rect.bottom;
+          const openUp = spaceBelow < 240;
+          return (
+            <>
+              <div className="fixed inset-0 z-40" onClick={handleCloseDropdown} />
+              <div
+                className="fixed z-50 w-64 rounded-xl border border-slate-200 bg-white shadow-xl ring-1 ring-black/5 overflow-hidden"
+                style={{
+                  left: Math.min(rect.left, window.innerWidth - 272),
+                  ...(openUp
+                    ? { bottom: window.innerHeight - rect.top + 4, top: "auto" }
+                    : { top: rect.bottom + 4 }),
+                }}
+              >
+                <div className="max-h-60 overflow-y-auto overscroll-contain">
+                  {filteredShortcuts.length === 0 ? (
+                    <p className="px-4 py-6 text-center text-xs text-slate-400">No shortcodes found</p>
+                  ) : (
+                    filteredShortcuts.map((shortcut, index) => (
+                      shortcut.isBold ? (
+                        <div key={index} className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-slate-400 bg-slate-50">
+                          {shortcut.title}
+                        </div>
+                      ) : (
+                        <button
+                          key={index}
+                          type="button"
+                          onClick={() => insertShortcode(shortcut.value)}
+                          className="flex w-full items-center px-3 py-2 text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors text-left"
+                        >
+                          {shortcut.title}
+                        </button>
+                      )
+                    ))
+                  )}
+                </div>
+              </div>
+            </>
+          );
+        })()}
+      </div>
+    </div>
   );
 }

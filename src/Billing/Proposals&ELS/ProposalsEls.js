@@ -1,19 +1,7 @@
 import React, { useState, useEffect } from "react";
-import {
-  Paper,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  IconButton,
-  Typography,
-  Box,
-  TableContainer,
-  Button,
-} from "@mui/material";
-import { useNavigate, useParams } from "react-router-dom";
-import { CiMenuKebab } from "react-icons/ci";
+import { useNavigate } from "react-router-dom";
+import { MoreHorizontal } from "lucide-react";
+import { Button } from "../../components/ui/button";
 import { toast } from "react-toastify";
 import axios from "axios";
 const ProposalsEls = () => {
@@ -112,424 +100,101 @@ const fetchPrprosalsAllData = async () => {
     navigate("/billing/proposalsandels/new");
   }
 
+  const HEADERS = ["Client Name", "Proposal Name", "Status", "Payment", "Auth", "Invoicing", "Date", "Signed", "Settings"];
+
   return (
-    <Box>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <Typography variant="h5" fontWeight="bold">
-          Proposals & Els
-        </Typography>
+    <div className="space-y-5">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">Proposals & ELs</h1>
         <Button
-          variant="contained"
-          sx={{
-            backgroundColor: "var(--color-save-btn)", // Normal background
-
-            "&:hover": {
-              backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-            },
-            borderRadius: "15px",
-          }}
           onClick={handleCreateProposal}
+          className="rounded-full px-5"
+          style={{ backgroundColor: "var(--color-save-btn)" }}
         >
-          New Proposals & Els
+          New Proposals & ELs
         </Button>
-      </Box>
+      </div>
 
-      {/* <TableContainer component={Paper} sx={{ overflow: "visible" }}>
-        <Table sx={{ width: "100%" }}>
-          <TableHead>
-            <TableRow>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Client Name
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="200"
-              >
-                Proposal Name
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Status
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Payment
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Auth
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Invoicing
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Date
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Signed
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Settings
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {ProposalsTemplates.map((row) => (
-              <TableRow key={row._id}>
-                <TableCell>
-                  <Typography
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                      cursor: "pointer",
-                      color: "#3f51b5",
-                    }}
-                    onClick={() =>
-                      handleAccountDash(row._id, row.accountid._id)
-                    }
-                  >
-                    {row.accountid.accountName}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                      cursor: "pointer",
-                      color: "#3f51b5",
-                    }}
-                    onClick={() => handleEdit(row._id, row.accountid._id)}
-                  >
-                    {row.proposalname}
-                  </Typography>
-                </TableCell>
-                <TableCell
-                  style={{
-                    fontSize: "12px",
-                    padding: "4px 8px",
-                    lineHeight: "1",
-                    cursor: "pointer",
-                  }}
-                >
-                  {row.status}
-                </TableCell>
-                <TableCell
-                  style={{
-                    fontSize: "12px",
-                    padding: "4px 8px",
-                    lineHeight: "1",
-                    cursor: "pointer",
-                  }}
-                >
-                  b
-                </TableCell>
-                <TableCell
-                  style={{
-                    fontSize: "12px",
-                    padding: "4px 8px",
-                    lineHeight: "1",
-                    cursor: "pointer",
-                  }}
-                >
-                  c
-                </TableCell>
-                <TableCell
-                  style={{
-                    fontSize: "12px",
-                    padding: "4px 8px",
-                    lineHeight: "1",
-                    cursor: "pointer",
-                  }}
-                >
-                  d
-                </TableCell>
-                <TableCell
-                  style={{
-                    fontSize: "12px",
-                    padding: "4px 8px",
-                    lineHeight: "1",
-                    cursor: "pointer",
-                  }}
-                >
-                
-                  {new Intl.DateTimeFormat("en-US", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                  }).format(new Date(row.createdAt))}
-                </TableCell>
-                <TableCell></TableCell>
-                <TableCell
-                  style={{
-                    fontSize: "12px",
-                    padding: "4px 8px",
-                    lineHeight: "1",
-                  }}
-                >
-                  <IconButton
-                    onClick={() => toggleMenu(row._id)}
-                    style={{ color: "#2c59fa" }}
-                  >
-                    <CiMenuKebab style={{ fontSize: "25px" }} />
+      <div className="bg-background rounded-xl border shadow-sm overflow-hidden">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b bg-muted/40">
+              {HEADERS.map((h) => (
+                <th key={h} className="text-xs font-semibold text-left px-4 py-3 text-muted-foreground uppercase tracking-wide">
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {proposallist.length === 0 ? (
+              <tr>
+                <td colSpan={HEADERS.length} className="text-center py-12 text-sm text-muted-foreground">
+                  No proposals found.
+                </td>
+              </tr>
+            ) : (
+              proposallist.map((row) => (
+                <tr key={row._id} className="border-b hover:bg-muted/30 transition-colors">
+                  <td className="px-4 py-3">
+                    <span
+                      className="text-sm text-indigo-600 cursor-pointer hover:underline font-medium"
+                      onClick={() => handleAccountDash(row._id, row.general.account?.[0]?._id)}
+                    >
+                      {row.general.account?.[0]?.accountName || "—"}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span
+                      className="text-sm text-indigo-600 cursor-pointer hover:underline font-medium"
+                      onClick={() => handleEdit(row._id, row.general.account?.[0]?._id)}
+                    >
+                      {row.general.proposalName || "Untitled"}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
+                      {row.status || "—"}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-sm text-muted-foreground">—</td>
+                  <td className="px-4 py-3 text-sm text-muted-foreground">—</td>
+                  <td className="px-4 py-3 text-sm text-muted-foreground">—</td>
+                  <td className="px-4 py-3 text-sm text-muted-foreground">
+                    {new Intl.DateTimeFormat("en-US", { day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(row.createdAt))}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-muted-foreground">—</td>
+                  <td className="px-4 py-3 relative">
+                    <button
+                      onClick={() => toggleMenu(row._id)}
+                      className="p-1.5 rounded-md hover:bg-muted transition-colors text-muted-foreground"
+                    >
+                      <MoreHorizontal className="h-4 w-4" />
+                    </button>
                     {openMenuId === row._id && (
-                      <Box
-                        sx={{
-                          position: "absolute",
-                          zIndex: 1,
-                          backgroundColor: "#fff",
-                          boxShadow: 1,
-                          borderRadius: 1,
-                          p: 1,
-                          left: "20px",
-
-                          m: 2,
-                          top: "10px",
-                          textAlign: "start",
-                        }}
-                      >
-                        <Typography
-                          sx={{ fontSize: "12px", fontWeight: "bold" }}
+                      <div className="absolute right-6 top-8 z-50 min-w-[120px] bg-background border rounded-lg shadow-lg py-1">
+                        <button
+                          className="w-full text-left px-4 py-2 text-sm font-medium hover:bg-muted transition-colors"
                           onClick={() => handleEdit(row._id)}
                         >
-                          Edit   
-                        </Typography>
-                        <Typography
-                          sx={{
-                            fontSize: "12px",
-                            color: "red",
-                            fontWeight: "bold",
-                          }}
+                          Edit
+                        </button>
+                        <button
+                          className="w-full text-left px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
                           onClick={() => handleDelete(row._id)}
                         >
                           Delete
-                        </Typography>
-                      </Box>
+                        </button>
+                      </div>
                     )}
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer> */}
-       <TableContainer component={Paper} sx={{ overflow: "visible" }}>
-      <Table sx={{ width: "100%" }}>
-        <TableHead>
-          <TableRow>
-            {[
-              "Client Name",
-              "Proposal Name",
-              "Status",
-              "Payment",
-              "Auth",
-              "Invoicing",
-              "Date",
-              "Signed",
-              "Settings",
-            ].map((header, i) => (
-              <TableCell
-                key={i}
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-              >
-                {header}
-              </TableCell>
-            ))}
-          </TableRow>
-        </TableHead>
-
-        <TableBody>
-          {proposallist.map((row) => (
-            <TableRow key={row._id}>
-              {/* ✅ Client Name */}
-              <TableCell>
-                <Typography
-                  style={{
-                    fontSize: "12px",
-                    padding: "4px 8px",
-                    lineHeight: "1",
-                    cursor: "pointer",
-                    color: "#3f51b5",
-                  }}
-                  onClick={() =>
-                    handleAccountDash(
-                      row._id,
-                      row.general.account?.[0]?._id
-                    )
-                  }
-                >
-                  {row.general.account?.[0]?.accountName || "—"}
-                </Typography>
-              </TableCell>
-
-              {/* ✅ Proposal Name */}
-              <TableCell>
-                <Typography
-                  style={{
-                    fontSize: "12px",
-                    padding: "4px 8px",
-                    lineHeight: "1",
-                    cursor: "pointer",
-                    color: "#3f51b5",
-                  }}
-                  onClick={() =>
-                    handleEdit(row._id, row.general.account?.[0]?._id)
-                  }
-                >
-                  {row.general.proposalName || "Untitled"}
-                </Typography>
-              </TableCell>
-
-              {/* ✅ Status */}
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  padding: "4px 8px",
-                  lineHeight: "1",
-                }}
-              >
-                {row.status}
-              </TableCell>
-
-              {/* Placeholder Columns */}
-              <TableCell>—</TableCell>
-              <TableCell>—</TableCell>
-              <TableCell>—</TableCell>
-
-              {/* ✅ Date */}
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  padding: "4px 8px",
-                  lineHeight: "1",
-                }}
-              >
-                {new Intl.DateTimeFormat("en-US", {
-                  day: "2-digit",
-                  month: "2-digit",
-                  year: "numeric",
-                }).format(new Date(row.createdAt))}
-              </TableCell>
-
-              <TableCell>—</TableCell>
-
-              {/* ✅ Settings (menu) */}
-              <TableCell>
-                <IconButton
-                  onClick={() => toggleMenu(row._id)}
-                  style={{ color: "#2c59fa" }}
-                >
-                  <CiMenuKebab style={{ fontSize: "25px" }} />
-                  {openMenuId === row._id && (
-                    <Box
-                      sx={{
-                        position: "absolute",
-                        zIndex: 1,
-                        backgroundColor: "#fff",
-                        boxShadow: 1,
-                        borderRadius: 1,
-                        p: 1,
-                        left: "20px",
-                        m: 2,
-                        top: "10px",
-                        textAlign: "start",
-                      }}
-                    >
-                      <Typography
-                        sx={{ fontSize: "12px", fontWeight: "bold" }}
-                        onClick={() => handleEdit(row._id)}
-                      >
-                        Edit
-                      </Typography>
-                      <Typography
-                        sx={{
-                          fontSize: "12px",
-                          color: "red",
-                          fontWeight: "bold",
-                        }}
-                        onClick={() => handleDelete(row._id)}
-                      >
-                        Delete
-                      </Typography>
-                    </Box>
-                  )}
-                </IconButton>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-    </Box>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 };
 

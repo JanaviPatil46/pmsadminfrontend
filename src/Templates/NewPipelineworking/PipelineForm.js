@@ -1,21 +1,12 @@
 import { useState } from "react";
 import { useEffect } from "react";
-
-import {
-  Box,
-  Button,
-  Typography,
-  Autocomplete,
-  TextField,
-  Switch,
-  FormControlLabel,
-  Grid,
-  Divider,
-} from "@mui/material";
 import StagesSection from "./StagesSection";
 import { toast } from "react-toastify";
 import MultiSelectDropdown from "../MultiSelectDropdown";
 import { useLocation, useNavigate } from "react-router-dom";
+import { Button } from "../../components/ui/button";
+import { Switch } from "../../components/ui/switch";
+import { Loader2, ChevronLeft } from "lucide-react";
 const PipelineForm = () => {
   const JOBS_API = process.env.REACT_APP_JOBS_TEMP_URL;
   const SORTJOBS_API = process.env.REACT_APP_SORTJOBS_URL;
@@ -504,274 +495,162 @@ const PipelineForm = () => {
     handleSavePipeline(true);
   };
 
+  const SwitchRow = ({ checked, onChange, label }) => (
+    <label className="flex items-center justify-between gap-3 py-2 px-3 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors group">
+      <span className="text-sm text-slate-700 group-hover:text-slate-900 select-none">{label}</span>
+      <Switch checked={checked} onCheckedChange={(val) => onChange({ target: { checked: val } })} />
+    </label>
+  );
+
+  const NativeSelect = ({ value, onChange, options, placeholder }) => (
+    <select
+      value={value?.value ?? ""}
+      onChange={(e) => {
+        const found = options.find((o) => o.value === e.target.value);
+        onChange(null, found ?? null);
+      }}
+      className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+    >
+      <option value="">{placeholder}</option>
+      {options.map((o) => (
+        <option key={o.value} value={o.value}>{o.label}</option>
+      ))}
+    </select>
+  );
+
   return (
-    <Box p={3}>
-      <Typography variant="h5" gutterBottom>
-        {isEditMode ? "Edit Pipeline" : "Create Pipeline"}
-      </Typography>
-      <Divider />
-      <Box p={3}>
-        <Grid container spacing={4} mt={1}>
-          {/* RIGHT SIDE – FORM INPUTS */}
-          <Grid item xs={12} md={6} p={2}>
-            <Box>
-              <Box>
-                <label className="pipeline-lable">Pipeline Name</label>
-                <TextField
-                  fullWidth
-                  value={pipelineName}
-                  onChange={(e) => setPipelineName(e.target.value)}
-                  size="small"
-                  sx={{ mt: 1, background: "#fff" }}
-                  placeholder="Pipeline Name"
-                />
-              </Box>
+    <div className="space-y-6 p-6">
+      {/* Header */}
+      <div className="flex items-center gap-3 border-b border-slate-100 pb-5">
+        <button
+          onClick={handleCancel}
+          className="flex items-center gap-1 rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </button>
+        <div>
+          <h1 className="text-xl font-semibold text-slate-900">
+            {isEditMode ? "Edit Pipeline" : "Create Pipeline"}
+          </h1>
+          <p className="text-sm text-slate-500 mt-0.5">Configure pipeline settings and stages</p>
+        </div>
+      </div>
 
-              <Box mt={3}>
-                <label className="pipeline-lable">Available To</label>
-                {/* <Autocomplete
-                  multiple
-                  options={options}
-                  value={selectedUser}
-                  onChange={handleUserChange}
-                  size="small"
-                  sx={{ mt: 1, background: "#fff" }}
-                  getOptionLabel={(o) => o.label}
-                  renderInput={(params) => (
-                    <TextField {...params} placeholder="Available To" />
-                  )}
-                /> */}
-                 <MultiSelectDropdown
-                                    value={selectedUser}
-                                    onChange={handleUserChange}
-                                    placeholder="Job Assignees"
-                                  />
-              </Box>
+      {/* Main form grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-              <Box mt={3}>
-                <label className="pipeline-lable">Sort jobs by</label>
-                <Autocomplete
-                  options={optionsort}
-                  value={selectedSortByJob}
-                  onChange={(e, v) => handleSortingByJobs(v)}
-                  size="small"
-                  sx={{ mt: 1, background: "#fff" }}
-                  getOptionLabel={(o) => o.label}
-                  renderInput={(params) => (
-                    <TextField {...params} placeholder="Sort By Job" />
-                  )}
-                />
-              </Box>
+        {/* LEFT – Pipeline settings */}
+        <div className="space-y-5 rounded-xl border border-slate-100 bg-white p-6 shadow-sm">
+          <h2 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">Pipeline Details</h2>
 
-              <Box mt={3}>
-                <label className="pipeline-lable">Default job template</label>
-                <Autocomplete
-                  options={optiontemp}
-                  value={selectedJobtemp}
-                  onChange={(e, v) => handleJobtemp(v)}
-                  size="small"
-                  sx={{ mt: 1, background: "#fff" }}
-                  getOptionLabel={(o) => o.label}
-                  renderInput={(params) => (
-                    <TextField {...params} placeholder="Default job template" />
-                  )}
-                />
-              </Box>
-            </Box>
-          </Grid>
-          {/* LEFT SIDE – JOB CARD FIELDS */}
-          <Grid item xs={12} md={6} p={2}>
-            <Box p={2} sx={{ background: "#fff", borderRadius: "10px" }}>
-              <Typography variant="h6" mb={2}>
-                Job card fields
-              </Typography>
+          {/* Pipeline Name */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">Pipeline Name</label>
+            <input
+              type="text"
+              value={pipelineName}
+              onChange={(e) => setPipelineName(e.target.value)}
+              placeholder="Pipeline Name"
+              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+            />
+          </div>
 
-              <Grid container spacing={2}>
-                {/* COLUMN 1 */}
-                <Grid item xs={12} sm={4}>
-                  <Box sx={{ width: 200, pt: 1, pb: 1 }}>
-                    {" "}
-                    {/* Fixed width */}
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={Account_id}
-                          onChange={handleAccount_idChange}
-                        />
-                      }
-                      label="Account ID"
-                    />
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={Days_on_stage}
-                          onChange={handleDays_on_stageChange}
-                        />
-                      }
-                      label="Days in stage"
-                    />
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={Account_tags}
-                          onChange={handleAccount_tagsChange}
-                        />
-                      }
-                      label="Account tags"
-                    />
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={clientFacing_status}
-                          onChange={handleClientFacing_status}
-                        />
-                      }
-                      label="Client-facing Status"
-                    />
-                  </Box>
-                </Grid>
+          {/* Available To */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">Available To</label>
+            <MultiSelectDropdown
+              value={selectedUser}
+              onChange={handleUserChange}
+              placeholder="Job Assignees"
+            />
+          </div>
 
-                {/* COLUMN 2 */}
-                <Grid item xs={12} sm={4}>
-                  <Box sx={{ width: 200, pt: 1, pb: 1 }}>
-                    {" "}
-                    {/* Same fixed width */}
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={startDate}
-                          onChange={handleStartDateChange}
-                        />
-                      }
-                      label="Start date"
-                    />
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={Name}
-                          onChange={handleNameSwitchChange}
-                        />
-                      }
-                      label="Name"
-                    />
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={Due_date}
-                          onChange={handleDue_dateChange}
-                        />
-                      }
-                      label="Due date"
-                    />
-                  </Box>
-                </Grid>
+          {/* Sort jobs by */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">Sort jobs by</label>
+            <NativeSelect
+              value={selectedSortByJob}
+              onChange={(e, v) => handleSortingByJobs(v)}
+              options={optionsort}
+              placeholder="Sort By Job"
+            />
+          </div>
 
-                {/* COLUMN 3 */}
-                <Grid item xs={12} sm={4}>
-                  <Box sx={{ width: 200, pt: 1, pb: 1 }}>
-                    {" "}
-                    {/* Same fixed width */}
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={Description}
-                          onChange={handleDescriptionChange}
-                        />
-                      }
-                      label="Description"
-                    />
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={Assignees}
-                          onChange={handleAssigneesChange}
-                        />
-                      }
-                      label="Assignees"
-                    />
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={Priority}
-                          onChange={handlePriorityChange}
-                        />
-                      }
-                      label="Priority"
-                    />
-                  </Box>
-                </Grid>
-              </Grid>
-            </Box>
-          </Grid>
-        </Grid>
+          {/* Default job template */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">Default job template</label>
+            <NativeSelect
+              value={selectedJobtemp}
+              onChange={(e, v) => handleJobtemp(v)}
+              options={optiontemp}
+              placeholder="Default job template"
+            />
+          </div>
+        </div>
 
-        {/* STAGES SECTION */}
-        <Box m={2}>
-          {" "}
-          <StagesSection
-            stages={stages}
-            stageNameErrors={stageNameErrors}
-            handleAddStage={handleAddStage}
-            handleDeleteStage={handleDeleteStage}
-            handleStageNameChange={handleStageNameChange}
-            handleSaveAutomations={handleSaveAutomations}
-          />
-        </Box>
-      </Box>
-      {/* ACTION BUTTONS */}
-      {/* <Box display="flex" gap={2} mt={4}>
-        <Button 
-          variant="contained" 
-          sx={{ borderRadius: "15px" }}
+        {/* RIGHT – Job card fields */}
+        <div className="rounded-xl border border-slate-100 bg-white p-6 shadow-sm">
+          <h2 className="text-sm font-semibold text-slate-700 uppercase tracking-wider mb-4">Job Card Fields</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-4">
+            {/* Column 1 */}
+            <div className="space-y-1">
+              <SwitchRow checked={Account_id} onChange={handleAccount_idChange} label="Account ID" />
+              <SwitchRow checked={Days_on_stage} onChange={handleDays_on_stageChange} label="Days in stage" />
+              <SwitchRow checked={Account_tags} onChange={handleAccount_tagsChange} label="Account tags" />
+              <SwitchRow checked={clientFacing_status} onChange={handleClientFacing_status} label="Client-facing Status" />
+            </div>
+            {/* Column 2 */}
+            <div className="space-y-1">
+              <SwitchRow checked={startDate} onChange={handleStartDateChange} label="Start date" />
+              <SwitchRow checked={Name} onChange={handleNameSwitchChange} label="Name" />
+              <SwitchRow checked={Due_date} onChange={handleDue_dateChange} label="Due date" />
+            </div>
+            {/* Column 3 */}
+            <div className="space-y-1">
+              <SwitchRow checked={Description} onChange={handleDescriptionChange} label="Description" />
+              <SwitchRow checked={Assignees} onChange={handleAssigneesChange} label="Assignees" />
+              <SwitchRow checked={Priority} onChange={handlePriorityChange} label="Priority" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Stages Section */}
+      <div className="rounded-xl border border-slate-100 bg-white p-6 shadow-sm">
+        <StagesSection
+          stages={stages}
+          stageNameErrors={stageNameErrors}
+          handleAddStage={handleAddStage}
+          handleDeleteStage={handleDeleteStage}
+          handleStageNameChange={handleStageNameChange}
+          handleSaveAutomations={handleSaveAutomations}
+        />
+      </div>
+
+      {/* Action buttons */}
+      <div className="flex items-center gap-3 pt-2 border-t border-slate-100">
+        <Button
           onClick={handleSaveAndExit}
           disabled={loading}
+          className="gap-2"
         >
-          {loading ? "Saving..." : "Save & exit"}
-        </Button>
-        <Button 
-          variant="contained" 
-          sx={{ borderRadius: "15px" }}
-          onClick={handleSave}
-          disabled={loading}
-        >
-          {loading ? "Saving..." : "Save"}
-        </Button>
-        <Button variant="outlined" sx={{ borderRadius: "15px" }} onClick={handleCancel}>
-          Cancel
-        </Button>
-      
-      </Box> */}
-      {/* Update button labels to be more clear */}
-      <Box display="flex" gap={2} mt={4}>
-        <Button
-          variant="contained"
-          sx={{ borderRadius: "15px" }}
-          onClick={handleSaveAndExit}
-          disabled={loading}
-        >
-          {loading
-            ? "Saving..."
-            : isEditMode || pipelineId
-              ? "Update & exit"
-              : "Save & exit"}
+          {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+          {loading ? "Saving..." : isEditMode || pipelineId ? "Update & Exit" : "Save & Exit"}
         </Button>
         <Button
-          variant="contained"
-          sx={{ borderRadius: "15px" }}
+          variant="outline"
           onClick={handleSave}
           disabled={loading}
+          className="gap-2"
         >
+          {loading && <Loader2 className="h-4 w-4 animate-spin" />}
           {loading ? "Saving..." : isEditMode || pipelineId ? "Update" : "Save"}
         </Button>
-        <Button
-          variant="outlined"
-          sx={{ borderRadius: "15px" }}
-          onClick={handleCancel}
-        >
+        <Button variant="ghost" onClick={handleCancel}>
           Cancel
         </Button>
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 };
 

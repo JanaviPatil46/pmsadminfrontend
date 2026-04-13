@@ -1,29 +1,12 @@
 
 
-import {
-    Box,
-    Typography,
-    Divider,
-    Grid,
-    Checkbox,
-    IconButton,
-    Button,
-    Menu,
-    MenuItem,
-    List,
-    ListItem,
-    ListItemText,
-    TextField,
-  } from "@mui/material";
   import { toast } from "react-toastify";
   import React, { useEffect, useState, useRef, useContext } from "react";
-  import MoreVertIcon from "@mui/icons-material/MoreVert";
-  import CloseIcon from "@mui/icons-material/Close";
-  import Editor from "./TextEditor"
+  import { MoreVertical, X } from "lucide-react";
+  import Editor from "./TextEditor";
   import { LoginContext } from "../../Sidebar/Context/Context";
   import axios from "axios";
-  import DeleteIcon from "@mui/icons-material/Delete";
-  import AddIcon from "@mui/icons-material/Add";
+  import { Button } from "../../components/ui/button";
   
   
   const ChatDetails = ({ chat, getsChatDetails,onChatAction,getsChatlist  }) => {
@@ -201,73 +184,51 @@ import {
     if (!chat) return null;
   
     return (
-      <Box sx={{ display: "flex" }}>
-        {/* Main Chat Area */}
-        <Box sx={{ flex: 1, overflow: "hidden", pr: showTasks ? 2 : 0 }}>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            
-            
-          </Box>
+      <div className="flex flex-col h-full">
+        <div className="border-b border-border mb-2" />
   
-          <Divider sx={{ my: 1 }} />
+        {/* Messages area */}
+        <div className="flex-1 overflow-y-auto mb-3" style={{ maxHeight: "40vh" }}>
+          {Array.isArray(chat.description) &&
+            chat.description.length > 0 &&
+            chat.description.map((desc, index) => (
+              <MessageItem
+                key={desc._id || index}
+                desc={desc}
+                chat={chat}
+                messageRefs={messageRefs}
+                highlightedId={highlightedId}
+                setHighlightedId={setHighlightedId}
+                handleMenuClick={handleMenuClick}
+                anchorEl={anchorEl}
+                setAnchorEl={setAnchorEl}
+                selectedMessage={selectedMessage}
+                setReplyTo={setReplyTo}
+                formatDate={formatDate}
+                loginUserId={loginUserId}
+                handleDeleteMessage={handleDeleteMessage}
+              />
+            ))}
+          <div ref={messagesEndRef} />
+        </div>
   
-          <Box height={"40vh"} sx={{ overflowY: "auto", mt: 1, mb: 1 }}>
-            {Array.isArray(chat.description) &&
-              chat.description.length > 0 &&
-              chat.description.map((desc, index) => (
-                <MessageItem
-                  key={desc._id || index}
-                  desc={desc}
-                  chat={chat}
-                  messageRefs={messageRefs}
-                  highlightedId={highlightedId}
-                  setHighlightedId={setHighlightedId}
-                  handleMenuClick={handleMenuClick}
-                  anchorEl={anchorEl}
-                  setAnchorEl={setAnchorEl}
-                  selectedMessage={selectedMessage}
-                  setReplyTo={setReplyTo}
-                  formatDate={formatDate}
-                  loginUserId={loginUserId}
-                  handleDeleteMessage={handleDeleteMessage}
-                />
-              ))}
-          </Box>
-  
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: "1fr auto",
-              gap: 2,
-              alignItems: "start",
-            }}
-          >
-            {replyTo && (
-              <ReplyPreview replyTo={replyTo} setReplyTo={setReplyTo} />
-            )}
-            <Box sx={{ display: "flex", gap: 3, alignItems: "center" }}>
-              {" "}
+        {/* Reply preview + editor */}
+        <div className="space-y-2">
+          {replyTo && <ReplyPreview replyTo={replyTo} setReplyTo={setReplyTo} />}
+          <div className="flex items-end gap-3">
+            <div className="flex-1">
               <Editor onChange={handleEditorChange} value={editorContent} />
-              <Button
-                onClick={() => updateChatDescription()}
-                variant="contained"
-                sx={{ height: "fit-content", alignSelf: "end" }}
-              >
-                Send
-              </Button>
-            </Box>
-          </Box>
-        </Box>
-  
-      
-       
-      </Box>
+            </div>
+            <Button
+              onClick={() => updateChatDescription()}
+              className="rounded-full px-5 self-end"
+              style={{ backgroundColor: "var(--color-save-btn)" }}
+            >
+              Send
+            </Button>
+          </div>
+        </div>
+      </div>
     );
   };
   
@@ -327,34 +288,16 @@ import {
   //   }
   // }
     return (
-      <Box
-        ref={(el) => {
-          if (desc._id) {
-            messageRefs.current[desc._id] = el;
-          }
-        }}
-        sx={{
-          display: "flex",
-          justifyContent: isCurrentUser ? "flex-end" : "flex-start",
-          mb: 2,
-          position: "relative",
-        }}
+      <div
+        ref={(el) => { if (desc._id) messageRefs.current[desc._id] = el; }}
+        className={`flex mb-3 ${isCurrentUser ? "justify-end" : "justify-start"}`}
       >
-        <Box
-          sx={{
-            maxWidth: "75%",
-            backgroundColor:
-              desc._id === highlightedId
-                ? "#fff2b3"
-                : isAdmin
-                  ? "#ffe6e6"
-                  : "#e6f0ff",
-            p: 2,
-            borderRadius: 2,
-            borderTopLeftRadius: isClient ? 16 : 4,
-            borderTopRightRadius: isClient ? 4 : 16,
-            boxShadow: 1,
-            position: "relative",
+        <div
+          className="max-w-[75%] rounded-2xl shadow-sm p-3 relative"
+          style={{
+            backgroundColor: desc._id === highlightedId ? "#fff2b3" : isAdmin ? "#ffe6e6" : "#e6f0ff",
+            borderTopLeftRadius: isClient ? "1rem" : "4px",
+            borderTopRightRadius: isClient ? "4px" : "1rem",
           }}
         >
           {desc.replyTo && (
@@ -366,97 +309,49 @@ import {
             />
           )}
   
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              color: "#333",
-            }}
-          >
-            <Typography
-              variant="subtitle2"
-              component="p"
-              gutterBottom
-              sx={{ fontWeight: "600" }}
-            >
-              {senderDisplayName}
-            </Typography>
-  
-            <MoreVertIcon
-              fontSize="small"
-              sx={{ cursor: "pointer" }}
-              onClick={(e) => handleMenuClick(e, desc)}
-            />
-            <Menu
-              anchorEl={anchorEl}
-              open={Boolean(anchorEl)}
-              onClose={() => setAnchorEl(null)}
-              PaperProps={{
-                elevation: 1,
-                sx: {
-                  boxShadow: "none",
-                  borderRadius: "8px",
-                  border: "1px solid #ccc",
-                },
-              }}
-            >
-              <MenuItem
-                onClick={() => {
-                  setReplyTo(selectedMessage);
-                  setAnchorEl(null);
-                }}
+          <div className="flex items-start justify-between gap-2">
+            <span className="text-sm font-semibold text-gray-800">{senderDisplayName}</span>
+            <div className="relative">
+              <button
+                className="p-0.5 rounded hover:bg-black/10 transition-colors"
+                onClick={(e) => handleMenuClick(e, desc)}
               >
-                Reply
-              </MenuItem>
-              {/* {selectedMessage?.fromwhome?.toLowerCase() === "admin" && (
-                <MenuItem
-                  onClick={() => {
-                    handleDeleteMessage(selectedMessage);
-                    setAnchorEl(null);
-                  }}
-                >
-                  Delete
-                </MenuItem>
-              )} */}
-              {selectedMessage && 
-  ((selectedMessage.senderid?._id === loginUserId) || 
-   (selectedMessage.senderid === loginUserId)) && (
-  <MenuItem
-    onClick={() => {
-      handleDeleteMessage(selectedMessage);
-      setAnchorEl(null);
-    }}
-  >
-    {/* <DeleteIcon fontSize="small" sx={{ mr: 1 }} /> */}
-    Delete
-  </MenuItem>
-)}
-            </Menu>
-          </Box>
+                <MoreVertical className="h-4 w-4 text-gray-500" />
+              </button>
+              {Boolean(anchorEl) && selectedMessage?._id === desc._id && (
+                <div className="absolute right-0 top-6 z-50 min-w-[120px] bg-white border rounded-lg shadow-lg py-1">
+                  <button
+                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
+                    onClick={() => { setReplyTo(selectedMessage); setAnchorEl(null); }}
+                  >
+                    Reply
+                  </button>
+                  {selectedMessage &&
+                    ((selectedMessage.senderid?._id === loginUserId) ||
+                      (selectedMessage.senderid === loginUserId)) && (
+                    <button
+                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                      onClick={() => { handleDeleteMessage(selectedMessage); setAnchorEl(null); }}
+                    >
+                      Delete
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
   
-          <Typography
-            variant="body2"
-            sx={{ whiteSpace: "pre-wrap", color: "#333" }}
+          <div
+            className="text-sm text-gray-700 whitespace-pre-wrap mt-1"
             dangerouslySetInnerHTML={{
-              __html:
-                typeof desc.message === "string"
-                  ? desc.message
-                  : "No message available",
+              __html: typeof desc.message === "string" ? desc.message : "No message available",
             }}
           />
-          <Typography
-            variant="caption"
-            sx={{
-              display: "block",
-              textAlign: "right",
-              color: "gray",
-              mt: 1,
-            }}
-          >
-            {messageTime}
-          </Typography>
-        </Box>
-      </Box>
+          <div className="text-right mt-1">
+            <span className="text-xs text-gray-400">{messageTime}</span>
+          </div>
+        </div>
+      </div>
     );
   };
   
@@ -465,94 +360,49 @@ import {
     if (!repliedMsg) return null;
   
     return (
-      <Box
-        sx={{
-          backgroundColor: "#f5f5f5",
-          borderLeft: "3px solid #1976d2",
-          px: 1,
-          py: 0.5,
-          mb: 1,
-        }}
-      >
-        <Typography
-          variant="caption"
-          fontWeight="bold"
-          sx={{ cursor: "pointer", color: "#1976d2" }}
+      <div className="bg-gray-100 border-l-4 border-indigo-400 px-2 py-1 mb-2 rounded">
+        <button
+          className="text-xs font-bold text-indigo-600 cursor-pointer hover:underline block mb-0.5"
           onClick={() => {
             const el = messageRefs.current[desc.replyTo];
             if (el) {
-              el.scrollIntoView({
-                behavior: "smooth",
-                block: "center",
-              });
+              el.scrollIntoView({ behavior: "smooth", block: "center" });
               setHighlightedId(desc.replyTo);
               setTimeout(() => setHighlightedId(null), 2000);
             }
           }}
         >
-          {repliedMsg.fromwhome === "teammember"
-            ? repliedMsg.senderid?.username
-            : "You"}
-        </Typography>
-  
-        <Typography
-          variant="body2"
-          sx={{ fontStyle: "italic", color: "#555" }}
+          {repliedMsg.fromwhome === "teammember" ? repliedMsg.senderid?.username : "You"}
+        </button>
+        <div
+          className="text-xs italic text-gray-600"
           dangerouslySetInnerHTML={{
-            __html:
-              repliedMsg.message?.length > 100
-                ? repliedMsg.message.slice(0, 100) + "..."
-                : repliedMsg.message,
+            __html: repliedMsg.message?.length > 100 ? repliedMsg.message.slice(0, 100) + "..." : repliedMsg.message,
           }}
         />
-      </Box>
+      </div>
     );
   };
   
   const ReplyPreview = ({ replyTo, setReplyTo }) => (
-    <Box
-      sx={{
-        gridColumn: "1 / -1",
-        mb: 1,
-        p: 1.5,
-        backgroundColor: "#f4f6f8",
-        borderLeft: "4px solid #1976d2",
-        borderRadius: 1,
-        position: "relative",
-      }}
-    >
-      <Typography variant="body2" fontWeight="bold" sx={{ mb: 0.5 }}>
+    <div className="relative bg-gray-50 border-l-4 border-indigo-500 rounded p-3">
+      <p className="text-xs font-bold text-gray-700 mb-1">
         Replying to:{" "}
-        {replyTo.fromwhome === "client"
-          ? replyTo.senderid?.username
-          : "You" || "Admin"}
-      </Typography>
-  
-      <Typography
-        variant="body2"
-        sx={{ fontStyle: "italic", whiteSpace: "pre-wrap", pr: 4 }}
+        {replyTo.fromwhome === "client" ? replyTo.senderid?.username : "You" || "Admin"}
+      </p>
+      <div
+        className="text-xs italic text-gray-500 whitespace-pre-wrap pr-6"
         dangerouslySetInnerHTML={{
-          __html:
-            replyTo.message?.length > 100
-              ? `${replyTo.message.slice(0, 100)}...`
-              : replyTo.message,
+          __html: replyTo.message?.length > 100 ? `${replyTo.message.slice(0, 100)}...` : replyTo.message,
         }}
       />
-  
-      <IconButton
-        size="small"
+      <button
         onClick={() => setReplyTo(null)}
-        sx={{
-          position: "absolute",
-          top: 6,
-          right: 6,
-          color: "#777",
-          "&:hover": { color: "#000" },
-        }}
+        className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 transition-colors"
       >
-        <CloseIcon fontSize="small" />
-      </IconButton>
-    </Box>
+        <X className="h-4 w-4" />
+      </button>
+    </div>
   );
   
   export default ChatDetails;

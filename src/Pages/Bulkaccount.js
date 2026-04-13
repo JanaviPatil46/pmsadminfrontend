@@ -3,34 +3,13 @@
 
 
 import React, { useState, useEffect,useContext } from 'react';
-import {
-  Box,
-  Typography,
-  TextField,
-  Grid,
-  Paper,
-  IconButton,
-  Button,
-  CircularProgress,
-  Switch,
-  MenuItem
-} from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { Trash2 } from 'lucide-react';
 import { LoginContext } from "../Sidebar/Context/Context";
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
 import Select from 'react-select';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-} from '@mui/material';
 const defaultClient = {
   accountName: "",
   clientType: "Individual",
@@ -524,227 +503,199 @@ console.log("email rawe",raw)
     // Don't clear createdAccounts to keep the results visible
   };
 
+  const inputCls = "w-full h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:bg-slate-50 disabled:text-slate-400";
+
   return (
-  <Box p={3}>
-    <Typography variant="h4" align="center" gutterBottom>
-      Add Multiple Clients
-    </Typography>
-    <form onSubmit={handleSubmit}>
+  <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+    <h1 className="text-2xl font-bold tracking-tight text-slate-800 text-center">Add Multiple Clients</h1>
+
+    <form onSubmit={handleSubmit} className="space-y-5">
       {clients.map((client, index) => (
-        <Paper key={index} elevation={3} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
+        <div key={index} className="relative rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4">
           {clients.length > 1 && (
-            <IconButton onClick={() => removeClient(index)} sx={{ float: "right" }}>
-              <DeleteIcon color="error" />
-            </IconButton>
+            <button
+              type="button"
+              onClick={() => removeClient(index)}
+              className="absolute top-4 right-4 p-1.5 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
           )}
 
-          <Typography variant="h6" gutterBottom>
-            {client.isAlias ? `Alias Client #${client.aliasNumber}` : `Client #${index + 1}`}
-            {client.isAlias && (
-              <Typography variant="caption" color="textSecondary" sx={{ ml: 1 }}>
-                (Based on Client #{clients.findIndex(c => !c.isAlias) + 1})
-              </Typography>
-            )}
-          </Typography>
-
-         
-              <TextField
-                label="Account Name"
-                fullWidth
-                size='small'
-                value={client.accountName}
-                onChange={(e) => handleChange(index, "accountName", e.target.value)}
-                required
-                margin='normal'
-                disabled={client.isAlias}
-              />
-          
-              <Box display="flex" alignItems="center">
-                <Typography variant="body1" sx={{ mr: 1 }}>
-                  Ind
-                </Typography>
-                <Switch
-                  checked={client.clientType === "Company"}
-                  onChange={(e) => 
-                    handleChange(
-                      index,
-                      "clientType",
-                      e.target.checked ? "Company" : "Individual"
-                    )
-                  }
-                  color="primary"
-                  disabled={client.isAlias}
-                />
-                <Typography variant="body1" sx={{ ml: 1 }}>
-                  Com
-                </Typography>
-              </Box>
-         
-
-           
-              
-              <Select
-                options={folderTemplates}
-                value={client.folderTemplate}
-                onChange={(option) => handleFolderSelect(index, option)}
-                placeholder="Select template"
-                isClearable
-                isDisabled={client.isAlias}
-              />
-       
-              <TextField
-                label="First Name"
-                fullWidth
-                value={client.firstName}
-                onChange={(e) => handleChange(index, "firstName", e.target.value)}
-                required
-                 size='small'
-                      margin='normal'
-                disabled={client.isAlias}
-              />
-           
-              <TextField
-                label="Last Name"
-                fullWidth
-                 size='small'
-                value={client.lastName}
-                onChange={(e) => handleChange(index, "lastName", e.target.value)}
-                required
-                     margin='normal'
-                disabled={client.isAlias}
-              />
-          
-             
-              <PhoneInput
-                country="in"
-                value={client.phoneNumber}
-                 size='small'
-                      margin='normal'
-                onChange={(value) => handleChange(index, "phoneNumber", value)}
-                inputStyle={{ width: "100%", height: "56px" }}
-                disabled={client.isAlias}
-              />
-           
-              <TextField
-                label="Email"
-                fullWidth
-                type="email"
-                 size='small'
-                      margin='normal'
-                value={client.email}
-                onChange={(e) => handleChange(index, "email", e.target.value)}
-                required
-                disabled={client.isAlias}
-              />
+          <div>
+            <p className="text-sm font-semibold text-slate-700">
+              {client.isAlias ? `Alias Client #${client.aliasNumber}` : `Client #${index + 1}`}
               {client.isAlias && (
-                <Typography variant="caption" color="textSecondary">
-                  Alias email automatically generated from base client
-                </Typography>
+                <span className="ml-2 text-xs font-normal text-slate-400">(Based on Client #{clients.findIndex(c => !c.isAlias) + 1})</span>
               )}
-   
+            </p>
+          </div>
 
-            {!client.isAlias && (
-        
-            <Box>
-                <Box display="flex" alignItems="center" >
-                  <TextField
-                    label="Number of Aliases"
+          <div>
+            <label className="block text-xs font-medium text-slate-600 mb-1">Account Name <span className="text-red-500">*</span></label>
+            <input
+              type="text"
+              className={inputCls}
+              value={client.accountName}
+              onChange={(e) => handleChange(index, "accountName", e.target.value)}
+              required
+              disabled={client.isAlias}
+              placeholder="Account Name"
+            />
+          </div>
+
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-slate-600">Individual</span>
+            <button
+              type="button"
+              disabled={client.isAlias}
+              onClick={() => handleChange(index, "clientType", client.clientType === "Company" ? "Individual" : "Company")}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none disabled:opacity-50 ${
+                client.clientType === "Company" ? "bg-indigo-600" : "bg-slate-300"
+              }`}
+            >
+              <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                client.clientType === "Company" ? "translate-x-6" : "translate-x-1"
+              }`} />
+            </button>
+            <span className="text-sm text-slate-600">Company</span>
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-slate-600 mb-1">Folder Template</label>
+            <Select
+              options={folderTemplates}
+              value={client.folderTemplate}
+              onChange={(option) => handleFolderSelect(index, option)}
+              placeholder="Select template"
+              isClearable
+              isDisabled={client.isAlias}
+              styles={{ control: (base) => ({ ...base, minHeight: '36px', borderRadius: '8px', borderColor: '#e2e8f0', fontSize: '14px' }) }}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-slate-600 mb-1">First Name <span className="text-red-500">*</span></label>
+              <input type="text" className={inputCls} value={client.firstName} onChange={(e) => handleChange(index, "firstName", e.target.value)} required disabled={client.isAlias} placeholder="First Name" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-600 mb-1">Last Name <span className="text-red-500">*</span></label>
+              <input type="text" className={inputCls} value={client.lastName} onChange={(e) => handleChange(index, "lastName", e.target.value)} required disabled={client.isAlias} placeholder="Last Name" />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-slate-600 mb-1">Phone Number</label>
+            <PhoneInput
+              country="in"
+              value={client.phoneNumber}
+              onChange={(value) => handleChange(index, "phoneNumber", value)}
+              inputStyle={{ width: "100%", height: "36px", borderRadius: "8px", border: "1px solid #e2e8f0", fontSize: "14px" }}
+              disabled={client.isAlias}
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-slate-600 mb-1">Email <span className="text-red-500">*</span></label>
+            <input type="email" className={inputCls} value={client.email} onChange={(e) => handleChange(index, "email", e.target.value)} required disabled={client.isAlias} placeholder="Email address" />
+            {client.isAlias && (
+              <p className="text-xs text-slate-400 mt-1">Alias email automatically generated from base client</p>
+            )}
+          </div>
+
+          {!client.isAlias && (
+            <div className="rounded-xl bg-slate-50 border border-slate-200 p-4 space-y-3">
+              <p className="text-xs font-semibold text-slate-600">Alias Configuration</p>
+              <div className="flex items-end gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Number of Aliases</label>
+                  <input
                     type="number"
-                     size='small'
+                    className="w-28 h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                     value={client.aliasConfig?.count || 0}
                     onChange={(e) => handleChange(index, "aliasCount", e.target.value)}
-                    sx={{ width: '120px', mr: 2 }}
-                    inputProps={{ min: 0 }}
-                         margin='normal'
+                    min={0}
                   />
-                  <TextField
-                    label="Starting Number"
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Starting Number</label>
+                  <input
                     type="number"
-                     size='small'
+                    className="w-32 h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                     value={client.aliasConfig?.startingNumber || 1}
                     onChange={(e) => handleChange(index, "startingNumber", e.target.value)}
-                    sx={{ width: '150px', mr: 2 }}
-                    inputProps={{ min: 1 }}
-                         margin='normal'
+                    min={1}
                   />
-                </Box>
-                <Typography variant="caption" color="textSecondary" sx={{ mt: 1 }}>
-                  {client.aliasConfig?.count > 0 
-                    ? `Will create ${client.aliasConfig.count} alias clients on submit (starting from ${client.aliasConfig.startingNumber})`
-                    : "No alias clients will be created for this account"}
-                </Typography>
-                </Box>
-       
-            )}
-      
-        </Paper>
+                </div>
+              </div>
+              <p className="text-xs text-slate-400">
+                {client.aliasConfig?.count > 0
+                  ? `Will create ${client.aliasConfig.count} alias clients on submit (starting from ${client.aliasConfig.startingNumber})`
+                  : "No alias clients will be created for this account"}
+              </p>
+            </div>
+          )}
+        </div>
       ))}
 
-   
-
-      <Box textAlign="center" display="flex" justifyContent="center" gap={2}>
-        <Button
-          variant="contained"
+      <div className="flex items-center justify-center gap-3 pt-2">
+        <button
           type="submit"
-          color="success"
-          size="large"
           disabled={loading}
-          sx={{ minWidth: 200 }}
+          className="inline-flex items-center gap-2 rounded-xl bg-green-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-700 disabled:bg-slate-200 disabled:text-slate-400 transition-colors min-w-[200px] justify-center"
         >
           {loading ? (
-            <CircularProgress size={24} sx={{ color: "#fff" }} />
-          ) : (
-            `Submit All Clients (${clients.length} base + ${clients.reduce(
-              (sum, client) => sum + (client.aliasConfig?.count || 0), 0
-            )} aliases)`
-          )}
-        </Button>
-         <Button
-          variant="outlined"
-          color="primary"
+            <svg className="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
+          ) : null}
+          {loading ? 'Submitting...' : `Submit All Clients (${clients.length} base + ${clients.reduce((s, c) => s + (c.aliasConfig?.count || 0), 0)} aliases)`}
+        </button>
+        <button
+          type="button"
           onClick={handleClearForm}
-          size="large"
-          sx={{ minWidth: 200 }}
+          className="rounded-xl border border-slate-300 px-6 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors min-w-[140px]"
         >
           Clear Form
-        </Button>
-      </Box>
+        </button>
+      </div>
     </form>
-     {createdAccounts.length > 0 && (
-        <Paper elevation={3} sx={{ p: 3, mt: 3, borderRadius: 2 }}>
-          <Typography variant="h5" gutterBottom sx={{ mb: 2 }}>
-            Created Accounts ({createdAccounts.length})
-          </Typography>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Account Name</TableCell>
-                  <TableCell>Email</TableCell>
-                  <TableCell>Type</TableCell>
-                  <TableCell>Created At</TableCell>
-                  <TableCell>Time Taken (ms)</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {createdAccounts.map((account, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{account.AccountName}</TableCell>
-                    <TableCell>{account.Email}</TableCell>
-                    <TableCell>
-                      {account.IsAlias ? `Alias #${account.AliasNumber}` : 'Base'}
-                    </TableCell>
-                    <TableCell>{account.CreatedAt}</TableCell>
-                    <TableCell>{account.DurationMs}</TableCell>
-                  </TableRow>
+
+    {createdAccounts.length > 0 && (
+      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <div className="px-5 py-4 border-b border-slate-100">
+          <h2 className="text-base font-semibold text-slate-800">Created Accounts ({createdAccounts.length})</h2>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b bg-slate-50">
+                {["Account Name","Email","Type","Created At","Time (ms)"].map(h => (
+                  <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">{h}</th>
                 ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Paper>
-      )}
+              </tr>
+            </thead>
+            <tbody>
+              {createdAccounts.map((account, index) => (
+                <tr key={index} className="border-b hover:bg-slate-50 transition-colors">
+                  <td className="px-4 py-3 font-medium text-slate-800">{account.AccountName}</td>
+                  <td className="px-4 py-3 text-slate-600">{account.Email}</td>
+                  <td className="px-4 py-3">
+                    <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
+                      account.IsAlias ? 'bg-amber-100 text-amber-700' : 'bg-indigo-100 text-indigo-700'
+                    }`}>{account.IsAlias ? `Alias #${account.AliasNumber}` : 'Base'}</span>
+                  </td>
+                  <td className="px-4 py-3 text-slate-500 text-xs">{account.CreatedAt}</td>
+                  <td className="px-4 py-3 text-slate-500">{account.DurationMs}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    )}
+
     <ToastContainer position="bottom-right" autoClose={5000} />
-  </Box>
+  </div>
 );
 };
 

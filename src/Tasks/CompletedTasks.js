@@ -1,23 +1,10 @@
-
-import React,{useState,useEffect} from 'react'
-import Tooltip from "@mui/material/Tooltip";
-import {
-  Box,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  Paper,
-  TableRow,
-  Checkbox,
-  MenuItem,
-  IconButton,
-  Menu,
-  Typography,Button
-} from "@mui/material";
+import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { MoreVertical } from "lucide-react";
+import { Checkbox } from "../components/ui/checkbox";
+import { Button } from "../components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../components/ui/tooltip";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "../components/ui/dropdown-menu";
 import NewTaskDrawer from "./NewTaskDrawer";
 const CompletedTasks = () => {
   const ACCOUNT_TASKS_API = process.env.REACT_APP_TASKS_API;
@@ -71,15 +58,13 @@ const CompletedTasks = () => {
     fetchCompletedTasks();
   }, []);
 
-  const [anchorEl, setAnchorEl] = useState(null);
-  
-    const handleMenuClick = (event, id) => {
-      setAnchorEl(event.currentTarget);
-      setSelectedTask(id);
+  const [openMenuId, setOpenMenuId] = useState(null);
+
+    const handleMenuClick = (id) => {
+      setOpenMenuId(openMenuId === id ? null : id);
     };
     const handleClose = () => {
-      setAnchorEl(null);
-      setSelectedTask(null);
+      setOpenMenuId(null);
     };
   
     const handleDelete = () => {
@@ -116,655 +101,225 @@ const CompletedTasks = () => {
         }
       }
     };
-  
-    const statusOptions = [
-      { value: "No status", label: "No status", color: "#C4AEAD" },
-      { value: "Planned", label: "Planned", color: "#4169E1" },
-      { value: "In review", label: "In review", color: "#F6BE00" },
-      { value: "In progress", label: "In progress", color: "#F6BE00" },
-      { value: "On hold", label: "On hold", color: "#BCC6CC" },
-      { value: "Extended", label: "Extended", color: "#82CAFF" },
-      {
-        value: "Waiting for Client",
-        label: "Waiting for Client",
-        color: "#566D7E",
-      },
-      {
-        value: "Waiting for Signatures",
-        label: "Waiting for Signatures",
-        color: "#566D7E",
-      },
-      {
-        value: "Waiting for agency",
-        label: "Waiting for agency",
-        color: "#566D7E",
-      },
-      { value: "Completed", label: "Completed", color: "#00FF00" },
-      { value: "Canceled", label: "Canceled", color: "#EB5406" },
-    ];
-  
-    const priorityOptions = [
-      { value: "Urgent", label: "Urgent", color: "#0E0402" },
-      { value: "High", label: "High", color: "#fe676e" },
-      { value: "Medium", label: "Medium", color: "#FFC300" },
-      { value: "Low", label: "Low", color: "#56c288" },
-    ];
-  
-  
-    // const handleClick = (id) => {
-    // console.log(id)
-    // };
-  
-    const handleClick = async (id) => {
-      
-      try {
-        const response = await fetch(`${ACCOUNT_TASKS_API}/accountstasks/task/listbyid/${id}`, {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-        });
-    
-        if (!response.ok) {
-          throw new Error("Failed to fetch task data");
-        }
-    
-        const taskToEdit = await response.json(); // Assuming response is JSON
-        setSelectedTaskData(taskToEdit);
-        handleClose()
-        setIsEditMode(true);
-        setDrawerOpen(true);
-      } catch (error) {
-        console.error("Error fetching task:", error);
-      }
-    };
-    
-  return (
-   <Box>
-    <Box mt={2}>
-      <TableContainer component={Paper}>
-        <Table style={{ tableLayout: "fixed", width: "100%" }}>
-          <TableHead>
-            <TableRow>
-              <TableCell
-                padding="checkbox"
-                style={{
-                  position: "sticky",
-                  left: 0,
-                  zIndex: 1,
-                  background: "#fff",
-                  fontSize: "2px", // Set a professional font size
-                  fontWeight: "bold",
-                  textAlign: "center",
-                }}
-              >
-                <Checkbox
-                  checked={selected.length === taskData.length}
-                  onChange={() => {
-                    if (selected.length === taskData.length) {
-                      setSelected([]);
-                    } else {
-                      const allSelected = taskData.map((item) => item.id);
-                      setSelected(allSelected);
-                    }
-                  }}
-                />
-              </TableCell>
-              <TableCell
-                style={{
-                  cursor: "pointer",
-                  position: "sticky",
-                  left: 50,
-                  zIndex: 1,
-                  background: "#fff",
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px", // Add more padding for better spacing
-                }}
-                width="200"
-              >
-                Name
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="200"
-              >
-                Account
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="200"
-              >
-                Assignee
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Status
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Priority
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Subtasks
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Start Date
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Due Date
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="250"
-              >
-                Job Name
-              </TableCell>
 
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="200"
-                height="60"
-              >
-                Pipeline
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="150"
-              >
-                Stage
-              </TableCell>
+  const statusOptions = [
+    { value: "No status", label: "No status", color: "#C4AEAD" },
+    { value: "Planned", label: "Planned", color: "#4169E1" },
+    { value: "In review", label: "In review", color: "#F6BE00" },
+    { value: "In progress", label: "In progress", color: "#F6BE00" },
+    { value: "On hold", label: "On hold", color: "#BCC6CC" },
+    { value: "Extended", label: "Extended", color: "#82CAFF" },
+    {
+      value: "Waiting for Client",
+      label: "Waiting for Client",
+      color: "#566D7E",
+    },
+    {
+      value: "Waiting for Signatures",
+      label: "Waiting for Signatures",
+      color: "#566D7E",
+    },
+    {
+      value: "Waiting for agency",
+      label: "Waiting for agency",
+      color: "#566D7E",
+    },
+    { value: "Completed", label: "Completed", color: "#00FF00" },
+    { value: "Canceled", label: "Canceled", color: "#EB5406" },
+  ];
 
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Tags
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="250"
-              >
-                Description
-              </TableCell>
-              <TableCell
-                
-                style={{
-                  position: "sticky",
-                  right: 0, // Stick to the right side
-                  zIndex: 2, // Ensure it appears above other elements
-                  background: "#fff",
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Settings
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {taskData.map((row) => {
-              const isSelected = selected.indexOf(row.id) !== -1;
-              return (
-                <TableRow
-                  key={row.id}
-                  hover
-                  onClick={() => handleSelect(row.id)}
-                  role="checkbox"
-                  tabIndex={-1}
-                  selected={isSelected}
-                  style={{
-                    cursor: "pointer",
-                    transition: "background-color 0.3s ease",
-                    "&:hover": {
-                      backgroundColor: "#f4f4f4", // Add hover effect
-                    },
-                  }}
-                >
-                  <TableCell
-                    padding="checkbox"
-                    style={{
-                      position: "sticky",
-                      left: 0,
-                      zIndex: 1,
-                      background: "#fff",
-                      fontSize: "12px",
-                      textAlign: "center",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                      // padding: "2px", // Adjust padding for better spacing
-                    }}
-                  >
-                    <Checkbox checked={isSelected} />
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      position: "sticky",
-                      left: 50,
-                      zIndex: 1,
-                      background: "#fff",
-                      fontSize: "12px",
-                      fontWeight: "normal",
-                      // padding: "12px 16px", // Add padding for better spacing
-                    }}
-                  >
-                    <span
-                      style={{ cursor: "pointer", color: "#3f51b5" }}
-                      // onClick={() => handleClick(row.id)}
-                      onClick={(e) => {
-                        e.stopPropagation(); // Prevent row click action when clicking on name
-                        handleClick(row.id);
-                      }}
-                    >
-                      {row.Name}
-                    </span>
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                    }}
-                  >
-                    {row.AccountName}
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                    }}
-                  >
-                    {row.Assignees}
-                  </TableCell>
-                 
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                    }}
-                  >
-                    {row.Status && (
-                      <span
-                        style={{
-                          display: "inline-block",
-                          backgroundColor:
-                            statusOptions.find(
-                              (status) => status.value === row.Status
-                            )?.color || "#ccc",
-                          color: "#fff",
-                          padding: "4px 8px",
-                          borderRadius: "10px",
-                          fontSize: "10px",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        {row.Status}
-                      </span>
-                    )}
-                  </TableCell>
-                  {/* <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                    }}
-                  >{row.Priority}</TableCell> */}
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                    }}
-                  >
-                    {row.Priority && (
-                      <span
-                        style={{
-                          display: "inline-block",
-                          backgroundColor:
-                            priorityOptions.find(
-                              (priority) => priority.value === row.Priority
-                            )?.color || "#ccc",
-                          color: "#fff",
-                          padding: "4px 8px",
-                          borderRadius: "10px",
-                          fontSize: "10px",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        {row.Priority}
-                      </span>
-                    )}
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                    }}
-                  >
-                    {row.SubtaskCount}
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                    }}
-                  >
-                    {row.startDate}
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                    }}
-                  >
-                    {row.dueDate}
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                    }}
-                  >
-                    {row.JobName}
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                    }}
-                  >
-                    {row.PipelineName}
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                    }}
-                  >
-                    {row.StageNames}
-                  </TableCell>
-                  {/* <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                    }}
-                  >
-                  {row.TaskTags && row.TaskTags.length > 0 ? (
-                    row.TaskTags.map((tag) => (
-                      <span
-                        key={tag.id}
-                        style={{
-                          display: "inline-block",
-                          backgroundColor: tag.tagColour,
-                          color: "#fff",
-                          padding: "4px 8px",
-                          borderRadius: "8px",
-                          marginRight: "4px",
-                          fontSize: "10px",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        {tag.tagName}
-                      </span>
-                    ))
-                  ) : (
-                    <span style={{ color: "#888" }}>No Tags</span>
-                  )}
-                </TableCell> */}
-                  {/* <TableCell
-  style={{
-    fontSize: "12px",
-    padding: "4px 8px",
-    lineHeight: "1",
-  }}
->
-  {row.TaskTags && row.TaskTags.length > 0 ? (
-    <>
-      <span
-        key={row.TaskTags[0].id}
-        style={{
-          display: "inline-block",
-          backgroundColor: row.TaskTags[0].tagColour,
-          color: "#fff",
-          padding: "4px 8px",
-          borderRadius: "8px",
-          marginRight: "4px",
-          fontSize: "10px",
-          fontWeight: "bold",
-        }}
-      >
-        {row.TaskTags[0].tagName}
-      </span>
+  const priorityOptions = [
+    { value: "Urgent", label: "Urgent", color: "#0E0402" },
+    { value: "High", label: "High", color: "#fe676e" },
+    { value: "Medium", label: "Medium", color: "#FFC300" },
+    { value: "Low", label: "Low", color: "#56c288" },
+  ];
 
-      {row.TaskTags.length > 1 && (
-        <Tooltip
-          title={row.TaskTags
-            .slice(1)
-            .map((tag) => tag.tagName)
-            .join(", ")}
-          arrow
-          placement="top"
-        >
-          <span
-            style={{
-              display: "inline-block",
-              backgroundColor: "#ddd",
-              color: "#333",
-              padding: "4px 8px",
-              borderRadius: "8px",
-              fontSize: "10px",
-              fontWeight: "bold",
-              cursor: "pointer",
+  const columns = [
+    { key: "Name", label: "Name", sticky: true },
+    { key: "AccountName", label: "Account" },
+    { key: "Assignees", label: "Assignee" },
+    { key: "Status", label: "Status" },
+    { key: "Priority", label: "Priority" },
+    { key: "SubtaskCount", label: "Subtasks" },
+    { key: "startDate", label: "Start Date" },
+    { key: "dueDate", label: "Due Date" },
+    { key: "JobName", label: "Job Name" },
+    { key: "PipelineName", label: "Pipeline" },
+    { key: "StageNames", label: "Stage" },
+    { key: "TaskTags", label: "Tags" },
+    { key: "description", label: "Description" },
+  ];
+
+  const renderCell = (row, col) => {
+    switch (col.key) {
+      case "Name":
+        return (
+          <button
+            className="text-sm font-medium text-primary hover:underline transition-colors text-left"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleClick(row.id);
             }}
           >
-            +{row.TaskTags.length - 1}
+            {row.Name}
+          </button>
+        );
+      case "Status":
+        if (!row.Status) return null;
+        return (
+          <span
+            className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold text-white"
+            style={{ backgroundColor: statusOptions.find((s) => s.value === row.Status)?.color || "#ccc" }}
+          >
+            {row.Status}
           </span>
-        </Tooltip>
-      )}
-    </>
-  ) : (
-    <span style={{ color: "#888" }}>No Tags</span>
-  )}
-</TableCell> */}
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                    }}
-                  >
-                    {row.TaskTags && row.TaskTags.length > 0 ? (
-                      <>
-                        {/* Display First Tag */}
-                        <span
-                          key={row.TaskTags[0].id}
-                          style={{
-                            display: "inline-block",
-                            backgroundColor: row.TaskTags[0].tagColour,
-                            color: "#fff",
-                            padding: "4px 8px",
-                            borderRadius: "8px",
-                            marginRight: "4px",
-                            fontSize: "10px",
-                            fontWeight: "bold",
-                          }}
-                        >
-                          {row.TaskTags[0].tagName}
-                        </span>
+        );
+      case "Priority":
+        if (!row.Priority) return null;
+        return (
+          <span
+            className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold text-white"
+            style={{ backgroundColor: priorityOptions.find((p) => p.value === row.Priority)?.color || "#ccc" }}
+          >
+            {row.Priority}
+          </span>
+        );
+      case "TaskTags":
+        if (!row.TaskTags || row.TaskTags.length === 0) return <span className="text-xs text-muted-foreground">No Tags</span>;
+        return (
+          <TooltipProvider>
+            <div className="flex items-center gap-1 flex-wrap">
+              <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold text-white" style={{ backgroundColor: row.TaskTags[0].tagColour }}>
+                {row.TaskTags[0].tagName}
+              </span>
+              {row.TaskTags.length > 1 && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground cursor-pointer">
+                      +{row.TaskTags.length - 1}
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="space-y-1">
+                    {row.TaskTags.slice(1).map((tag) => (
+                      <span key={tag.id} className="block rounded-full px-2 py-0.5 text-[10px] font-semibold text-white" style={{ backgroundColor: tag.tagColour }}>
+                        {tag.tagName}
+                      </span>
+                    ))}
+                  </TooltipContent>
+                </Tooltip>
+              )}
+            </div>
+          </TooltipProvider>
+        );
+      default:
+        return <span className="text-xs text-foreground">{row[col.key] || ""}</span>;
+    }
+  };
 
-                        {/* Tooltip for Remaining Tags */}
-                        {row.TaskTags.length > 1 && (
-                          <Tooltip
-                            arrow
-                            placement="top"
-                            title={
-                              <div>
-                                {row.TaskTags.slice(1).map((tag) => (
-                                  <Typography
-                                    key={tag.id}
-                                    sx={{
-                                      backgroundColor: tag.tagColour,
-                                      color: "#fff",
-                                      padding: "4px 8px",
-                                      borderRadius: "8px",
-                                      fontSize: "10px",
-                                      fontWeight: "bold",
-                                      display: "block",
-                                      marginBottom: "4px",
-                                    }}
-                                  >
-                                    {tag.tagName}
-                                  </Typography>
-                                ))}
-                              </div>
-                            }
-                          >
-                            <span
-                              style={{
-                                display: "inline-block",
-                                backgroundColor: "#ddd",
-                                color: "#333",
-                                padding: "4px 8px",
-                                borderRadius: "8px",
-                                fontSize: "10px",
-                                fontWeight: "bold",
-                                cursor: "pointer",
-                              }}
-                            >
-                              +{row.TaskTags.length - 1}
-                            </span>
-                          </Tooltip>
-                        )}
-                      </>
-                    ) : (
-                      <span style={{ color: "#888" }}>No Tags</span>
-                    )}
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
+  const handleClick = async (id) => {
+    try {
+      const response = await fetch(`${ACCOUNT_TASKS_API}/accountstasks/task/listbyid/${id}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch task data");
+      }
+
+      const taskToEdit = await response.json(); // Assuming response is JSON
+      setSelectedTaskData(taskToEdit);
+      handleClose();
+      setIsEditMode(true);
+      setDrawerOpen(true);
+    } catch (error) {
+      console.error("Error fetching task:", error);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="rounded-xl border bg-card shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-b bg-muted/40">
+                <th className="sticky left-0 z-10 bg-muted/40 w-10 px-3 py-3">
+                  <Checkbox
+                    checked={taskData.length > 0 && selected.length === taskData.length}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        setSelected(taskData.map((item) => item.id));
+                      } else {
+                        setSelected([]);
+                      }
                     }}
-                  >
-                    {row.description}
-                  </TableCell>
-                  <TableCell
-                    // style={{
-                    //   fontSize: "12px",
-                    //   padding: "4px 8px",
-                    //   lineHeight: "1",
-                    // }}
-                    style={{
-                      position: "sticky",
-                      right: 0, // Stick to the right side
-                      zIndex: 1, // Keep it above the table content
-                      background: "#fff",
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                    }}
-                  >
-                    <IconButton
-                      onClick={(event) => handleMenuClick(event, row.id)}
+                  />
+                </th>
+                {columns.map((col) => (
+                  <th key={col.key} className={`px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-nowrap ${col.sticky ? "sticky left-10 z-10 bg-muted/40" : ""}`}>
+                    {col.label}
+                  </th>
+                ))}
+                <th className="sticky right-0 z-10 bg-muted/40 w-14 px-3 py-3" />
+              </tr>
+            </thead>
+            <tbody className="divide-y">
+              {taskData.length === 0 ? (
+                <tr>
+                  <td colSpan={columns.length + 2} className="px-4 py-12 text-center text-sm text-muted-foreground">
+                    No completed tasks found.
+                  </td>
+                </tr>
+              ) : (
+                taskData.map((row) => {
+                  const isSelected = selected.includes(row.id);
+                  return (
+                    <tr
+                      key={row.id}
+                      onClick={() => handleSelect(row.id)}
+                      className={`cursor-pointer transition-colors hover:bg-muted/30 ${isSelected ? "bg-primary/5" : ""}`}
                     >
-                      <MoreVertIcon />
-                    </IconButton>
-                    <Menu
-                      anchorEl={anchorEl}
-                      open={Boolean(anchorEl && selectedTask === row.id)}
-                      onClose={handleClose}
-                    >
-                      <MenuItem onClick={() => handleClick(row.id)}>Edit</MenuItem>
-                      <MenuItem onClick={handleDelete}>Delete</MenuItem>
-                    </Menu>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      </Box>
+                      <td className="sticky left-0 z-[5] bg-card px-3 py-2.5">
+                        <Checkbox checked={isSelected} onCheckedChange={() => handleSelect(row.id)} />
+                      </td>
+                      {columns.map((col) => (
+                        <td key={col.key} className={`px-4 py-2.5 whitespace-nowrap ${col.sticky ? "sticky left-10 z-[5] bg-card" : ""}`}>
+                          {renderCell(row, col)}
+                        </td>
+                      ))}
+                      <td className="sticky right-0 z-[5] bg-card px-2 py-2.5">
+                        <DropdownMenu open={openMenuId === row.id} onOpenChange={(open) => setOpenMenuId(open ? row.id : null)}>
+                          <DropdownMenuTrigger>
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); handleMenuClick(row.id); }}>
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleClick(row.id); }}>Edit</DropdownMenuItem>
+                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleClose(); handleDeleteTask(selectedTask); }} className="text-destructive">Delete</DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       <NewTaskDrawer
-  open={drawerOpen}
-  onClose={onclose}
-  fetchCompletedTasks={fetchCompletedTasks}
-  isEditMode={isEditMode}
-  taskData={selectedTaskData}
-/>
-   </Box>
-  )
-}
+        open={drawerOpen}
+        onClose={onclose}
+        fetchCompletedTasks={fetchCompletedTasks}
+        isEditMode={isEditMode}
+        taskData={selectedTaskData}
+      />
+    </div>
+  );
+};
 
-export default CompletedTasks
+export default CompletedTasks;

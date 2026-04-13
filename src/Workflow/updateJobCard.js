@@ -1,32 +1,13 @@
 import React, { useState, useEffect } from "react";
-import {
-  Drawer,
-  Box,
-  Typography,
-  IconButton,
-  Divider,
-  InputLabel,
-  TextField,
-  FormControl,
-  Select,
-  OutlinedInput,
-  MenuItem,
-  Chip,
-  Button,
-  FormControlLabel,
-  Switch,
-  InputAdornment,
-  Autocomplete,
-} from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { X } from "lucide-react";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Switch } from "../components/ui/switch";
 import dayjs from "dayjs";
 import { toast } from "react-toastify";
-import Priority from "../Templates/Priority/Priority"; // Adjust path as needed
-import Editor from "../Templates/Texteditor/Editor"; // Adjust path as needed
-import MultiSelectDropdown from "../Templates/MultiSelectDropdown"; // Adjust path as needed
+import Priority from "../Templates/Priority/Priority";
+import Editor from "../Templates/Texteditor/Editor";
+import MultiSelectDropdown from "../Templates/MultiSelectDropdown";
 
 const EditJobDrawer = ({
   open,
@@ -38,8 +19,6 @@ const EditJobDrawer = ({
   tagOptions,
   userOptions,
   clientFacingOptions,
-  theme,
-  isSmallScreen,
 }) => {
   // API endpoints
   const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
@@ -364,465 +343,215 @@ const EditJobDrawer = ({
       });
   };
 
+  if (!open) return null;
+
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Drawer
-        anchor="right"
-        open={open}
-        onClose={onClose}
-        PaperProps={{
-          sx: {
-            borderRadius: isSmallScreen ? "0" : "10px 0 0 10px",
-            width: isSmallScreen ? "100%" : 500,
-            maxWidth: "100%",
-            [theme.breakpoints.down("sm")]: {
-              width: "100%",
-            },
-          },
-        }}
-      >
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: "20px",
-            ml: 1,
-          }}
-        >
-          <Typography sx={{ fontWeight: "bold", fontSize: "20px" }}>
-            Edit Job
-          </Typography>
-          <IconButton onClick={onClose}>
-            <CloseIcon />
-          </IconButton>
-        </Box>
-        <Divider />
-        <Box
-          padding={2}
-          height="83vh"
-          sx={{ overflowY: "auto" }}
-          className="bulk-job-form"
-        >
-          <Box>
-            <InputLabel sx={{ color: "black" }}>Account</InputLabel>
-            <TextField
-              value={selectedAccount}
-              size="small"
-              fullWidth
-              margin="normal"
-            />
-          </Box>
-          <Box>
-            <InputLabel sx={{ color: "black" }}>Job Name</InputLabel>
-            <TextField
-              value={jobName}
-              onChange={(e) => setJobName(e.target.value)}
-              size="small"
-              fullWidth
-              margin="normal"
-            />
-          </Box>
+    <div className="fixed inset-0 z-50 flex">
+      <div className="fixed inset-0 bg-black/40" onClick={onClose} />
+      <div className="ml-auto relative z-50 w-full max-w-[500px] sm:rounded-l-xl bg-background h-full overflow-hidden shadow-2xl flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b">
+          <h2 className="text-xl font-bold">Edit Job</h2>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
+            <X className="h-5 w-5" />
+          </button>
+        </div>
 
-          <Box>
-            <InputLabel sx={{ color: "black" }}>Pipeline</InputLabel>
-            <Autocomplete
-            disabled
-              options={pipelineOptions}
-              getOptionLabel={(option) => option.label}
-              value={selectedPipeline}
-              onChange={(event, newValue) => handlePipelineChange(newValue)}
-              isOptionEqualToValue={(option, value) =>
-                option.value === value.value
-              }
-              renderOption={(props, option) => (
-                <Box
-                  component="li"
-                  {...props}
-                  sx={{ cursor: "pointer", margin: "5px 10px" }}
-                >
-                  {option.label}
-                </Box>
-              )}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  sx={{ backgroundColor: "#fff" }}
-                  placeholder="Pipeline"
-                  variant="outlined"
-                  size="small"
-                />
-              )}
-              sx={{ width: "100%", marginTop: "8px" }}
-              clearOnEscape
-            />
-          </Box>
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto p-5 space-y-4 bulk-job-form">
+          <div>
+            <label className="text-sm font-medium">Account</label>
+            <Input value={selectedAccount} readOnly className="mt-1 bg-white" />
+          </div>
 
-          <Box mt={2}>
-            <InputLabel sx={{ color: "black", mb: 1 }}>Account Tags</InputLabel>
-            <FormControl sx={{ width: "100%" }}>
-              <Select
-                multiple
-                multiline
-                size="small"
-                input={<OutlinedInput />}
-                displayEmpty
-                value={combinedTagsValues}
-                onChange={handleTagChange}
-                renderValue={(selected) => {
-                  if (selected.length === 0) {
-                    return (
-                      <span style={{ color: "#aaa" }}>Select tags...</span>
-                    );
-                  }
+          <div>
+            <label className="text-sm font-medium">Job Name</label>
+            <Input value={jobName} onChange={(e) => setJobName(e.target.value)} className="mt-1 bg-white" />
+          </div>
+
+          <div>
+            <label className="text-sm font-medium">Pipeline</label>
+            <select
+              value={selectedPipeline?.value || ""}
+              disabled
+              className="w-full mt-1 rounded-lg border border-input bg-muted px-3 py-2 text-sm opacity-70 cursor-not-allowed"
+            >
+              <option value="" disabled>Pipeline</option>
+              {pipelineOptions?.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="text-sm font-medium">Account Tags</label>
+            <div className="mt-1 rounded-lg border border-input bg-background p-2 min-h-[40px]">
+              <div className="flex flex-wrap gap-1.5 mb-2">
+                {combinedTagsValues.map((value) => {
+                  const option = tagOptions?.find((opt) => opt.value === value);
                   return (
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexWrap: "wrap",
-                        gap: "6px",
-                        padding: "6px",
+                    <span
+                      key={value}
+                      className="text-[10px] text-white font-medium px-2 py-0.5 rounded-full shadow-sm cursor-pointer"
+                      style={{ backgroundColor: option?.colour }}
+                      onClick={() => {
+                        const newValues = combinedTagsValues.filter((v) => v !== value);
+                        setCombinedTagsValues(newValues);
+                        setSelectedTags(tagOptions?.filter((opt) => newValues.includes(opt.value)) || []);
                       }}
                     >
-                      {selected.map((value) => {
-                        const option = tagOptions.find(
-                          (opt) => opt.value === value
-                        );
-                        return (
-                          <Chip
-                            key={value}
-                            label={option?.label}
-                            sx={{
-                              backgroundColor: option?.colour,
-                              color: "#fff",
-                              fontWeight: 500,
-                              fontSize: "10px",
-                              borderRadius: "16px",
-                              height: "20px",
-                              cursor: "pointer",
-                              boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)",
-                            }}
-                          />
-                        );
-                      })}
-                    </Box>
-                  );
-                }}
-                MenuProps={{
-                  PaperProps: {
-                    style: { maxHeight: 250 },
-                  },
-                }}
-                sx={{
-                  borderRadius: "10px",
-                  "& .MuiOutlinedInput-root": { borderRadius: "10px" },
-                }}
-              >
-                {tagOptions.map((option) => {
-                  const dynamicWidth = Math.min(
-                    option.label.length * 8 + 16,
-                    150
-                  );
-                  return (
-                    <MenuItem
-                      key={option.value}
-                      value={option.value}
-                      sx={{
-                        backgroundColor: option.colour,
-                        color: "#fff",
-                        fontSize: "10px",
-                        borderRadius: "10px",
-                        margin: "5px",
-                        textAlign: "center",
-                        padding: "4px 9px",
-                        minWidth: `${dynamicWidth}px`,
-                        maxWidth: `${dynamicWidth}px`,
-                        "&:hover": {
-                          backgroundColor: option.colour,
-                          color: "#fff",
-                        },
-                      }}
-                    >
-                      {option.label}
-                    </MenuItem>
+                      {option?.label} ×
+                    </span>
                   );
                 })}
-              </Select>
-            </FormControl>
-          </Box>
+              </div>
+              <select
+                value=""
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (!combinedTagsValues.includes(val)) {
+                    const newValues = [...combinedTagsValues, val];
+                    setCombinedTagsValues(newValues);
+                    setSelectedTags(tagOptions?.filter((opt) => newValues.includes(opt.value)) || []);
+                  }
+                }}
+                className="w-full text-sm bg-transparent border-0 focus:outline-none"
+              >
+                <option value="" disabled>Select tags...</option>
+                {tagOptions?.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
 
-          <Box mt={2} mr={2.5}>
-            <InputLabel sx={{ color: "black" }}>Job Assignee</InputLabel>
+          <div className="mr-2.5">
+            <label className="text-sm font-medium">Job Assignee</label>
             <MultiSelectDropdown
               value={selectedUser}
               onChange={handleUserChange}
               placeholder="Job Assignees"
               options={userOptions}
             />
-          </Box>
+          </div>
 
-          <Box mt={2}>
-            <InputLabel sx={{ color: "black" }}>Stage</InputLabel>
-            <Autocomplete
-              options={stages}
-              getOptionLabel={(option) => option.label}
-              value={selectedStage}
-              onChange={(event, newValue) => handleStageChange(newValue)}
-              isOptionEqualToValue={(option, value) =>
-                option.value === value.value
-              }
-              renderOption={(props, option) => (
-                <Box
-                  component="li"
-                  {...props}
-                  sx={{ cursor: "pointer", margin: "5px 10px" }}
-                >
-                  {option.label}
-                </Box>
-              )}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  sx={{ backgroundColor: "#fff" }}
-                  placeholder="Select stages"
-                  variant="outlined"
-                  size="small"
-                />
-              )}
-              clearOnEscape
-              sx={{ width: "100%", marginTop: "8px" }}
-            />
-          </Box>
+          <div>
+            <label className="text-sm font-medium">Stage</label>
+            <select
+              value={selectedStage?.value || ""}
+              onChange={(e) => {
+                const opt = stages.find((o) => o.value === e.target.value);
+                handleStageChange(opt);
+              }}
+              className="w-full mt-1 rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            >
+              <option value="" disabled>Select stages</option>
+              {stages.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </div>
 
-          <Box mt={2}>
+          <div>
             <Priority
               onPriorityChange={handlePriorityChange}
               selectedPriority={priority}
             />
-          </Box>
+          </div>
 
-          <Box mt={2}>
-            <InputLabel sx={{ color: "black" }}>Start Date</InputLabel>
-            <DatePicker
-              format="MM/DD/YYYY"
-              sx={{ width: "100%", backgroundColor: "#fff", mt: 2 }}
-              value={startDate}
-              onChange={handleStartDateChange}
-              renderInput={(params) => <TextField {...params} size="small" />}
+          <div>
+            <label className="text-sm font-medium">Start Date</label>
+            <Input
+              type="date"
+              value={startDate ? dayjs(startDate).format("YYYY-MM-DD") : ""}
+              onChange={(e) => handleStartDateChange(e.target.value ? dayjs(e.target.value) : null)}
+              className="mt-1 bg-white"
             />
-          </Box>
+          </div>
 
-          <Box mt={2}>
-            <InputLabel sx={{ color: "black" }}>Due Date</InputLabel>
-            <DatePicker
-              format="MM/DD/YYYY"
-              sx={{ width: "100%", backgroundColor: "#fff", mt: 2 }}
-              value={dueDate}
-              onChange={handleDueDateChange}
-              renderInput={(params) => <TextField {...params} size="small" />}
+          <div>
+            <label className="text-sm font-medium">Due Date</label>
+            <Input
+              type="date"
+              value={dueDate ? dayjs(dueDate).format("YYYY-MM-DD") : ""}
+              onChange={(e) => handleDueDateChange(e.target.value ? dayjs(e.target.value) : null)}
+              className="mt-1 bg-white"
             />
-          </Box>
+          </div>
 
-          <Box mt={2} mb={5}>
+          <div className="mb-5">
             <Editor
               initialContent={description}
               onChange={handleEditorChange}
             />
-          </Box>
+          </div>
 
-          <Box mt={3}>
-            <Box style={{ display: "flex", alignItems: "center" }}>
-              <Box
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "8px",
-                  width: "100%",
-                }}
-              >
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Typography variant="body">
-                    <b>Client-facing status</b>
-                  </Typography>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        onChange={handleClientFacingToggle}
-                        checked={clientFacingStatus}
-                        color="primary"
-                      />
-                    }
-                    label="Show in Client portal"
+          <div className="mt-6 flex flex-col gap-2 w-full">
+            <div className="flex items-center justify-between">
+              <p className="font-bold text-sm">Client-facing status</p>
+              <div className="flex items-center gap-2">
+                <Switch
+                  checked={clientFacingStatus}
+                  onCheckedChange={(checked) => setClientFacingStatus(checked)}
+                />
+                <span className="text-sm">Show in Client portal</span>
+              </div>
+            </div>
+
+            {clientFacingStatus && (
+              <div className="space-y-3">
+                <div>
+                  <label className="text-sm font-medium">Job name for client</label>
+                  <Input
+                    name="subject"
+                    value={inputText}
+                    onChange={handleInputTextChange}
+                    placeholder="Job name for client"
+                    className="mt-1 bg-white"
                   />
-                </Box>
-                <Box>
-                  {clientFacingStatus && (
-                    <>
-                      <InputLabel sx={{ color: "black" }}>
-                        Job name for client
-                      </InputLabel>
-                      <TextField
-                        fullWidth
-                        name="subject"
-                        value={inputText}
-                        onChange={handleInputTextChange}
-                        placeholder="Job name for client"
-                        size="small"
-                        sx={{ background: "#fff", mt: 2 }}
-                      />
+                </div>
 
-                      <Box mt={2}>
-                        <InputLabel sx={{ color: "black" }}>Status</InputLabel>
-                        <Autocomplete
-                          options={clientFacingOptions}
-                          size="small"
-                          sx={{ mt: 1 }}
-                          value={selectedJob}
-                          onChange={handleJobChange}
-                          getOptionLabel={(option) => option.label}
-                          isOptionEqualToValue={(option, value) =>
-                            option.value === value.value
-                          }
-                          renderOption={(props, option) => (
-                            <Box component="li" {...props}>
-                              <Chip
-                                size="small"
-                                style={{
-                                  backgroundColor: option.clientfacingColour,
-                                  marginRight: 8,
-                                  marginLeft: 8,
-                                  borderRadius: "50%",
-                                  height: "15px",
-                                }}
-                              />
-                              {option.label}
-                            </Box>
-                          )}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder="Select Client Facing Job"
-                              InputProps={{
-                                ...params.InputProps,
-                                startAdornment:
-                                  params.inputProps.value &&
-                                  clientFacingOptions.length > 0 ? (
-                                    <Chip
-                                      size="small"
-                                      style={{
-                                        backgroundColor:
-                                          clientFacingOptions.find(
-                                            (job) =>
-                                              job.clientfacingName ===
-                                              params.inputProps.value
-                                          )?.clientfacingColour,
-                                        marginRight: 8,
-                                        marginLeft: 2,
-                                        borderRadius: "50%",
-                                        height: "15px",
-                                      }}
-                                    />
-                                  ) : null,
-                              }}
-                            />
-                          )}
-                        />
-                      </Box>
-                      <Box sx={{ position: "relative", mt: 2 }}>
-                        <InputLabel sx={{ color: "black" }}>
-                          Description
-                        </InputLabel>
-                        <TextField
-                          fullWidth
-                          size="small"
-                          margin="normal"
-                          type="text"
-                          multiline
-                          value={clientDescription}
-                          onChange={handleClientDescriptionChange}
-                          placeholder="Description"
-                          InputProps={{
-                            endAdornment: (
-                              <InputAdornment position="end">
-                                <Typography
-                                  sx={{
-                                    color: "gray",
-                                    fontSize: "12px",
-                                    position: "absolute",
-                                    bottom: "15px",
-                                    right: "15px",
-                                  }}
-                                >
-                                  {charCount}/{charLimit}
-                                </Typography>
-                              </InputAdornment>
-                            ),
-                          }}
-                        />
-                      </Box>
-                    </>
-                  )}
-                </Box>
-              </Box>
-            </Box>
-          </Box>
+                <div>
+                  <label className="text-sm font-medium">Status</label>
+                  <select
+                    value={selectedJob?.value || ""}
+                    onChange={(e) => {
+                      const opt = clientFacingOptions?.find((o) => o.value === e.target.value);
+                      handleJobChange(e, opt);
+                    }}
+                    className="w-full mt-1 rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  >
+                    <option value="" disabled>Select Client Facing Job</option>
+                    {clientFacingOptions?.map((opt) => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                </div>
 
-          <Box mt={5} display="flex" alignItems="center" gap={2}>
-            <Button
-              variant="contained"
-              onClick={handleSaveAndExit}
-              sx={{
-                backgroundColor: "var(--color-save-btn)",
-                "&:hover": {
-                  backgroundColor: "var(--color-save-hover-btn)",
-                },
-                borderRadius: "15px",
-              }}
-            >
-              Save & Exit
-            </Button>
-            <Button
-              variant="contained"
-              onClick={handleSave}
-              sx={{
-                backgroundColor: "var(--color-save-btn)",
-                "&:hover": {
-                  backgroundColor: "var(--color-save-hover-btn)",
-                },
-                width: "80px",
-                borderRadius: "15px",
-              }}
-            >
-              Save
-            </Button>
-            <Button
-              variant="outlined"
-              onClick={onClose}
-              sx={{
-                borderColor: "var(--color-border-cancel-btn)",
-                color: "var(--color-save-btn)",
-                "&:hover": {
-                  backgroundColor: "var(--color-save-hover-btn)",
-                  color: "#fff",
-                  border: "none",
-                },
-                width: "80px",
-                borderRadius: "15px",
-                ml: 2,
-              }}
-            >
-              Cancel
-            </Button>
-          </Box>
-        </Box>
-      </Drawer>
-    </LocalizationProvider>
+                <div className="relative">
+                  <label className="text-sm font-medium">Description</label>
+                  <textarea
+                    value={clientDescription}
+                    onChange={handleClientDescriptionChange}
+                    placeholder="Description"
+                    className="w-full mt-1 rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring min-h-[80px] resize-y"
+                  />
+                  <span className="absolute bottom-3 right-3 text-xs text-gray-400">
+                    {charCount}/{charLimit}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="flex items-center gap-3 pt-6 pb-4">
+            <Button onClick={handleSaveAndExit}>Save & Exit</Button>
+            <Button onClick={handleSave}>Save</Button>
+            <Button variant="outline" onClick={onClose}>Cancel</Button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

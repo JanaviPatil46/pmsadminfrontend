@@ -1354,6 +1354,7 @@ const getRelativeTime = (dateStr) => {
 
 const EmailViewer = () => {
   const [threads, setThreads] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [expandedThreadId, setExpandedThreadId] = useState(null);
   const [expandedMessageId, setExpandedMessageId] = useState(null);
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
@@ -1515,7 +1516,7 @@ const cleanSubjectText = (subject = "") => {
   const markThreadAsRead = async (threadId) => {
     try {
       await axios.patch(
-        "http://127.0.0.1:8015/emailsync/messagesList/threads/mark-read",
+        "https://www.snptaxes.com/emailsync/messagesList/threads/mark-read",
         {
           threadId,
         },
@@ -1529,7 +1530,7 @@ const cleanSubjectText = (subject = "") => {
   const archiveThread = async (threadId, archived) => {
     try {
       await axios.patch(
-        "http://127.0.0.1:8015/emailsync/messagesList/threads/archive",
+        "https://www.snptaxes.com/emailsync/messagesList/threads/archive",
         {
           threadId,
           archived,
@@ -1546,16 +1547,27 @@ const cleanSubjectText = (subject = "") => {
   //   return tab === 0 ? !isArchived : isArchived;
   // });
 
-   const filteredThreads = threads
+  const filteredThreads = threads
     .filter((thread) => {
       const isArchived = thread.latest?.archived;
       return tab === 0 ? !isArchived : isArchived;
     })
     .filter((thread) => {
       if (matchesSelectedFilters(thread.latest?.subject)) return true;
-
-      return thread.messages?.some((msg) =>
-        matchesSelectedFilters(msg.subject)
+      return thread.messages?.some((msg) => matchesSelectedFilters(msg.subject));
+    })
+    .filter((thread) => {
+      if (!searchQuery.trim()) return true;
+      const q = searchQuery.toLowerCase();
+      const latest = thread.latest;
+      if (latest?.from?.toLowerCase().includes(q)) return true;
+      if (cleanSubjectText(latest?.subject || "").toLowerCase().includes(q)) return true;
+      if (getPreview(latest?.body || "").toLowerCase().includes(q)) return true;
+      return thread.messages?.some(
+        (msg) =>
+          msg.from?.toLowerCase().includes(q) ||
+          cleanSubjectText(msg.subject || "").toLowerCase().includes(q) ||
+          getPreview(msg.body || "").toLowerCase().includes(q)
       );
     });
   const renderLinkedSubject = (subject, isBold = false) => {
@@ -1595,6 +1607,8 @@ const cleanSubjectText = (subject = "") => {
               <Search size={13} style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "#bbb", pointerEvents: "none" }} />
               <Input
                 placeholder="Search emails"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 style={{ paddingLeft: 30, height: 32, fontSize: 12, borderRadius: 8, border: "1px solid #eee", backgroundColor: "#fafafa" }}
               />
             </div>

@@ -10,7 +10,6 @@ import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { Label } from "../../components/ui/label";
 import { Switch } from "../../components/ui/switch";
-import { Typography,IconButton,Box, } from "@mui/material";
 import { CiMenuKebab } from "react-icons/ci";
 import { Eye, X, FileText, Receipt, MoreVertical, Plus, Percent, Pencil, Trash2, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 const InvoiceTemp = () => {
@@ -649,33 +648,42 @@ const InvoiceTemp = () => {
       accessorKey: "templatename", // Access the template name
       header: "Name",
       Cell: ({ row }) => (
-        <Typography sx={{ color: "#2c59fa", cursor: "pointer", fontWeight: "bold" }} onClick={() => handleEdit(row.original._id)}>
+        <span className="text-blue-600 cursor-pointer font-bold" onClick={() => handleEdit(row.original._id)}>
           {row.original.templatename}
-        </Typography>
+        </span>
       ),
     },
     {
       accessorKey: "settings", // Add settings column
       header: "Settings",
       Cell: ({ row }) => (
-        <IconButton onClick={() => toggleMenu(row.original._id)} style={{ color: "#2c59fa" }}>
-          <CiMenuKebab style={{ fontSize: "25px" }} />
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => toggleMenu(row.original._id)}
+            className="rounded p-1 text-blue-600 hover:bg-blue-50 transition-colors"
+          >
+            <CiMenuKebab style={{ fontSize: "20px" }} />
+          </button>
           {openMenuId === row.original._id && (
-            <Box sx={{ position: "absolute", zIndex: 1, backgroundColor: "#fff", boxShadow: 1, borderRadius: 1, p: 1, left: "30px", m: 2 }}>
-              <Typography
-                sx={{ fontSize: "12px", fontWeight: "bold" }}
-                onClick={() => {
-                  handleEdit(row.original._id);
-                }}
+            <div className="absolute left-8 top-0 z-10 w-24 rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
+              <button
+                type="button"
+                className="w-full px-3 py-1.5 text-left text-xs font-bold text-gray-700 hover:bg-gray-50"
+                onClick={() => handleEdit(row.original._id)}
               >
                 Edit
-              </Typography>
-              <Typography sx={{ fontSize: "12px", color: "red", fontWeight: "bold" }} onClick={() => handleDelete(row.original._id)}>
+              </button>
+              <button
+                type="button"
+                className="w-full px-3 py-1.5 text-left text-xs font-bold text-red-500 hover:bg-red-50"
+                onClick={() => handleDelete(row.original._id)}
+              >
                 Delete
-              </Typography>
-            </Box>
+              </button>
+            </div>
           )}
-        </IconButton>
+        </div>
       ),
     },
   ];
@@ -1288,12 +1296,12 @@ const InvoiceTemp = () => {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-border bg-muted/50">
-                        <th className="sticky left-0 bg-muted/50 px-3 py-2 text-left font-medium text-muted-foreground">Product/Service</th>
-                        <th className="px-3 py-2 text-left font-medium text-muted-foreground">Description</th>
-                        <th className="px-3 py-2 text-left font-medium text-muted-foreground">Rate</th>
-                        <th className="px-3 py-2 text-left font-medium text-muted-foreground">Qty</th>
-                        <th className="px-3 py-2 text-left font-medium text-muted-foreground">Amount</th>
-                        <th className="px-3 py-2 text-center font-medium text-muted-foreground">Tax</th>
+                        <th className="sticky left-0 bg-muted/50 px-3 py-2 text-left font-medium text-muted-foreground" style={{ minWidth: 180 }}>Product/Service</th>
+                        <th className="px-3 py-2 text-left font-medium text-muted-foreground" style={{ minWidth: 140 }}>Description</th>
+                        <th className="px-3 py-2 text-right font-medium text-muted-foreground" style={{ minWidth: 90 }}>Rate</th>
+                        <th className="px-3 py-2 text-right font-medium text-muted-foreground" style={{ minWidth: 60 }}>Qty</th>
+                        <th className="px-3 py-2 text-right font-medium text-muted-foreground" style={{ minWidth: 90 }}>Amount</th>
+                        <th className="px-3 py-2 text-center font-medium text-muted-foreground" style={{ minWidth: 48 }}>Tax</th>
                         <th className="px-3 py-2 w-10" />
                         <th className="px-3 py-2 w-10" />
                       </tr>
@@ -1317,16 +1325,16 @@ const InvoiceTemp = () => {
                               menuPortalTarget={document.body}
                             />
                           </td>
-                          <td className="px-2 py-1.5">
+                          <td className="px-2 py-1.5" style={{ minWidth: 140 }}>
                             <input type="text" name="description" value={row.description} onChange={(e) => handleInputChange(index, e)} className="w-full rounded border-0 bg-transparent px-1 py-1 text-sm outline-none focus:ring-1 focus:ring-ring" placeholder="Description" />
                           </td>
-                          <td className="px-2 py-1.5">
-                            <input type="text" name="rate" value={row.rate} onChange={(e) => handleInputChange(index, e)} className="w-20 rounded border-0 bg-transparent px-1 py-1 text-sm outline-none focus:ring-1 focus:ring-ring" />
+                          <td className="px-2 py-1.5 text-right" style={{ minWidth: 90 }}>
+                            <input type="text" name="rate" value={row.rate} onChange={(e) => handleInputChange(index, e)} className="w-full rounded border-0 bg-transparent px-1 py-1 text-sm text-right outline-none focus:ring-1 focus:ring-ring" />
                           </td>
-                          <td className="px-2 py-1.5">
-                            <input type="text" name="qty" value={row.qty} onChange={(e) => handleInputChange(index, e)} className="w-14 rounded border-0 bg-transparent px-1 py-1 text-sm outline-none focus:ring-1 focus:ring-ring" />
+                          <td className="px-2 py-1.5 text-right" style={{ minWidth: 60 }}>
+                            <input type="text" name="qty" value={row.qty} onChange={(e) => handleInputChange(index, e)} className="w-full rounded border-0 bg-transparent px-1 py-1 text-sm text-right outline-none focus:ring-1 focus:ring-ring" />
                           </td>
-                          <td className="px-2 py-1.5 text-sm">{row.amount}</td>
+                          <td className="px-2 py-1.5 text-sm text-right font-medium" style={{ minWidth: 90 }}>{row.amount}</td>
                           <td className="px-2 py-1.5 text-center">
                             <input type="checkbox" name="tax" checked={row.tax} onChange={(e) => handleInputChange(index, e)} className="h-4 w-4 rounded border-gray-300" />
                           </td>
@@ -1368,35 +1376,39 @@ const InvoiceTemp = () => {
                 {/* Summary */}
                 <div className="mt-6">
                   <h4 className="text-base font-semibold mb-3">Summary</h4>
-                  <div className="overflow-x-auto rounded-lg border border-border bg-white">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b border-border bg-muted/50">
-                          <th className="px-3 py-2 text-left font-medium text-muted-foreground">Subtotal</th>
-                          <th className="px-3 py-2 text-left font-medium text-muted-foreground">Tax Rate</th>
-                          <th className="px-3 py-2 text-left font-medium text-muted-foreground">Tax Total</th>
-                          <th className="px-3 py-2 text-left font-medium text-muted-foreground">Total</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td className="px-3 py-2">
-                            <div className="flex items-center gap-1">
-                              <span>$</span>
-                              <input value={subtotal} onChange={handleSubtotalChange} className="w-20 rounded border-0 bg-transparent px-1 py-0.5 text-sm outline-none focus:ring-1 focus:ring-ring" />
-                            </div>
-                          </td>
-                          <td className="px-3 py-2">
-                            <div className="flex items-center gap-1">
-                              <input value={taxRate} onChange={handleTaxRateChange} className="w-16 rounded border-0 bg-transparent px-1 py-0.5 text-sm outline-none focus:ring-1 focus:ring-ring" />
-                              <span>%</span>
-                            </div>
-                          </td>
-                          <td className="px-3 py-2 text-sm">${taxTotal.toFixed(2)}</td>
-                          <td className="px-3 py-2 text-sm font-semibold">${totalAmount}</td>
-                        </tr>
-                      </tbody>
-                    </table>
+                  <div className="rounded-lg border border-border bg-white overflow-hidden">
+                    <div className="grid grid-cols-4 divide-x divide-border">
+                      <div className="px-4 py-3">
+                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">Subtotal</p>
+                        <div className="flex items-center gap-1">
+                          <span className="text-sm text-slate-500">$</span>
+                          <input
+                            value={subtotal}
+                            onChange={handleSubtotalChange}
+                            className="w-full rounded border-0 bg-transparent px-0 py-0.5 text-sm font-medium text-slate-800 outline-none focus:ring-0"
+                          />
+                        </div>
+                      </div>
+                      <div className="px-4 py-3">
+                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">Tax Rate</p>
+                        <div className="flex items-center gap-1">
+                          <input
+                            value={taxRate}
+                            onChange={handleTaxRateChange}
+                            className="w-full rounded border-0 bg-transparent px-0 py-0.5 text-sm font-medium text-slate-800 outline-none focus:ring-0"
+                          />
+                          <span className="text-sm text-slate-500">%</span>
+                        </div>
+                      </div>
+                      <div className="px-4 py-3">
+                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">Tax Total</p>
+                        <p className="text-sm font-medium text-slate-800">${taxTotal.toFixed(2)}</p>
+                      </div>
+                      <div className="px-4 py-3 bg-slate-50/60">
+                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">Total</p>
+                        <p className="text-sm font-bold text-slate-900">${totalAmount}</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </FormSection>

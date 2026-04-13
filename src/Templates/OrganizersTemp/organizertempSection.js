@@ -1,31 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { HiOutlineDuplicate } from "react-icons/hi";
 import { RiDeleteBinLine } from "react-icons/ri";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import {
-  Box,
-  TextField,
-  IconButton,
-  Button,
-  Menu,
-  MenuItem,
-  Input,
-  Typography,
-  Drawer,
-  Divider,
-  Switch,
-  FormControlLabel,
-  Autocomplete,
-  Paper,
-} from "@mui/material";
-import { Badge } from "@mui/material";
+import { Upload, GripVertical } from "lucide-react";
 import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css"; // Quill Snow theme
-import "quill-emoji/dist/quill-emoji.css"; // Emoji styles
+import "react-quill/dist/quill.snow.css";
+import "quill-emoji/dist/quill-emoji.css";
 import Quill from "quill";
 import "quill-emoji";
 import { useDrag, useDrop } from "react-dnd";
-import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import { IoSettingsOutline } from "react-icons/io5";
 import { IoMdClose } from "react-icons/io";
 Quill.register("modules/emoji", require("quill-emoji"));
@@ -74,19 +56,11 @@ const DraggableQuestion = ({ id, index, moveQuestion, children }) => {
   return (
     <div
       ref={ref}
-      style={{
-        opacity: isDragging ? 0.5 : 1,
-        cursor: "move",
-        padding: "8px",
-        marginBottom: "8px",
-        backgroundColor: "#fff",
-        border: isDragging ? "2px dashed #1976d2" : "1px solid #ddd",
-        borderRadius: "4px",
-        display: "flex",
-        // alignItems: 'center'
-      }}
+      className={`mb-2 rounded bg-white flex ${
+        isDragging ? "opacity-50 border-2 border-dashed border-blue-400" : "border border-gray-200"
+      } p-2`}
     >
-      <DragIndicatorIcon style={{ cursor: "move", marginRight: "8px" }} />
+      <GripVertical className="h-4 w-4 text-gray-400 cursor-move mr-2 mt-1 shrink-0" />
       {children}
     </div>
   );
@@ -133,15 +107,11 @@ const DraggableOption = ({ id, index, moveOption, children, elementId }) => {
   return (
     <div
       ref={ref}
-      style={{
-        opacity: isDragging ? 0.5 : 1,
-        cursor: "move",
-        display: "flex",
-        alignItems: "center",
-        marginBottom: "8px",
-      }}
+      className={`flex items-center mb-2 ${
+        isDragging ? "opacity-50" : ""
+      }`}
     >
-      <DragIndicatorIcon style={{ cursor: "move", marginRight: "8px" }} />
+      <GripVertical className="h-4 w-4 text-gray-400 cursor-move mr-2 shrink-0" />
       {children}
     </div>
   );
@@ -658,7 +628,7 @@ const getAllQuestionsGrouped = () => {
 
   const renderOptions = (element, type = "text") => {
     return (
-      <Box>
+      <div className="mt-1">
         {element.options &&
           element.options.map((option, index) => (
             <DraggableOption
@@ -668,294 +638,240 @@ const getAllQuestionsGrouped = () => {
               moveOption={moveOption}
               elementId={element.id}
             >
-              {type === "radio" ? (
-                <Input
+              {(type === "radio" || type === "Yes/No") && (
+                <input
                   type="radio"
                   name={`radio-${element.id}`}
-                  sx={{ marginRight: "8px" }}
+                  className="mr-2 shrink-0"
+                  readOnly
                 />
-              ) : type === "checkbox" ? (
-                <Input
+              )}
+              {type === "checkbox" && (
+                <input
                   type="checkbox"
                   name={`checkbox-${element.id}`}
-                  sx={{ marginRight: "8px" }}
+                  className="mr-2 shrink-0"
+                  readOnly
                 />
-              ) : type === "Yes/No" ? (
-                <Input
-                  type="radio"
-                  name={`radio-${element.id}`}
-                  sx={{ marginRight: "8px" }}
-                />
-              ) : null}
-
-              <TextField
-                variant="outlined"
+              )}
+              <input
+                type="text"
                 placeholder="Option"
                 value={option.text}
-                size="small"
-                margin="normal"
-                fullWidth
-                className="organizer-input-label"
+                className="organizer-input-label flex-1 rounded border border-gray-200 bg-white px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                 onChange={(e) =>
                   handleOptionChange(element.id, option.id, e.target.value)
                 }
               />
-              <IconButton
+              <button
+                type="button"
                 onClick={() => handleDeleteOption(element.id, option.id)}
+                className="ml-1 rounded p-1 text-red-400 hover:bg-red-50 transition-colors"
               >
-                <RiDeleteBinLine />
-              </IconButton>
+                <RiDeleteBinLine className="h-4 w-4" />
+              </button>
             </DraggableOption>
           ))}
-        <Button
-          variant="contained"
+        <button
+          type="button"
           onClick={() => handleAddOption(element.id)}
-          sx={{
-            backgroundColor: "var(--color-save-btn)",
-            "&:hover": {
-              backgroundColor: "var(--color-save-hover-btn)",
-            },
-            borderRadius: "15px",
-          }}
+          className="mt-2 rounded-full bg-[var(--color-save-btn)] px-4 py-1.5 text-sm text-white hover:bg-[var(--color-save-hover-btn)] transition-colors"
         >
           Add Option
-        </Button>
-      </Box>
+        </button>
+      </div>
     );
   };
 
   const renderFormElement = (element) => {
-    const commonElementProps = {
-      key: element.id,
-      sx: {
-        display: "flex",
-        alignItems: "center",
-        marginBottom: "8px",
-      },
-    };
-
-    const commonTextFieldProps = {
-      variant: "outlined",
-      value: element.text,
-      size: "small",
-      margin: "normal",
-      fullWidth: true,
-      sx: { backgroundColor: "#fff" },
-      onChange: (e) => handleElementTextChange(element.id, e.target.value),
-    };
 
     const conditionalBadge = element.questionsectionsettings?.conditional && (
-      <Box
-        style={{
-          backgroundColor: "green",
-          color: "white",
-          borderRadius: "10px",
-          padding: "4px 8px",
-          fontSize: "12px",
-          marginLeft: "8px",
-        }}
-      >
+      <span className="ml-2 shrink-0 rounded-full bg-green-600 px-2 py-0.5 text-xs text-white">
         Conditional
-      </Box>
+      </span>
     );
 
     const requiredQuestion = element.questionsectionsettings?.required && (
-      <Box component="span" sx={{ color: "red", ml: 0.5 }}>
-        *
-      </Box>
+      <span className="ml-0.5 text-red-500">*</span>
     );
 
     const settingsButton = (
-      <IconButton onClick={() => handleSettingsClick(element.id)}>
-        <IoSettingsOutline />
-      </IconButton>
+      <button
+        type="button"
+        onClick={() => handleSettingsClick(element.id)}
+        className="ml-1 shrink-0 rounded p-1 text-gray-500 hover:bg-gray-100 transition-colors"
+      >
+        <IoSettingsOutline className="h-4 w-4" />
+      </button>
     );
 
     const deleteButton = (
-      <IconButton onClick={() => handleDeleteFormElement(element.id)}>
-        <RiDeleteBinLine />
-      </IconButton>
+      <button
+        type="button"
+        onClick={() => handleDeleteFormElement(element.id)}
+        className="ml-1 shrink-0 rounded p-1 text-red-400 hover:bg-red-50 transition-colors"
+      >
+        <RiDeleteBinLine className="h-4 w-4" />
+      </button>
+    );
+
+    const simpleElementRow = (label, placeholder, onChangeFn) => (
+      <div className="mb-2 w-full">
+        <p className="text-xs font-medium text-gray-500 mb-1">{label}</p>
+        <div className="flex items-center gap-1">
+          <input
+            type="text"
+            placeholder={placeholder}
+            value={element.text}
+            className="flex-1 rounded border border-gray-200 bg-white px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+            onChange={onChangeFn || ((e) => handleElementTextChange(element.id, e.target.value))}
+          />
+          {conditionalBadge}
+          {requiredQuestion}
+          {settingsButton}
+          {deleteButton}
+        </div>
+      </div>
     );
 
     switch (element.type) {
       case "Free Entry":
-        return (
-          <>
-            <Box sx={{ marginBottom: "8px", width: "100%" }}>
-              <Typography>Free Entry</Typography>
-              <Box {...commonElementProps}>
-                <TextField {...commonTextFieldProps} placeholder="Free Entry" />
-                {conditionalBadge}
-                {requiredQuestion}
-                {settingsButton}
-                {deleteButton}
-              </Box>
-            </Box>
-          </>
-        );
+        return simpleElementRow("Free Entry", "Free Entry");
 
       case "Email":
-        return (
-          <>
-            <Box sx={{ marginBottom: "8px", width: "100%" }}>
-              <Typography>Email</Typography>
-              <Box {...commonElementProps}>
-                <TextField {...commonTextFieldProps} placeholder="Email" />
-                {conditionalBadge}
-                {requiredQuestion}
-                {settingsButton}
-                {deleteButton}
-              </Box>
-            </Box>
-          </>
-        );
+        return simpleElementRow("Email", "Email");
 
       case "Number":
-        return (
-          <>
-            <Box sx={{ marginBottom: "8px", width: "100%" }}>
-              <Typography>Number</Typography>
-              <Box {...commonElementProps}>
-                <TextField {...commonTextFieldProps} placeholder="Number" />
-                {conditionalBadge}
-                {requiredQuestion}
-                {settingsButton}
-                {deleteButton}
-              </Box>
-            </Box>
-          </>
-        );
+        return simpleElementRow("Number", "Number");
 
       case "Date":
-        return (
-          <>
-            <Box sx={{ marginBottom: "8px", width: "100%" }}>
-              <Typography>Date</Typography>
-              <Box {...commonElementProps}>
-                <TextField {...commonTextFieldProps} placeholder="Date" />
-                {conditionalBadge}
-                {requiredQuestion}
-                {settingsButton}
-                {deleteButton}
-              </Box>
-            </Box>
-          </>
-        );
+        return simpleElementRow("Date", "Date");
 
       case "Radio Buttons":
         return (
-          <Box sx={{ marginBottom: "8px", width: "100%" }}>
-            <Typography>Radio Button:</Typography>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <TextField
-                {...commonTextFieldProps}
+          <div className="mb-2 w-full">
+            <p className="text-xs font-medium text-gray-500 mb-1">Radio Button:</p>
+            <div className="flex items-center gap-1">
+              <input
+                type="text"
                 placeholder="Radio Buttons"
+                value={element.text}
+                className="flex-1 rounded border border-gray-200 bg-white px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                onChange={(e) => handleElementTextChange(element.id, e.target.value)}
               />
               {conditionalBadge}
               {requiredQuestion}
               {settingsButton}
               {deleteButton}
-            </Box>
+            </div>
             {renderOptions(element, "radio")}
-          </Box>
+          </div>
         );
 
       case "Checkboxes":
         return (
-          <Box sx={{ marginBottom: "8px", width: "100%" }}>
-            <Typography>Checkbox:</Typography>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <TextField
-                fullWidth
-                {...commonTextFieldProps}
+          <div className="mb-2 w-full">
+            <p className="text-xs font-medium text-gray-500 mb-1">Checkbox:</p>
+            <div className="flex items-center gap-1">
+              <input
+                type="text"
                 placeholder="Checkboxes"
-                onChange={(e) =>
-                  handleCheckboxTextChange(element.id, e.target.value)
-                }
+                value={element.text}
+                className="flex-1 rounded border border-gray-200 bg-white px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                onChange={(e) => handleCheckboxTextChange(element.id, e.target.value)}
               />
               {conditionalBadge}
               {requiredQuestion}
               {settingsButton}
               {deleteButton}
-            </Box>
+            </div>
             {renderOptions(element, "checkbox")}
-          </Box>
+          </div>
         );
 
       case "Dropdown":
         return (
-          <Box sx={{ marginBottom: "8px", width: "100%" }}>
-            <Typography>Dropdown:</Typography>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <TextField
-                {...commonTextFieldProps}
+          <div className="mb-2 w-full">
+            <p className="text-xs font-medium text-gray-500 mb-1">Dropdown:</p>
+            <div className="flex items-center gap-1">
+              <input
+                type="text"
                 placeholder="Dropdown"
-                onChange={(e) =>
-                  handleCheckboxTextChange(element.id, e.target.value)
-                }
+                value={element.text}
+                className="flex-1 rounded border border-gray-200 bg-white px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                onChange={(e) => handleCheckboxTextChange(element.id, e.target.value)}
               />
               {conditionalBadge}
               {requiredQuestion}
               {settingsButton}
               {deleteButton}
-            </Box>
+            </div>
             {renderOptions(element)}
-          </Box>
+          </div>
         );
 
       case "Yes/No":
         return (
-          <Box sx={{ marginBottom: "8px", width: "100%" }}>
-            <Typography>Yes/No:</Typography>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <TextField {...commonTextFieldProps} placeholder="Yes/No" />
+          <div className="mb-2 w-full">
+            <p className="text-xs font-medium text-gray-500 mb-1">Yes/No:</p>
+            <div className="flex items-center gap-1">
+              <input
+                type="text"
+                placeholder="Yes/No"
+                value={element.text}
+                className="flex-1 rounded border border-gray-200 bg-white px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                onChange={(e) => handleElementTextChange(element.id, e.target.value)}
+              />
               {conditionalBadge}
               {requiredQuestion}
               {settingsButton}
               {deleteButton}
-            </Box>
+            </div>
             {renderOptions(element, "Yes/No")}
-          </Box>
+          </div>
         );
 
       case "File Upload":
         return (
-          <Box sx={{ marginBottom: "8px", width: "100%" }}>
-            <Typography>File Upload:</Typography>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <TextField {...commonTextFieldProps} placeholder="File Upload" />
+          <div className="mb-2 w-full">
+            <p className="text-xs font-medium text-gray-500 mb-1">File Upload:</p>
+            <div className="flex items-center gap-1">
+              <input
+                type="text"
+                placeholder="File Upload"
+                value={element.text}
+                className="flex-1 rounded border border-gray-200 bg-white px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                onChange={(e) => handleElementTextChange(element.id, e.target.value)}
+              />
               {conditionalBadge}
               {requiredQuestion}
               {settingsButton}
               {deleteButton}
-            </Box>
-            <Button
-              component="label"
-              role={undefined}
-              variant="outlined"
+            </div>
+            <button
+              type="button"
               disabled
-              tabIndex={-1}
-              startIcon={<CloudUploadIcon />}
+              className="mt-2 flex items-center gap-1.5 rounded border border-gray-300 px-3 py-1.5 text-sm text-gray-400 cursor-not-allowed"
             >
-              Upload files
-            </Button>
-          </Box>
+              <Upload className="h-4 w-4" /> Upload files
+            </button>
+          </div>
         );
 
       case "Text Editor":
         return (
-          <Box
-            sx={{ marginTop: "16px", display: "flex", alignItems: "center" }}
-          >
-            <ReactQuill
-              theme="snow"
-              value={element.text}
-              modules={modules}
-              formats={formats}
-              onChange={(newText) => handleQuillChange(element.id, newText)}
-            />
+          <div className="mt-4 flex items-start gap-1">
+            <div className="flex-1">
+              <ReactQuill
+                theme="snow"
+                value={element.text}
+                modules={modules}
+                formats={formats}
+                onChange={(newText) => handleQuillChange(element.id, newText)}
+              />
+            </div>
             {deleteButton}
-          </Box>
+          </div>
         );
 
       default:
@@ -1045,89 +961,68 @@ const getAllQuestionsGrouped = () => {
   }, [selectedElement]);
 
   return (
-    <Box
-      sx={{
-        border: "1px solid black",
-        padding: "16px",
-        marginBottom: "16px",
-        borderRadius: "8px",
-        position: "relative",
-        backgroundColor: "#fff",
-      }}
-    >
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <TextField
-          variant="outlined"
-          fullWidth
+    <div className="relative mb-4 rounded-lg border border-gray-300 bg-white p-4">
+      <div className="flex items-center justify-between">
+        <input
+          type="text"
           value={text}
-          size="small"
-          margin="normal"
           onChange={handleTextChange}
           placeholder="Section text"
+          className="flex-1 rounded border border-gray-200 bg-white px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
-        {/* {section.sectionsettings?.conditional && ( */}
         {sectionConditionBadge && (
-          <Box
-            style={{
-              backgroundColor: "green",
-              color: "white",
-              borderRadius: "10px",
-              padding: "4px 8px",
-              fontSize: "12px",
-              marginLeft: "8px",
-            }}
-          >
+          <span className="ml-2 shrink-0 rounded-full bg-green-600 px-2 py-0.5 text-xs text-white">
             Conditional
-          </Box>
+          </span>
         )}
-
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <IconButton onClick={handleDuplicate}>
-            <HiOutlineDuplicate />
-          </IconButton>
-
-          <IconButton onClick={handleSectionSettingsClick}>
-            <IoSettingsOutline />
-          </IconButton>
-
-          <IconButton onClick={handleDelete}>
-            <RiDeleteBinLine />
-          </IconButton>
-        </Box>
-        <Menu
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={() => setAnchorEl(null)}
-        >
-          {[
-            "Free Entry",
-            "Email",
-            "Number",
-            "Date",
-            "Radio Buttons",
-            "Checkboxes",
-            "Dropdown",
-            "Yes/No",
-            "File Upload",
-          ].map((type) => (
-            <MenuItem key={type} onClick={() => handleAddFormElement(type)}>
-              {type}
-            </MenuItem>
-          ))}
-        </Menu>
-      </Box>
+        <div className="flex items-center ml-2">
+          <button
+            type="button"
+            onClick={handleDuplicate}
+            className="rounded p-1.5 text-gray-500 hover:bg-gray-100 transition-colors"
+          >
+            <HiOutlineDuplicate className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={handleSectionSettingsClick}
+            className="rounded p-1.5 text-gray-500 hover:bg-gray-100 transition-colors"
+          >
+            <IoSettingsOutline className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={handleDelete}
+            className="rounded p-1.5 text-red-400 hover:bg-red-50 transition-colors"
+          >
+            <RiDeleteBinLine className="h-4 w-4" />
+          </button>
+        </div>
+        {Boolean(anchorEl) && (
+          <div className="absolute right-4 top-14 z-50 w-44 rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
+            {[
+              "Free Entry",
+              "Email",
+              "Number",
+              "Date",
+              "Radio Buttons",
+              "Checkboxes",
+              "Dropdown",
+              "Yes/No",
+              "File Upload",
+            ].map((type) => (
+              <button
+                key={type}
+                type="button"
+                onClick={() => { handleAddFormElement(type); setAnchorEl(null); }}
+                className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                {type}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
 
       {formElements.map((element, index) => (
         <DraggableQuestion
@@ -1139,655 +1034,362 @@ const getAllQuestionsGrouped = () => {
           {renderFormElement(element)}
         </DraggableQuestion>
       ))}
-      <Box sx={{ display: "flex", alignItems: "center", gap: 3, mt: 3 }}>
-        <Button
-          variant="contained"
+      <div className="mt-4 flex items-center gap-3">
+        <button
+          type="button"
           onClick={(event) => setAnchorEl(event.currentTarget)}
-          sx={{
-            backgroundColor: "var(--color-save-btn)", // Normal background
-
-            "&:hover": {
-              backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-            },
-            borderRadius: "15px",
-          }}
+          className="rounded-full bg-[var(--color-save-btn)] px-4 py-1.5 text-sm text-white hover:bg-[var(--color-save-hover-btn)] transition-colors"
         >
           Questions
-        </Button>
-        <Button
-          variant="outlined"
+        </button>
+        <button
+          type="button"
           onClick={() => handleAddFormElement("Text Editor")}
-          sx={{
-            borderColor: "var(--color-border-cancel-btn)", // Normal background
-            color: "var(--color-save-btn)",
-            "&:hover": {
-              backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-              color: "#fff",
-              border: "none",
-            },
-            borderRadius: "15px",
-          }}
+          className="rounded-full border border-[var(--color-border-cancel-btn)] px-4 py-1.5 text-sm text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white hover:border-transparent transition-colors"
         >
           Text Block
-        </Button>
-      </Box>
-      <Drawer
-        anchor="right"
-        open={isDrawerOpen}
-        onClose={() => toggleDrawer(false)}
-      >
-        <Box sx={{ width: 800 }} role="presentation">
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              p: 2,
-            }}
-          >
-            <Box>
-              <Typography variant="h6" gutterBottom>
-                Section Settings
-              </Typography>
-              {/* <h2>Settings for Section ID: {selectedSectionId}</h2> */}
-              <Typography gutterBottom>{text}</Typography>
-            </Box>
-
-            <IconButton onClick={() => toggleDrawer(false)}>
-              <IoMdClose />
-            </IconButton>
-          </Box>
-          <Divider />
-          <Box sx={{ p: 3 }}>
-            <Box display={"flex"} alignItems={"center"}>
-              <Box>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={repeateButton}
-                      onChange={(event) =>
-                        handleRepeateButton(event.target.checked)
-                      }
-                      color="primary"
-                    />
-                  }
-                />
-              </Box>
-              <Typography variant="h6">Allow client to repeat</Typography>
-            </Box>
-            {repeateButton && (
-              <Box mb={3} mt={2}>
-                <Typography variant="body">
-                  Button name (maximum 25 characters)
-                </Typography>
-                <TextField
-                  variant="outlined"
-                  fullWidth
-                  size="small"
-                  margin="normal"
-                  // defaultValue="Repeat Section"
-                  value={repeatButtonName}
-                  onChange={(e) => setRepeatButtonName(e.target.value)}
-                />
-              </Box>
-            )}
-
-            <Box display={"flex"} alignItems={"center"}>
-              <Box>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={conditionButton}
-                      onChange={(event) =>
-                        handleConditionButton(event.target.checked)
-                      }
-                      color="primary"
-                    />
-                  }
-                />
-              </Box>
-              <Typography variant="h6">Conditional</Typography>
-            </Box>
-            {conditionButton && (
-              <Box mb={3} mt={2}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                    Conditions
-                  </Typography>
-                  <Button
-                    variant="text"
-                    onClick={handleAddSectionQuestionAnswer}
-                  >
-                    Add
-                  </Button>
-                </Box>
-                <Divider />
-                <Box mt={2}>
-                  <Typography>Mode</Typography>
-                  <Autocomplete
-                    options={["Any", "All"]}
-                    defaultValue="Any"
-                    value={sectionMode} // Bind value to state
-                    onChange={(event, newValue) => setSectionMode(newValue)}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        variant="outlined"
-                        size="small"
-                        margin="normal"
-                      />
-                    )}
-                    renderOption={(props, option) => (
-                      <li
-                        {...props}
-                        style={{ margin: "5px", cursor: "pointer" }}
-                      >
-                        {option}
-                      </li>
-                    )}
-                  />
-                </Box>
-
-                {sectionQuestionAnswers.map((qa, index) => (
-                  <Box
-                    key={index}
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 3,
-                      mt: 2,
-                    }}
-                  >
-                    <Box sx={{ width: "380px" }}>
-                      <Typography>Question</Typography>
-
-                      {/* <Autocomplete
-                        options={getAllQuestions()}
-                        getOptionLabel={(option) => option.text || ""}
-                        value={selectedSectionQuestions[index] || null}
-                        onChange={(event, newValue) =>
-                          handleSectionQuestionSelect(newValue, index)
-                        }
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            variant="outlined"
-                            size="small"
-                            margin="normal"
-                            placeholder="Question"
-                          />
-                        )}
-                        renderOption={(props, option) => (
-                          <li
-                            {...props}
-                            style={{ margin: "5px", cursor: "pointer" }}
-                          >
-                            {option.text}
-                          </li>
-                        )}
-                      /> */}
-                      <Autocomplete
-  options={getAllQuestionsGrouped()}
-  getOptionLabel={(option) => option.text || ""}
-  groupBy={(option) => option.sectionName}
-  value={selectedSectionQuestions[index] || null}
-  onChange={(event, newValue) =>
-    handleSectionQuestionSelect(newValue, index)
-  }
-  renderInput={(params) => (
-    <TextField
-      {...params}
-      variant="outlined"
-      size="small"
-      margin="normal"
-      placeholder="Question"
-    />
-  )}
-  renderOption={(props, option) => (
-    <li
-      {...props}
-      style={{ margin: "5px", cursor: "pointer", paddingLeft: "20px" }}
-    >
-      {option.text}
-    </li>
-  )}
-  renderGroup={(params) => (
-    <li key={params.key}>
-      <div
-        style={{
-          padding: "8px 16px",
-          // fontWeight: "bold",
-          // backgroundColor: "#f5f5f5",
-          color: "gray",
-          // fontWeight: "600",
-          // borderBottom: "1px solid #e0e0e0"
-        }}
-      >
-        {params.group}
+        </button>
       </div>
-      <ul style={{ padding: 0, margin: 0 }}>{params.children}</ul>
-    </li>
-  )}
-/>
-                    </Box>
-                    <Box>
-                      <Typography>sectionAnswer</Typography>
-
-                      <Autocomplete
-                        options={getAnswerOptions(
-                          selectedSectionQuestions[index]
-                        )}
-                        value={selectedSectionAnswers[index] || null}
-                        onChange={(event, newValue) => {
-                          const updatedAnswers = [...selectedSectionAnswers];
-                          updatedAnswers[index] = newValue;
-                          setSelectedSectionAnswers(updatedAnswers);
-                        }}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            variant="outlined"
-                            size="small"
-                            margin="normal"
-                            placeholder="Answer"
-                          />
-                        )}
-                        renderOption={(props, option) => (
-                          <li
-                            {...props}
-                            style={{ margin: "5px", cursor: "pointer" }}
-                          >
-                            {option}
-                          </li>
-                        )}
-                      />
-                    </Box>
-                    <Box mt={5}>
-                      <IconButton
-                        onClick={() => handleRemoveQuestionAnswer(index)}
-                      >
-                        <RiDeleteBinLine />
-                      </IconButton>
-                    </Box>
-                  </Box>
-                ))}
-              </Box>
-            )}
-
-            <Box sx={{ display: "flex", alighItems: "center", gap: 3, mt: 2 }}>
-              <Button
-                variant="contained"
-                onClick={handleSectionSave}
-                sx={{
-                  backgroundColor: "var(--color-save-btn)", // Normal background
-
-                  "&:hover": {
-                    backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                  },
-                  borderRadius: "15px",
-                  width: "80px",
-                }}
-              >
-                Save
-              </Button>
-              <Button
-                variant="outlined"
+      {isDrawerOpen && (
+        <div className="fixed inset-0 z-50 flex">
+          <div className="fixed inset-0 bg-black/40" onClick={() => toggleDrawer(false)} />
+          <div className="ml-auto relative z-50 w-full max-w-[800px] bg-white h-full overflow-y-auto shadow-2xl">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
+              <div>
+                <h3 className="text-base font-semibold">Section Settings</h3>
+                <p className="text-sm text-gray-500 mt-0.5">{text}</p>
+              </div>
+              <button
+                type="button"
                 onClick={() => toggleDrawer(false)}
-                sx={{
-                  borderColor: "var(--color-border-cancel-btn)", // Normal background
-                  color: "var(--color-save-btn)",
-                  "&:hover": {
-                    backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                    color: "#fff",
-                    border: "none",
-                  },
-                  width: "80px",
-                  borderRadius: "15px",
-                }}
+                className="rounded p-1.5 text-gray-500 hover:bg-gray-100 transition-colors"
               >
-                Cancel
-              </Button>
-            </Box>
-          </Box>
-        </Box>
-      </Drawer>
-
-      <Drawer
-        anchor="right"
-        open={queDrawerOpen}
-        onClose={() => setQueDrawerOpen(false)}
-      >
-        <Box
-          sx={{ width: 600, height: "100vh", overflowY: "auto" }}
-          role="presentation"
-        >
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              p: 2,
-            }}
-          >
-            {selectedElement && (
-              <Typography variant="h6">{selectedElement.text}</Typography>
-            )}
-
-            <IconButton onClick={() => setQueDrawerOpen(false)}>
-              <IoMdClose />
-            </IconButton>
-          </Box>
-
-          <Divider />
-          <Box sx={{ p: 3 }}>
-            <Paper style={{ padding: "15px" }}>
-              <Box display={"flex"} alignItems={"center"} m={1}>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={requiredButton}
-                      onChange={(event) =>
-                        handleRequiredButton(event.target.checked)
-                      }
-                      color="primary"
-                    />
-                  }
-                />
-
-                <Typography variant="h6">Required</Typography>
-              </Box>
-              <Divider />
-              <p>
-                It is mandatory to respond to this question to submit the
-                organizer
-              </p>
-            </Paper>
-
-            <Paper style={{ padding: "15px", marginTop: "20px" }}>
-              <Box display={"flex"} alignItems={"center"} m={1}>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={prefilledButton}
-                      onChange={(event) =>
-                        handlePrefilledButton(event.target.checked)
-                      }
-                      color="primary"
-                    />
-                  }
-                />
-
-                <Typography variant="h6">Pre-Filled</Typography>
-              </Box>
-              <Divider />
-              <p>
-                If asked before, answer pre-populates from previous organizer
-              </p>
-            </Paper>
-
-            <Paper style={{ padding: "15px", marginTop: "20px" }}>
-              <Box display={"flex"} alignItems={"center"} m={1}>
-                <Box>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={queConditionButton}
-                        onChange={(event) =>
-                          handleQueConditionButton(event.target.checked)
-                        }
-                        color="primary"
-                      />
-                    }
+                <IoMdClose className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="p-5 space-y-5">
+              <div className="flex items-center gap-3">
+                <label className="relative inline-flex cursor-pointer items-center">
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={repeateButton}
+                    onChange={(e) => handleRepeateButton(e.target.checked)}
                   />
-                </Box>
-                <Typography variant="h6">Conditional</Typography>
-              </Box>
-              <Divider />
-              <p>Ask question only in certain scenarios</p>
-              {queConditionButton && (
-                <Box mb={3} mt={2}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                      Conditions
-                    </Typography>
-                    <Button variant="text" onClick={handleAddQuestionAnswer}>
-                      Add
-                    </Button>
-                  </Box>
-                  <Divider />
-                  <Box mt={2}>
-                    <Typography>Mode</Typography>
-                    <Autocomplete
-                      options={["Any", "All"]}
-                      defaultValue="Any"
-                      value={mode} // Bind value to state
-                      onChange={(event, newValue) => setMode(newValue)}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          variant="outlined"
-                          size="small"
-                          margin="normal"
-                        />
-                      )}
-                      renderOption={(props, option) => (
-                        <li
-                          {...props}
-                          style={{ margin: "5px", cursor: "pointer" }}
-                        >
-                          {option}
-                        </li>
-                      )}
-                    />
-                  </Box>
+                  <div className="h-5 w-9 rounded-full bg-gray-200 peer-checked:bg-blue-600 transition-colors after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-all peer-checked:after:translate-x-4" />
+                </label>
+                <span className="text-base font-medium">Allow client to repeat</span>
+              </div>
+              {repeateButton && (
+                <div className="space-y-1">
+                  <label className="text-sm text-gray-600">Button name (maximum 25 characters)</label>
+                  <input
+                    type="text"
+                    value={repeatButtonName}
+                    onChange={(e) => setRepeatButtonName(e.target.value)}
+                    maxLength={25}
+                    className="w-full rounded border border-gray-200 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  />
+                </div>
+              )}
 
-                  {questionAnswers.map((qa, index) => (
-                    <Box
-                      key={index}
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 3,
-                        mt: 2,
-                      }}
+              <div className="flex items-center gap-3">
+                <label className="relative inline-flex cursor-pointer items-center">
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={conditionButton}
+                    onChange={(e) => handleConditionButton(e.target.checked)}
+                  />
+                  <div className="h-5 w-9 rounded-full bg-gray-200 peer-checked:bg-blue-600 transition-colors after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-all peer-checked:after:translate-x-4" />
+                </label>
+                <span className="text-base font-medium">Conditional</span>
+              </div>
+              {conditionButton && (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-semibold">Conditions</span>
+                    <button
+                      type="button"
+                      onClick={handleAddSectionQuestionAnswer}
+                      className="text-sm text-blue-600 hover:underline"
                     >
-                      <Box sx={{ width: "380px" }}>
-                        <Typography>Question</Typography>
-
-                        {/* <Autocomplete
-                          options={getAllQuestions()}
-                          getOptionLabel={(option) => option.text || ""}
-                          value={selectedQuestions[index] || null}
-                          onChange={(event, newValue) =>
-                            handleQuestionSelect(newValue, index)
-                          }
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              variant="outlined"
-                              size="small"
-                              margin="normal"
-                              placeholder="Question"
-                            />
-                          )}
-                          renderOption={(props, option) => (
-                            <li
-                              {...props}
-                              style={{ margin: "5px", cursor: "pointer" }}
-                            >
-                              {option.text}
-                            </li>
-                          )}
-                        /> */}
-                        <Autocomplete
-  options={getAllQuestionsGrouped()}
-  getOptionLabel={(option) => option.text || ""}
-  groupBy={(option) => option.sectionName}
-  value={selectedQuestions[index] || null}
-  onChange={(event, newValue) =>
-    handleQuestionSelect(newValue, index)
-  }
-  renderInput={(params) => (
-    <TextField
-      {...params}
-      variant="outlined"
-      size="small"
-      margin="normal"
-      placeholder="Question"
-    />
-  )}
-  renderOption={(props, option) => (
-    <li
-      {...props}
-      style={{ margin: "5px", cursor: "pointer", paddingLeft: "20px" }}
-    >
-      {option.text}
-    </li>
-  )}
-  renderGroup={(params) => (
-    <li key={params.key}>
-       <div
-        style={{
-          padding: "8px 16px",
-        
-          color: "gray",
-         
-        }}
-      >
-        {params.group}
-      </div>
-      <ul style={{ padding: 0, margin: 0 }}>{params.children}</ul>
-    </li>
-  )}
-/>
-                      </Box>
-                      <Box>
-                        <Typography>Answer</Typography>
-
-                        <Autocomplete
-                          options={getAnswerOptions(selectedQuestions[index])}
-                          value={selectedAnswers[index] || null}
-                          onChange={(event, newValue) => {
-                            const updatedAnswers = [...selectedAnswers];
-                            updatedAnswers[index] = newValue;
-                            setSelectedAnswers(updatedAnswers);
+                      Add
+                    </button>
+                  </div>
+                  <hr className="border-gray-200" />
+                  <div>
+                    <label className="text-sm text-gray-600">Mode</label>
+                    <select
+                      value={sectionMode}
+                      onChange={(e) => setSectionMode(e.target.value)}
+                      className="mt-1 w-full rounded border border-gray-200 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    >
+                      <option value="Any">Any</option>
+                      <option value="All">All</option>
+                    </select>
+                  </div>
+                  {sectionQuestionAnswers.map((qa, index) => (
+                    <div key={index} className="flex items-start gap-3 mt-2">
+                      <div className="w-64">
+                        <label className="text-xs text-gray-500">Question</label>
+                        <select
+                          value={selectedSectionQuestions[index]?.id || ""}
+                          onChange={(e) => {
+                            const q = getAllQuestionsGrouped().find((q) => String(q.id) === e.target.value);
+                            handleSectionQuestionSelect(q, index);
                           }}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              variant="outlined"
-                              size="small"
-                              margin="normal"
-                              placeholder="Answer"
-                            />
-                          )}
-                          renderOption={(props, option) => (
-                            <li
-                              {...props}
-                              style={{ margin: "5px", cursor: "pointer" }}
-                            >
-                              {option}
-                            </li>
-                          )}
-                        />
-                      </Box>
-                      <Box mt={5}>
-                        <IconButton
-                          onClick={() => handleRemoveQuestionAnswer(index)}
+                          className="mt-1 w-full rounded border border-gray-200 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                         >
-                          <RiDeleteBinLine />
-                        </IconButton>
-                      </Box>
-                    </Box>
+                          <option value="">Select question</option>
+                          {getAllQuestionsGrouped().map((q) => (
+                            <option key={q.id} value={q.id}>{q.text} ({q.sectionName})</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-500">Answer</label>
+                        <select
+                          value={selectedSectionAnswers[index] || ""}
+                          onChange={(e) => {
+                            const updatedAnswers = [...selectedSectionAnswers];
+                            updatedAnswers[index] = e.target.value;
+                            setSelectedSectionAnswers(updatedAnswers);
+                          }}
+                          className="mt-1 rounded border border-gray-200 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        >
+                          <option value="">Select answer</option>
+                          {getAnswerOptions(selectedSectionQuestions[index]).map((opt) => (
+                            <option key={opt} value={opt}>{opt}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveQuestionAnswer(index)}
+                        className="mt-6 rounded p-1 text-red-400 hover:bg-red-50"
+                      >
+                        <RiDeleteBinLine className="h-4 w-4" />
+                      </button>
+                    </div>
                   ))}
-                </Box>
+                </div>
               )}
-            </Paper>
-            <Paper style={{ padding: "15px", marginTop: "20px" }}>
-              <Box display={"flex"} alignItems={"center"} m={1}>
-                <Box>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={descriptionButton}
-                        onChange={(event) =>
-                          handleDescriptionButton(event.target.checked)
-                        }
-                        color="primary"
-                      />
-                    }
-                  />
-                </Box>
-                <Typography variant="h6">Description</Typography>
-              </Box>
-              <Divider />
-              <p>Add instructional text to help clients answer your question</p>
-              {descriptionButton && (
-                <Box mb={3} mt={2}>
-                  <Typography>Description</Typography>
-                  <TextField
-                    fullWidth
-                    multiline
-                    rows={4}
-                    placeholder="Description"
-                    variant="outlined"
-                    margin="normal"
-                    value={descriptionText}
-                    onChange={(event) => setDescriptionText(event.target.value)}
-                  />
-                </Box>
-              )}
-            </Paper>
-            <Box sx={{ display: "flex", alighItems: "center", gap: 3, mt: 2 }}>
-              <Button
-                variant="contained"
-                onClick={handleSave}
-                sx={{
-                  backgroundColor: "var(--color-save-btn)", // Normal background
 
-                  "&:hover": {
-                    backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                  },
-                  borderRadius: "15px",
-                  width: "80px",
-                }}
-              >
-                Save
-              </Button>
-              <Button
-                variant="outlined"
+              <div className="flex items-center gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={handleSectionSave}
+                  className="rounded-full bg-[var(--color-save-btn)] px-5 py-1.5 text-sm text-white hover:bg-[var(--color-save-hover-btn)] transition-colors"
+                >
+                  Save
+                </button>
+                <button
+                  type="button"
+                  onClick={() => toggleDrawer(false)}
+                  className="rounded-full border border-[var(--color-border-cancel-btn)] px-5 py-1.5 text-sm text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white hover:border-transparent transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {queDrawerOpen && (
+        <div className="fixed inset-0 z-50 flex">
+          <div className="fixed inset-0 bg-black/40" onClick={() => setQueDrawerOpen(false)} />
+          <div className="ml-auto relative z-50 w-full max-w-[600px] bg-white h-full overflow-y-auto shadow-2xl">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
+              {selectedElement && (
+                <h3 className="text-base font-semibold">{selectedElement.text}</h3>
+              )}
+              <button
+                type="button"
                 onClick={() => setQueDrawerOpen(false)}
-                sx={{
-                  borderColor: "var(--color-border-cancel-btn)", // Normal background
-                  color: "var(--color-save-btn)",
-                  "&:hover": {
-                    backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                    color: "#fff",
-                    border: "none",
-                  },
-                  width: "80px",
-                  borderRadius: "15px",
-                }}
+                className="rounded p-1.5 text-gray-500 hover:bg-gray-100 transition-colors"
               >
-                Cancel
-              </Button>
-            </Box>
-          </Box>
-        </Box>
-      </Drawer>
-    </Box>
+                <IoMdClose className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="p-5 space-y-4">
+              {/* Required */}
+              <div className="rounded-lg border border-gray-200 bg-white p-4">
+                <div className="flex items-center gap-3 mb-2">
+                  <label className="relative inline-flex cursor-pointer items-center">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={requiredButton}
+                      onChange={(e) => handleRequiredButton(e.target.checked)}
+                    />
+                    <div className="h-5 w-9 rounded-full bg-gray-200 peer-checked:bg-blue-600 transition-colors after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-all peer-checked:after:translate-x-4" />
+                  </label>
+                  <span className="text-base font-medium">Required</span>
+                </div>
+                <hr className="border-gray-200 mb-2" />
+                <p className="text-sm text-gray-500">It is mandatory to respond to this question to submit the organizer</p>
+              </div>
+
+              {/* Pre-Filled */}
+              <div className="rounded-lg border border-gray-200 bg-white p-4">
+                <div className="flex items-center gap-3 mb-2">
+                  <label className="relative inline-flex cursor-pointer items-center">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={prefilledButton}
+                      onChange={(e) => handlePrefilledButton(e.target.checked)}
+                    />
+                    <div className="h-5 w-9 rounded-full bg-gray-200 peer-checked:bg-blue-600 transition-colors after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-all peer-checked:after:translate-x-4" />
+                  </label>
+                  <span className="text-base font-medium">Pre-Filled</span>
+                </div>
+                <hr className="border-gray-200 mb-2" />
+                <p className="text-sm text-gray-500">If asked before, answer pre-populates from previous organizer</p>
+              </div>
+
+              {/* Conditional */}
+              <div className="rounded-lg border border-gray-200 bg-white p-4">
+                <div className="flex items-center gap-3 mb-2">
+                  <label className="relative inline-flex cursor-pointer items-center">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={queConditionButton}
+                      onChange={(e) => handleQueConditionButton(e.target.checked)}
+                    />
+                    <div className="h-5 w-9 rounded-full bg-gray-200 peer-checked:bg-blue-600 transition-colors after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-all peer-checked:after:translate-x-4" />
+                  </label>
+                  <span className="text-base font-medium">Conditional</span>
+                </div>
+                <hr className="border-gray-200 mb-2" />
+                <p className="text-sm text-gray-500">Ask question only in certain scenarios</p>
+                {queConditionButton && (
+                  <div className="mt-3 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-semibold">Conditions</span>
+                      <button
+                        type="button"
+                        onClick={handleAddQuestionAnswer}
+                        className="text-sm text-blue-600 hover:underline"
+                      >
+                        Add
+                      </button>
+                    </div>
+                    <hr className="border-gray-200" />
+                    <div>
+                      <label className="text-sm text-gray-600">Mode</label>
+                      <select
+                        value={mode}
+                        onChange={(e) => setMode(e.target.value)}
+                        className="mt-1 w-full rounded border border-gray-200 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      >
+                        <option value="Any">Any</option>
+                        <option value="All">All</option>
+                      </select>
+                    </div>
+                    {questionAnswers.map((qa, index) => (
+                      <div key={index} className="flex items-start gap-3 mt-2">
+                        <div className="w-64">
+                          <label className="text-xs text-gray-500">Question</label>
+                          <select
+                            value={selectedQuestions[index]?.id || ""}
+                            onChange={(e) => {
+                              const q = getAllQuestionsGrouped().find((q) => String(q.id) === e.target.value);
+                              handleQuestionSelect(q, index);
+                            }}
+                            className="mt-1 w-full rounded border border-gray-200 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                          >
+                            <option value="">Select question</option>
+                            {getAllQuestionsGrouped().map((q) => (
+                              <option key={q.id} value={q.id}>{q.text} ({q.sectionName})</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-xs text-gray-500">Answer</label>
+                          <select
+                            value={selectedAnswers[index] || ""}
+                            onChange={(e) => {
+                              const updatedAnswers = [...selectedAnswers];
+                              updatedAnswers[index] = e.target.value;
+                              setSelectedAnswers(updatedAnswers);
+                            }}
+                            className="mt-1 rounded border border-gray-200 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                          >
+                            <option value="">Select answer</option>
+                            {getAnswerOptions(selectedQuestions[index]).map((opt) => (
+                              <option key={opt} value={opt}>{opt}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveQuestionAnswer(index)}
+                          className="mt-6 rounded p-1 text-red-400 hover:bg-red-50"
+                        >
+                          <RiDeleteBinLine className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Description */}
+              <div className="rounded-lg border border-gray-200 bg-white p-4">
+                <div className="flex items-center gap-3 mb-2">
+                  <label className="relative inline-flex cursor-pointer items-center">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={descriptionButton}
+                      onChange={(e) => handleDescriptionButton(e.target.checked)}
+                    />
+                    <div className="h-5 w-9 rounded-full bg-gray-200 peer-checked:bg-blue-600 transition-colors after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-all peer-checked:after:translate-x-4" />
+                  </label>
+                  <span className="text-base font-medium">Description</span>
+                </div>
+                <hr className="border-gray-200 mb-2" />
+                <p className="text-sm text-gray-500">Add instructional text to help clients answer your question</p>
+                {descriptionButton && (
+                  <div className="mt-3">
+                    <label className="text-sm text-gray-600">Description</label>
+                    <textarea
+                      rows={4}
+                      placeholder="Description"
+                      value={descriptionText}
+                      onChange={(e) => setDescriptionText(e.target.value)}
+                      className="mt-1 w-full rounded border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="flex items-center gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={handleSave}
+                  className="rounded-full bg-[var(--color-save-btn)] px-5 py-1.5 text-sm text-white hover:bg-[var(--color-save-hover-btn)] transition-colors"
+                >
+                  Save
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setQueDrawerOpen(false)}
+                  className="rounded-full border border-[var(--color-border-cancel-btn)] px-5 py-1.5 text-sm text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white hover:border-transparent transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

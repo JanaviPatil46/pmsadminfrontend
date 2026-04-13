@@ -1095,35 +1095,39 @@ const InvoiceTempUpdate = () => {
               {/* Summary */}
               <div className="mt-6">
                 <h4 className="text-base font-semibold mb-3">Summary</h4>
-                <div className="overflow-x-auto rounded-lg border border-border bg-white">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-border bg-muted/50">
-                        <th className="px-3 py-2 text-left font-medium text-muted-foreground">Subtotal</th>
-                        <th className="px-3 py-2 text-left font-medium text-muted-foreground">Tax Rate</th>
-                        <th className="px-3 py-2 text-left font-medium text-muted-foreground">Tax Total</th>
-                        <th className="px-3 py-2 text-left font-medium text-muted-foreground">Total</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td className="px-3 py-2">
-                          <div className="flex items-center gap-1">
-                            <span>$</span>
-                            <input value={subtotal} onChange={handleSubtotalChange} className="w-20 rounded border-0 bg-transparent px-1 py-0.5 text-sm outline-none focus:ring-1 focus:ring-ring" />
-                          </div>
-                        </td>
-                        <td className="px-3 py-2">
-                          <div className="flex items-center gap-1">
-                            <input value={taxRate} onChange={handleTaxRateChange} className="w-16 rounded border-0 bg-transparent px-1 py-0.5 text-sm outline-none focus:ring-1 focus:ring-ring" />
-                            <span>%</span>
-                          </div>
-                        </td>
-                        <td className="px-3 py-2 text-sm">${taxTotal.toFixed(2)}</td>
-                        <td className="px-3 py-2 text-sm font-semibold">${totalAmount}</td>
-                      </tr>
-                    </tbody>
-                  </table>
+                <div className="rounded-lg border border-border bg-white overflow-hidden">
+                  <div className="grid grid-cols-4 divide-x divide-border">
+                    <div className="px-4 py-3">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">Subtotal</p>
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm text-slate-500">$</span>
+                        <input
+                          value={subtotal}
+                          onChange={handleSubtotalChange}
+                          className="w-full rounded border-0 bg-transparent px-0 py-0.5 text-sm font-medium text-slate-800 outline-none focus:ring-0"
+                        />
+                      </div>
+                    </div>
+                    <div className="px-4 py-3">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">Tax Rate</p>
+                      <div className="flex items-center gap-1">
+                        <input
+                          value={taxRate}
+                          onChange={handleTaxRateChange}
+                          className="w-full rounded border-0 bg-transparent px-0 py-0.5 text-sm font-medium text-slate-800 outline-none focus:ring-0"
+                        />
+                        <span className="text-sm text-slate-500">%</span>
+                      </div>
+                    </div>
+                    <div className="px-4 py-3">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">Tax Total</p>
+                      <p className="text-sm font-medium text-slate-800">${taxTotal.toFixed(2)}</p>
+                    </div>
+                    <div className="px-4 py-3 bg-slate-50/60">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">Total</p>
+                      <p className="text-sm font-bold text-slate-900">${totalAmount}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </FormSection>

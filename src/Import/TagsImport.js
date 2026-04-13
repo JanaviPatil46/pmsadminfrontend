@@ -1,18 +1,7 @@
 import React, { useState } from "react";
 import Papa from "papaparse";
-import {
-  TableContainer,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Paper,
-  Typography,
-  Button,
-  Checkbox,
-  Box,
-} from "@mui/material";
+import { Button } from "../components/ui/button";
+import { Checkbox } from "../components/ui/checkbox";
 
 const TagsImport = () => {
   const [tags, setTags] = useState([]);
@@ -157,70 +146,61 @@ const TagsImport = () => {
     document.body.removeChild(a);
   };
   return (
-    <>
-      <Box >
-         <Typography variant="h5" gutterBottom>
-               Import Tags
-              </Typography>
-        <Box sx={{display:'flex', alignItems:'center',gap:2}}>
-          <Button variant="contained" component="label">
-          Import  Tags 
-            <input
-              type="file"
-              accept=".csv"
-              hidden
-              onChange={handleTagsFileUpload}
-            />
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold tracking-tight text-foreground">Import Tags</h1>
+
+      <div className="flex items-center gap-3">
+        <label className="cursor-pointer">
+          <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium border border-input bg-background hover:bg-muted transition-colors">
+            Import Tags
+          </span>
+          <input type="file" accept=".csv" hidden onChange={handleTagsFileUpload} />
+        </label>
+
+        {selectedTags.length > 0 && (
+          <Button
+            onClick={handleSaveSelectedTags}
+            className="rounded-full px-5"
+            style={{ backgroundColor: "var(--color-save-btn)" }}
+          >
+            Create Tags ({selectedTags.length})
           </Button>
-          {selectedTags.length > 0 && (
-            <Button
-              variant="contained"
-              color="primary"
-            
-              onClick={handleSaveSelectedTags}
-            >
-              create tags
-            </Button>
-          )}
-        </Box>
-        <Box>
-          {tags.length > 0 && (
-            <TableContainer component={Paper} style={{ marginTop: "20px" }}>
-              <Table>
-                <TableHead>
-                  <TableRow style={{ backgroundColor: "#f5f5f5" }}>
-                    <TableCell>
-                      <Checkbox
-                        checked={
-                          selectedTags.length === tags.length && tags.length > 0
-                        }
-                        onChange={handleSelectAllTags}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <strong>Tags</strong>
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {tags.map((tag, index) => (
-                    <TableRow key={index}>
-                      <TableCell>
-                        <Checkbox
-                          checked={selectedTags.includes(tag)}
-                          onChange={() => handleSelectTag(tag)}
-                        />
-                      </TableCell>
-                      <TableCell>{tag.tagName}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-        </Box>
-      </Box>
-    </>
+        )}
+      </div>
+
+      {tags.length > 0 && (
+        <div className="bg-background rounded-xl border shadow-sm overflow-hidden">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b bg-muted/40">
+                <th className="px-4 py-3 w-10">
+                  <Checkbox
+                    checked={selectedTags.length === tags.length && tags.length > 0}
+                    onCheckedChange={handleSelectAllTags}
+                  />
+                </th>
+                <th className="text-xs font-semibold text-left px-4 py-3 text-muted-foreground uppercase tracking-wide">
+                  Tag Name
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {tags.map((tag, index) => (
+                <tr key={index} className={`border-b hover:bg-muted/30 transition-colors ${selectedTags.includes(tag) ? "bg-blue-50/50" : ""}`}>
+                  <td className="px-4 py-3">
+                    <Checkbox
+                      checked={selectedTags.includes(tag)}
+                      onCheckedChange={() => handleSelectTag(tag)}
+                    />
+                  </td>
+                  <td className="px-4 py-2.5 text-sm font-medium">{tag.tagName}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
   );
 };
 

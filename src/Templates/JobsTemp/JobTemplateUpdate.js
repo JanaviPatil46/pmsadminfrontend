@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import Priority from "../Priority/Priority";
 import EditorShortcodes from "../Texteditor/EditorShortcodes";
 import dayjs from "dayjs";
-import { Switch } from "@mui/material";
+import { Switch } from "../../components/ui/switch";
 import DatePicker from "react-datepicker";
 
 import customParseFormat from "dayjs/plugin/customParseFormat";

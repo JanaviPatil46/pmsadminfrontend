@@ -1,12 +1,4 @@
-import React, { useState, useEffect } from "react";
-import {
-  Chip,
-  Menu,
-  MenuItem,
-  Autocomplete,
-  TextField,Box,Checkbox,Drawer,Grid,Typography,InputLabel,IconButton,
-  InputAdornment,FormControl,Select,OutlinedInput
-} from "@mui/material";
+import React, { useState, useEffect, useRef } from "react";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import {  LuPenLine } from "react-icons/lu";
 import { RxDragHandleDots2 } from "react-icons/rx";
@@ -25,16 +17,8 @@ import { Label } from "../../components/ui/label";
 import { Switch } from "../../components/ui/switch";
 import { Plus, Trash2, GripVertical, Pencil } from "lucide-react";
 const PipelineTempUpdate = () => {
-  const ITEM_HEIGHT = 48;
-  const ITEM_PADDING_TOP = 8;
-  const MenuProps = {
-    PaperProps: {
-      style: {
-        maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-        width: "auto",
-      },
-    },
-  };
+  const [openDropdownStageIndex, setOpenDropdownStageIndex] = useState(null);
+  const dropdownRef = useRef(null);
   const EMAIL_API = process.env.REACT_APP_EMAIL_TEMP_URL;
   const INVOICE_API = process.env.REACT_APP_INVOICE_TEMP_URL;
   const PIPELINE_API = process.env.REACT_APP_PIPELINE_TEMP_URL;
@@ -1309,24 +1293,13 @@ const assigneeOptions = assignee.map((ass)=>({
     tag.tagName.toLowerCase().includes(searchTerm.toLowerCase())
   );
   const selectedTagElements = selectedTags.map((tag) => (
-    <Box
+    <span
       key={tag._id}
-      sx={{
-        backgroundColor: tag.tagColour,
-        borderRadius: "20px",
-        color: "#fff",
-        fontSize: "12px",
-        fontWeight: "600",
-        textAlign: "center",
-        padding: "3px",
-        marginBottom: "5px",
-        marginRight: "5px",
-        display: "inline-block",
-        width: `${calculateWidth(tag.tagName)}px`,
-      }}
+      className="inline-block rounded-full px-2 py-0.5 text-[11px] font-semibold text-white mr-1 mb-1"
+      style={{ backgroundColor: tag.tagColour, minWidth: `${calculateWidth(tag.tagName)}px` }}
     >
       {tag.tagName}
-    </Box>
+    </span>
   ));
 
   const [addTags, setAddTags] = useState([]); // Separate state for Add Tags
@@ -2553,2279 +2526,320 @@ const assigneeOptions = assignee.map((ass)=>({
   //   }
   // };
 
-  const renderActionContent = (automationSelect, index) => {
-    switch (automationSelect) {
-
-      case "Create Task":
-        return (
-          <>
-            <Grid item>
-              {/* {automationSelect} */}
-              <Box
-                sx={{
-                  border: "2px solid #ddd",
-                  borderRadius: "8px",
-                  padding: 2,
-                  // marginBottom: 2,
-                }}
-              >
-                <Typography gutterBottom>
-                  1. {automationSelect || "No Type"}
-                </Typography>
-
-                <Typography mb={1}>Select templates</Typography>
-                <Autocomplete
-                  options={taskTemplateOptions}
-                  getOptionLabel={(option) => option.label}
-                  value={selectedtemp}
-                  onChange={(event, newValue) => handletemp(newValue)}
-                  isOptionEqualToValue={(option, value) =>
-                    option.value === value.value
-                  }
-                  renderOption={(props, option) => (
-                    <Box
-                      component="li"
-                      {...props}
-                      sx={{ cursor: "pointer", margin: "5px 10px" }} // Add cursor pointer style
-                    >
-                      {option.label}
-                    </Box>
-                  )}
-                  renderInput={(params) => (
-                    <>
-                      <TextField
-                        {...params}
-                        // helperText={templateError}
-                        sx={{ backgroundColor: "#fff" }}
-                        placeholder="Select Template"
-                        variant="outlined"
-                        size="small"
-                      />
-                    </>
-                  )}
-                  sx={{ width: "100%", marginTop: "8px" }}
-                  clearOnEscape // Enable clearable functionality
-                />
-                <Box mt={2}>
-                  {" "}
-                  {selectedTags.length > 0 && (
-                    <Grid container alignItems="center" gap={1}>
-                      <Typography>Only for:</Typography>
-                      <Grid item>{selectedTagElements}</Grid>
-                    </Grid>
-                  )}
-                </Box>
-
-                <Button variant="text" onClick={handleAddConditions}>
-                  Add Conditions
-                </Button>
-              </Box>
-              <Box mt={2}>
-                <Button
-                  variant="contained"
-                  onClick={handleSaveAutomation(stageSelected)}
-                  sx={{
-                    backgroundColor: "var(--color-save-btn)", // Normal background
-
-                    "&:hover": {
-                      backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                    },
-                    borderRadius: "15px",
-                  }}
-                >
-                  Save Automation
-                </Button>
-              </Box>
-            </Grid>
-            <Drawer
-              anchor="right"
-              open={isConditionsFormOpen}
-              onClose={handleGoBack}
-              PaperProps={{ sx: { width: "550px", padding: 2 } }}
-            >
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <IconButton onClick={handleGoBack}>
-                  <IoMdArrowRoundBack fontSize="large" color="blue" />
-                </IconButton>
-                <Typography variant="h6">Add conditions</Typography>
-              </Box>
-
-              <Box sx={{ padding: 2 }}>
-                <Typography variant="body1">
-                  Apply automation only for accounts with these tags
-                </Typography>
-                <TextField
-                  fullWidth
-                  size="small"
-                  variant="outlined"
-                  placeholder="Search..."
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                  InputProps={{
-                    startAdornment: (
-                      <AiOutlineSearch style={{ marginRight: 8 }} />
-                    ),
-                  }}
-                  sx={{ marginTop: 2 }}
-                />
-
-                <Box sx={{ marginTop: 2, height: "68vh", overflowY: "auto" }}>
-                  {filteredTags.map((tag) => (
-                    <Box
-                      key={tag._id}
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 3,
-                        borderBottom: "1px solid grey",
-                        paddingBottom: 1,
-                      }}
-                    >
-                      <Checkbox
-                        checked={tempSelectedTags.includes(tag)}
-                        onChange={() => handleCheckboxChange(tag)}
-                      />
-                      <Chip
-                        label={tag.tagName}
-                        sx={{
-                          backgroundColor: tag.tagColour,
-                          color: "#fff",
-                          fontWeight: "500",
-                          borderRadius: "20px",
-                          marginRight: 1,
-                        }}
-                      />
-                    </Box>
-                  ))}
-                </Box>
-
-                <Box sx={{ display: "flex", gap: 2, marginTop: 2 }}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    disabled={!isAnyCheckboxChecked}
-                    onClick={handleAddTags}
-                    sx={{
-                      backgroundColor: "var(--color-save-btn)", // Normal background
-
-                      "&:hover": {
-                        backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                      },
-                      borderRadius: "15px",
-                      width: "80px",
-                    }}
-                  >
-                    Add
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    onClick={handleGoBack}
-                    sx={{
-                      borderColor: "var(--color-border-cancel-btn)", // Normal background
-                      color: "var(--color-save-btn)",
-                      "&:hover": {
-                        backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                        color: "#fff",
-                        border: "none",
-                      },
-                      width: "80px",
-                      borderRadius: "15px",
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                </Box>
-              </Box>
-            </Drawer>
-          </>
-        );
-      // Send message
-      case "Send message":
-        return (
-          <>
-            <Grid item>
-              {/* {automationSelect} */}
-              <Box
-                sx={{
-                  border: "2px solid #ddd",
-                  borderRadius: "8px",
-                  padding: 2,
-                  // marginBottom: 2,
-                }}
-              >
-                <Typography gutterBottom>
-                  1. {automationSelect || "No Type"}
-                </Typography>
-
-                <Typography mb={1}>Select templates</Typography>
-                <Autocomplete
-                  options={chatTemplateOptions}
-                  getOptionLabel={(option) => option.label}
-                  value={selectedtemp}
-                  onChange={(event, newValue) => handletemp(newValue)}
-                  isOptionEqualToValue={(option, value) =>
-                    option.value === value.value
-                  }
-                  renderOption={(props, option) => (
-                    <Box
-                      component="li"
-                      {...props}
-                      sx={{ cursor: "pointer", margin: "5px 10px" }} // Add cursor pointer style
-                    >
-                      {option.label}
-                    </Box>
-                  )}
-                  renderInput={(params) => (
-                    <>
-                      <TextField
-                        {...params}
-                        // helperText={templateError}
-                        sx={{ backgroundColor: "#fff" }}
-                        placeholder="Select Template"
-                        variant="outlined"
-                        size="small"
-                      />
-                    </>
-                  )}
-                  sx={{ width: "100%", marginTop: "8px" }}
-                  clearOnEscape // Enable clearable functionality
-                />
-                <Box mt={2}>
-                  {" "}
-                  {selectedTags.length > 0 && (
-                    <Grid container alignItems="center" gap={1}>
-                      <Typography>Only for:</Typography>
-                      <Grid item>{selectedTagElements}</Grid>
-                    </Grid>
-                  )}
-                </Box>
-
-                <Button variant="text" onClick={handleAddConditions}>
-                  Add Conditions
-                </Button>
-              </Box>
-              <Box mt={2}>
-                <Button
-                  variant="contained"
-                  onClick={handleSaveAutomation(stageSelected)}
-                  sx={{
-                    backgroundColor: "var(--color-save-btn)", // Normal background
-
-                    "&:hover": {
-                      backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                    },
-                    borderRadius: "15px",
-                  }}
-                >
-                  Save Automation
-                </Button>
-              </Box>
-            </Grid>
-            <Drawer
-              anchor="right"
-              open={isConditionsFormOpen}
-              onClose={handleGoBack}
-              PaperProps={{ sx: { width: "550px", padding: 2 } }}
-            >
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <IconButton onClick={handleGoBack}>
-                  <IoMdArrowRoundBack fontSize="large" color="blue" />
-                </IconButton>
-                <Typography variant="h6">Add conditions</Typography>
-              </Box>
-
-              <Box sx={{ padding: 2 }}>
-                <Typography variant="body1">
-                  Apply automation only for accounts with these tags
-                </Typography>
-                <TextField
-                  fullWidth
-                  size="small"
-                  variant="outlined"
-                  placeholder="Search..."
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                  InputProps={{
-                    startAdornment: (
-                      <AiOutlineSearch style={{ marginRight: 8 }} />
-                    ),
-                  }}
-                  sx={{ marginTop: 2 }}
-                />
-
-                <Box sx={{ marginTop: 2, height: "68vh", overflowY: "auto" }}>
-                  {filteredTags.map((tag) => (
-                    <Box
-                      key={tag._id}
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 3,
-                        borderBottom: "1px solid grey",
-                        paddingBottom: 1,
-                      }}
-                    >
-                      <Checkbox
-                        checked={tempSelectedTags.includes(tag)}
-                        onChange={() => handleCheckboxChange(tag)}
-                      />
-                      <Chip
-                        label={tag.tagName}
-                        sx={{
-                          backgroundColor: tag.tagColour,
-                          color: "#fff",
-                          fontWeight: "500",
-                          borderRadius: "20px",
-                          marginRight: 1,
-                        }}
-                      />
-                    </Box>
-                  ))}
-                </Box>
-
-                <Box sx={{ display: "flex", gap: 2, marginTop: 2 }}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    disabled={!isAnyCheckboxChecked}
-                    onClick={handleAddTags}
-                    sx={{
-                      backgroundColor: "var(--color-save-btn)", // Normal background
-
-                      "&:hover": {
-                        backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                      },
-                      borderRadius: "15px",
-                      width: "80px",
-                    }}
-                  >
-                    Add
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    onClick={handleGoBack}
-                    sx={{
-                      borderColor: "var(--color-border-cancel-btn)", // Normal background
-                      color: "var(--color-save-btn)",
-                      "&:hover": {
-                        backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                        color: "#fff",
-                        border: "none",
-                      },
-                      width: "80px",
-                      borderRadius: "15px",
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                </Box>
-              </Box>
-            </Drawer>
-          </>
-        );
-      case "Send Invoice":
-        return (
-          <>
-            <Grid item>
-              {/* {automationSelect} */}
-              <Box
-                sx={{
-                  border: "2px solid #ddd",
-                  borderRadius: "8px",
-                  padding: 2,
-                  // marginBottom: 2,
-                }}
-              >
-                <Typography gutterBottom>
-                  1. {automationSelect || "No Type"}
-                </Typography>
-
-                <Typography mb={1}>Select templates</Typography>
-                <Autocomplete
-                  options={invoiceTemplateOptions}
-                  getOptionLabel={(option) => option.label}
-                  value={selectedtemp}
-                  onChange={(event, newValue) => handletemp(newValue)}
-                  isOptionEqualToValue={(option, value) =>
-                    option.value === value.value
-                  }
-                  renderOption={(props, option) => (
-                    <Box
-                      component="li"
-                      {...props}
-                      sx={{ cursor: "pointer", margin: "5px 10px" }} // Add cursor pointer style
-                    >
-                      {option.label}
-                    </Box>
-                  )}
-                  renderInput={(params) => (
-                    <>
-                      <TextField
-                        {...params}
-                        // helperText={templateError}
-                        sx={{ backgroundColor: "#fff" }}
-                        placeholder="Select Template"
-                        variant="outlined"
-                        size="small"
-                      />
-                    </>
-                  )}
-                  sx={{ width: "100%", marginTop: "8px" }}
-                  clearOnEscape // Enable clearable functionality
-                />
-                <Box mt={2}>
-                  {" "}
-                  {selectedTags.length > 0 && (
-                    <Grid container alignItems="center" gap={1}>
-                      <Typography>Only for:</Typography>
-                      <Grid item>{selectedTagElements}</Grid>
-                    </Grid>
-                  )}
-                </Box>
-
-                <Button variant="text" onClick={handleAddConditions}>
-                  Add Conditions
-                </Button>
-              </Box>
-              <Box mt={2}>
-                <Button
-                  variant="contained"
-                  onClick={handleSaveAutomation(index)}
-                  sx={{
-                    backgroundColor: "var(--color-save-btn)", // Normal background
-
-                    "&:hover": {
-                      backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                    },
-                    borderRadius: "15px",
-                  }}
-                >
-                  Save Automation
-                </Button>
-              </Box>
-            </Grid>
-            <Drawer
-              anchor="right"
-              open={isConditionsFormOpen}
-              onClose={handleGoBack}
-              PaperProps={{ sx: { width: "550px", padding: 2 } }}
-            >
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <IconButton onClick={handleGoBack}>
-                  <IoMdArrowRoundBack fontSize="large" color="blue" />
-                </IconButton>
-                <Typography variant="h6">Add conditions</Typography>
-              </Box>
-
-              <Box sx={{ padding: 2 }}>
-                <Typography variant="body1">
-                  Apply automation only for accounts with these tags
-                </Typography>
-                <TextField
-                  fullWidth
-                  size="small"
-                  variant="outlined"
-                  placeholder="Search..."
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                  InputProps={{
-                    startAdornment: (
-                      <AiOutlineSearch style={{ marginRight: 8 }} />
-                    ),
-                  }}
-                  sx={{ marginTop: 2 }}
-                />
-
-                <Box sx={{ marginTop: 2, height: "68vh", overflowY: "auto" }}>
-                  {filteredTags.map((tag) => (
-                    <Box
-                      key={tag._id}
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 3,
-                        borderBottom: "1px solid grey",
-                        paddingBottom: 1,
-                      }}
-                    >
-                      <Checkbox
-                        checked={tempSelectedTags.includes(tag)}
-                        onChange={() => handleCheckboxChange(tag)}
-                      />
-                      <Chip
-                        label={tag.tagName}
-                        sx={{
-                          backgroundColor: tag.tagColour,
-                          color: "#fff",
-                          fontWeight: "500",
-                          borderRadius: "20px",
-                          marginRight: 1,
-                        }}
-                      />
-                    </Box>
-                  ))}
-                </Box>
-
-                <Box sx={{ display: "flex", gap: 2, marginTop: 2 }}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    disabled={!isAnyCheckboxChecked}
-                    onClick={handleAddTags}
-                    sx={{
-                      backgroundColor: "var(--color-save-btn)", // Normal background
-
-                      "&:hover": {
-                        backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                      },
-                      borderRadius: "15px",
-                      width: "80px",
-                    }}
-                  >
-                    Add
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    onClick={handleGoBack}
-                    sx={{
-                      borderColor: "var(--color-border-cancel-btn)", // Normal background
-                      color: "var(--color-save-btn)",
-                      "&:hover": {
-                        backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                        color: "#fff",
-                        border: "none",
-                      },
-                      width: "80px",
-                      borderRadius: "15px",
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                </Box>
-              </Box>
-            </Drawer>
-          </>
-        );
-      case "Send Proposal/Els":
-        return (
-          <>
-            <Grid item>
-              <Box
-                sx={{
-                  border: "2px solid #ddd",
-                  borderRadius: "8px",
-                  padding: 2,
-                  // marginBottom: 2,
-                }}
-              >
-                <Typography gutterBottom>
-                  1. {automationSelect || "No Type"}
-                </Typography>
-                <Typography mb={1}>Select template</Typography>
-                <Autocomplete
-                  options={proposalElsOptions}
-                  getOptionLabel={(option) => option.label}
-                  value={selectedtemp}
-                  onChange={(event, newValue) => handletemp(newValue)}
-                  isOptionEqualToValue={(option, value) =>
-                    option.value === value.value
-                  }
-                  renderOption={(props, option) => (
-                    <Box
-                      component="li"
-                      {...props}
-                      sx={{ cursor: "pointer", margin: "5px 10px" }} // Add cursor pointer style
-                    >
-                      {option.label}
-                    </Box>
-                  )}
-                  renderInput={(params) => (
-                    <>
-                      <TextField
-                        {...params}
-                        // helperText={templateError}
-                        sx={{ backgroundColor: "#fff" }}
-                        placeholder="Select Template"
-                        variant="outlined"
-                        size="small"
-                      />
-                    </>
-                  )}
-                  sx={{ width: "100%", marginTop: "8px" }}
-                  clearOnEscape // Enable clearable functionality
-                />
-                <Box mt={2}>
-                  {" "}
-                  {selectedTags.length > 0 && (
-                    <Grid container alignItems="center" gap={1}>
-                      <Typography>Only for:</Typography>
-                      <Grid item>{selectedTagElements}</Grid>
-                    </Grid>
-                  )}
-                </Box>
-                <Button variant="text" onClick={handleAddConditions}>
-                  Add Conditions
-                </Button>
-              </Box>
-              <Box mt={2}>
-                <Button
-                  variant="contained"
-                  onClick={handleSaveAutomation(index)}
-                  sx={{
-                    backgroundColor: "var(--color-save-btn)", // Normal background
-
-                    "&:hover": {
-                      backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                    },
-                    borderRadius: "15px",
-                  }}
-                >
-                  Save Automation
-                </Button>
-              </Box>
-            </Grid>
-
-            <Drawer
-              anchor="right"
-              open={isConditionsFormOpen}
-              onClose={handleGoBack}
-              PaperProps={{ sx: { width: "550px", padding: 2 } }}
-            >
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <IconButton onClick={handleGoBack}>
-                  <IoMdArrowRoundBack fontSize="large" color="blue" />
-                </IconButton>
-                <Typography variant="h6">Add conditions</Typography>
-              </Box>
-
-              <Box sx={{ padding: 2 }}>
-                <Typography variant="body1">
-                  Apply automation only for accounts with these tags
-                </Typography>
-                <TextField
-                  fullWidth
-                  size="small"
-                  variant="outlined"
-                  placeholder="Search..."
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                  InputProps={{
-                    startAdornment: (
-                      <AiOutlineSearch style={{ marginRight: 8 }} />
-                    ),
-                  }}
-                  sx={{ marginTop: 2 }}
-                />
-
-                <Box sx={{ marginTop: 2, height: "68vh", overflowY: "auto" }}>
-                  {filteredTags.map((tag) => (
-                    <Box
-                      key={tag._id}
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 3,
-                        borderBottom: "1px solid grey",
-                        paddingBottom: 1,
-                      }}
-                    >
-                      <Checkbox
-                        checked={tempSelectedTags.includes(tag)}
-                        onChange={() => handleCheckboxChange(tag)}
-                      />
-                      <Chip
-                        label={tag.tagName}
-                        sx={{
-                          backgroundColor: tag.tagColour,
-                          color: "#fff",
-                          fontWeight: "500",
-                          borderRadius: "20px",
-                          marginRight: 1,
-                        }}
-                      />
-                    </Box>
-                  ))}
-                </Box>
-
-                <Box sx={{ display: "flex", gap: 2, marginTop: 2 }}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    disabled={!isAnyCheckboxChecked}
-                    onClick={handleAddTags}
-                    sx={{
-                      backgroundColor: "var(--color-save-btn)", // Normal background
-
-                      "&:hover": {
-                        backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                      },
-                      borderRadius: "15px",
-                      width: "80px",
-                    }}
-                  >
-                    Add
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    onClick={handleGoBack}
-                    sx={{
-                      borderColor: "var(--color-border-cancel-btn)", // Normal background
-                      color: "var(--color-save-btn)",
-                      "&:hover": {
-                        backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                        color: "#fff",
-                        border: "none",
-                      },
-                      width: "80px",
-                      borderRadius: "15px",
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                </Box>
-              </Box>
-            </Drawer>
-          </>
-        );
-      case "Send Email":
-        return (
-          <>
-            <Grid item>
-              <Box
-                sx={{
-                  border: "2px solid #ddd",
-                  borderRadius: "8px",
-                  padding: 2,
-                  // marginBottom: 2,
-                }}
-              >
-                <Typography gutterBottom>
-                  1. {automationSelect || "No Type"}
-                </Typography>
-                <Autocomplete
-                  options={emailTemplateOptions}
-                  getOptionLabel={(option) => option.label}
-                  value={selectedtemp}
-                  onChange={(event, newValue) => handletemp(newValue)}
-                  isOptionEqualToValue={(option, value) =>
-                    option.value === value.value
-                  }
-                  renderOption={(props, option) => (
-                    <Box
-                      component="li"
-                      {...props}
-                      sx={{ cursor: "pointer", margin: "5px 10px" }} // Add cursor pointer style
-                    >
-                      {option.label}
-                    </Box>
-                  )}
-                  renderInput={(params) => (
-                    <>
-                      <TextField
-                        {...params}
-                        // helperText={templateError}
-                        sx={{ backgroundColor: "#fff" }}
-                        placeholder="Select Template"
-                        variant="outlined"
-                        size="small"
-                      />
-                    </>
-                  )}
-                  sx={{ width: "100%", marginTop: "8px" }}
-                  clearOnEscape // Enable clearable functionality
-                />
-                <Box mt={2}>
-                  {" "}
-                  {selectedTags.length > 0 && (
-                    <Grid container alignItems="center" gap={1}>
-                      <Typography>Only for:</Typography>
-                      <Grid item>{selectedTagElements}</Grid>
-                    </Grid>
-                  )}
-                </Box>
-                <Button variant="text" onClick={handleAddConditions}>
-                  Add Conditions
-                </Button>
-              </Box>
-              <Box mt={2}>
-                <Button
-                  variant="contained"
-                  onClick={handleSaveAutomation(stageSelected)}
-                  sx={{
-                    backgroundColor: "var(--color-save-btn)", // Normal background
-
-                    "&:hover": {
-                      backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                    },
-                    borderRadius: "15px",
-                  }}
-                >
-                  Save Automation
-                </Button>
-              </Box>
-            </Grid>
-
-            {/* Condition tags for automation */}
-            <Drawer
-              anchor="right"
-              open={isConditionsFormOpen}
-              onClose={handleGoBack}
-              PaperProps={{ sx: { width: "550px", padding: 2 } }}
-            >
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <IconButton onClick={handleGoBack}>
-                  <IoMdArrowRoundBack fontSize="large" color="blue" />
-                </IconButton>
-                <Typography variant="h6">Add conditions</Typography>
-              </Box>
-
-              <Box sx={{ padding: 2 }}>
-                <Typography variant="body1">
-                  Apply automation only for accounts with these tags
-                </Typography>
-                <TextField
-                  fullWidth
-                  size="small"
-                  variant="outlined"
-                  placeholder="Search..."
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                  InputProps={{
-                    startAdornment: (
-                      <AiOutlineSearch style={{ marginRight: 8 }} />
-                    ),
-                  }}
-                  sx={{ marginTop: 2 }}
-                />
-
-                <Box sx={{ marginTop: 2, height: "68vh", overflowY: "auto" }}>
-                  {filteredTags.map((tag) => (
-                    <Box
-                      key={tag._id}
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 3,
-                        borderBottom: "1px solid grey",
-                        paddingBottom: 1,
-                      }}
-                    >
-                      <Checkbox
-                        checked={tempSelectedTags.includes(tag)}
-                        onChange={() => handleCheckboxChange(tag)}
-                      />
-                      <Chip
-                        label={tag.tagName}
-                        sx={{
-                          backgroundColor: tag.tagColour,
-                          color: "#fff",
-                          fontWeight: "500",
-                          borderRadius: "20px",
-                          marginRight: 1,
-                        }}
-                      />
-                    </Box>
-                  ))}
-                </Box>
-
-                <Box sx={{ display: "flex", gap: 2, marginTop: 2 }}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    disabled={!isAnyCheckboxChecked}
-                    onClick={handleAddTags}
-                    sx={{
-                      backgroundColor: "var(--color-save-btn)", // Normal background
-
-                      "&:hover": {
-                        backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                      },
-                      borderRadius: "15px",
-                      width: "80px",
-                    }}
-                  >
-                    Add
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    onClick={handleGoBack}
-                    sx={{
-                      borderColor: "var(--color-border-cancel-btn)", // Normal background
-                      color: "var(--color-save-btn)",
-                      "&:hover": {
-                        backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                        color: "#fff",
-                        border: "none",
-                      },
-                      width: "80px",
-                      borderRadius: "15px",
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                </Box>
-              </Box>
-            </Drawer>
-          </>
-        );
-      case "Apply folder template":
-        return (
-          <>
-            <Grid item>
-              <Box
-                sx={{
-                  border: "2px solid #ddd",
-                  borderRadius: "8px",
-                  padding: 2,
-                  // marginBottom: 2,
-                }}
-              >
-                <Typography gutterBottom>
-                  1. {automationSelect || "No Type"}
-                </Typography>
-
-                <Typography mb={1}>Select template</Typography>
-                <Autocomplete
-                  options={optionfolder}
-                  getOptionLabel={(option) => option.label}
-                  value={selectedtemp}
-                  onChange={(event, newValue) => handletemp(newValue)}
-                  isOptionEqualToValue={(option, value) =>
-                    option.value === value.value
-                  }
-                  renderOption={(props, option) => (
-                    <Box
-                      component="li"
-                      {...props}
-                      sx={{ cursor: "pointer", margin: "5px 10px" }} // Add cursor pointer style
-                    >
-                      {option.label}
-                    </Box>
-                  )}
-                  renderInput={(params) => (
-                    <>
-                      <TextField
-                        {...params}
-                        // helperText={templateError}
-                        sx={{ backgroundColor: "#fff" }}
-                        placeholder="Select Template"
-                        variant="outlined"
-                        size="small"
-                      />
-                    </>
-                  )}
-                  sx={{ width: "100%", marginTop: "8px" }}
-                  clearOnEscape // Enable clearable functionality
-                />
-                <Box mt={2}>
-                  {" "}
-                  {selectedTags.length > 0 && (
-                    <Grid container alignItems="center" gap={1}>
-                      <Typography>Only for:</Typography>
-                      <Grid item>{selectedTagElements}</Grid>
-                    </Grid>
-                  )}
-                </Box>
-                <Button variant="text" onClick={handleAddConditions}>
-                  Add Conditions
-                </Button>
-              </Box>
-            </Grid>
-            <Box mt={2}>
-              <Button
-                variant="contained"
-                onClick={handleSaveAutomation(stageSelected)}
-                sx={{
-                  backgroundColor: "var(--color-save-btn)", // Normal background
-
-                  "&:hover": {
-                    backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                  },
-                  borderRadius: "15px",
-                }}
-              >
-                Save Automation
-              </Button>
-            </Box>
-
-            {/* Condition tags for automation */}
-            <Drawer
-              anchor="right"
-              open={isConditionsFormOpen}
-              onClose={handleGoBack}
-              PaperProps={{ sx: { width: "550px", padding: 2 } }}
-            >
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <IconButton onClick={handleGoBack}>
-                  <IoMdArrowRoundBack fontSize="large" color="blue" />
-                </IconButton>
-                <Typography variant="h6">Add conditions</Typography>
-              </Box>
-
-              <Box sx={{ padding: 2 }}>
-                <Typography variant="body1">
-                  Apply automation only for accounts with these tags
-                </Typography>
-                <TextField
-                  fullWidth
-                  size="small"
-                  variant="outlined"
-                  placeholder="Search..."
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                  InputProps={{
-                    startAdornment: (
-                      <AiOutlineSearch style={{ marginRight: 8 }} />
-                    ),
-                  }}
-                  sx={{ marginTop: 2 }}
-                />
-
-                <Box sx={{ marginTop: 2, height: "68vh", overflowY: "auto" }}>
-                  {filteredTags.map((tag) => (
-                    <Box
-                      key={tag._id}
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 3,
-                        borderBottom: "1px solid grey",
-                        paddingBottom: 1,
-                      }}
-                    >
-                      <Checkbox
-                        checked={tempSelectedTags.includes(tag)}
-                        onChange={() => handleCheckboxChange(tag)}
-                      />
-                      <Chip
-                        label={tag.tagName}
-                        sx={{
-                          backgroundColor: tag.tagColour,
-                          color: "#fff",
-                          fontWeight: "500",
-                          borderRadius: "20px",
-                          marginRight: 1,
-                        }}
-                      />
-                    </Box>
-                  ))}
-                </Box>
-
-                <Box sx={{ display: "flex", gap: 2, marginTop: 2 }}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    disabled={!isAnyCheckboxChecked}
-                    onClick={handleAddTags}
-                    sx={{
-                      backgroundColor: "var(--color-save-btn)", // Normal background
-
-                      "&:hover": {
-                        backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                      },
-                      borderRadius: "15px",
-                      width: "80px",
-                    }}
-                  >
-                    Add
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    onClick={handleGoBack}
-                    sx={{
-                      borderColor: "var(--color-border-cancel-btn)", // Normal background
-                      color: "var(--color-save-btn)",
-                      "&:hover": {
-                        backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                        color: "#fff",
-                        border: "none",
-                      },
-                      width: "80px",
-                      borderRadius: "15px",
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                </Box>
-              </Box>
-            </Drawer>
-          </>
-        );
-        case "Update account tags":
-          return (
-            <>
-              <Box p={2} sx={{
-                  border: "2px solid #ddd",
-                  borderRadius: "8px",
-                  padding: 2,
-                  // marginBottom: 2,
-                }}>
-               1. {automationSelect}
-  
-                <Grid item >
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 5 }}>
-                    {/* Add Tags Section */}
-                    <Box mt={2}>
-                      <Typography gutterBottom variant="body2">Add Tags</Typography>
-                      <FormControl
-                        sx={{
-                          width: "100%",
-                          marginTop: "8px",
-                          backgroundColor: "#fff",
-                        }}
-                        size="small"
-                      >
-                        <Select
-                          multiple
-                          size="small"
-                          fullWidth
-                          multiline
-                          value={addTags}
-                          onChange={handleAddTagChange}
-                          input={<OutlinedInput />}
-                          displayEmpty // Enables placeholder when no value is selected
-                          renderValue={(selected) => {
-                            if (selected.length === 0) {
-                              return (
-                                <span style={{ color: "#aaa" }}>
-                                  Select tags...
-                                </span>
-                              ); // Placeholder
-                            }
-                            return (
-                              <Box
-                                sx={{
-                                  display: "flex",
-                                  flexWrap: "wrap",
-                                  gap: "6px",
-                                  padding: "6px",
-                                  borderRadius: "10px",
-                                }}
-                              >
-                                {selected.map((value) => {
-                                  const option = tagsoptions.find(
-                                    (opt) => opt.value === value
-                                  );
-                                  return (
-                                    <Chip
-                                      key={value}
-                                      label={option?.label}
-                                      sx={{
-                                        backgroundColor: option?.colour,
-                                        color: "#fff",
-                                        fontWeight: 500,
-                                        fontSize: "10px",
-                                        borderRadius: "16px",
-                                        height: "20px",
-                                        cursor: "pointer",
-                                        boxShadow:
-                                          "0px 2px 4px rgba(0, 0, 0, 0.2)",
-                                        "& .MuiChip-deleteIcon": {
-                                          color: "#fff",
-                                          opacity: 0.7,
-                                          transition: "opacity 0.2s",
-                                          "&:hover": { opacity: 1 },
-                                        },
-                                      }}
-                                    />
-                                  );
-                                })}
-                              </Box>
-                            );
-                          }}
-                          MenuProps={MenuProps}
-                          sx={{
-                            borderRadius: "10px",
-                            "& .MuiOutlinedInput-root": {
-                              borderRadius: "10px",
-                            },
-                          }}
-                        >
-                          {filteredAddTagsOptions.map((option) => {
-                            // const dynamicWidth = Math.min(option.label.length * 10, 150); // Adjust width dynamically
-                            // Create a canvas element to measure the actual text width
-                            const canvas = document.createElement("canvas");
-                            const context = canvas.getContext("2d");
-                            context.font = "12px Arial"; // Match the font size/style of MenuItem
-  
-                            const textWidth = context.measureText(
-                              option.label
-                            ).width; // Get precise width
-                            const dynamicWidth = Math.min(textWidth + 16, 150); // Add padding & set max width
-                            return (
-                              <MenuItem
-                                key={option.value}
-                                value={option.value}
-                                sx={{
-                                  backgroundColor: option.colour,
-                                  color: "#fff",
-                                  fontSize: "10px",
-                                  borderRadius: "10px",
-                                  margin: "5px",
-                                  textAlign: "center",
-                                  display: "flex",
-                                  justifyContent: "center",
-                                  padding: "4px 9px",
-                                  // alignItems: "center",
-                                  // paddingLeft: "10px",
-                                  whiteSpace: "nowrap", // Prevent line breaks
-                                  // textAlign: "left", // Ensure text is left-aligned
-                                  // paddingLeft: "10px", // Add left padding for proper alignment
-                                  minWidth: `${dynamicWidth}px`,
-                                  maxWidth: `${dynamicWidth}px`, // Dynamically set maxWidth
-                                  "&:hover": {
-                                    backgroundColor: option.colour,
-                                    color: "#fff",
-                                  },
-                                }}
-                              >
-                                {option.label}
-                              </MenuItem>
-                            );
-                          })}
-                        </Select>
-                      </FormControl>
-                    </Box>
-  
-                    {/* Remove Tags Section */}
-                    <Box mt={2}>
-                    <Typography gutterBottom variant="body2">Remove Tags</Typography>
-                      <FormControl
-                        sx={{
-                          width: "100%",
-                          marginTop: "8px",
-                          backgroundColor: "#fff",
-                        }}
-                        size="small"
-                      >
-                        <Select
-                          multiple
-                          size="small"
-                          fullWidth
-                          multiline
-                          value={removeTags}
-                          onChange={handleRemoveTagChange}
-                          input={<OutlinedInput />}
-                          displayEmpty // Enables placeholder when no value is selected
-                          renderValue={(selected) => {
-                            if (selected.length === 0) {
-                              return (
-                                <span style={{ color: "#aaa" }}>
-                                  Select tags...
-                                </span>
-                              ); // Placeholder
-                            }
-                            return (
-                              <Box
-                                sx={{
-                                  display: "flex",
-                                  flexWrap: "wrap",
-                                  gap: "6px",
-                                  padding: "6px",
-                                  borderRadius: "10px",
-                                }}
-                              >
-                                {selected.map((value) => {
-                                  const option = tagsoptions.find(
-                                    (opt) => opt.value === value
-                                  );
-                                  return (
-                                    <Chip
-                                      key={value}
-                                      label={option?.label}
-                                      sx={{
-                                        backgroundColor: option?.colour,
-                                        color: "#fff",
-                                        fontWeight: 500,
-                                        fontSize: "10px",
-                                        borderRadius: "16px",
-                                        height: "20px",
-                                        cursor: "pointer",
-                                        boxShadow:
-                                          "0px 2px 4px rgba(0, 0, 0, 0.2)",
-                                        "& .MuiChip-deleteIcon": {
-                                          color: "#fff",
-                                          opacity: 0.7,
-                                          transition: "opacity 0.2s",
-                                          "&:hover": { opacity: 1 },
-                                        },
-                                      }}
-                                    />
-                                  );
-                                })}
-                              </Box>
-                            );
-                          }}
-                          MenuProps={MenuProps}
-                          sx={{
-                            borderRadius: "10px",
-                            "& .MuiOutlinedInput-root": {
-                              borderRadius: "10px",
-                            },
-                          }}
-                        >
-                          {filteredRemoveTagsOptions.map((option) => {
-                            // const dynamicWidth = Math.min(option.label.length * 10, 150); // Adjust width dynamically
-                            // Create a canvas element to measure the actual text width
-                            const canvas = document.createElement("canvas");
-                            const context = canvas.getContext("2d");
-                            context.font = "12px Arial"; // Match the font size/style of MenuItem
-  
-                            const textWidth = context.measureText(
-                              option.label
-                            ).width; // Get precise width
-                            const dynamicWidth = Math.min(textWidth + 16, 150); // Add padding & set max width
-                            return (
-                              <MenuItem
-                                key={option.value}
-                                value={option.value}
-                                sx={{
-                                  backgroundColor: option.colour,
-                                  color: "#fff",
-                                  fontSize: "10px",
-                                  borderRadius: "10px",
-                                  margin: "5px",
-                                  textAlign: "center",
-                                  display: "flex",
-                                  justifyContent: "center",
-                                  padding: "4px 9px",
-                                  // alignItems: "center",
-                                  // paddingLeft: "10px",
-                                  whiteSpace: "nowrap", // Prevent line breaks
-                                  // textAlign: "left", // Ensure text is left-aligned
-                                  // paddingLeft: "10px", // Add left padding for proper alignment
-                                  minWidth: `${dynamicWidth}px`,
-                                  maxWidth: `${dynamicWidth}px`, // Dynamically set maxWidth
-                                  "&:hover": {
-                                    backgroundColor: option.colour,
-                                    color: "#fff",
-                                  },
-                                }}
-                              >
-                                {option.label}
-                              </MenuItem>
-                            );
-                          })}
-                        </Select>
-                      </FormControl>
-                    </Box>
-                  </Box>
-  
-                  {selectedTags.length > 0 && (
-                    <Grid container alignItems="center" gap={1}>
-                      <Typography>Only for:</Typography>
-                      <Grid item>{selectedTagElements}</Grid>
-                    </Grid>
-                  )}
-  
-                  <Button variant="text" onClick={handleAddConditions}>
-                    Add Conditions
-                  </Button>
-                </Grid>
-  
-                <Button
-                  variant="contained"
-                  onClick={handleSaveAutomation(stageSelected)}
-                  sx={{
-                    backgroundColor: "var(--color-save-btn)", // Normal background
-  
-                    "&:hover": {
-                      backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                    },
-                    borderRadius: "15px",
-                  }}
-                >
-                  Save Automation
-                </Button>
-              </Box>
-              {/* Condition tags for automation */}
-              <Drawer
-                anchor="right"
-                open={isConditionsFormOpen}
-                onClose={handleGoBack}
-                PaperProps={{ sx: { width: "550px", padding: 2 } }}
-              >
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <IconButton onClick={handleGoBack}>
-                    <IoMdArrowRoundBack fontSize="large" color="blue" />
-                  </IconButton>
-                  <Typography variant="h6">Add conditions</Typography>
-                </Box>
-  
-                <Box sx={{ padding: 2 }}>
-                  <Typography variant="body1">
-                    Apply automation only for accounts with these tags
-                  </Typography>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    variant="outlined"
-                    placeholder="Search..."
-                    value={searchTerm}
-                    onChange={handleSearchChange}
-                    InputProps={{
-                      startAdornment: (
-                        <AiOutlineSearch style={{ marginRight: 8 }} />
-                      ),
-                    }}
-                    sx={{ marginTop: 2 }}
-                  />
-  
-                  <Box sx={{ marginTop: 2, height: "68vh", overflowY: "auto" }}>
-                    {filteredTags.map((tag) => (
-                      <Box
-                        key={tag._id}
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 3,
-                          borderBottom: "1px solid grey",
-                          paddingBottom: 1,
-                        }}
-                      >
-                        <Checkbox
-                          checked={tempSelectedTags.includes(tag)}
-                          onChange={() => handleCheckboxChange(tag)}
-                        />
-                        <Chip
-                          label={tag.tagName}
-                          sx={{
-                            backgroundColor: tag.tagColour,
-                            color: "#fff",
-                            fontWeight: "500",
-                            borderRadius: "20px",
-                            marginRight: 1,
-                          }}
-                        />
-                      </Box>
-                    ))}
-                  </Box>
-  
-                  <Box sx={{ display: "flex", gap: 2, marginTop: 2 }}>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      disabled={!isAnyCheckboxChecked}
-                      onClick={handleAddTags}
-                      sx={{
-                        backgroundColor: "var(--color-save-btn)", // Normal background
-  
-                        "&:hover": {
-                          backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                        },
-                        borderRadius: "15px",
-                        width: "80px",
-                      }}
-                    >
-                      Add
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      color="primary"
-                      onClick={handleGoBack}
-                      sx={{
-                        borderColor: "var(--color-border-cancel-btn)", // Normal background
-                        color: "var(--color-save-btn)",
-                        "&:hover": {
-                          backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                          color: "#fff",
-                          border: "none",
-                        },
-                        width: "80px",
-                        borderRadius: "15px",
-                      }}
-                    >
-                      Cancel
-                    </Button>
-                  </Box>
-                </Box>
-              </Drawer>
-            </>
-          );
-      case "Update job assignees":
-  return (
-    <>
-      <Grid item>
-        <Box
-          sx={{
-            border: "2px solid #ddd",
-            borderRadius: "8px",
-            padding: 2,
-          }}
-        >
-          <Typography gutterBottom>
-            1. {automationSelect || "No Type"}
-          </Typography>
-
-          <Box sx={{ display: "flex", alignItems: "center", gap: 5 }}>
-            <Box mt={2} width={"50%"}>
-              <Typography gutterBottom variant="body2">
-                Add Assignees
-              </Typography>
-              <FormControl
-                sx={{
-                  width: "100%",
-                  marginTop: "8px",
-                  backgroundColor: "#fff",
-                }}
-                size="small"
-              >
-                <Select
-                  multiple
-                  size="small"
-                  fullWidth
-                  multiline
-                  value={selectedAssignees}
-                  onChange={(e) => setSelectedAssignees(e.target.value)}
-                  input={<OutlinedInput />}
-                  displayEmpty
-                  renderValue={(selected) => {
-                    if (selected.length === 0) {
-                      return (
-                        <span style={{ color: "#aaa" }}>
-                          Select assignees...
-                        </span>
-                      );
-                    }
-                    return (
-                      <Box
-                        sx={{
-                          display: "flex",
-                          flexWrap: "wrap",
-                          gap: "6px",
-                          padding: "6px",
-                          borderRadius: "10px",
-                        }}
-                      >
-                        {selected.map((value) => {
-                          const option = assigneeOptions.find(
-                            (opt) => opt.value === value
-                          );
-                          return (
-                            <Chip
-                              key={value}
-                              label={option?.label}
-                             
-                            />
-                          );
-                        })}
-                      </Box>
-                    );
-                  }}
-                  MenuProps={MenuProps}
-                  sx={{
-                    borderRadius: "10px",
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: "10px",
-                    },
-                  }}
-                >
-                  {assigneeOptions.filter(opt => !assigneesToRemove.includes(opt.value)).map((option) => {
-                 
-                    return (
-                      <MenuItem
-                        key={option.value}
-                        value={option.value}
-                        
-                      >
-                        {option.label}
-                      </MenuItem>
-                    );
-                  })}
-                </Select>
-              </FormControl>
-            </Box>
-
-            <Box mt={2} width={"50%"}>
-              <Typography gutterBottom variant="body2">
-                Remove Assignees
-              </Typography>
-              <FormControl
-                sx={{
-                  width: "100%",
-                  marginTop: "8px",
-                  backgroundColor: "#fff",
-                }}
-                size="small"
-              >
-                <Select
-                  multiple
-                  size="small"
-                  fullWidth
-                  multiline
-                  value={assigneesToRemove}
-                  onChange={(e) => setAssigneesToRemove(e.target.value)}
-                  input={<OutlinedInput />}
-                  displayEmpty
-                  renderValue={(selected) => {
-                    if (selected.length === 0) {
-                      return (
-                        <span style={{ color: "#aaa" }}>
-                          Select assignees...
-                        </span>
-                      );
-                    }
-                    return (
-                      <Box
-                        sx={{
-                          display: "flex",
-                          flexWrap: "wrap",
-                          gap: "6px",
-                          padding: "6px",
-                          borderRadius: "10px",
-                        }}
-                      >
-                        {selected.map((value) => {
-                          const option = assigneeOptions.find(
-                            (opt) => opt.value === value
-                          );
-                          return (
-                            <Chip
-                              key={value}
-                              label={option?.label}
-                             
-                            />
-                          );
-                        })}
-                      </Box>
-                    );
-                  }}
-                  MenuProps={MenuProps}
-                  sx={{
-                    borderRadius: "10px",
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: "10px",
-                    },
-                  }}
-                >
-                  {assigneeOptions.filter(opt => !selectedAssignees.includes(opt.value)).map((option) => {
-                    // const canvas = document.createElement("canvas");
-                    // const context = canvas.getContext("2d");
-                    // context.font = "12px Arial";
-                    // const textWidth = context.measureText(option.label).width;
-                    // const dynamicWidth = Math.min(textWidth + 16, 150);
-                    return (
-                      <MenuItem
-                        key={option.value}
-                        value={option.value}
-                        // sx={{
-                        //   backgroundColor: "#f44336", // Red color for remove
-                        //   color: "#fff",
-                        //   fontSize: "10px",
-                        //   borderRadius: "10px",
-                        //   margin: "5px",
-                        //   textAlign: "center",
-                        //   display: "flex",
-                        //   justifyContent: "center",
-                        //   padding: "4px 9px",
-                        //   whiteSpace: "nowrap",
-                        //   minWidth: `${dynamicWidth}px`,
-                        //   maxWidth: `${dynamicWidth}px`,
-                        //   "&:hover": {
-                        //     backgroundColor: "#d32f2f", // Darker red on hover
-                        //     color: "#fff",
-                        //   },
-                        // }}
-                      >
-                        {option.label}
-                      </MenuItem>
-                    );
-                  })}
-                </Select>
-              </FormControl>
-            </Box>
-          </Box>
-
-          {selectedTags.length > 0 && (
-            <Grid container alignItems="center" gap={1}>
-              <Typography>Only for:</Typography>
-              <Grid item>{selectedTagElements}</Grid>
-            </Grid>
-          )}
-
-          <Button variant="text" onClick={handleAddConditions}>
-            Add Conditions
-          </Button>
-        </Box>
-        <Box mt={2}>
-          <Button
-            variant="contained"
-            onClick={handleSaveAutomation(stageSelected)}
-            sx={{
-              backgroundColor: "var(--color-save-btn)",
-              "&:hover": {
-                backgroundColor: "var(--color-save-hover-btn)",
-              },
-              borderRadius: "15px",
-            }}
-          >
-            Save Automation
-          </Button>
-        </Box>
-      </Grid>
-
-      {/* Condition tags for automation */}
-      <Drawer
-        anchor="right"
-        open={isConditionsFormOpen}
-        onClose={handleGoBack}
-        BackdropProps={{ invisible: true }}
-        PaperProps={{ sx: { width: "550px", padding: 2 } }}
-      >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <IconButton onClick={handleGoBack}>
-            <IoMdArrowRoundBack fontSize="large" color="blue" />
-          </IconButton>
-          <Typography variant="h6">Add conditions</Typography>
-        </Box>
-
-        <Box sx={{ padding: 2 }}>
-          <Typography variant="body1">
-            Apply automation only for accounts with these tags
-          </Typography>
-          <TextField
-            fullWidth
-            size="small"
-            variant="outlined"
+  const conditionsDrawer = (
+    <div
+      className={`fixed inset-y-0 right-0 z-50 w-[550px] bg-white shadow-xl flex flex-col transition-transform duration-300 ${
+        isConditionsFormOpen ? "translate-x-0" : "translate-x-full"
+      }`}
+    >
+      <div className="flex items-center gap-2 p-4 border-b">
+        <button type="button" onClick={handleGoBack} className="text-blue-600 hover:opacity-75">
+          <IoMdArrowRoundBack size={22} />
+        </button>
+        <span className="text-base font-semibold">Add conditions</span>
+      </div>
+      <div className="p-4 flex flex-col flex-1 overflow-hidden">
+        <p className="text-sm text-gray-600">Apply automation only for accounts with these tags</p>
+        <div className="relative mt-3">
+          <AiOutlineSearch className="absolute left-2.5 top-2.5 text-gray-400" />
+          <input
+            type="text"
             placeholder="Search..."
             value={searchTerm}
             onChange={handleSearchChange}
-            InputProps={{
-              startAdornment: (
-                <AiOutlineSearch style={{ marginRight: 8 }} />
-              ),
-            }}
-            sx={{ marginTop: 2 }}
+            className="w-full rounded border border-gray-200 pl-8 pr-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
-
-          <Box sx={{ marginTop: 2, height: "68vh", overflowY: "auto" }}>
-            {filteredTags.map((tag) => (
-              <Box
-                key={tag._id}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 3,
-                  borderBottom: "1px solid grey",
-                  paddingBottom: 1,
-                }}
+        </div>
+        <div className="mt-3 flex-1 overflow-y-auto" style={{ maxHeight: "68vh" }}>
+          {filteredTags.map((tag) => (
+            <div key={tag._id} className="flex items-center gap-3 border-b border-gray-200 py-2">
+              <input
+                type="checkbox"
+                checked={tempSelectedTags.includes(tag)}
+                onChange={() => handleCheckboxChange(tag)}
+                className="h-4 w-4 rounded border-gray-300"
+              />
+              <span
+                className="inline-block rounded-full px-3 py-0.5 text-xs font-semibold text-white"
+                style={{ backgroundColor: tag.tagColour }}
               >
-                <Checkbox
-                  checked={tempSelectedTags.includes(tag)}
-                  onChange={() => handleCheckboxChange(tag)}
-                />
-                <Chip
-                  label={tag.tagName}
-                  sx={{
-                    backgroundColor: tag.tagColour,
-                    color: "#fff",
-                    fontWeight: "500",
-                    borderRadius: "20px",
-                    marginRight: 1,
-                  }}
-                />
-              </Box>
-            ))}
-          </Box>
-
-          <Box sx={{ display: "flex", gap: 2, marginTop: 2 }}>
-            <Button
-              variant="contained"
-              color="primary"
-              disabled={!isAnyCheckboxChecked}
-              onClick={handleAddTags}
-              sx={{
-                backgroundColor: "var(--color-save-btn)",
-                "&:hover": {
-                  backgroundColor: "var(--color-save-hover-btn)",
-                },
-                borderRadius: "15px",
-                width: "80px",
-              }}
-            >
-              Add
-            </Button>
-            <Button
-              variant="outlined"
-              color="primary"
-              onClick={handleGoBack}
-              sx={{
-                borderColor: "var(--color-border-cancel-btn)",
-                color: "var(--color-save-btn)",
-                "&:hover": {
-                  backgroundColor: "var(--color-save-hover-btn)",
-                  color: "#fff",
-                  border: "none",
-                },
-                width: "80px",
-                borderRadius: "15px",
-              }}
-            >
-              Cancel
-            </Button>
-          </Box>
-        </Box>
-      </Drawer>
-    </>
+                {tag.tagName}
+              </span>
+            </div>
+          ))}
+        </div>
+        <div className="flex gap-3 mt-4">
+          <button
+            type="button"
+            disabled={!isAnyCheckboxChecked}
+            onClick={handleAddTags}
+            className="rounded-full px-5 py-1.5 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] disabled:opacity-50"
+          >
+            Add
+          </button>
+          <button
+            type="button"
+            onClick={handleGoBack}
+            className="rounded-full px-5 py-1.5 text-sm font-medium border border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
   );
-      
-      
-        case "Create Organizer":
+
+  const getOptions = (type) => {
+    switch (type) {
+      case "Create Task": return taskTemplateOptions;
+      case "Send message": return chatTemplateOptions;
+      case "Send Invoice": return invoiceTemplateOptions;
+      case "Send Email": return emailTemplateOptions;
+      case "Send Proposal/Els": return proposalElsOptions;
+      case "Apply folder template": return optionfolder;
+      case "Create Organizer": return organizerOptions;
+      default: return [];
+    }
+  };
+
+  const templateCases = ["Create Task", "Send message", "Send Invoice", "Send Email", "Send Proposal/Els", "Apply folder template", "Create Organizer"];
+
+  const renderActionContent = (automationSelect, index) => {
+    if (templateCases.includes(automationSelect)) {
+      const opts = getOptions(automationSelect);
+      return (
+        <>
+          <div className="rounded-lg border-2 border-gray-200 p-3 space-y-2">
+            <p className="text-sm font-medium">1. {automationSelect || "No Type"}</p>
+            <p className="text-xs text-gray-500">Select template</p>
+            <select
+              className="w-full rounded border border-gray-200 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+              value={selectedtemp?.value || ""}
+              onChange={(e) => {
+                const opt = opts.find((o) => o.value === e.target.value);
+                handletemp(opt || null);
+              }}
+            >
+              <option value="">Select Template</option>
+              {opts.map((o) => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+            {selectedTags.length > 0 && (
+              <div className="flex flex-wrap items-center gap-1 mt-1">
+                <span className="text-xs text-gray-500">Only for:</span>
+                {selectedTagElements}
+              </div>
+            )}
+            <button type="button" onClick={handleAddConditions} className="text-xs text-blue-600 hover:underline mt-1">
+              Add Conditions
+            </button>
+          </div>
+          <div className="mt-3">
+            <button
+              type="button"
+              onClick={handleSaveAutomation(stageSelected)}
+              className="rounded-full px-5 py-1.5 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)]"
+            >
+              Save Automation
+            </button>
+          </div>
+          {conditionsDrawer}
+        </>
+      );
+    }
+
+    switch (automationSelect) {
+
+      case "Update account tags":
         return (
           <>
-            <Grid item>
-              <Box
-                sx={{
-                  border: "2px solid #ddd",
-                  borderRadius: "8px",
-                  padding: 2,
-                  // marginBottom: 2,
-                }}
-              >
-                <Typography gutterBottom>
-                  1. {automationSelect || "No Type"}
-                </Typography>
-                <Autocomplete
-                  options={organizerOptions}
-                  getOptionLabel={(option) => option.label}
-                  value={selectedtemp}
-                  onChange={(event, newValue) => handletemp(newValue)}
-                  isOptionEqualToValue={(option, value) =>
-                    option.value === value.value
-                  }
-                  renderOption={(props, option) => (
-                    <Box
-                      component="li"
-                      {...props}
-                      sx={{ cursor: "pointer", margin: "5px 10px" }} // Add cursor pointer style
-                    >
-                      {option.label}
-                    </Box>
-                  )}
-                  renderInput={(params) => (
-                    <>
-                      <TextField
-                        {...params}
-                        // helperText={templateError}
-                        sx={{ backgroundColor: "#fff" }}
-                        placeholder="Select Template"
-                        variant="outlined"
-                        size="small"
-                      />
-                    </>
-                  )}
-                  sx={{ width: "100%", marginTop: "8px" }}
-                  clearOnEscape // Enable clearable functionality
-                />
-                <Box mt={2}>
-                  {" "}
-                  {selectedTags.length > 0 && (
-                    <Grid container alignItems="center" gap={1}>
-                      <Typography>Only for:</Typography>
-                      <Grid item>{selectedTagElements}</Grid>
-                    </Grid>
-                  )}
-                </Box>
-                <Button variant="text" onClick={handleAddConditions}>
-                  Add Conditions
-                </Button>
-              </Box>
-            </Grid>
-            <Box mt={2}>
-              <Button
-                variant="contained"
+            <div className="rounded-lg border-2 border-gray-200 p-3">
+              <p className="text-sm font-medium mb-2">1. {automationSelect}</p>
+              <div className="flex gap-4">
+                <div className="flex-1">
+                  <p className="text-xs font-medium text-gray-600 mb-1">Add Tags</p>
+                  <select
+                    multiple
+                    className="w-full rounded border border-gray-200 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    value={addTags}
+                    onChange={handleAddTagChange}
+                  >
+                    {filteredAddTagsOptions.map((o) => (
+                      <option key={o.value} value={o.value} style={{ backgroundColor: o.colour, color: "#fff", borderRadius: "8px", margin: "2px" }}>
+                        {o.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs font-medium text-gray-600 mb-1">Remove Tags</p>
+                  <select
+                    multiple
+                    className="w-full rounded border border-gray-200 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    value={removeTags}
+                    onChange={handleRemoveTagChange}
+                  >
+                    {filteredRemoveTagsOptions.map((o) => (
+                      <option key={o.value} value={o.value} style={{ backgroundColor: o.colour, color: "#fff", borderRadius: "8px", margin: "2px" }}>
+                        {o.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              {selectedTags.length > 0 && (
+                <div className="flex flex-wrap items-center gap-1 mt-2">
+                  <span className="text-xs text-gray-500">Only for:</span>
+                  {selectedTagElements}
+                </div>
+              )}
+              <button type="button" onClick={handleAddConditions} className="text-xs text-blue-600 hover:underline mt-2">
+                Add Conditions
+              </button>
+            </div>
+            <div className="mt-3">
+              <button
+                type="button"
                 onClick={handleSaveAutomation(stageSelected)}
-                sx={{
-                  backgroundColor: "var(--color-save-btn)", // Normal background
-
-                  "&:hover": {
-                    backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                  },
-                  borderRadius: "15px",
-                }}
+                className="rounded-full px-5 py-1.5 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)]"
               >
                 Save Automation
-              </Button>
-            </Box>
-
-            {/* Condition tags for automation */}
-            <Drawer
-              anchor="right"
-              open={isConditionsFormOpen}
-              onClose={handleGoBack}
-              PaperProps={{ sx: { width: "550px", padding: 2 } }}
-            >
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <IconButton onClick={handleGoBack}>
-                  <IoMdArrowRoundBack fontSize="large" color="blue" />
-                </IconButton>
-                <Typography variant="h6">Add conditions</Typography>
-              </Box>
-
-              <Box sx={{ padding: 2 }}>
-                <Typography variant="body1">
-                  Apply automation only for accounts with these tags
-                </Typography>
-                <TextField
-                  fullWidth
-                  size="small"
-                  variant="outlined"
-                  placeholder="Search..."
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                  InputProps={{
-                    startAdornment: (
-                      <AiOutlineSearch style={{ marginRight: 8 }} />
-                    ),
-                  }}
-                  sx={{ marginTop: 2 }}
-                />
-
-                <Box sx={{ marginTop: 2, height: "68vh", overflowY: "auto" }}>
-                  {filteredTags.map((tag) => (
-                    <Box
-                      key={tag._id}
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 3,
-                        borderBottom: "1px solid grey",
-                        paddingBottom: 1,
-                      }}
-                    >
-                      <Checkbox
-                        checked={tempSelectedTags.includes(tag)}
-                        onChange={() => handleCheckboxChange(tag)}
-                      />
-                      <Chip
-                        label={tag.tagName}
-                        sx={{
-                          backgroundColor: tag.tagColour,
-                          color: "#fff",
-                          fontWeight: "500",
-                          borderRadius: "20px",
-                          marginRight: 1,
-                        }}
-                      />
-                    </Box>
-                  ))}
-                </Box>
-
-                <Box sx={{ display: "flex", gap: 2, marginTop: 2 }}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    disabled={!isAnyCheckboxChecked}
-                    onClick={handleAddTags}
-                    sx={{
-                      backgroundColor: "var(--color-save-btn)", // Normal background
-
-                      "&:hover": {
-                        backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                      },
-                      borderRadius: "15px",
-                      width: "80px",
-                    }}
-                  >
-                    Add
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    onClick={handleGoBack}
-                    sx={{
-                      borderColor: "var(--color-border-cancel-btn)", // Normal background
-                      color: "var(--color-save-btn)",
-                      "&:hover": {
-                        backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                        color: "#fff",
-                        border: "none",
-                      },
-                      width: "80px",
-                      borderRadius: "15px",
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                </Box>
-              </Box>
-            </Drawer>
+              </button>
+            </div>
+            {conditionsDrawer}
           </>
         );
-        case "Update client-facing job status":
-                return (
-                  <>
-                    <Grid item>
-                      {/* {automationSelect} */}
-                      <Box
-                        sx={{
-                          border: "2px solid #ddd",
-                          borderRadius: "8px",
-                          padding: 2,
-                          // marginBottom: 2,
-                        }}
-                      >
-                        <Typography gutterBottom>
-                          1. {automationSelect || "No Type"}
-                        </Typography>
-                        <Typography gutterBottom fontSize={"12px"}>
-                          The client-facing status will update automatically as soon as
-                          the job enters the stage. Your clients will see it in their
-                          client portal.
-                        </Typography>
-        
-                        <Grid container spacing={2} mt={2}>
-                          <Grid item xs={12}>
-                            <InputLabel sx={{ color: "black", mb: 1 }}>
-                              Visibility for client
-                            </InputLabel>
-                            <Autocomplete
-                              options={statusOptions}
-                              getOptionLabel={(option) => option.label}
-                              value={status}
-                            onChange={handleStatusChange}
-                              renderInput={(params) => (
-                                <TextField
-                                  {...params}
-                                  size="small"
-                                  variant="outlined"
-                                  placeholder="Select status"
-                                />
-                              )}
-                              fullWidth
-                            />
-                          </Grid>
-                        </Grid>
-                        {status?.value === true && (
-                          <Box>
-                            <Box>
-                              <InputLabel sx={{ color: "black", mb: 1, mt: 1 }}>
-                                Select status
-                              </InputLabel>
-                              <Autocomplete
-                                options={optionstatus}
-                                size="small"
-                                sx={{ mt: 1 }}
-                                value={selectedClientStatus}
-                                onChange={handleClientStatusChange}
-                                getOptionLabel={(option) => option.label}
-                                isOptionEqualToValue={(option, value) =>
-                                  option.value === value.value
-                                }
-                                renderOption={(props, option) => (
-                                  <Box component="li" {...props}>
-                                    {/* Color dot */}
-                                    <Chip
-                                      size="small"
-                                      style={{
-                                        backgroundColor: option.clientfacingColour,
-                                        marginRight: 8,
-                                        marginLeft: 8,
-                                        borderRadius: "50%",
-                                        height: "15px",
-                                      }}
-                                    />
-                                    {option.label}
-                                  </Box>
-                                )}
-                                renderInput={(params) => (
-                                  <TextField
-                                    {...params}
-                                    placeholder="Select status"
-                                    InputProps={{
-                                      ...params.InputProps,
-                                      startAdornment:
-                                        params.inputProps.value &&
-                                        clientFacingJobs.length > 0 ? (
-                                          <Chip
-                                            size="small"
-                                            style={{
-                                              backgroundColor: clientFacingJobs.find(
-                                                (job) =>
-                                                  job.clientfacingName ===
-                                                  params.inputProps.value
-                                              )?.clientfacingColour, // Set color from selection
-                                              marginRight: 8,
-                                              marginLeft: 2,
-                                              borderRadius: "50%",
-                                              height: "15px",
-                                            }}
-                                          />
-                                        ) : null,
-                                    }}
-                                  />
-                                )}
-                              />
-                            </Box>
-                            <Box mt={1}>
-                              <InputLabel sx={{ color: "black", mb: 1 }}>
-                                Status description for client
-                              </InputLabel>
-                              <TextField
-                                fullWidth
-                                multiline
-                                rows={4}
-                                variant="outlined"
-                                value={clientDescription}
-                                onChange={handleClientDescriptionChange}
-                                placeholder="Status description for client"
-                              />
-                              <Typography variant="caption" color="textSecondary">
-                                {clientDescription.length}/{maxDescriptionLength}
-                              </Typography>
-                            </Box>
-                          </Box>
-                        )}
-        
-                        <Box mt={2}>
-                          {" "}
-                          {selectedTags.length > 0 && (
-                            <Grid container alignItems="center" gap={1}>
-                              <Typography>Only for:</Typography>
-                              <Grid item>{selectedTagElements}</Grid>
-                            </Grid>
-                          )}
-                        </Box>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                          }}
-                        >
-                          <Button variant="text" onClick={handleAddConditions}>
-                            Add Conditions
-                          </Button>
-                        </Box>
-                      </Box>
-                      <Box mt={2}>
-                        <Button
-                          variant="contained"
-                          onClick={handleSaveAutomation(stageSelected)}
-                          sx={{
-                            backgroundColor: "var(--color-save-btn)", // Normal background
-        
-                            "&:hover": {
-                              backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                            },
-                            borderRadius: "15px",
-                          }}
-                        >
-                          Save Automation
-                        </Button>
-                      </Box>
-                    </Grid>
-                    <Drawer
-                      anchor="right"
-                      open={isConditionsFormOpen}
-                      onClose={handleGoBack}
-                      BackdropProps={{ invisible: true }}
-                      PaperProps={{ sx: { width: "550px", padding: 2 } }}
-                    >
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <IconButton onClick={handleGoBack}>
-                          <IoMdArrowRoundBack fontSize="large" color="blue" />
-                        </IconButton>
-                        <Typography variant="h6">Add conditions</Typography>
-                      </Box>
-        
-                      <Box sx={{ padding: 2 }}>
-                        <Typography variant="body1">
-                          Apply automation only for accounts with these tags
-                        </Typography>
-                        <TextField
-                          fullWidth
-                          size="small"
-                          variant="outlined"
-                          placeholder="Search..."
-                          value={searchTerm}
-                          onChange={handleSearchChange}
-                          InputProps={{
-                            startAdornment: (
-                              <AiOutlineSearch style={{ marginRight: 8 }} />
-                            ),
-                          }}
-                          sx={{ marginTop: 2 }}
-                        />
-        
-                        <Box sx={{ marginTop: 2, height: "68vh", overflowY: "auto" }}>
-                          {filteredTags.map((tag) => (
-                            <Box
-                              key={tag._id}
-                              sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 3,
-                                borderBottom: "1px solid grey",
-                                paddingBottom: 1,
-                              }}
-                            >
-                              <Checkbox
-                                checked={tempSelectedTags.includes(tag)}
-                                onChange={() => handleCheckboxChange(tag)}
-                              />
-                              <Chip
-                                label={tag.tagName}
-                                sx={{
-                                  backgroundColor: tag.tagColour,
-                                  color: "#fff",
-                                  fontWeight: "500",
-                                  borderRadius: "20px",
-                                  marginRight: 1,
-                                }}
-                              />
-                            </Box>
-                          ))}
-                        </Box>
-        
-                        <Box sx={{ display: "flex", gap: 2, marginTop: 2 }}>
-                          <Button
-                            variant="contained"
-                            color="primary"
-                            disabled={!isAnyCheckboxChecked}
-                            onClick={handleAddTags}
-                            sx={{
-                              backgroundColor: "var(--color-save-btn)", // Normal background
-        
-                              "&:hover": {
-                                backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                              },
-                              borderRadius: "15px",
-                              width: "80px",
-                            }}
-                          >
-                            Add
-                          </Button>
-                          <Button
-                            variant="outlined"
-                            color="primary"
-                            onClick={handleGoBack}
-                            sx={{
-                              borderColor: "var(--color-border-cancel-btn)", // Normal background
-                              color: "var(--color-save-btn)",
-                              "&:hover": {
-                                backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                                color: "#fff",
-                                border: "none",
-                              },
-                              width: "80px",
-                              borderRadius: "15px",
-                            }}
-                          >
-                            Cancel
-                          </Button>
-                        </Box>
-                      </Box>
-                    </Drawer>
-                  </>
-                );
-      // Add cases for other actions here
+
+      case "Update job assignees":
+        return (
+          <>
+            <div className="rounded-lg border-2 border-gray-200 p-3">
+              <p className="text-sm font-medium mb-2">1. {automationSelect || "No Type"}</p>
+              <div className="flex gap-4">
+                <div className="flex-1">
+                  <p className="text-xs font-medium text-gray-600 mb-1">Add Assignees</p>
+                  <select
+                    multiple
+                    className="w-full rounded border border-gray-200 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    value={selectedAssignees}
+                    onChange={(e) => setSelectedAssignees([...e.target.selectedOptions].map((o) => o.value))}
+                  >
+                    {assigneeOptions.filter((o) => !assigneesToRemove.includes(o.value)).map((o) => (
+                      <option key={o.value} value={o.value}>{o.label}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs font-medium text-gray-600 mb-1">Remove Assignees</p>
+                  <select
+                    multiple
+                    className="w-full rounded border border-gray-200 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    value={assigneesToRemove}
+                    onChange={(e) => setAssigneesToRemove([...e.target.selectedOptions].map((o) => o.value))}
+                  >
+                    {assigneeOptions.filter((o) => !selectedAssignees.includes(o.value)).map((o) => (
+                      <option key={o.value} value={o.value}>{o.label}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              {selectedTags.length > 0 && (
+                <div className="flex flex-wrap items-center gap-1 mt-2">
+                  <span className="text-xs text-gray-500">Only for:</span>
+                  {selectedTagElements}
+                </div>
+              )}
+              <button type="button" onClick={handleAddConditions} className="text-xs text-blue-600 hover:underline mt-2">
+                Add Conditions
+              </button>
+            </div>
+            <div className="mt-3">
+              <button
+                type="button"
+                onClick={handleSaveAutomation(stageSelected)}
+                className="rounded-full px-5 py-1.5 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)]"
+              >
+                Save Automation
+              </button>
+            </div>
+            {conditionsDrawer}
+          </>
+        );
+
+      case "Update client-facing job status":
+        return (
+          <>
+            <div className="rounded-lg border-2 border-gray-200 p-3 space-y-2">
+              <p className="text-sm font-medium">1. {automationSelect || "No Type"}</p>
+              <p className="text-xs text-gray-500">The client-facing status will update automatically as soon as the job enters the stage. Your clients will see it in their client portal.</p>
+              <div>
+                <label className="text-xs font-medium text-gray-600">Visibility for client</label>
+                <select
+                  className="mt-1 w-full rounded border border-gray-200 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  value={status?.value ?? ""}
+                  onChange={(e) => {
+                    const val = e.target.value === "true";
+                    setStatus(statusOptions.find((o) => o.value === val));
+                  }}
+                >
+                  {statusOptions.map((o) => (
+                    <option key={String(o.value)} value={String(o.value)}>{o.label}</option>
+                  ))}
+                </select>
+              </div>
+              {status?.value === true && (
+                <div className="space-y-2">
+                  <label className="text-xs font-medium text-gray-600">Select status</label>
+                  <select
+                    className="w-full rounded border border-gray-200 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    value={selectedClientStatus?.value || ""}
+                    onChange={(e) => {
+                      const opt = optionstatus.find((o) => o.value === e.target.value);
+                      handleClientStatusChange(null, opt || null);
+                    }}
+                  >
+                    <option value="">Select status</option>
+                    {optionstatus.map((o) => (
+                      <option key={o.value} value={o.value}>{o.label}</option>
+                    ))}
+                  </select>
+                  <div>
+                    <label className="text-xs font-medium text-gray-600">Status description for client</label>
+                    <textarea
+                      rows={4}
+                      className="mt-1 w-full rounded border border-gray-200 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      value={clientDescription}
+                      onChange={handleClientDescriptionChange}
+                      placeholder="Status description for client"
+                    />
+                    <p className="text-xs text-gray-400 text-right">{clientDescription.length}/{maxDescriptionLength}</p>
+                  </div>
+                </div>
+              )}
+              {selectedTags.length > 0 && (
+                <div className="flex flex-wrap items-center gap-1">
+                  <span className="text-xs text-gray-500">Only for:</span>
+                  {selectedTagElements}
+                </div>
+              )}
+              <button type="button" onClick={handleAddConditions} className="text-xs text-blue-600 hover:underline">
+                Add Conditions
+              </button>
+            </div>
+            <div className="mt-3">
+              <button
+                type="button"
+                onClick={handleSaveAutomation(stageSelected)}
+                className="rounded-full px-5 py-1.5 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)]"
+              >
+                Save Automation
+              </button>
+            </div>
+            {conditionsDrawer}
+          </>
+        );
+
       default:
         return null;
     }
@@ -4950,62 +2964,49 @@ const assigneeOptions = assignee.map((ass)=>({
                 />
               </FormField>
               <FormField label="Available To">
-                <Autocomplete
+                <select
                   multiple
-                  sx={{ marginTop: "8px" }}
-                  options={options}
-                  size="small"
-                  getOptionLabel={(option) => option.label}
-                  value={selectedUser}
-                  onChange={handleUserChange}
-                  renderOption={(props, option) => (
-                    <li {...props} style={{ cursor: "pointer", margin: "5px 10px" }}>
-                      {option.label}
-                    </li>
-                  )}
-                  renderInput={(params) => (
-                    <TextField {...params} variant="outlined" placeholder="Available To" />
-                  )}
-                  isOptionEqualToValue={(option, value) => option.value === value.value}
-                />
+                  className="mt-2 w-full rounded border border-gray-200 px-2 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  value={selectedUser.map((u) => u.value)}
+                  onChange={(e) => {
+                    const selected = [...e.target.selectedOptions].map((o) => ({ value: o.value, label: o.text }));
+                    handleUserChange(null, selected);
+                  }}
+                >
+                  {options.map((o) => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
+                  ))}
+                </select>
               </FormField>
               <FormField label="Sort jobs by">
-                <Autocomplete
-                  options={optionsort}
-                  value={selectedSortByJob}
-                  onChange={(event, newValue) => handleSortingByJobs(newValue)}
-                  getOptionLabel={(option) => option.label || ""}
-                  renderOption={(props, option) => (
-                    <li {...props} style={{ cursor: "pointer", margin: "5px 10px" }}>
-                      {option.label}
-                    </li>
-                  )}
-                  renderInput={(params) => (
-                    <TextField {...params} placeholder="Sort By Job" size="small" sx={{ width: "100%", marginTop: "8px" }} variant="outlined" />
-                  )}
-                  isOptionEqualToValue={(option, value) => option.value === value.value}
-                  disableClearable={false}
-                  clearOnEscape
-                />
+                <select
+                  className="mt-2 w-full rounded border border-gray-200 px-2 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  value={selectedSortByJob?.value || ""}
+                  onChange={(e) => {
+                    const opt = optionsort.find((o) => o.value === e.target.value);
+                    handleSortingByJobs(opt || null);
+                  }}
+                >
+                  <option value="">Sort By Job</option>
+                  {optionsort.map((o) => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
+                  ))}
+                </select>
               </FormField>
               <FormField label="Default job template">
-                <Autocomplete
-                  options={optiontemp}
-                  value={selectedJobtemp}
-                  onChange={handleJobtemp}
-                  getOptionLabel={(option) => option.label || ""}
-                  renderOption={(props, option) => (
-                    <li {...props} style={{ cursor: "pointer", margin: "5px 10px" }}>
-                      {option.label}
-                    </li>
-                  )}
-                  renderInput={(params) => (
-                    <TextField {...params} placeholder="Default job template" size="small" sx={{ width: "100%", marginTop: "8px" }} variant="outlined" />
-                  )}
-                  isOptionEqualToValue={(option, value) => option.value === value.value}
-                  disableClearable={false}
-                  clearOnEscape
-                />
+                <select
+                  className="mt-2 w-full rounded border border-gray-200 px-2 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  value={selectedJobtemp?.value || ""}
+                  onChange={(e) => {
+                    const opt = optiontemp.find((o) => o.value === e.target.value);
+                    handleJobtemp(null, opt || null);
+                  }}
+                >
+                  <option value="">Default job template</option>
+                  {optiontemp.map((o) => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
+                  ))}
+                </select>
               </FormField>
             </FormSection>
 
@@ -5116,29 +3117,30 @@ const assigneeOptions = assignee.map((ass)=>({
                     <p className="text-xs text-muted-foreground">Triggered when job enters stage</p>
                     <button
                       type="button"
-                      className="text-xs font-semibold text-primary cursor-pointer hover:underline mt-1"
-                      onClick={(e) => handleClick(e, index, "edit")}
+                      className="text-xs font-semibold text-primary cursor-pointer hover:underline mt-1 relative"
+                      onClick={(e) => { if (stage.automations.length > 0) { handleClick(e, index, "edit"); } else { setOpenDropdownStageIndex(openDropdownStageIndex === index ? null : index); SetStageSelected(index); } }}
                     >
                       {stage.automations.length > 0 ? "Edit automation" : "Add automation"}
                     </button>
 
-                    <Menu
-                      anchorEl={anchorEl}
-                      open={Boolean(anchorEl)}
-                      onClose={handleClose}
-                      PaperProps={{ style: { maxHeight: 200, overflowY: "auto" } }}
-                    >
-                      <MenuItem onClick={() => handleAddAutomation(stageSelected, "Send Email")}>Send Email</MenuItem>
-                      <MenuItem onClick={() => handleAddAutomation(stageSelected, "Send Invoice")}>Send Invoice</MenuItem>
-                      <MenuItem onClick={() => handleAddAutomation(stageSelected, "Send Proposal/Els")}>Send Proposal/Els</MenuItem>
-                      <MenuItem onClick={() => handleAddAutomation(stageSelected, "Create Organizer")}>Create Organizer</MenuItem>
-                      <MenuItem onClick={() => handleAddAutomation(stageSelected, "Apply folder template")}>Apply folder template</MenuItem>
-                      <MenuItem onClick={() => handleAddAutomation(stageSelected, "Update account tags")}>Update account tags</MenuItem>
-                      <MenuItem onClick={() => handleAddAutomation(stageSelected, "Update job assignees")}>Update job assignees</MenuItem>
-                      <MenuItem onClick={() => handleAddAutomation(stageSelected, "Create Task")}>Create Task</MenuItem>
-                      <MenuItem onClick={() => handleAddAutomation(stageSelected, "Send message")}>Send message</MenuItem>
-                      <MenuItem onClick={() => handleAddAutomation(stageSelected, "Update client-facing job status")}>Update client-facing job status</MenuItem>
-                    </Menu>
+                    {openDropdownStageIndex === index && (
+                      <div ref={dropdownRef} className="absolute z-50 mt-1 w-56 rounded-lg border border-gray-200 bg-white shadow-lg py-1" style={{ top: "100%", left: 0 }}>
+                        {[
+                          "Send Email", "Send Invoice", "Send Proposal/Els", "Create Organizer",
+                          "Apply folder template", "Update account tags", "Update job assignees",
+                          "Create Task", "Send message", "Update client-facing job status"
+                        ].map((opt) => (
+                          <button
+                            key={opt}
+                            type="button"
+                            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                            onClick={() => { handleAddAutomation(index, opt); setOpenDropdownStageIndex(null); }}
+                          >
+                            {opt}
+                          </button>
+                        ))}
+                      </div>
+                    )}
 
                     <AddAutomationDrawer
                       isDrawerOpen={isDrawerOpen}

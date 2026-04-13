@@ -3,19 +3,8 @@ import React, { useState } from "react";
 import Papa from "papaparse";
 import axios from "axios";
 
-import {
-  Box,
-  Button,
-  Checkbox,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography
-} from "@mui/material";
+import { Button } from "../components/ui/button";
+import { Checkbox } from "../components/ui/checkbox";
 
 const CSVImportContacts = () => {
   const [rows, setRows] = useState([]);
@@ -164,102 +153,81 @@ const handleSaveContacts = async () => {
   }
 };
 
-   const handleSelectAll = () => {
-  if (selectedRows.length === rows.length) {
-    // unselect all
-    setSelectedRows([]);
-  } else {
-    // select all
-    setSelectedRows(rows.map((_, index) => index));
-  }
-};
+  const handleSelectAll = () => {
+    if (selectedRows.length === rows.length) {
+      setSelectedRows([]);
+    } else {
+      setSelectedRows(rows.map((_, index) => index));
+    }
+  };
 
   return (
-    <Box p={3}>
-      <Typography variant="h5" sx={{ mb: 2 }}>
-        Import Contacts (CSV)
-      </Typography>
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold tracking-tight text-foreground">Import Contacts (CSV)</h1>
 
-      {/* Upload CSV Button */}
-      <Button variant="contained" component="label">
-        Upload CSV
-        <input
-          hidden
-          type="file"
-          accept=".csv"
-          onChange={handleFileUpload}
-        />
-      </Button>
+      <div className="flex items-center gap-3">
+        <label className="cursor-pointer">
+          <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium border border-input bg-background hover:bg-muted transition-colors">
+            Upload CSV
+          </span>
+          <input hidden type="file" accept=".csv" onChange={handleFileUpload} />
+        </label>
 
-      {/* Save Contacts Button */}
-      {selectedRows.length > 0 && (
-        <Button
-          variant="contained"
-          color="success"
-          sx={{ ml: 2 }}
-          onClick={handleSaveContacts}
-            disabled={isSaving}  
-        >
-          {/* Save Contacts ({selectedRows.length}) */}
-            {isSaving
-    ? "Saving..."            // show loading text
-    : `Save Contacts (${selectedRows.length})`}
+        {selectedRows.length > 0 && (
+          <Button
+            onClick={handleSaveContacts}
+            disabled={isSaving}
+            className="rounded-full px-5"
+            style={{ backgroundColor: "var(--color-save-btn)" }}
+          >
+            {isSaving ? "Saving..." : `Save Contacts (${selectedRows.length})`}
+          </Button>
+        )}
+      </div>
 
-        </Button>
-      )}
-
-      {/* Data Table */}
       {rows.length > 0 && (
-        <TableContainer component={Paper} sx={{ mt: 3 }}>
-          <Table>
-            <TableHead>
-              <TableRow>
-               <TableCell>
-      <Checkbox
-        checked={selectedRows.length === rows.length && rows.length > 0}
-        indeterminate={
-          selectedRows.length > 0 && selectedRows.length < rows.length
-        }
-        onChange={handleSelectAll}
-      />
-    </TableCell>
+        <div className="bg-background rounded-xl border shadow-sm overflow-hidden">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b bg-muted/40">
+                <th className="px-4 py-3 w-10">
+                  <Checkbox
+                    checked={selectedRows.length === rows.length && rows.length > 0}
+                    onCheckedChange={handleSelectAll}
+                  />
+                </th>
                 {tableHeaders.map((header, idx) => (
-                  <TableCell key={idx} sx={{ fontWeight: "bold" }}>
+                  <th key={idx} className="text-xs font-semibold text-left px-4 py-3 text-muted-foreground uppercase tracking-wide">
                     {header}
-                  </TableCell>
+                  </th>
                 ))}
-              </TableRow>
-            </TableHead>
-
-            <TableBody>
+              </tr>
+            </thead>
+            <tbody>
               {rows.map((row, rowIndex) => (
-                <TableRow key={rowIndex}>
-                  <TableCell>
+                <tr key={rowIndex} className={`border-b hover:bg-muted/30 transition-colors ${selectedRows.includes(rowIndex) ? "bg-blue-50/50" : ""}`}>
+                  <td className="px-4 py-3">
                     <Checkbox
                       checked={selectedRows.includes(rowIndex)}
-                      onChange={() => handleSelectRow(rowIndex)}
+                      onCheckedChange={() => handleSelectRow(rowIndex)}
                     />
-                  </TableCell>
-
-                  <TableCell>
-                    {row["Contact Name"] ||
-                      `${row["First Name"] ?? ""} ${row["Last Name"] ?? ""}`}
-                  </TableCell>
-
-                  <TableCell>{row["First Name"] || ""}</TableCell>
-                  <TableCell>{row["Middle Name"] || ""}</TableCell>
-                  <TableCell>{row["Last Name"] || ""}</TableCell>
-                  <TableCell>{row["Company Name"] || ""}</TableCell>
-                  <TableCell>{row["Phone Numbers"] || row["Phone"] || ""}</TableCell>
-                  <TableCell>{row["Email"] || row["Email Address"] || ""}</TableCell>
-                </TableRow>
+                  </td>
+                  <td className="px-4 py-2.5 text-sm font-medium">
+                    {row["Contact Name"] || `${row["First Name"] ?? ""} ${row["Last Name"] ?? ""}`}
+                  </td>
+                  <td className="px-4 py-2.5 text-sm">{row["First Name"] || ""}</td>
+                  <td className="px-4 py-2.5 text-sm">{row["Middle Name"] || ""}</td>
+                  <td className="px-4 py-2.5 text-sm">{row["Last Name"] || ""}</td>
+                  <td className="px-4 py-2.5 text-sm">{row["Company Name"] || ""}</td>
+                  <td className="px-4 py-2.5 text-sm">{row["Phone Numbers"] || row["Phone"] || ""}</td>
+                  <td className="px-4 py-2.5 text-sm">{row["Email"] || row["Email Address"] || ""}</td>
+                </tr>
               ))}
-            </TableBody>
-
-          </Table>
-        </TableContainer>
+            </tbody>
+          </table>
+        </div>
       )}
-    </Box>
+    </div>
   );
 };
 

@@ -1,13 +1,4 @@
 import React, { useEffect, useState, useRef } from "react";
-import {
-  Input,
-  IconButton,
-  Box,
-  Typography,
-  Divider,
-  Paper,
-  Button,Menu,MenuItem
-} from "@mui/material";
 import { toast } from "react-toastify";
 import FetchFolder from "./FetchFolder";
 import CreateFolder from "./CreateFolder";
@@ -467,11 +458,9 @@ function FolderList({ tempName, fetchAllFolders, folderData, templateId }) {
                   </span>
                 )}
               </div>
-              <div style={{ position: "relative" }}>
-                <IconButton onClick={(e) => handleMenuOpen(e, item)} size="small">
-                  <BsThreeDotsVertical />
-                </IconButton>
-              </div>
+              <button type="button" onClick={(e) => handleMenuOpen(e, item)} className="p-1 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors">
+                  <BsThreeDotsVertical className="h-4 w-4" />
+                </button>
             </div>
             {item.isOpen && item.contents?.length > 0 && (
               <div>{renderTree(item.contents)}</div>
@@ -512,11 +501,9 @@ function FolderList({ tempName, fetchAllFolders, folderData, templateId }) {
                 </span>
               )}
             </div>
-            <div style={{ position: "relative" }}>
-              <IconButton onClick={(e) => handleMenuOpen(e, item)} size="small"> 
-                <BsThreeDotsVertical />
-              </IconButton>
-            </div>
+            <button type="button" onClick={(e) => handleMenuOpen(e, item)} className="p-1 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors">
+                <BsThreeDotsVertical className="h-4 w-4" />
+              </button>
           </div>
         );
       }
@@ -624,13 +611,9 @@ function FolderList({ tempName, fetchAllFolders, folderData, templateId }) {
                   <span>{item.isOpen ? "📂" : "📁"}</span>
                   <span>{item.folder}</span>
                 </div>
-                <IconButton
-                  onClick={(e) => handleMenuOpen(e, item)}
-                  size="small"
-                  style={{ marginLeft: "auto" }}
-                >
-                  <BsThreeDotsVertical />
-                </IconButton>
+                <button type="button" onClick={(e) => handleMenuOpen(e, item)} className="ml-auto p-1 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors">
+                  <BsThreeDotsVertical className="h-4 w-4" />
+                </button>
               </div>
               {item.isOpen && item.contents?.length > 0 && (
                 <div style={{ marginTop: "4px" }}>
@@ -664,9 +647,9 @@ function FolderList({ tempName, fetchAllFolders, folderData, templateId }) {
                 <span>📄</span>
                 <span style={{ cursor: "pointer" }}>{item.file}</span>
               </div>
-              <IconButton onClick={(e) => handleMenuOpen(e, item)} size="small">
-                <BsThreeDotsVertical />
-              </IconButton>
+              <button type="button" onClick={(e) => handleMenuOpen(e, item)} className="p-1 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors">
+                <BsThreeDotsVertical className="h-4 w-4" />
+              </button>
             </div>
           );
         }
@@ -678,10 +661,8 @@ function FolderList({ tempName, fetchAllFolders, folderData, templateId }) {
   const fileTree = buildFileTree(firmFiles, firmfolderName);
 
   return (
-    <Box sx={{ padding: 3 }} >
-      <Typography variant="h6">
-        Template Name: <strong>{tempName}</strong>
-      </Typography>
+    <div className="p-4 space-y-4">
+      <p className="text-sm font-semibold text-slate-700">Template Name: <strong>{tempName}</strong></p>
       {/* <Divider sx={{ marginY: 2 }} />
       <Box
         sx={{
@@ -882,187 +863,87 @@ function FolderList({ tempName, fetchAllFolders, folderData, templateId }) {
         accountId={templateId}
       /> */}
 
-<Divider sx={{ marginY: 2 }} />
-      <Box
-        sx={{
-          backgroundColor: "#fff",
-          borderRadius: "8px",
-          padding: "16px",
-          maxWidth: "800px",
-        }}
-      >
-        <Box sx={{ display: "flex", gap: 2 }}>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <IconButton
-              component="label"
-              htmlFor="fileInput"
-              sx={{ color: "#e87800" }}
-            >
-              <HiDocumentArrowUp size={24} />
-            </IconButton>
-            <Typography
-              variant="body1"
-              component="label"
-              htmlFor="fileInput"
-              sx={{ cursor: "pointer" }}
-            >
-              Upload Document
-            </Typography>
-            <Input
-              type="file"
-              id="fileInput"
-              onChange={(e) => {
-                handleFileChange(e);
-                handleFileUpload();
-              }}
-              sx={{ display: "none" }}
-            />
-          </Box>
+      <hr className="border-slate-200" />
 
-          <Box
-            sx={{ display: "flex", alignItems: "center", gap: 1 }}
-            onClick={handleCreateFolderClick}
-          >
-            <IconButton sx={{ color: "#e87800" }}>
-              <FaRegFolderClosed size={20} />
-            </IconButton>
-            <Typography variant="body1" sx={{ cursor: "pointer" }}>
-              Create Folder
-            </Typography>
-          </Box>
+      {/* Client Uploaded Documents toolbar */}
+      <div className="flex flex-wrap items-center gap-3 rounded-xl border border-slate-200 bg-white p-3">
+        <label htmlFor="fileInput" className="inline-flex items-center gap-1.5 cursor-pointer rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
+          <HiDocumentArrowUp className="h-4 w-4 text-orange-500" />
+          Upload Document
+          <input type="file" id="fileInput" className="hidden" onChange={(e) => { handleFileChange(e); handleFileUpload(); }} />
+        </label>
+        <button type="button" onClick={handleCreateFolderClick} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
+          <FaRegFolderClosed className="h-4 w-4 text-orange-500" />
+          Create Folder
+        </button>
+        <button type="button" onClick={() => folderInputRef.current.click()} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
+          <MdOutlineDriveFolderUpload className="h-4 w-4 text-orange-500" />
+          Upload Folder
+          <input type="file" ref={folderInputRef} className="hidden" webkitdirectory="true" directory="true" onChange={handleFolderSelection} />
+        </button>
+      </div>
 
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 1,
-              cursor: "pointer",
-            }}
-            onClick={() => folderInputRef.current.click()}
-          >
-            <IconButton sx={{ color: "#e87800" }}>
-              <MdOutlineDriveFolderUpload size={24} />
-            </IconButton>
-            <Typography variant="body1">Upload Folder</Typography>
-            <input
-              type="file"
-              ref={folderInputRef}
-              style={{ display: "none" }}
-              webkitdirectory="true"
-              directory="true"
-              onChange={handleFolderSelection}
-            />
-          </Box>
-        </Box>
-      </Box>
-      <Box>{renderTree(combinedFolderStructure)}</Box>
-     
-  <Menu
-         anchorEl={anchorEl}
-         open={Boolean(anchorEl)}
-         onClose={handleMenuClose}
-       >
-         <MenuItem
-           onClick={() => {
-             if (selectedItem?.folder !== "Client Uploaded Documents" &&
-               selectedItem?.folder !== "Private") {
-               handleEdit(selectedItem);
-               handleMenuClose();
-             }
-           }}
-           disabled={
-             selectedItem?.folder === "Client Uploaded Documents" ||
-             selectedItem?.folder === "Private"
-           }
-         >
-           Edit
-         </MenuItem>
-         <MenuItem
-           onClick={() => {
-             if (selectedItem?.folder !== "Client Uploaded Documents" &&
-               selectedItem?.folder !== "Private") {
-               handleDelete(selectedItem);
-               handleMenuClose();
-             }
-           }}
-           disabled={
-             selectedItem?.folder === "Client Uploaded Documents" ||
-             selectedItem?.folder === "Private"
-           }
-         >
-           Delete
-         </MenuItem>
-       </Menu>
+      {/* Folder tree */}
+      <div className="rounded-xl border border-slate-200 bg-white">
+        {renderTree(combinedFolderStructure)}
+      </div>
 
-      <Box>
+      {/* Context menu */}
+      {Boolean(anchorEl) && (() => {
+        const rect = anchorEl.getBoundingClientRect();
+        const isDisabled = selectedItem?.folder === "Client Uploaded Documents" || selectedItem?.folder === "Private";
+        return (
+          <>
+            <div className="fixed inset-0 z-40" onClick={handleMenuClose} />
+            <div className="fixed z-50 w-36 rounded-xl border border-slate-200 bg-white py-1 shadow-xl" style={{ top: rect.bottom + 4, left: rect.left }}>
+              <button
+                type="button"
+                disabled={isDisabled}
+                onClick={() => { if (!isDisabled) { handleEdit(selectedItem); handleMenuClose(); } }}
+                className="flex w-full items-center px-4 py-2 text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 disabled:text-slate-300 disabled:cursor-not-allowed transition-colors"
+              >Edit</button>
+              <button
+                type="button"
+                disabled={isDisabled}
+                onClick={() => { if (!isDisabled) { handleDelete(selectedItem); handleMenuClose(); } }}
+                className="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 disabled:text-slate-300 disabled:cursor-not-allowed transition-colors"
+              >Delete</button>
+            </div>
+          </>
+        );
+      })()}
+
+      {/* Private folder contents */}
+      <div className="rounded-xl border border-slate-200 bg-white">
         {renderPrivateFolderContents(
           privateStructFolder.folders,
-          (newFolders) =>
-            setPrivateStructFolder({
-              ...privateStructFolder,
-              folders: newFolders,
-            })
+          (newFolders) => setPrivateStructFolder({ ...privateStructFolder, folders: newFolders })
         )}
-      </Box>
-      <Box sx={{ mt: 2, borderBottom: "2px solid grey" }}></Box>
+      </div>
 
-      <Box>
-        <Box
-          sx={{
-            backgroundColor: "#fff",
-            borderRadius: "8px",
-            padding: "16px",
-            maxWidth: "800px",
-          }}
-        >
-          <Box sx={{ display: "flex", gap: 2 }}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <IconButton
-                component="label"
-                htmlFor="firmDocFileInput"
-                sx={{ color: "#e87800" }}
-              >
-                <HiDocumentArrowUp size={24} />
-              </IconButton>
-              <Typography
-                variant="body1"
-                component="label"
-                htmlFor="firmDocFileInput"
-                sx={{ cursor: "pointer" }}
-              >
-                Upload Document in firm
-              </Typography>
-              <Input
-                type="file"
-                id="firmDocFileInput"
-                onChange={(e) => {
-                  handleNewFileChange(e);
-                  handleOpenDrawer();
-                }}
-                sx={{ display: "none" }}
-              />
-            </Box>
+      <hr className="border-slate-200" />
 
-            <Box
-              sx={{ display: "flex", alignItems: "center", gap: 1 }}
-              onClick={handleNewFolderClick}
-            >
-              <IconButton sx={{ color: "#e87800" }}>
-                <FaRegFolderClosed size={20} />
-              </IconButton>
-              <Typography variant="body1" sx={{ cursor: "pointer" }}>
-                Create Folder in firm
-              </Typography>
-            </Box>
-          </Box>
-        </Box>
-        <Box>
-          {Object.entries(fileTree).map(([name, content]) => (
-            <FirmFolder key={name} name={name} content={content} />
-          ))}
-        </Box>
-      </Box>
-      <Box sx={{ mt: 2, borderBottom: "2px solid grey" }}></Box>
+      {/* Firm Docs toolbar */}
+      <div className="flex flex-wrap items-center gap-3 rounded-xl border border-slate-200 bg-white p-3">
+        <label htmlFor="firmDocFileInput" className="inline-flex items-center gap-1.5 cursor-pointer rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
+          <HiDocumentArrowUp className="h-4 w-4 text-orange-500" />
+          Upload Document in firm
+          <input type="file" id="firmDocFileInput" className="hidden" onChange={(e) => { handleNewFileChange(e); handleOpenDrawer(); }} />
+        </label>
+        <button type="button" onClick={handleNewFolderClick} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
+          <FaRegFolderClosed className="h-4 w-4 text-orange-500" />
+          Create Folder in firm
+        </button>
+      </div>
+
+      {/* Firm file tree */}
+      <div className="rounded-xl border border-slate-200 bg-white">
+        {Object.entries(fileTree).map(([name, content]) => (
+          <FirmFolder key={name} name={name} content={content} />
+        ))}
+      </div>
+
+      <hr className="border-slate-200" />
       {/* <Box mt={5}>
         <Button
           variant="outlined"
@@ -1172,7 +1053,7 @@ function FolderList({ tempName, fetchAllFolders, folderData, templateId }) {
         fetchFirmFiles={fetchFirmFiles}
       />
     
-    </Box>
+    </div>
   );
 }
 

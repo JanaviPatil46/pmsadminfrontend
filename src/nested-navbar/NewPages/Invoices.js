@@ -1,46 +1,40 @@
 import React from 'react'
-import { NavLink, Outlet } from 'react-router-dom'
-import { Box, } from '@mui/material'
-import { useNavigate, useParams, useRouteLoaderData } from "react-router-dom";
+import { NavLink, Outlet, useParams } from 'react-router-dom'
 
 const DashInvoices = () => {
-  const { data } =  useParams();
-  console.log(data)
+  const { data } = useParams();
+
+  const navLinkClass = ({ isActive }) =>
+    `px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+      isActive
+        ? 'text-white'
+        : 'text-muted-foreground hover:text-white'
+    }`;
+
   return (
-
-  <Box >
-
-      <Box className="firmtemp" >
-        <Box className="firmtemp-nav" sx={{
-          display: 'flex',
-
-          mt: 5,
-          flexWrap: 'wrap', // Allow items to wrap to the next line if they overflow
-         gap:2 ,// Space out items evenly
-          '& a': { // Styling for the NavLink components
-            textDecoration: 'none',
-            padding: '8px 16px',
-            borderRadius: '4px',
-            // color: 'primary.main',
-            '&:hover': {
-              backgroundColor: "var(--color-save-btn)",
-              color: 'white'
-            },
-            '&.active': {
-              backgroundColor: "var(--color-save-btn)",
-              color: 'white'
-            }
-          }
-        }}>
-             <NavLink to={`/clients/accounts/accountsdash/invoices/${data}/invoice`} >Invoice</NavLink >
-             <NavLink to={`/clients/accounts/accountsdash/invoices/${data}/payments`} >Payments</NavLink>
-        </Box>
-
-      </Box>
-      <Box> <hr /></Box>
-      <Box mt={2} ><Outlet /></Box>
-    </Box>
-  )
+    <div>
+      <div className="mt-5 flex flex-wrap gap-2">
+        <NavLink
+          to={`/clients/accounts/accountsdash/invoices/${data}/invoice`}
+          className={navLinkClass}
+          style={({ isActive }) => isActive ? { backgroundColor: 'var(--color-save-btn)' } : { backgroundColor: 'transparent' }}
+        >
+          Invoice
+        </NavLink>
+        <NavLink
+          to={`/clients/accounts/accountsdash/invoices/${data}/payments`}
+          className={navLinkClass}
+          style={({ isActive }) => isActive ? { backgroundColor: 'var(--color-save-btn)' } : { backgroundColor: 'transparent' }}
+        >
+          Payments
+        </NavLink>
+      </div>
+      <hr className="my-3 border-border" />
+      <div className="mt-2">
+        <Outlet />
+      </div>
+    </div>
+  );
 }
 
 export default DashInvoices

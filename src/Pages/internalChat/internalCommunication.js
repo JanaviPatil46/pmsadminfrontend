@@ -258,16 +258,14 @@
 
 
 import React, { useState, useEffect, useContext } from "react";
-import { Box, Button, Typography, Paper, Divider, IconButton, Menu, MenuItem, List, ListItem, ListItemText, TextField, Checkbox, Grid } from "@mui/material";
 import NewChatDrawer from "./NewChat";
-import { useTheme } from "@mui/material/styles";
 import axios from "axios";
 import { LoginContext } from "../../Sidebar/Context/Context";
-
 import ChatDetails from "./ChatDetails";
+import { Button } from "../../components/ui/button";
+import { MessageSquare } from "lucide-react";
 const InternalCommunication = () => {
   const INTERNALCHAT = process.env.REACT_APP_INTERNALCHAT_API;
-  const theme = useTheme();
   const [open, setOpen] = useState(false);
   const [chatList, setChatList] = useState([]);
   const [time, setTime] = useState();
@@ -343,107 +341,99 @@ const InternalCommunication = () => {
   }).replace(",", "") : "";
 
   return (
-    <Box mt={2}>
-      <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
-        <Typography variant="h5">Communications</Typography>
+    <div className="mt-4 space-y-5">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">Communications</h1>
         <Button
-          variant="contained"
-          sx={{
-            backgroundColor: "var(--color-save-btn)",
-            "&:hover": { backgroundColor: "var(--color-save-hover-btn)" },
-            borderRadius: "15px",
-          }}
           onClick={() => setOpen(true)}
+          className="rounded-full px-5"
+          style={{ backgroundColor: "var(--color-save-btn)" }}
         >
           New Communication
         </Button>
-      </Box>
+      </div>
 
       {chatList.length === 0 ? (
-        <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="70vh">
-          <Typography variant="h6" gutterBottom>No Communications Found</Typography>
-          <Typography variant="body1" color="text.secondary" mb={3}>
-            Start a new communication to collaborate with your team
-          </Typography>
+        <div className="flex flex-col items-center justify-center h-[60vh] text-center gap-4">
+          <div className="p-4 rounded-full bg-muted">
+            <MessageSquare className="h-8 w-8 text-muted-foreground" />
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold text-foreground">No Communications Found</h2>
+            <p className="text-sm text-muted-foreground mt-1">Start a new communication to collaborate with your team</p>
+          </div>
           <Button
-            variant="contained"
-            sx={{
-              backgroundColor: "var(--color-save-btn)",
-              "&:hover": { backgroundColor: "var(--color-save-hover-btn)" },
-              borderRadius: "15px",
-            }}
             onClick={() => setOpen(true)}
+            className="rounded-full px-5 mt-2"
+            style={{ backgroundColor: "var(--color-save-btn)" }}
           >
             Create New Communication
           </Button>
-        </Box>
+        </div>
       ) : (
-        <Box display="flex" height="90vh" gap={2} p={1}>
-          <Box width="30%" height="100%" overflow="auto" pr={1} borderRight="1px solid #ddd">
+        <div className="flex gap-3" style={{ height: "calc(100vh - 160px)" }}>
+          {/* Chat List */}
+          <div className="w-[30%] min-w-[220px] flex flex-col gap-2 overflow-y-auto pr-2 border-r border-border">
             {chatList.map((chat, index) => {
               const receiver = chat.participants.find(p => p._id !== loginUserId);
               const unreadCount = countUnreadMessages(chat);
               const latestMessage = chat.description?.[chat.description.length - 1];
               const previewText = latestMessage?.message?.replace(/<[^>]+>/g, "") || "";
-              
+              const isSelected = selectedChat?._id === chat._id;
+
               return (
-                <Box key={index}>
-                  <Paper sx={{ p: 1, cursor: "pointer" }} onClick={() => handleShowChat(chat._id)}>
-                    <Box display="flex" alignItems="center" justifyContent="space-between" mb={1}>
-                      <Typography variant="caption" color="text.secondary">
-                        Chat with <b>{receiver?.username || "Unknown"}</b>
-                      </Typography>
+                <div
+                  key={index}
+                  onClick={() => handleShowChat(chat._id)}
+                  className={`cursor-pointer rounded-lg border p-3 transition-colors hover:bg-muted/60 ${
+                    isSelected ? "bg-muted border-indigo-300" : "bg-background border-border"
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm font-medium text-foreground">
+                      {receiver?.username || "Unknown"}
+                    </span>
+                    <div className="flex items-center gap-2">
                       {unreadCount > 0 && (
-                        <Box sx={{
-                          backgroundColor: theme.palette.success.main,
-                          color: "white",
-                          borderRadius: "50%",
-                          width: 20,
-                          height: 20,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontSize: "0.75rem",
-                        }}>
+                        <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-green-500 text-white text-[10px] font-bold">
                           {unreadCount}
-                        </Box>
+                        </span>
                       )}
-                    </Box>
-                    <Typography variant="caption">
-                      {latestMessage ? 
-                        `${latestMessage.fromwhome === "Admin" ? "You" : latestMessage.senderid?.username || ""}: ${previewText.slice(0, 35)}${previewText.length > 35 ? "..." : ""}`
-                        : "No messages yet"}
-                    </Typography>
-                    <Box textAlign="right">
-                      <Typography variant="caption" color="text.secondary">
-                        {formattedTime}
-                      </Typography>
-                    </Box>
-                  </Paper>
-                  <Divider sx={{ my: 1 }} />
-                </Box>
+                      <span className="text-xs text-muted-foreground">{formattedTime}</span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground truncate">
+                    {latestMessage
+                      ? `${latestMessage.fromwhome === "Admin" ? "You" : latestMessage.senderid?.username || ""}: ${previewText.slice(0, 45)}${previewText.length > 45 ? "..." : ""}`
+                      : "No messages yet"}
+                  </p>
+                </div>
               );
             })}
-          </Box>
+          </div>
 
-          <Box width="70%" height="100%" overflow="auto">
+          {/* Chat Details */}
+          <div className="flex-1 overflow-y-auto">
             {selectedChat ? (
-              <ChatDetails 
-                chat={selectedChat} 
-                getsChatDetails={getsChatDetails} 
+              <ChatDetails
+                chat={selectedChat}
+                getsChatDetails={getsChatDetails}
                 getsChatlist={getsChatlist}
                 onChatAction={() => setSelectedChat(null)}
                 loginUserId={loginUserId}
               />
             ) : (
-              <Typography variant="body1" mt={2}>Select a chat to view details</Typography>
+              <div className="flex flex-col items-center justify-center h-full text-center gap-2">
+                <MessageSquare className="h-10 w-10 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">Select a chat to view the conversation</p>
+              </div>
             )}
-          </Box>
-        </Box>
+          </div>
+        </div>
       )}
 
       <NewChatDrawer open={open} handleClose={() => setOpen(false)} getsChatlist={getsChatlist} />
-    </Box>
+    </div>
   );
 };
 
