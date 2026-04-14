@@ -45,11 +45,6 @@ import axios from "axios";
 import { FaTimes } from "react-icons/fa";
 import { FaFolder, FaFolderOpen,  } from "react-icons/fa";
 
-import { Drawer, IconButton, Typography,   List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Collapse, } from "@mui/material";
 import "./foldertemp.css";
 
 export default function CreateFolder({
@@ -134,24 +129,24 @@ export default function CreateFolder({
 
 
   const renderFolderOrFile = (item) => {
+    const depth = item.id.split("-").length;
     if (item.file) {
-      // Render file
       return (
-        <ListItem key={item.id} sx={{ pl: item.id.split("-").length * 2 }}>
-         📄
-          <ListItemText primary={item.file} sx={{ ml: 1 }} />
-        </ListItem>
+        <div key={item.id} className="flex items-center gap-1 py-1 text-sm text-gray-600" style={{ paddingLeft: depth * 16 }}>
+          <span>📄</span><span>{item.file}</span>
+        </div>
       );
     } else if (item.folder) {
-      // Render folder
       return (
         <div key={item.id}>
-          <ListItem  onClick={() => toggleFolder(item.id)} sx={{ pl: item.id.split("-").length * 2 }}>
-          {item.isOpen ? "📂" : "📁"}
-            <ListItemText primary={item.folder} sx={{ ml: 1 }} />
-          </ListItem>
+          <div onClick={() => toggleFolder(item.id)}
+            className="flex items-center gap-1 py-1 text-sm cursor-pointer hover:bg-gray-50"
+            style={{ paddingLeft: depth * 16 }}>
+            <span>{item.isOpen ? "📂" : "📁"}</span>
+            <span>{item.folder}</span>
+          </div>
           {item.isOpen && item.contents && item.contents.length > 0 && (
-            <List>{item.contents.map((subItem) => renderFolderOrFile(subItem))}</List>
+            <div>{item.contents.map((subItem) => renderFolderOrFile(subItem))}</div>
           )}
         </div>
       );
@@ -159,33 +154,20 @@ export default function CreateFolder({
     return null;
   };
 
-  return (
-    <Drawer
-      anchor="right"
-      open={isFolderFormOpen}
-      onClose={handleFormClose}
-      PaperProps={{ sx: { width: 800 } }} // Set width of the Drawer
-    >
-      <div style={{ padding: 16 }}>
-        <Typography
-          variant="h6"
-          component="div"
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          Create Folder
-          <IconButton aria-label="close" onClick={handleFormClose}>
-            <FaTimes style={{ color: "#1976d3" }} />
-          </IconButton>
-        </Typography>
+  if (!isFolderFormOpen) return null;
 
-       
-        <List>{folders.map((folder) => renderFolderOrFile(folder))}</List>
-    
+  return (
+    <div className="fixed inset-0 z-40 overflow-hidden">
+      <div className="absolute inset-0 bg-black/30" onClick={handleFormClose} />
+      <div className="absolute right-0 top-0 h-full w-[800px] bg-white shadow-xl overflow-y-auto p-4">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-base font-semibold">Create Folder</h2>
+          <button type="button" onClick={handleFormClose} className="text-blue-600 hover:text-blue-800">
+            <FaTimes />
+          </button>
+        </div>
+        <div>{folders.map((folder) => renderFolderOrFile(folder))}</div>
       </div>
-    </Drawer>
+    </div>
   );
 }

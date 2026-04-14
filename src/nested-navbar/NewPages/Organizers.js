@@ -1,30 +1,15 @@
 import React, { useState, useEffect, useMemo } from "react";
-import {
-  Dialog,
-  DialogContent,
-  Box,
-  Button,
-  IconButton,
-  Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Paper,
-  Chip,
-  TableContainer,Menu,DialogActions,TextField,DialogTitle
-} from "@mui/material";
 import axios from "axios";
 import { CiMenuKebab } from "react-icons/ci";
-import { useNavigate, useParams, useRouteLoaderData } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import OrganizerUpdate from "../NewPages/OrganizerUpdate";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import OrganizerDialog from "./OrganizerDialog"
+import OrganizerDialog from "./OrganizerDialog";
+import { Button } from "../../components/ui/button";
+import { Badge } from "../../components/ui/badge";
+import { Input } from "../../components/ui/input";
 const Organizers = () => {
   const [openMenuId, setOpenMenuId] = useState(null);
   const ORGANIZER_TEMP_API = process.env.REACT_APP_ORGANIZER_TEMP_URL;
@@ -675,390 +660,195 @@ const handleOpenDialog = (organizer) => {
     // fetchOrganizers();
   };
   return (
-    <Box sx={{ mt: 2 }}>
-      <Button
-        variant="contained"
-        onClick={handleCreateInvoiceClick}
-        sx={{
-          backgroundColor: "var(--color-save-btn)", // Normal background
+    <div className="p-4 md:p-6 space-y-5">
+      {/* Page Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900 tracking-tight">Organizers</h2>
+          <p className="text-sm text-gray-400 mt-0.5">Manage organizers for this account</p>
+        </div>
+        <Button size="sm" onClick={handleCreateInvoiceClick}>
+          + New Organizer
+        </Button>
+      </div>
 
-          "&:hover": {
-            backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-          },
-          mb: 3,
-          borderRadius: "15px",
-        }}
-      >
-        New Organizer
-      </Button>
-      {/* <MaterialReactTable columns={columns} table={table} /> */}
-      <Box>
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Typography
-            style={{
-              backgroundColor:
-                activeButton === "active"
-                  ? "var(--color-save-btn)"
-                  : "transparent",
-              color: activeButton === "active" ? "white" : "black",
-              fontWeight: activeButton === "active" ? "bold" : "normal",
-              padding: "4px 8px",
-              borderRadius: "10px",
-              fontSize: "14px",
-              cursor: "pointer",
-            }}
-            onClick={handleActiveClick}
-          >
-            Active
-          </Typography>
+      {/* Tab Switcher */}
+      <div className="inline-flex items-center gap-1 bg-gray-100 rounded-xl p-1">
+        <button
+          type="button"
+          onClick={handleActiveClick}
+          className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-150 ${
+            activeButton === "active"
+              ? "bg-white text-gray-900 shadow-sm"
+              : "text-gray-500 hover:text-gray-700"
+          }`}
+        >
+          Active
+        </button>
+        <button
+          type="button"
+          onClick={handleArchivedClick}
+          className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-150 ${
+            activeButton === "archived"
+              ? "bg-white text-gray-900 shadow-sm"
+              : "text-gray-500 hover:text-gray-700"
+          }`}
+        >
+          Archived
+        </button>
+      </div>
 
-          <Typography
-            style={{
-              backgroundColor:
-                activeButton === "archived"
-                  ? "var(--color-save-btn)"
-                  : "transparent",
-              color: activeButton === "archived" ? "white" : "black",
-              fontWeight: activeButton === "archived" ? "bold" : "normal",
-              padding: "4px 8px",
-              borderRadius: "10px",
-              fontSize: "14px",
-              cursor: "pointer",
-            }}
-            onClick={handleArchivedClick}
-          >
-            Archived
-          </Typography>
-        </Box>
-          
-      </Box>
       {!showForm ? (
-        // <Paper>
         <>
-        <TableContainer component={Paper} sx={{ overflow: "visible" }}>
-          <Table sx={{ width: "100%" }}>
-            <TableHead>
-              <TableRow>
-                <TableCell
-                  style={{
-                    fontSize: "12px",
-                    fontWeight: "bold",
-                    padding: "16px",
-                  }}
-                  width="250"
-                >
-                  Name
-                </TableCell>
-                <TableCell
-                  style={{
-                    fontSize: "12px",
-                    fontWeight: "bold",
-                    padding: "16px",
-                  }}
-                  width="100"
-                >
-                  Last Updated
-                </TableCell>
-                <TableCell
-                  style={{
-                    fontSize: "12px",
-                    fontWeight: "bold",
-                    padding: "16px",
-                  }}
-                  width="100"
-                >
-                  Status
-                </TableCell>
-                <TableCell
-                  style={{
-                    fontSize: "12px",
-                    fontWeight: "bold",
-                    padding: "16px",
-                  }}
-                  width="100"
-                >
-                  Progress
-                </TableCell>
-                <TableCell
-                  style={{
-                    fontSize: "12px",
-                    fontWeight: "bold",
-                    padding: "16px",
-                  }}
-                  width="100"
-                >
-                  Seal
-                </TableCell>
-                <TableCell
-                  style={{
-                    fontSize: "12px",
-                    fontWeight: "bold",
-                    padding: "16px",
-                  }}
-                  width="100"
-                >
-                  Settings
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {organizerTemplatesData.map((row) => (
-                <TableRow key={row._id}>
-                  <TableCell>
-                    <Typography
-                      style={{
-                        fontSize: "12px",
-                        padding: "4px 8px",
-                        lineHeight: "1",
-                        cursor: "pointer",
-                        color: "#3f51b5",
-                      }}
-                      onClick={() => handleEdit(row._id)}
-                    >
-                      {row.organizerName}
-                    </Typography>
-                  </TableCell>
-                  
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                      cursor: "pointer",
-                      // {row.updatedAt}
-                    }}
+          {/* Organizers Table */}
+          <div className="rounded-2xl border border-gray-100 shadow-sm overflow-hidden bg-white">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-gray-50 border-b border-gray-100">
+                    <th className="text-left px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Name</th>
+                    <th className="text-left px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Last Updated</th>
+                    <th className="text-left px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Status</th>
+                    <th className="text-left px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Sections</th>
+                    <th className="text-left px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Seal</th>
+                    <th className="text-right px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {organizerTemplatesData.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="px-5 py-12 text-center text-sm text-gray-400">
+                        No organizers found.
+                      </td>
+                    </tr>
+                  ) : (
+                    organizerTemplatesData.map((row) => (
+                      <tr key={row._id} className="hover:bg-gray-50/60 transition-colors">
+                        <td className="px-5 py-3">
+                          <span
+                            className="text-sm font-medium text-indigo-600 cursor-pointer hover:underline"
+                            onClick={() => handleEdit(row._id)}
+                          >
+                            {row.organizerName}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-xs text-gray-500">
+                          {new Intl.DateTimeFormat("en-US", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(row.updatedAt))}
+                        </td>
+                        <td className="px-4 py-3">
+                          <Badge
+                            className={`rounded-full text-[11px] font-medium border-0 ${
+                              row.status === "Completed"
+                                ? "bg-green-50 text-green-700"
+                                : row.status === "In Progress"
+                                ? "bg-blue-50 text-blue-700"
+                                : "bg-gray-100 text-gray-500"
+                            }`}
+                            variant="outline"
+                          >
+                            {row.status || "Pending"}
+                          </Badge>
+                        </td>
+                        <td className="px-4 py-3 text-xs text-gray-500">{row.sections.length}</td>
+                        <td className="px-4 py-3">
+                          {row.issealed && (
+                            <Badge className="rounded-full text-[11px] bg-indigo-600 text-white border-0 font-medium">Sealed</Badge>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-right relative">
+                          <button
+                            type="button"
+                            onClick={(e) => toggleMenu(e, row._id)}
+                            className="h-7 w-7 inline-flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                          >
+                            <CiMenuKebab size={15} />
+                          </button>
+                          {openMenuId === row._id && (
+                            <>
+                              <div className="fixed inset-0 z-30" onClick={handleMenuClose} />
+                              <div className="absolute right-4 z-40 bg-white border border-gray-100 rounded-xl shadow-xl py-1.5 w-48 overflow-hidden">
+                                <button type="button" className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                                  onClick={() => { handleSealed(row._id, !row.issealed); handleMenuClose(); }}>
+                                  {row.issealed ? "Unseal" : "Seal"}
+                                </button>
+                                <button type="button" className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                                  onClick={() => { handleDownload(row); handleMenuClose(); }}>
+                                  Download
+                                </button>
+                                <button type="button" className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                                  onClick={() => { handleOpenDialog(row); handleMenuClose(); }}>
+                                  Change Answers
+                                </button>
+                                <button type="button" className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                                  onClick={() => { handleArchive(row._id, row.active); handleMenuClose(); }}>
+                                  {row.active ? "Archive" : "Restore"}
+                                </button>
+                                <button type="button" className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                                  onClick={() => { printOrganizerData(row._id); handleMenuClose(); }}>
+                                  Print
+                                </button>
+                                <button type="button" className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                                  onClick={() => { setRenameRowId(row._id); setRenameValue(row.organizerName); setRenameDialogOpen(true); handleMenuClose(); }}>
+                                  Rename
+                                </button>
+                                <div className="my-1 h-px bg-gray-100 mx-2" />
+                                <button type="button" className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                                  onClick={() => { handleDelete(row._id); handleMenuClose(); }}>
+                                  Delete
+                                </button>
+                              </div>
+                            </>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Rename Dialog */}
+          {renameDialogOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <div className="absolute inset-0 bg-black/40" onClick={() => setRenameDialogOpen(false)} />
+              <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm">
+                <div className="px-5 py-4 border-b border-gray-100">
+                  <h2 className="text-sm font-semibold text-gray-800">Rename Organizer</h2>
+                </div>
+                <div className="px-5 py-4">
+                  <Input
+                    autoFocus
+                    type="text"
+                    value={renameValue}
+                    onChange={(e) => setRenameValue(e.target.value)}
+                    placeholder="Enter new name..."
+                    className="text-sm"
+                  />
+                </div>
+                <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100">
+                  <Button variant="outline" size="sm" onClick={() => setRenameDialogOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => { handleRenameConfirm(renameRowId, renameValue); setRenameDialogOpen(false); }}
                   >
-                    {" "}
-                    {new Intl.DateTimeFormat("en-US", {
-                      day: "2-digit",
-                      month: "2-digit",
-                      year: "numeric",
-                    }).format(new Date(row.updatedAt))}
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                      cursor: "pointer",
-                    }}
-                  >
-                   
-                    <Chip
-                      label={row.status || "Pending"}
-                      color={row.status === "Completed" ? "success" : "default"}
-                      size="small"
-                      sx={{ border: "none" }}
-                    />
-                        
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                      cursor: "pointer",
-                    }}
-                  >
-                    {row.sections.length}
-                  </TableCell>{" "}
-                  {/* Show the number of sections */}
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                      cursor: "pointer",
-                    }}
-                  >
-                    {row.issealed ? (
-                      <Chip
-                        label="Sealed"
-                        color="primary"
-                        sx={{
-                          // backgroundColor: row.issubmited ? "green" : "grey",
-                          // color: "white",
-                          color: "#fff",
-                          // borderRadius: "15px",
-                          // padding: "1px 1px",
-                          fontSize: "11px",
-                        }}
-                      />
-                    ) : null}
-                  </TableCell>
-                 
-                  <TableCell
-                                                                      style={{
-                                                                        fontSize: "12px",
-                                                                        padding: "4px 8px",
-                                                                        lineHeight: "1",
-                                                                      }}
-                                                                    >
-                                                                      <IconButton
-                                                                        onClick={(event) => toggleMenu(event, row._id)}
-                                                                        style={{ color: "#2c59fa" }}
-                                                                        size="small"
-                                                                      >
-                                                                        <CiMenuKebab />
-                                                                      </IconButton>
-                                                    
-                                                                      {/* MUI Menu */}
-                                                                       <Menu
-    anchorEl={anchorEl}
-    open={openMenuId === row._id}
-    onClose={handleMenuClose}
-    anchorOrigin={{
-      vertical: "top",
-      horizontal: "right",
-    }}
-    transformOrigin={{
-      vertical: "top",
-      horizontal: "left",
-    }}
-    PaperProps={{
-      sx: {
-        mt: 1,
-        ml: 1,
-        boxShadow: 3,
-        borderRadius: 1,
-        minWidth: 140,
-        p: 1,
-      },
-    }}
-  >
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-      <Typography
-        sx={{ fontSize: "12px", fontWeight: "bold", cursor: "pointer" }}
-        onClick={() => {
-          handleSealed(row._id, !row.issealed);
-          handleMenuClose();
-        }}
-      >
-        {row.issealed ? "Unseal" : "Seal"}
-      </Typography>
-<Typography
-  sx={{ fontSize: "12px", fontWeight: "bold", cursor: "pointer" }}
-  onClick={() => {
-    handleDownload(row); // Pass current organizer
-    handleMenuClose();
-  }}
->
-  Download
-</Typography>
-
-      <Typography
-        sx={{
-          fontSize: "12px",
-          fontWeight: "bold",
-          color: "red",
-          cursor: "pointer",
-        }}
-        onClick={() => {
-          handleDelete(row._id);
-          handleMenuClose();
-        }}
-      >
-        Delete
-      </Typography>
-
-      <Typography
-        sx={{ fontSize: "12px", fontWeight: "bold", cursor: "pointer" }}
-        onClick={() => {
-          handleOpenDialog(row);
-          handleMenuClose();
-        }}
-      >
-        Change Answers
-      </Typography>
-
-      <Typography
-        sx={{ fontSize: "12px", fontWeight: "bold", cursor: "pointer" }}
-        onClick={() => {
-          handleArchive(row._id, row.active);
-          handleMenuClose();
-        }}
-      >
-        {row.active ? "Archive" : "Restore"}
-      </Typography>
-
-      <Typography
-        sx={{ fontSize: "12px", fontWeight: "bold", cursor: "pointer" }}
-        onClick={() => {
-          printOrganizerData(row._id);
-          handleMenuClose();
-        }}
-      >
-        Print
-      </Typography>
-      <Typography
-  sx={{ fontSize: "12px", fontWeight: "bold", cursor: "pointer" }}
-  onClick={() => {
-    setRenameRowId(row._id);
-    setRenameValue(row.organizerName); // Pre-fill current name
-    setRenameDialogOpen(true);
-    handleMenuClose();
-  }}
->
-  Rename
-</Typography>
-
-    </Box>
-  </Menu>
-                                                                    
-                                                                    </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        
-      <Dialog
-  open={renameDialogOpen}
-  onClose={() => setRenameDialogOpen(false)}
-  maxWidth="xs"
-  fullWidth
->
-  <DialogTitle>Rename Organizer</DialogTitle>
-  <DialogContent>
-    <TextField
-      autoFocus
-      margin="dense"
-      label="New Name"
-      type="text"
-      fullWidth
-      variant="outlined"
-      value={renameValue}
-      onChange={(e) => setRenameValue(e.target.value)}
-    />
-  </DialogContent>
-  <DialogActions>
-    <Button onClick={() => setRenameDialogOpen(false)} color="secondary">
-      Cancel
-    </Button>
-    <Button
-      onClick={() => {
-        handleRenameConfirm(renameRowId, renameValue);
-        setRenameDialogOpen(false);
-      }}
-      color="primary"
-    >
-      Save
-    </Button>
-  </DialogActions>
-</Dialog>
-
-</>
-        
+                    Save
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </>
       ) : (
-        <Box>
-          {" "}
+        <div>
           <OrganizerUpdate
             OrganizerData={selectedOrganizer}
             onClose={handleClosePreview}
           />
-        </Box>
+        </div>
       )}
-
 
       <OrganizerDialog
         open={openDialog}
@@ -1066,7 +856,7 @@ const handleOpenDialog = (organizer) => {
         organizer={selectedOrganizer}
         accountid={data}
       />
-    </Box>
+    </div>
   );
 };
 

@@ -1,14 +1,5 @@
 
 import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Typography,
-  Drawer,
-  IconButton,
-  CircularProgress,
-  TextField,
-  Button,
-} from "@mui/material";
 import { MdClose } from "react-icons/md";
 import axios from "axios";
 import FileExplorer from "../FileExplorer";
@@ -88,51 +79,37 @@ const handlePathSelect = (path) => {
     return <div>Error: {error}</div>;
   }
 
+  if (!open) return null;
+
   return (
-    <Box>
-      <Drawer anchor="right" open={open} onClose={onClose}>
-        <Box
-          sx={{
-            backgroundColor: "#fff",
-            borderRadius: "8px",
-
-            padding: 2,
-            width: 600,
-            fontFamily:
-              "'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif",
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Typography variant="h6">Create folder</Typography>
-            <IconButton onClick={onClose}>
-              <MdClose />
-            </IconButton>
-          </Box>
-          <TextField
-            fullWidth
-            size="small"
-            variant="outlined"
-            placeholder="Folder Name"
-            value={newFolderName}
-            onChange={(e) => setNewFolderName(e.target.value)}
-          />
-          <Button variant="contained" sx={{ mt: 2 }}  onClick={handleCreateFolder}
-  disabled={!newFolderName || !destinationPath}>
-            Create Folder
-          </Button>
-
-          <Box sx={{ maxHeight: "500px", overflowY: "auto" }}>
-          <FileExplorer onPathSelect={handlePathSelect} accountId={accountId}/>
-          </Box>
-        </Box>
-      </Drawer>
-    </Box>
+    <div className="fixed inset-0 z-40 overflow-hidden">
+      <div className="absolute inset-0 bg-black/30" onClick={onClose} />
+      <div className="absolute right-0 top-0 h-full w-[600px] bg-white shadow-xl flex flex-col p-4"
+        style={{ fontFamily: "'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif" }}>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-base font-semibold">Create folder</h2>
+          <button type="button" onClick={onClose} className="text-gray-500 hover:text-gray-700">
+            <MdClose size={18} />
+          </button>
+        </div>
+        <input
+          type="text"
+          className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm mb-2 focus:outline-none focus:ring-1 focus:ring-blue-400"
+          placeholder="Folder Name"
+          value={newFolderName}
+          onChange={(e) => setNewFolderName(e.target.value)}
+        />
+        <button type="button"
+          onClick={handleCreateFolder}
+          disabled={!newFolderName || !destinationPath}
+          className="mb-3 px-4 py-1.5 rounded text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-40">
+          Create Folder
+        </button>
+        <div className="flex-1 overflow-y-auto" style={{ maxHeight: 500 }}>
+          <FileExplorer onPathSelect={handlePathSelect} accountId={accountId} />
+        </div>
+      </div>
+    </div>
   );
 };
 

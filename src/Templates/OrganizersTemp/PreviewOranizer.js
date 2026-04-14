@@ -2,25 +2,19 @@
 
 
 import React, { useState } from 'react';
-import {
-    Box, TextField, FormControl, Typography, Button, LinearProgress, Select, MenuItem, Tooltip,
-} from '@mui/material';
 import { useLocation } from 'react-router-dom';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { Button } from '../../components/ui/button';
 
 const OrganizerPreview = () => {
     const location = useLocation();
     const { data } = location.state || {};
     const organizerName = data?.organizerName || 'Organizer';
     const sections = data?.sections || [];
-    const [startDate, setStartDate] = useState(null);
+    const [startDate, setStartDate] = useState('');
     const [activeStep, setActiveStep] = useState(0);
-    // const totalSteps = sections.length;
-console.log("preview organizer of sections", sections)
-    const handleStartDateChange = (date) => {
-        setStartDate(date);
+    console.log("preview organizer of sections", sections)
+    const handleStartDateChange = (value) => {
+        setStartDate(value);
     };
 
     const handleNext = () => {
@@ -139,248 +133,182 @@ console.log("preview organizer of sections", sections)
     const visibleSections = getVisibleSections();
     const totalSteps = visibleSections.length;
 
+    const inputCls = "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm mt-3 focus:outline-none focus:ring-2 focus:ring-ring bg-white";
+    const progressPct = totalSteps > 0 ? ((activeStep + 1) / totalSteps) * 100 : 0;
+
     return (
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <Box>
-              <Box sx={{display:'flex', alignItems:'center', justifyContent:'space-between', border:'2px solid #3FA2F6', p:2, mb:3, borderRadius:'10px', backgroundColor:'#96C9F4'}}>
-                <Box >
-                    <Typography fontWeight='bold'>Preview mode</Typography>
-                    <Typography>The client sees your organizer like this</Typography>
-                </Box>
-                <Button variant='text' >Back to edit</Button>
-              </Box>
-                <Typography variant='text' gutterBottom>
-                    {organizerName}
-                </Typography>
+        <div>
+            {/* Preview banner */}
+            <div className="flex items-center justify-between border-2 border-blue-400 bg-blue-200 rounded-xl px-4 py-3 mb-5">
+                <div>
+                    <p className="font-bold text-sm text-blue-900">Preview mode</p>
+                    <p className="text-sm text-blue-800">The client sees your organizer like this</p>
+                </div>
+                <Button variant="outline" size="sm">Back to edit</Button>
+            </div>
 
-                <FormControl fullWidth sx={{ marginBottom: '10px', marginTop: '10px' }}>
-                    <Select
-                        value={activeStep}
-                        onChange={handleDropdownChange}
-                        size='small'
-                    >
-                        
-                        {visibleSections.map((section, index) => (
-                            <MenuItem key={index} value={index}>
-                                {section.text} ({answeredCount}/{totalElements})
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
+            <p className="text-base font-medium mb-3">{organizerName}</p>
 
-                <Box mt={2} mb={2}>
-                    <LinearProgress variant="determinate" value={(activeStep + 1) / totalSteps * 100} />
-                </Box>
+            {/* Section dropdown */}
+            <select
+                value={activeStep}
+                onChange={handleDropdownChange}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-ring bg-white"
+            >
+                {visibleSections.map((section, index) => (
+                    <option key={index} value={index}>
+                        {section.text} ({answeredCount}/{totalElements})
+                    </option>
+                ))}
+            </select>
 
-              
-                        {visibleSections.map((section, sectionIndex) => (
-                    sectionIndex === activeStep && (
-                            <Box key={section.text}>
-                                {section.formElements.map((element) => (
-                                    shouldShowElement(element) && (
-                                        <Box key={element.text} style={{ marginBottom: '10px' }}>
-                                            {(element.type === 'Free Entry' || element.type === 'Number' || element.type === 'Email') && (
-                                                <Box>
-                                                    <Typography fontSize='18px' mb={2}>{element.text}</Typography>
-                                                    <TextField
-                                                        variant="outlined"
-                                                        size='small'
-                                                        multiline
-                                                        fullWidth
-                                                        margin='normal'
-                                                        placeholder={`${element.type} Answer`}
-                                                        inputProps={{
-                                                            type: element.type === 'Free Entry' ? 'text' : element.type.toLowerCase(),
-                                                        }}
-                                                        maxRows={8}
-                                                        style={{ display: 'block', marginTop: '15px' }}
-                                                        value={inputValues[element.text] || ''}
-                                                        onChange={(e) => handleInputChange(e, element.text)}
-                                                    />
-                                                </Box>
-                                            )}
+            {/* Progress bar */}
+            <div className="w-full bg-gray-200 rounded-full h-2 mb-5">
+                <div
+                    className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${progressPct}%` }}
+                />
+            </div>
 
-                                            {element.type === 'Radio Buttons' && (
-                                                <Box>
-                                                    <Typography fontSize='18px' mb={2}>{element.text}</Typography>
-                                                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                                                        {element.options.map((option) => (
-                                                            <Button
-                                                                key={option.text}
-                                                                variant={radioValues[element.text] === option.text ? 'contained' : 'outlined'}
-                                                                onClick={() => handleRadioChange(option.text, element.text)}
-                                                                sx={{
-                                                                    width: '80px',
-                                                                    borderRadius: '15px',
-                                                                    ...(radioValues[element.text] === option.text
-                                                                      ? {
-                                                                          backgroundColor: 'var(--color-save-btn)',  // Normal background
-                                                                          '&:hover': {
-                                                                            backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                                                                          },
-                                                                        }
-                                                                      : {
-                                                                          borderColor: 'var(--color-border-cancel-btn)',  // Normal border color
-                                                                          color: 'var(--color-save-btn)',
-                                                                          '&:hover': {
-                                                                            backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                                                                            color: '#fff',
-                                                                            border: 'none',
-                                                                          },
-                                                                        }),
-                                                                  }} 
-                                                            >
-                                                                {option.text}
-                                                            </Button>
-                                                        ))}
-                                                    </Box>
-                                                </Box>
-                                            )}
+            {/* Section elements */}
+            {visibleSections.map((section, sectionIndex) =>
+                sectionIndex === activeStep && (
+                    <div key={section.text}>
+                        {section.formElements.map((element) =>
+                            shouldShowElement(element) && (
+                                <div key={element.text} className="mb-4">
 
-                                            {element.type === 'Checkboxes' && (
-                                                <Box>
-                                                    <Typography fontSize='18px' mb={2}>{element.text}</Typography>
-                                                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                                                        {element.options.map((option) => (
-                                                            <Button
-                                                                key={option.text}
-                                                                variant={checkboxValues[element.text]?.[option.text] ? 'contained' : 'outlined'}
-                                                                onClick={() => handleCheckboxChange(option.text, element.text)}
-                                                                sx={{
-                                                                    width: '80px',
-                                                                    borderRadius: '15px',
-                                                                    ...(checkboxValues[element.text]?.[option.text]
-                                                                      ? {
-                                                                          backgroundColor: 'var(--color-save-btn)',  // Normal background
-                                                                          '&:hover': {
-                                                                            backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                                                                          },
-                                                                        }
-                                                                      : {
-                                                                          borderColor: 'var(--color-border-cancel-btn)',  // Normal border color
-                                                                          color: 'var(--color-save-btn)',
-                                                                          '&:hover': {
-                                                                            backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                                                                            color: '#fff',
-                                                                            border: 'none',
-                                                                          },
-                                                                        }),
-                                                                  }}
-                                                           >
-                                                                {option.text}
-                                                            </Button>
-                                                        ))}
-                                                    </Box>
-                                                </Box>
-                                            )}
+                                    {(element.type === 'Free Entry' || element.type === 'Number' || element.type === 'Email') && (
+                                        <div>
+                                            <p className="text-lg font-medium mb-2">{element.text}</p>
+                                            <textarea
+                                                className={inputCls}
+                                                rows={3}
+                                                placeholder={`${element.type} Answer`}
+                                                value={inputValues[element.text] || ''}
+                                                onChange={(e) => handleInputChange(e, element.text)}
+                                            />
+                                        </div>
+                                    )}
 
-                                            {element.type === 'Yes/No' && (
-                                                <Box>
-                                                    <Typography fontSize='18px' mb={2}>{element.text}</Typography>
-                                                    <Box sx={{ display: 'flex', gap: 1 }}>
-                                                        {element.options.map((option) => (
-                                                            <Button
-                                                                key={option.text}
-                                                                variant={selectedValue === option.text ? 'contained' : 'outlined'}
-                                                                onClick={(event) => handleChange(event, element.text)}
-                                                                sx={{
-                                                                    width: '80px',
-                                                                    borderRadius: '15px',
-                                                                    ...(selectedValue === option.text
-                                                                      ? {
-                                                                          backgroundColor: 'var(--color-save-btn)',  // Normal background
-                                                                          '&:hover': {
-                                                                            backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                                                                          },
-                                                                        }
-                                                                      : {
-                                                                          borderColor: 'var(--color-border-cancel-btn)',  // Normal border color
-                                                                          color: 'var(--color-save-btn)',
-                                                                          '&:hover': {
-                                                                            backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                                                                            color: '#fff',
-                                                                            border: 'none',
-                                                                          },
-                                                                        }),
-                                                                  }}
-                                                           >
-                                                                {option.text}
-                                                            </Button>
-                                                        ))}
-                                                    </Box>
-                                                </Box>
-                                            )}
+                                    {element.type === 'Radio Buttons' && (
+                                        <div>
+                                            <p className="text-lg font-medium mb-2">{element.text}</p>
+                                            <div className="flex flex-wrap gap-2">
+                                                {element.options.map((option) => (
+                                                    <Button
+                                                        key={option.text}
+                                                        size="sm"
+                                                        variant={radioValues[element.text] === option.text ? 'default' : 'outline'}
+                                                        onClick={() => handleRadioChange(option.text, element.text)}
+                                                    >
+                                                        {option.text}
+                                                    </Button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
 
-                                            {element.type === 'Dropdown' && (
-                                                <Box>
-                                                    <Typography fontSize='18px' mb={2}>{element.text}</Typography>
-                                                    <FormControl fullWidth>
-                                                        <Select
-                                                            value={selectedDropdownValue}
-                                                            onChange={(event) => handleDropdownValueChange(event, element.text)}
-                                                            size='small'
-                                                        >
-                                                            {element.options.map((option) => (
-                                                                <MenuItem key={option.text} value={option.text}>
-                                                                    {option.text}
-                                                                </MenuItem>
-                                                            ))}
-                                                        </Select>
-                                                    </FormControl>
-                                                </Box>
-                                            )}
+                                    {element.type === 'Checkboxes' && (
+                                        <div>
+                                            <p className="text-lg font-medium mb-2">{element.text}</p>
+                                            <div className="flex flex-wrap gap-2">
+                                                {element.options.map((option) => (
+                                                    <Button
+                                                        key={option.text}
+                                                        size="sm"
+                                                        variant={checkboxValues[element.text]?.[option.text] ? 'default' : 'outline'}
+                                                        onClick={() => handleCheckboxChange(option.text, element.text)}
+                                                    >
+                                                        {option.text}
+                                                    </Button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
 
-                                            {element.type === 'Date' && (
-                                                <Box>
-                                                    <Typography fontSize='18px' mb={2}>{element.text}</Typography>
-                                                    <DatePicker
-                                                         format="MM/DD/YYYY"
-                                                        sx={{ width: '100%', backgroundColor: '#fff' }}
-                                                        selected={startDate}
-                                                        onChange={handleStartDateChange}
-                                                        renderInput={(params) => <TextField {...params} size="small" />}
-                                                        onOpen={() => setAnsweredElements((prevAnswered) => ({
-                                                            ...prevAnswered,
-                                                            [element.text]: true,
-                                                        }))}
-                                                    />
-                                                </Box>
-                                            )}
-                                            {/* File Upload */}
-                                            {element.type === "File Upload" && (
-                                                <Box>
-                                                    <Typography fontSize='18px' mb={2}>{element.text}</Typography>
-                                                    <Tooltip title="Unavailable in preview mode" placement="top">
-                                                        <Box sx={{ position: 'relative', display: 'inline-block' }}>
-                                                            <Button variant="contained" color="primary" disabled>
-                                                                Upload
-                                                            </Button>
-                                                        </Box>
-                                                    </Tooltip>
-                                                </Box>
-                                            )}
-                                            {element.type === "Text Editor" && (
-                                                <Box>
-                                                    <Typography>{stripHtmlTags(element.text)}</Typography>
-                                                </Box>
-                                            )}
-                                        </Box>
-                                    )
-                                ))}
-                            </Box>
-                        )
-                    ))}
+                                    {element.type === 'Yes/No' && (
+                                        <div>
+                                            <p className="text-lg font-medium mb-2">{element.text}</p>
+                                            <div className="flex gap-2">
+                                                {element.options.map((option) => (
+                                                    <Button
+                                                        key={option.text}
+                                                        size="sm"
+                                                        variant={selectedValue === option.text ? 'default' : 'outline'}
+                                                        onClick={(event) => handleChange(event, element.text)}
+                                                    >
+                                                        {option.text}
+                                                    </Button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
 
-                <Box mt={2}>
-                    <Button disabled={activeStep === 0} onClick={handleBack} variant='contained'>
-                        Back
-                    </Button>
-                    <Button onClick={handleNext} disabled={activeStep === totalSteps - 1} variant='contained'>
-                        Next
-                    </Button>
-                </Box>
-            </Box>
-        </LocalizationProvider>
+                                    {element.type === 'Dropdown' && (
+                                        <div>
+                                            <p className="text-lg font-medium mb-2">{element.text}</p>
+                                            <select
+                                                value={selectedDropdownValue}
+                                                onChange={(event) => handleDropdownValueChange(event, element.text)}
+                                                className={inputCls}
+                                            >
+                                                <option value="">Select an option</option>
+                                                {element.options.map((option) => (
+                                                    <option key={option.text} value={option.text}>
+                                                        {option.text}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    )}
+
+                                    {element.type === 'Date' && (
+                                        <div>
+                                            <p className="text-lg font-medium mb-2">{element.text}</p>
+                                            <input
+                                                type="date"
+                                                value={startDate || ''}
+                                                onChange={(e) => {
+                                                    handleStartDateChange(e.target.value);
+                                                    setAnsweredElements((prev) => ({ ...prev, [element.text]: true }));
+                                                }}
+                                                className={inputCls}
+                                            />
+                                        </div>
+                                    )}
+
+                                    {element.type === 'File Upload' && (
+                                        <div>
+                                            <p className="text-lg font-medium mb-2">{element.text}</p>
+                                            <div title="Unavailable in preview mode" className="inline-block">
+                                                <Button size="sm" disabled>Upload</Button>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {element.type === 'Text Editor' && (
+                                        <div>
+                                            <p className="text-sm text-gray-700">{stripHtmlTags(element.text)}</p>
+                                        </div>
+                                    )}
+                                </div>
+                            )
+                        )}
+                    </div>
+                )
+            )}
+
+            {/* Navigation */}
+            <div className="flex gap-3 mt-5">
+                <Button variant="outline" disabled={activeStep === 0} onClick={handleBack}>
+                    Back
+                </Button>
+                <Button disabled={activeStep === totalSteps - 1} onClick={handleNext}>
+                    Next
+                </Button>
+            </div>
+        </div>
     );
 };
 

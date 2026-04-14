@@ -1,17 +1,4 @@
 import React, { useState, useEffect, useMemo } from "react";
-import {
-  OutlinedInput,
-  FormControl,
-  Chip,
-  Box,
-  Button,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField,
-  Typography,
-  Autocomplete,
-} from "@mui/material";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import axios from "axios";
@@ -216,350 +203,110 @@ const ContactForm = ({
       });
   };
 
+  const inputCls = "w-full mt-1 rounded border border-gray-200 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-400";
+  const labelCls = "block text-sm font-medium text-gray-700 mb-0.5";
+
   return (
     <form
-      style={{
-        paddingRight: "3%",
-        paddingLeft: "3%",
-        height: "90vh",
-        overflowY: "auto",
-      }}
+      style={{ paddingRight: "3%", paddingLeft: "3%", height: "90vh", overflowY: "auto" }}
       className="contact-form"
     >
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: isSmallScreen ? "column" : "row",
-          gap: isSmallScreen ? 2 : 5,
-          padding: "1px 5px 0 2px",
-          mt: 1,
-        }}
-      >
-        <Box>
-          {/* <InputLabel sx={{ color: "black" }}>First name</InputLabel> */}
-          <InputLabel sx={{ color: "black" }}>First name</InputLabel>
-          <TextField
-            margin="normal"
-            fullWidth
-            name="firstName"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            placeholder="First Name"
-            size="small"
-          />
-        </Box>
-        <Box>
-          <InputLabel sx={{ color: "black" }}>Middle Name</InputLabel>
-          <TextField
-            margin="normal"
-            fullWidth
-            name="middleName"
-            value={middleName}
-            onChange={(e) => setMiddleName(e.target.value)}
-            placeholder="Middle Name"
-            size="small"
-          />
-        </Box>
-        <Box>
-          <InputLabel sx={{ color: "black" }}>Last Name</InputLabel>
-          <TextField
-            fullWidth
-            name="lastName"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            margin="normal"
-            placeholder="Last name"
-            size="small"
-          />
-        </Box>
-      </Box>
-      <Box mt={1}>
-        <InputLabel sx={{ color: "black" }}>Contact Name</InputLabel>
-        <TextField
-          name="contactName"
-          value={contactName}
-          onChange={(e) => setContactName(e.target.value)}
-          fullWidth
-          placeholder="Contact Name"
-          margin="normal"
-          size="small"
-        />
-      </Box>
-      <Box mt={1}>
-        <InputLabel sx={{ color: "black" }}>Company Name</InputLabel>
-        <TextField
-          fullWidth
-          name="companyName"
-          value={companyName}
-          onChange={(e) => setCompanyName(e.target.value)}
-          margin="normal"
-          placeholder="Company Name"
-          size="small"
-        />
-      </Box>
-      <Box mt={1}>
-        <InputLabel sx={{ color: "black" }}>Note</InputLabel>
-        <TextField
-          fullWidth
-          name="note"
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          margin="normal"
-          placeholder="Note"
-          size="small"
-        />
-      </Box>
-      <Box mt={1}>
-        <InputLabel sx={{ color: "black" }}>SSN</InputLabel>
-        <TextField
-          fullWidth
-          name="ssn"
-          value={ssn}
-          onChange={(e) => setSsn(e.target.value)}
-          margin="normal"
-          placeholder="SSN"
-          size="small"
-        />
-      </Box>
-      <Box mt={1}>
-        <InputLabel sx={{ color: "black" }}>Email</InputLabel>
-        <TextField
-          fullWidth
-          name="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          margin="normal"
-          placeholder="Email"
-          size="small"
-        />
-      </Box>
-      <Box mt={1}>
-        <InputLabel sx={{ color: "black", mb: 1 }}>Tags</InputLabel>
-        <TagsMultiSelectDropDown
-          value={tagsNew}
-          onChange={handleTagChange}
-          placeholder="Tags"
-        />
-      </Box>
-      <Typography
-        variant="h6"
-        gutterBottom
-        sx={{ ml: 1, fontWeight: "bold", mt: 3 }}
-      >
-        Phone Numbers
-      </Typography>
-      {phoneNumbers.map((phone) => (
-        <Box
-          key={phone.id}
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 2,
-            ml: 1,
-            mb: 2,
-          }}
-        >
-          {phone.isPrimary && (
-            <Chip
-              label="Primary phone"
-              color="primary"
-              size="small"
-              sx={{ position: "absolute", mt: -3 }}
-            />
-          )}
+      <div className={`mt-1 flex ${isSmallScreen ? "flex-col gap-2" : "flex-row gap-5"} px-1`}>
+        <div className="flex-1">
+          <label className={labelCls}>First name</label>
+          <input className={inputCls} name="firstName" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="First Name" />
+        </div>
+        <div className="flex-1">
+          <label className={labelCls}>Middle Name</label>
+          <input className={inputCls} name="middleName" value={middleName} onChange={(e) => setMiddleName(e.target.value)} placeholder="Middle Name" />
+        </div>
+        <div className="flex-1">
+          <label className={labelCls}>Last Name</label>
+          <input className={inputCls} name="lastName" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Last name" />
+        </div>
+      </div>
 
-          {/* <PhoneInput
-  country={phone.country || "us"}
-  value={phone.phone}
-  // onChange={(phoneValue) => handlePhoneNumberChange(phone.id, phoneValue)}
-     onChange={(value, country) => handlePhoneNumberChange(value, country, phone.id)}
-  inputStyle={{
-    width: "100%",
-  }}
-  buttonStyle={{
-    borderTopLeftRadius: "8px",
-    borderBottomLeftRadius: "8px",
-  }}
-  containerStyle={{
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
-  }}
-/> */}
+      {[{label:"Contact Name",val:contactName,set:setContactName,name:"contactName",ph:"Contact Name"},
+        {label:"Company Name",val:companyName,set:setCompanyName,name:"companyName",ph:"Company Name"},
+        {label:"Note",val:note,set:setNote,name:"note",ph:"Note"},
+        {label:"SSN",val:ssn,set:setSsn,name:"ssn",ph:"SSN"},
+        {label:"Email",val:email,set:setEmail,name:"email",ph:"Email"},
+      ].map(({label,val,set,name,ph}) => (
+        <div key={name} className="mt-2">
+          <label className={labelCls}>{label}</label>
+          <input className={inputCls} name={name} value={val} onChange={(e) => set(e.target.value)} placeholder={ph} />
+        </div>
+      ))}
+
+      <div className="mt-2">
+        <label className={labelCls}>Tags</label>
+        <TagsMultiSelectDropDown value={tagsNew} onChange={handleTagChange} placeholder="Tags" />
+      </div>
+
+      <h6 className="ml-1 font-bold mt-5 mb-2 text-base">Phone Numbers</h6>
+      {phoneNumbers.map((phone) => (
+        <div key={phone.id} className="flex flex-row items-center gap-2 ml-1 mb-3">
+          {phone.isPrimary && (
+            <span className="absolute -mt-6 inline-block rounded-full bg-blue-600 px-2 py-0.5 text-[10px] font-semibold text-white">Primary phone</span>
+          )}
           <PhoneInput
             country={"us"}
             value={phone.phone}
-            // onChange={(phoneValue) => handlePhoneNumberChange(phone.id, phoneValue)}
-            onChange={(value, country) =>
-              handlePhoneNumberChange(value, country, phone.id)
-            }
-            inputStyle={{
-              width: "100%",
-            }}
-            buttonStyle={{
-              borderTopLeftRadius: "8px",
-              borderBottomLeftRadius: "8px",
-            }}
-            containerStyle={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-            }}
+            onChange={(value, country) => handlePhoneNumberChange(value, country, phone.id)}
+            inputStyle={{ width: "100%" }}
+            buttonStyle={{ borderTopLeftRadius: "8px", borderBottomLeftRadius: "8px" }}
+            containerStyle={{ display: "flex", alignItems: "center", gap: "8px" }}
           />
-          <AiOutlineDelete
-            onClick={() => handleDeletePhoneNumber(phone.id)}
-            style={{ cursor: "pointer", color: "red" }}
-          />
-        </Box>
+          <AiOutlineDelete onClick={() => handleDeletePhoneNumber(phone.id)} style={{ cursor: "pointer", color: "red" }} />
+        </div>
       ))}
-      <Box
-        sx={{
-          display: "flex",
-          gap: 2,
-          alignItems: isSmallScreen ? "center" : "flex-start",
-          ml: 1,
-          cursor: "pointer",
-          color: "blue",
-          fontWeight: 600,
-        }}
-        onClick={handleAddPhoneNumber}
-      >
-        <AiOutlinePlusCircle style={{ marginTop: "20px" }} />
+      <div className="flex gap-2 items-center ml-1 cursor-pointer text-blue-600 font-semibold" onClick={handleAddPhoneNumber}>
+        <AiOutlinePlusCircle className="mt-1" />
         <p>Add phone number</p>
-      </Box>
-      <Typography
-        variant="h6"
-        gutterBottom
-        sx={{ ml: 1, fontWeight: "bold", mt: 3 }}
-      >
-        Address
-      </Typography>
-      <Box mt={1}>
-        <InputLabel sx={{ color: "black" }}>Country</InputLabel>
-        {/* <Select
-          size="small"
-          value={selectedCountry.code}
-          onChange={handleCountryChange}
-          sx={{
-            width: "100%",
-            marginTop: "8px",
-          }}
-        >
-          {countries.map((country) => (
-            <MenuItem key={country.code} value={country.code}>
-              {country.name}
-            </MenuItem>
-          ))}
-        </Select> */}
-        <Autocomplete
-          options={options}
-          size="small"
-          getOptionLabel={(option) => option.label} // show country name
-          value={selectedCountry || ""}
-          onChange={(event, newValue) => setSelectedCountry(newValue)}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              placeholder="Select Country"
-              variant="outlined"
-            />
-          )}
-        />
-      </Box>
-      <Box mt={2}>
-        <InputLabel sx={{ color: "black" }}>Street Address</InputLabel>
-        <TextField
-          fullWidth
-          name="streetAddress"
-          value={streetAddress}
-          onChange={(e) => setStreetAddress(e.target.value)}
-          margin="normal"
-          placeholder="Street Address"
-          size="small"
-        />
-      </Box>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: isSmallScreen ? "column" : "row",
-          gap: isSmallScreen ? 2 : 5,
-          padding: "1px 5px 0 1px",
-          mt: 1,
-        }}
-      >
-        <Box>
-          <InputLabel sx={{ color: "black" }}>City</InputLabel>
-          <TextField
-            fullWidth
-            name="city"
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            margin="normal"
-            placeholder="City"
-            size="small"
-          />
-        </Box>
-        <Box>
-          <InputLabel sx={{ color: "black" }}>State</InputLabel>
-          <TextField
-            fullWidth
-            name="state"
-            value={state}
-            onChange={(e) => setState(e.target.value)}
-            margin="normal"
-            placeholder="State"
-            size="small"
-          />
-        </Box>
-        <Box>
-          <InputLabel sx={{ color: "black" }}>Postal Code</InputLabel>
-          <TextField
-            fullWidth
-            name="postalCode"
-            value={postalCode}
-            onChange={(e) => setPostalCode(e.target.value)}
-            margin="normal"
-            placeholder="Postal Code"
-            size="small"
-          />
-        </Box>
-      </Box>
-      <Box sx={{ mt: 2, mb: 2 }}>
-        <Button
-          variant="contained"
-          onClick={handleSave} // Attach the save handler
-          sx={{
-            backgroundColor: "var(--color-save-btn)", // Normal background
+      </div>
 
-            "&:hover": {
-              backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-            },
-            width: "80px",
-            borderRadius: "15px",
+      <h6 className="ml-1 font-bold mt-5 mb-2 text-base">Address</h6>
+      <div className="mt-2">
+        <label className={labelCls}>Country</label>
+        <select
+          className={inputCls}
+          value={selectedCountry?.value || ""}
+          onChange={(e) => {
+            const opt = options.find((o) => o.value === e.target.value);
+            setSelectedCountry(opt || null);
           }}
         >
+          <option value="">Select Country</option>
+          {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+        </select>
+      </div>
+      <div className="mt-2">
+        <label className={labelCls}>Street Address</label>
+        <input className={inputCls} name="streetAddress" value={streetAddress} onChange={(e) => setStreetAddress(e.target.value)} placeholder="Street Address" />
+      </div>
+      <div className={`mt-2 flex ${isSmallScreen ? "flex-col gap-2" : "flex-row gap-5"} px-0.5`}>
+        <div className="flex-1">
+          <label className={labelCls}>City</label>
+          <input className={inputCls} name="city" value={city} onChange={(e) => setCity(e.target.value)} placeholder="City" />
+        </div>
+        <div className="flex-1">
+          <label className={labelCls}>State</label>
+          <input className={inputCls} name="state" value={state} onChange={(e) => setState(e.target.value)} placeholder="State" />
+        </div>
+        <div className="flex-1">
+          <label className={labelCls}>Postal Code</label>
+          <input className={inputCls} name="postalCode" value={postalCode} onChange={(e) => setPostalCode(e.target.value)} placeholder="Postal Code" />
+        </div>
+      </div>
+
+      <div className="flex gap-3 mt-4 mb-4">
+        <button type="button" onClick={handleSave} className="rounded-full px-5 py-1.5 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)]">
           Save
-        </Button>
-        <Button
-          variant="outlined"
-          onClick={handleClose}
-          sx={{
-            borderColor: "var(--color-border-cancel-btn)", // Normal background
-            color: "var(--color-save-btn)",
-            "&:hover": {
-              backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-              color: "#fff",
-              border: "none",
-            },
-            width: "80px",
-            borderRadius: "15px",
-            ml: 2,
-          }}
-        >
+        </button>
+        <button type="button" onClick={handleClose} className="rounded-full px-5 py-1.5 text-sm font-medium border border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white">
           Cancel
-        </Button>
-      </Box>
+        </button>
+      </div>
     </form>
   );
 };

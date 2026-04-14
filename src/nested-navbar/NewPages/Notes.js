@@ -1,21 +1,10 @@
 import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import Editor from "../../Templates/Texteditor/Editor";
-import {
-  Box,
-  Button,
-  ToggleButton,
-  ToggleButtonGroup,
-  Typography,
-  Card,
-  CardContent,
-  IconButton,
-  Stack,Dialog,DialogActions,DialogContent,DialogContentText,TextField,DialogTitle
-} from "@mui/material";
-import { Edit, Delete, PushPin, Archive, Unarchive } from "@mui/icons-material";
 import { useParams } from "react-router-dom";
 import { LoginContext } from "../../Sidebar/Context/Context";
 import { toast } from "react-toastify";
+import { MdPushPin, MdOutlinePushPin, MdArchive, MdUnarchive, MdDelete } from "react-icons/md";
 
 const NoteApp = () => {
   const ACC_NOTE = process.env.REACT_APP_ACCOUNT_NOTE_URL
@@ -283,316 +272,134 @@ const handleConfirmDelete = async () => {
     console.error("Failed to delete note:", error);
   }
 };
+  const saveBtnCls = "rounded-full px-5 py-1.5 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)]";
+  const cancelBtnCls = "rounded-full px-5 py-1.5 text-sm font-medium border border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white";
+
   return (
-    <Box sx={{ padding: 4, backgroundColor: "#f9fbfd", minHeight: "100vh" }}>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          mb: 2,
-        }}
-      >
-        <ToggleButtonGroup
-          value={view}
-          exclusive
-          onChange={handleViewChange}
-          sx={{ backgroundColor: "#e8edf3", borderRadius: 2 }}
-        >
-          <ToggleButton
-            value="active"
-            sx={{
-              padding: "8px 16px",
-              borderRadius: "10px",
-              fontSize: "15px",
-              fontWeight: view === "active" ? "bold" : "normal",
-              color: view === "active" ? "var(--color-save-btn)" : "#333",
-              backgroundColor: view === "active" ? "#fff" : "transparent",
-              textTransform: "none",
-              transition: "all 0.3s ease",
-              "&.Mui-selected": {
-                backgroundColor: "#fff !important",
-                fontWeight: "bold",
-                color: "var(--color-save-btn)",
-              },
-            }}
-          >
-            Active
-          </ToggleButton>
-
-          <ToggleButton
-            value="archived"
-            sx={{
-              padding: "8px 16px",
-              borderRadius: "10px",
-              fontSize: "15px",
-              fontWeight: view === "archived" ? "bold" : "normal",
-              color: view === "archived" ? "var(--color-save-btn)" : "#333",
-              backgroundColor: view === "archived" ? "#fff" : "transparent",
-              textTransform: "none",
-              transition: "all 0.3s ease",
-              "&.Mui-selected": {
-                backgroundColor: "#fff !important",
-                fontWeight: "bold",
-                color: "var(--color-save-btn)",
-              },
-            }}
-          >
-            Archived
-          </ToggleButton>
-        </ToggleButtonGroup>
-
-        <Button
-          variant="contained"
-        sx={{
-            backgroundColor: "var(--color-save-btn)",
-            "&:hover": {
-              backgroundColor: "var(--color-save-hover-btn)",
-            },
-            borderRadius: "15px",
-          }}
-          onClick={() => setNewNoteVisible(true)}
-        >
+    <div className="p-6 bg-[#f9fbfd] min-h-screen">
+      {/* Top bar */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center bg-[#e8edf3] rounded-xl p-1.5 gap-1">
+          {[{ label: "Active", val: "active" }, { label: "Archived", val: "archived" }].map(({ label, val }) => (
+            <button key={val} type="button"
+              onClick={() => handleViewChange(null, val)}
+              className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                view === val ? 'bg-white font-bold text-[var(--color-save-btn)]' : 'text-gray-600'
+              }`}
+            >{label}</button>
+          ))}
+        </div>
+        <button type="button" onClick={() => setNewNoteVisible(true)} className={saveBtnCls}>
           New note
-        </Button>
-      </Box>
+        </button>
+      </div>
 
+      {/* New note editor */}
       {newNoteVisible && (
-        <Box sx={{ mb: 3 }}>
+        <div className="mb-4">
           <Editor onChange={handleEditorChange} content={newNoteText} />
-          <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
-            <Button onClick={handleAddNote} variant="contained" sx={{
-            backgroundColor: "var(--color-save-btn)",
-            "&:hover": {
-              backgroundColor: "var(--color-save-hover-btn)",
-            },
-            borderRadius: "15px",
-          }}>
-              Save
-            </Button>
-            <Button onClick={() => setNewNoteVisible(false)} variant="outlined" sx={{
-              borderColor: "var(--color-border-cancel-btn)", // Normal background
-              color: "var(--color-save-btn)",
-              "&:hover": {
-                backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                color: "#fff",
-                border: "none",
-              },
-              
-              borderRadius: "15px",
-            }}>
-              Cancel
-            </Button>
-          </Box>
-        </Box>
+          <div className="flex gap-2 mt-2">
+            <button type="button" onClick={handleAddNote} className={saveBtnCls}>Save</button>
+            <button type="button" onClick={() => setNewNoteVisible(false)} className={cancelBtnCls}>Cancel</button>
+          </div>
+        </div>
       )}
 
-      
-      <Stack spacing={2}>
+      {/* Notes list */}
+      <div className="space-y-3">
         {filteredNotes.map((note) => (
-          <Card
-            key={note.id}
-            variant="outlined"
-            sx={{
-              borderRadius: 2,
-              borderLeft: note.pinned ? "4px solid #ffc107" : "",
-            }}
+          <div key={note.id}
+            className={`rounded-lg border bg-white p-4 ${
+              note.pinned ? 'border-l-4 border-l-yellow-400 border-gray-200' : 'border-gray-200'
+            }`}
           >
-            <CardContent>
-              {editingNoteId === note.id ? (
-                <>
-                  <Editor
-                    onChange={setEditingNoteText}
-                    initialContent={editingNoteText}
-                  />
-                  <Box sx={{ display: "flex", gap: 2, mt: 5 }}>
-                    <Button onClick={handleUpdateNote} variant="contained" sx={{
-            backgroundColor: "var(--color-save-btn)",
-            "&:hover": {
-              backgroundColor: "var(--color-save-hover-btn)",
-            },
-            borderRadius: "15px",
-          }}>
-                      Update
-                    </Button>
-                    <Button onClick={handleCancelEdit} variant="outlined" sx={{
-              borderColor: "var(--color-border-cancel-btn)", // Normal background
-              color: "var(--color-save-btn)",
-              "&:hover": {
-                backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                color: "#fff",
-                border: "none",
-              },
-              
-              borderRadius: "15px",
-            }}>
-                      Cancel
-                    </Button>
-                  </Box>
-                </>
-              ) : (
-                <>
-                 <Typography 
-  variant="body1" 
-  gutterBottom
-  dangerouslySetInnerHTML={{
-    __html: note.text || "No content available"
-  }}
-  sx={{
-    '& img': { maxWidth: '100%' }, // Optional: style embedded content
-    '& a': { wordBreak: 'break-all' } // Optional: style links
-  }}
-/>
-                  <Box
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="center"
-                  >
-                    <Box>
-                      {view === "active" ? (
-                        <>
-                          <IconButton
-                            size="small"
-                            onClick={() => handleTogglePin(note.id)}
-                            color={note.pinned ? "primary" : "default"}
-                          >
-                            <PushPin fontSize="small" />
-                          </IconButton>
-                          <IconButton
-                            size="small"
-                            onClick={() => handleArchiveNote(note.id)}
-                          >
-                            <Archive fontSize="small" />
-                          </IconButton>
-                          <IconButton
-                            size="small"
-                            onClick={() => handleEditNote(note.id, note.text)}
-                            sx={{
-                              color: "#1976d2",
-                              "&:hover": {
-                                backgroundColor: "rgba(25, 118, 210, 0.08)",
-                              },
-                            }}
-                          >
-                            {/* <Edit fontSize="small" /> */}
-                          </IconButton>
-                          <Typography
-                            component="span"
-                            sx={{
-                              fontSize: "0.875rem",
-                              color: "#1976d2",
-                              cursor: "pointer",
-                            }}
-                            onClick={() => handleEditNote(note.id, note.text)}
-                          >
-                            Edit
-                          </Typography>
-                        </>
-                      ) : (
-                        <>
-                          <IconButton size="small"  onClick={() => handleUnarchiveNote(note.id)}>
-                            <Unarchive fontSize="small"  sx={{
-                              color: "#1976d2",
-                              "&:hover": {
-                                backgroundColor: "rgba(255, 61, 0, 0.08)",
-                              },
-                            }}/>
-                            <Typography
-                             component="span"
-                             
-                             sx={{
-                              fontSize: "0.875rem",
-                              color: "#1976d2",
-                              cursor: "pointer",
-                              ml: 1,
-                            }}
-                            >
-                              Move to Active
-                            </Typography>
-                          </IconButton>
-                          <IconButton
-                            size="small"
-                            onClick={() => handleDeleteClick(note.id)}
-                            sx={{
-                              color: "#ff3d00",
-                              "&:hover": {
-                                backgroundColor: "rgba(255, 61, 0, 0.08)",
-                              },
-                            }}
-                          >
-                            <Delete fontSize="small" />
-                          </IconButton>
-                          <Typography
-                            component="span"
-                            sx={{
-                              fontSize: "0.875rem",
-                              color: "#ff3d00",
-                              cursor: "pointer",
-                              ml: 1,
-                            }}
-                            onClick={() => handleDeleteClick(note.id)}
-                          >
-                            Delete
-                          </Typography>
-                        </>
-                      )}
-                    </Box>
-                    <Typography variant="caption" color="text.secondary">
-                      {view === "active" ? (
-                        `Created by ${note.createdBy} on ${note.time}`
-                      ) : (
-                        `Archived by ${note.createdBy} on ${note.time}`
-                        
-                      )}
-                    </Typography>
-                   
-                  </Box>
-                </>
-              )}
-            </CardContent>
-          </Card>
+            {editingNoteId === note.id ? (
+              <div>
+                <Editor onChange={setEditingNoteText} initialContent={editingNoteText} />
+                <div className="flex gap-2 mt-5">
+                  <button type="button" onClick={handleUpdateNote} className={saveBtnCls}>Update</button>
+                  <button type="button" onClick={handleCancelEdit} className={cancelBtnCls}>Cancel</button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <div
+                  className="text-sm text-gray-800 mb-3 [&_img]:max-w-full [&_a]:break-all"
+                  dangerouslySetInnerHTML={{ __html: note.text || "No content available" }}
+                />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    {view === "active" ? (
+                      <>
+                        <button type="button" onClick={() => handleTogglePin(note.id)}
+                          className={`p-1 rounded hover:bg-gray-100 ${
+                            note.pinned ? 'text-blue-500' : 'text-gray-400'
+                          }`}>
+                          {note.pinned ? <MdPushPin size={16} /> : <MdOutlinePushPin size={16} />}
+                        </button>
+                        <button type="button" onClick={() => handleArchiveNote(note.id)}
+                          className="p-1 rounded hover:bg-gray-100 text-gray-400">
+                          <MdArchive size={16} />
+                        </button>
+                        <button type="button" onClick={() => handleEditNote(note.id, note.text)}
+                          className="text-sm text-blue-600 cursor-pointer hover:underline">
+                          Edit
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button type="button" onClick={() => handleUnarchiveNote(note.id)}
+                          className="flex items-center gap-1 text-sm text-blue-600 cursor-pointer hover:underline">
+                          <MdUnarchive size={16} /> Move to Active
+                        </button>
+                        <button type="button" onClick={() => handleDeleteClick(note.id)}
+                          className="flex items-center gap-1 text-sm text-red-500 cursor-pointer hover:underline">
+                          <MdDelete size={16} /> Delete
+                        </button>
+                      </>
+                    )}
+                  </div>
+                  <span className="text-xs text-gray-400">
+                    {view === "active"
+                      ? `Created by ${note.createdBy} on ${note.time}`
+                      : `Archived by ${note.createdBy} on ${note.time}`}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
         ))}
-      </Stack>
-      <Dialog
-      open={deleteConfirmOpen}
-      onClose={() => setDeleteConfirmOpen(false)}
-      maxWidth="sm"
-      fullWidth
-    >
-      <DialogTitle>Delete the note?</DialogTitle>
-      <DialogContent>
-        <DialogContentText>
-          Are you sure you want to delete this note?
-        </DialogContentText>
-        <DialogContentText sx={{ mt: 1 }}>
-          This action is not reversible. If you proceed to delete the note, 
-          you will not be able to recover it.
-        </DialogContentText>
-        
-        <Typography variant="body2" sx={{ mt: 3, mb: 1, fontWeight: 500 }}>
-          To proceed, type <strong>DELETE</strong> below.
-        </Typography>
-        
-        <TextField
-          fullWidth
-          value={deleteConfirmationText}
-          onChange={handleDeleteConfirmationChange}
-          placeholder="Enter DELETE to confirm"
-        />
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={() => setDeleteConfirmOpen(false)}>Cancel</Button>
-        <Button 
-          onClick={handleConfirmDelete}
-          color="error"
-          disabled={!isDeleteEnabled}
-         variant="contained"
-        >
-          Delete
-        </Button>
-      </DialogActions>
-    </Dialog>
-    </Box>
+      </div>
+
+      {/* Delete confirm modal */}
+      {deleteConfirmOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/30" onClick={() => setDeleteConfirmOpen(false)} />
+          <div className="relative bg-white rounded-lg shadow-xl w-full max-w-sm p-6">
+            <h2 className="text-base font-semibold mb-2">Delete the note?</h2>
+            <p className="text-sm text-gray-600">Are you sure you want to delete this note?</p>
+            <p className="text-sm text-gray-600 mt-1">This action is not reversible. If you proceed to delete the note, you will not be able to recover it.</p>
+            <p className="text-sm font-medium mt-4 mb-1">To proceed, type <strong>DELETE</strong> below.</p>
+            <input
+              type="text"
+              className="w-full rounded border border-gray-200 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+              value={deleteConfirmationText}
+              onChange={handleDeleteConfirmationChange}
+              placeholder="Enter DELETE to confirm"
+            />
+            <div className="flex justify-end gap-2 mt-4">
+              <button type="button" onClick={() => setDeleteConfirmOpen(false)} className={cancelBtnCls}>Cancel</button>
+              <button type="button" onClick={handleConfirmDelete} disabled={!isDeleteEnabled}
+                className={`rounded-full px-5 py-1.5 text-sm font-medium text-white ${
+                  isDeleteEnabled ? 'bg-red-500 hover:bg-red-600' : 'bg-red-200 cursor-not-allowed'
+                }`}>
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography, Autocomplete, TextField } from "@mui/material";
 const UpdateJob = ({ selectedJob, handleClose }) => {
   const PIPELINE_API = process.env.REACT_APP_PIPELINE_TEMP_URL;
   useEffect(() => {
@@ -44,32 +43,25 @@ const UpdateJob = ({ selectedJob, handleClose }) => {
     label: pipelineData.pipelineName,
   }));
   return (
-    <Box>
-      <Box mt={2}>
+    <div>
+      <div className="mt-3">
         <label className="job-input-label">Pipeline</label>
-
-        <Autocomplete
-          options={optionpipeline}
-          getOptionLabel={(option) => option.label}
-          value={selectedPipeline}
-          onChange={(event, newValue) => handlePipelineChange(newValue)}
-          isOptionEqualToValue={(option, value) => option.value === value.value}
-          renderOption={(props, option) => (
-            <Box
-              component="li"
-              {...props}
-              sx={{ cursor: "pointer", margin: "5px 10px" }} // Add cursor pointer style
-            >
-              {option.label}
-            </Box>
-          )}
-          renderInput={(params) => <TextField {...params} sx={{ backgroundColor: "#fff" }} placeholder="Pipeline" variant="outlined" size="small" />}
-          sx={{ width: "100%", marginTop: "8px" }}
-          clearOnEscape // Enable clearable functionality
-        />
-      </Box>
-      <Typography> edit job</Typography>
-    </Box>
+        <select
+          className="w-full mt-1 rounded border border-gray-200 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+          value={selectedPipeline?.value || ""}
+          onChange={(e) => {
+            const opt = optionpipeline.find(o => o.value === e.target.value);
+            if (opt) handlePipelineChange(opt);
+          }}
+        >
+          <option value="">Pipeline</option>
+          {optionpipeline.map(o => (
+            <option key={o.value} value={o.value}>{o.label}</option>
+          ))}
+        </select>
+      </div>
+      <p className="mt-3 text-sm text-gray-700">edit job</p>
+    </div>
   );
 };
 

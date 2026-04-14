@@ -1,14 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import './overview.css'
 import { Link } from 'react-router-dom'
-import { IoDocumentTextOutline, IoMailOpenOutline } from "react-icons/io5";
-import { PiChats, PiNotepad } from "react-icons/pi";
-import { GrNotes } from "react-icons/gr";
-import { CgNotes } from "react-icons/cg";
-import { HiOutlineDocumentDuplicate } from "react-icons/hi2";
-import { TbSubtask } from "react-icons/tb";
-import { useNavigate, useParams, useRouteLoaderData } from "react-router-dom";
-import { Typography, Card, CardContent, Divider, Box, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { PiNotepad } from "react-icons/pi";
+import { useParams } from "react-router-dom";
 
 
 const Overview = () => {
@@ -138,252 +131,143 @@ const accountwiseChatlist = (data, isActiveTrue) => {
       });
   };
 
+  const EmptyState = ({ label }) => (
+    <div className="flex flex-col items-center py-8 text-gray-300">
+      <PiNotepad className="text-5xl mb-2" />
+      <p className="text-xs text-gray-400">{label}</p>
+    </div>
+  );
+
+  const SectionHeader = ({ title, to }) => (
+    <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
+      <h3 className="text-sm font-semibold text-gray-800">{title}</h3>
+      <Link to={to} className="text-xs font-medium text-blue-500 hover:text-blue-600 no-underline transition-colors">View all</Link>
+    </div>
+  );
+
+  const TableHead = ({ cols }) => (
+    <thead>
+      <tr className="bg-gray-50 border-b border-gray-100">
+        {cols.map(c => <th key={c} className="px-4 py-2.5 text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wide">{c}</th>)}
+      </tr>
+    </thead>
+  );
+
   return (
-    <div className='overview-container' style={{ display: 'flex', gap: '5%', }}>
-      <div className='boxone'>
-        <div className='document-card'>
-          <Box sx={{display:'flex', alignItems:'center', justifyContent:'space-between'}}>
-            <h3>Chats</h3>
-            <Link to={`/clients/accounts/accountsdash/communication/${data}`}>View all</Link>
-          </Box>
-          <div className='underline'></div>
-        
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell><strong>Chat Subject</strong></TableCell>
-          
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {chats.length > 0 ? (
-            chats.map((chat) => (
-              <TableRow key={chat._id}>
-                <TableCell>{chat.chatsubject}</TableCell>
-                
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={3} align="center">No chats available</TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-   
-        </div>
-       
-        <Box sx={{display:'flex', alignItems:'center', justifyContent:'space-between'}}>
-          <Typography variant="h7" component="h3" sx={{ fontWeight: 'bold' }}>
-            Organizers
-          </Typography>
-          <Link to={`/clients/accounts/accountsdash/organizers/${data}`} style={{ textDecoration: 'none', color: '#1976d2' }}>
-            View all
-          </Link>
-        </Box>
-        <div className='underline'></div>
-        <CardContent>
-          <Box display="flex" flexDirection="column" alignItems="center" textAlign="center">
-            {organizerTemplatesData && organizerTemplatesData.length > 0 ? (
-              // Show the table when there are records
-              <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>
-                      <strong>Name</strong>
-                    </TableCell>
-                    <TableCell>
-                      <strong>Status</strong>
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {organizerTemplatesData.map((row) => (
-                    <TableRow key={row._id}>
-                      <TableCell>
-                       
-                          {row.organizertemplateid?.organizerName || "Unnamed Template"}
-                      
-                      </TableCell>
-                      <TableCell></TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            ) : (
-              // Show the fallback UI when there are no records
-              <Box>
-                <PiNotepad style={{ fontSize: '4rem', color: '#9e9e9e' }} />
-                <Typography variant="body1" color="textSecondary" mt={2} sx={{
-                  color: "text.disabled", // Use Material-UI's disabled text color
-                  mt: 2,
-                }}>
-                  No Organizers available
-                </Typography>
-              </Box>
-            )}
-          </Box>
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
-        </CardContent>
-       
+      {/* ── LEFT COLUMN ── */}
+      <div className="space-y-5">
 
-
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-          <Typography variant="h7" component="h3" sx={{ fontWeight: 'bold' }}>
-            Proposals & ELs
-          </Typography>
-          <Link
-            to={`/clients/accounts/accountsdash/proposals/${data}`}
-            style={{ textDecoration: 'none', color: '#1976d2' }}
-          >
-            View all
-          </Link>
-        </Box>
-        <div className='underline'></div>
-
-        <CardContent>
-          <Box display="flex" flexDirection="column" alignItems="center" textAlign="center">
-            {ProposalsTemplates && ProposalsTemplates.length === 0 ? (
-              // Show icon when the data is empty
-              // <PiNotepad style={{ fontSize: '4rem', color: '#9e9e9e' }} />
-              <Box>
-                <PiNotepad style={{ fontSize: '4rem', color: '#9e9e9e' }} />
-                <Typography variant="body1" color="textSecondary" mt={2} sx={{
-                  color: "text.disabled", // Use Material-UI's disabled text color
-                  mt: 2,
-                }}>
-                  No Proposals
-                </Typography>
-              </Box>
-            ) : (
-              // Show table when there are records
-              <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>
-                      <strong>Name</strong>
-                    </TableCell>
-                    <TableCell>
-                      <strong>Status</strong>
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {ProposalsTemplates.map((row) => (
-                    <TableRow key={row._id}>
-                      <TableCell>
-                       
-                          {row.proposalname}
-                       
-                      </TableCell>
-                      <TableCell>a</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </Box>
-        </CardContent>
-
-
-      </div>
-      <div className='boxtwo'>
-       
-        <div className='document-card'>
-          <div className='heading'>
-            <h3>Jobs</h3>
-            <Link to={`/clients/accounts/accountsdash/workflow/${data}/activejobs`}>View all</Link>
+        {/* Chats card */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <SectionHeader title="Chats" to={`/clients/accounts/accountsdash/communication/${data}`} />
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <TableHead cols={["Chat Subject"]} />
+              <tbody className="divide-y divide-gray-50">
+                {chats.length > 0 ? chats.map((chat) => (
+                  <tr key={chat._id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-4 py-2.5 text-xs text-gray-700">{chat.chatsubject}</td>
+                  </tr>
+                )) : (
+                  <tr><td><EmptyState label="No chats available" /></td></tr>
+                )}
+              </tbody>
+            </table>
           </div>
-          <div className='underline'></div>
-          <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell><strong>Job Name</strong></TableCell>
-            <TableCell><strong>Pipeline</strong></TableCell>
-            <TableCell><strong>Stage</strong></TableCell>
-            {/* <TableCell><strong>Account</strong></TableCell>
-            <TableCell><strong>Start Date</strong></TableCell>
-            <TableCell><strong>Due Date</strong></TableCell>
-            <TableCell><strong>Priority</strong></TableCell> */}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {jobData.length > 0 ? (
-            jobData.map((job) => (
-              <TableRow key={job.id}>
-                <TableCell>{job.Name}</TableCell>
-                <TableCell>{job.Pipeline}</TableCell>
-                <TableCell></TableCell>
-                {/* <TableCell>{job.Stage.join(", ")}</TableCell> */}
-                {/* <TableCell>{job.Account.join(", ")}</TableCell> */}
-                {/* <TableCell>{new Date(job.StartDate).toLocaleDateString()}</TableCell> */}
-                {/* <TableCell>{new Date(job.DueDate).toLocaleDateString()}</TableCell> */}
-                {/* <TableCell>{job.Priority}</TableCell> */}
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={7} align="center">No jobs available</TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
         </div>
 
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-          <Typography variant="h7" component="h3" sx={{ fontWeight: 'bold' }}>
-            Unpaid invoices
-          </Typography>
-          <Link to={`/clients/accounts/accountsdash/invoices/${data}/invoice`} style={{ textDecoration: 'none', color: '#1976d2' }}>
-            View all
-          </Link>
-        </Box>
-        <div className='underline'></div>
-        <CardContent>
-          <Box display="flex" flexDirection="column" alignItems="center" textAlign="center">
-            {accountInvoicesData && accountInvoicesData.length > 0 ? (
-              // Show the table when there are records
-              <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>
-                      <strong>Name</strong>
-                    </TableCell>
-                    <TableCell>
-                      <strong>Status</strong>
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {accountInvoicesData.map((row) => (
-                    <TableRow key={row._id}>
-                      <TableCell>
-                      
-                          {row.invoicenumber}
-                       
-                      </TableCell>
-                      <TableCell>a</TableCell>
-                    </TableRow>
+        {/* Organizers card */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <SectionHeader title="Organizers" to={`/clients/accounts/accountsdash/organizers/${data}`} />
+          {organizerTemplatesData && organizerTemplatesData.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <TableHead cols={["Name", "Status"]} />
+                <tbody className="divide-y divide-gray-50">
+                  {organizerTemplatesData.map((row) => (
+                    <tr key={row._id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-2.5 text-xs text-gray-700">{row.organizertemplateid?.organizerName || "Unnamed Template"}</td>
+                      <td className="px-4 py-2.5 text-xs text-gray-400">—</td>
+                    </tr>
                   ))}
-                </TableBody>
-              </Table>
-            ) : (
-              // Show the fallback UI when no records
-              <Box>
-                <PiNotepad style={{ fontSize: '4rem', color: '#9e9e9e' }} />
-                <Typography variant="body1" color="textSecondary" mt={2} sx={{
-                  color: "text.disabled", // Use Material-UI's disabled text color
-                  mt: 2,
-                }}>
-                  No unpaid invoices
-                </Typography>
-              </Box>
-            )}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <EmptyState label="No organizers available" />
+          )}
+        </div>
 
-          </Box>
-        </CardContent>
+        {/* Proposals card */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <SectionHeader title="Proposals & ELs" to={`/clients/accounts/accountsdash/proposals/${data}`} />
+          {ProposalsTemplates && ProposalsTemplates.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <TableHead cols={["Name", "Status"]} />
+                <tbody className="divide-y divide-gray-50">
+                  {ProposalsTemplates.map((row) => (
+                    <tr key={row._id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-2.5 text-xs text-gray-700">{row.proposalname}</td>
+                      <td className="px-4 py-2.5 text-xs text-gray-400">—</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <EmptyState label="No proposals" />
+          )}
+        </div>
+      </div>
 
-       
+      {/* ── RIGHT COLUMN ── */}
+      <div className="space-y-5">
+
+        {/* Jobs card */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <SectionHeader title="Jobs" to={`/clients/accounts/accountsdash/workflow/${data}/activejobs`} />
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <TableHead cols={["Job Name", "Pipeline", "Stage"]} />
+              <tbody className="divide-y divide-gray-50">
+                {jobData.length > 0 ? jobData.map((job) => (
+                  <tr key={job.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-4 py-2.5 text-xs text-gray-700">{job.Name}</td>
+                    <td className="px-4 py-2.5 text-xs text-gray-500">{job.Pipeline}</td>
+                    <td className="px-4 py-2.5 text-xs text-gray-400">—</td>
+                  </tr>
+                )) : (
+                  <tr><td colSpan={3}><EmptyState label="No jobs available" /></td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Invoices card */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <SectionHeader title="Unpaid Invoices" to={`/clients/accounts/accountsdash/invoices/${data}/invoice`} />
+          {accountInvoicesData && accountInvoicesData.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <TableHead cols={["Invoice #", "Status"]} />
+                <tbody className="divide-y divide-gray-50">
+                  {accountInvoicesData.map((row) => (
+                    <tr key={row._id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-2.5 text-xs text-gray-700">{row.invoicenumber}</td>
+                      <td className="px-4 py-2.5 text-xs text-gray-400">—</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <EmptyState label="No unpaid invoices" />
+          )}
+        </div>
       </div>
     </div>
   )

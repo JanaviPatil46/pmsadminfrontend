@@ -1,52 +1,21 @@
-import {
-  Chip,
-  Box,
-  InputLabel,
-  InputAdornment,
-  IconButton,
-  Popover,
-  ListItem,
-  ListItemText,
-  Button,
-  List,
-  Grid,
-  Typography,
-  TextField,
-  label,
-  Switch,
-  FormControlLabel,
-  Autocomplete,
-  Drawer,
-  Checkbox,
-  Alert,
-  MenuItem,
-  Select,
-  FormControl,
-  OutlinedInput,
-} from "@mui/material";
 import React, { useState, useEffect, useContext } from "react";
 import Priority from "../Templates/Priority/Priority";
 import Editor from "../Templates/Texteditor/Editor";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import customParseFormat from "dayjs/plugin/customParseFormat";
 import axios from "axios";
 import { LoginContext } from "../Sidebar/Context/Context";
-import Cookies from "js-cookie";
-import DeleteIcon from "@mui/icons-material/Delete";
 import MultiSelectDropdown from "../Templates/MultiSelectDropdown";
 import AccountMultiSelectDropdown from "../Templates/AccountMultiSelectDropdown";
-import CloseIcon from "@mui/icons-material/Close";
+import { RxCross2 } from "react-icons/rx";
 import { format, formatDistanceToNow } from "date-fns";
 const JobDrawer = ({
   handleNewDrawerClose,
   handleDrawerClose,
   charLimit = 4000,
 }) => {
+  const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
   const { logindata } = useContext(LoginContext);
   const [loginuserid, setLoginUserId] = useState("");
   const [username, setUsername] = useState("");
@@ -80,7 +49,6 @@ const JobDrawer = ({
   const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
   const JOBS_API = process.env.REACT_APP_ADD_JOBS_URL;
   const JOBS_TEMP_API = process.env.REACT_APP_JOBS_TEMP_URL;
-  const USER_API = process.env.REACT_APP_USER_URL;
   const PIPELINE_API = process.env.REACT_APP_PIPELINE_TEMP_URL;
   const CLIENT_FACING_API = process.env.REACT_APP_CLIENT_FACING_URL;
   // State to keep track of selected values
@@ -163,7 +131,6 @@ const JobDrawer = ({
   useEffect(() => {
     fetchData();
   }, []);
-  const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
   const fetchData = async () => {
     try {
       const url = `${LOGIN_API}/common/users/roles?roles=TeamMember,Admin`;
@@ -175,13 +142,7 @@ const JobDrawer = ({
     }
   };
 
-  // const foundUser = userData.find((user) =>
-  //   user.username.toLowerCase().includes(searchTerm.toLowerCase())
-  // );
-
   const [selectedUser, setSelectedUser] = useState([]);
-  const [combinedAssigneesValues, setCombinedAssigneesValues] = useState([]);
-
   const [combinedValues, setCombinedValues] = useState();
   const handleUserChange = (newSelectedUsers) => {
     setSelectedUser(newSelectedUsers);
@@ -189,11 +150,6 @@ const JobDrawer = ({
     const selectedValues = newSelectedUsers.map((option) => option.value);
     setCombinedValues(selectedValues);
   };
-
-  const assigneesoptions = userData.map((user) => ({
-    value: user._id,
-    label: user.username,
-  }));
 
   //Default Jobt template get
   const [jobTemp, setJobTemp] = useState([]);
@@ -221,10 +177,6 @@ const JobDrawer = ({
         setSelectedUser(jobAssignees);
         const selectedValues = jobAssignees.map((option) => option.value);
         setCombinedValues(selectedValues);
-        // const jobAssignees = template.jobassignees.map(
-        //   (assignee) => assignee.username
-        // );
-        // setSelectedUser(jobAssignees);
 
         setPriority(template.priority);
         console.log(template.priority);
@@ -317,26 +269,11 @@ const JobDrawer = ({
       setStagesOptions(stageOptions);
       setSelectedStage(stageOptions[0]);
 
-      // setPipelineData(data.pipeline);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
-  // const fetchPipelineData = async () => {
-  //   try {
-  //     const url = `${PIPELINE_API}/workflow/pipeline/pipelines`;
-  //     const response = await fetch(url);
-  //     const data = await response.json();
-  //     setPipelineData(data.pipeline);
-  //   } catch (error) {
-  //     console.error("Error fetching data:", error);
-  //   }
-  // };
-  // useEffect(() => {
-  //   fetchPipelineData();
-  // }, []);
   const [userRole, setUserRole] = useState("");
-  // const [loading, setLoading] = useState(false);
 
   const fetchPipelineData = async () => {
     setLoading(true);
@@ -367,14 +304,11 @@ const JobDrawer = ({
     }
   };
 
-  // Fetch userRole first
   useEffect(() => {
     const storedUserRole = localStorage.getItem("userRole") || "";
-    console.log("UserRole from localStorage:", storedUserRole);
     setUserRole(storedUserRole);
   }, []);
 
-  // After userRole is updated, fetch pipeline list
   useEffect(() => {
     if (userRole) {
       fetchPipelineData();
@@ -829,8 +763,6 @@ const JobDrawer = ({
     });
   };
   const [assignee, setAssignee] = useState([]);
-  const [selectedAssignees, setSelectedAssignees] = useState([]);
-  const [assigneesToRemove, setAssigneesToRemove] = useState([]);
   useEffect(() => {
     const fetchAssignees = async () => {
       try {
@@ -900,11 +832,6 @@ const JobDrawer = ({
   const [isActiveTrue, setIsActiveTrue] = useState(true);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const storedUserRole = localStorage.getItem("userRole");
-    console.log("Fetched userRole from localStorage:", storedUserRole);
-    setUserRole(storedUserRole);
-  }, []);
   useEffect(() => {
     if (userRole) {
       fetchjobData();
@@ -1034,1299 +961,7 @@ const JobDrawer = ({
       setLoading(false);
     }
   };
-  // Drawer Component
-  //   const DrawerContent = () => {
-  //     const ITEM_HEIGHT = 48;
-  //     const ITEM_PADDING_TOP = 8;
-  //     const MenuProps = {
-  //       PaperProps: {
-  //         style: {
-  //           maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-  //           width: "auto",
-  //         },
-  //       },
-  //     };
 
-  //     // Get the tags for the selected accounts
-  //     const accountTags = combinedaccountValues
-
-  //       .map((accountId) => {
-  //         console.log("combinedaccountValues", combinedaccountValues);
-  //         const account = accountdata.find(
-  //           (account) => account._id === accountId
-  //         );
-  //         return account ? account.tags || [] : []; // Assuming accounts have tags
-  //       })
-  //       .flat(); // Flattening array to get all tags
-  //     console.log("hghg", accountTags);
-
-  //     const ACCOUNT_TASKS_API = process.env.REACT_APP_TASKS_API;
-  //     const CHAT_API = process.env.REACT_APP_CHAT_TEMP_URL;
-  //     const CHATTOCLIENT_API = process.env.REACT_APP_CHAT_API;
-  //     const INVOICE_API = process.env.REACT_APP_INVOICE_TEMP_URL;
-  //     const INVOICE_NEW = process.env.REACT_APP_INVOICES_URL;
-  //     const PROPOSAL_API = process.env.REACT_APP_PROPOSAL_TEMP_URL;
-  //     const PROPOSAL_ACCOUNT_API = process.env.REACT_APP_PROPOSAL_URL;
-  //     const ORGANIZER_TEMP_API = process.env.REACT_APP_ORGANIZER_TEMP_URL;
-  //     const AUTOMATION_API = process.env.REACT_APP_AUTOMATION_API;
-  //     // fetch invoive temp by id
-  //     const fetchinvoicetempbyid = async (automationTemp) => {
-  //       const requestOptions = {
-  //         method: "GET",
-  //         redirect: "follow",
-  //       };
-  //       const url = `${INVOICE_API}/workflow/invoicetemp/invoicetemplate/${automationTemp}`;
-  //       try {
-  //         const response = await fetch(url, requestOptions); // Fetch the data
-  //         const result = await response.json(); // Parse the JSON response
-  //         console.log("Fetched invoice template:", result.invoiceTemplate);
-  //         return result.invoiceTemplate; // Return the data
-  //       } catch (error) {
-  //         console.error("Error fetching invoice template:", error);
-  //         throw error; // Let the calling function handle the error
-  //       }
-  //     };
-
-  //     // fetch chat temp by id
-  //     const fetchchattempbyid = async (automationTemp) => {
-  //       const requestOptions = {
-  //         method: "GET",
-  //         redirect: "follow",
-  //       };
-  //       const url = `${CHAT_API}/workflow/chats/chattemplate/chattemplateList/${automationTemp}`;
-  //       try {
-  //         const response = await fetch(url, requestOptions); // Fetch the data
-  //         const result = await response.json(); // Parse the JSON response
-  //         console.log("Fetched chat template:", result.chatTemplate);
-  //         return result.chatTemplate; // Return the data
-  //       } catch (error) {
-  //         console.error("Error fetching invoice template:", error);
-  //         throw error; // Let the calling function handle the error
-  //       }
-  //     };
-
-  //     // fetch task temp by id
-  //     const TASK_API = process.env.REACT_APP_TASK_TEMP_URL;
-  //     const fetchtasktempbyid = async (automationTemp) => {
-  //       const requestOptions = {
-  //         method: "GET",
-  //         redirect: "follow",
-  //       };
-  //       const url = `${TASK_API}/workflow/tasks/tasktemplate/tasktemplatebyid/${automationTemp}`;
-  //       try {
-  //         const response = await fetch(url, requestOptions); // Fetch the data
-  //         const result = await response.json(); // Parse the JSON response
-  //         console.log("Fetched task template:", result.taskTemplate);
-  //         return result.taskTemplate; // Return the data
-  //       } catch (error) {
-  //         console.error("Error fetching invoice template:", error);
-  //         throw error; // Let the calling function handle the error
-  //       }
-  //     };
-  //     // fetch proposal temp by id
-  //     const fetchproposalbyid = async (automationTemp) => {
-  //       const requestOptions = {
-  //         method: "GET",
-  //         redirect: "follow",
-  //       };
-  //       const url = `${PROPOSAL_API}/workflow/proposalesandels/proposalesandels/${automationTemp}`;
-  //       try {
-  //         const response = await fetch(url, requestOptions); // Fetch the data
-  //         const result = await response.json(); // Parse the JSON response
-  //         console.log(
-  //           "Fetched proposalsels template:",
-  //           result.proposalesAndElsTemplate
-  //         );
-  //         return result.proposalesAndElsTemplate; // Return the data
-  //       } catch (error) {
-  //         console.error("Error fetching proposal template:", error);
-  //         throw error; // Let the calling function handle the error
-  //       }
-  //     };
-  //     // fetch organizer temp by id
-  //     const fetchorganizertempbyid = async (automationTemp) => {
-  //       const requestOptions = {
-  //         method: "GET",
-  //         redirect: "follow",
-  //       };
-  //       const url = `${ORGANIZER_TEMP_API}/workflow/organizers/organizertemplate/${automationTemp}`;
-
-  //       try {
-  //         const response = await fetch(url, requestOptions); // Fetch the data
-  //         const result = await response.json(); // Parse the JSON response
-  //         console.log("Fetched organizer template:", result.organizerTemplate);
-  //         return result.organizerTemplate; // Return the data
-  //       } catch (error) {
-  //         console.error("Error fetching organizer template:", error);
-  //         throw error; // Let the calling function handle the error
-  //       }
-  //     };
-
-  //     const getCurrentDate = () => {
-  //       const today = new Date();
-  //       const year = today.getFullYear();
-  //       const month = String(today.getMonth() + 1).padStart(2, "0"); // Months are 0-based
-  //       const day = String(today.getDate()).padStart(2, "0");
-  //       return `${year}-${month}-${day}`; // Format: YYYY-MM-DD
-  //     };
-
-  //     const assignInvoiceToAccount = (invoiceData, automationTemp, accountId) => {
-  //       const myHeaders = new Headers();
-  //       myHeaders.append("Content-Type", "application/json");
-
-  //       // Dynamically prepare the payload from invoiceData
-  //       const raw = JSON.stringify({
-  //         account: accountId,
-  //         invoicenumber: "", // Fill in if required
-  //         invoicedate: getCurrentDate(), // Today's date
-  //         description: invoiceData.description || "",
-  //         invoicetemplate: automationTemp,
-  //         paymentMethod: invoiceData.paymentMethod || "",
-  //         teammember: loginuserid, // Fill in if required
-  //         payInvoicewithcredits: invoiceData.payInvoicewithcredits || false,
-  //         emailinvoicetoclient: invoiceData.sendEmailWhenInvCreated || false,
-  //         reminders: invoiceData.sendReminderstoClients || false,
-  //         daysuntilnextreminder: invoiceData.daysuntilnextreminder || null,
-  //         numberOfreminder: invoiceData.numberOfreminder || null,
-  //         scheduleinvoice: false, // Optional, adjust as needed
-  //         scheduleinvoicedate: new Date(), // Current date and time
-  //         scheduleinvoicetime: new Date().toLocaleTimeString("en-US", {
-  //           hour12: false,
-  //         }),
-  //         lineItems: invoiceData.lineItems.map((item) => ({
-  //           productorService: item.productorService || "",
-  //           description: item.description || "",
-  //           rate: item.rate || "",
-  //           quantity: item.quantity || "",
-  //           amount: item.amount || "",
-  //           tax: item.tax || false,
-  //         })),
-  //         summary: {
-  //           subtotal: invoiceData.summary.subtotal || "",
-  //           taxRate: invoiceData.summary.taxRate || "",
-  //           taxTotal: invoiceData.summary.taxTotal || "",
-  //           total: invoiceData.summary.total || "",
-  //         },
-  //         paidAmount: "",
-  //         invoiceStatus: "Pending",
-  //         balanceDueAmount: "",
-  //       });
-  //       console.log("invoices", raw);
-  //       const requestOptions = {
-  //         method: "POST",
-  //         headers: myHeaders,
-  //         body: raw,
-  //         redirect: "follow",
-  //       };
-  //       fetch(`${INVOICE_NEW}/workflow/invoices/invoice`, requestOptions)
-  //         .then((response) => response.json())
-  //         .then((result) => {
-  //           console.log("Invoice assigned successfully:", result);
-  //         })
-  //         .catch((error) => console.error("Error assigning invoice:", error));
-  //     };
-
-  //     const [chatId, setChatId] = useState();
-  //     const [adminusername, setAdminUsername] = useState("");
-  //     const fetchLoginUserData = async (loginuserid) => {
-  //       const myHeaders = new Headers();
-
-  //       const requestOptions = {
-  //         method: "GET",
-  //         headers: myHeaders,
-  //         redirect: "follow",
-  //       };
-  //       const url = `${LOGIN_API}/common/user/${loginuserid}`;
-  //       fetch(url, requestOptions)
-  //         .then((response) => response.json())
-  //         .then((result) => {
-  //           // console.log("jbhguhid", result);
-
-  //           // console.log(userData)
-  //           setAdminUsername(result.username);
-  //         });
-  //     };
-  //     useEffect(() => {
-  //       // console.log("teammenber", loginuserid);
-  //       fetchLoginUserData(loginuserid);
-  //     }, []);
-  //     // sendChatToAccount
-  //     const sendChatToAccount = (
-  //       chatData,
-  //       automationTemp,
-  //       automationAccountId
-  //     ) => {
-  //       console.log(
-  //         "sending chat",
-  //         chatData,
-  //         automationTemp,
-  //         automationAccountId
-  //       );
-
-  //       const myHeaders = new Headers();
-  //       myHeaders.append("Content-Type", "application/json");
-  //       const subtaskData = chatData.clienttasks.map(({ id, text, checked }) => ({
-  //         id,
-  //         text,
-  //         checked: checked !== undefined ? checked : false, // Ensure checked is either true or false
-  //       }));
-  //       const messageData = [
-  //         {
-  //           message: chatData.description,
-  //           fromwhome: "Admin",
-  //           senderid: username,
-  //           isRead: false,
-  //         },
-  //       ];
-  //       // Dynamically prepare the payload from invoiceData
-  //       const raw = JSON.stringify({
-  //         accountids: [automationAccountId],
-  //         chattemplateid: automationTemp, // Fill in if required
-  //         chatsubject: chatData.chatsubject, // Today's date
-  //         description: messageData || "",
-  //          templatename:chatData.templatename,
-  //           from : username,
-  //         sendreminderstoclient: chatData.sendreminderstoclient,
-  //         daysuntilnextreminder: chatData.daysuntilnextreminder,
-  //         numberofreminders: chatData.numberofreminders,
-  //         clienttasks: subtaskData,
-
-  //       });
-  //       console.log("chats", raw);
-  //       const requestOptions = {
-  //         method: "POST",
-  //         headers: myHeaders,
-  //         body: raw,
-  //         redirect: "follow",
-  //       };
-  //       fetch(`${CHATTOCLIENT_API}/chats/chatsaccountwise`, requestOptions)
-  //         .then((response) => response.json())
-  //         .then((result) => {
-  //           console.log("send chat to account successfully:", result);
-  //         })
-  //         .catch((error) => console.error("Error assigning invoice:", error));
-  //     };
-  //     // mail for drawer btn
-  //     const sendSaveChatMail = (
-  //       chatId,
-  //       automationAccountId,
-  //       automationTemp,
-  //       adminusername
-  //     ) => {
-  //       const myHeaders = new Headers();
-  //       myHeaders.append("Content-Type", "application/json");
-
-  //       const raw = JSON.stringify({
-  //         accountid: automationAccountId,
-  //         chattemplateid: automationTemp,
-  //         username: adminusername,
-  //         chatId: chatId,
-  //         viewchatlink: "/login",
-  //       });
-
-  //       const requestOptions = {
-  //         method: "POST",
-  //         headers: myHeaders,
-  //         body: raw,
-  //         redirect: "follow",
-  //       };
-  //       console.log(raw);
-  //       fetch(`${CHATTOCLIENT_API}/chatsend/securechatsend`, requestOptions)
-  //         .then((response) => response.json())
-  //         .then((result) => console.log(result))
-  //         .catch((error) => console.error(error));
-  //     };
-
-  //     const assignTaskToAccount = (
-  //       taskData,
-  //       automationTemp,
-  //       automationAccountId,
-  //       jobId
-  //     ) => {
-  //       console.log(
-  //         "Assigning task",
-  //         taskData,
-  //         automationTemp,
-  //         automationAccountId,
-  //         jobId
-  //       );
-
-  //       const myHeaders = new Headers();
-  //       myHeaders.append("Content-Type", "application/json");
-
-  //       const raw = JSON.stringify({
-  //         accounts: automationAccountId,
-  //         job: jobId,
-  //         templatename: automationTemp,
-  //         taskname: taskData.templatename,
-  //         status: taskData.status,
-  //         taskassignees: taskData.taskassignees,
-  //         priority: taskData.priority,
-  //         description: taskData.description,
-  //         tasktags: taskData.tasktags,
-  //         issubtaskschecked: taskData.issubtaskschecked,
-  //         startdate: taskData.startdate,
-  //         enddate: taskData.enddate,
-  //         subtasks: taskData.subtasks,
-  //       });
-  //       console.log("tasks creation", raw);
-  //       const requestOptions = {
-  //         method: "POST",
-  //         headers: myHeaders,
-  //         body: raw,
-  //         redirect: "follow",
-  //       };
-
-  //       fetch(`${ACCOUNT_TASKS_API}/accountstasks/newtask`, requestOptions)
-  //         .then((response) => response.json())
-  //         .then((result) => {
-  //           console.log("task created", result);
-  //           // onClose()
-  //         })
-  //         .catch((error) => console.error(error));
-  //     };
-  // const assignProposalToAccount = async (automationTemp,automationAccountId) => {
-  //   try {
-  //     const response = await fetch("https://www.snptaxes.com/account/proposals/automation", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({
-  //         proposalTemp: automationTemp,
-  //         account: [
-  //           automationAccountId
-  //         ],
-  //       }),
-  //     });
-
-  //     if (!response.ok) {
-  //       throw new Error(`HTTP error! status: ${response.status}`);
-  //     }
-
-  //     const result = await response.json(); // or .text() if backend returns plain text
-  //     console.log("✅ Success:", result);
-  //   } catch (error) {
-  //     console.error("❌ Error sending proposal automation:", error);
-  //   }
-  // };
-
-  //     const assignOrganizerToAccount = (
-  //       organizerData,
-  //       automationTemp,
-  //       accountId
-  //     ) => {
-  //       console.log(
-  //         "Assigning proposal",
-  //         organizerData,
-  //         automationTemp,
-  //         accountId
-  //       );
-  //       const myHeaders = new Headers();
-  //       myHeaders.append("Content-Type", "application/json");
-  //       const raw = JSON.stringify({
-  //         accountid: accountId,
-  //         organizertemplateid: automationTemp,
-  //         organizerName: organizerData.organizerName,
-  //         reminders: organizerData.reminders,
-  //         noofreminders: organizerData.noOfReminder,
-  //         daysuntilnextreminder: organizerData.daysuntilNextReminder,
-  //         sections: organizerData.sections,
-  //         status: "Pending",
-  //         active: true,
-  //       });
-  //       const requestOptions = {
-  //         method: "POST",
-  //         headers: myHeaders,
-  //         body: raw,
-  //         redirect: "follow",
-  //       };
-  //       console.log(raw);
-  //       const url = `${ORGANIZER_TEMP_API}/workflow/orgaccwise/organizeraccountwise/org`;
-  //       fetch(url, requestOptions)
-  //         .then((response) => response.json())
-  //         .then((result) => {
-  //           console.log(result);
-  //         })
-  //         .catch((error) => console.error(error));
-  //     };
-
-  //     const CLIENT_DOCS_API = process.env.REACT_APP_CLIENT_DOCS_MANAGE;
-  //     const assignfoldertemp = (accountId, automationTemp) => {
-  //       const myHeaders = new Headers();
-  //       myHeaders.append("Content-Type", "application/json");
-
-  //       const raw = JSON.stringify({
-  //         accountId: accountId,
-  //         templateId: automationTemp,
-  //       });
-
-  //       const requestOptions = {
-  //         method: "POST",
-  //         headers: myHeaders,
-  //         body: raw,
-  //         redirect: "follow",
-  //       };
-
-  //       console.log(raw);
-  //       // fetch(`${CLIENT_DOCS_API}/clientdocs/accountfoldertemp`, requestOptions)
-  //         fetch(`https://www.snptaxes.com/api/docManagement/apply-template`, requestOptions)
-  //          .then((response) => response.json())
-  //         .then((result) => console.log(result))
-  //         .catch((error) => console.error(error));
-  //     };
-
-  //     const selectAutomationApi = async (
-  //       automationType,
-  //       automationTemp,
-  //       automationAccountId,
-  //       automation,
-  //       jobId = null
-  //     ) => {
-  //       console.log("bvhgv", automation);
-  //       console.log(`Updating account tags for Account ID: ${automationAccountId}`)
-  //       if (!automationType || !automationAccountId) {
-  //         console.error("Missing required parameters");
-  //         return;
-  //       }
-
-  //       switch (automationType) {
-  //         case "Update account tags":
-  //           console.log(
-  //             `Updating account tags for Account ID: ${automationAccountId}`
-  //           );
-
-  //           try {
-
-  //            const res = await axios.get(
-  //   `https://www.snptaxes.com/api/accounts/${automationAccountId}`
-  // );
-
-  // // The JSON data is in res.data
-  // const accountsData = res.data;
-
-  // console.log("accountsData", accountsData);
-
-  //             let currentTags = accountsData.tags || []; // Existing tag IDs
-
-  //             // Extract tag IDs from automation object
-  //             const addTagIds = automation?.addTags?.map((tag) => tag._id) || [];
-  //             const removeTagIds =
-  //               automation?.removeTags?.map((tag) => tag._id) || [];
-
-  //             console.log("Current Tags:", currentTags);
-  //             console.log("Tags to Add:", addTagIds);
-  //             console.log("Tags to Remove:", removeTagIds);
-
-  //             // Remove tags that match `removeTags`
-  //             let updatedTags = currentTags.filter(
-  //               (tagId) => !removeTagIds.includes(tagId)
-  //             );
-
-  //             // Add new tags without duplication
-  //             updatedTags = [...new Set([...updatedTags, ...addTagIds])];
-
-  //             console.log("Final Updated Tags:", updatedTags);
-
-  //             // Send updated tags back to the server
-  //             const updateResponse = await fetch(
-  //               `https://www.snptaxes.com/api/accounts/accountdetails/updateaccounttags/${automationAccountId}`,
-  //               {
-  //                 method: "PATCH",
-  //                 headers: {
-  //                   "Content-Type": "application/json",
-  //                 },
-  //                 body: JSON.stringify({ tags: updatedTags }),
-  //               }
-  //             );
-
-  //             console.log("PATCH Response Status:", updateResponse.status);
-  //             console.log("PATCH Response OK:", updateResponse.ok);
-
-  //             const updateResponseData = await updateResponse.json();
-  //             console.log("PATCH Response Data:", updateResponseData);
-
-  //             if (!updateResponse.ok)
-  //               throw new Error("Failed to update account tags");
-
-  //             console.log("Account tags updated successfully");
-  //           } catch (error) {
-  //             console.error("Error updating account tags:", error);
-  //           }
-  //           break;
-
-  //         // Other automation cases (unchanged)
-  //         case "Send Invoice":
-  //           console.log(
-  //             `Processing 'Send Invoice' with template: ${automationTemp}, Account ID: ${automationAccountId}`
-  //           );
-  //           try {
-  //             const invoiceData = await fetchinvoicetempbyid(automationTemp);
-  //             console.log("Fetched invoice data", invoiceData);
-  //             assignInvoiceToAccount(
-  //               invoiceData,
-  //               automationTemp,
-  //               automationAccountId
-  //             );
-  //           } catch (error) {
-  //             console.error("Error processing 'Send Invoice':", error);
-  //           }
-  //           break;
-  //         case "Send message":
-  //           console.log(
-  //             `Processing 'Send message' with template: ${automationTemp}, Account ID: ${automationAccountId}`
-  //           );
-  //           try {
-  //             const chatData = await fetchchattempbyid(automationTemp);
-  //             console.log("Fetched chat data", chatData);
-  //             sendChatToAccount(chatData, automationTemp, automationAccountId);
-  //           } catch (error) {
-  //             console.error("Error processing 'Send Invoice':", error);
-  //           }
-  //           break;
-  //         case "Create Task":
-  //           try {
-  //             const taskData = await fetchtasktempbyid(automationTemp);
-  //             console.log("Creating task with:", jobId);
-  //             return await assignTaskToAccount(
-  //               taskData,
-  //               automationTemp,
-  //               automationAccountId,
-  //               jobId
-  //             );
-  //           } catch (error) {
-  //             console.error("Task creation failed:", error);
-  //             throw new Error(`Failed to create task: ${error.message}`);
-  //           }
-  //         case "Apply folder template":
-  //           console.log(
-  //             `Applying folder template with template: ${automationTemp}, Account ID: ${automationAccountId}`
-  //           );
-  //           try {
-  //             await assignfoldertemp(automationAccountId, automationTemp);
-  //             console.log("Folder template assigned successfully");
-  //           } catch (error) {
-  //             console.error("Error applying folder template:", error);
-  //           }
-  //           break;
-
-  //         case "Create Organizer":
-  //           console.log(
-  //             `Processing 'Create Organizer' with template: ${automationTemp}, Account ID: ${automationAccountId}`
-  //           );
-  //           try {
-  //             const organizerData = await fetchorganizertempbyid(automationTemp);
-  //             console.log("Fetched organizer data", organizerData);
-  //             assignOrganizerToAccount(
-  //               organizerData,
-  //               automationTemp,
-  //               automationAccountId
-  //             );
-  //           } catch (error) {
-  //             console.error("Error processing 'Create Organizer':", error);
-  //           }
-  //           break;
-
-  //         case "Send Proposal/Els":
-  //           console.log(
-  //             `Creating Proposals with template: ${automationTemp}, Account ID: ${automationAccountId}`
-  //           );
-  //           try {
-  //             // const proposalData = await fetchproposalbyid(automationTemp);
-  //             // console.log("Fetched Proposals data", proposalData);
-  //             assignProposalToAccount(
-  //               // proposalData,
-  //               automationTemp,
-  //               automationAccountId
-  //             );
-  //           } catch (error) {
-  //             console.error("Error processing 'Send Proposal/Els':", error);
-  //           }
-  //           break;
-
-  //         case "Send Email":
-  //           console.log(
-  //             `Sending email with template: ${automationTemp}, Account ID: ${automationAccountId}`
-  //           );
-  //           const myHeaders = new Headers();
-  //           myHeaders.append("Content-Type", "application/json");
-
-  //           const raw = JSON.stringify({
-  //             automationType,
-  //             templateId: automationTemp,
-  //             accountId: automationAccountId,
-  //           });
-
-  //           const requestOptions = {
-  //             method: "POST",
-  //             headers: myHeaders,
-  //             body: raw,
-  //             redirect: "follow",
-  //           };
-
-  //           fetch(`${AUTOMATION_API}/automations/`, requestOptions)
-  //             .then((response) => response.json())
-  //             .then((result) => console.log(result))
-  //             .catch((error) => console.error(error));
-  //           break;
-
-  //         default:
-  //           console.warn(`Unhandled automation type: ${automationType}`);
-  //           break;
-  //       }
-  //     };
-
-  //     const [selectedAutomations, setSelectedAutomations] = useState([]);
-
-  //     // Initialize selectedAutomations to include all indices
-  //     useEffect(() => {
-  //       const allIndices = automations.map((_, index) => index);
-  //       setSelectedAutomations(allIndices);
-  //     }, [automations]);
-  //     const handleCheckboxChange = (index) => {
-  //       setSelectedAutomations((prevSelected) =>
-  //         prevSelected.includes(index)
-  //           ? prevSelected.filter((i) => i !== index)
-  //           : [...prevSelected, index]
-  //       );
-  //     };
-
-  //     const handleMove = async () => {
-  //       try {
-  //         // 1. Create all jobs first
-  //         const { accountJobMap } = await createJob();
-  //         console.log("Job mapping created:", accountJobMap);
-
-  //         // 2. Process automations for each account
-  //         const automationResults = await Promise.allSettled(
-  //           combinedaccountValues.map(async (accountId) => {
-  //             const jobId = accountJobMap[accountId];
-  //             if (!jobId) {
-  //               throw new Error(`No job ID found for account ${accountId}`);
-  //             }
-
-  //             // Process each automation for this account
-  //             await Promise.all(
-  //               selectedAutomations.map(async (automationIndex) => {
-  //                 const automation = automations[automationIndex];
-  //                 if (!automation || !automation.type) {
-  //                   throw new Error(
-  //                     `Invalid automation at index ${automationIndex}`
-  //                   );
-  //                 }
-
-  //                 const automationType = automation.type;
-  //                 const automationTemp = automation?.template?.value || null;
-
-  //                 // Check for tag matching if automation has tags
-  //                 if (automation.tags && automation.tags.length > 0) {
-  //                   const account = accountdata.find(
-  //                     (acc) => acc._id === accountId
-  //                   );
-  //                   if (!account) {
-  //                     console.warn(
-  //                       `Account with ID ${accountId} not found. Skipping.`
-  //                     );
-  //                     return;
-  //                   }
-
-  //                   const accountTags = account.tags || [];
-  //                   const tagMatch = automation.tags.some((automationTag) =>
-  //                     accountTags.some(
-  //                       (accountTag) =>
-  //                         accountTag.tagName === automationTag.tagName
-  //                     )
-  //                   );
-
-  //                   if (!tagMatch) {
-  //                     console.warn(
-  //                       `Tags do not match for automation index: ${automationIndex} and account ID: ${accountId}. Skipping this account.`
-  //                     );
-  //                     return;
-  //                   }
-  //                 }
-
-  //                 await selectAutomationApi(
-  //                   automationType,
-  //                   automationTemp,
-  //                   [accountId],
-  //                   automation,
-  //                   automationType === "Create Task" ? jobId : null
-  //                 );
-  //               })
-  //             );
-  //           })
-  //         );
-
-  //         // Check for failures
-  //         const failedResults = automationResults.filter(
-  //           (r) => r.status === "rejected"
-  //         );
-  //         if (failedResults.length > 0) {
-  //           console.error("Some automations failed:", failedResults);
-  //           toast.error(
-  //             `${failedResults.length} automations failed (job was created)`
-  //           );
-  //         } else {
-  //           toast.success("Job created successfully");
-  //           handleDrawerClose();
-  //           navigate("/jobs/activejob");
-  //         }
-  //         setDrawerOpen(false);
-  //         handleNewDrawerClose();
-  //         handleDrawerClose();
-  //         // handleDrawerClose();
-  //         // fetchJobData();
-  //       } catch (error) {
-  //         console.error("Operation failed:", error);
-  //         toast.error(`Operation failed: ${error.message}`);
-  //       }
-  //     };
-
-  // const createJob = async () => {
-  //   const myHeaders = new Headers();
-  //   myHeaders.append("Content-Type", "application/json");
-
-  //   // Find relevant automations
-  //   const clientStatusAutomation = automations.find(
-  //     (automation) => automation.type === "Update client-facing job status"
-  //   );
-
-  //   const assigneesAutomation = automations.find(
-  //     (automation) => automation.type === "Update job assignees"
-  //   );
-
-  //   // Create jobs for each account
-  //   const jobCreationPromises = combinedaccountValues.map(
-  //     async (accountId) => {
-  //       // Start with the base assignees from combinedValues
-  //       let finalAssignees = [...combinedValues];
-
-  //       // Apply assignees automation if it exists
-  //       if (assigneesAutomation) {
-  //         // Add new assignees (avoid duplicates)
-  //         assigneesAutomation.addAssignees.forEach(assignee => {
-  //           if (!finalAssignees.includes(assignee._id)) {
-  //             finalAssignees.push(assignee._id);
-  //           }
-  //         });
-
-  //         // Remove specified assignees
-  //         finalAssignees = finalAssignees.filter(assigneeId =>
-  //           !assigneesAutomation.removeAssignees.some(
-  //             removeAssignee => removeAssignee._id === assigneeId
-  //           )
-  //         );
-  //       }
-
-  //       const jobData = {
-  //         accounts: [accountId],
-  //            stageid: selectedStage.value,
-  //         pipeline: selectedPipeline.value,
-  //         templatename: selectedtemp.value,
-  //         jobname: jobName,
-  //         jobassignees: finalAssignees, // Use the modified assignees list
-  //         priority: priority,
-  //         description: description,
-  //         absolutedates: absoluteDate,
-  //         startsin: startsin,
-  //         startsinduration: startsInDuration,
-  //         duein: duein,
-  //         dueinduration: dueinduration,
-  //         showinclientportal: clientStatusAutomation
-  //           ? clientStatusAutomation.visibilityForClient
-  //           : clientFacingStatus,
-  //         jobnameforclient: inputText,
-  //         clientfacingstatus: clientStatusAutomation
-  //           ? clientStatusAutomation.selectedClientStatus?.value
-  //           : selectedJob?.value,
-  //         clientfacingDescription: clientStatusAutomation
-  //           ? clientStatusAutomation.statusDescription
-  //           : clientDescription,
-  //         startdate: startDate,
-  //         enddate: dueDate,
-  //       };
-
-  //       const response = await fetch(`${JOBS_API}/workflow/jobs/newjob`, {
-  //         method: "POST",
-  //         headers: myHeaders,
-  //         body: JSON.stringify(jobData),
-  //       });
-
-  //       console.log("jobs automation creation", jobData);
-  //       if (!response.ok) {
-  //         const error = await response.json();
-  //         throw new Error(
-  //           `Failed to create job for account ${accountId}: ${error.message}`
-  //         );
-  //       }
-
-  //       const result = await response.json();
-  //       if (!result.createdJobs || result.createdJobs.length === 0) {
-  //         throw new Error(`No job created for account ${accountId}`);
-  //       }
-
-  //       return {
-  //         accountId,
-  //         jobId: result.createdJobs[0]._id,
-  //         jobData: result.createdJobs[0],
-  //       };
-  //     }
-  //   );
-
-  //   try {
-  //     const jobResults = await Promise.all(jobCreationPromises);
-
-  //     const accountJobMap = {};
-  //     jobResults.forEach((result) => {
-  //       accountJobMap[result.accountId] = result.jobId;
-  //     });
-
-  //     return {
-  //       success: true,
-  //       accountJobMap,
-  //       jobs: jobResults.map((r) => r.jobData),
-  //     };
-  //   } catch (error) {
-  //     console.error("Job creation failed:", error);
-  //     throw error;
-  //   }
-  // };
-  //     return (
-  //       <Box p={2}>
-  //         <Typography variant="h6" sx={{ display: "flex", alignItems: "center" }}>
-  //           Automations for{" "}
-  //           <Typography variant="h6" ml={1}>
-  //             {combinedaccountValues
-  //               .map((accountId) => {
-  //                 const account = accountdata.find(
-  //                   (account) => account._id === accountId
-  //                 );
-  //                 return account ? account.accountName : null;
-  //               })
-  //               .join(", ")}
-  //           </Typography>
-  //         </Typography>
-
-  //         <Box>
-  //           {automations.map((automation, index) => {
-  //             const hasMatchingTags = automation.tags?.length
-  //               ? automation.tags.some((automationTag) =>
-  //                   accountTags.some(
-  //                     (accountTag) => accountTag._id === automationTag._id
-  //                   )
-  //                 )
-  //               : true; // Allow if no tags are specified
-
-  //             return (
-  //               <Box key={index} sx={{ marginBottom: 2 }}>
-  //                 <Box sx={{ display: "flex", alignItems: "center" }}>
-  //                   <FormControlLabel
-  //                     control={
-  //                       <Checkbox
-  //                         checked={selectedAutomations.includes(index)}
-  //                         onChange={() => handleCheckboxChange(index)}
-  //                         disabled={!hasMatchingTags} // Disable checkbox if tags don't match
-  //                       />
-  //                     }
-  //                   />
-  //                   {!hasMatchingTags && (
-  //                     <Typography
-  //                       variant="body2"
-  //                       color="error"
-  //                       sx={{ fontStyle: "italic" }}
-  //                     >
-  //                       The tags do not match the account
-  //                     </Typography>
-  //                   )}
-  //                 </Box>
-  //                 {automation.type === "Update account tags" ? (
-  //                   <Box>
-  //                     <Box sx={{ width: 500 }}>
-  //                       <Typography variant="body2" sx={{ marginBottom: 1 }}>
-  //                         Add tags to account
-  //                       </Typography>
-
-  //                       <Select
-  //                         multiple
-  //                         displayEmpty
-  //                         multiline
-  //                         size="small"
-  //                         value={automation.addTags.map((tag) => tag._id)}
-  //                         onChange={(event) =>
-  //                           handleTagChange(index, "addTags", event)
-  //                         }
-  //                         renderValue={(selected) =>
-  //                           selected.length === 0 ? (
-  //                             <Typography color="gray">
-  //                               Select tags to add
-  //                             </Typography>
-  //                           ) : (
-  //                             <Box
-  //                               sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}
-  //                             >
-  //                               {automation.addTags.map((tag) => (
-  //                                 <Chip
-  //                                   key={tag._id}
-  //                                   label={tag.tagName}
-  //                                   sx={{
-  //                                     backgroundColor: tag.tagColour,
-  //                                     color: "#fff",
-  //                                     fontWeight: "500",
-  //                                     borderRadius: "20px",
-  //                                   }}
-  //                                 />
-  //                               ))}
-  //                             </Box>
-  //                           )
-  //                         }
-  //                         fullWidth
-  //                         MenuProps={MenuProps}
-  //                         sx={{ width: "100%", marginBottom: 2 }}
-  //                       >
-  //                         {tagsoptions
-  //                           .filter(
-  //                             (option) =>
-  //                               !automation.removeTags.some(
-  //                                 (tag) => tag._id === option.value
-  //                               )
-  //                           ) // Hide selected removeTags
-  //                           .map((option) => {
-  //                             // Create a hidden canvas to measure text width
-  //                             const canvas = document.createElement("canvas");
-  //                             const context = canvas.getContext("2d");
-  //                             context.font = "14px Arial"; // Match the MenuItem font style
-
-  //                             const textWidth = context.measureText(
-  //                               option.label
-  //                             ).width; // Get exact width
-  //                             const dynamicWidth = Math.min(textWidth + 20, 200); // Add padding & set max width
-
-  //                             return (
-  //                               <MenuItem
-  //                                 key={option.value}
-  //                                 value={option.value}
-  //                                 sx={{
-  //                                   backgroundColor: option.colour,
-  //                                   color: "#fff",
-  //                                   fontSize: "10px",
-  //                                   borderRadius: "10px",
-  //                                   margin: "5px",
-  //                                   textAlign: "center",
-  //                                   display: "flex",
-  //                                   justifyContent: "center",
-  //                                   padding: "4px 9px",
-  //                                   whiteSpace: "nowrap", // Prevent text wrapping
-  //                                   minWidth: `${dynamicWidth}px`,
-  //                                   maxWidth: `${dynamicWidth}px`, // Set dynamic max width
-  //                                   "&:hover": {
-  //                                     backgroundColor: option.colour,
-  //                                     color: "#fff",
-  //                                   },
-  //                                 }}
-  //                               >
-  //                                 {option.label}
-  //                               </MenuItem>
-  //                             );
-  //                           })}
-  //                       </Select>
-  //                       <Typography variant="body2" sx={{ marginBottom: 1 }}>
-  //                         Remove tags from account
-  //                       </Typography>
-
-  //                       <Select
-  //                         multiple
-  //                         size="small"
-  //                         multiline
-  //                         displayEmpty
-  //                         value={automation.removeTags.map((tag) => tag._id)}
-  //                         onChange={(event) =>
-  //                           handleTagChange(index, "removeTags", event)
-  //                         }
-  //                         renderValue={(selected) =>
-  //                           selected.length === 0 ? (
-  //                             <Typography color="gray">
-  //                               Select tags to remove
-  //                             </Typography>
-  //                           ) : (
-  //                             <Box
-  //                               sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}
-  //                             >
-  //                               {automation.removeTags.map((tag) => (
-  //                                 <Chip
-  //                                   key={tag._id}
-  //                                   label={tag.tagName}
-  //                                   sx={{
-  //                                     backgroundColor: tag.tagColour,
-  //                                     color: "#fff",
-  //                                     fontWeight: "500",
-  //                                     borderRadius: "20px",
-  //                                   }}
-  //                                 />
-  //                               ))}
-  //                             </Box>
-  //                           )
-  //                         }
-  //                         MenuProps={MenuProps}
-  //                         sx={{ width: "100%", marginBottom: 2 }}
-  //                       >
-  //                         {tagsoptions
-  //                           .filter(
-  //                             (option) =>
-  //                               !automation.addTags.some(
-  //                                 (tag) => tag._id === option.value
-  //                               )
-  //                           ) // Hide selected removeTags
-  //                           .map((option) => {
-  //                             // Create a hidden canvas to measure text width
-  //                             const canvas = document.createElement("canvas");
-  //                             const context = canvas.getContext("2d");
-  //                             context.font = "14px Arial"; // Match the MenuItem font style
-
-  //                             const textWidth = context.measureText(
-  //                               option.label
-  //                             ).width; // Get exact width
-  //                             const dynamicWidth = Math.min(textWidth + 20, 200); // Add padding & set max width
-
-  //                             return (
-  //                               <MenuItem
-  //                                 key={option.value}
-  //                                 value={option.value}
-  //                                 sx={{
-  //                                   backgroundColor: option.colour,
-  //                                   color: "#fff",
-  //                                   fontSize: "10px",
-  //                                   borderRadius: "10px",
-  //                                   margin: "5px",
-  //                                   textAlign: "center",
-  //                                   display: "flex",
-  //                                   justifyContent: "center",
-  //                                   padding: "4px 9px",
-  //                                   whiteSpace: "nowrap", // Prevent text wrapping
-  //                                   minWidth: `${dynamicWidth}px`,
-  //                                   maxWidth: `${dynamicWidth}px`, // Set dynamic max width
-  //                                   "&:hover": {
-  //                                     backgroundColor: option.colour,
-  //                                     color: "#fff",
-  //                                   },
-  //                                 }}
-  //                               >
-  //                                 {option.label}
-  //                               </MenuItem>
-  //                             );
-  //                           })}
-  //                       </Select>
-  //                       {/* Warning Message */}
-  //                       <Alert severity="warning" sx={{ marginBottom: 2 }}>
-  //                         This automation can affect conditions for automations
-  //                         below
-  //                       </Alert>
-  //                     </Box>
-  //                   </Box>
-  //                 ) : automation.type === "Update job assignees" ? (
-  //           <Box>
-  //             <Box sx={{ width: 500 }}>
-  //               <Typography variant="body2" sx={{ marginBottom: 1 }}>
-  //                 Add assignees to job
-  //               </Typography>
-
-  //               <Select
-  //                 multiple
-  //                 displayEmpty
-  //                 multiline
-  //                 size="small"
-  //                 value={automation.addAssignees.map((assignee) => assignee._id)}
-  //                 onChange={(event) =>
-  //                   handleAssigneeChange(index, "addAssignees", event)
-  //                 }
-  //                 renderValue={(selected) =>
-  //                   selected.length === 0 ? (
-  //                     <Typography color="gray">
-  //                       Select assignees to add
-  //                     </Typography>
-  //                   ) : (
-  //                     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-  //                       {automation.addAssignees.map((assignee) => (
-  //                         <Chip
-  //                           key={assignee._id}
-  //                           label={assignee.username}
-  //                           sx={{
-  //                             backgroundColor: '#e0e0e0',
-  //                             color: "#000",
-  //                             fontWeight: "500",
-  //                             borderRadius: "20px",
-  //                           }}
-  //                         />
-  //                       ))}
-  //                     </Box>
-  //                   )
-  //                 }
-  //                 fullWidth
-  //                 MenuProps={MenuProps}
-  //                 sx={{ width: "100%", marginBottom: 2 }}
-  //               >
-  //                 {assigneeOptions.map((option) => (
-  //                   <MenuItem
-  //                     key={option.value}
-  //                     value={option.value}
-  //                     sx={{
-  //                       '&:hover': {
-  //                         backgroundColor: '#f5f5f5',
-  //                       },
-  //                     }}
-  //                   >
-  //                     {option.label}
-  //                   </MenuItem>
-  //                 ))}
-  //               </Select>
-
-  //               <Typography variant="body2" sx={{ marginBottom: 1 }}>
-  //                 Remove assignees from job
-  //               </Typography>
-
-  //               <Select
-  //                 multiple
-  //                 size="small"
-  //                 multiline
-  //                 displayEmpty
-  //                 value={automation.removeAssignees.map((assignee) => assignee._id)}
-  //                 onChange={(event) =>
-  //                   handleAssigneeChange(index, "removeAssignees", event)
-  //                 }
-  //                 renderValue={(selected) =>
-  //                   selected.length === 0 ? (
-  //                     <Typography color="gray">
-  //                       Select assignees to remove
-  //                     </Typography>
-  //                   ) : (
-  //                     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-  //                       {automation.removeAssignees.map((assignee) => (
-  //                         <Chip
-  //                           key={assignee._id}
-  //                          label={assignee.username}
-  //                           sx={{
-  //                             backgroundColor: '#e0e0e0',
-  //                             color: "#000",
-  //                             fontWeight: "500",
-  //                             borderRadius: "20px",
-  //                           }}
-  //                         />
-  //                       ))}
-  //                     </Box>
-  //                   )
-  //                 }
-  //                 MenuProps={MenuProps}
-  //                 sx={{ width: "100%", marginBottom: 2 }}
-  //               >
-  //                 {assigneeOptions.map((option) => (
-  //                   <MenuItem
-  //                     key={option.value}
-  //                     value={option.value}
-  //                     sx={{
-  //                       '&:hover': {
-  //                         backgroundColor: '#f5f5f5',
-  //                       },
-  //                     }}
-  //                   >
-  //                     {option.label}
-  //                   </MenuItem>
-  //                 ))}
-  //               </Select>
-
-  //               <Alert severity="warning" sx={{ marginBottom: 2 }}>
-  //                 This automation can affect job assignment notifications
-  //               </Alert>
-  //             </Box>
-  //           </Box>
-
-  //         ) : automation.type === "Update client-facing job status" ? (
-  //                   <Box>
-  //                     <Typography variant="body1">
-  //                       <strong>Type:</strong> {automation.type}
-  //                       {automation.visibilityForClient &&
-  //                         automation.selectedClientStatus && (
-  //                           <span>
-  //                             {" "}
-  //                             : {automation.selectedClientStatus.label}
-  //                           </span>
-  //                         )}
-  //                       {!automation.visibilityForClient && (
-  //                         <span> : Hide status</span>
-  //                       )}
-  //                     </Typography>
-  //                   </Box>
-  //                 ) : (
-  //                   <Box>
-  //                     <Typography variant="body1">
-  //                       <strong>Type:</strong> {automation.type}
-  //                     </Typography>
-
-  //                     <Typography variant="body1">
-  //                       <strong>Template:</strong> {automation.template.label}
-  //                     </Typography>
-  //                     <Typography variant="body1">
-  //                       <strong>Tags:</strong>
-  //                     </Typography>
-  //                     {automation.tags.map((tag) => (
-  //                       <Box
-  //                         key={tag._id}
-  //                         sx={{
-  //                           display: "inline-block",
-  //                           backgroundColor: tag.tagColour,
-  //                           color: "white",
-  //                           borderRadius: "15px",
-  //                           padding: "3px 8px",
-  //                           marginRight: "4px",
-  //                         }}
-  //                       >
-  //                         {tag.tagName}
-  //                       </Box>
-  //                     ))}
-  //                   </Box>
-  //                 )}
-  //               </Box>
-  //             );
-  //           })}
-  //         </Box>
-  //         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mt: 5 }}>
-  //           <Button
-  //             variant="contained"
-  //             onClick={handleMove}
-  //             sx={{
-  //               backgroundColor: "var(--color-save-btn)", // Normal background
-
-  //               "&:hover": {
-  //                 backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-  //               },
-  //               borderRadius: "15px",
-  //               width: "80px",
-  //             }}
-  //           >
-  //             Move
-  //           </Button>
-  //           <Button
-  //             variant="outlined"
-  //             onClick={() => setDrawerOpen(false)}
-  //             sx={{
-  //               borderColor: "var(--color-border-cancel-btn)", // Normal background
-  //               color: "var(--color-save-btn)",
-  //               "&:hover": {
-  //                 backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-  //                 color: "#fff",
-  //                 border: "none",
-  //               },
-  //               width: "80px",
-  //               borderRadius: "15px",
-  //             }}
-  //           >
-  //             Close
-  //           </Button>
-  //         </Box>
-  //       </Box>
-  //     );
-  //   };
-
-  // Drawer Component
   const DrawerContent = () => {
     const ITEM_HEIGHT = 48;
     const ITEM_PADDING_TOP = 8;
@@ -3264,822 +1899,416 @@ console.log("Sending chat to account...", raw);
 
     // Render function
     return (
-      <Box p={2}>
-        <Typography variant="h6" sx={{ display: "flex", alignItems: "center" }}>
-          Automations for{" "}
-          <Typography variant="h6" ml={1}>
+      <div className="p-4">
+        <h2 className="text-base font-semibold text-gray-800 mb-4 flex flex-wrap gap-1">
+          Automations for
+          <span className="font-normal text-gray-600">
             {combinedaccountValues
               .map((accountId) => {
-                const account = accountdata.find(
-                  (account) => account._id === accountId
-                );
+                const account = accountdata.find((a) => a._id === accountId);
                 return account ? account.accountName : null;
               })
               .join(", ")}
-          </Typography>
-        </Typography>
+          </span>
+        </h2>
 
-        <Box>
+        <div className="space-y-3">
           {automations.map((automation, index) => {
             const currentTagData = tagData[index] || {};
             const templateName = templateData[index] || "Loading...";
-
-            // const hasMatchingTags = automation.selectedTags?.length
-            //   ? automation.selectedTags.some((automationTagId) =>
-            //       accountTags.some(
-            //         (accountTag) => accountTag._id === automationTagId
-            //       )
-            //     )
-            //   : true;
-            // Check if ALL selected accounts have matching tags for this automation
             const allAccountsHaveMatchingTags = combinedaccountValues.every(
               (accountId) => checkTagMatch(automation.selectedTags, accountId)
             );
             return (
-              <Box
-                key={index}
-                sx={{
-                  marginBottom: 2,
-                  p: 2,
-                  border: "1px solid #e0e0e0",
-                  borderRadius: 2,
-                }}
-              >
-                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={selectedAutomations.includes(index)}
-                        onChange={() => handleCheckboxChange(index)}
-                        disabled={!allAccountsHaveMatchingTags}
-                      />
-                    }
-                    label={
-                      <Typography variant="h6" component="span">
-                        {automation.type}
-                      </Typography>
-                    }
+              <div key={index} className="border border-gray-200 rounded-xl p-4 space-y-3">
+                {/* Checkbox + type */}
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={selectedAutomations.includes(index)}
+                    onChange={() => handleCheckboxChange(index)}
+                    disabled={!allAccountsHaveMatchingTags}
+                    className="h-4 w-4 accent-blue-600"
                   />
+                  <span className="text-sm font-semibold text-gray-800">{automation.type}</span>
                   {!allAccountsHaveMatchingTags && (
-                    <Typography
-                      variant="body2"
-                      color="error"
-                      sx={{ fontStyle: "italic", ml: 2 }}
-                    >
-                      The tags do not match the account
-                    </Typography>
+                    <span className="text-xs text-red-500 italic ml-2">The tags do not match the account</span>
                   )}
-                </Box>
+                </div>
 
-                {/* Template Information */}
+                {/* Template */}
                 {automation.selectedtemp && (
-                  <Box sx={{ mb: 2 }}>
-                    <Typography variant="subtitle1" fontWeight="bold">
-                      Template:
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary">
-                      {templateName}
-                    </Typography>
-                    {/* <Typography variant="caption" color="textSecondary">
-                    Type: {automation.refModel}
-                  </Typography> */}
-                  </Box>
+                  <div>
+                    <p className="text-xs font-bold text-gray-700">Template:</p>
+                    <p className="text-xs text-gray-500">{templateName}</p>
+                  </div>
                 )}
 
-                {/* Selected Tags (Condition Tags) */}
-                {currentTagData.selectedTags &&
-                  currentTagData.selectedTags.length > 0 && (
-                    <Box sx={{ mb: 2 }}>
-                      <Typography variant="subtitle1" fontWeight="bold">
-                        Condition Tags:
-                      </Typography>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          flexWrap: "wrap",
-                          gap: 1,
-                          mt: 1,
-                        }}
-                      >
-                        {currentTagData.selectedTags.map((tag) => (
-                          <Chip
-                            key={tag._id}
-                            label={tag.tagName}
-                            sx={{
-                              backgroundColor: tag.tagColour,
-                              color: "#fff",
-                              fontWeight: "500",
-                              borderRadius: "20px",
-                            }}
-                            size="small"
-                          />
-                        ))}
-                      </Box>
-                    </Box>
-                  )}
+                {/* Condition Tags */}
+                {currentTagData.selectedTags && currentTagData.selectedTags.length > 0 && (
+                  <div>
+                    <p className="text-xs font-bold text-gray-700 mb-1">Condition Tags:</p>
+                    <div className="flex flex-wrap gap-1">
+                      {currentTagData.selectedTags.map((tag) => (
+                        <span key={tag._id} className="text-xs text-white px-2 py-0.5 rounded-full font-medium"
+                          style={{ backgroundColor: tag.tagColour }}>
+                          {tag.tagName}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Add Tags */}
-                {automation.type === "Update account tags" &&
-                  currentTagData.addTags &&
-                  currentTagData.addTags.length > 0 && (
-                    <Box sx={{ mb: 2 }}>
-                      <Typography
-                        variant="subtitle1"
-                        fontWeight="bold"
-                        color="success.main"
-                      >
-                        Add Tags:
-                      </Typography>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          flexWrap: "wrap",
-                          gap: 1,
-                          mt: 1,
-                        }}
-                      >
-                        {currentTagData.addTags.map((tag) => (
-                          <Chip
-                            key={tag._id}
-                            label={tag.tagName}
-                            sx={{
-                              backgroundColor: tag.tagColour,
-                              color: "#fff",
-                              fontWeight: "500",
-                              borderRadius: "20px",
-                              border: "2px solid #4caf50",
-                            }}
-                            size="small"
-                          />
-                        ))}
-                      </Box>
-                    </Box>
-                  )}
+                {automation.type === "Update account tags" && currentTagData.addTags && currentTagData.addTags.length > 0 && (
+                  <div>
+                    <p className="text-xs font-bold text-green-600 mb-1">Add Tags:</p>
+                    <div className="flex flex-wrap gap-1">
+                      {currentTagData.addTags.map((tag) => (
+                        <span key={tag._id} className="text-xs text-white px-2 py-0.5 rounded-full font-medium border-2 border-green-500"
+                          style={{ backgroundColor: tag.tagColour }}>
+                          {tag.tagName}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Remove Tags */}
-                {automation.type === "Update account tags" &&
-                  currentTagData.removeTags &&
-                  currentTagData.removeTags.length > 0 && (
-                    <Box sx={{ mb: 2 }}>
-                      <Typography
-                        variant="subtitle1"
-                        fontWeight="bold"
-                        color="error.main"
-                      >
-                        Remove Tags:
-                      </Typography>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          flexWrap: "wrap",
-                          gap: 1,
-                          mt: 1,
-                        }}
-                      >
-                        {currentTagData.removeTags.map((tag) => (
-                          <Chip
-                            key={tag._id}
-                            label={tag.tagName}
-                            sx={{
-                              backgroundColor: tag.tagColour,
-                              color: "#fff",
-                              fontWeight: "500",
-                              borderRadius: "20px",
-                              border: "2px solid #f44336",
-                              textDecoration: "line-through",
-                            }}
-                            size="small"
-                          />
-                        ))}
-                      </Box>
-                    </Box>
-                  )}
+                {automation.type === "Update account tags" && currentTagData.removeTags && currentTagData.removeTags.length > 0 && (
+                  <div>
+                    <p className="text-xs font-bold text-red-600 mb-1">Remove Tags:</p>
+                    <div className="flex flex-wrap gap-1">
+                      {currentTagData.removeTags.map((tag) => (
+                        <span key={tag._id} className="text-xs text-white px-2 py-0.5 rounded-full font-medium border-2 border-red-400 line-through"
+                          style={{ backgroundColor: tag.tagColour }}>
+                          {tag.tagName}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-                {/* Client Status Information */}
-                {/* {automation.type === "Update client-facing job status" && (
-                  <Box sx={{ mb: 2 }}>
-                    <Typography variant="subtitle1" fontWeight="bold">
-                      Client Status:
-                    </Typography>
-                    <Typography variant="body2">
-                      {automation.selectedClientStatus
-                        ? `Status: ${automation.selectedClientStatus.label}`
-                        : "Hide status"}
-                    </Typography>
-                    {automation.statusDescription && (
-                      <Typography variant="body2" color="textSecondary">
-                        Description: {automation.statusDescription}
-                      </Typography>
-                    )}
-                  </Box>
-                )} */}
+                {/* Client Status */}
                 {automation.type === "Update client-facing job status" && (
-                  <Box sx={{ mb: 2 }}>
-                    <Typography variant="subtitle1" fontWeight="bold">
-                      Client Status:
-                    </Typography>
-
-                    {/* Display status with colored dot */}
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                        mt: 1,
-                      }}
-                    >
-                      {automation.selectedClientStatus && (
-                        <>
-                          <Box
-                            sx={{
-                              width: 12,
-                              height: 12,
-                              borderRadius: "50%",
-                              backgroundColor:
-                                clientStatusOptions?.find(
-                                  (opt) =>
-                                    opt.value ===
-                                    automation.selectedClientStatus
-                                )?.clientfacingColour || "#ccc",
-                            }}
-                          />
-                          <Typography variant="body2">
-                            {clientStatusOptions?.find(
-                              (opt) =>
-                                opt.value === automation.selectedClientStatus
-                            )?.label ||
-                              automation.selectedClientStatus ||
-                              "Not set"}
-                          </Typography>
-                        </>
-                      )}
-                    </Box>
-
-                    {/* Display visibility setting */}
-                    <Typography variant="body2" sx={{ mt: 1 }}>
-                      Visibility:{" "}
-                      {automation.status
-                        ? "Visible to client"
-                        : "Hidden from client"}
-                    </Typography>
-
-                    {/* Display status description if available */}
-                    {automation.statusDescription && (
-                      <Typography
-                        variant="body2"
-                        color="textSecondary"
-                        sx={{ mt: 1 }}
-                      >
-                        Description: {automation.statusDescription}
-                      </Typography>
+                  <div className="space-y-1">
+                    <p className="text-xs font-bold text-gray-700">Client Status:</p>
+                    {automation.selectedClientStatus && (
+                      <div className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full inline-block"
+                          style={{ backgroundColor: clientStatusOptions?.find(o => o.value === automation.selectedClientStatus)?.clientfacingColour || "#ccc" }} />
+                        <span className="text-xs text-gray-600">
+                          {clientStatusOptions?.find(o => o.value === automation.selectedClientStatus)?.label || automation.selectedClientStatus || "Not set"}
+                        </span>
+                      </div>
                     )}
-                  </Box>
+                    <p className="text-xs text-gray-500">
+                      Visibility: {automation.status ? "Visible to client" : "Hidden from client"}
+                    </p>
+                    {automation.statusDescription && (
+                      <p className="text-xs text-gray-400">Description: {automation.statusDescription}</p>
+                    )}
+                  </div>
                 )}
-                {/* Warning for Account Tags Automation */}
+
+                {/* Warning */}
                 {automation.type === "Update account tags" && (
-                  <Alert severity="warning" sx={{ mt: 2 }}>
-                    This automation can affect conditions for automations below
-                  </Alert>
+                  <div className="flex items-start gap-2 bg-yellow-50 border border-yellow-300 rounded-lg p-3 mt-2">
+                    <span className="text-yellow-600 text-xs">⚠️ This automation can affect conditions for automations below</span>
+                  </div>
                 )}
-              </Box>
+              </div>
             );
           })}
-        </Box>
+        </div>
 
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2, mt: 5 }}>
-          <Button
-            variant="contained"
-            onClick={handleMove}
-             disabled={isProcessing}
-            sx={{
-              backgroundColor: "var(--color-save-btn)",
-              "&:hover": { backgroundColor: "var(--color-save-hover-btn)" },
-              borderRadius: "15px",
-              width: "80px",
-            }}
-          >
-              {/* {isProcessing ? "Processing..." : "Move"} */}
+        <div className="flex items-center gap-3 mt-6">
+          <button type="button" onClick={handleMove} disabled={isProcessing}
+            className="rounded-full px-5 py-1.5 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] transition-colors disabled:opacity-50">
             Move
-          </Button>
-          <Button
-            variant="outlined"
-              disabled={isProcessing}
-            onClick={() => setDrawerOpen(false)}
-            sx={{
-              borderColor: "var(--color-border-cancel-btn)",
-              color: "var(--color-save-btn)",
-              "&:hover": {
-                backgroundColor: "var(--color-save-hover-btn)",
-                color: "#fff",
-                border: "none",
-              },
-              width: "80px",
-              borderRadius: "15px",
-            }}
-          >
+          </button>
+          <button type="button" onClick={() => setDrawerOpen(false)} disabled={isProcessing}
+            className="rounded-full px-5 py-1.5 text-sm font-medium border border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white hover:border-transparent transition-colors disabled:opacity-50">
             Close
-          </Button>
-        </Box>
-      </Box>
+          </button>
+        </div>
+      </div>
     );
   };
 
   const handleClose = () => {
     handleNewDrawerClose();
   };
+
+  const inputCls = "w-full border border-gray-300 rounded px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-blue-400";
+  const labelCls = "block text-sm font-medium text-gray-700 mb-1";
+  const btnPrimary = "rounded-full px-5 py-1.5 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] transition-colors";
+  const btnOutline = "rounded-full px-5 py-1.5 text-sm font-medium border border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white hover:border-transparent transition-colors";
+
   return (
-    <Box>
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        padding={1.5}
-      >
-        <Typography variant="h6">Add Job </Typography>
-        <IconButton onClick={handleClose}>
-          <CloseIcon />
-        </IconButton>
-      </Box>
+    <div>
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+        <h2 className="text-base font-semibold text-gray-800">Add Job</h2>
+        <button type="button" onClick={handleClose} className="text-gray-400 hover:text-gray-700">
+          <RxCross2 size={18} />
+        </button>
+      </div>
 
-      <Box sx={{ padding: "0 10px", height: "83vh", overflowY: "auto" }}>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <Box>
-            <Box mr={2.5}>
-              <label className="job-input-label">Accounts</label>
+      {/* Scrollable body */}
+      <div className="px-4 py-3 overflow-y-auto" style={{ height: "83vh" }}>
+        <div className="space-y-4">
 
-              <AccountMultiSelectDropdown
-                value={selectedaccount}
-                onChange={handleAccountChange}
-                placeholder="Accounts"
-              />
-            </Box>
-            <Box mt={2}>
-              <label className="job-input-label">Pipeline</label>
+          {/* Accounts */}
+          <div>
+            <label className={labelCls}>Accounts</label>
+            <AccountMultiSelectDropdown
+              value={selectedaccount}
+              onChange={handleAccountChange}
+              placeholder="Accounts"
+            />
+          </div>
 
-              <Autocomplete
-                options={optionpipeline}
-                getOptionLabel={(option) => option.label}
-                value={selectedPipeline}
-                onChange={(event, newValue) => handlePipelineChange(newValue)}
-                isOptionEqualToValue={(option, value) =>
-                  option.value === value.value
-                }
-                renderOption={(props, option) => (
-                  <Box
-                    component="li"
-                    {...props}
-                    sx={{ cursor: "pointer", margin: "5px 10px" }} // Add cursor pointer style
-                  >
-                    {option.label}
-                  </Box>
-                )}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    sx={{ backgroundColor: "#fff" }}
-                    placeholder="Pipeline"
-                    variant="outlined"
-                    size="small"
-                  />
-                )}
-                sx={{ width: "100%", marginTop: "15px" }}
-                clearOnEscape // Enable clearable functionality
-              />
-            </Box>
-            <Box mt={2}>
-              <label className="job-input-label">Stage</label>
-              <Autocomplete
-                // disabled // Disable the Autocomplete input
-                size="small"
-                options={stagesoptions}
-                getOptionLabel={(option) => option.label}
-                value={selectedStage}
-                onChange={handleStageChange}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    placeholder="Stages"
-                    variant="outlined"
-                    className="add-jobs-select-dropdown"
-                  />
-                )}
-                sx={{ width: "100%", marginTop: "8px" }}
-              />
-            </Box>
-            <Box mt={2}>
-              <label className="job-input-label">Template</label>
-              <Autocomplete
-                options={optiontemp}
-                getOptionLabel={(option) => option.label}
-                value={selectedtemp}
-                onChange={handletemp}
-                isOptionEqualToValue={(option, value) =>
-                  option.value === value.value
-                }
-                renderOption={(props, option) => (
-                  <Box
-                    component="li"
-                    {...props}
-                    sx={{ cursor: "pointer", margin: "5px 10px" }} // Add cursor pointer style
-                  >
-                    {option.label}
-                  </Box>
-                )}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    sx={{ backgroundColor: "#fff" }}
-                    placeholder="Job Template"
-                    variant="outlined"
-                    size="small"
-                  />
-                )}
-                sx={{ width: "100%", marginTop: "15px" }}
-                clearOnEscape // Enable clearable functionality
-              />
-            </Box>
-            <Box mt={2}>
-              <label className="job-input-label">Name</label>
-              <TextField
-                fullWidth
-                value={jobName}
-                onChange={(e) => setJobName(e.target.value)}
-                margin="normal"
-                size="small"
-                placeholder="Job Name"
-                sx={{ backgroundColor: "#fff" }}
-              />
-            </Box>
-            <Box mt={2} mr={2.5}>
-              <label className="job-input-label">Job Assignees</label>
+          {/* Pipeline */}
+          <div>
+            <label className={labelCls}>Pipeline</label>
+            <select
+              value={selectedPipeline?.value || ""}
+              onChange={(e) => {
+                const opt = optionpipeline.find(o => o.value === e.target.value);
+                if (opt) handlePipelineChange(opt);
+              }}
+              className={inputCls + " mt-1"}
+            >
+              <option value="">Pipeline</option>
+              {optionpipeline.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
 
-              <MultiSelectDropdown
-                value={selectedUser}
-                onChange={handleUserChange}
-                placeholder="Job Assignees"
-              />
-            </Box>
-            <Box mt={2}>
-              <Priority
-                onPriorityChange={handlePriorityChange}
-                selectedPriority={priority}
-              />
-            </Box>
-            <Box mt={3}>
-              <Editor
-                initialContent={description}
-                onChange={handleEditorChange}
-              />
-            </Box>
-            <Box mt={7}>
-              <Box
-                display={"flex"}
-                alignItems={"center"}
-                justifyContent={"space-between"}
-              >
-                <Typography variant="h6">Start and Due Date</Typography>
-                <Box className="absolutes-dates">
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={absoluteDate}
-                        // onChange={handleAbsolutesDates}
-                        onChange={(event) =>
-                          handleAbsolutesDates(event.target.checked)
-                        }
-                        color="primary"
-                      />
-                    }
-                    label={"Absolute Date"}
+          {/* Stage */}
+          <div>
+            <label className={labelCls}>Stage</label>
+            <select
+              value={selectedStage?.value || ""}
+              onChange={(e) => {
+                const opt = stagesoptions.find(o => o.value === e.target.value);
+                handleStageChange(null, opt || null);
+              }}
+              className={inputCls + " mt-1"}
+            >
+              <option value="">Stages</option>
+              {stagesoptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
+
+          {/* Template */}
+          <div>
+            <label className={labelCls}>Template</label>
+            <select
+              value={selectedtemp?.value || ""}
+              onChange={(e) => {
+                const opt = optiontemp.find(o => o.value === e.target.value);
+                handletemp(null, opt || null);
+              }}
+              className={inputCls + " mt-1"}
+            >
+              <option value="">Job Template</option>
+              {optiontemp.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
+
+          {/* Job Name */}
+          <div>
+            <label className={labelCls}>Name</label>
+            <input
+              value={jobName}
+              onChange={(e) => setJobName(e.target.value)}
+              placeholder="Job Name"
+              className={inputCls + " mt-1"}
+            />
+          </div>
+
+          {/* Job Assignees */}
+          <div>
+            <label className={labelCls}>Job Assignees</label>
+            <MultiSelectDropdown
+              value={selectedUser}
+              onChange={handleUserChange}
+              placeholder="Job Assignees"
+            />
+          </div>
+
+          {/* Priority */}
+          <div>
+            <Priority onPriorityChange={handlePriorityChange} selectedPriority={priority} />
+          </div>
+
+          {/* Description editor */}
+          <div className="mt-2">
+            <Editor initialContent={description} onChange={handleEditorChange} />
+          </div>
+
+          {/* Start and Due Date */}
+          <div className="mt-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-semibold text-gray-800">Start and Due Date</span>
+              <label className="flex items-center gap-2 cursor-pointer absolutes-dates">
+                <span className="text-xs text-gray-600">Absolute Date</span>
+                <div className="relative inline-flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={absoluteDate}
+                    onChange={(e) => handleAbsolutesDates(e.target.checked)}
+                    className="sr-only peer"
                   />
-                </Box>
-              </Box>
-            </Box>
+                  <div className="w-10 h-5 bg-gray-200 rounded-full peer peer-checked:bg-blue-600 transition-colors after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5" />
+                </div>
+              </label>
+            </div>
+
             {absoluteDate && (
-              <>
-                <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
-                  <Typography>Start Date</Typography>
-                  <DatePicker
-                    //  format="MM/DD/YYYY"
-                    format="MM/DD/YYYY"
-                    sx={{ width: "100%", backgroundColor: "#fff" }}
-                    // value={startDate}
-                    // onChange={handleStartDateChange}
-                    value={startDate}
-                    onChange={handleStartDateChange}
-                    renderInput={(params) => (
-                      <TextField {...params} size="small" />
-                    )}
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-gray-600 w-20 shrink-0">Start Date</span>
+                  <input
+                    type="date"
+                    className={inputCls}
+                    value={startDate ? startDate.format("YYYY-MM-DD") : ""}
+                    onChange={(e) => handleStartDateChange(dayjs(e.target.value))}
                   />
-                </Box>
-                <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
-                  <Typography>Due Date</Typography>
-                  <DatePicker
-                    format="MM/DD/YYYY"
-                    sx={{ width: "100%", backgroundColor: "#fff" }}
-                    // value={dueDate}
-                    // onChange={handleDueDateChange}
-                    value={dueDate}
-                    onChange={handleDueDateChange}
-                    renderInput={(params) => (
-                      <TextField {...params} size="small" />
-                    )}
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-gray-600 w-20 shrink-0">Due Date</span>
+                  <input
+                    type="date"
+                    className={inputCls}
+                    value={dueDate ? dueDate.format("YYYY-MM-DD") : ""}
+                    onChange={(e) => handleDueDateChange(dayjs(e.target.value))}
                   />
-                </Box>
-              </>
+                </div>
+              </div>
             )}
+
             {!absoluteDate && (
-              <>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                  <Typography>Start In</Typography>
-                  <TextField
-                    size="small"
-                    margin="normal"
-                    fullWidth
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-gray-600 w-20 shrink-0">Start In</span>
+                  <input
+                    type="text"
                     placeholder="0"
-                    sx={{ ml: 1, backgroundColor: "#fff" }}
                     value={startsin}
                     onChange={(e) => setstartsin(e.target.value)}
+                    className={inputCls}
                   />
-                  <Autocomplete
-                    options={dayOptions}
-                    size="small"
-                    getOptionLabel={(option) => option.label}
-                    value={
-                      startsInDuration
-                        ? dayOptions.find(
-                            (option) => option.value === startsInDuration
-                          )
-                        : null
-                    }
-                    onChange={handleStartInDateChange}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        variant="outlined"
-                        sx={{ backgroundColor: "#fff" }}
-                      />
-                    )}
-                    isOptionEqualToValue={(option, value) =>
-                      option.value === value.value
-                    }
-                    renderOption={(props, option) => (
-                      <Box
-                        component="li"
-                        {...props}
-                        sx={{ cursor: "pointer", margin: "5px 10px" }}
-                      >
-                        {option.label}
-                      </Box>
-                    )}
-                    // value={dayOptions.find((option) => option.value === startsInDuration) || null}
-                    className="job-template-select-dropdown"
-                  />
-                </Box>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                  <Typography>Due In</Typography>
-                  <TextField
-                    size="small"
-                    margin="normal"
-                    fullWidth
-                    sx={{ ml: 1.5, backgroundColor: "#fff" }}
-                    value={duein}
-                    placeholder="0"
-                    onChange={(e) => setduein(e.target.value)}
-                    // onChange={(e) => setduein(e.target.value)}
-                  />
-
-                  <Autocomplete
-                    options={dayOptions}
-                    getOptionLabel={(option) => option.label}
-                    // onChange={handledueindateChange}
-                    value={
-                      dueinduration
-                        ? dayOptions.find(
-                            (option) => option.value === dueinduration
-                          )
-                        : null
-                    }
-                    onChange={handleDueInDateChange}
-                    size="small"
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        variant="outlined"
-                        sx={{ backgroundColor: "#fff" }}
-                      />
-                    )}
-                    isOptionEqualToValue={(option, value) =>
-                      option.value === value.value
-                    }
-                    renderOption={(props, option) => (
-                      <Box
-                        component="li"
-                        {...props}
-                        sx={{ cursor: "pointer", margin: "5px 10px" }}
-                      >
-                        {option.label}
-                      </Box>
-                    )}
-                    className="job-template-select-dropdown"
-                  />
-                </Box>
-              </>
-            )}
-
-            <Box sx={{ display: "flex", flexDirection: "column" }}>
-              <Box mt={2}>
-                <Box style={{ display: "flex", alignItems: "center" }}>
-                  {/* <EditCalendarRoundedIcon sx={{ fontSize: '120px', color: '#c6c7c7', }} /> */}
-                  <Box
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "8px",
-                      width: "100%",
-                    }}
+                  <select
+                    value={startsInDuration || ""}
+                    onChange={(e) => handleStartInDateChange(null, dayOptions.find(o => o.value === e.target.value) || null)}
+                    className={inputCls + " job-template-select-dropdown"}
                   >
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <Typography variant="body">
-                        <b>Client-facing status</b>
-                      </Typography>
-                      <FormControlLabel
-                        control={
-                          <Switch
-                            onChange={(event) =>
-                              handleClientFacing(event.target.checked)
-                            }
-                            checked={clientFacingStatus}
-                            color="primary"
-                          />
-                        }
-                        label="Show in Client portal"
-                      />
-                    </Box>
-                    <Box>
-                      {clientFacingStatus && (
-                        <>
-                          <Typography>Job name for client</Typography>
-                          <TextField
-                            fullWidth
-                            name="subject"
-                            value={inputText + selectedJobShortcut}
-                            onChange={handlechatsubject}
-                            placeholder="Job name for client"
-                            size="small"
-                            sx={{ background: "#fff", mt: 2 }}
-                          />
+                    {dayOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                  </select>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-gray-600 w-20 shrink-0">Due In</span>
+                  <input
+                    type="text"
+                    placeholder="0"
+                    value={duein}
+                    onChange={(e) => setduein(e.target.value)}
+                    className={inputCls}
+                  />
+                  <select
+                    value={dueinduration || ""}
+                    onChange={(e) => handleDueInDateChange(null, dayOptions.find(o => o.value === e.target.value) || null)}
+                    className={inputCls + " job-template-select-dropdown"}
+                  >
+                    {dayOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                  </select>
+                </div>
+              </div>
+            )}
+          </div>
 
-                          <Box mt={2}>
-                            <Typography>Status</Typography>
-                            <Autocomplete
-                              options={optionstatus}
-                              size="small"
-                              sx={{ mt: 1 }}
-                              value={selectedJob}
-                              onChange={handleJobChange}
-                              getOptionLabel={(option) => option.label}
-                              isOptionEqualToValue={(option, value) =>
-                                option.value === value.value
-                              }
-                              renderOption={(props, option) => (
-                                <Box component="li" {...props}>
-                                  {/* Color dot */}
-                                  <Chip
-                                    size="small"
-                                    style={{
-                                      backgroundColor:
-                                        option.clientfacingColour,
-                                      marginRight: 8,
-                                      marginLeft: 8,
-                                      borderRadius: "50%",
-                                      height: "15px",
-                                    }}
-                                  />
-                                  {option.label}
-                                </Box>
-                              )}
-                              renderInput={(params) => (
-                                <TextField
-                                  {...params}
-                                  placeholder="Select Client Facing Job"
-                                  InputProps={{
-                                    ...params.InputProps,
-                                    startAdornment:
-                                      params.inputProps.value &&
-                                      clientFacingJobs.length > 0 ? (
-                                        <Chip
-                                          size="small"
-                                          style={{
-                                            backgroundColor:
-                                              clientFacingJobs.find(
-                                                (job) =>
-                                                  job.clientfacingName ===
-                                                  params.inputProps.value
-                                              )?.clientfacingColour, // Set color from selection
-                                            marginRight: 8,
-                                            marginLeft: 2,
-                                            borderRadius: "50%",
-                                            height: "15px",
-                                          }}
-                                        />
-                                      ) : null,
-                                  }}
-                                />
-                              )}
-                            />
-                          </Box>
-                          <Box sx={{ position: "relative", mt: 2 }}>
-                            <InputLabel sx={{ color: "black" }}>
-                              Description
-                            </InputLabel>
-                            <TextField
-                              fullWidth
-                              size="small"
-                              margin="normal"
-                              type="text"
-                              multiline
-                              value={clientDescription}
-                              onChange={handleChange}
-                              placeholder="Description"
-                              InputProps={{
-                                endAdornment: (
-                                  <InputAdornment position="end">
-                                    <Typography
-                                      sx={{
-                                        color: "gray",
-                                        fontSize: "12px",
-                                        position: "absolute",
-                                        bottom: "15px",
-                                        right: "15px",
-                                      }}
-                                    >
-                                      {charCount}/{charLimit}
-                                    </Typography>
-                                  </InputAdornment>
-                                ),
-                              }}
-                            />
-                          </Box>
-                        </>
-                      )}
-                    </Box>
-                  </Box>
-                </Box>
-              </Box>
-            </Box>
-          </Box>
-        </LocalizationProvider>
-      </Box>
-      <Box sx={{ pt: 2, display: "flex", alignItems: "center", gap: 4, ml: 2 }}>
-        <Button
-          variant="contained"
-          onClick={createjob}
-          sx={{
-            backgroundColor: "var(--color-save-btn)", // Normal background
+          {/* Client-facing status */}
+          <div className="mt-2">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-bold text-gray-800">Client-facing status</span>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <span className="text-xs text-gray-600">Show in Client portal</span>
+                <div className="relative inline-flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={clientFacingStatus}
+                    onChange={(e) => handleClientFacing(e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-10 h-5 bg-gray-200 rounded-full peer peer-checked:bg-blue-600 transition-colors after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5" />
+                </div>
+              </label>
+            </div>
 
-            "&:hover": {
-              backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-            },
-            borderRadius: "15px",
-          }}
-        >
-          Add
-        </Button>
-        <Button
-          variant="outlined"
-          onClick={handleClose}
-          sx={{
-            borderColor: "var(--color-border-cancel-btn)", // Normal background
-            color: "var(--color-save-btn)",
-            "&:hover": {
-              backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-              color: "#fff",
-              border: "none",
-            },
-            width: "80px",
-            borderRadius: "15px",
-          }}
-        >
-          Cancel
-        </Button>
-      </Box>
-      <Drawer
-        anchor="right"
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-      >
-        <Box sx={{ width: 550 }}>
-          <DrawerContent selectedAccounts={combinedaccountValues} />
-        </Box>
-      </Drawer>
-    </Box>
+            {clientFacingStatus && (
+              <div className="mt-3 space-y-3">
+                <div>
+                  <p className="text-sm text-gray-700 mb-1">Job name for client</p>
+                  <input
+                    name="subject"
+                    value={inputText + selectedJobShortcut}
+                    onChange={handlechatsubject}
+                    placeholder="Job name for client"
+                    className={inputCls}
+                  />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-700 mb-1">Status</p>
+                  <select
+                    value={selectedJob?.value || ""}
+                    onChange={(e) => {
+                      const opt = optionstatus.find(o => o.value === e.target.value);
+                      handleJobChange(null, opt || null);
+                    }}
+                    className={inputCls}
+                  >
+                    <option value="">Select Client Facing Job</option>
+                    {optionstatus.map(o => (
+                      <option key={o.value} value={o.value}>{o.label}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="relative">
+                  <label className={labelCls}>Description</label>
+                  <textarea
+                    value={clientDescription}
+                    onChange={handleChange}
+                    placeholder="Description"
+                    rows={3}
+                    className={inputCls}
+                  />
+                  <p className="text-xs text-gray-400 text-right mt-1">{charCount}/{charLimit}</p>
+                </div>
+              </div>
+            )}
+          </div>
+
+        </div>
+      </div>
+
+      {/* Footer actions */}
+      <div className="flex items-center gap-4 px-4 py-3 border-t border-gray-100">
+        <button type="button" className={btnPrimary} onClick={createjob}>Add</button>
+        <button type="button" className={btnOutline} onClick={handleClose}>Cancel</button>
+      </div>
+
+      {/* Automations slide-over */}
+      {drawerOpen && (
+        <div className="fixed inset-0 z-50 overflow-hidden">
+          <div className="absolute inset-0 bg-black/30" onClick={() => setDrawerOpen(false)} />
+          <div className="absolute right-0 top-0 h-full bg-white shadow-2xl overflow-y-auto w-full md:w-[550px]">
+            <DrawerContent selectedAccounts={combinedaccountValues} />
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

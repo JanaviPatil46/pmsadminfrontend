@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import Cropper from 'react-easy-crop';
-import { Box, Button, Slider } from '@mui/material';
 import getCroppedImg from './cropImage';
+import { Button } from '../components/ui/button';
 
 function ImageCropper({ image, onCroppedImage }) {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
@@ -15,31 +15,15 @@ function ImageCropper({ image, onCroppedImage }) {
   const handleCrop = async () => {
     try {
       const croppedImage = await getCroppedImg(image, croppedAreaPixels);
-      onCroppedImage(croppedImage); // Pass the cropped image to the parent
+      onCroppedImage(croppedImage);
     } catch (error) {
       console.error('Error cropping image:', error);
     }
   };
 
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      sx={{
-        width: '100%',
-        height: '400px',
-        position: 'relative',
-        mb: 2,
-      }}
-    >
-      <Box
-        sx={{
-          width: '100%',
-          height: '300px',
-          position: 'relative',
-        }}
-      >
+    <div className="flex flex-col items-center w-full mb-2" style={{ height: '400px' }}>
+      <div className="w-full relative" style={{ height: '300px' }}>
         <Cropper
           image={image}
           crop={crop}
@@ -49,26 +33,22 @@ function ImageCropper({ image, onCroppedImage }) {
           onCropComplete={onCropComplete}
           onZoomChange={setZoom}
         />
-      </Box>
+      </div>
 
-      <Slider
-        value={zoom}
+      <input
+        type="range"
         min={1}
         max={3}
         step={0.1}
-        onChange={(e, newValue) => setZoom(newValue)}
-        sx={{ mt: 2, width: '80%' }}
+        value={zoom}
+        onChange={(e) => setZoom(Number(e.target.value))}
+        className="mt-4 w-4/5 accent-primary"
       />
 
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleCrop}
-        sx={{ mt: 2 }}
-      >
+      <Button onClick={handleCrop} className="mt-4">
         Crop and Set Avatar
       </Button>
-    </Box>
+    </div>
   );
 }
 

@@ -1,23 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Typography,
-  CircularProgress,
-  Box,
-  Alert,
-  Chip,
-  Button,
-  IconButton,
-  MenuItem,
-  Menu,
-} from "@mui/material";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { BsThreeDotsVertical } from "react-icons/bs";
 import { Link, useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -340,180 +322,108 @@ const handleDownload = async (proposal) => {
 
   if (loading) {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="200px"
-      >
-        <CircularProgress />
-        <Typography variant="body1" sx={{ ml: 2 }}>
-          Loading proposals...
-        </Typography>
-      </Box>
+      <div className="flex items-center justify-center min-h-[200px] gap-3">
+        <div className="h-6 w-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+        <span className="text-sm text-gray-600">Loading proposals...</span>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <Alert severity="error" sx={{ mt: 2 }}>
+      <div className="mt-4 px-4 py-3 rounded-md bg-red-50 border border-red-200 text-red-700 text-sm">
         Error: {error}
-      </Alert>
+      </div>
     );
   }
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        mb={3}
-      >
-        <Typography variant="h4">Proposals List</Typography>
-        <Button variant="contained" color="primary" onClick={handleCreateNew}>
+    <div className="p-6">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-semibold text-gray-800">Proposals List</h1>
+        <button type="button" onClick={handleCreateNew}
+          className="px-4 py-2 rounded text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
           Create New Proposal
-        </Button>
-      </Box>
+        </button>
+      </div>
 
-      <TableContainer component={Paper} elevation={3}>
-        <Table sx={{ minWidth: 650 }} size="medium">
-          <TableHead sx={{ bgcolor: "primary.main" }}>
-            <TableRow>
-              <TableCell
-                sx={{ color: "white", fontWeight: "bold", fontSize: "1rem" }}
-              >
-                Proposal Name
-              </TableCell>
-              <TableCell
-                sx={{ color: "white", fontWeight: "bold", fontSize: "1rem" }}
-              >
-                Status
-              </TableCell>
-              <TableCell
-                sx={{ color: "white", fontWeight: "bold", fontSize: "1rem" }}
-              >
-                Actions
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
+      <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
+        <table className="w-full text-sm min-w-[650px]">
+          <thead className="bg-blue-600">
+            <tr>
+              <th className="text-left px-4 py-3 text-white font-bold">Proposal Name</th>
+              <th className="text-left px-4 py-3 text-white font-bold">Status</th>
+              <th className="text-left px-4 py-3 text-white font-bold">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
             {proposals.map((proposal) => (
-              <TableRow
-                key={proposal._id}
-                sx={{
-                  "&:nth-of-type(odd)": { backgroundColor: "action.hover" },
-                  "&:hover": { backgroundColor: "action.selected" },
-                }}
-              >
-                <TableCell>
-                  {/* <Link  to={`/clients/accounts/accountsdash/proposals/${data}/account-proposal?edit=${proposal._id}`}  style={{
-                        textDecoration: "none",
-                        color: "blue",
-                        fontWeight: 500,
-                      }}> */}
-                  <Typography
-                    variant="body1"
-                    fontWeight="medium"
-                    sx={{ cursor: "pointer" }}
-                    color="primary"
+              <tr key={proposal._id} className="odd:bg-gray-50 hover:bg-blue-50 transition-colors">
+                <td className="px-4 py-3">
+                  <span
+                    className="text-sm font-medium text-blue-600 cursor-pointer hover:underline"
                     onClick={() => handleOpenDialog(proposal)}
                   >
                     {proposal.general.proposalName}
-                  </Typography>
-                  {/* </Link> */}
-                </TableCell>
-
-                {/* <TableCell>{proposal.status}</TableCell> */}
-                <TableCell>
-  <Chip
-    label={proposal.status}
-    color={proposal.status === "Signed" ? "success" : "default"}
-    size="small"
-  />
-</TableCell>
-
-                <TableCell>
-                  <IconButton onClick={(e) => handleMenuOpen(e, proposal)}>
-                    <MoreVertIcon />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
+                  </span>
+                </td>
+                <td className="px-4 py-3">
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                    proposal.status === "Signed" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"
+                  }`}>
+                    {proposal.status}
+                  </span>
+                </td>
+                <td className="px-4 py-3 relative">
+                  <button type="button" onClick={(e) => handleMenuOpen(e, proposal)}
+                    className="p-1 text-gray-500 hover:text-gray-700">
+                    <BsThreeDotsVertical />
+                  </button>
+                  {Boolean(anchorEl) && selectedProposal?._id === proposal._id && (
+                    <>
+                      <div className="fixed inset-0 z-30" onClick={handleMenuClose} />
+                      <div className="absolute right-0 z-40 bg-white border border-gray-200 rounded-lg shadow-lg py-1 min-w-[120px]">
+                        {selectedProposal?.status === "Signed" ? (
+                          <button type="button" className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
+                            onClick={() => { handleDownload(selectedProposal); handleMenuClose(); }}>
+                            Download
+                          </button>
+                        ) : (
+                          <button type="button" className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
+                            onClick={() => { handleTemplateClick(selectedProposal); handleMenuClose(); }}>
+                            Edit
+                          </button>
+                        )}
+                        <button type="button" className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50"
+                          onClick={handleDelete}>
+                          Delete
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </td>
+              </tr>
             ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      {/* ✅ Shared Menu */}
-      {/* <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleMenuClose}
-      >
-        <MenuItem
-          onClick={() => {
-            handleTemplateClick(selectedProposal);
-            handleMenuClose();
-          }}
-        >
-          Edit
-        </MenuItem>
-
-        <MenuItem sx={{ color: "red" }} onClick={handleDelete}>
-          Delete
-        </MenuItem>
-      </Menu> */}
-      <Menu
-  anchorEl={anchorEl}
-  open={Boolean(anchorEl)}
-  onClose={handleMenuClose}
->
-  {selectedProposal?.status === "Signed" ? (
-    <MenuItem
-      onClick={() => {
-        handleDownload(selectedProposal);
-        handleMenuClose();
-      }}
-    >
-      Download
-    </MenuItem>
-  ) : (
-    <MenuItem
-      onClick={() => {
-        handleTemplateClick(selectedProposal);
-        handleMenuClose();
-      }}
-    >
-      Edit
-    </MenuItem>
-  )}
-
-  <MenuItem sx={{ color: "red" }} onClick={handleDelete}>
-    Delete
-  </MenuItem>
-</Menu>
+          </tbody>
+        </table>
+      </div>
 
       {proposals.length === 0 && (
-        <Box textAlign="center" sx={{ mt: 4 }}>
-          <Typography variant="h6" color="text.secondary">
-            No proposals available
-          </Typography>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleCreateNew}
-            sx={{ mt: 2 }}
-          >
+        <div className="text-center mt-8">
+          <p className="text-base text-gray-500 mb-3">No proposals available</p>
+          <button type="button" onClick={handleCreateNew}
+            className="px-4 py-2 rounded text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
             Create Your First Proposal
-          </Button>
-        </Box>
+          </button>
+        </div>
       )}
-     
+
       <ProposalPreviewDialog
         open={openDialog}
         handleClose={handleCloseDialog}
         proposal={selectedProposal}
       />
-    </Box>
+    </div>
   );
 };
 

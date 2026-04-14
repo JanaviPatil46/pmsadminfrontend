@@ -1,37 +1,6 @@
-import {
-  Drawer,
-  Checkbox,
-  Chip,
-  InputLabel,
-  List,
-  Box,
-  InputAdornment,
-  IconButton,
-  Popover,
-  ListItem,
-  ListItemText,
-  Button,
-  Grid,
-  Typography,
-  TextField,
-  label,
-  Switch,
-  FormControlLabel,
-  Autocomplete,
-  FormControl,
-  Select,
-  MenuItem,
-  Alert,
-} from "@mui/material";
 import React, { useState, useEffect, useContext } from "react";
-import DeleteIcon from "@mui/icons-material/Delete";
-// import Priority from '../Templates/Priority/Priority';
 import Priority from "../../Templates/Priority/Priority";
-// import Editor from '../Templates/Texteditor/Editor';
 import Editor from "../../Templates/Texteditor/Editor";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -1905,865 +1874,276 @@ const [clientFacingJobs, setClientFacingJobs] = useState([]);
 
     // Render function
     return (
-      <Box p={2}>
-        <Typography variant="h6" sx={{ display: "flex", alignItems: "center" }}>
+      <div className="p-4">
+        <p className="text-base font-semibold mb-3">
           Automations for{" "}
-          <Typography variant="h6" ml={1}>
+          <span className="font-bold">
             {combinedaccountValues
               .map((accountId) => {
-                const account = accountdata.find(
-                  (account) => account._id === accountId
-                );
+                const account = accountdata.find((a) => a._id === accountId);
                 return account ? account.accountName : null;
               })
               .join(", ")}
-          </Typography>
-        </Typography>
+          </span>
+        </p>
 
-        <Box>
+        <div className="space-y-3">
           {automations.map((automation, index) => {
             const currentTagData = tagData[index] || {};
             const templateName = templateData[index] || "Loading...";
-
-            // const hasMatchingTags = automation.selectedTags?.length
-            //   ? automation.selectedTags.some((automationTagId) =>
-            //       accountTags.some(
-            //         (accountTag) => accountTag._id === automationTagId
-            //       )
-            //     )
-            //   : true;
-// Check if ALL selected accounts have matching tags for this automation
-          const allAccountsHaveMatchingTags = combinedaccountValues.every(accountId => 
-            checkTagMatch(automation.selectedTags, accountId)
-          );
+            const allAccountsHaveMatchingTags = combinedaccountValues.every((accountId) =>
+              checkTagMatch(automation.selectedTags, accountId)
+            );
             return (
-              <Box
-                key={index}
-                sx={{
-                  marginBottom: 2,
-                  p: 2,
-                  border: "1px solid #e0e0e0",
-                  borderRadius: 2,
-                }}
-              >
-                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={selectedAutomations.includes(index)}
-                        onChange={() => handleCheckboxChange(index)}
- disabled={!allAccountsHaveMatchingTags}                      />
-                    }
-                    label={
-                      <Typography variant="h6" component="span">
-                        {automation.type}
-                      </Typography>
-                    }
+              <div key={index} className="rounded-lg border border-gray-200 p-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4 rounded border-gray-300"
+                    checked={selectedAutomations.includes(index)}
+                    onChange={() => handleCheckboxChange(index)}
+                    disabled={!allAccountsHaveMatchingTags}
                   />
+                  <span className="text-sm font-semibold">{automation.type}</span>
                   {!allAccountsHaveMatchingTags && (
-                    <Typography
-                      variant="body2"
-                      color="error"
-                      sx={{ fontStyle: "italic", ml: 2 }}
-                    >
-                      The tags do not match the account
-                    </Typography>
+                    <span className="text-xs text-red-500 italic ml-2">The tags do not match the account</span>
                   )}
-                </Box>
+                </div>
 
-                {/* Template Information */}
                 {automation.selectedtemp && (
-                  <Box sx={{ mb: 2 }}>
-                    <Typography variant="subtitle1" fontWeight="bold">
-                      Template:
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary">
-                      {templateName}
-                    </Typography>
-                    {/* <Typography variant="caption" color="textSecondary">
-                    Type: {automation.refModel}
-                  </Typography> */}
-                  </Box>
+                  <div className="mb-2">
+                    <p className="text-xs font-bold text-gray-700">Template:</p>
+                    <p className="text-xs text-gray-500">{templateName}</p>
+                  </div>
                 )}
 
-                {/* Selected Tags (Condition Tags) */}
-                {currentTagData.selectedTags &&
-                  currentTagData.selectedTags.length > 0 && (
-                    <Box sx={{ mb: 2 }}>
-                      <Typography variant="subtitle1" fontWeight="bold">
-                        Condition Tags:
-                      </Typography>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          flexWrap: "wrap",
-                          gap: 1,
-                          mt: 1,
-                        }}
-                      >
-                        {currentTagData.selectedTags.map((tag) => (
-                          <Chip
-                            key={tag._id}
-                            label={tag.tagName}
-                            sx={{
-                              backgroundColor: tag.tagColour,
-                              color: "#fff",
-                              fontWeight: "500",
-                              borderRadius: "20px",
-                            }}
-                            size="small"
-                          />
-                        ))}
-                      </Box>
-                    </Box>
-                  )}
+                {currentTagData.selectedTags?.length > 0 && (
+                  <div className="mb-2">
+                    <p className="text-xs font-bold text-gray-700">Condition Tags:</p>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {currentTagData.selectedTags.map((tag) => (
+                        <span key={tag._id} className="inline-block rounded-full px-2 py-0.5 text-xs font-medium text-white" style={{ backgroundColor: tag.tagColour }}>{tag.tagName}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-                {/* Add Tags */}
-                {automation.type === "Update account tags" &&
-                  currentTagData.addTags &&
-                  currentTagData.addTags.length > 0 && (
-                    <Box sx={{ mb: 2 }}>
-                      <Typography
-                        variant="subtitle1"
-                        fontWeight="bold"
-                        color="success.main"
-                      >
-                        Add Tags:
-                      </Typography>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          flexWrap: "wrap",
-                          gap: 1,
-                          mt: 1,
-                        }}
-                      >
-                        {currentTagData.addTags.map((tag) => (
-                          <Chip
-                            key={tag._id}
-                            label={tag.tagName}
-                            sx={{
-                              backgroundColor: tag.tagColour,
-                              color: "#fff",
-                              fontWeight: "500",
-                              borderRadius: "20px",
-                              border: "2px solid #4caf50",
-                            }}
-                            size="small"
-                          />
-                        ))}
-                      </Box>
-                    </Box>
-                  )}
+                {automation.type === "Update account tags" && currentTagData.addTags?.length > 0 && (
+                  <div className="mb-2">
+                    <p className="text-xs font-bold text-green-600">Add Tags:</p>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {currentTagData.addTags.map((tag) => (
+                        <span key={tag._id} className="inline-block rounded-full px-2 py-0.5 text-xs font-medium text-white border-2 border-green-500" style={{ backgroundColor: tag.tagColour }}>{tag.tagName}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-                {/* Remove Tags */}
-                {automation.type === "Update account tags" &&
-                  currentTagData.removeTags &&
-                  currentTagData.removeTags.length > 0 && (
-                    <Box sx={{ mb: 2 }}>
-                      <Typography
-                        variant="subtitle1"
-                        fontWeight="bold"
-                        color="error.main"
-                      >
-                        Remove Tags:
-                      </Typography>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          flexWrap: "wrap",
-                          gap: 1,
-                          mt: 1,
-                        }}
-                      >
-                        {currentTagData.removeTags.map((tag) => (
-                          <Chip
-                            key={tag._id}
-                            label={tag.tagName}
-                            sx={{
-                              backgroundColor: tag.tagColour,
-                              color: "#fff",
-                              fontWeight: "500",
-                              borderRadius: "20px",
-                              border: "2px solid #f44336",
-                              textDecoration: "line-through",
-                            }}
-                            size="small"
-                          />
-                        ))}
-                      </Box>
-                    </Box>
-                  )}
+                {automation.type === "Update account tags" && currentTagData.removeTags?.length > 0 && (
+                  <div className="mb-2">
+                    <p className="text-xs font-bold text-red-600">Remove Tags:</p>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {currentTagData.removeTags.map((tag) => (
+                        <span key={tag._id} className="inline-block rounded-full px-2 py-0.5 text-xs font-medium text-white border-2 border-red-500 line-through" style={{ backgroundColor: tag.tagColour }}>{tag.tagName}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-                {/* Client Status Information */}
                 {automation.type === "Update client-facing job status" && (
-  <Box sx={{ mb: 2 }}>
-    <Typography variant="subtitle1" fontWeight="bold">
-      Client Status:
-    </Typography>
-    
-    {/* Display status with colored dot */}
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
-      {automation.selectedClientStatus && (
-        <>
-          <Box
-            sx={{
-              width: 12,
-              height: 12,
-              borderRadius: '50%',
-              backgroundColor: clientStatusOptions?.find(
-                opt => opt.value === automation.selectedClientStatus
-              )?.clientfacingColour || '#ccc'
-            }}
-          />
-          <Typography variant="body2">
-            {clientStatusOptions?.find(
-              opt => opt.value === automation.selectedClientStatus
-            )?.label || automation.selectedClientStatus || "Not set"}
-          </Typography>
-        </>
-      )}
-    </Box>
-
-    {/* Display visibility setting */}
-    <Typography variant="body2" sx={{ mt: 1 }}>
-      Visibility: {automation.status ? "Visible to client" : "Hidden from client"}
-    </Typography>
-
-    {/* Display status description if available */}
-    {automation.statusDescription && (
-      <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
-        Description: {automation.statusDescription}
-      </Typography>
-    )}
-  </Box>
-)}
-
-                {/* Warning for Account Tags Automation */}
-                {automation.type === "Update account tags" && (
-                  <Alert severity="warning" sx={{ mt: 2 }}>
-                    This automation can affect conditions for automations below
-                  </Alert>
+                  <div className="mb-2">
+                    <p className="text-xs font-bold text-gray-700">Client Status:</p>
+                    {automation.selectedClientStatus && (
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="inline-block w-3 h-3 rounded-full" style={{ backgroundColor: clientStatusOptions?.find(o => o.value === automation.selectedClientStatus)?.clientfacingColour || '#ccc' }}></span>
+                        <span className="text-xs">{clientStatusOptions?.find(o => o.value === automation.selectedClientStatus)?.label || automation.selectedClientStatus || "Not set"}</span>
+                      </div>
+                    )}
+                    <p className="text-xs mt-1">Visibility: {automation.status ? "Visible to client" : "Hidden from client"}</p>
+                    {automation.statusDescription && <p className="text-xs text-gray-500 mt-1">Description: {automation.statusDescription}</p>}
+                  </div>
                 )}
-              </Box>
+
+                {automation.type === "Update account tags" && (
+                  <div className="mt-2 rounded bg-yellow-50 border border-yellow-300 px-3 py-2 text-xs text-yellow-800">
+                    ⚠ This automation can affect conditions for automations below
+                  </div>
+                )}
+              </div>
             );
           })}
-        </Box>
+        </div>
 
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2, mt: 5 }}>
-          <Button
-            variant="contained"
-            onClick={handleMove}
-              disabled={isProcessing}
-            sx={{
-              backgroundColor: "var(--color-save-btn)",
-              "&:hover": { backgroundColor: "var(--color-save-hover-btn)" },
-              borderRadius: "15px",
-              width: "80px",
-            }}
-          >
-            Move
-          </Button>
-          <Button
-            variant="outlined"
-            onClick={() => setDrawerOpen(false)}
-            sx={{
-              borderColor: "var(--color-border-cancel-btn)",
-              color: "var(--color-save-btn)",
-              "&:hover": {
-                backgroundColor: "var(--color-save-hover-btn)",
-                color: "#fff",
-                border: "none",
-              },
-              width: "80px",
-              borderRadius: "15px",
-            }}
-          >
-            Close
-          </Button>
-        </Box>
-      </Box>
+        <div className="flex items-center gap-3 mt-6">
+          <button type="button" onClick={handleMove} disabled={isProcessing} className="rounded-full px-5 py-1.5 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] disabled:opacity-40">Move</button>
+          <button type="button" onClick={() => setDrawerOpen(false)} className="rounded-full px-5 py-1.5 text-sm font-medium border border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white">Close</button>
+        </div>
+      </div>
     );
   };
+  const inputCls = "w-full mt-1 rounded border border-gray-200 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-400";
+  const labelCls = "block text-sm font-medium text-gray-700 mb-0.5";
+  const btnPrimary = "rounded-full px-5 py-1.5 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)]";
+  const btnOutline = "rounded-full px-5 py-1.5 text-sm font-medium border border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white";
+
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Box>
-        <form>
-          <Box mt={2} mb={1}>
-            <hr />
-          </Box>
-          <Box
-            className="bulk-job-form"
-            sx={{ height: "88vh", overflowY: "auto" }}
-          >
-            <Grid spacing={2}>
-              <Grid padding={1}>
-                <Box>
-                  <InputLabel sx={{ color: "black" }}>
-                    Select Accounts
-                  </InputLabel>
-                  <AccountMultiSelectDropdown
-                    value={selectedaccount}
-                    onChange={handleAccountChange}
-                    placeholder="Accounts"
-                    options={accountoptions}
-                  />
-                  
-                </Box>
+    <div>
+      <form>
+        <div className="mt-2 mb-1"><hr /></div>
+        <div className="bulk-job-form" style={{ height: '88vh', overflowY: 'auto' }}>
+          <div className="p-2 space-y-4">
+            <div>
+              <label className={labelCls}>Select Accounts</label>
+              <AccountMultiSelectDropdown
+                value={selectedaccount}
+                onChange={handleAccountChange}
+                placeholder="Accounts"
+                options={accountoptions}
+              />
+            </div>
 
-                <Box mt={2}>
-                  <label className="job-input-label">Pipeline</label>
+            <div>
+              <label className="job-input-label">Pipeline</label>
+              <select className={inputCls} value={selectedPipeline?.value || ""}
+                onChange={(e) => { const opt = optionpipeline.find(o => o.value === e.target.value); if (opt) handlePipelineChange(opt); }}>
+                <option value="">Pipeline</option>
+                {optionpipeline.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            </div>
 
-                  <Autocomplete
-                    options={optionpipeline}
-                    getOptionLabel={(option) => option.label}
-                    value={selectedPipeline}
-                    onChange={(event, newValue) =>
-                      handlePipelineChange(newValue)
-                    }
-                    isOptionEqualToValue={(option, value) =>
-                      option.value === value.value
-                    }
-                    renderOption={(props, option) => (
-                      <Box
-                        component="li"
-                        {...props}
-                        sx={{ cursor: "pointer", margin: "5px 10px" }} // Add cursor pointer style
-                      >
-                        {option.label}
-                      </Box>
-                    )}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        sx={{ backgroundColor: "#fff" }}
-                        placeholder="Pipeline"
-                        variant="outlined"
-                        size="small"
-                      />
-                    )}
-                    sx={{ width: "100%", marginTop: "8px" }}
-                    // clearOnEscape // Enable clearable functionality
-                  />
-                </Box>
+            <div>
+              <label className="job-input-label">Stage</label>
+              <select className={inputCls} value={selectedStage?.value || ""}
+                onChange={(e) => { const opt = stagesoptions.find(o => o.value === e.target.value); handleStageChange(null, opt || null); }}>
+                <option value="">Stages</option>
+                {stagesoptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            </div>
 
-                <Box mt={2}>
-                  <label className="job-input-label">Stage</label>
-                  <Autocomplete
-                    // disabled // Disable the Autocomplete input
-                    size="small"
-                    options={stagesoptions}
-                    getOptionLabel={(option) => option.label}
-                    value={selectedStage}
-                    onChange={handleStageChange}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        placeholder="Stages"
-                        variant="outlined"
-                        className="add-jobs-select-dropdown"
-                      />
-                    )}
-                    sx={{ width: "100%", marginTop: "8px" }}
-                  />
-                </Box>
-                <Box mt={2}>
-                  <label className="job-input-label">Job Template</label>
-                  <Autocomplete
-                    options={optiontemp}
-                    getOptionLabel={(option) => option.label}
-                    value={selectedtemp}
-                    onChange={handletemp}
-                    isOptionEqualToValue={(option, value) =>
-                      option.value === value.value
-                    }
-                    renderOption={(props, option) => (
-                      <Box
-                        component="li"
-                        {...props}
-                        sx={{ cursor: "pointer", margin: "5px 10px" }} // Add cursor pointer style
-                      >
-                        {option.label}
-                      </Box>
-                    )}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        sx={{ backgroundColor: "#fff" }}
-                        placeholder="Job Template"
-                        variant="outlined"
-                        size="small"
-                      />
-                    )}
-                    sx={{ width: "100%", marginTop: "8px" }}
-                    clearOnEscape // Enable clearable functionality
-                  />
-                </Box>
-                <Box mt={2}>
-                  <label className="job-input-label">Name</label>
-                  <TextField
-                    fullWidth
-                    value={jobName}
-                    onChange={(e) => setJobName(e.target.value)}
-                    margin="normal"
-                    size="small"
-                    placeholder="Job Name"
-                    sx={{ backgroundColor: "#fff" }}
-                  />
-                </Box>
-                <Box mt={2}>
-                  <label className="job-input-label">Job Assignees</label>
-                  {/* <Autocomplete
-                    multiple
-                    sx={{ marginTop: "8px" }}
-                    options={assigneesoptions}
-                    size="small"
-                    getOptionLabel={(option) => option.label}
-                    value={selectedUser}
-                    onChange={handleUserChange}
-                    renderOption={(props, option) => (
-                      <Box
-                        component="li"
-                        {...props}
-                        sx={{ cursor: "pointer", margin: "5px 10px" }} // Add cursor pointer style
-                      >
-                        {option.label}
-                      </Box>
-                    )}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        variant="outlined"
-                        placeholder="Job Assignees"
-                        sx={{ backgroundColor: "#fff" }}
-                      />
-                    )}
-                    isOptionEqualToValue={(option, value) =>
-                      option.value === value.value
-                    }
-                  /> */}
-                  <MultiSelectDropdown
-                    value={selectedUser}
-                    onChange={handleUserChange}
-                    placeholder="Job Assignees"
-                  />
-                </Box>
-                <Box mt={2}>
-                  <Priority
-                    onPriorityChange={handlePriorityChange}
-                    selectedPriority={priority}
-                  />
-                </Box>
-                <Box mt={3}>
-                  <Editor
-                    initialContent={description}
-                    onChange={handleEditorChange}
-                  />
-                </Box>
-                <Box mt={7}>
-                  <Box
-                    display={"flex"}
-                    alignItems={"center"}
-                    justifyContent={"space-between"}
-                  >
-                    <Typography variant="h6">Start and Due Date</Typography>
-                    <Box className="absolutes-dates">
-                      <FormControlLabel
-                        control={
-                          <Switch
-                            checked={absoluteDate}
-                            // onChange={handleAbsolutesDates}
-                            onChange={(event) =>
-                              handleAbsolutesDates(event.target.checked)
-                            }
-                            color="primary"
-                          />
-                        }
-                        label={"Absolute Date"}
-                      />
-                    </Box>
-                  </Box>
-                </Box>
-                {absoluteDate && (
-                  <>
-                    <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
-                      <Typography>Start Date</Typography>
-                      <DatePicker
-                         format="MM/DD/YYYY"
-                        sx={{ width: "100%", backgroundColor: "#fff" }}
-                        // value={startDate}
-                        // onChange={handleStartDateChange}
-                        value={startDate}
-                        onChange={handleStartDateChange}
-                        renderInput={(params) => (
-                          <TextField {...params} size="small" />
-                        )}
-                      />
-                    </Box>
-                    <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
-                      <Typography>Due Date</Typography>
-                      <DatePicker
-                         format="MM/DD/YYYY"
-                        sx={{ width: "100%", backgroundColor: "#fff" }}
-                        // value={dueDate}
-                        // onChange={handleDueDateChange}
-                        value={dueDate}
-                        onChange={handleDueDateChange}
-                        renderInput={(params) => (
-                          <TextField {...params} size="small" />
-                        )}
-                      />
-                    </Box>
-                  </>
-                )}
-                {!absoluteDate && (
-                  <>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                      <Typography>Start In</Typography>
-                      <TextField
-                        size="small"
-                        margin="normal"
-                        fullWidth
-                        placeholder="0"
-                        sx={{ ml: 1, backgroundColor: "#fff" }}
-                        value={startsin}
-                        onChange={(e) => setstartsin(e.target.value)}
-                      />
-                      <Autocomplete
-                        options={dayOptions}
-                        size="small"
-                        getOptionLabel={(option) => option.label}
-                        value={
-                          startsInDuration
-                            ? dayOptions.find(
-                                (option) => option.value === startsInDuration
-                              )
-                            : null
-                        }
-                        onChange={handleStartInDateChange}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            variant="outlined"
-                            sx={{ backgroundColor: "#fff" }}
-                          />
-                        )}
-                        isOptionEqualToValue={(option, value) =>
-                          option.value === value.value
-                        }
-                        renderOption={(props, option) => (
-                          <Box
-                            component="li"
-                            {...props}
-                            sx={{ cursor: "pointer", margin: "5px 10px" }}
-                          >
-                            {option.label}
-                          </Box>
-                        )}
-                        // value={dayOptions.find((option) => option.value === startsInDuration) || null}
-                        className="job-template-select-dropdown"
-                      />
-                    </Box>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                      <Typography>Due In</Typography>
-                      <TextField
-                        size="small"
-                        margin="normal"
-                        fullWidth
-                        sx={{ ml: 1.5, backgroundColor: "#fff" }}
-                        value={duein}
-                        placeholder="0"
-                        onChange={(e) => setduein(e.target.value)}
-                        // onChange={(e) => setduein(e.target.value)}
-                      />
+            <div>
+              <label className="job-input-label">Job Template</label>
+              <select className={inputCls} value={selectedtemp?.value || ""}
+                onChange={(e) => { const opt = optiontemp.find(o => o.value === e.target.value); if (opt) handletemp(null, opt); }}>
+                <option value="">Job Template</option>
+                {optiontemp.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            </div>
 
-                      <Autocomplete
-                        options={dayOptions}
-                        getOptionLabel={(option) => option.label}
-                        // onChange={handledueindateChange}
-                        value={
-                          dueinduration
-                            ? dayOptions.find(
-                                (option) => option.value === dueinduration
-                              )
-                            : null
-                        }
-                        onChange={handleDueInDateChange}
-                        size="small"
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            variant="outlined"
-                            sx={{ backgroundColor: "#fff" }}
-                          />
-                        )}
-                        isOptionEqualToValue={(option, value) =>
-                          option.value === value.value
-                        }
-                        renderOption={(props, option) => (
-                          <Box
-                            component="li"
-                            {...props}
-                            sx={{ cursor: "pointer", margin: "5px 10px" }}
-                          >
-                            {option.label}
-                          </Box>
-                        )}
-                        // value={dayOptions.find((option) => option.value === dueinduration) || null}
-                        className="job-template-select-dropdown"
-                      />
-                    </Box>
-                  </>
-                )}
+            <div>
+              <label className="job-input-label">Name</label>
+              <input className={inputCls} value={jobName} onChange={(e) => setJobName(e.target.value)} placeholder="Job Name" />
+            </div>
 
-                <Box sx={{ display: "flex", flexDirection: "column" }}>
-                  <Box mt={2}>
-                    <Box style={{ display: "flex", alignItems: "center" }}>
-                      {/* <EditCalendarRoundedIcon sx={{ fontSize: '120px', color: '#c6c7c7', }} /> */}
-                      <Box
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          gap: "8px",
-                          width: "100%",
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                          }}
-                        >
-                          <Typography variant="body">
-                            <b>Client-facing status</b>
-                          </Typography>
-                          <FormControlLabel
-                            control={
-                              <Switch
-                                onChange={(event) =>
-                                  handleClientFacing(event.target.checked)
-                                }
-                                checked={clientFacingStatus}
-                                color="primary"
-                              />
-                            }
-                            label="Show in Client portal"
-                          />
-                        </Box>
-                        <Box>
-                          {clientFacingStatus && (
-                            <>
-                              <Typography>Job name for client</Typography>
-                              <TextField
-                                fullWidth
-                                name="subject"
-                                value={inputText + selectedJobShortcut}
-                                onChange={handlechatsubject}
-                                placeholder="Job name for client"
-                                size="small"
-                                sx={{ background: "#fff", mt: 2 }}
-                              />
+            <div>
+              <label className="job-input-label">Job Assignees</label>
+              <MultiSelectDropdown value={selectedUser} onChange={handleUserChange} placeholder="Job Assignees" />
+            </div>
 
-                              <Box mt={2}>
-                                <Typography>Status</Typography>
-                                <Autocomplete
-                                  options={optionstatus}
-                                  size="small"
-                                  sx={{ mt: 1 }}
-                                  value={selectedJob}
-                                  onChange={handleJobChange}
-                                  getOptionLabel={(option) => option.label}
-                                  isOptionEqualToValue={(option, value) =>
-                                    option.value === value.value
-                                  }
-                                  renderOption={(props, option) => (
-                                    <Box component="li" {...props}>
-                                      {/* Color dot */}
-                                      <Chip
-                                        size="small"
-                                        style={{
-                                          backgroundColor:
-                                            option.clientfacingColour,
-                                          marginRight: 8,
-                                          marginLeft: 8,
-                                          borderRadius: "50%",
-                                          height: "15px",
-                                        }}
-                                      />
-                                      {option.label}
-                                    </Box>
-                                  )}
-                                  renderInput={(params) => (
-                                    <TextField
-                                      {...params}
-                                      placeholder="Select Client Facing Job"
-                                      InputProps={{
-                                        ...params.InputProps,
-                                        startAdornment:
-                                          params.inputProps.value &&
-                                          clientFacingJobs.length > 0 ? (
-                                            <Chip
-                                              size="small"
-                                              style={{
-                                                backgroundColor:
-                                                  clientFacingJobs.find(
-                                                    (job) =>
-                                                      job.clientfacingName ===
-                                                      params.inputProps.value
-                                                  )?.clientfacingColour, // Set color from selection
-                                                marginRight: 8,
-                                                marginLeft: 2,
-                                                borderRadius: "50%",
-                                                height: "15px",
-                                              }}
-                                            />
-                                          ) : null,
-                                      }}
-                                    />
-                                  )}
-                                />
-                              </Box>
-                              <Box sx={{ position: "relative", mt: 2 }}>
-                                <InputLabel sx={{ color: "black" }}>
-                                  Description
-                                </InputLabel>
-                                <TextField
-                                  fullWidth
-                                  size="small"
-                                  margin="normal"
-                                  type="text"
-                                  multiline
-                                  value={clientDescription}
-                                  onChange={handleChange}
-                                  placeholder="Description"
-                                  InputProps={{
-                                    endAdornment: (
-                                      <InputAdornment position="end">
-                                        <Typography
-                                          sx={{
-                                            color: "gray",
-                                            fontSize: "12px",
-                                            position: "absolute",
-                                            bottom: "15px",
-                                            right: "15px",
-                                          }}
-                                        >
-                                          {charCount}/{charLimit}
-                                        </Typography>
-                                      </InputAdornment>
-                                    ),
-                                  }}
-                                />
-                              </Box>
-                            </>
-                          )}
-                        </Box>
-                      </Box>
-                    </Box>
-                  </Box>
-                </Box>
-              </Grid>
-            </Grid>
-            <Box mt={3}>
-              <hr />
-            </Box>
+            <div>
+              <Priority onPriorityChange={handlePriorityChange} selectedPriority={priority} />
+            </div>
 
-            <Box sx={{ pt: 2, display: "flex", alignItems: "center", gap: 5 }}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={createjob}
-                sx={{
-                  backgroundColor: "var(--color-save-btn)", // Normal background
+            <div className="mt-3">
+              <Editor initialContent={description} onChange={handleEditorChange} />
+            </div>
 
-                  "&:hover": {
-                    backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                  },
-                  width: "80px",
-                  borderRadius: "15px",
-                }}
-              >
-                Add
-              </Button>
-              {/* <Link to='/'><Button variant="outlined" onClick={handleJobFormClose}>Cancel</Button></Link> */}
-              <Button
-                onClick={handleJobFormClose}
-                variant="outlined"
-                sx={{
-                  borderColor: "var(--color-border-cancel-btn)", // Normal background
-                  color: "var(--color-save-btn)",
-                  "&:hover": {
-                    backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                    color: "#fff",
-                    border: "none",
-                  },
-                  width: "80px",
-                  borderRadius: "15px",
-                }}
-              >
-                Cancel
-              </Button>
-            </Box>
-          </Box>
-        </form>
-      </Box>
+            <div className="mt-6">
+              <div className="flex items-center justify-between">
+                <span className="text-base font-semibold">Start and Due Date</span>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <span className="text-sm text-gray-600">Absolute Date</span>
+                  <div className="relative inline-flex items-center">
+                    <input type="checkbox" className="sr-only peer" checked={absoluteDate} onChange={(e) => handleAbsolutesDates(e.target.checked)} />
+                    <div className="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-[var(--color-save-btn)] after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5"></div>
+                  </div>
+                </label>
+              </div>
+            </div>
 
-      <Drawer
-        anchor="right"
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-      >
-        {/* <Box sx={{ width: 400, padding: 2 }}>
-                <Typography variant="h6">Automations</Typography>
-                {automations.length > 0 && (
-                  <Box>
-                    {automations.map((automation, index) => (
-                      <Box key={index}>
-                        <Typography variant="body1">
-                          <strong>Type:</strong> {automation.type}
-                        </Typography>
-                        <Typography variant="body1">
-                          <strong>Template:</strong> {automation.template.label}
-                        </Typography>
-                        <Typography variant="body1">
-                          <strong>Tags:</strong>
-                        </Typography>
-                        {automation.tags.map((tag) => (
-                          <Box
-                            key={tag._id}
-                            sx={{
-                              display: "inline-block",
-                              backgroundColor: tag.tagColour,
-                              color: "white",
-                              borderRadius: "8px",
-                              padding: "2px 6px",
-                              marginRight: "4px",
-                            }}
-                          >
-                            {tag.tagName}
-                          </Box>
-                        ))}
-                      </Box>
-                    ))}
-                  </Box>
-                )}
-                <Button
-                  variant="contained"
-                  color="primary"
-                  fullWidth
-                  onClick={() => {
-                    setDrawerOpen(false);
-                  }}
-                >
-                  Proceed
-                </Button>
-              </Box> */}
-        <Box sx={{ width: 550 }}>
+            {absoluteDate && (
+              <div className="space-y-3">
+                <div>
+                  <label className={labelCls}>Start Date</label>
+                  <input type="date" className={inputCls} value={startDate ? (typeof startDate === 'string' ? startDate : startDate.format?.('YYYY-MM-DD') || '') : ''} onChange={(e) => handleStartDateChange(e.target.value)} />
+                </div>
+                <div>
+                  <label className={labelCls}>Due Date</label>
+                  <input type="date" className={inputCls} value={dueDate ? (typeof dueDate === 'string' ? dueDate : dueDate.format?.('YYYY-MM-DD') || '') : ''} onChange={(e) => handleDueDateChange(e.target.value)} />
+                </div>
+              </div>
+            )}
+
+            {!absoluteDate && (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm whitespace-nowrap">Start In</span>
+                  <input className={inputCls} placeholder="0" value={startsin} onChange={(e) => setstartsin(e.target.value)} />
+                  <select className={inputCls} value={startsInDuration || ""} onChange={(e) => handleStartInDateChange(null, { value: e.target.value })}>
+                    {dayOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                  </select>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm whitespace-nowrap">Due In</span>
+                  <input className={inputCls} placeholder="0" value={duein} onChange={(e) => setduein(e.target.value)} />
+                  <select className={inputCls} value={dueinduration || ""} onChange={(e) => handleDueInDateChange(null, { value: e.target.value })}>
+                    {dayOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                  </select>
+                </div>
+              </div>
+            )}
+
+            <div className="mt-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-bold">Client-facing status</span>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <span className="text-sm text-gray-600">Show in Client portal</span>
+                  <div className="relative inline-flex items-center">
+                    <input type="checkbox" className="sr-only peer" checked={clientFacingStatus} onChange={(e) => handleClientFacing(e.target.checked)} />
+                    <div className="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-[var(--color-save-btn)] after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5"></div>
+                  </div>
+                </label>
+              </div>
+
+              {clientFacingStatus && (
+                <div className="mt-3 space-y-3">
+                  <div>
+                    <label className={labelCls}>Job name for client</label>
+                    <input className={inputCls} name="subject" value={inputText + selectedJobShortcut} onChange={handlechatsubject} placeholder="Job name for client" />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Status</label>
+                    <select className={inputCls} value={selectedJob?.value || ""}
+                      onChange={(e) => { const opt = optionstatus.find(o => o.value === e.target.value); if (opt) handleJobChange(null, opt); }}>
+                      <option value="">Select Client Facing Job</option>
+                      {optionstatus.map(o => (
+                        <option key={o.value} value={o.value}>{o.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="relative">
+                    <label className={labelCls}>Description</label>
+                    <textarea className={`${inputCls} resize-none`} rows={3} value={clientDescription} onChange={handleChange} placeholder="Description" />
+                    <span className="absolute bottom-2 right-2 text-xs text-gray-400">{charCount}/{charLimit}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="mt-3"><hr /></div>
+          <div className="flex items-center gap-5 pt-3 px-2 pb-4">
+            <button type="button" onClick={createjob} className={btnPrimary}>Add</button>
+            <button type="button" onClick={handleJobFormClose} className={btnOutline}>Cancel</button>
+          </div>
+        </div>
+      </form>
+
+      {drawerOpen && (
+        <div className="fixed inset-y-0 right-0 z-50 w-[550px] bg-white shadow-2xl overflow-y-auto">
           <DrawerContent selectedAccounts={combinedaccountValues} />
-        </Box>
-      </Drawer>
-    </LocalizationProvider>
+        </div>
+      )}
+    </div>
   );
 };
 

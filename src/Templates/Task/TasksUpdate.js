@@ -1,7 +1,5 @@
 
 import React, { useState, useEffect } from 'react';
-import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { toast } from "react-toastify";
 import { useNavigate, useParams } from "react-router-dom";
 import Editor from '../Texteditor/Editor';
@@ -32,8 +30,8 @@ const Tasks = () => {
     const [absoluteDate, setAbsoluteDates] = useState(false);
     const [priority, setPriority] = useState('Medium');
     const [status, setStatus] = useState('No status');
-    const [StartsDateNew, setStartsDateNew] = useState(null);
-    const [DueDateNew, setDueDateNew] = useState(null);
+    const [StartsDateNew, setStartsDateNew] = useState("");
+    const [DueDateNew, setDueDateNew] = useState("");
     const [StartsInDurationNew, setStartsInDurationNew] = useState();
     const [DueInDurationNew, setDueInDurationNew] = useState();
     const [StartsInNew, setStartsInNew] = useState();
@@ -195,11 +193,11 @@ const Tasks = () => {
   }
 };
 
-    const handleStartDateChange = (date) => {
-        setStartsDateNew(date);
+    const handleStartDateChange = (e) => {
+        setStartsDateNew(e.target.value);
     };
-    const handleDueDateChange = (date) => {
-        setDueDateNew(date);
+    const handleDueDateChange = (e) => {
+        setDueDateNew(e.target.value);
     };
     const handleAbsolutesDates = (checked) => {
         setAbsoluteDates(checked);
@@ -444,8 +442,8 @@ const Tasks = () => {
             // setDueInNew(tempvalues.duein || '');
             setDueInNew(String(tempvalues.duein ?? ''));
 
-            setStartsDateNew(dayjs(tempvalues.startdate) || null);
-            setDueDateNew(dayjs(tempvalues.enddate) || null);
+            setStartsDateNew(tempvalues.startdate ? tempvalues.startdate.substring(0, 10) : "");
+            setDueDateNew(tempvalues.enddate ? tempvalues.enddate.substring(0, 10) : "");
             setStartsInDurationNew(tempvalues.startsinduration || '');
             setDueInDurationNew(tempvalues.dueinduration || '');
             setAbsoluteDates(tempvalues.absolutedates || false);
@@ -582,8 +580,8 @@ const Tasks = () => {
             AssigneesNew.length !== tempvalues.taskassignees?.length ||
             tagsNew.length !== tempvalues.tasktags?.length ||
             absoluteDate !== tempvalues.absolutedates ||
-            StartsDateNew !== dayjs(tempvalues.startdate) ||
-            DueDateNew !== dayjs(tempvalues.enddate);
+            StartsDateNew !== (tempvalues.startdate ? tempvalues.startdate.substring(0, 10) : "") ||
+            DueDateNew !== (tempvalues.enddate ? tempvalues.enddate.substring(0, 10) : "");
 
         if (hasUnsavedChanges) {
             if (window.confirm("You have unsaved changes. Are you sure you want to leave without saving?")) {
@@ -594,8 +592,7 @@ const Tasks = () => {
         }
     };
     return (
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <FormPage
+        <FormPage
                 title="Edit Task Template"
                 subtitle="Configure your task template settings"
                 actions={
@@ -662,19 +659,19 @@ const Tasks = () => {
                             {absoluteDate && (
                                 <div className="space-y-4 mt-4">
                                     <FormField label="Start Date">
-                                        <DatePicker
-                                            format="MM/DD/YYYY"
-                                            sx={{ width: '100%', backgroundColor: '#fff' }}
+                                        <input
+                                            type="date"
                                             value={StartsDateNew}
                                             onChange={handleStartDateChange}
+                                            className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
                                         />
                                     </FormField>
                                     <FormField label="Due Date">
-                                        <DatePicker
-                                            format="MM/DD/YYYY"
-                                            sx={{ width: '100%', backgroundColor: '#fff' }}
+                                        <input
+                                            type="date"
                                             value={DueDateNew}
                                             onChange={handleDueDateChange}
+                                            className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
                                         />
                                     </FormField>
                                 </div>
@@ -794,7 +791,6 @@ const Tasks = () => {
                     </FormGrid.Sidebar>
                 </FormGrid>
             </FormPage>
-        </LocalizationProvider>
     );
 };
 

@@ -1,10 +1,6 @@
-import { Box, Typography, Divider, Dialog, Tooltip, FormControlLabel, Switch, InputLabel, DialogContent, Select, LinearProgress, Autocomplete, TextField, MenuItem, Chip, Container, Button, Checkbox, FormControl } from "@mui/material";
 import { useState, useEffect } from "react";
 import { Navigate, useParams, useSearchParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { toast } from "react-toastify";
 import AccountMultiSelectDropdown from "../../Templates/AccountMultiSelectDropdown";
 
@@ -720,246 +716,96 @@ const handleYesNoChange = (value, elementText, sectionId) => {
     setSelectedAccount((prevSelected) => prevSelected.filter((value) => value !== valueToDelete));
   };
 
+  const inputCls = "w-full mt-1 rounded border border-gray-200 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-400";
+  const btnPrimary = "rounded-full px-5 py-1.5 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] disabled:opacity-40";
+  const btnOutline = "rounded-full px-5 py-1.5 text-sm font-medium border border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white";
+  const optionBtn = (active) => `rounded-full px-4 py-1.5 text-sm font-medium border transition-colors ${
+    active
+      ? "bg-[var(--color-save-btn)] text-white border-[var(--color-save-btn)]"
+      : "border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white"
+  }`;
+
   return (
-    <Container>
-      {/* <Divider />
-      <Box mt={3} borderBottom={"2px solid #e2e8f0"} p={2}>
-        <Typography fontSize={20}>
-          <strong>Create organizer</strong>
-        </Typography>
-      </Box> */}
-
-      <Box mt={3}>
-        <Typography>Accounts</Typography>
-        {/* <Autocomplete
-          multiple
-          options={accountoptions}
-          value={selectedAccount}
+    <div className="max-w-2xl mx-auto px-4">
+      <div className="mt-4">
+        <p className="text-sm font-medium text-gray-700 mb-1">Accounts</p>
+        <AccountMultiSelectDropdown
+          value={selectedaccount}
           onChange={handleAccountChange}
-          getOptionLabel={(option) => option.label}
-          isOptionEqualToValue={(option, value) => option.value === value.value}
-          renderOption={(props, option) => (
-            <Box component="li" {...props} sx={{ cursor: "pointer", margin: "5px 10px" }}>
-              {option.label}
-            </Box>
-          )}
-           renderTags={(value, getTagProps) => (
-                                <Box sx={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
-                                  {value.map((option, index) => (
-                                    <Chip
-                                      key={option.value}
-                                      label={option.label}
-                                      {...getTagProps({ index })}
-                                      sx={{ maxWidth: "100%",cursor:'pointer' }} // Ensures wrapping within the container
-                                    />
-                                  ))}
-                                </Box>
-                              )}
-          renderInput={(params) => <TextField {...params} placeholder="Select Accounts" variant="outlined" size="small" sx={{ backgroundColor: "#fff" }}  multiline />}
-          sx={{ width: "100%", marginTop: "8px" }}
-        /> */}
-         <AccountMultiSelectDropdown
-                            value={selectedaccount}
-                            onChange={handleAccountChange}
-                            placeholder="Accounts"
-                            options={accountoptions}
-                          />
-      </Box>
-
-      <Box mt={3}>
-        <FormControl fullWidth sx={{ marginBottom: "10px" }}>
-          <Typography>Organizer Template</Typography>
-          {/* <InputLabel>Organizer Template</InputLabel> */}
-          <Select
-            value={selectedOrganizerTemplate}
-            size="small"
-            // label="Age"
-            onChange={handleOrganizerTemplateChange}
-            renderValue={(selected) => {
-              const option = OrganizerTemplateOptions.find((opt) => opt.value === selected);
-              return option ? option.label : ""; // Show the label of the selected option
-            }}
-          >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
-            {OrganizerTemplateOptions.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Box>
-
-      <Box mt={2}>
-        <TextField
-          variant="outlined"
-          fullWidth
-          value={organizerName || ""} // Replace 'someField' with the field you want to display/edit
-          placeholder="Organizer Name"
-           onChange={handleOrganizerNameChange}
-          size="small"
+          placeholder="Accounts"
+          options={accountoptions}
         />
-      </Box>
+      </div>
 
-      <Box mt={2}>
-        <Button variant="contained" onClick={handlePreview} sx={{
-                backgroundColor: 'var(--color-save-btn)',  // Normal background
-               
-                '&:hover': {
-                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                },
-               borderRadius:'15px'
-              }}>
-          Preview Mode
-        </Button>
-      </Box>
-      <Box mt={2} display={"flex"} alignItems={"center"}>
-        <Box>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={reminder}
-                onChange={(event) => handleAbsolutesDates(event.target.checked)}
-                // checked={reminders}
-                // onChange={(event)=>handleDateSwitchChange(event.target.checked)}
-                color="primary"
-              />
-            }
-          />
-        </Box>
-        <Typography variant="h6">Reminders</Typography>
-      </Box>
-      <Box sx={{ display: "flex", alignItems: "center", gap: 3, mt: 2 }}>
-        {reminder && (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 3, mt: 2 }}>
-            <Box>
-              <InputLabel sx={{ color: "black" }}>Days until next reminder</InputLabel>
-              <TextField
-                // margin="normal"
-                fullWidth
-                name="Daysuntilnextreminder"
-                value={daysuntilNextReminder}
-                onChange={(e) => setDaysuntilNextReminder(e.target.value)}
-                placeholder="Days until next reminder"
-                size="small"
-                sx={{ mt: 2 }}
-              />
-            </Box>
+      <div className="mt-4">
+        <p className="text-sm font-medium text-gray-700 mb-1">Organizer Template</p>
+        <select className={inputCls} value={selectedOrganizerTemplate} onChange={handleOrganizerTemplateChange}>
+          <option value="">None</option>
+          {OrganizerTemplateOptions.map((opt) => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
+      </div>
 
-            <Box>
-              <InputLabel sx={{ color: "black" }}>No Of reminders</InputLabel>
-              <TextField fullWidth name="No Of reminders" value={noOfReminder} onChange={(e) => setNoOfReminder(e.target.value)} placeholder="NoOfreminders" size="small" sx={{ mt: 2 }} />
-            </Box>
-          </Box>
-        )}
-      </Box>
+      <div className="mt-3">
+        <input className={inputCls} value={organizerName || ""} onChange={handleOrganizerNameChange} placeholder="Organizer Name" />
+      </div>
 
-      <Box display={"flex"} gap={2} alignItems={"center"} mt={2}>
-        <Box>
-          <Button onClick={createOrganizerOfAccount} variant="contained" sx={{
-                backgroundColor: 'var(--color-save-btn)',  // Normal background
-               
-                '&:hover': {
-                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                },
-               width:'80px',borderRadius:'15px'
-              }}>
-            Create
-          </Button>
-        </Box>
+      <div className="mt-3">
+        <button type="button" onClick={handlePreview} className={btnPrimary}>Preview Mode</button>
+      </div>
 
-        <Box>
-          <Button onClick={handleOrganizerFormClose} variant="outlined" sx={{
-                    borderColor: 'var(--color-border-cancel-btn)',  // Normal background
-                   color:'var(--color-save-btn)',
-                    '&:hover': {
-                      backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                      color:'#fff',
-                      border:"none"
-                    },
-                    width:'80px',borderRadius:'15px'
-                  }}>
-            Cancel
-          </Button>
-        </Box>
-      </Box>
+      <div className="flex items-center gap-3 mt-4">
+        <label className="relative inline-flex items-center cursor-pointer">
+          <input type="checkbox" className="sr-only peer" checked={reminder} onChange={(e) => handleAbsolutesDates(e.target.checked)} />
+          <div className="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-[var(--color-save-btn)] after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5"></div>
+        </label>
+        <span className="text-base font-semibold">Reminders</span>
+      </div>
 
-      <Dialog open={previewDialogOpen} onClose={handleClosePreview} fullScreen>
-        <DialogContent>
-          <Box>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <Box>
-                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", border: "2px solid #3FA2F6", p: 2, mb: 3, borderRadius: "10px", backgroundColor: "#96C9F4" }}>
-                  <Box>
-                    <Typography fontWeight="bold">Preview mode</Typography>
-                    <Typography>The client sees your organizer like this</Typography>
-                  </Box>
-                  <Button variant="text" onClick={handleClosePreview}>
-                    Back to edit
-                  </Button>
-                </Box>
-                <Typography variant="text" gutterBottom>
-                  {organizerName}
-                </Typography>
+      {reminder && (
+        <div className="flex items-center gap-4 mt-3">
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-gray-700 mb-0.5">Days until next reminder</label>
+            <input className={inputCls} name="Daysuntilnextreminder" value={daysuntilNextReminder} onChange={(e) => setDaysuntilNextReminder(e.target.value)} placeholder="Days until next reminder" />
+          </div>
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-gray-700 mb-0.5">No. of reminders</label>
+            <input className={inputCls} name="noOfReminder" value={noOfReminder} onChange={(e) => setNoOfReminder(e.target.value)} placeholder="No of reminders" />
+          </div>
+        </div>
+      )}
 
-                <FormControl fullWidth sx={{ marginBottom: "10px", marginTop: "10px" }}>
-                  {/* <Select value={activeStep} onChange={handleDropdownChange} size="small">
-                    
-                    {visibleSections.map((section, index) => {
-                                                                                      // Calculate answered elements count for this specific section
-                                                                                      const answeredCount = section.formElements.reduce(
-                                                                                        (count, element) => {
-                                                                                          const key = `${section.id}_${element.text}`;
-                                                                                          return count + (answeredElements[key] ? 1 : 0);
-                                                                                        },
-                                                                                        0
-                                                                                      );
-                                                                
-                                                                                      const totalElements = section.formElements.length;
-                                                                
-                                                                                      return (
-                                                                                        <MenuItem key={section.id} value={index}>
-                                                                                          {section.text} ({answeredCount}/{totalElements})
-                                                                                        </MenuItem>
-                                                                                      );
-                                                                                    })}
-                  </Select> */}
-                  <Select
-  value={activeStep}
-  onChange={handleDropdownChange}
-  size="small"
->
-  {visibleSections.map((section, index) => {
-    // Filter form elements that are actually visible
-    const visibleElements = section.formElements.filter((el) =>
-      shouldShowElement(el, section.id)
-    );
+      <div className="flex gap-3 mt-5">
+        <button type="button" onClick={createOrganizerOfAccount} className={btnPrimary}>Create</button>
+        <button type="button" onClick={handleOrganizerFormClose} className={btnOutline}>Cancel</button>
+      </div>
 
-    // Count answered visible elements
-    const answeredCount = visibleElements.reduce((count, element) => {
-      const key = `${section.id}_${element.text}`;
-      return count + (answeredElements[key] ? 1 : 0);
-    }, 0);
+      {previewDialogOpen && (
+        <div className="fixed inset-0 z-50 bg-white overflow-y-auto">
+          <div className="p-6">
+            <div className="flex items-center justify-between border-2 border-blue-400 bg-blue-200 p-3 mb-4 rounded-xl">
+              <div>
+                <p className="font-bold">Preview mode</p>
+                <p className="text-sm">The client sees your organizer like this</p>
+              </div>
+              <button type="button" onClick={handleClosePreview} className="text-blue-700 hover:underline text-sm font-medium">Back to edit</button>
+            </div>
+            <p className="text-base font-medium mb-3">{organizerName}</p>
 
-    const totalVisibleElements = visibleElements.length;
+            <select className="w-full rounded border border-gray-200 px-3 py-1.5 text-sm mb-3" value={activeStep} onChange={handleDropdownChange}>
+              {visibleSections.map((section, index) => {
+                const visibleElements = section.formElements.filter((el) => shouldShowElement(el, section.id));
+                const answered = visibleElements.reduce((c, el) => c + (answeredElements[`${section.id}_${el.text}`] ? 1 : 0), 0);
+                return <option key={section.id} value={index}>{section.text} ({answered}/{visibleElements.length})</option>;
+              })}
+            </select>
 
-    return (
-      <MenuItem key={section.id} value={index}>
-        {section.text} ({answeredCount}/{totalVisibleElements})
-      </MenuItem>
-    );
-  })}
-</Select>
+            <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+              <div className="bg-blue-500 h-2 rounded-full transition-all" style={{ width: `${((activeStep + 1) / totalSteps) * 100}%` }}></div>
+            </div>
 
-                </FormControl>
-
-                <Box mt={2} mb={2}>
-                  <LinearProgress variant="determinate" value={((activeStep + 1) / totalSteps) * 100} />
-                </Box>
-
-                <Box sx={{ pl: 20, pr: 20 }}>
+            <div className="px-4 md:px-20">
                   {/* {visibleSections.map(
                     (section, sectionIndex) =>
                       sectionIndex === activeStep && (
@@ -1161,419 +1007,126 @@ const handleYesNoChange = (value, elementText, sectionId) => {
                         </Box>
                       )
                   )} */}
-{visibleSections.map(
-                    (section, sectionIndex) =>
-                      sectionIndex === activeStep && (
-                        <Box key={section.id}>
-                          {section.formElements.map(
-                            (element) =>
-                              shouldShowElement(element, section.id) && (
-                                <Box key={`${section.id}_${element.id}`}>
-                                  {/* Text Editor */}
-                                  {element.type === "Text Editor" && (
-                                    <Box mt={2} mb={2}>
-                                      <Typography>
-                                        {stripHtmlTags(element.text)}
-                                      </Typography>
-                                    </Box>
-                                  )}
+              {visibleSections.map((section, sectionIndex) =>
+                sectionIndex === activeStep && (
+                  <div key={section.id}>
+                    {section.formElements.map(
+                      (element) =>
+                        shouldShowElement(element, section.id) && (
+                          <div key={`${section.id}_${element.id}`} className="mb-4">
+                            {element.type === "Text Editor" && (
+                              <p className="text-sm text-gray-700 my-3">{stripHtmlTags(element.text)}</p>
+                            )}
+                            {(element.type === "Free Entry" || element.type === "Email") && (
+                              <div>
+                                <p className="text-base mb-1 mt-2">{element.text}</p>
+                                <textarea
+                                  className="w-full rounded border border-gray-200 px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                  rows={3}
+                                  placeholder={`${element.type} Answer`}
+                                  value={inputValues[`${section.id}_${element.text}`] || ""}
+                                  onChange={(e) => handleInputChange(e, element.text, section.id)}
+                                />
+                              </div>
+                            )}
+                            {element.type === "Number" && (
+                              <div>
+                                <p className="text-base mb-1 mt-2">{element.text}</p>
+                                <input type="text" inputMode="numeric" pattern="[0-9]*"
+                                  className="w-full rounded border border-gray-200 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                  placeholder="Number Answer"
+                                  value={inputValues[`${section.id}_${element.text}`] || ""}
+                                  onChange={(e) => handleInputChange({ target: { value: e.target.value.replace(/\D/g, "") } }, element.text, section.id)}
+                                />
+                              </div>
+                            )}
+                            {element.type === "Radio Buttons" && (
+                              <div>
+                                <p className="text-base mb-1 mt-2">{element.text}</p>
+                                <div className="flex flex-wrap gap-2">
+                                  {element.options.map((option) => (
+                                    <button key={option.text} type="button"
+                                      className={optionBtn(radioValues[`${section.id}_${element.text}`] === option.text)}
+                                      onClick={() => handleRadioChange(option.text, element.text, section.id)}
+                                    >{option.text}</button>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            {element.type === "Checkboxes" && (
+                              <div>
+                                <p className="text-base mb-1 mt-2">{element.text}</p>
+                                <div className="flex flex-wrap gap-2">
+                                  {element.options.map((option) => (
+                                    <button key={option.text} type="button"
+                                      className={optionBtn(!!checkboxValues[`${section.id}_${element.text}`]?.[option.text])}
+                                      onClick={() => handleCheckboxChange(option.text, element.text, section.id)}
+                                    >{option.text}</button>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            {element.type === "Yes/No" && (
+                              <div>
+                                <p className="text-base mb-1 mt-2">{element.text}</p>
+                                <div className="flex gap-2">
+                                  {element.options.map((option) => (
+                                    <button key={option.text} type="button"
+                                      className={optionBtn(selectedYesNoValues[`${section.id}_${element.text}`] === option.text)}
+                                      onClick={() => handleYesNoChange(option.text, element.text, section.id)}
+                                    >{option.text}</button>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            {element.type === "Dropdown" && (
+                              <div>
+                                <p className="text-base mb-1 mt-2">{element.text}</p>
+                                <select
+                                  className="w-full rounded border border-gray-200 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                  value={selectedDropdownValues[`${section.id}_${element.text}`] || ""}
+                                  onChange={(e) => handleDropdownValueChange(e, element.text, section.id)}
+                                >
+                                  {element.options.map((opt) => <option key={opt.text} value={opt.text}>{opt.text}</option>)}
+                                </select>
+                              </div>
+                            )}
+                            {element.type === "Date" && (
+                              <div>
+                                <p className="text-base mb-1 mt-2">{element.text}</p>
+                                <input type="date"
+                                  className="w-full rounded border border-gray-200 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                  value={startDate || ""}
+                                  onChange={(e) => { handleStartDateChange(e.target.value); setAnsweredElements(p => ({ ...p, [`${section.id}_${element.text}`]: true })); }}
+                                />
+                              </div>
+                            )}
+                            {element.type === "File Upload" && (
+                              <div>
+                                <p className="text-base mb-1 mt-2">{element.text}</p>
+                                <div title="Unavailable in preview mode">
+                                  <input disabled placeholder="Add Document"
+                                    className="w-full rounded border border-gray-200 px-3 py-1.5 text-sm bg-gray-100 cursor-not-allowed"
+                                  />
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )
+                    )}
+                  </div>
+                )
+              )}
 
-                                  {/* Free Entry or Email */}
-                                  {(element.type === "Free Entry" ||
-                                    element.type === "Email") && (
-                                    <Box>
-                                      <Typography fontSize="18px" mb={1} mt={1}>
-                                        {element.text}
-                                      </Typography>
-                                      <TextField
-                                        variant="outlined"
-                                        size="small"
-                                        multiline
-                                        fullWidth
-                                        placeholder={`${element.type} Answer`}
-                                        inputProps={{
-                                          type:
-                                            element.type === "Free Entry"
-                                              ? "text"
-                                              : element.type.toLowerCase(),
-                                        }}
-                                        maxRows={8}
-                                        style={{ display: "block" }}
-                                        value={
-                                          inputValues[
-                                            `${section.id}_${element.text}`
-                                          ] || ""
-                                        }
-                                        onChange={(e) =>
-                                          handleInputChange(
-                                            e,
-                                            element.text,
-                                            section.id
-                                          )
-                                        }
-                                      />
-                                    </Box>
-                                  )}
-
-                                  {/* Number */}
-                                  {element.type === "Number" && (
-                                    <Box>
-                                      <Typography fontSize="18px" mb={1} mt={1}>
-                                        {element.text}
-                                      </Typography>
-                                      <TextField
-                                        variant="outlined"
-                                        size="small"
-                                        multiline
-                                        fullWidth
-                                        placeholder={`${element.type} Answer`}
-                                        inputProps={{
-                                          type: "text",
-                                          inputMode: "numeric",
-                                          pattern: "[0-9]*",
-                                        }}
-                                        maxRows={8}
-                                        style={{
-                                          display: "block",
-                                          marginTop: "15px",
-                                        }}
-                                        value={
-                                          inputValues[
-                                            `${section.id}_${element.text}`
-                                          ] || ""
-                                        }
-                                        onChange={(e) => {
-                                          const numericValue =
-                                            e.target.value.replace(/\D/g, "");
-                                          handleInputChange(
-                                            { target: { value: numericValue } },
-                                            element.text,
-                                            section.id
-                                          );
-                                        }}
-                                      />
-                                    </Box>
-                                  )}
-
-                                  {/* Radio Buttons */}
-                                  {element.type === "Radio Buttons" && (
-                                    <Box>
-                                      <Typography fontSize="18px" mb={1} mt={1}>
-                                        {element.text}
-                                      </Typography>
-                                      <Box
-                                        sx={{
-                                          display: "flex",
-                                          gap: 1,
-                                          flexWrap: "wrap",
-                                        }}
-                                      >
-                                        {element.options.map((option) => (
-                                          <Button
-                                            key={option.text}
-                                            variant={
-                                              radioValues[
-                                                `${section.id}_${element.text}`
-                                              ] === option.text
-                                                ? "contained"
-                                                : "outlined"
-                                            }
-                                            onClick={() =>
-                                              handleRadioChange(
-                                                option.text,
-                                                element.text,
-                                                section.id
-                                              )
-                                            }
-                                            sx={{
-                                              borderRadius: "15px",
-                                              ...(radioValues[
-                                                `${section.id}_${element.text}`
-                                              ] === option.text
-                                                ? {
-                                                    backgroundColor:
-                                                      "var(--color-save-btn)",
-                                                    "&:hover": {
-                                                      backgroundColor:
-                                                        "var(--color-save-hover-btn)",
-                                                    },
-                                                  }
-                                                : {
-                                                    borderColor:
-                                                      "var(--color-border-cancel-btn)",
-                                                    color:
-                                                      "var(--color-save-btn)",
-                                                    "&:hover": {
-                                                      backgroundColor:
-                                                        "var(--color-save-hover-btn)",
-                                                      color: "#fff",
-                                                      border: "none",
-                                                    },
-                                                  }),
-                                            }}
-                                          >
-                                            {option.text}
-                                          </Button>
-                                        ))}
-                                      </Box>
-                                    </Box>
-                                  )}
-
-                                  {/* Checkboxes */}
-                                  {element.type === "Checkboxes" && (
-                                    <Box>
-                                      <Typography fontSize="18px">
-                                        {element.text}
-                                      </Typography>
-                                      <Box
-                                        sx={{
-                                          display: "flex",
-                                          gap: 1,
-                                          flexWrap: "wrap",
-                                        }}
-                                      >
-                                        {element.options.map((option) => (
-                                          <Button
-                                            key={option.text}
-                                            variant={
-                                              checkboxValues[
-                                                `${section.id}_${element.text}`
-                                              ]?.[option.text]
-                                                ? "contained"
-                                                : "outlined"
-                                            }
-                                            onClick={() =>
-                                              handleCheckboxChange(
-                                                option.text,
-                                                element.text,
-                                                section.id
-                                              )
-                                            }
-                                            sx={{
-                                              borderRadius: "15px",
-                                              ...(checkboxValues[
-                                                `${section.id}_${element.text}`
-                                              ]?.[option.text]
-                                                ? {
-                                                    backgroundColor:
-                                                      "var(--color-save-btn)",
-                                                    "&:hover": {
-                                                      backgroundColor:
-                                                        "var(--color-save-hover-btn)",
-                                                    },
-                                                  }
-                                                : {
-                                                    borderColor:
-                                                      "var(--color-border-cancel-btn)",
-                                                    color:
-                                                      "var(--color-save-btn)",
-                                                    "&:hover": {
-                                                      backgroundColor:
-                                                        "var(--color-save-hover-btn)",
-                                                      color: "#fff",
-                                                      border: "none",
-                                                    },
-                                                  }),
-                                            }}
-                                          >
-                                            {option.text}
-                                          </Button>
-                                        ))}
-                                      </Box>
-                                    </Box>
-                                  )}
-
-                                  {/* Yes/No */}
-                                  {element.type === "Yes/No" && (
-                                    <Box>
-                                      <Typography fontSize="18px">
-                                        {element.text}
-                                      </Typography>
-                                      <Box sx={{ display: "flex", gap: 1 }}>
-                                        {element.options.map((option) => (
-                                          <Button
-                                            key={option.text}
-                                            variant={
-                                              selectedYesNoValues[
-                                                `${section.id}_${element.text}`
-                                              ] === option.text
-                                                ? "contained"
-                                                : "outlined"
-                                            }
-                                            onClick={() =>
-                                              handleYesNoChange(
-                                                option.text,
-                                                element.text,
-                                                section.id
-                                              )
-                                            }
-                                            sx={{
-                                              borderRadius: "15px",
-                                              ...(selectedYesNoValues[
-                                                `${section.id}_${element.text}`
-                                              ] === option.text
-                                                ? {
-                                                    backgroundColor:
-                                                      "var(--color-save-btn)",
-                                                    "&:hover": {
-                                                      backgroundColor:
-                                                        "var(--color-save-hover-btn)",
-                                                    },
-                                                  }
-                                                : {
-                                                    borderColor:
-                                                      "var(--color-border-cancel-btn)",
-                                                    color:
-                                                      "var(--color-save-btn)",
-                                                    "&:hover": {
-                                                      backgroundColor:
-                                                        "var(--color-save-hover-btn)",
-                                                      color: "#fff",
-                                                      border: "none",
-                                                    },
-                                                  }),
-                                            }}
-                                          >
-                                            {option.text}
-                                          </Button>
-                                        ))}
-                                      </Box>
-                                    </Box>
-                                  )}
-
-                                  {/* Dropdown */}
-                                  {element.type === "Dropdown" && (
-                                    <Box>
-                                      <Typography fontSize="18px">
-                                        {element.text}
-                                      </Typography>
-                                      <FormControl fullWidth>
-                                        <Select
-                                          value={
-                                            selectedDropdownValues[
-                                              `${section.id}_${element.text}`
-                                            ] || ""
-                                          }
-                                          onChange={(event) =>
-                                            handleDropdownValueChange(
-                                              event,
-                                              element.text,
-                                              section.id
-                                            )
-                                          }
-                                          size="small"
-                                        >
-                                          {element.options.map((option) => (
-                                            <MenuItem
-                                              key={option.text}
-                                              value={option.text}
-                                            >
-                                              {option.text}
-                                            </MenuItem>
-                                          ))}
-                                        </Select>
-                                      </FormControl>
-                                    </Box>
-                                  )}
-
-                                  {/* Date */}
-                                  {element.type === "Date" && (
-                                    <Box>
-                                      <Typography fontSize="18px">
-                                        {element.text}
-                                      </Typography>
-                                      <DatePicker
-                                         format="MM/DD/YYYY"
-                                        sx={{
-                                          width: "100%",
-                                          backgroundColor: "#fff",
-                                        }}
-                                        selected={startDate}
-                                        onChange={handleStartDateChange}
-                                        renderInput={(params) => (
-                                          <TextField {...params} size="small" />
-                                        )}
-                                        onOpen={() =>
-                                          setAnsweredElements(
-                                            (prevAnswered) => ({
-                                              ...prevAnswered,
-                                              [`${section.id}_${element.text}`]: true,
-                                            })
-                                          )
-                                        }
-                                      />
-                                    </Box>
-                                  )}
-
-                                  {/* File Upload */}
-                                  {element.type === "File Upload" && (
-                                    <Box>
-                                      <Typography fontSize="18px" mb={1} mt={2}>
-                                        {element.text}
-                                      </Typography>
-                                      <Tooltip
-                                        title="Unavailable in preview mode"
-                                        placement="top"
-                                      >
-                                        <Box
-                                          sx={{
-                                            position: "relative",
-                                            width: "100%",
-                                          }}
-                                        >
-                                          <TextField
-                                            variant="outlined"
-                                            size="small"
-                                            fullWidth
-                                            disabled
-                                            placeholder="Add Document"
-                                            sx={{
-                                              cursor: "not-allowed",
-                                              "& .MuiInputBase-input": {
-                                                pointerEvents: "none",
-                                                cursor: "not-allowed",
-                                              },
-                                            }}
-                                          />
-                                        </Box>
-                                      </Tooltip>
-                                    </Box>
-                                  )}
-                                </Box>
-                              )
-                          )}
-                        </Box>
-                      )
-                  )}
-                  <Box mt={3} display="flex" gap={3} alignItems="center">
-                    <Button disabled={activeStep === 0} onClick={handleBack} variant="contained" sx={{
-                backgroundColor: 'var(--color-save-btn)',  // Normal background
-               
-                '&:hover': {
-                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                },
-               width:'80px',borderRadius:'15px'
-              }}>
-                      Back
-                    </Button>
-                    <Button onClick={handleNext} disabled={activeStep === totalSteps - 1} variant="contained" sx={{
-                backgroundColor: 'var(--color-save-btn)',  // Normal background
-               
-                '&:hover': {
-                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                },
-               width:'80px',borderRadius:'15px'
-              }}>
-                      Next
-                    </Button>
-                  </Box>
-                </Box>
-              </Box>
-            </LocalizationProvider>
-          </Box>
-        </DialogContent>
-      </Dialog>
-    </Container>
+              <div className="flex gap-3 mt-6">
+                <button type="button" disabled={activeStep === 0} onClick={handleBack} className={btnPrimary}>Back</button>
+                <button type="button" disabled={activeStep === totalSteps - 1} onClick={handleNext} className={btnPrimary}>Next</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

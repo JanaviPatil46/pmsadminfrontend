@@ -73,98 +73,39 @@
 
 // export default Email
 
-import { Box, List, ListItemButton, Typography,Badge } from "@mui/material";
-import { NavLink, Outlet } from "react-router-dom";
-import { useLocation } from "react-router-dom";
+import { NavLink, Outlet, useLocation } from "react-router-dom";
 const EmailLayout = () => {
 
   const location = useLocation();
 const unreadInbox = location.state?.unreadCount || 0;
 
+  const navCls = ({ isActive }) =>
+    `flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${
+      isActive ? 'bg-blue-50 font-bold text-blue-600' : 'text-gray-700 hover:bg-gray-100'
+    }`;
+
   return (
-    <Box sx={{ display: "flex", mt:2}}>
+    <div className="flex mt-2">
       {/* Sidebar */}
-      <Box sx={{ width: 220,  p: 1 }}>
-        <List>
-
-          {/* INBOX */}
-          {/* <ListItemButton
-            component={NavLink}
-            to="inbox"
-            sx={{
-              "&.active": {
-                bgcolor: "#e3f2fd",
-                fontWeight: "bold",
-                color: "#1976d2",
-              },
-            }}
-          >
-            Inbox 
-
-          </ListItemButton> */}
-          <ListItemButton
-  component={NavLink}
-  to="inbox"
-  sx={{
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    px: 2,
-    py: 1,
-    borderRadius: 2,
-
-    "&.active": {
-      bgcolor: "#e3f2fd",
-      fontWeight: "bold",
-      color: "#1976d2",
-    },
-  }}
->
-  <Typography sx={{ fontWeight: "inherit" }}>
-    Inbox
-  </Typography>
-
-  {unreadInbox > 0 && (
-    <Badge
-      badgeContent={unreadInbox}
-      color="primary"
-      sx={{
-        "& .MuiBadge-badge": {
-          fontSize: "0.75rem",
-          minWidth: 20,
-          height: 20,
-        },
-      }}
-    />
-  )}
-</ListItemButton>
-
-
-          {/* SENT */}
-          <ListItemButton
-            component={NavLink}
-            to="sent"
-            sx={{
-              "&.active": {
-                bgcolor: "#e3f2fd",
-                fontWeight: "bold",
-                color: "#1976d2",
-              },
-            }}
-          >
-            Sent
-          </ListItemButton>
-
-        </List>
-      </Box>
+      <div className="w-[220px] p-1 shrink-0">
+        <NavLink to="inbox" className={navCls}>
+          <span>Inbox</span>
+          {unreadInbox > 0 && (
+            <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1 rounded-full bg-blue-500 text-white text-xs font-medium">
+              {unreadInbox}
+            </span>
+          )}
+        </NavLink>
+        <NavLink to="sent" className={navCls}>
+          <span>Sent</span>
+        </NavLink>
+      </div>
 
       {/* Main Area */}
-      <Box sx={{ flex: 1 }}>
-        {/* <Outlet /> */}
+      <div className="flex-1">
         <Outlet context={{ unreadCount: 0 }} />
-
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 };
 

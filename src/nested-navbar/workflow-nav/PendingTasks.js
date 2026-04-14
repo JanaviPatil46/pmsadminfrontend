@@ -1,22 +1,6 @@
-import React, { useState, useEffect } from "react";
-import Tooltip from "@mui/material/Tooltip";
-import {
-  Box,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  Paper,
-  TableRow,
-  Checkbox,
-  MenuItem,
-  IconButton,
-  Menu,
-  Typography,Button
-} from "@mui/material";
+import React, { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { MoreVertical } from "lucide-react";
 import NewTaskDrawer from "../../Tasks/NewTaskDrawer";
 import { useParams } from "react-router-dom";
 const PendingTasks = () => {
@@ -60,10 +44,9 @@ const PendingTasks = () => {
           dueDate: task.EndDate
             ? new Date(task.EndDate).toLocaleDateString("en-GB")
             : "",
-          description: task.Description.replace(/<[^>]+>/g, ""), // Remove HTML tags
+          description: task.Description.replace(/<[^>]+>/g, "")
         }));
 
-        console.log(formattedTasks);
         setTasksData(formattedTasks);
       })
       .catch((error) => console.error(error));
@@ -86,7 +69,6 @@ const PendingTasks = () => {
   const handleDelete = () => {
     handleClose();
     handleDeleteTask(selectedTask);
-    console.log("Deleted:", selectedTask);
   };
   const handleDeleteTask = async () => {
     const isConfirmed = window.confirm(
@@ -94,7 +76,6 @@ const PendingTasks = () => {
     );
     if (isConfirmed) {
       try {
-        // Make delete requests for each selected job
         await Promise.all(
           selected.map((id) =>
             fetch(`${ACCOUNT_TASKS_API}/accountstasks/taskdelete/` + id, {
@@ -103,10 +84,6 @@ const PendingTasks = () => {
             })
           )
         );
-
-        // Optionally, you can remove the deleted jobs from the UI (if needed)
-        // If you're using jobData in state, for example:
-        // setJobData((prevJobs) => prevJobs.filter((job) => !selected.includes(job.id)));
 
         toast.success("task deleted successfully!");
         setSelected([]); // Clear the selected jobs
@@ -152,9 +129,6 @@ const PendingTasks = () => {
   ];
 
 
-  // const handleClick = (id) => {
-  // console.log(id)
-  // };
   const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
   const handleClick = async (id) => {
     
@@ -180,594 +154,152 @@ const PendingTasks = () => {
   
 
   return (
-    <Box>
-
-
-      <Box mt={2}>
-      <TableContainer component={Paper}>
-        <Table style={{ tableLayout: "fixed", width: "100%" }}>
-          <TableHead>
-            <TableRow>
-              <TableCell
-                padding="checkbox"
-                style={{
-                  position: "sticky",
-                  left: 0,
-                  zIndex: 1,
-                  background: "#fff",
-                  fontSize: "2px", // Set a professional font size
-                  fontWeight: "bold",
-                  textAlign: "center",
-                }}
-              >
-                <Checkbox
-                  checked={selected.length === taskData.length}
-                  onChange={() => {
-                    if (selected.length === taskData.length) {
-                      setSelected([]);
-                    } else {
-                      const allSelected = taskData.map((item) => item.id);
-                      setSelected(allSelected);
-                    }
-                  }}
-                />
-              </TableCell>
-              <TableCell
-                style={{
-                  cursor: "pointer",
-                  position: "sticky",
-                  left: 50,
-                  zIndex: 1,
-                  background: "#fff",
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px", // Add more padding for better spacing
-                }}
-                width="200"
-              >
-                Name
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="200"
-              >
-                Account
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="200"
-              >
-                Assignee
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Status
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Priority
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Subtasks
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Start Date
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Due Date
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="250"
-              >
-                Job Name
-              </TableCell>
-
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="200"
-                height="60"
-              >
-                Pipeline
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="150"
-              >
-                Stage
-              </TableCell>
-
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Tags
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="250"
-              >
-                Description
-              </TableCell>
-              <TableCell
-                
-                style={{
-                  position: "sticky",
-                  right: 0, // Stick to the right side
-                  zIndex: 2, // Ensure it appears above other elements
-                  background: "#fff",
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Settings
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {taskData.map((row) => {
-              const isSelected = selected.indexOf(row.id) !== -1;
-              return (
-                <TableRow
-                  key={row.id}
-                  hover
-                  onClick={() => handleSelect(row.id)}
-                  role="checkbox"
-                  tabIndex={-1}
-                  selected={isSelected}
-                  style={{
-                    cursor: "pointer",
-                    transition: "background-color 0.3s ease",
-                    "&:hover": {
-                      backgroundColor: "#f4f4f4", // Add hover effect
-                    },
-                  }}
-                >
-                  <TableCell
-                    padding="checkbox"
-                    style={{
-                      position: "sticky",
-                      left: 0,
-                      zIndex: 1,
-                      background: "#fff",
-                      fontSize: "12px",
-                      textAlign: "center",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                      // padding: "2px", // Adjust padding for better spacing
+    <div>
+      <div className="mt-2">
+        <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
+          <table className="w-full text-left border-collapse" style={{ tableLayout: "fixed" }}>
+            <thead>
+              <tr className="bg-gray-50 border-b border-gray-200">
+                <th className="px-2 py-3 w-10 sticky left-0 z-10 bg-gray-50">
+                  <input
+                    type="checkbox"
+                    className="w-4 h-4 rounded border-gray-300 accent-[var(--color-save-btn)] cursor-pointer"
+                    checked={taskData.length > 0 && selected.length === taskData.length}
+                    onChange={() => {
+                      if (selected.length === taskData.length) {
+                        setSelected([]);
+                      } else {
+                        setSelected(taskData.map((item) => item.id));
+                      }
                     }}
+                  />
+                </th>
+                {["Name","Account","Assignee","Status","Priority","Subtasks","Start Date","Due Date","Job Name","Pipeline","Stage","Tags","Description","Settings"].map((col) => (
+                  <th key={col} className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">{col}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {taskData.map((row) => {
+                const isSelected = selected.indexOf(row.id) !== -1;
+                return (
+                  <tr
+                    key={row.id}
+                    onClick={() => handleSelect(row.id)}
+                    className={`cursor-pointer transition-colors hover:bg-gray-50 ${isSelected ? "bg-blue-50" : ""}`}
                   >
-                    <Checkbox checked={isSelected} />
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      position: "sticky",
-                      left: 50,
-                      zIndex: 1,
-                      background: "#fff",
-                      fontSize: "12px",
-                      fontWeight: "normal",
-                      // padding: "12px 16px", // Add padding for better spacing
-                    }}
-                  >
-                    <span
-                      style={{ cursor: "pointer", color: "#3f51b5" }}
-                      // onClick={() => handleClick(row.id)}
-                      onClick={(e) => {
-                        e.stopPropagation(); // Prevent row click action when clicking on name
-                        handleClick(row.id);
-                      }}
-                    >
-                      {row.Name}
-                    </span>
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                    }}
-                  >
-                    {row.AccountName}
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                    }}
-                  >
-                    {row.Assignees}
-                  </TableCell>
-                 
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                    }}
-                  >
-                    {row.Status && (
+                    <td className="px-2 py-2.5 sticky left-0 z-10 bg-white" onClick={(e) => e.stopPropagation()}>
+                      <input
+                        type="checkbox"
+                        className="w-4 h-4 rounded border-gray-300 accent-[var(--color-save-btn)] cursor-pointer"
+                        checked={isSelected}
+                        onChange={() => handleSelect(row.id)}
+                      />
+                    </td>
+                    <td className="px-4 py-2.5 text-xs sticky left-10 z-10 bg-white whitespace-nowrap">
                       <span
-                        style={{
-                          display: "inline-block",
-                          backgroundColor:
-                            statusOptions.find(
-                              (status) => status.value === row.Status
-                            )?.color || "#ccc",
-                          color: "#fff",
-                          padding: "4px 8px",
-                          borderRadius: "10px",
-                          fontSize: "10px",
-                          fontWeight: "bold",
-                        }}
+                        className="text-blue-600 font-medium cursor-pointer hover:underline"
+                        onClick={(e) => { e.stopPropagation(); handleClick(row.id); }}
                       >
-                        {row.Status}
+                        {row.Name}
                       </span>
-                    )}
-                  </TableCell>
-                  {/* <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                    }}
-                  >{row.Priority}</TableCell> */}
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                    }}
-                  >
-                    {row.Priority && (
-                      <span
-                        style={{
-                          display: "inline-block",
-                          backgroundColor:
-                            priorityOptions.find(
-                              (priority) => priority.value === row.Priority
-                            )?.color || "#ccc",
-                          color: "#fff",
-                          padding: "4px 8px",
-                          borderRadius: "10px",
-                          fontSize: "10px",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        {row.Priority}
-                      </span>
-                    )}
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                    }}
-                  >
-                    {row.SubtaskCount}
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                    }}
-                  >
-                    {row.startDate}
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                    }}
-                  >
-                    {row.dueDate}
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                    }}
-                  >
-                    {row.JobName}
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                    }}
-                  >
-                    {row.PipelineName}
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                    }}
-                  >
-                    {row.StageNames}
-                  </TableCell>
-                  {/* <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                    }}
-                  >
-                  {row.TaskTags && row.TaskTags.length > 0 ? (
-                    row.TaskTags.map((tag) => (
-                      <span
-                        key={tag.id}
-                        style={{
-                          display: "inline-block",
-                          backgroundColor: tag.tagColour,
-                          color: "#fff",
-                          padding: "4px 8px",
-                          borderRadius: "8px",
-                          marginRight: "4px",
-                          fontSize: "10px",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        {tag.tagName}
-                      </span>
-                    ))
-                  ) : (
-                    <span style={{ color: "#888" }}>No Tags</span>
-                  )}
-                </TableCell> */}
-                  {/* <TableCell
-  style={{
-    fontSize: "12px",
-    padding: "4px 8px",
-    lineHeight: "1",
-  }}
->
-  {row.TaskTags && row.TaskTags.length > 0 ? (
-    <>
-      <span
-        key={row.TaskTags[0].id}
-        style={{
-          display: "inline-block",
-          backgroundColor: row.TaskTags[0].tagColour,
-          color: "#fff",
-          padding: "4px 8px",
-          borderRadius: "8px",
-          marginRight: "4px",
-          fontSize: "10px",
-          fontWeight: "bold",
-        }}
-      >
-        {row.TaskTags[0].tagName}
-      </span>
-
-      {row.TaskTags.length > 1 && (
-        <Tooltip
-          title={row.TaskTags
-            .slice(1)
-            .map((tag) => tag.tagName)
-            .join(", ")}
-          arrow
-          placement="top"
-        >
-          <span
-            style={{
-              display: "inline-block",
-              backgroundColor: "#ddd",
-              color: "#333",
-              padding: "4px 8px",
-              borderRadius: "8px",
-              fontSize: "10px",
-              fontWeight: "bold",
-              cursor: "pointer",
-            }}
-          >
-            +{row.TaskTags.length - 1}
-          </span>
-        </Tooltip>
-      )}
-    </>
-  ) : (
-    <span style={{ color: "#888" }}>No Tags</span>
-  )}
-</TableCell> */}
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                    }}
-                  >
-                    {row.TaskTags && row.TaskTags.length > 0 ? (
-                      <>
-                        {/* Display First Tag */}
+                    </td>
+                    <td className="px-4 py-2.5 text-xs text-gray-700 whitespace-nowrap">{row.AccountName}</td>
+                    <td className="px-4 py-2.5 text-xs text-gray-700 whitespace-nowrap">{row.Assignees}</td>
+                    <td className="px-4 py-2.5 text-xs whitespace-nowrap">
+                      {row.Status && (
                         <span
-                          key={row.TaskTags[0].id}
-                          style={{
-                            display: "inline-block",
-                            backgroundColor: row.TaskTags[0].tagColour,
-                            color: "#fff",
-                            padding: "4px 8px",
-                            borderRadius: "8px",
-                            marginRight: "4px",
-                            fontSize: "10px",
-                            fontWeight: "bold",
-                          }}
+                          className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold text-white"
+                          style={{ backgroundColor: statusOptions.find((s) => s.value === row.Status)?.color || "#ccc" }}
                         >
-                          {row.TaskTags[0].tagName}
+                          {row.Status}
                         </span>
-
-                        {/* Tooltip for Remaining Tags */}
-                        {row.TaskTags.length > 1 && (
-                          <Tooltip
-                            arrow
-                            placement="top"
-                            title={
-                              <div>
+                      )}
+                    </td>
+                    <td className="px-4 py-2.5 text-xs whitespace-nowrap">
+                      {row.Priority && (
+                        <span
+                          className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold text-white"
+                          style={{ backgroundColor: priorityOptions.find((p) => p.value === row.Priority)?.color || "#ccc" }}
+                        >
+                          {row.Priority}
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-2.5 text-xs text-gray-700 whitespace-nowrap">{row.SubtaskCount}</td>
+                    <td className="px-4 py-2.5 text-xs text-gray-700 whitespace-nowrap">{row.startDate}</td>
+                    <td className="px-4 py-2.5 text-xs text-gray-700 whitespace-nowrap">{row.dueDate}</td>
+                    <td className="px-4 py-2.5 text-xs text-gray-700 whitespace-nowrap">{row.JobName}</td>
+                    <td className="px-4 py-2.5 text-xs text-gray-700 whitespace-nowrap">{row.PipelineName}</td>
+                    <td className="px-4 py-2.5 text-xs text-gray-700 whitespace-nowrap">{row.StageNames}</td>
+                    <td className="px-4 py-2.5 text-xs whitespace-nowrap">
+                      {row.TaskTags && row.TaskTags.length > 0 ? (
+                        <div className="flex items-center gap-1 flex-wrap">
+                          <span
+                            className="inline-block px-2 py-0.5 rounded-lg text-[10px] font-bold text-white"
+                            style={{ backgroundColor: row.TaskTags[0].tagColour }}
+                          >
+                            {row.TaskTags[0].tagName}
+                          </span>
+                          {row.TaskTags.length > 1 && (
+                            <div className="relative group">
+                              <span className="inline-block bg-gray-200 text-gray-600 px-2 py-0.5 rounded-lg text-[10px] font-bold cursor-pointer">
+                                +{row.TaskTags.length - 1}
+                              </span>
+                              <div className="absolute left-0 bottom-6 z-50 hidden group-hover:flex flex-col gap-1 bg-gray-800 rounded-xl p-2 shadow-xl min-w-[120px]">
                                 {row.TaskTags.slice(1).map((tag) => (
-                                  <Typography
+                                  <span
                                     key={tag.id}
-                                    sx={{
-                                      backgroundColor: tag.tagColour,
-                                      color: "#fff",
-                                      padding: "4px 8px",
-                                      borderRadius: "8px",
-                                      fontSize: "10px",
-                                      fontWeight: "bold",
-                                      display: "block",
-                                      marginBottom: "4px",
-                                    }}
+                                    className="inline-block px-2 py-0.5 rounded-lg text-[10px] font-bold text-white"
+                                    style={{ backgroundColor: tag.tagColour }}
                                   >
                                     {tag.tagName}
-                                  </Typography>
+                                  </span>
                                 ))}
                               </div>
-                            }
-                          >
-                            <span
-                              style={{
-                                display: "inline-block",
-                                backgroundColor: "#ddd",
-                                color: "#333",
-                                padding: "4px 8px",
-                                borderRadius: "8px",
-                                fontSize: "10px",
-                                fontWeight: "bold",
-                                cursor: "pointer",
-                              }}
-                            >
-                              +{row.TaskTags.length - 1}
-                            </span>
-                          </Tooltip>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-gray-400 text-[10px]">No Tags</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-2.5 text-xs text-gray-700">{row.description}</td>
+                    <td className="px-4 py-2.5 text-xs sticky right-0 z-10 bg-white" onClick={(e) => e.stopPropagation()}>
+                      <div className="relative inline-block">
+                        <button
+                          type="button"
+                          className="p-1 rounded hover:bg-gray-100 transition-colors"
+                          onClick={(e) => { e.stopPropagation(); handleMenuClick(e, row.id); }}
+                        >
+                          <MoreVertical size={15} className="text-gray-500" />
+                        </button>
+                        {Boolean(anchorEl) && selectedTask === row.id && (
+                          <div className="absolute right-0 top-8 z-50 bg-white border border-gray-200 rounded-xl shadow-xl w-36 py-1 overflow-hidden">
+                            <div className="fixed inset-0 z-30" onClick={handleClose} />
+                            <div className="relative z-40">
+                              <button type="button" className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors" onClick={() => handleClick(row.id)}>Edit</button>
+                              <button type="button" className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors" onClick={handleDelete}>Delete</button>
+                            </div>
+                          </div>
                         )}
-                      </>
-                    ) : (
-                      <span style={{ color: "#888" }}>No Tags</span>
-                    )}
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                    }}
-                  >
-                    {row.description}
-                  </TableCell>
-                  <TableCell
-                    // style={{
-                    //   fontSize: "12px",
-                    //   padding: "4px 8px",
-                    //   lineHeight: "1",
-                    // }}
-                    style={{
-                      position: "sticky",
-                      right: 0, // Stick to the right side
-                      zIndex: 1, // Keep it above the table content
-                      background: "#fff",
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                    }}
-                  >
-                    <IconButton
-                      onClick={(event) => handleMenuClick(event, row.id)}
-                    >
-                      <MoreVertIcon />
-                    </IconButton>
-                    <Menu
-                      anchorEl={anchorEl}
-                      open={Boolean(anchorEl && selectedTask === row.id)}
-                      onClose={handleClose}
-                    >
-                      <MenuItem onClick={() => handleClick(row.id)}>Edit</MenuItem>
-                      <MenuItem onClick={handleDelete}>Delete</MenuItem>
-                    </Menu>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      </Box>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
       <NewTaskDrawer
-  open={drawerOpen}
-  onClose={onclose}
-  fetchTasksData={fetchTasksData}
-  isEditMode={isEditMode}
-  taskData={selectedTaskData}
-/>
-    </Box>
+        open={drawerOpen}
+        onClose={onclose}
+        fetchTasksData={fetchTasksData}
+        isEditMode={isEditMode}
+        taskData={selectedTaskData}
+      />
+    </div>
   );
 };
 

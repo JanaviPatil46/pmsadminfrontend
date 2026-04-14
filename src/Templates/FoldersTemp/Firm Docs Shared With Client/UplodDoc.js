@@ -213,7 +213,6 @@
 
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Button, Box, Typography, Drawer } from "@mui/material";
 import { FaTimes } from "react-icons/fa";
 import FileExplorer from "../FileExplorer";
 
@@ -282,59 +281,36 @@ const handlePathSelect = (path) => {
   setSelectedPath(path);
   setDestinationPath(path); 
 };
-  if (error) return <Box>Error: {error}</Box>;
+  if (error) return <div>Error: {error}</div>;
+  if (!open) return null;
 
   return (
-    <Drawer
-      anchor="right"
-      open={open}
-      onClose={onClose}
-      PaperProps={{
-        sx: {
-          width: 600,
-        },
-      }}
-    >
-      <Box>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            p: 2,
-            borderBottom: "1px solid grey",
-          }}
-        >
-          <Typography variant="h6">
-            Upload in Firm Docs Shared With Client
-          </Typography>
-          <FaTimes style={{ cursor: "pointer" }} onClick={onClose} />
-        </Box>
-
-        <Box sx={{ maxHeight: "500px", overflowY: "auto" }}>
-     
-        <FileExplorer onPathSelect={handlePathSelect} accountId={accountId}/>
-
-       
-        </Box>
-
-     
-
-        <Box sx={{ display: "flex", gap: 2, mt: 3, ml: 4 }}>
-          <Button
-            variant="contained"
-            color="primary"
+    <div className="fixed inset-0 z-40 overflow-hidden">
+      <div className="absolute inset-0 bg-black/30" onClick={onClose} />
+      <div className="absolute right-0 top-0 h-full w-[600px] bg-white shadow-xl flex flex-col">
+        <div className="flex items-center justify-between p-4 border-b border-gray-300">
+          <h2 className="text-base font-semibold">Upload in Firm Docs Shared With Client</h2>
+          <button type="button" onClick={onClose} className="text-gray-500 hover:text-gray-700 cursor-pointer">
+            <FaTimes />
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto" style={{ maxHeight: 500 }}>
+          <FileExplorer onPathSelect={handlePathSelect} accountId={accountId} />
+        </div>
+        <div className="flex gap-3 p-4 ml-2">
+          <button type="button"
             disabled={!file}
             onClick={handleUploadClick}
-          >
+            className="px-4 py-1.5 rounded text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-40">
             Upload
-          </Button>
-          <Button variant="outlined" onClick={onClose}>
+          </button>
+          <button type="button" onClick={onClose}
+            className="px-4 py-1.5 rounded text-sm font-medium border border-gray-300 text-gray-700 hover:bg-gray-50">
             Cancel
-          </Button>
-        </Box>
-      </Box>
-    </Drawer>
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 

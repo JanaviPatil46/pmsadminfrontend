@@ -1,35 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
-import {
-  Box,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  IconButton,
-  Menu,
-  MenuItem,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Button,
-} from "@mui/material";
-import { useTheme } from "@mui/material/styles";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { GoDotFill } from "react-icons/go";
+import { MoreVertical } from "lucide-react";
 import EditJobDrawer from "../../Workflow/updateJobCard";
 const ActiveJobs = () => {
   const JOBS_API = process.env.REACT_APP_ADD_JOBS_URL;
   const [jobData, setJobData] = useState([]);
   const { data } = useParams();
- const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const menuRef = useRef(null);
   useEffect(() => {
     fetchJobList(data);
   }, [data]);
@@ -104,7 +82,6 @@ const ActiveJobs = () => {
     fetch(archiveUrl, requestOptions)
       .then((response) => response.json())
       .then((result) => {
-        console.log("Archive result:", result);
         setJobData((prevJobs) =>
           prevJobs.filter((job) => job.id !== selectedJobId)
         ); // Remove archived job from the table
@@ -127,325 +104,201 @@ const ActiveJobs = () => {
     fetch(deleteUrl, requestOptions)
       .then((response) => response.json())
       .then((result) => {
-        console.log("Delete result:", result);
         setJobData((prevJobs) =>
           prevJobs.filter((job) => job.id !== selectedJobId)
-        ); // Remove deleted job from the table
+        );
       })
       .catch((error) => {
         console.error("Error deleting job:", error);
       });
   };
 
-    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-     const [editJobId, setEditJobId] = useState(null);
-     const handleEditJobCard = (jobId) => {
-        setEditJobId(jobId);
-        setIsDrawerOpen(true);
-      };
-         const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
-          const [accountData, setAccountData] = useState([]);
-      
-          useEffect(() => {
-            fetchAccountData();
-          }, []);
-      
-          const fetchAccountData = async () => {
-            try {
-              const response = await fetch(`${ACCOUNT_API}/accounts/accountdetails`);
-              const data = await response.json();
-              setAccountData(data.accounts);
-            } catch (error) {
-              console.error("Error fetching data:", error);
-            }
-          };
-      
-          // Create account options
-          const accountOptions = accountData.map((account) => ({
-            value: account._id,
-            label: account.accountName,
-          }));
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [editJobId, setEditJobId] = useState(null);
+  const handleEditJobCard = (jobId) => {
+    setEditJobId(jobId);
+    setIsDrawerOpen(true);
+  };
 
-            const PIPELINE_API = process.env.REACT_APP_PIPELINE_TEMP_URL;
-              const [pipelineData, setPipelineData] = useState([]);
-            useEffect(() => {
-                fetchPipelineData();
-              }, []);
-          
-              const fetchPipelineData = async () => {
-                try {
-                  const url = `${PIPELINE_API}/workflow/pipeline/pipelines`;
-                  const response = await fetch(url);
-                  if (!response.ok) {
-                    throw new Error("Failed to fetch pipeline data");
-                  }
-                  const data = await response.json();
-                  console.log(data);
-                  setPipelineData(data.pipeline || []);
-                } catch (error) {
-                  console.error("Error fetching data:", error);
-                }
-              };
-          
-              const optionpipeline = pipelineData.map((pipeline) => ({
-                value: pipeline._id,
-                label: pipeline.pipelineName,
-              }));
-              const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
-                 const [tags, setTags] = useState([]);
-                
-                  useEffect(() => {
-                    fetchTagData();
-                  }, []);
-              
-                  const fetchTagData = async () => {
-                    try {
-                      const response = await fetch(`${TAGS_API}/tags/`);
-                      const data = await response.json();
-                      setTags(data.tags);
-                    } catch (error) {
-                      console.error("Error fetching data:", error);
-                    }
-                  };
-                  
-                  
-                  const tagoptions = tags.map((tag) => ({
-                    value: tag._id,
-                    label: tag.tagName,
-                    colour: tag.tagColour,
-              
-                    customTagStyle: {
-                      backgroundColor: tag.tagColour,
-                      color: "#fff",
-                      borderRadius: "8px",
-                      alignItems: "center",
-                      textAlign: "center",
-                      marginBottom: "5px",
-                      padding: "2px,8px",
-              
-                      fontSize: "10px",
-                      // width: `${calculateWidth(tag.tagName)}px`,
-                      margin: "7px",
-                    },
-                  }));
-                   useEffect(() => {
-                        fetchUserData();
-                      }, []);
-                      const [userData, setUserData] = useState([]);
-                     
-                      const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
-                      const fetchUserData = async () => {
-                        try {
-                          const url = `${LOGIN_API}/common/users/roles?roles=TeamMember,Admin`;
-                          const response = await fetch(url);
-                          const data = await response.json();
-                          setUserData(data);
-                        } catch (error) {
-                          console.error("Error fetching data:", error);
-                        }
-                      };
-                      const useroptions = userData.map((user) => ({
-                        value: user._id,
-                        label: user.username,
-                      }));
-                      const CLIENT_FACING_API = process.env.REACT_APP_CLIENT_FACING_URL;
-                       const [clientFacingJobs, setClientFacingJobs] = useState([]);
-                          const fetchClientFacingJobsData = async () => {
-      try {
-        const response = await fetch(
-          `${CLIENT_FACING_API}/workflow/clientfacingjobstatus/`
-        );
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const data = await response.json();
-        setClientFacingJobs(data.clientFacingJobStatues); // Ensure data is set correctly
-        console.log(data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    const optionstatus = clientFacingJobs.map((status) => ({
-      value: status._id,
-      label: status.clientfacingName,
-      clientfacingColour: status.clientfacingColour,
-    }));
-     // useEffect to fetch jobs when the component mounts
-        useEffect(() => {
-          fetchClientFacingJobsData();
-        }, []);
+  const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
+  const [accountData, setAccountData] = useState([]);
+  useEffect(() => { fetchAccountData(); }, []);
+  const fetchAccountData = async () => {
+    try {
+      const response = await fetch(`${ACCOUNT_API}/accounts/accountdetails`);
+      const data = await response.json();
+      setAccountData(data.accounts);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+  const accountOptions = accountData.map((account) => ({ value: account._id, label: account.accountName }));
+
+  const PIPELINE_API = process.env.REACT_APP_PIPELINE_TEMP_URL;
+  const [pipelineData, setPipelineData] = useState([]);
+  useEffect(() => { fetchPipelineData(); }, []);
+  const fetchPipelineData = async () => {
+    try {
+      const url = `${PIPELINE_API}/workflow/pipeline/pipelines`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("Failed to fetch pipeline data");
+      const data = await response.json();
+      setPipelineData(data.pipeline || []);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+  const optionpipeline = pipelineData.map((pipeline) => ({ value: pipeline._id, label: pipeline.pipelineName }));
+
+  const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
+  const [tags, setTags] = useState([]);
+  useEffect(() => { fetchTagData(); }, []);
+  const fetchTagData = async () => {
+    try {
+      const response = await fetch(`${TAGS_API}/tags/`);
+      const data = await response.json();
+      setTags(data.tags);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+  const tagoptions = tags.map((tag) => ({
+    value: tag._id,
+    label: tag.tagName,
+    colour: tag.tagColour,
+    customTagStyle: {
+      backgroundColor: tag.tagColour,
+      color: "#fff",
+      borderRadius: "8px",
+      alignItems: "center",
+      textAlign: "center",
+      marginBottom: "5px",
+      padding: "2px,8px",
+      fontSize: "10px",
+      margin: "7px",
+    },
+  }));
+
+  const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
+  const [userData, setUserData] = useState([]);
+  useEffect(() => { fetchUserData(); }, []);
+  const fetchUserData = async () => {
+    try {
+      const url = `${LOGIN_API}/common/users/roles?roles=TeamMember,Admin`;
+      const response = await fetch(url);
+      const data = await response.json();
+      setUserData(data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+  const useroptions = userData.map((user) => ({ value: user._id, label: user.username }));
+
+  const CLIENT_FACING_API = process.env.REACT_APP_CLIENT_FACING_URL;
+  const [clientFacingJobs, setClientFacingJobs] = useState([]);
+  useEffect(() => { fetchClientFacingJobsData(); }, []);
+  const fetchClientFacingJobsData = async () => {
+    try {
+      const response = await fetch(`${CLIENT_FACING_API}/workflow/clientfacingjobstatus/`);
+      if (!response.ok) throw new Error("Network response was not ok");
+      const data = await response.json();
+      setClientFacingJobs(data.clientFacingJobStatues);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+  const optionstatus = clientFacingJobs.map((status) => ({
+    value: status._id,
+    label: status.clientfacingName,
+    clientfacingColour: status.clientfacingColour,
+  }));
   return (
-    <Box sx={{ padding: 2 }}>
-      <TableContainer component={Paper}>
-        <Table sx={{width:'100%'}}>
-          <TableHead>
-            <TableRow>
-              <TableCell  style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="200">Name</TableCell>
-              <TableCell  style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="200">Job Assignee(s)</TableCell>
-              <TableCell  style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="200">Pipeline</TableCell>
-              <TableCell  style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="100">Stage</TableCell>
-              <TableCell  style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="100">Starts In</TableCell>
-              <TableCell  style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="100">Due In</TableCell>
-              <TableCell  style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="100">Status</TableCell>
-              <TableCell  style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="100">Settings</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
+    <div className="p-4">
+      <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
+        <table className="w-full text-left border-collapse">
+          <thead>
+            <tr className="bg-gray-50 border-b border-gray-200">
+              {["Name","Job Assignee(s)","Pipeline","Stage","Starts In","Due In","Status","Settings"].map((col) => (
+                <th key={col} className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">{col}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
             {jobData.map((job) => (
-              <TableRow key={job.id}>
-                <TableCell style={{
-                          fontSize: "12px",
-                          padding: "4px 8px",
-                          lineHeight: "1",cursor:"pointer"
-                        }}  onClick={() => handleEditJobCard(job.id)}>{job.Name}</TableCell>
-                <TableCell style={{
-                          fontSize: "12px",
-                          padding: "4px 8px",
-                          lineHeight: "1",
-                        }}>{job.JobAssignee.join(", ")}</TableCell>
-                <TableCell style={{
-                          fontSize: "12px",
-                          padding: "4px 8px",
-                          lineHeight: "1",
-                        }}>{job.Pipeline}</TableCell>
-                <TableCell style={{
-                          fontSize: "12px",
-                          padding: "4px 8px",
-                          lineHeight: "1",
-                        }}>{job.Stages?.map(stage => stage.name).join(", ")}</TableCell>
-               
-                <TableCell style={{
-                          fontSize: "12px",
-                          padding: "4px 8px",
-                          lineHeight: "1",
-                        }}>{formatDate(job.StartDate)}</TableCell>
-                <TableCell style={{
-                          fontSize: "12px",
-                          padding: "4px 8px",
-                          lineHeight: "1",
-                        }}>{formatDate(job.DueDate)}</TableCell>
-<TableCell style={{
-                          fontSize: "12px",
-                          padding: "4px 8px",
-                          lineHeight: "1",
-                        }}>
+              <tr key={job.id} className="hover:bg-gray-50 transition-colors">
+                <td className="px-4 py-2.5 text-xs text-blue-600 font-medium cursor-pointer hover:underline whitespace-nowrap" onClick={() => handleEditJobCard(job.id)}>{job.Name}</td>
+                <td className="px-4 py-2.5 text-xs text-gray-700 whitespace-nowrap">{job.JobAssignee.join(", ")}</td>
+                <td className="px-4 py-2.5 text-xs text-gray-700 whitespace-nowrap">{job.Pipeline}</td>
+                <td className="px-4 py-2.5 text-xs text-gray-700 whitespace-nowrap">{job.Stages?.map(stage => stage.name).join(", ")}</td>
+                <td className="px-4 py-2.5 text-xs text-gray-700 whitespace-nowrap">{formatDate(job.StartDate)}</td>
+                <td className="px-4 py-2.5 text-xs text-gray-700 whitespace-nowrap">{formatDate(job.DueDate)}</td>
+                <td className="px-4 py-2.5 text-xs whitespace-nowrap">
                   {job.ClientFacingStatus ? (
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                      }}
+                    <div className="flex items-center gap-1.5">
+                      <GoDotFill style={{ color: job.ClientFacingStatus.statusColor, fontSize: "18px" }} />
+                      <span className="text-gray-700">{job.ClientFacingStatus.statusName}</span>
+                    </div>
+                  ) : ""}
+                </td>
+                <td className="px-4 py-2.5 text-xs">
+                  <div className="relative inline-block" ref={anchorEl && selectedJobId === job.id ? menuRef : null}>
+                    <button
+                      type="button"
+                      className="p-1 rounded hover:bg-gray-100 transition-colors"
+                      onClick={(e) => { e.stopPropagation(); handleSettingsClick(e, job.id); }}
                     >
-                      <GoDotFill
-                        style={{
-                          color: job.ClientFacingStatus.statusColor,
-                          fontSize: "25px",
-                        }}
-                      />
-                      <span>{job.ClientFacingStatus.statusName}</span>
-                    </Box>
-                  ) : (
-                    ""
-                  )}
-                </TableCell>
-                 <TableCell style={{
-                          fontSize: "12px",
-                          padding: "4px 8px",
-                          lineHeight: "1",
-                        }}>
-                  <IconButton
-                     onClick={(event) => handleSettingsClick(event, job.id)}
-                    aria-label="Settings"
-                  >
-                    <MoreVertIcon />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
+                      <MoreVertical size={15} className="text-gray-500" />
+                    </button>
+                    {Boolean(anchorEl) && selectedJobId === job.id && (
+                      <div className="absolute right-0 top-8 z-50 bg-white border border-gray-200 rounded-xl shadow-xl w-40 py-1 overflow-hidden">
+                        <div className="fixed inset-0 z-30" onClick={handleCloseMenu} />
+                        <div className="relative z-40">
+                          <button type="button" className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors" onClick={() => openConfirmationDialog("archive")}>Archive</button>
+                          <button type="button" className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors" onClick={() => openConfirmationDialog("delete")}>Delete</button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </td>
+              </tr>
             ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-       <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleCloseMenu}
-      >
-        <MenuItem onClick={() => openConfirmationDialog("archive")}>Archive</MenuItem>
-        <MenuItem onClick={() => openConfirmationDialog("delete")}>Delete</MenuItem>
-      </Menu>
+          </tbody>
+        </table>
+      </div>
 
       {/* Confirmation Dialog */}
-      <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
-        <DialogTitle>Confirm Action</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Are you sure you want to {actionType} this job?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          
-          <Button onClick={handleConfirmAction} color="primary">
-            Confirm
-          </Button>
-          <Button onClick={handleCloseDialog}>Cancel</Button>
-        </DialogActions>
-      </Dialog>
+      {isDialogOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40" onClick={handleCloseDialog} />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm">
+            <div className="px-5 py-4 border-b border-gray-100">
+              <h2 className="text-sm font-semibold text-gray-800">Confirm Action</h2>
+            </div>
+            <div className="px-5 py-4">
+              <p className="text-sm text-gray-600">Are you sure you want to {actionType} this job?</p>
+            </div>
+            <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100">
+              <button type="button" onClick={handleCloseDialog} className="rounded-lg px-4 py-2 text-sm font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">Cancel</button>
+              <button type="button" onClick={handleConfirmAction} className="rounded-lg px-4 py-2 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] transition-colors">Confirm</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <EditJobDrawer
         open={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
         jobId={editJobId}
-        // fetchJobData={fetchJobList}
-        fetchJobData={()=> fetchJobList(data)}
+        fetchJobData={() => fetchJobList(data)}
         accountOptions={accountOptions}
         pipelineOptions={optionpipeline}
         tagOptions={tagoptions}
         userOptions={useroptions}
         clientFacingOptions={optionstatus}
-        theme={theme}
-        isSmallScreen={isSmallScreen}
+        theme={{ breakpoints: { down: () => false } }}
+        isSmallScreen={false}
       />
-    </Box>
+    </div>
   );
 };
 

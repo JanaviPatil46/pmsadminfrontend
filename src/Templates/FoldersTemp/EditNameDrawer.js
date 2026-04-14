@@ -1,6 +1,5 @@
 // components/EditNameDrawer.jsx
 import React, { useState, useEffect } from "react";
-import { Drawer, TextField, Button, Box, Typography } from "@mui/material";
 
 const EditNameDrawer = ({ open, onClose, item, onRename }) => {
   const [newName, setNewName] = useState("");
@@ -28,28 +27,31 @@ useEffect(() => {
   
   };
 
+  if (!open) return null;
+
   return (
-    <Drawer anchor="right" open={open} onClose={onClose}>
-      <Box sx={{ width: 300, p: 3 }}>
-        <Typography variant="h6" gutterBottom>
+    <div className="fixed inset-0 z-40 overflow-hidden">
+      <div className="absolute inset-0 bg-black/30" onClick={onClose} />
+      <div className="absolute right-0 top-0 h-full w-[300px] bg-white shadow-xl flex flex-col p-6">
+        <h2 className="text-base font-semibold mb-4">
           Rename {item?.type === "folder" ? "Folder" : "File"}
-        </Typography>
-        <TextField
-          fullWidth
-          label="New Name"
+        </h2>
+        <input
+          type="text"
+          className="w-full border border-gray-300 rounded px-3 py-2 text-sm mb-4 focus:outline-none focus:ring-1 focus:ring-blue-400"
+          placeholder="New Name"
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
-          sx={{ mb: 2 }}
         />
-        <Button
-          variant="contained"
-          fullWidth
+        <button
+          type="button"
+          className="w-full py-2 rounded text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
           onClick={handleRename}
         >
           Save
-        </Button>
-      </Box>
-    </Drawer>
+        </button>
+      </div>
+    </div>
   );
 };
 

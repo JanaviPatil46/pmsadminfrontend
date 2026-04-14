@@ -1,15 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import Cookies from "js-cookie";
-import {
-  Box,
-  Checkbox,
-  TextField,
-  Menu,
-  Chip,
-  Typography,
-  IconButton
-} from "@mui/material";
-import { FaCaretUp, FaCaretDown } from "react-icons/fa";
+import { FaCaretUp, FaCaretDown, FaTimes } from "react-icons/fa";
 
 
 const MultiSelectDropdown = ({
@@ -168,124 +159,63 @@ const MultiSelectDropdown = ({
   );
 
   return (
-    <Box sx={{ width }}>
-      <Box
+    <div className="relative" style={{ width }}>
+      <div
         ref={containerRef}
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          border: "1px solid #ccc",
-          borderRadius: "8px",
-          padding: "8px",
-          cursor: "pointer",
-          bgcolor: "background.paper",
-          width: "100%",
-          mt: 2,
-          minHeight: "20px"
-        }}
+        className="flex items-center justify-between border border-gray-300 rounded-lg px-2 py-1.5 cursor-pointer bg-white mt-2 min-h-[32px] w-full"
         onClick={handleClick}
       >
-        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, flexGrow: 1 }}>
+        <div className="flex flex-wrap gap-1 flex-1">
           {value.length > 0 ? (
             value.map((item) => (
-              <Chip
-                key={item.value}
-                label={item.label}
-                onDelete={() => handleSelect(item.value)}
-                size="small"
-                sx={{
-                  fontWeight: 500,
-                  fontSize: "10px",
-                  borderRadius: "16px",
-                  height: "20px",
-                  cursor: "pointer",
-                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)",
-                  "& .MuiChip-deleteIcon": {
-                    color: "#fff",
-                    opacity: 0.7,
-                    transition: "opacity 0.2s",
-                    "&:hover": { opacity: 1 },
-                  },
-                }}
-              />
+              <span key={item.value}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-200 text-gray-700 shadow-sm">
+                {item.label}
+                <button type="button" onClick={(e) => { e.stopPropagation(); handleSelect(item.value); }} className="hover:opacity-70"><FaTimes size={8}/></button>
+              </span>
             ))
           ) : (
-            <Typography variant="body2" color="textSecondary">
-              {placeholder}
-            </Typography>
+            <span className="text-xs text-gray-400">{placeholder}</span>
           )}
-        </Box>
-        <IconButton size="small" sx={{ p: 0 }}>
-          {anchorEl ? <FaCaretUp /> : <FaCaretDown />}
-        </IconButton>
-      </Box>
+        </div>
+        <button type="button" className="text-gray-400 p-0">
+          {anchorEl ? <FaCaretUp size={12}/> : <FaCaretDown size={12}/>}
+        </button>
+      </div>
 
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-        transformOrigin={{ vertical: "top", horizontal: "left" }}
-        PaperProps={{
-          style: {
-            width: menuWidth || "auto",
-            maxHeight: "250px",
-          }
-        }}
-      >
-        <Box sx={{ p: 1 }}>
-          <TextField
-            fullWidth
-            size="small"
-            placeholder="Search..."
-            value={searchQuery}
-            onChange={handleSearchChange}
-            variant="outlined"
-            autoComplete="off"
-            autoFocus
-          />
-        </Box>
-
-        {filteredOptions.length > 0 ? (
-          filteredOptions.map((option) => (
-            <Box
-              key={option.value}
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                padding: "8px 12px",
-                cursor: "pointer",
-                "&:hover": { bgcolor: "action.hover" },
-              }}
-              onClick={() => handleSelect(option.value)}
-            >
-              <Checkbox
-                checked={value.some(item => item.value === option.value)}
-                sx={{ p: 0, mr: 1 }}
-              />
-              <Typography>{option.label}</Typography>
-            </Box>
-          ))
-        ) : (
-          <Typography sx={{ p: 2, color: "gray" }}>No results found</Typography>
-        )}
-
-        {value.length > 0 && (
-          <Box
-            sx={{
-              padding: "8px 12px",
-              color: "red",
-              cursor: "pointer",
-              "&:hover": { bgcolor: "action.hover" },
-            }}
-            onClick={clearSelection}
-          >
-            X Clear selected
-          </Box>
-        )}
-      </Menu>
-    </Box>
+      {Boolean(anchorEl) && (
+        <>
+          <div className="fixed inset-0 z-30" onClick={handleClose} />
+          <div className="absolute top-full left-0 z-40 bg-white border border-gray-200 rounded shadow-lg overflow-y-auto"
+            style={{ width: menuWidth || "auto", maxHeight: 250 }}>
+            <div className="p-1">
+              <input type="text" autoFocus placeholder="Search..."
+                className="w-full border border-gray-200 rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400"
+                value={searchQuery} onChange={handleSearchChange} autoComplete="off" />
+            </div>
+            {filteredOptions.length > 0 ? (
+              filteredOptions.map((option) => (
+                <div key={option.value}
+                  className="flex items-center px-3 py-2 cursor-pointer hover:bg-gray-50 text-sm"
+                  onClick={() => handleSelect(option.value)}>
+                  <input type="checkbox" className="mr-2 h-3.5 w-3.5"
+                    checked={value.some(item => item.value === option.value)}
+                    onChange={() => handleSelect(option.value)}
+                    onClick={e => e.stopPropagation()} />
+                  <span>{option.label}</span>
+                </div>
+              ))
+            ) : (
+              <p className="px-3 py-2 text-xs text-gray-400">No results found</p>
+            )}
+            {value.length > 0 && (
+              <button type="button" className="w-full text-left px-3 py-2 text-xs text-red-500 hover:bg-gray-50"
+                onClick={clearSelection}>✕ Clear selected</button>
+            )}
+          </div>
+        </>
+      )}
+    </div>
   );
 };
 

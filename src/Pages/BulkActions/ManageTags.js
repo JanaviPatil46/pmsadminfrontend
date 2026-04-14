@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { Badge ,Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Select, MenuItem, Button, Typography, Box } from "@mui/material";
 import { toast } from "react-toastify";
 
 const ManageTags = ({ selectedAccounts, onClose,fetchData }) => {
@@ -125,81 +124,55 @@ const ManageTags = ({ selectedAccounts, onClose,fetchData }) => {
 
   console.log(tagActions);
 
-  return (
-    <Box>
-      <TableContainer sx={{height:'75vh',}}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Tag Name</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {tags.map((tag) => (
-              <TableRow key={tag._id}>
-                <TableCell >
-                  <Box
-                    sx={{
-                      backgroundColor: tag.tagColour,
-                      color: "#fff", // Adjust text color if needed
-                      display: "inline-block",
-                      padding: "3px 6px",
-                      borderRadius: "10px",
-                     
-                    }}
-                  >
-                    <Typography  noWrap sx={{ fontSize: "12px",}}>
-                      {tag.tagName}
-                    </Typography>
-                  </Box>
-                
-                </TableCell>
-                <TableCell>
-                  <Select
-                    value={tagActions[tag._id] || "Do nothing"} // Get the action for the tag
-                    onChange={(e) => handleActionChange(tag._id, e.target.value)}
-                    displayEmpty
-                    inputProps={{ "aria-label": "Without label" }}
-                    // disabled // Disable selection
-                    sx={{ width: "150px" }}
-                  >
-                    <MenuItem value="Assign to all">Assign to all</MenuItem>
-                    <MenuItem value="Remove from all">Remove from all</MenuItem>
-                    <MenuItem value="Do nothing">Do nothing</MenuItem>
-                  </Select>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+  const thCls = "px-4 py-2 text-left text-xs font-bold text-gray-700 bg-gray-50 border-b border-gray-200";
+  const tdCls = "px-4 py-2 text-xs text-gray-700 border-b border-gray-100";
 
-      <Box className="buttons-email" sx={{ display: "flex", gap: 2, mt: 2 }}>
-        <Button variant="contained"onClick={sendbulkTags} sx={{
-                backgroundColor: 'var(--color-save-btn)',  // Normal background
-               
-                '&:hover': {
-                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                },
-              borderRadius:'15px'
-              }}>
+  return (
+    <div>
+      <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm" style={{ height: '75vh', overflowY: 'auto' }}>
+        <table className="w-full border-collapse">
+          <thead>
+            <tr>
+              <th className={thCls}>Tag Name</th>
+              <th className={thCls}>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {tags.map((tag) => (
+              <tr key={tag._id} className="hover:bg-gray-50">
+                <td className={tdCls}>
+                  <span
+                    className="inline-block rounded-full px-2 py-0.5 text-xs font-medium text-white whitespace-nowrap"
+                    style={{ backgroundColor: tag.tagColour }}
+                  >
+                    {tag.tagName}
+                  </span>
+                </td>
+                <td className={tdCls}>
+                  <select
+                    className="rounded border border-gray-200 px-2 py-1 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 w-40"
+                    value={tagActions[tag._id] || "Do nothing"}
+                    onChange={(e) => handleActionChange(tag._id, e.target.value)}
+                  >
+                    <option value="Assign to all">Assign to all</option>
+                    <option value="Remove from all">Remove from all</option>
+                    <option value="Do nothing">Do nothing</option>
+                  </select>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="flex gap-3 mt-4">
+        <button onClick={sendbulkTags} className="rounded-full px-5 py-1.5 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)]">
           Assign Tags
-        </Button>
-        <Button variant="outlined"  onClick={handleCancel} sx={{
-                    borderColor: 'var(--color-border-cancel-btn)',  // Normal background
-                   color:'var(--color-save-btn)',
-                    '&:hover': {
-                      backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                      color:'#fff',
-                      border:"none"
-                    },
-                    width:'80px',borderRadius:'15px'
-                  }}>
+        </button>
+        <button onClick={handleCancel} className="rounded-full px-5 py-1.5 text-sm font-medium border border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white">
           Cancel
-        </Button>
-      </Box>
-    </Box>
+        </button>
+      </div>
+    </div>
   );
 };
 

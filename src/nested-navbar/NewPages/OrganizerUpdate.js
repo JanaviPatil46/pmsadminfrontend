@@ -1,37 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
-import {
-  Drawer,
-  IconButton,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  FormGroup,
-  Autocomplete,
-  Container,
-  Box,
-  Typography,
-  FormControl,
-  Select,
-  InputLabel,
-  MenuItem,
-  TextField,
-  FormControlLabel,
-  Checkbox,
-  Radio,
-  RadioGroup,
-  Button,
-  FormLabel,
-  Grid,
-  Paper,
-  LinearProgress,
-  Tooltip,
-  Switch,
-} from "@mui/material"; // Make sure you have MUI installed
-import { ExpandMore, ExpandLess } from "@mui/icons-material";
+import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import axios from "axios";
 import { RxCross2 } from "react-icons/rx";
 const CreateOrganizerUpdate = ({ OrganizerData, onClose }) => {
@@ -131,181 +100,109 @@ const handleToggleSection = (sectionId) => {
     return !section.sectionsettings?.conditional || showConditional;
   });
   return (
-    <Box>
-      <FormControlLabel
-        control={
-          <Switch
+    <div>
+      <div className="flex items-center gap-2 mb-4">
+        <label className="relative inline-flex items-center cursor-pointer">
+          <input
+            type="checkbox"
             checked={showConditional}
             onChange={(e) => setShowConditional(e.target.checked)}
+            className="sr-only peer"
           />
-        }
-        label="Show Hidden Questions"
-        sx={{ mb: 2 }}
-      />
+          <div className="w-10 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:bg-blue-600 transition-colors after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5" />
+        </label>
+        <span className="text-sm text-gray-700">Show Hidden Questions</span>
+      </div>
+
       {filteredSections.length > 0 ? (
         filteredSections.map((section) => (
-          <Box key={section.id} sx={{ marginBottom: 2 }}>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Typography
-                sx={{ flexGrow: 1, cursor: "pointer" }}
-                onClick={() => handleToggleSection(section.id)}
-              >
-                {/* {section.text} */}
-                {section.text}{" "}
+          <div key={section.id} className="mb-4">
+            <div className="flex items-center cursor-pointer" onClick={() => handleToggleSection(section.id)}>
+              <span className="flex-1 text-sm font-medium">
+                {section.text}
                 {section.sectionsettings?.conditional && showConditional && (
-                  <Typography
-                    component="span"
-                    sx={{
-                      fontStyle: "italic",
-                      color: "gray",
-                      fontSize: "0.85rem",
-                    }}
-                  >
-                    (Hidden Section)
-                  </Typography>
+                  <span className="ml-1 italic text-gray-400 text-xs">(Hidden Section)</span>
                 )}
-              </Typography>
-              <Typography
-                component="span"
-                sx={{
-                  fontWeight: "normal",
-                  fontSize: "0.9rem",
-                  color: "gray",
-                  ml: 1,
-                }}
-              >
-                (
-                {
-                  section.formElements.filter(
-                    (el) =>
-                      el.textvalue &&
-                      (!el.questionsectionsettings?.conditional ||
-                        showConditional)
-                  ).length
-                }{" "}
-                /{" "}
-                {
-                  section.formElements.filter(
-                    (el) =>
-                      !el.questionsectionsettings?.conditional ||
-                      showConditional
-                  ).length
-                }
-                )
-              </Typography>
-              {/* <IconButton onClick={() => handleToggleSection(section.id)}>
-                {expandedSection === section.id ? (
-                  <ExpandLess />
-                ) : (
-                  <ExpandMore />
-                )}
-              </IconButton> */}
-              <IconButton onClick={() => handleToggleSection(section.id)}>
-  {expandedSections.includes(section.id) ? <ExpandLess /> : <ExpandMore />}
-</IconButton>
+              </span>
+              <span className="text-xs text-gray-400 mr-2">
+                ({section.formElements.filter((el) => el.textvalue && (!el.questionsectionsettings?.conditional || showConditional)).length}
+                {" / "}
+                {section.formElements.filter((el) => !el.questionsectionsettings?.conditional || showConditional).length})
+              </span>
+              <button type="button" className="p-1 text-gray-500">
+                {expandedSections.includes(section.id) ? <FaChevronUp size={12} /> : <FaChevronDown size={12} />}
+              </button>
+            </div>
 
-            </Box>
-
-            {/* {expandedSection === section.id && ( */}
             {expandedSections.includes(section.id) && (
-              <TableContainer component={Paper}>
-                <Table sx={{ minWidth: 650 }} aria-label="form elements table">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell sx={{ width: "40%" }}>
-                        <strong>Question</strong>
-                      </TableCell>
-                      <TableCell sx={{ width: "40%", textAlign: "start" }}>
-                        <strong>Answer</strong>
-                      </TableCell>
-                      <TableCell sx={{ width: "20%", textAlign: "start" }}>
-                        <strong>Reviewed</strong>
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-
-                  <TableBody>
+              <div className="overflow-x-auto rounded-lg border border-gray-200 mt-2">
+                <table className="w-full text-sm min-w-[650px]">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="text-left px-4 py-2 w-[40%] text-xs font-bold">Question</th>
+                      <th className="text-left px-4 py-2 w-[40%] text-xs font-bold">Answer</th>
+                      <th className="text-left px-4 py-2 w-[20%] text-xs font-bold">Reviewed</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
                     {section.formElements
-                      .filter(
-                        (formElement) =>
-                          !formElement.questionsectionsettings?.conditional ||
-                          showConditional
-                      )
+                      .filter((formElement) => !formElement.questionsectionsettings?.conditional || showConditional)
                       .map((formElement) => (
-                        <TableRow key={formElement.id}>
-                          <TableCell>
-                            {formElement.type === "Text Editor"
-                              ? "Text Block"
-                              : formElement.text}
-                          </TableCell>
-                          <TableCell>
+                        <tr key={formElement.id}>
+                          <td className="px-4 py-2 text-xs">
+                            {formElement.type === "Text Editor" ? "Text Block" : formElement.text}
+                          </td>
+                          <td className="px-4 py-2 text-xs">
                             {formElement.type === "Text Editor" ? (
-                              <Box
-                                sx={{ cursor: "pointer", color: "blue" }}
-                                onClick={() =>
-                                  handleOpenDrawer(formElement.text)
-                                }
-                              >
+                              <span className="text-blue-600 cursor-pointer"
+                                onClick={() => handleOpenDrawer(formElement.text)}>
                                 Display
-                              </Box>
+                              </span>
                             ) : (
-                              // formElement.textvalue || ""
-                              <div style={{ whiteSpace: "pre-line" }}>
-                                {formElement.textvalue}
-                              </div>
+                              <div style={{ whiteSpace: "pre-line" }}>{formElement.textvalue}</div>
                             )}
-                          </TableCell>
-                          <TableCell sx={{ textAlign: "center" }}>
+                          </td>
+                          <td className="px-4 py-2 text-center">
                             {formElement.type !== "Text Editor" && (
-                              <Checkbox
+                              <input
+                                type="checkbox"
                                 checked={formElement.active || false}
-                                onChange={(e) =>
-                                  handleCheckboxChange(
-                                    section.id,
-                                    formElement.id,
-                                    e.target.checked
-                                  )
-                                }
+                                onChange={(e) => handleCheckboxChange(section.id, formElement.id, e.target.checked)}
+                                className="h-4 w-4"
                               />
                             )}
-                          </TableCell>
-                        </TableRow>
+                          </td>
+                        </tr>
                       ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+                  </tbody>
+                </table>
+              </div>
             )}
-          </Box>
+          </div>
         ))
       ) : (
-        <Typography variant="body1"></Typography>
+        <span />
       )}
 
-      <Button onClick={onClose}>Back</Button>
-      {/* Drawer Component */}
-      <Drawer anchor="right" open={drawerOpen} onClose={handleCloseDrawer}>
-        <Box sx={{ width: 600, padding: 2 }}>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <Typography>Text Block Content</Typography>
-            <RxCross2
-              style={{ cursor: "pointer" }}
-              onClick={handleCloseDrawer}
-            />
-          </Box>
+      <button type="button" onClick={onClose}
+        className="mt-2 px-4 py-1.5 text-sm rounded border border-gray-300 text-gray-700 hover:bg-gray-50">
+        Back
+      </button>
 
-          <Box sx={{ marginTop: 1 }}>
-            {/* Display the content */}
+      {/* Text Block Drawer */}
+      {drawerOpen && (
+        <div className="fixed inset-0 z-50 overflow-hidden">
+          <div className="absolute inset-0 bg-black/30" onClick={handleCloseDrawer} />
+          <div className="absolute right-0 top-0 h-full w-[600px] bg-white shadow-xl overflow-y-auto p-4">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-medium">Text Block Content</span>
+              <RxCross2 className="cursor-pointer text-gray-500" onClick={handleCloseDrawer} />
+            </div>
             <div dangerouslySetInnerHTML={{ __html: drawerContent }} />
-          </Box>
-        </Box>
-      </Drawer>
-    </Box>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

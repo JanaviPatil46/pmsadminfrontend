@@ -1,47 +1,10 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import axios from "axios";
 import "./account.css";
-import {
-  Stack,
-  Paper,
-  useMediaQuery,
-  Box,
-  Tooltip,
-  Typography,
-  Divider,
-  Checkbox,
-  Autocomplete,
-  TextField,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TablePagination,
-  TableRow,
-  Button,
-  Menu,
-  MenuItem,
-  Chip,
-  Select,
-  OutlinedInput,
-  FormControl,
-} from "@mui/material";
 import { toast } from "react-toastify";
-import {
-  useMaterialReactTable,
-  MaterialReactTable,
-} from "material-react-table";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { Drawer } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import IconButton from "@mui/material/IconButton";
-import ContactForm from "./UpdateContact";
-import { MRT_TableHeadCellFilterContainer } from "material-react-table";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { Trash2, X, ChevronDown } from "lucide-react";
 import { format } from "date-fns";
+import ContactForm from "./UpdateContact";
 import TagsMultiSelectDropDown from "./Accounts/TagsMultiSelectDropDown"
 const ContactTable = () => {
   const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
@@ -54,7 +17,7 @@ const ContactTable = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState(null);
   const [tags, setTags] = useState([]);
-  const isMobile = useMediaQuery("(max-width: 1000px)");
+  const isMobile = window.innerWidth <= 1000;
   const [filterText, setFilterText] = useState({});
 
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
@@ -556,32 +519,23 @@ const ContactTable = () => {
     if (filter === "tags") setSelectedTags([]);
   };
 
+  const selectCls = "rounded border border-gray-200 px-2 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-400";
+  const thCls = "px-4 py-3 text-left text-xs font-bold text-gray-700 bg-gray-50 border-b border-gray-200 cursor-pointer select-none whitespace-nowrap";
+  const tdCls = "px-3 py-2 text-xs text-gray-700 border-b border-gray-100";
+
   return (
     <>
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <Drawer
-          anchor="right"
-          open={isDrawerOpen}
-          onClose={() => setIsDrawerOpen(false)}
-          sx={{ width: 600 }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "20px",
-              ml: 1,
-            }}
-          >
-            <Typography sx={{ fontWeight: "bold" }} variant="h6">
-              Edit Contact
-            </Typography>
-            <IconButton onClick={() => setIsDrawerOpen(false)}>
-              <CloseIcon />
-            </IconButton>
-          </Box>
-          <Divider />
+      {/* Edit Contact Drawer */}
+      <div
+        className={`fixed inset-y-0 right-0 z-50 w-[580px] bg-white shadow-xl flex flex-col transition-transform duration-300 ${
+          isDrawerOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <div className="flex items-center justify-between px-5 py-4 border-b">
+          <span className="font-bold text-base">Edit Contact</span>
+          <button onClick={() => setIsDrawerOpen(false)} className="text-gray-500 hover:text-gray-800"><X size={18} /></button>
+        </div>
+        <div className="flex-1 overflow-y-auto">
           {selectedContact && (
             <ContactForm
               selectedContact={selectedContact}
@@ -591,653 +545,190 @@ const ContactTable = () => {
               onContactUpdated={handleContactUpdated}
             />
           )}
-        </Drawer>
+        </div>
+      </div>
+      {isDrawerOpen && <div className="fixed inset-0 z-40 bg-black/30" onClick={() => setIsDrawerOpen(false)} />}
 
-        <Box display="flex" alignItems="center" mb={2}>
-          <Button
-            variant="contained"
+      {/* Filter bar */}
+      <div className="flex flex-wrap items-center gap-3 mb-4">
+        <div className="relative">
+          <button
             onClick={handleMenuOpen}
-            sx={{
-              backgroundColor: "var(--color-save-btn)",
-              "&:hover": {
-                backgroundColor: "var(--color-save-hover-btn)",
-              },
-              borderRadius: "15px",
-            }}
+            className="flex items-center gap-1 rounded-full px-4 py-1.5 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)]"
           >
-            Filter by
-          </Button>
-          <Menu
-            anchorEl={menuAnchor}
-            open={Boolean(menuAnchor)}
-            onClose={handleMenuClose}
-          >
-            <MenuItem onClick={() => handleFilterOptionClick("name")}>
-              Name
-            </MenuItem>
-            <MenuItem onClick={() => handleFilterOptionClick("email")}>
-              Email
-            </MenuItem>
-            <MenuItem onClick={() => handleFilterOptionClick("companyName")}>
-              Company Name
-            </MenuItem>
-            <MenuItem onClick={() => handleFilterOptionClick("tags")}>
-              Tags
-            </MenuItem>
-            <MenuItem onClick={() => handleFilterOptionClick("createdAt")}>
-              Date Created
-            </MenuItem>
-
-            <MenuItem onClick={() => handleFilterOptionClick("updatedAt")}>
-              Date Updated
-            </MenuItem>
-          </Menu>
-
-          {selectedFilters.map((filter) => (
-            <Box display="flex" alignItems="center" ml={2} key={filter}>
-              {filter === "tags" ? (
-                // <FormControl sx={{ width: "100%" }}>
-                //   {/* Your existing tags select component */}
-                //   <Select
-                //     multiple
-                //     displayEmpty
-                //     fullWidth
-                //     value={selectedTags}
-                //     onChange={handleTagChange}
-                //     input={<OutlinedInput placeholder="Tags" />}
-                //     renderValue={(selected) =>
-                //       selected.length > 0 ? (
-                //         <Box
-                //           sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}
-                //         >
-                //           {selected.map((label) => {
-                //             const option = tagsoptions.find(
-                //               (tag) => tag.label === label
-                //             );
-                //             return (
-                //               <Chip
-                //                 key={label}
-                //                 label={label}
-                //                 sx={{
-                //                   backgroundColor: option?.colour,
-                //                   color: "#fff",
-                //                   fontWeight: 500,
-                //                   fontSize: "10px",
-                //                   borderRadius: "16px",
-                //                   height: "20px",
-                //                   cursor: "pointer",
-                //                   boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)",
-                //                   "& .MuiChip-deleteIcon": {
-                //                     color: "#fff",
-                //                     opacity: 0.7,
-                //                     transition: "opacity 0.2s",
-                //                     "&:hover": { opacity: 1 },
-                //                   },
-                //                 }}
-                //               />
-                //             );
-                //           })}
-                //         </Box>
-                //       ) : (
-                //         "Tags"
-                //       )
-                //     }
-                //     style={{ width: "250px", marginRight: "10px" }}
-                //     MenuProps={{
-                //       PaperProps: {
-                //         style: {
-                //           maxHeight: 200,
-                //           overflowY: "auto",
-                //         },
-                //       },
-                //     }}
-                //   >
-                //     {tagsoptions.map((option) => {
-                //       const canvas = document.createElement("canvas");
-                //       const context = canvas.getContext("2d");
-                //       context.font = "12px Arial";
-                //       const textWidth = context.measureText(option.label).width;
-                //       const dynamicWidth = Math.min(textWidth + 16, 150);
-                //       return (
-                //         <MenuItem
-                //           key={option.label}
-                //           value={option.label}
-                //           sx={{
-                //             backgroundColor: option.colour,
-                //             color: "#fff",
-                //             fontSize: "10px",
-                //             borderRadius: "10px",
-                //             margin: "5px",
-                //             textAlign: "center",
-                //             display: "flex",
-                //             justifyContent: "center",
-                //             padding: "4px 9px",
-                //             whiteSpace: "nowrap",
-                //             minWidth: `${dynamicWidth}px`,
-                //             maxWidth: `${dynamicWidth}px`,
-                //             "&:hover": {
-                //               backgroundColor: option.colour,
-                //               color: "#fff",
-                //             },
-                //           }}
-                //         >
-                //           {option.label}
-                //         </MenuItem>
-                //       );
-                //     })}
-                //   </Select>
-                // </FormControl>
-                <Box sx={{ width: "250px" }}>
-        <TagsMultiSelectDropDown
-          value={selectedTags.map(tagName => {
-            const tag = tags.find(t => t.tagName === tagName);
-            return tag ? {
-              value: tag._id,
-              label: tag.tagName,
-              colour: tag.tagColour
-            } : null;
-          }).filter(Boolean)}
-          onChange={(selected) => {
-            setSelectedTags(selected.map(item => item.label));
-          }}
-          options={tagsoptions.map(option => ({
-            value: option.value,
-            label: option.label,
-            colour: option.colour
-          }))}
-          placeholder="Select tags"
-          width="250px"
-        />
-      </Box>
-              ) : filter === "createdAt" ? (
-                <Box display="flex" alignItems="center" gap={2}>
-                  <Typography>Date Created</Typography>
-                  <FormControl sx={{ minWidth: 120, mr: 1 }}>
-                    <Select
-                      value={dateFilter.option || ""}
-                      onChange={(e) => handleDateOptionChange(e.target.value)}
-                      displayEmpty
-                      size="small"
-                    >
-                      <MenuItem value="">Select period</MenuItem>
-                      <MenuItem value="today">Today</MenuItem>
-                      <MenuItem value="lastWeek">Last week</MenuItem>
-                      <MenuItem value="lastMonth">Last month</MenuItem>
-                      <MenuItem value="lastQuarter">Last quarter</MenuItem>
-                      <MenuItem value="lastYear">Last year</MenuItem>
-                    </Select>
-                  </FormControl>
-                  {dateFilter.option && (
-                    <Typography variant="body2" sx={{ ml: 1 }}>
-                      {dateFilter.displayText}
-                    </Typography>
-                  )}
-                  {dateFilter.option === "custom" && (
-                    <>
-                      <DatePicker
-                        label="Start date"
-                        value={dateFilter.startDate}
-                        onChange={(newValue) =>
-                          handleDateChange("startDate", newValue)
-                        }
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            size="small"
-                            sx={{ width: 150, mr: 1 }}
-                          />
-                        )}
-                      />
-                      <DatePicker
-                        label="End date"
-                        value={dateFilter.endDate}
-                        onChange={(newValue) =>
-                          handleDateChange("endDate", newValue)
-                        }
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            size="small"
-                            sx={{ width: 150 }}
-                          />
-                        )}
-                      />
-                    </>
-                  )}
-                </Box>
-              ) : filter === "updatedAt" ? (
-                <Box display="flex" alignItems="center" gap={2}>
-                  <Typography>Date Updated</Typography>
-                  <FormControl sx={{ minWidth: 120, mr: 1 }}>
-                    <Select
-                      value={updatedDateFilter.option || ""}
-                      onChange={(e) =>
-                        handleUpdatedDateOptionChange(e.target.value)
-                      }
-                      displayEmpty
-                      size="small"
-                    >
-                      <MenuItem value="">Select period</MenuItem>
-                      <MenuItem value="today">Today</MenuItem>
-                      <MenuItem value="lastWeek">Last week</MenuItem>
-                      <MenuItem value="lastMonth">Last month</MenuItem>
-                      <MenuItem value="lastQuarter">Last quarter</MenuItem>
-                      <MenuItem value="lastYear">Last year</MenuItem>
-                    </Select>
-                  </FormControl>
-                  {updatedDateFilter.option && (
-                    <Typography variant="body2" sx={{ ml: 1 }}>
-                      {updatedDateFilter.displayText}
-                    </Typography>
-                  )}
-                  {updatedDateFilter.option === "custom" && (
-                    <>
-                      <DatePicker
-                        label="Start date"
-                        value={updatedDateFilter.startDate}
-                        onChange={(newValue) =>
-                          handleUpdatedDateChange("startDate", newValue)
-                        }
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            size="small"
-                            sx={{ width: 150, mr: 1 }}
-                          />
-                        )}
-                      />
-                      <DatePicker
-                        label="End date"
-                        value={updatedDateFilter.endDate}
-                        onChange={(newValue) =>
-                          handleUpdatedDateChange("endDate", newValue)
-                        }
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            size="small"
-                            sx={{ width: 150 }}
-                          />
-                        )}
-                      />
-                    </>
-                  )}
-                </Box>
-              ) : (
-                <TextField
-                  label={`Search by ${filter}`}
-                  variant="outlined"
-                  size="small"
-                  // value={filterText}
-                  // onChange={(e) => setFilterText(e.target.value)}
-                  onChange={(e) =>
-                    setFilterText((prev) => ({
-                      ...prev,
-                      [filter]: e.target.value,
-                    }))
-                  }
-                  value={filterText[filter] || ""}
-                  sx={{ width: "200px" }}
-                />
-              )}
-              <IconButton onClick={() => clearFilter(filter)} sx={{ ml: 1 }}>
-                <DeleteIcon color="error" />
-              </IconButton>
-            </Box>
-          ))}
-        </Box>
-        <Box display="flex" alignItems="center" mb={2}>
-          {/* Only show delete button when contacts are selected */}
-          {selectedContacts.length > 0 && (
-            <IconButton
-              onClick={handleDeleteSelected}
-              sx={{ color: "red" }}
-              disabled={storedData?.teammember?.manageContacts === false}
-            >
-              <DeleteIcon />
-            </IconButton>
+            Filter by <ChevronDown size={14} />
+          </button>
+          {Boolean(menuAnchor) && (
+            <div className="absolute left-0 top-full mt-1 z-50 w-44 rounded-lg border border-gray-200 bg-white shadow-lg py-1">
+              {["name","email","companyName","tags","createdAt","updatedAt"].map((opt) => (
+                <button key={opt} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 capitalize"
+                  onClick={() => handleFilterOptionClick(opt)}>
+                  {opt === "createdAt" ? "Date Created" : opt === "updatedAt" ? "Date Updated" : opt.charAt(0).toUpperCase() + opt.slice(1)}
+                </button>
+              ))}
+            </div>
           )}
-        </Box>
-        <TableContainer>
-          <Table sx={{ width: "100%" }} aria-label="contact table">
-            <TableHead>
-              <TableRow>
-                <TableCell
-                  padding="checkbox"
-                  style={{
-                    position: "sticky",
-                    left: 0,
-                    zIndex: 1,
-                    background: "#fff",
-                    fontSize: "2px", // Set a professional font size
-                    fontWeight: "bold",
-                    textAlign: "center",
-                  }}
-                >
-                  <Checkbox
-                    checked={selectedContacts.length === contactData.length}
-                    onChange={handleSelectAll}
+        </div>
+
+        {selectedFilters.map((filter) => (
+          <div key={filter} className="flex items-center gap-2">
+            {filter === "tags" ? (
+              <div style={{ width: "250px" }}>
+                <TagsMultiSelectDropDown
+                  value={selectedTags.map(tagName => {
+                    const tag = tags.find(t => t.tagName === tagName);
+                    return tag ? { value: tag._id, label: tag.tagName, colour: tag.tagColour } : null;
+                  }).filter(Boolean)}
+                  onChange={(selected) => setSelectedTags(selected.map(item => item.label))}
+                  options={tagsoptions.map(o => ({ value: o.value, label: o.label, colour: o.colour }))}
+                  placeholder="Select tags"
+                  width="250px"
+                />
+              </div>
+            ) : filter === "createdAt" ? (
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-600">Date Created</span>
+                <select className={selectCls} value={dateFilter.option || ""} onChange={(e) => handleDateOptionChange(e.target.value)}>
+                  <option value="">Select period</option>
+                  {["today","lastWeek","lastMonth","lastQuarter","lastYear"].map(o => <option key={o} value={o}>{o}</option>)}
+                </select>
+                {dateFilter.option && <span className="text-xs text-gray-500">{dateFilter.displayText}</span>}
+                {dateFilter.option === "custom" && (
+                  <>
+                    <input type="date" className={selectCls} value={dateFilter.startDate ? format(new Date(dateFilter.startDate),"yyyy-MM-dd") : ""} onChange={(e) => handleDateChange("startDate", e.target.value ? new Date(e.target.value) : null)} />
+                    <input type="date" className={selectCls} value={dateFilter.endDate ? format(new Date(dateFilter.endDate),"yyyy-MM-dd") : ""} onChange={(e) => handleDateChange("endDate", e.target.value ? new Date(e.target.value) : null)} />
+                  </>
+                )}
+              </div>
+            ) : filter === "updatedAt" ? (
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-600">Date Updated</span>
+                <select className={selectCls} value={updatedDateFilter.option || ""} onChange={(e) => handleUpdatedDateOptionChange(e.target.value)}>
+                  <option value="">Select period</option>
+                  {["today","lastWeek","lastMonth","lastQuarter","lastYear"].map(o => <option key={o} value={o}>{o}</option>)}
+                </select>
+                {updatedDateFilter.option && <span className="text-xs text-gray-500">{updatedDateFilter.displayText}</span>}
+                {updatedDateFilter.option === "custom" && (
+                  <>
+                    <input type="date" className={selectCls} value={updatedDateFilter.startDate ? format(new Date(updatedDateFilter.startDate),"yyyy-MM-dd") : ""} onChange={(e) => handleUpdatedDateChange("startDate", e.target.value ? new Date(e.target.value) : null)} />
+                    <input type="date" className={selectCls} value={updatedDateFilter.endDate ? format(new Date(updatedDateFilter.endDate),"yyyy-MM-dd") : ""} onChange={(e) => handleUpdatedDateChange("endDate", e.target.value ? new Date(e.target.value) : null)} />
+                  </>
+                )}
+              </div>
+            ) : (
+              <input
+                type="text"
+                placeholder={`Search by ${filter}`}
+                className={`${selectCls} w-48`}
+                value={filterText[filter] || ""}
+                onChange={(e) => setFilterText((prev) => ({ ...prev, [filter]: e.target.value }))}
+              />
+            )}
+            <button onClick={() => clearFilter(filter)} className="text-red-500 hover:text-red-700"><X size={14} /></button>
+          </div>
+        ))}
+
+        {selectedContacts.length > 0 && (
+          <button
+            onClick={handleDeleteSelected}
+            disabled={storedData?.teammember?.manageContacts === false}
+            className="ml-2 text-red-600 hover:text-red-800 disabled:opacity-40"
+          >
+            <Trash2 size={18} />
+          </button>
+        )}
+      </div>
+
+      {/* Table */}
+      <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
+        <table className="w-full min-w-[700px] border-collapse text-sm">
+          <thead>
+            <tr>
+              <th className={`${thCls} w-8`}>
+                <input type="checkbox"
+                  checked={selectedContacts.length === contactData.length && contactData.length > 0}
+                  onChange={handleSelectAll}
+                  className="h-4 w-4 rounded border-gray-300"
+                />
+              </th>
+              {[["name","Name",200],["email","Email",150],["phoneNumbers","Phone Numbers",200],[null,"Tags",100],["companyName","Company Name",180],[null,"Actions",60]].map(([key,label,w]) => (
+                <th key={label} className={thCls} style={{ width: w }} onClick={() => key && handleSort(key)}>
+                  {label} {key && getSortIcon(key)}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {paginatedData.map((contact) => (
+              <tr key={contact.id} className="hover:bg-gray-50 transition-colors">
+                <td className={tdCls}>
+                  <input type="checkbox"
+                    checked={selectedContacts.includes(contact.id)}
+                    onChange={(e) => handleCheckboxChange(e, contact.id)}
+                    className="h-4 w-4 rounded border-gray-300"
                   />
-                </TableCell>
-                <TableCell
-                  onClick={() => handleSort("name")}
-                  style={{
-                    cursor: "pointer",
-
-                    left: 50,
-                    // zIndex: 1,
-                    background: "#fff",
-                    fontSize: "12px",
-                    fontWeight: "bold",
-                    padding: "16px", // Add more padding for better spacing
-                  }}
-                  width="200"
+                </td>
+                <td className={tdCls}
+                  style={{ cursor: storedData?.teammember?.manageContacts === false ? "not-allowed" : "pointer", color: storedData?.teammember?.manageContacts === false ? "gray" : "#3f51b5" }}
+                  onClick={() => { if (storedData?.teammember?.manageContacts !== false) handleClick(contact.id); }}
                 >
-                  Name {getSortIcon("name")}
-                </TableCell>
-                <TableCell
-                  onClick={() => handleSort("email")}
-                  style={{
-                    cursor: "pointer",
-                    fontSize: "12px",
-                    fontWeight: "bold",
-                    padding: "16px",
-                  }}
-                  width="150"
-                >
-                  Email {getSortIcon("email")}
-                </TableCell>
-                <TableCell
-                  onClick={() => handleSort("phoneNumbers")}
-                  style={{
-                    cursor: "pointer",
-                    fontSize: "12px",
-                    fontWeight: "bold",
-                    padding: "16px",
-                  }}
-                  width="250"
-                >
-                  Phone Numbers {getSortIcon("phoneNumbers")}
-                </TableCell>
-                <TableCell
-                  style={{
-                    cursor: "pointer",
-                    fontSize: "12px",
-                    fontWeight: "bold",
-                    padding: "16px",
-                  }}
-                  width="100"
-                >
-                  Tags
-                </TableCell>
-                <TableCell
-                  onClick={() => handleSort("companyName")}
-                  style={{
-                    cursor: "pointer",
-                    fontSize: "12px",
-                    fontWeight: "bold",
-                    padding: "16px",
-                  }}
-                  width="200"
-                >
-                  Company Name {getSortIcon("companyName")}
-                </TableCell>
-                <TableCell
-                  style={{
-                    fontSize: "12px",
-                    fontWeight: "bold",
-                    padding: "16px",
-                  }}
-                  width="50"
-                >
-                  Actions
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {paginatedData.map((contact) => (
-                <TableRow
-                  key={contact.id}
-                  role="checkbox"
-                  hover
-                  tabIndex={-1}
-                  style={{
-                    cursor: "pointer",
-                    transition: "background-color 0.3s ease",
-                    "&:hover": {
-                      backgroundColor: "#f4f4f4", // Add hover effect
-                    },
-                  }}
-                >
-                  <TableCell
-                    padding="checkbox"
-                    style={{
-                      position: "sticky",
-                      left: 0,
-                      zIndex: 1,
-                      background: "#fff",
-                      fontSize: "12px",
-                      textAlign: "center",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                      // padding: "2px", // Adjust padding for better spacing
-                    }}
-                  >
-                    <Checkbox
-                      checked={selectedContacts.includes(contact.id)}
-                      onChange={(e) => handleCheckboxChange(e, contact.id)}
-                    />
-                  </TableCell>
-                  {/* <TableCell
-                    style={{
-                      cursor: "pointer",
-                      color: "#3f51b5",
-                      // position: "sticky",
-                      left: 50,
-                      zIndex: 1,
-                      background: "#fff",
-                      fontSize: "12px",
-                      fontWeight: "normal",
-                      // padding: "12px 16px", // Add padding for better spacing
-                    }}
-                    // sx={{ }}
-                    onClick={() => handleClick(contact.id)}
-                     disabled={!storedData?.teammember?.manageContacts}
-                  >
-                    {contact.name}
-                  </TableCell> */}
-
-                  {/* <TableCell
-                    style={{
-                      cursor: storedData?.teammember?.manageContacts
-                        ? "pointer"
-                        : "not-allowed",
-                      color: storedData?.teammember?.manageContacts
-                        ? "#3f51b5"
-                        : "gray",
-                      left: 50,
-                      zIndex: 1,
-                      background: "#fff",
-                      fontSize: "12px",
-                      fontWeight: "normal",
-                    }}
-                    onClick={() => {
-                      if (storedData?.teammember?.manageContacts) {
-                        handleClick(contact.id);
-                      }
-                    }}
-                  >
-                    {contact.name}
-                  </TableCell> */}
-                  <TableCell
-                    style={{
-                      cursor:
-                        storedData?.teammember?.manageContacts === false
-                          ? "not-allowed"
-                          : "pointer",
-                      color:
-                        storedData?.teammember?.manageContacts === false
-                          ? "gray"
-                          : "#3f51b5",
-                      left: 50,
-                      zIndex: 1,
-                      background: "#fff",
-                      fontSize: "12px",
-                      fontWeight: "normal",
-                    }}
-                    onClick={() => {
-                      if (storedData?.teammember?.manageContacts !== false) {
-                        handleClick(contact.id);
-                      }
-                    }}
-                  >
-                    {contact.name}
-                  </TableCell>
-
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                    }}
-                  >
-                    {contact.email}
-                  </TableCell>
-                  {/* <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                    }}
-                  >
-                    {contact.phoneNumbers && contact.phoneNumbers.length > 0 ? (
-                      <div>
-                        {contact.phoneNumbers.map((phoneObj, index) => (
-                          <div key={phoneObj._id || index}>
-                           
-                            +{phoneObj.phone}
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      ""
-                    )}
-                  </TableCell> */}
-                  <TableCell
-  style={{
-    fontSize: "12px",
-    padding: "4px 8px",
-    lineHeight: "1",
-  }}
->
-  {contact.phoneNumbers && contact.phoneNumbers.length > 0 ? (
-    <div>
-      {contact.phoneNumbers.map((phone, index) => (
-        <div key={index}>{phone}</div>
-      ))}
-    </div>
-  ) : (
-    ""
-  )}
-</TableCell>
-
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                    }}
-                  >
-                    {contact.tags && contact.tags.flat().length > 0 && (
-                      <Tooltip
-                        title={
-                          <div>
-                            {contact.tags.flat().map((tag) => (
-                              <span
-                                key={tag._id}
-                                style={{
-                                  display: "block",
-                                  backgroundColor: tag.tagColour,
-                                  color: "#fff",
-                                  padding: "2px 4px",
-                                  margin: "2px 0",
-                                  borderRadius: "4px",
-                                }}
-                              >
-                                {tag.tagName}
-                              </span>
+                  {contact.name}
+                </td>
+                <td className={tdCls}>{contact.email}</td>
+                <td className={tdCls}>
+                  {contact.phoneNumbers?.length > 0 && contact.phoneNumbers.map((p, i) => <div key={i}>{p}</div>)}
+                </td>
+                <td className={tdCls}>
+                  {contact.tags?.flat().length > 0 && (
+                    <div className="group relative inline-block">
+                      {contact.tags.flat()[0] && (
+                        <span className="inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold text-white mr-1" style={{ backgroundColor: contact.tags.flat()[0].tagColour }}>
+                          {contact.tags.flat()[0].tagName}
+                        </span>
+                      )}
+                      {contact.tags.flat().length > 1 && (
+                        <>
+                          <span className="cursor-pointer text-blue-600 text-xs">+{contact.tags.flat().length - 1}</span>
+                          <div className="absolute left-0 top-full z-10 hidden group-hover:block bg-white border border-gray-200 rounded-lg shadow-lg p-2 min-w-[120px]">
+                            {contact.tags.flat().map(tag => (
+                              <span key={tag._id} className="block rounded px-2 py-0.5 text-[10px] font-semibold text-white mb-1" style={{ backgroundColor: tag.tagColour }}>{tag.tagName}</span>
                             ))}
                           </div>
-                        }
-                        arrow
-                        placement="top"
-                      >
-                        <span style={{ display: "inline-block" }}>
-                          {contact.tags.flat()[0] && (
-                            <span
-                              style={{
-                                backgroundColor:
-                                  contact.tags.flat()[0].tagColour,
-                                color: "#fff",
-                                padding: "3px 8px",
-                                borderRadius: "10px",
-                                marginRight: "4px",
-                              }}
-                            >
-                              {contact.tags.flat()[0].tagName}
-                            </span>
-                          )}
-                          {contact.tags.flat().length > 1 && (
-                            <span style={{ cursor: "pointer", color: "blue" }}>
-                              +{contact.tags.flat().length - 1}
-                            </span>
-                          )}
-                        </span>
-                      </Tooltip>
-                    )}
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                    }}
+                        </>
+                      )}
+                    </div>
+                  )}
+                </td>
+                <td className={tdCls}>{contact.companyName}</td>
+                <td className={tdCls}>
+                  <button
+                    onClick={() => handleDelete(contact.id)}
+                    disabled={storedData?.teammember?.manageContacts === false}
+                    className="text-red-500 hover:text-red-700 disabled:opacity-40"
                   >
-                    {contact.companyName}
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                    }}
-                  >
-                    <IconButton
-                      onClick={() => handleDelete(contact.id)}
-                      sx={{ color: "red" }}
-                      disabled={
-                        storedData?.teammember?.manageContacts === false
-                      }
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                    <Trash2 size={16} />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-        <TablePagination
-          component="div"
-          count={contactData.length}
-          page={page}
-          onPageChange={handleChangePage}
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          rowsPerPageOptions={[30, 40, 50, 60, 100]} // Added row options
-        />
-      </LocalizationProvider>
+      {/* Pagination */}
+      <div className="flex items-center justify-between mt-3 text-xs text-gray-600">
+        <div className="flex items-center gap-2">
+          <span>Rows per page:</span>
+          <select className="rounded border border-gray-200 px-2 py-1 text-xs" value={rowsPerPage} onChange={(e) => { setRowsPerPage(parseInt(e.target.value,10)); setPage(0); }}>
+            {[30,40,50,60,100].map(n => <option key={n} value={n}>{n}</option>)}
+          </select>
+        </div>
+        <div className="flex items-center gap-3">
+          <span>{page * rowsPerPage + 1}–{Math.min((page + 1) * rowsPerPage, contactData.length)} of {contactData.length}</span>
+          <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0} className="px-2 py-1 rounded border border-gray-200 disabled:opacity-40 hover:bg-gray-100">‹</button>
+          <button onClick={() => setPage(p => p + 1)} disabled={(page + 1) * rowsPerPage >= contactData.length} className="px-2 py-1 rounded border border-gray-200 disabled:opacity-40 hover:bg-gray-100">›</button>
+        </div>
+      </div>
     </>
   );
 };

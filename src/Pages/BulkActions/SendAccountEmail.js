@@ -14,7 +14,6 @@ import makeAnimated from "react-select/animated";
 import { LuConstruction } from "react-icons/lu";
 import { ToastContainer, toast } from "react-toastify";
 
-import { Chip,TextField, Button, FormControl, Select, Autocomplete, MenuItem, Typography, Box } from "@mui/material";
 import AccountMultiSelectDropdown from "../../Templates/AccountMultiSelectDropdown";
 
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
@@ -585,139 +584,116 @@ const sendbulkEmail = () => {
     };
   }, []);
 
+  const inputCls = "w-full mt-1 rounded border border-gray-200 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-400";
+  const labelCls = "block text-sm font-medium text-gray-700 mb-0.5";
+
   return (
-    <Box>
-      <Box className="send-email-container">
-        <Box className="contact-temp">
-          <label className="email-input-label">Email Template</label>
-          <Autocomplete options={emailoptions} sx={{ mt: 2, mb: 2, backgroundColor: "#fff" }} size="small" value={emailTemplate} onChange={handleEmailtemp} isOptionEqualToValue={(option, value) => option.value === value.value} getOptionLabel={(option) => option.label || ""} renderInput={(params) => <TextField {...params} placeholder="Email Template" />} />
-        </Box>
+    <div>
+      <div className="send-email-container">
+        <div className="contact-temp">
+          <label className={labelCls}>Email Template</label>
+          <select
+            className={inputCls}
+            value={emailTemplate?.value || ""}
+            onChange={(e) => {
+              const opt = emailoptions.find(o => o.value === e.target.value);
+              if (opt) handleEmailtemp(null, opt);
+            }}
+          >
+            <option value="">Email Template</option>
+            {emailoptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+          </select>
+        </div>
 
-        <Box sx={{ mt: 2 }}>
-          <label className="email-input-label">From</label>
-          <Autocomplete options={options} sx={{ mt: 2, mb: 2, backgroundColor: "#fff" }} size="small" value={selecteduser} onChange={handleuserChange} isOptionEqualToValue={(option, value) => option.value === value.value} getOptionLabel={(option) => option.label || ""} renderInput={(params) => <TextField {...params} placeholder="Form" />} clearOnEscape />
-        </Box>
+        <div className="mt-3">
+          <label className={labelCls}>From</label>
+          <select
+            className={inputCls}
+            value={selecteduser?.value || ""}
+            onChange={(e) => {
+              const opt = options.find(o => o.value === e.target.value);
+              if (opt) handleuserChange(null, opt);
+            }}
+          >
+            <option value="">From</option>
+            {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+          </select>
+        </div>
 
-        <Box sx={{ mt: 2 }}>
-          <label className="email-input-label">To</label>
-          {/* <Autocomplete multiple options={accountOptions} sx={{ mt: 2, mb: 2, backgroundColor: "#fff" }} size="small" value={selectedto} onChange={handleToselect} isOptionEqualToValue={(option, value) => option.value === value.value} getOptionLabel={(option) => option.label || ""} renderInput={(params) => <TextField {...params} placeholder="To" />} /> */}
-          {/* <Autocomplete
-            multiple
-            options={accountOptions}
-            value={selectedto}
-            onChange={handleToselect}
-            getOptionLabel={(option) => option.label}
-            isOptionEqualToValue={(option, value) => option.value === value.value}
-            renderOption={(props, option) => (
-              <Box component="li" {...props} sx={{ cursor: "pointer", margin: "5px 10px" }}>
-                {option.label}
-              </Box>
-            )}
-            renderTags={(value, getTagProps) => (
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
-                {value.map((option, index) => (
-                  <Chip
-                    key={option.value}
-                    label={option.label}
-                    {...getTagProps({ index })}
-                    sx={{ maxWidth: "100%",cursor:'pointer' }} // Ensures wrapping within the container
-                  />
-                ))}
-              </Box>
-            )}
-            renderInput={(params) => <TextField {...params} placeholder="Select Accounts" variant="outlined" size="small" sx={{ backgroundColor: "#fff" }} />}
-            sx={{ width: "100%", marginTop: "8px" }}   multiline
-          /> */}
-            <AccountMultiSelectDropdown
-                                      value={selectedaccount}
-                                      onChange={handleAccountChange}
-                                      placeholder="Accounts"
-                                      options={accountoptions}
-                                    />
-        </Box>
+        <div className="mt-3">
+          <label className={labelCls}>To</label>
+          <AccountMultiSelectDropdown
+            value={selectedaccount}
+            onChange={handleAccountChange}
+            placeholder="Accounts"
+            options={accountoptions}
+          />
+        </div>
 
-        <Box sx={{ mt: 2 }}>
-          <Typography variant="subtitle1">Subject</Typography>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <TextField
-              fullWidth
-              label="Subject"
+        <div className="mt-3">
+          <p className="text-sm font-medium text-gray-700 mb-1">Subject</p>
+          <div className="flex items-center gap-2">
+            <input
+              className={inputCls}
               value={emailSubject + selectedShortcut}
               onChange={handleEmailInputChange}
-              InputProps={{
-                inputProps: { style: { textTransform: "none" } },
-              }}
+              placeholder="Subject"
             />
-            <Button onClick={toggleDropdown} startIcon={<RiAddCircleLine />} color="primary">
-              Add Shortcode
-            </Button>
-          </Box>
+            <button
+              type="button"
+              onClick={toggleDropdown}
+              className="flex items-center gap-1 whitespace-nowrap rounded px-3 py-1.5 text-sm text-blue-600 border border-blue-300 hover:bg-blue-50"
+            >
+              <RiAddCircleLine /> Add Shortcode
+            </button>
+          </div>
 
           {showDropdown && (
-            <Box className="dropdown" ref={dropdownRef}>
-              <Box className="search-bar">
-                <TextField fullWidth placeholder="Search shortcuts" value={searchTerm} onChange={handleSearchChange} />
-                <Button onClick={toggleDropdown} style={{ minWidth: "auto" }}>
-                  <IoIosCloseCircleOutline fontSize="20px" />
-                </Button>
-              </Box>
-              <Box component="ul" className="dropdown-list">
+            <div className="dropdown border border-gray-200 rounded-lg shadow-lg bg-white mt-1 p-2" ref={dropdownRef}>
+              <div className="flex items-center gap-2 mb-2">
+                <input className={inputCls} placeholder="Search shortcuts" value={searchTerm} onChange={handleSearchChange} />
+                <button type="button" onClick={toggleDropdown} className="text-gray-500 hover:text-gray-700"><IoIosCloseCircleOutline fontSize="20px" /></button>
+              </div>
+              <ul className="dropdown-list max-h-48 overflow-y-auto">
                 {filteredShortcuts.map((shortcut) => (
-                  <li key={shortcut.title} onClick={() => handleAddShortcut(shortcut.value)}>
-                    <Typography variant="body2" style={{ fontWeight: shortcut.isBold ? "bold" : "normal", cursor: "pointer" }}>
-                      {shortcut.title}
-                    </Typography>
+                  <li key={shortcut.title} onClick={() => handleAddShortcut(shortcut.value)}
+                    className="px-3 py-1 text-sm cursor-pointer hover:bg-gray-100"
+                    style={{ fontWeight: shortcut.isBold ? "bold" : "normal" }}
+                  >
+                    {shortcut.title}
                   </li>
                 ))}
-              </Box>
-            </Box>
+              </ul>
+            </div>
           )}
 
-          <Box sx={{ mt: 2 }}>
+          <div className="mt-3">
             <Editor editorState={editorState} wrapperClassName="demo-wrapper" editorClassName="demo-editor" toolbarCustomButtons={[<CustomToolbar />]} onEditorStateChange={setEditorState} />
-          </Box>
+          </div>
 
-          <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
-            <Switch checked={scheduledEmail} onChange={handleScheduledEmail} color="primary" />
-            <Typography variant="body2" style={{ cursor: "pointer" }}>
-              Scheduled email
-            </Typography>
-          </Box>
+          <div className="flex items-center gap-2 mt-4">
+            <Switch checked={scheduledEmail} onChange={handleScheduledEmail} />
+            <span className="text-sm text-gray-600 cursor-pointer">Scheduled email</span>
+          </div>
 
           {scheduledEmail && (
-            <Box className="datetime" sx={{ mt: 2 }}>
-              <Typography variant="subtitle1">Date & time</Typography>
-              <TextField type="datetime-local" fullWidth placeholder="Date & time" />
-            </Box>
+            <div className="mt-3">
+              <p className="text-sm font-medium text-gray-700 mb-1">Date &amp; time</p>
+              <input type="datetime-local" className={inputCls} placeholder="Date &amp; time" />
+            </div>
           )}
 
-          <Box className="buttons-email" sx={{ display: "flex", gap: 2, mt: 2 }}>
-            <Button variant="contained" sx={{
-                backgroundColor: 'var(--color-save-btn)',  // Normal background
-               
-                '&:hover': {
-                  backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                },
-               width:'80px',borderRadius:'15px'
-              }}onClick={sendbulkEmail}>
+          <div className="flex gap-3 mt-4">
+            <button type="button" onClick={sendbulkEmail} className="rounded-full px-5 py-1.5 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)]">
               Send
-            </Button>
-            <Button variant="outlined"  onClick={handleCancel} sx={{
-                    borderColor: 'var(--color-border-cancel-btn)',  // Normal background
-                   color:'var(--color-save-btn)',
-                    '&:hover': {
-                      backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                      color:'#fff',
-                      border:"none"
-                    },
-                    width:'80px',borderRadius:'15px'
-                  }}>
+            </button>
+            <button type="button" onClick={handleCancel} className="rounded-full px-5 py-1.5 text-sm font-medium border border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white">
               Cancel
-            </Button>
-          </Box>
-        </Box>
-      </Box>
-    </Box>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

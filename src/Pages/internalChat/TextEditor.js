@@ -1,6 +1,5 @@
 
 import React, { useEffect, useState } from 'react';
-import { Box } from '@mui/material';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css'; // Quill Snow theme
 import 'quill-emoji/dist/quill-emoji.css'; // Emoji styles
@@ -60,11 +59,8 @@ export default function Editor({ initialContent, onChange,value }) {
   };
 
   return (
-    <Box
-      sx={{height:'250px'}}
-    >
+    <div style={{ height: '250px' }}>
       <ReactQuill
-        // value={editorContent}
         value={value}
         onChange={handleChange}
         modules={modules}
@@ -72,7 +68,7 @@ export default function Editor({ initialContent, onChange,value }) {
         theme="snow"
         style={{ height: '150px' }}
       />
-    </Box>
+    </div>
   );
 }
 

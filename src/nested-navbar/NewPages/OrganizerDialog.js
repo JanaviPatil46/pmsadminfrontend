@@ -910,32 +910,14 @@
 
 
 
-import {
-  MenuItem,
-  Select,
-  FormControl,
-  Dialog,
-  DialogContent,
-  Typography,
-  DialogTitle,
-  IconButton,
-  Box,
-  TextField,
-  Button, Input,
-} from "@mui/material";
-import { LinearProgress } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import { useState, useEffect, useCallback,useContext } from "react";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useState, useEffect, useCallback, useContext } from "react";
 import { toast } from "react-toastify";
 import dayjs from "dayjs";
 import { debounce } from "lodash";
 import UploadDrawer from "./UploadDrawer";
 import { LoginContext } from "../../Sidebar/Context/Context";
+import { IoClose } from "react-icons/io5";
+import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 const OrganizerDialog = ({ open, handleClose, organizer,accountid }) => {
     const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
    const { logindata } = useContext(LoginContext);
@@ -1428,522 +1410,244 @@ const [uploadedFiles, setUploadedFiles] = useState({}); // Stores file names for
     return element.active === true;
   };
 
+  const inputCls = "w-full mt-1 rounded border border-gray-200 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:bg-gray-100 disabled:cursor-not-allowed";
+  const optionBtn = (active, disabled) => `rounded-full px-4 py-1.5 text-sm font-medium border transition-colors ${
+    disabled ? 'opacity-50 cursor-not-allowed border-gray-300 text-gray-400' :
+    active ? 'bg-[var(--color-save-btn)] text-white border-[var(--color-save-btn)]' :
+    'border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white'
+  }`;
+
   return (
     <>
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Dialog fullScreen open={open} onClose={handleClose}>
-        <DialogTitle
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            px: 3,
-            py: 2,
-            borderBottom: "1px solid #ddd",
-          }}
-        >
-          <Typography variant="h6" component="p">
-            {organizer?.organizerName || "Organizer"}
-          </Typography>
-          <IconButton edge="end" onClick={handleClose}>
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent>
-          <FormControl
-            fullWidth
-            sx={{ marginBottom: "10px", marginTop: "10px" }}
+    {open && (
+      <div className="fixed inset-0 z-50 bg-white flex flex-col overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-3 border-b border-gray-200">
+          <p className="text-base font-semibold">{organizer?.organizerName || "Organizer"}</p>
+          <button type="button" onClick={handleClose} className="p-1 rounded hover:bg-gray-100 text-gray-600">
+            <IoClose size={20} />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-6">
+          {/* Section dropdown */}
+          <select
+            className="w-full mb-3 rounded border border-gray-200 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+            value={activeStep}
+            onChange={handleDropdownChange}
           >
-            <Select
-              value={activeStep}
-              onChange={handleDropdownChange}
-              size="small"
-            >
-              {visibleSections.map((section, index) => {
-                const visibleElements = section.formElements.filter((el) =>
-                  shouldShowElement(el, section.id)
-                );
+            {visibleSections.map((section, index) => {
+              const visibleElements = section.formElements.filter((el) => shouldShowElement(el, section.id));
+              const answeredCount = visibleElements.reduce((c, el) => c + (answeredElements[`${section.id}_${el.text}`] ? 1 : 0), 0);
+              return (
+                <option key={section.id} value={index}>
+                  {section.text} ({answeredCount}/{visibleElements.length})
+                </option>
+              );
+            })}
+          </select>
 
-                const answeredCount = visibleElements.reduce(
-                  (count, element) => {
-                    const key = `${section.id}_${element.text}`;
-                    return count + (answeredElements[key] ? 1 : 0);
-                  },
-                  0
-                );
+          {/* Progress bar */}
+          <div className="w-full bg-gray-200 rounded-full h-2 mb-6">
+            <div className="bg-blue-500 h-2 rounded-full transition-all" style={{ width: `${((activeStep + 1) / totalSteps) * 100}%` }}></div>
+          </div>
 
-                const totalVisibleElements = visibleElements.length;
+          <div className="px-4 md:px-20">
+            {visibleSections.map((section, sectionIndex) =>
+              sectionIndex === activeStep && (
+                <div key={section.id}>
+                  {section.formElements.map((element) =>
+                    shouldShowElement(element, section.id) && (
+                      <div key={`${section.id}_${element.id}`} className="mb-5">
 
-                return (
-                  <MenuItem key={section.id} value={index}>
-                    {section.text} ({answeredCount}/{totalVisibleElements})
-                  </MenuItem>
-                );
-              })}
-            </Select>
-          </FormControl>
-          <Box mt={2} mb={2}>
-            <LinearProgress
-              variant="determinate"
-              value={((activeStep + 1) / totalSteps) * 100}
-            />
-          </Box>
+                        {element.type === "Text Editor" && (
+                          <p className="text-sm text-gray-700 my-3" dangerouslySetInnerHTML={{ __html: element.text }} />
+                        )}
 
-          <Box sx={{ pl: 20, pr: 20 }}>
-            {visibleSections.map(
-              (section, sectionIndex) =>
-                sectionIndex === activeStep && (
-                  <Box key={section.id}>
-                    {section.formElements.map(
-                      (element) =>
-                        shouldShowElement(element, section.id) && (
-                          <Box key={`${section.id}_${element.id}`}>
-                            {element.type === "Text Editor" && (
-                              <Box mt={2} mb={2}>
-                                <Typography>
-                                  <span
-                                    dangerouslySetInnerHTML={{
-                                      __html: element.text,
-                                    }}
-                                  />
-                                </Typography>
-                              </Box>
-                            )}
+                        {(element.type === "Free Entry" || element.type === "Email") && (
+                          <div>
+                            <p className="text-sm font-semibold mb-1">{element.text}</p>
+                            <textarea
+                              className={inputCls}
+                              rows={3}
+                              placeholder={`${element.type} Answer`}
+                              disabled={isElementActive(element)}
+                              value={inputValues[`${section.id}_${element.text}`] || ""}
+                              onChange={(e) => handleInputChange(e, element.text, section.id)}
+                            />
+                          </div>
+                        )}
 
-                            {(element.type === "Free Entry" ||
-                              element.type === "Email") && (
-                              <Box mt={2}>
-                                <Typography
-                                  variant="subtitle2"
-                                  component="p"
-                                  gutterBottom
-                                  sx={{ fontWeight: "550" }}
-                                >
-                                  {element.text}
-                                </Typography>
-                                <TextField
-                                  disabled={isElementActive(element)}
-                                  variant="outlined"
-                                  size="small"
-                                  multiline
-                                  fullWidth
-                                  placeholder={`${element.type} Answer`}
-                                  inputProps={{
-                                    type:
-                                      element.type === "Free Entry"
-                                        ? "text"
-                                        : element.type.toLowerCase(),
-                                  }}
-                                  maxRows={8}
-                                  style={{ display: "block" }}
-                                  value={
-                                    inputValues[
-                                      `${section.id}_${element.text}`
-                                    ] || ""
+                        {element.type === "Number" && (
+                          <div>
+                            <p className="text-sm font-semibold mb-1">{element.text}</p>
+                            <input
+                              type="text" inputMode="numeric" pattern="[0-9]*"
+                              className={inputCls}
+                              placeholder="Number Answer"
+                              disabled={isElementActive(element)}
+                              value={inputValues[`${section.id}_${element.text}`] || ""}
+                              onChange={(e) => handleInputChange({ target: { value: e.target.value.replace(/\D/g, "") } }, element.text, section.id)}
+                            />
+                          </div>
+                        )}
+
+                        {element.type === "Radio Buttons" && (
+                          <div>
+                            <p className="text-sm font-semibold mb-2">{element.text}</p>
+                            <div className="flex flex-wrap gap-2">
+                              {element.options.map((option) => (
+                                <button key={option.text} type="button"
+                                  className={optionBtn(radioValues[`${section.id}_${element.text}`] === option.text, isElementActive(element))}
+                                  onClick={() => !isElementActive(element) && handleRadioChange(option.text, element.text, section.id)}
+                                >{option.text}</button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {element.type === "Checkboxes" && (
+                          <div>
+                            <p className="text-sm font-semibold mb-2">{element.text}</p>
+                            <div className="flex flex-wrap gap-2">
+                              {element.options.map((option) => (
+                                <button key={option.text} type="button"
+                                  className={optionBtn(!!checkboxValues[`${section.id}_${element.text}`]?.[option.text], isElementActive(element))}
+                                  onClick={() => !isElementActive(element) && handleCheckboxChange(option.text, element.text, section.id)}
+                                >{option.text}</button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {element.type === "Yes/No" && (
+                          <div>
+                            <p className="text-sm font-semibold mb-2">{element.text}</p>
+                            <div className="flex gap-2">
+                              {element.options.map((option) => (
+                                <button key={option.text} type="button"
+                                  className={optionBtn(selectedYesNoValues[`${section.id}_${element.text}`] === option.text, isElementActive(element))}
+                                  onClick={() => !isElementActive(element) && handleYesNoChange(option.text, element.text, section.id)}
+                                >{option.text}</button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {element.type === "Dropdown" && (
+                          <div>
+                            <p className="text-sm font-semibold mb-1">{element.text}</p>
+                            <select
+                              className={inputCls}
+                              disabled={isElementActive(element)}
+                              value={selectedDropdownValues[`${section.id}_${element.text}`] || ""}
+                              onChange={(event) => handleDropdownValueChange(event, element.text, section.id)}
+                            >
+                              {element.options.map((option) => (
+                                <option key={option.text} value={option.text}>{option.text}</option>
+                              ))}
+                            </select>
+                          </div>
+                        )}
+
+                        {element.type === "Date" && (
+                          <div>
+                            <p className="text-sm font-semibold mb-1">{element.text}</p>
+                            <input
+                              type="date"
+                              className={inputCls}
+                              disabled={isElementActive(element)}
+                              value={startDate ? (dayjs.isDayjs(startDate) ? startDate.format('YYYY-MM-DD') : startDate) : ""}
+                              onChange={(e) => {
+                                if (!isElementActive(element)) {
+                                  setStartDate(e.target.value);
+                                  setAnsweredElements((prev) => ({ ...prev, [`${section.id}_${element.text}`]: true }));
+                                }
+                              }}
+                            />
+                          </div>
+                        )}
+
+                        {element.type === "File Upload" && (
+                          <div>
+                            <p className="text-sm font-semibold mb-1">{element.text}</p>
+                            <div className="flex items-center gap-2">
+                              <label
+                                htmlFor={`fileInput_${section.id}_${element.id}`}
+                                className={`text-sm cursor-pointer text-[var(--color-save-btn)] underline ${isElementActive(element) ? 'opacity-50 pointer-events-none' : ''}`}
+                              >
+                                Upload Document
+                              </label>
+                              <input
+                                type="file"
+                                id={`fileInput_${section.id}_${element.id}`}
+                                className="hidden"
+                                disabled={isElementActive(element)}
+                                onChange={(e) => {
+                                  const selectedFile = e.target.files[0];
+                                  if (selectedFile) {
+                                    setFile(selectedFile);
+                                    setIsDocumentForm(true);
+                                    const key = `${section.id}_${element.text}`;
+                                    setUploadedFiles(prev => ({ ...prev, [key]: selectedFile.name }));
+                                    setAnsweredElements(prev => ({ ...prev, [key]: true }));
                                   }
-                                  onChange={(e) =>
-                                    handleInputChange(
-                                      e,
-                                      element.text,
-                                      section.id
-                                    )
-                                  }
-                                />
-                              </Box>
-                            )}
-
-                            {element.type === "Number" && (
-                              <Box mt={2}>
-                                <Typography
-                                  variant="subtitle2"
-                                  component="p"
-                                  gutterBottom
-                                  sx={{ fontWeight: "550" }}
-                                >
-                                  {element.text}
-                                </Typography>
-                                <TextField
+                                }}
+                              />
+                            </div>
+                            {uploadedFiles[`${section.id}_${element.text}`] && (
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className="text-xs text-gray-500">Selected file: {uploadedFiles[`${section.id}_${element.text}`]}</span>
+                                <button type="button" className="text-gray-400 hover:text-red-500"
                                   disabled={isElementActive(element)}
-                                  variant="outlined"
-                                  size="small"
-                                  multiline
-                                  fullWidth
-                                  placeholder={`${element.type} Answer`}
-                                  inputProps={{
-                                    type: "text",
-                                    inputMode: "numeric",
-                                    pattern: "[0-9]*",
+                                  onClick={() => {
+                                    const key = `${section.id}_${element.text}`;
+                                    setUploadedFiles(prev => { const n = {...prev}; delete n[key]; return n; });
+                                    setAnsweredElements(prev => ({ ...prev, [key]: false }));
+                                    const d = prepareSubmitData(false);
+                                    debouncedAutoSave(d);
                                   }}
-                                  maxRows={8}
-                                  style={{
-                                    display: "block",
-                                    marginTop: "15px",
-                                  }}
-                                  value={
-                                    inputValues[
-                                      `${section.id}_${element.text}`
-                                    ] || ""
-                                  }
-                                  onChange={(e) => {
-                                    const numericValue = e.target.value.replace(
-                                      /\D/g,
-                                      ""
-                                    );
-                                    handleInputChange(
-                                      { target: { value: numericValue } },
-                                      element.text,
-                                      section.id
-                                    );
-                                  }}
-                                />
-                              </Box>
+                                ><IoClose size={14} /></button>
+                              </div>
                             )}
+                          </div>
+                        )}
 
-                            {element.type === "Radio Buttons" && (
-                              <Box mt={2}>
-                                <Typography
-                                  variant="subtitle2"
-                                  component="p"
-                                  gutterBottom
-                                  sx={{ fontWeight: "550" }}
-                                >
-                                  {element.text}
-                                </Typography>
-                                <Box
-                                  sx={{
-                                    display: "flex",
-                                    gap: 1,
-                                    flexWrap: "wrap",
-                                  }}
-                                >
-                                  {element.options.map((option) => (
-                                    <Button
-                                      key={option.text}
-                                      variant={
-                                        radioValues[
-                                          `${section.id}_${element.text}`
-                                        ] === option.text
-                                          ? "contained"
-                                          : "outlined"
-                                      }
-                                      disabled={isElementActive(element)}
-                                      onClick={() =>
-                                        !isElementActive(element) &&
-                                        handleRadioChange(
-                                          option.text,
-                                          element.text,
-                                          section.id
-                                        )
-                                      }
-                                      sx={{
-                                        borderRadius: "15px",
-                                      }}
-                                    >
-                                      {option.text}
-                                    </Button>
-                                  ))}
-                                </Box>
-                              </Box>
-                            )}
-
-                            {element.type === "Checkboxes" && (
-                              <Box mt={2}>
-                                <Typography
-                                  variant="subtitle2"
-                                  component="p"
-                                  gutterBottom
-                                  sx={{ fontWeight: "550" }}
-                                >
-                                  {element.text}
-                                </Typography>
-                                <Box
-                                  sx={{
-                                    display: "flex",
-                                    gap: 1,
-                                    flexWrap: "wrap",
-                                  }}
-                                >
-                                  {element.options.map((option) => (
-                                    <Button
-                                      key={option.text}
-                                      variant={
-                                        checkboxValues[
-                                          `${section.id}_${element.text}`
-                                        ]?.[option.text]
-                                          ? "contained"
-                                          : "outlined"
-                                      }
-                                      disabled={isElementActive(element)}
-                                      onClick={() =>
-                                        !isElementActive(element) &&
-                                        handleCheckboxChange(
-                                          option.text,
-                                          element.text,
-                                          section.id
-                                        )
-                                      }
-                                      sx={{
-                                        borderRadius: "15px",
-                                      }}
-                                    >
-                                      {option.text}
-                                    </Button>
-                                  ))}
-                                </Box>
-                              </Box>
-                            )}
-
-                            {element.type === "Yes/No" && (
-                              <Box mt={2}>
-                                <Typography
-                                  variant="subtitle2"
-                                  component="p"
-                                  gutterBottom
-                                  sx={{ fontWeight: "550" }}
-                                >
-                                  {element.text}
-                                </Typography>
-                                <Box sx={{ display: "flex", gap: 1 }}>
-                                  {element.options.map((option) => (
-                                    <Button
-                                      key={option.text}
-                                      variant={
-                                        selectedYesNoValues[
-                                          `${section.id}_${element.text}`
-                                        ] === option.text
-                                          ? "contained"
-                                          : "outlined"
-                                      }
-                                      disabled={isElementActive(element)}
-                                      onClick={() =>
-                                        !isElementActive(element) &&
-                                        handleYesNoChange(
-                                          option.text,
-                                          element.text,
-                                          section.id
-                                        )
-                                      }
-                                      sx={{
-                                        borderRadius: "15px",
-                                      }}
-                                    >
-                                      {option.text}
-                                    </Button>
-                                  ))}
-                                </Box>
-                              </Box>
-                            )}
-
-                            {element.type === "Dropdown" && (
-                              <Box mt={2}>
-                                <Typography
-                                  variant="subtitle2"
-                                  component="p"
-                                  gutterBottom
-                                  sx={{ fontWeight: "550" }}
-                                >
-                                  {element.text}
-                                </Typography>
-                                <FormControl fullWidth>
-                                  <Select
-                                    value={
-                                      selectedDropdownValues[
-                                        `${section.id}_${element.text}`
-                                      ] || ""
-                                    }
-                                    disabled={isElementActive(element)}
-                                    onChange={(event) =>
-                                      handleDropdownValueChange(
-                                        event,
-                                        element.text,
-                                        section.id
-                                      )
-                                    }
-                                    size="small"
-                                  >
-                                    {element.options.map((option) => (
-                                      <MenuItem
-                                        key={option.text}
-                                        value={option.text}
-                                      >
-                                        {option.text}
-                                      </MenuItem>
-                                    ))}
-                                  </Select>
-                                </FormControl>
-                              </Box>
-                            )}
-
-                            {element.type === "Date" && (
-                              <Box mt={2}>
-                                <Typography
-                                  variant="subtitle2"
-                                  component="p"
-                                  gutterBottom
-                                  sx={{ fontWeight: "550" }}
-                                >
-                                  {element.text}
-                                </Typography>
-                                <DatePicker
-                                   format="MM/DD/YYYY"
-                                  sx={{
-                                    width: "100%",
-                                    backgroundColor: "#fff",
-                                  }}
-                                  value={startDate}
-                                  disabled={isElementActive(element)}
-                                  onChange={(newValue) => {
-                                    if (!isElementActive(element)) {
-                                      setStartDate(newValue);
-                                      setAnsweredElements((prev) => ({
-                                        ...prev,
-                                        [`${section.id}_${element.text}`]: true,
-                                      }));
-                                    }
-                                  }}
-                                  renderInput={(params) => (
-                                    <TextField {...params} size="small" />
-                                  )}
-                                />
-                              </Box>
-                            )}
-
-                            {/* {element.type === "File Upload" && (
-                              <Box mt={2}>
-                                <Typography
-                                  variant="subtitle2"
-                                  component="p"
-                                  gutterBottom
-                                  sx={{ fontWeight: "550" }}
-                                >
-                                  {element.text}
-                                </Typography>
-                                This file upload question
-                              </Box>
-                            )} */}
-                            {element.type === "File Upload" && (
-  <Box mt={2}>
-    <Typography
-      variant="subtitle2"
-      component="p"
-      gutterBottom
-      sx={{ fontWeight: "550" }}
-    >
-      {element.text}
-    </Typography>
-    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-      {/* <IconButton
-        component="label"
-        htmlFor={`fileInput_${section.id}_${element.id}`}
-        sx={{ color: "#e87800" }}
-        disabled={isElementActive(element)}
-      >
-        <HiDocumentArrowUp size={24} />
-      </IconButton> */}
-      <Typography
-        variant="body1"
-        component="label"
-        htmlFor={`fileInput_${section.id}_${element.id}`}
-        sx={{ cursor: isElementActive(element) ? 'default' : 'pointer', }}
-      >
-        Upload Document
-      </Typography>
-      <Input
-        type="file"
-        id={`fileInput_${section.id}_${element.id}`}
-        onChange={(e) => {
-          const selectedFile = e.target.files[0];
-          if (selectedFile) {
-            setFile(selectedFile);
-            setIsDocumentForm(true);
-            // Store the temporary file name in state
-            const key = `${section.id}_${element.text}`;
-            setUploadedFiles(prev => ({
-              ...prev,
-              [key]: selectedFile.name
-            }));
-            setAnsweredElements(prev => ({
-              ...prev,
-              [key]: true
-            }));
-          }
-        }}
-        sx={{ display: "none" }}
-        disabled={isElementActive(element)}
-      />
-    </Box>
-    {uploadedFiles[`${section.id}_${element.text}`] && (
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
-        <Typography variant="caption">
-          Selected file: {uploadedFiles[`${section.id}_${element.text}`]}
-        </Typography>
-        <IconButton
-          size="small"
-          onClick={() => {
-            const key = `${section.id}_${element.text}`;
-            setUploadedFiles(prev => {
-              const newState = {...prev};
-              delete newState[key];
-              return newState;
-            });
-            setAnsweredElements(prev => ({
-              ...prev,
-              [key]: false
-            }));
-            // Trigger auto-save with the removed file
-            const data = prepareSubmitData(false);
-            debouncedAutoSave(data);
-          }}
-          disabled={isElementActive(element)}
-        >
-          <CloseIcon fontSize="small" />
-        </IconButton>
-      </Box>
-    )}
-  </Box>
-)}
-                          </Box>
-                        )
-                    )}
-                  </Box>
-                )
+                      </div>
+                    )
+                  )}
+                </div>
+              )
             )}
 
-            <Box
-              mt={3}
-              display="flex"
-              alignItems="center"
-              justifyContent={"space-between"}
-            >
-              <Box display="flex" gap={3} alignItems="center">
+            {/* Navigation */}
+            <div className="flex items-center justify-between mt-6">
+              <div className="flex items-center gap-3">
                 {activeStep > 0 && (
-                  <Button onClick={handleBack} variant="outlined">
-                    <ArrowBackIcon fontSize="small" />
-                  </Button>
+                  <button type="button" onClick={handleBack}
+                    className="flex items-center gap-1 rounded-full px-4 py-1.5 text-sm font-medium border border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white">
+                    <IoIosArrowBack size={14} />
+                  </button>
                 )}
-
                 {activeStep < totalSteps - 1 ? (
-                  <Button onClick={handleNext} variant="contained">
-                    Next{" "}
-                    <ArrowForwardIcon fontSize="small" sx={{ marginLeft: 2 }} />
-                  </Button>
+                  <button type="button" onClick={handleNext}
+                    className="flex items-center gap-1 rounded-full px-4 py-1.5 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)]">
+                    Next <IoIosArrowForward size={14} />
+                  </button>
                 ) : (
-                  <Button variant="contained" onClick={handleSubmit}>
+                  <button type="button" onClick={handleSubmit}
+                    className="rounded-full px-5 py-1.5 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)]">
                     Submit
-                  </Button>
+                  </button>
                 )}
-              </Box>
-
-              <Box sx={{ display: "flex", alignItems: "flex-end" }}>
-                <Typography>
-                  Step {activeStep + 1} of {totalSteps}
-                </Typography>
-              </Box>
-            </Box>
-          </Box>
-        </DialogContent>
-      </Dialog>
-    </LocalizationProvider>
+              </div>
+              <span className="text-sm text-gray-500">Step {activeStep + 1} of {totalSteps}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
     <UploadDrawer
   open={isDocumentForm}
   onClose={() => setIsDocumentForm(false)}

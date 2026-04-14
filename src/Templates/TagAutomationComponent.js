@@ -1,11 +1,4 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Typography,
-  Grid,
-  Button,
-  Chip
-} from "@mui/material";
 import MultiSelectDropdown from "./MultiSelectDropdown";
 
 const TagAutomationComponent = ({
@@ -35,37 +28,20 @@ const TagAutomationComponent = ({
   const selectedTagElements = selectedTags.map((tag) => {
     const option = tagsoptions.find(opt => opt.value === tag.value);
     return (
-      <Chip
-        key={tag.value}
-        label={tag.label}
-        sx={{
-          backgroundColor: option?.colour,
-          color: "#fff",
-          fontWeight: 500,
-          fontSize: "10px",
-          borderRadius: "16px",
-          height: "20px",
-        }}
-      />
+      <span key={tag.value}
+        className="inline-block px-2 py-0.5 rounded-full text-[10px] font-medium text-white"
+        style={{ backgroundColor: option?.colour }}>
+        {tag.label}
+      </span>
     );
   });
 
   return (
-    <Grid item>
-      <Box
-        sx={{
-          border: "2px solid #ddd",
-          borderRadius: "8px",
-          padding: 2,
-        }}
-      >
-        <Typography gutterBottom>
-          1. {automationSelect || "No Type"}
-        </Typography>
-
-        <Box sx={{ display: "flex", alignItems: "center", gap: 5 }}>
-          {/* Add Tags Section */}
-          <Box mt={2} width={"50%"}>
+    <div>
+      <div className="border-2 border-gray-200 rounded-lg p-4">
+        <p className="text-sm mb-2">1. {automationSelect || "No Type"}</p>
+        <div className="flex items-start gap-5">
+          <div className="mt-2 w-1/2">
             <MultiSelectDropdown
               value={addTags}
               onChange={handleAddTagChange}
@@ -73,10 +49,8 @@ const TagAutomationComponent = ({
               placeholder="Select tags..."
               label="Add Tags"
             />
-          </Box>
-
-          {/* Remove Tags Section */}
-          <Box mt={2} width={"50%"}>
+          </div>
+          <div className="mt-2 w-1/2">
             <MultiSelectDropdown
               value={removeTags}
               onChange={handleRemoveTagChange}
@@ -84,13 +58,10 @@ const TagAutomationComponent = ({
               placeholder="Select tags..."
               label="Remove Tags"
             />
-          </Box>
-        </Box>
-
-        
-      </Box>
-     
-    </Grid>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

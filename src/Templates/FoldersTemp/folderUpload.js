@@ -1,16 +1,8 @@
 
 
 import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Typography,
-  Drawer,
-  IconButton,
-  CircularProgress,
-  TextField,
-  Button,
-} from "@mui/material";
 import { MdClose } from "react-icons/md";
+import { FolderOpen, FolderClosed, FileText } from "lucide-react";
 import axios from "axios";
 import JSZip from "jszip";
 const UploadDocument = ({
@@ -119,53 +111,26 @@ const UploadDocument = ({
           setSelectedType("public");
         };
 
+        const isSelectedPublic = selectedFolderId === item.id && selectedType === "public";
         return (
-          <div key={index} style={{ marginLeft: "20px", marginBottom: "4px" }}>
+          <div key={index} className="ml-5 mb-1">
             <div
-              style={{
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                padding: "6px 8px",
-                borderRadius: "4px",
-                // backgroundColor:
-                //   selectedFolderId === item.id ? "#f0f7ff" : "transparent",
-                backgroundColor:
-                  selectedFolderId === item.id && selectedType === "public"
-                    ? "#f0f7ff"
-                    : "transparent",
-
-                transition: "background-color 0.2s ease",
-                "&:hover": {
-                  backgroundColor: "#f5f5f5",
-                },
-              }}
+              className={`flex items-center gap-2 px-2 py-1.5 rounded-lg cursor-pointer transition-colors ${
+                isSelectedPublic ? "bg-blue-50 border border-blue-200" : "hover:bg-gray-50"
+              }`}
               onClick={selectFolder}
             >
-              <div
-                onClick={toggleFolder}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  width: "100%",
-                }}
-              >
-                <span style={{ marginRight: "8px" }}>
-                  {item.isOpen ? "📂" : "📁"}
-                </span>
-                <strong
-                  style={{
-                    fontWeight: 500,
-                    color: "#333",
-                    fontSize: "14px",
-                  }}
-                >
+              <button type="button" onClick={(e) => { e.stopPropagation(); toggleFolder(); }} className="flex items-center gap-2 w-full text-left">
+                {item.isOpen
+                  ? <FolderOpen size={15} className="text-amber-400 shrink-0" />
+                  : <FolderClosed size={15} className="text-amber-400 shrink-0" />}
+                <span className={`text-sm ${ isSelectedPublic ? "font-semibold text-blue-700" : "font-medium text-gray-700" }`}>
                   {item.folder}
-                </strong>
-              </div>
+                </span>
+              </button>
             </div>
             {item.isOpen && item.contents && item.contents.length > 0 && (
-              <div style={{ marginTop: "4px" }}>
+              <div className="mt-0.5">
                 {renderContents(item.contents, (newContents) => {
                   const updatedFolders = contents.map((folder, i) =>
                     i === index ? { ...folder, contents: newContents } : folder
@@ -178,18 +143,8 @@ const UploadDocument = ({
         );
       } else if (item.file) {
         return (
-          <div
-            key={index}
-            style={{
-              marginLeft: "40px",
-              padding: "4px 8px",
-              fontSize: "14px",
-              color: "#555",
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            <span style={{ marginRight: "8px" }}>📄</span>
+          <div key={index} className="ml-10 flex items-center gap-2 px-2 py-1 text-sm text-gray-500">
+            <FileText size={13} className="text-gray-300 shrink-0" />
             {item.file}
           </div>
         );
@@ -214,50 +169,26 @@ const UploadDocument = ({
           setSelectedType("private");
         };
 
+        const isSelectedPrivate = selectedFolderId === item.id && selectedType === "private";
         return (
-          <div key={index} style={{ marginLeft: "20px", marginBottom: "4px" }}>
+          <div key={index} className="ml-5 mb-1">
             <div
-              style={{
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                padding: "6px 8px",
-                borderRadius: "4px",
-                backgroundColor:
-                  selectedFolderId === item.id && selectedType === "private"
-                    ? "#f0f7ff"
-                    : "transparent",
-
-                // backgroundColor:
-                //   selectedFolderId === item.id ? "#f0f7ff" : "transparent",
-                transition: "background-color 0.2s ease",
-              }}
+              className={`flex items-center gap-2 px-2 py-1.5 rounded-lg cursor-pointer transition-colors ${
+                isSelectedPrivate ? "bg-blue-50 border border-blue-200" : "hover:bg-gray-50"
+              }`}
               onClick={selectFolder}
             >
-              <div
-                onClick={toggleFolder}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  width: "100%",
-                }}
-              >
-                <span style={{ marginRight: "8px" }}>
-                  {item.isOpen ? "📂" : "📁"}
-                </span>
-                <strong
-                  style={{
-                    fontWeight: 500,
-                    color: "#333",
-                    fontSize: "14px",
-                  }}
-                >
+              <button type="button" onClick={(e) => { e.stopPropagation(); toggleFolder(); }} className="flex items-center gap-2 w-full text-left">
+                {item.isOpen
+                  ? <FolderOpen size={15} className="text-amber-400 shrink-0" />
+                  : <FolderClosed size={15} className="text-amber-400 shrink-0" />}
+                <span className={`text-sm ${ isSelectedPrivate ? "font-semibold text-blue-700" : "font-medium text-gray-700" }`}>
                   {item.folder}
-                </strong>
-              </div>
+                </span>
+              </button>
             </div>
             {item.isOpen && item.contents && item.contents.length > 0 && (
-              <div style={{ marginTop: "4px" }}>
+              <div className="mt-0.5">
                 {renderPrivateContents(item.contents, (newContents) => {
                   const updatedFolders = contents.map((folder, i) =>
                     i === index ? { ...folder, contents: newContents } : folder
@@ -270,18 +201,8 @@ const UploadDocument = ({
         );
       } else if (item.file) {
         return (
-          <div
-            key={index}
-            style={{
-              marginLeft: "40px",
-              padding: "4px 8px",
-              fontSize: "14px",
-              color: "#555",
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            <span style={{ marginRight: "8px" }}>📄</span>
+          <div key={index} className="ml-10 flex items-center gap-2 px-2 py-1 text-sm text-gray-500">
+            <FileText size={13} className="text-gray-300 shrink-0" />
             {item.file}
           </div>
         );
@@ -414,62 +335,81 @@ const UploadDocument = ({
   }, [privateFolderPath, selectedType]);
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return <div className="p-4 text-sm text-red-500">Error: {error}</div>;
   }
 
   if (!structFolder || !privateStructFolder) {
-    return <div></div>;
+    return null;
   }
 
+  if (!open) return null;
+
   return (
-    <Box>
-      <Drawer anchor="right" open={open} onClose={onClose}>
-        
-        <Box
-          sx={{
-            backgroundColor: "#fff",
-            borderRadius: "8px",
+    <div className="fixed inset-0 z-40 overflow-hidden">
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div className="absolute right-0 top-0 h-full w-full sm:w-[520px] bg-white shadow-2xl flex flex-col">
 
-            padding: 2,
-            width: 600,
-            fontFamily:
-              "'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif",
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0">
+          <div>
+            <h2 className="text-sm font-semibold text-gray-800">Upload Folder</h2>
+            <p className="text-xs text-gray-400 mt-0.5">Select a destination folder to upload into</p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="h-7 w-7 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
           >
-            <Typography variant="h6">upload folder</Typography>
-            <IconButton onClick={onClose}>
-              <MdClose />
-            </IconButton>
-          </Box>
-          
+            <MdClose size={16} />
+          </button>
+        </div>
 
-          <Box sx={{ maxHeight: "500px", overflowY: "auto" }}>
+        {/* Folder tree */}
+        <div className="flex-1 overflow-y-auto px-3 py-3 space-y-1">
+          {/* Public section */}
+          <div className="mb-3">
+            <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide px-2 mb-1.5">Client Folders</p>
             {renderContents(structFolder.folders, (newFolders) =>
               setStructFolder({ ...structFolder, folders: newFolders })
             )}
+          </div>
 
+          <div className="border-t border-gray-100 pt-3">
+            <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide px-2 mb-1.5">Private Folders</p>
             {renderPrivateContents(privateStructFolder.folders, (newFolders) =>
-              setPrivateStructFolder({
-                ...privateStructFolder,
-                folders: newFolders,
-              })
+              setPrivateStructFolder({ ...privateStructFolder, folders: newFolders })
             )}
-          </Box>
-          <Box sx={{ marginTop: 2, textAlign: "center" }}>
-            <Button variant="contained" color="primary" onClick={handleSubmitFolder}>
-              Upload to Selected Folder
-            </Button>
-          </Box>
-        </Box>
-      </Drawer>
-    </Box>
+          </div>
+        </div>
+
+        {/* Selected destination info */}
+        {destinationPath && (
+          <div className="px-5 py-2 border-t border-gray-100 bg-blue-50">
+            <p className="text-[11px] text-blue-600 font-medium truncate">
+              Destination: <span className="font-semibold">{destinationPath}</span>
+            </p>
+          </div>
+        )}
+
+        {/* Footer */}
+        <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100 shrink-0">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-lg px-4 py-2 text-sm font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={handleSubmitFolder}
+            className="rounded-lg px-4 py-2 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] transition-colors"
+          >
+            Upload to Selected Folder
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 

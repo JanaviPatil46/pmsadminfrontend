@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { OutlinedInput,  FormControl,Chip, Box, Button, InputLabel, MenuItem, Select, TextField, Typography, Autocomplete, Grid, IconButton } from "@mui/material";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import axios from "axios";
 import { AiOutlinePlusCircle, AiOutlineDelete } from "react-icons/ai";
 import { toast } from "react-toastify";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
-import CloseIcon from "@mui/icons-material/Close";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Drawer, Checkbox } from "@mui/material";
+import { AiOutlinePlusCircle as AddCircle } from "react-icons/ai";
+import { IoClose } from "react-icons/io5";
 import TagsMultiSelectDropDown from "../../Templates/TagsMultiSelectDropDown"
 const ContactUpdateForm = ({ onContactUpdated, selectedContact, handleClose, isSmallScreen }) => {
   const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
@@ -414,335 +412,212 @@ const updateUsersEmail = async (contactId, newEmail) => {
       .catch((error) => console.error(error));
   };
 
+  const inputCls = "w-full border border-gray-300 rounded px-3 py-1.5 text-sm mt-1 focus:outline-none focus:ring-1 focus:ring-blue-400";
+  const labelCls = "block text-sm text-gray-700 font-medium";
+
   return (
     <form style={{ paddingRight: "3%", paddingLeft: "3%", height: "90vh", overflowY: "auto" }} className="contact-form">
-     
-      <Box sx={{ display: "flex", flexDirection: isSmallScreen ? "column" : "row", gap: isSmallScreen ? 2 : 5, padding: "1px 5px 0 2px" , mt: 2,}}>
-        <Box>
-          <InputLabel sx={{
-                color: "black",
-                display: "flex",
-                alignItems: "center",
-              }}>First name</InputLabel>
-          <TextField size="small" margin="normal" fullWidth name="firstName" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="First Name" />
-        </Box>
-        <Box>
-          <InputLabel sx={{ color: "black" }}>Middle Name</InputLabel>
-          <TextField margin="normal" fullWidth name="middleName" value={middleName} onChange={(e) => setMiddleName(e.target.value)} placeholder="Middle Name" size="small" />
-        </Box>
-        <Box>
-          <InputLabel sx={{ color: "black" }}>Last Name</InputLabel>
-          <TextField fullWidth name="lastName" value={lastName} onChange={(e) => setLastName(e.target.value)} margin="normal" placeholder="Last name" size="small" />
-        </Box>
-      </Box>
-      <Box mt={1}>
-        <InputLabel sx={{ color: "black" }}>Contact Name</InputLabel>
-        <TextField name="contactName" value={contactName} onChange={(e) => setContactName(e.target.value)} fullWidth placeholder="Contact Name" margin="normal" size="small" />
-      </Box>
-      <Box mt={1}>
-        <InputLabel sx={{ color: "black" }}>Company Name</InputLabel>
-        <TextField fullWidth name="companyName" value={companyName} onChange={(e) => setCompanyName(e.target.value)} margin="normal" placeholder="Company Name" size="small"/>
-      </Box>
-      <Box mt={1}>
-        <InputLabel sx={{ color: "black" }}>Note</InputLabel>
-        <TextField fullWidth name="note" value={note} onChange={(e) => setNote(e.target.value)} margin="normal" placeholder="Note" size="small" />
-      </Box>
-      <Box mt={1}>
-        <InputLabel sx={{ color: "black" }}>SSN</InputLabel>
-        <TextField fullWidth name="ssn" value={ssn} onChange={(e) => setSsn(e.target.value)} margin="normal" placeholder="SSN" size="small" />
-      </Box>
-      <Box mt={1}>
-        <InputLabel sx={{ color: "black" }}>Email</InputLabel>
-        <TextField fullWidth name="email" value={email} onChange={(e) => setEmail(e.target.value)} margin="normal" placeholder="Email" size="small" />
-      </Box>
-      <Box mt={1} mr={2}>
-        {/* <InputLabel sx={{ color: "black" }}>Tags</InputLabel>
-        <Autocomplete
-          multiple
-          size="small"
-          id="tags-outlined"
-          options={options}
-          getOptionLabel={(option) => option.label}
+
+      {/* Name row */}
+      <div className={`flex ${isSmallScreen ? "flex-col gap-2" : "flex-row gap-5"} mt-4 px-1`}>
+        <div className="flex-1">
+          <label className={labelCls}>First name</label>
+          <input type="text" name="firstName" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="First Name" className={inputCls} />
+        </div>
+        <div className="flex-1">
+          <label className={labelCls}>Middle Name</label>
+          <input type="text" name="middleName" value={middleName} onChange={(e) => setMiddleName(e.target.value)} placeholder="Middle Name" className={inputCls} />
+        </div>
+        <div className="flex-1">
+          <label className={labelCls}>Last Name</label>
+          <input type="text" name="lastName" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Last name" className={inputCls} />
+        </div>
+      </div>
+
+      <div className="mt-3">
+        <label className={labelCls}>Contact Name</label>
+        <input type="text" name="contactName" value={contactName} onChange={(e) => setContactName(e.target.value)} placeholder="Contact Name" className={inputCls} />
+      </div>
+      <div className="mt-3">
+        <label className={labelCls}>Company Name</label>
+        <input type="text" name="companyName" value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="Company Name" className={inputCls} />
+      </div>
+      <div className="mt-3">
+        <label className={labelCls}>Note</label>
+        <input type="text" name="note" value={note} onChange={(e) => setNote(e.target.value)} placeholder="Note" className={inputCls} />
+      </div>
+      <div className="mt-3">
+        <label className={labelCls}>SSN</label>
+        <input type="text" name="ssn" value={ssn} onChange={(e) => setSsn(e.target.value)} placeholder="SSN" className={inputCls} />
+      </div>
+      <div className="mt-3">
+        <label className={labelCls}>Email</label>
+        <input type="email" name="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className={inputCls} />
+      </div>
+
+      <div className="mt-3 mr-2">
+        <label className={labelCls + " mb-1"}>Tags</label>
+        <TagsMultiSelectDropDown
           value={tagsNew}
           onChange={handleTagChange}
-          renderTags={(selected, getTagProps) => selected.map((option, index) => <Chip key={option.value} label={option.label} style={option.customTagStyle} {...getTagProps({ index })} />)}
-          renderInput={(params) => <TextField {...params} variant="outlined" placeholder="Tags" sx={{ width: "100%", marginTop: "8px" }} />}
-          renderOption={(props, option) => (
-            <Box component="li" {...props} style={option.customStyle}>
-              {option.label}
-            </Box>
-          )}
-        /> */}
-        <InputLabel sx={{ color: "black", mb: 1 }}>Tags</InputLabel>
-        <TagsMultiSelectDropDown 
-  value={tagsNew}
-  onChange={handleTagChange}
-  placeholder="Tags"
-/>
+          placeholder="Tags"
+        />
+      </div>
 
-      </Box>
-      <Typography variant="h6" gutterBottom sx={{ ml: 1, fontWeight: "bold", mt: 3 }}>
-        Phone Numbers
-      </Typography>
+      <h3 className="ml-1 font-bold mt-6 mb-2 text-base">Phone Numbers</h3>
       {phoneNumbers.map((phone) => (
-        <Box
-          key={phone.id}
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 2,
-            ml: 1,
-            mb: 2,
-          }}
-        >
-        
-                     <PhoneInput
-country={"us"}
-  value={phone.phone}
-  // onChange={(phoneValue) => handlePhoneNumberChange(phone.id, phoneValue)}
-     onChange={(value, country) => handlePhoneNumberChange(value, country, phone.id)}
-  inputStyle={{
-    width: "100%",
-  }}
-  buttonStyle={{
-    borderTopLeftRadius: "8px",
-    borderBottomLeftRadius: "8px",
-  }}
-  containerStyle={{
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
-  }}
-/>
-          <AiOutlineDelete onClick={() => handleDeletePhoneNumber(phone.id)} style={{ cursor: "pointer", color: "red" }} />
-        </Box>
+        <div key={phone.id} className="flex flex-row items-center gap-3 ml-1 mb-3">
+          <PhoneInput
+            country="us"
+            value={phone.phone}
+            onChange={(value, country) => handlePhoneNumberChange(value, country, phone.id)}
+            inputStyle={{ width: "100%" }}
+            buttonStyle={{ borderTopLeftRadius: "8px", borderBottomLeftRadius: "8px" }}
+            containerStyle={{ display: "flex", alignItems: "center", gap: "8px" }}
+          />
+          <AiOutlineDelete onClick={() => handleDeletePhoneNumber(phone.id)} className="cursor-pointer text-red-500 shrink-0" />
+        </div>
       ))}
-      <Box
-        sx={{
-          display: "flex",
-          gap: 2,
-          alignItems: isSmallScreen ? "center" : "flex-start",
-          ml: 1,
-          cursor: "pointer",
-          color: "blue",
-          fontWeight: 600,
-        }}
-        onClick={handleAddPhoneNumber}
-      >
-        <AiOutlinePlusCircle style={{ marginTop: "20px" }} />
-        <p>Add phone number</p>
-      </Box>
-      <Typography variant="h6" gutterBottom sx={{ ml: 1, fontWeight: "bold", mt: 3 }}>
-        Address
-      </Typography>
-      <Box>
-        <InputLabel sx={{ color: "black" }}>Country</InputLabel>
-        <Select
-          size="small"
+      <div className="flex items-center gap-2 ml-1 cursor-pointer text-blue-600 font-semibold mt-1 mb-3"
+        onClick={handleAddPhoneNumber}>
+        <AiOutlinePlusCircle className="mt-1" />
+        <span>Add phone number</span>
+      </div>
+
+      <h3 className="ml-1 font-bold mt-5 mb-2 text-base">Address</h3>
+      <div>
+        <label className={labelCls}>Country</label>
+        <select
           value={selectedCountry.code}
           onChange={handleCountryChange}
-          sx={{
-            width: "100%",
-            marginTop: "8px",
-          }}
+          className={inputCls}
         >
           {countries.map((country) => (
-            <MenuItem key={country.code} value={country.code}>
-              {country.name}
-            </MenuItem>
+            <option key={country.code} value={country.code}>{country.name}</option>
           ))}
-        </Select>
-      </Box>
-      <Box mt={1}>
-        <InputLabel sx={{ color: "black" }}>Street Address</InputLabel>
-        <TextField fullWidth name="streetAddress" value={streetAddress} onChange={(e) => setStreetAddress(e.target.value)} margin="normal" placeholder="Street Address" size="small" />
-      </Box>
-      <Box sx={{mt:1, display: "flex", flexDirection: isSmallScreen ? "column" : "row", gap: isSmallScreen ? 2 : 5, padding: "1px 5px 0 5px" }}>
-        <Box>
-          <InputLabel sx={{ color: "black" }}>City</InputLabel>
-          <TextField fullWidth name="city" value={city} onChange={(e) => setCity(e.target.value)} margin="normal" placeholder="City" size="small" />
-        </Box>
-        <Box>
-          <InputLabel sx={{ color: "black" }}>State</InputLabel>
-          <TextField fullWidth name="state" value={state} onChange={(e) => setState(e.target.value)} margin="normal" placeholder="State" size="small"/>
-        </Box>
-        <Box>
-          <InputLabel sx={{ color: "black" }}>Postal Code</InputLabel>
-          <TextField fullWidth name="postalCode" value={postalCode} onChange={(e) => setPostalCode(e.target.value)} margin="normal" placeholder="Postal Code" size="small" />
-        </Box>
-      </Box>
+        </select>
+      </div>
+      <div className="mt-3">
+        <label className={labelCls}>Street Address</label>
+        <input type="text" name="streetAddress" value={streetAddress} onChange={(e) => setStreetAddress(e.target.value)} placeholder="Street Address" className={inputCls} />
+      </div>
+      <div className={`mt-3 flex ${isSmallScreen ? "flex-col gap-2" : "flex-row gap-5"} px-1`}>
+        <div className="flex-1">
+          <label className={labelCls}>City</label>
+          <input type="text" name="city" value={city} onChange={(e) => setCity(e.target.value)} placeholder="City" className={inputCls} />
+        </div>
+        <div className="flex-1">
+          <label className={labelCls}>State</label>
+          <input type="text" name="state" value={state} onChange={(e) => setState(e.target.value)} placeholder="State" className={inputCls} />
+        </div>
+        <div className="flex-1">
+          <label className={labelCls}>Postal Code</label>
+          <input type="text" name="postalCode" value={postalCode} onChange={(e) => setPostalCode(e.target.value)} placeholder="Postal Code" className={inputCls} />
+        </div>
+      </div>
 
-      <Box p={2}>
-        <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Typography variant="h7" fontWeight="bold">
-            Linked accounts
-          </Typography>
-          <Button
-            startIcon={<AddCircleIcon />}
-            color="primary"
-            onClick={handleDrawerOpen} // Opens the drawer
-          >
-            Link accounts
-          </Button>
-          {/* Drawer Component */}
-          <Drawer anchor="right" open={drawerOpen} onClose={handleDrawerClose}>
-            <Box width={700} p={2}>
-              {/* Drawer Header */}
-              <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Typography variant="h6">Link accounts</Typography>
-                <IconButton onClick={handleDrawerClose}>
-                  <CloseIcon />
-                </IconButton>
-              </Box>
+      <div className="p-4">
+        <div className="flex justify-between items-center">
+          <span className="font-bold text-sm">Linked accounts</span>
+          <button type="button" onClick={handleDrawerOpen}
+            className="flex items-center gap-1 text-sm text-blue-600 hover:underline">
+            <AddCircle size={16} /> Link accounts
+          </button>
+        </div>
 
-              {/* Search Input */}
-              <Box mt={2}>
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  placeholder="Search"
-                  InputProps={{
-                    startAdornment: (
-                      <Button sx={{ padding: 0 }}>
-                        <svg className="icon v2-icon v2-icon-search" />
-                      </Button>
-                    ),
-                  }}
-                />
-              </Box>
-              {/* Accounts List */}
-              <Box mt={2}>
-                <TableContainer>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell padding="checkbox">
-                          <Checkbox />
-                        </TableCell>
-                        <TableCell>ID</TableCell>
-                        <TableCell>Name</TableCell>
-                        {/* <TableCell>Type</TableCell>
-                                                <TableCell>Tags</TableCell> */}
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {accountDataAll.map((account) => (
-                        <TableRow key={account.id}>
-                          <TableCell padding="checkbox">
-                            <Checkbox checked={checkedAccounts.includes(account.id)} onChange={() => handleCheckboxChange(account.id)} />
-                          </TableCell>
-                          <TableCell>{account.id}</TableCell>
-                          <TableCell>{account.Name}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Box>
-              {/* Drawer Footer */}
-              <Box mt={4}>
-                <Button variant="contained" color="primary" onClick={updatecontactidtoAccounts} sx={{
-                        backgroundColor: "var(--color-save-btn)", // Normal background
-
-                        "&:hover": {
-                          backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                        },
-                        borderRadius: "15px",
-                        width: "80px",
-                      }}>
+        {/* Link Accounts Drawer */}
+        {drawerOpen && (
+          <div className="fixed inset-0 z-50 overflow-hidden">
+            <div className="absolute inset-0 bg-black/30" onClick={handleDrawerClose} />
+            <div className="absolute right-0 top-0 h-full w-[700px] bg-white shadow-xl overflow-y-auto p-5">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-base font-semibold">Link accounts</h2>
+                <button type="button" onClick={handleDrawerClose}>
+                  <IoClose className="text-gray-500 text-xl" />
+                </button>
+              </div>
+              <input type="text" placeholder="Search" className={inputCls + " mb-4"} />
+              <div className="overflow-x-auto rounded-lg border border-gray-200">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-3 py-2 w-10"></th>
+                      <th className="text-left px-3 py-2 text-xs font-bold">ID</th>
+                      <th className="text-left px-3 py-2 text-xs font-bold">Name</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {accountDataAll.map((account) => (
+                      <tr key={account.id}>
+                        <td className="px-3 py-2">
+                          <input type="checkbox" checked={checkedAccounts.includes(account.id)}
+                            onChange={() => handleCheckboxChange(account.id)}
+                            className="h-4 w-4" />
+                        </td>
+                        <td className="px-3 py-2 text-xs">{account.id}</td>
+                        <td className="px-3 py-2 text-xs">{account.Name}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div className="flex gap-3 mt-6">
+                <button type="button" onClick={updatecontactidtoAccounts}
+                  className="rounded-full px-5 py-1.5 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] w-20">
                   Save
-                </Button>
-                <Button variant="outlined" onClick={handleDrawerClose}  sx={{
-                        borderColor: "var(--color-border-cancel-btn)", // Normal background
-                        color: "var(--color-save-btn)",
-                        "&:hover": {
-                          backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                          color: "#fff",
-                          border: "none",
-                        },
-                        width: "80px",
-                        borderRadius: "15px",
-                      }}>
+                </button>
+                <button type="button" onClick={handleDrawerClose}
+                  className="rounded-full px-5 py-1.5 text-sm font-medium border border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white w-20">
                   Cancel
-                </Button>
-              </Box>
-            </Box>
-          </Drawer>
-        </Box>
-        <Box mt={3}>
-          <TableContainer component={Paper}>
-            <Table>
-              {/* Table header */}
-              <TableHead>
-                <TableRow>
-                  <TableCell>
-                    <Typography variant="h6" fontWeight="bold">
-                      Name
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="h6" fontWeight="bold">
-                      Description
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              {/* Table body */}
-              <TableBody>
-                {accountdata.map((account) => (
-                  <TableRow key={account._id}>
-                    {/* Account Name */}
-                    <TableCell>
-                      <Button href={`/app/clients/${account._id}`} target="_blank" rel="noopener" color="primary">
-                        {account.accountName}
-                      </Button>
-                    </TableCell>
-                    <TableCell>{account.description}</TableCell>
-                    {/* Close button */}
-                    <TableCell>
-                      <IconButton color="secondary" onClick={() => handleRemoveAccount(account._id)}>
-                        <CloseIcon />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Box>
-      </Box>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
-      <Box sx={{ mt: 2, mb: 2 }}>
-        <Button
-          variant="contained"
-          onClick={handleSave} // Attach the save handler
-          sx={{
-            backgroundColor: "var(--color-save-btn)", // Normal background
+        {/* Linked accounts table */}
+        <div className="mt-4 overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="text-left px-4 py-2 text-xs font-bold">Name</th>
+                <th className="text-left px-4 py-2 text-xs font-bold">Description</th>
+                <th className="px-4 py-2 w-10"></th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {accountdata.map((account) => (
+                <tr key={account._id}>
+                  <td className="px-4 py-2">
+                    <a href={`/app/clients/${account._id}`} target="_blank" rel="noopener"
+                      className="text-blue-600 hover:underline text-sm">
+                      {account.accountName}
+                    </a>
+                  </td>
+                  <td className="px-4 py-2 text-xs text-gray-600">{account.description}</td>
+                  <td className="px-4 py-2">
+                    <button type="button" onClick={() => handleRemoveAccount(account._id)}
+                      className="text-gray-400 hover:text-red-500">
+                      <IoClose size={16} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-            "&:hover": {
-              backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-            },
-            borderRadius: "15px",
-            width: "80px",
-          }}
-        >
+      <div className="flex gap-3 mt-4 mb-4">
+        <button type="button" onClick={handleSave}
+          className="rounded-full px-5 py-1.5 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] w-20">
           Save
-        </Button>
-        <Button variant="outlined" onClick={handleClose} sx={{
-                        borderColor: "var(--color-border-cancel-btn)", // Normal background
-                        color: "var(--color-save-btn)",
-                        "&:hover": {
-                          backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                          color: "#fff",
-                          border: "none",
-                        },
-                        width: "80px",
-                        borderRadius: "15px",ml:2
-                      }}>
+        </button>
+        <button type="button" onClick={handleClose}
+          className="rounded-full px-5 py-1.5 text-sm font-medium border border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white w-20">
           Cancel
-        </Button>
-      </Box>
+        </button>
+      </div>
     </form>
   );
 };

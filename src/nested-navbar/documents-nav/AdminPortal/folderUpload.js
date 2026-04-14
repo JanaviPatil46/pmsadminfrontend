@@ -1,15 +1,6 @@
 
 
 import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Typography,
-  Drawer,
-  IconButton,
-  CircularProgress,
-  TextField,
-  Button,
-} from "@mui/material";
 import { MdClose } from "react-icons/md";
 import axios from "axios";
 import JSZip from "jszip";
@@ -420,55 +411,51 @@ const UploadDocument = ({
     return <div></div>;
   }
 
+  if (!open) return null;
+
   return (
-    <Box>
-      <Drawer anchor="right" open={open} onClose={onClose}>
-        
-        <Box
-          sx={{
-            backgroundColor: "#fff",
-            borderRadius: "8px",
-
-            padding: 2,
-            width: 600,
-            fontFamily:
-              "'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif",
-          }}
+    <>
+      <div
+        className="fixed inset-0 z-40 bg-black/30"
+        onClick={onClose}
+      />
+      <div className="fixed right-0 top-0 h-full z-50 flex">
+        <div
+          className="bg-white rounded-l-xl shadow-xl"
+          style={{ width: 600, fontFamily: "'Segoe UI', Roboto, sans-serif" }}
         >
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Typography variant="h6">upload folder</Typography>
-            <IconButton onClick={onClose}>
-              <MdClose />
-            </IconButton>
-          </Box>
-          
+          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
+            <h2 className="text-base font-semibold text-gray-800">Upload Folder</h2>
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-1 rounded hover:bg-gray-100 text-gray-500"
+            >
+              <MdClose size={20} />
+            </button>
+          </div>
 
-          <Box sx={{ maxHeight: "500px", overflowY: "auto" }}>
+          <div className="px-5 py-3 overflow-y-auto" style={{ maxHeight: 500 }}>
             {renderContents(structFolder.folders, (newFolders) =>
               setStructFolder({ ...structFolder, folders: newFolders })
             )}
-
             {renderPrivateContents(privateStructFolder.folders, (newFolders) =>
-              setPrivateStructFolder({
-                ...privateStructFolder,
-                folders: newFolders,
-              })
+              setPrivateStructFolder({ ...privateStructFolder, folders: newFolders })
             )}
-          </Box>
-          <Box sx={{ marginTop: 2, textAlign: "center" }}>
-            <Button variant="contained" color="primary" onClick={handleSubmitFolder}>
+          </div>
+
+          <div className="px-5 py-4 border-t border-gray-200 text-center">
+            <button
+              type="button"
+              onClick={handleSubmitFolder}
+              className="rounded-full px-6 py-2 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] transition-colors"
+            >
               Upload to Selected Folder
-            </Button>
-          </Box>
-        </Box>
-      </Drawer>
-    </Box>
+            </button>
+          </div>
+        </div>
+      </div>
+    </>
   );
 };
 

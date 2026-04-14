@@ -1,22 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {
-  Box,
-  Typography,
-  IconButton,
-  Menu,
-  MenuItem,
-} from "@mui/material";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import DeleteIcon from "@mui/icons-material/Delete";
-import DriveFileMoveIcon from "@mui/icons-material/DriveFileMove";
-import {
-  Folder as FolderIcon,
-  InsertDriveFile as FileIcon,
-  Lock as LockIcon,
-  LockOpen as LockOpenIcon,
-} from "@mui/icons-material";
-import UploadFileIcon from "@mui/icons-material/UploadFile";
-import DriveFolderUploadIcon from "@mui/icons-material/DriveFolderUpload";
+import { BsThreeDotsVertical, BsTrash, BsArrowsMove, BsFolderPlus, BsUpload, BsFolderSymlink, BsPencil } from "react-icons/bs";
+import { MdLock, MdLockOpen, MdInsertDriveFile, MdFolder, MdFolderOpen, MdUploadFile, MdDriveFolderUpload } from "react-icons/md";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import FileUploadDrawer from "./FileUploadDrawer";
 import FolderUploadDrawer from "./FolderUploadDrawer";
@@ -423,181 +407,107 @@ console.log("hgjhg",templateId)
 
  const renderTree = (items, level = 0, parentPath = "") => {
     return (
-      <Box component="ul" sx={{ listStyle: "none", pl: level * 2, mb: 1 }}>
+      <ul className="list-none mb-1" style={{ paddingLeft: level * 8 }}>
         {items.map((item) => {
-          const fullPath = parentPath
-            ? `${parentPath}/${item.name}`
-            : item.name;
+          const fullPath = parentPath ? `${parentPath}/${item.name}` : item.name;
           const meta = item.meta || {};
-
-          // 🎯 Define colors for statuses
           const getColor = (status) => (status ? "#1976d2" : "#9e9e9e");
 
           const StatusIcons = () => (
-            <Box sx={{ display: "flex", gap: 1, alignItems: "center", ml: 1 }}>
+            <div className="flex gap-1 items-center ml-1">
               <Eye size={16} color={getColor(meta.readStatus)} />
               <PenTool size={16} color={getColor(meta.signStatus)} />
               <Stamp size={16} color={getColor(meta.authStatus)} />
               <Lock size={16} color={meta.readOnly ? "#e53935" : "#9e9e9e"} />
-            </Box>
+            </div>
           );
-          
 
           return (
-            <li key={fullPath} style={{ marginBottom: 8 }}>
+            <li key={fullPath} className="mb-2">
               {item.type === "folder" ? (
-                // 📁 Folder with open/close icon
-                <Box
-                  sx={{
-                    p: 1,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    borderRadius: 2,
-                    cursor: "pointer",
-                    backgroundColor: "#fff",
-                    "&:hover": { backgroundColor: "#f5f5f5" },
-                    transition: "background-color 0.2s ease-in-out",
-                  }}
+                <div
+                  className="p-1 flex items-center justify-between rounded cursor-pointer bg-white hover:bg-gray-50 transition-colors"
                   onClick={() => toggleFolder(fullPath, meta.readOnly)}
                 >
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    sx={{ flexGrow: 1, gap: 1 }}
-                  >
+                  <div className="flex items-center gap-1 flex-1">
                     {expandedFolders[fullPath] ? (
-                      <FolderOpenIcon color="#1976d2" size={18} />
+                      <MdFolderOpen size={18} color="#1976d2" />
                     ) : (
-                      <FolderClosedIcon color="#757575" size={18} />
+                      <MdFolder size={18} color="#757575" />
                     )}
-                    <Typography
-                      variant="body1"
-                      fontWeight="medium"
-                      sx={{ wordBreak: "break-word" }}
-                    >
-                      {item.name}
-                    </Typography>
+                    <span className="text-sm font-medium break-words">{item.name}</span>
                     <StatusIcons />
-                  </Box>
-
-                  {/* Optional: Folder menu */}
-                  <IconButton
-                    size="small"
-                    onClick={(e) => handleMenuOpen(e, { ...item, fullPath })}
-                  >
-                    <MoreVertIcon size={16} />
-                  </IconButton>
-                </Box>
+                  </div>
+                  <button type="button" className="p-1 text-gray-500 hover:text-gray-700"
+                    onClick={(e) => { e.stopPropagation(); handleMenuOpen(e, { ...item, fullPath }); }}>
+                    <BsThreeDotsVertical size={14} />
+                  </button>
+                </div>
               ) : (
-                // 📄 File with single dot icon
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    pl: 4,
-                    mb: 1,
-                    borderRadius: 2,
-                    "&:hover .file-menu-icon": { opacity: 1 },
-                  }}
-                >
-                  <FileIcon
-                    size={16}
-                    color="#757575"
-                    style={{ marginRight: 6 }}
-                  />
-                  <Typography
-                    variant="body2"
-                    sx={{ flex: 1, wordBreak: "break-word" }}
-                  >
-                    {item.name}
-                  </Typography>
+                <div className="flex items-center pl-8 mb-1 rounded group">
+                  <MdInsertDriveFile size={16} color="#757575" style={{ marginRight: 6 }} />
+                  <span className="text-xs flex-1 break-words">{item.name}</span>
                   <StatusIcons />
-
-                  {/* 🔵 Single blue dot icon for file menu */}
-                  <Box
-                    className="file-menu-icon"
-                    sx={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: "50%",
-                      backgroundColor: "#1976d2",
-                      opacity: 0,
-                      transition: "opacity 0.2s",
-                      cursor: "pointer",
-                      mr: 1,
-                      ml: 1,
-                    }}
-                    onClick={(e) => handleMenuOpen(e, { ...item, fullPath })}
-                  />
-                </Box>
+                  <button type="button"
+                    className="w-2 h-2 rounded-full bg-blue-600 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer mx-1"
+                    onClick={(e) => handleMenuOpen(e, { ...item, fullPath })} />
+                </div>
               )}
-
-              {/* Recursive children */}
-              {expandedFolders[fullPath] &&
-                item.children &&
-                item.children.length > 0 && (
-                  <Box
-                    sx={{
-                      ml: 2,
-                      mt: 1,
-                      borderLeft: "2px dashed #ccc",
-                      pl: 2,
-                    }}
-                  >
-                    {renderTree(item.children, level + 1, fullPath)}
-                  </Box>
-                )}
+              {expandedFolders[fullPath] && item.children && item.children.length > 0 && (
+                <div className="ml-4 mt-1 border-l-2 border-dashed border-gray-300 pl-2">
+                  {renderTree(item.children, level + 1, fullPath)}
+                </div>
+              )}
             </li>
           );
         })}
-      </Box>
+      </ul>
     );
   };
   return (
-    <div className="mx-auto p-4 md:p-6 space-y-6">
+    <div className="mx-auto p-4 md:p-8 space-y-6 max-w-5xl">
       {/* Header */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         <button
-          className="rounded-lg p-2 hover:bg-accent transition-colors"
+          type="button"
+          className="h-9 w-9 flex items-center justify-center rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-500 hover:text-gray-700 transition-colors shadow-sm"
           onClick={() => navigate("/firmtemp/templates/folders")}
         >
-          <ArrowLeft className="h-5 w-5" />
+          <ArrowLeft className="h-4 w-4" />
         </button>
-        <h1 className="text-xl font-semibold text-foreground">
-          Template: {templateName}
-        </h1>
+        <div>
+          <h1 className="text-lg font-semibold text-gray-900 tracking-tight">Template: {templateName}</h1>
+          <p className="text-xs text-gray-400 mt-0.5">Manage folders and files for this template</p>
+        </div>
       </div>
 
       {/* Action Buttons */}
-      <div className="max-w-[1000px] mx-auto">
-        <div className="flex flex-col sm:flex-row gap-2 max-w-[600px] mx-auto">
+      <div className="max-w-5xl mx-auto">
+        <div className="flex flex-col sm:flex-row gap-2">
           <Button
-            className="flex-1"
-            onClick={() => {
-              setNewFolderDrawerOpen(true);
-              handleMenuClose();
-            }}
+            size="sm"
+            className="flex-1 gap-2"
+            onClick={() => { setNewFolderDrawerOpen(true); handleMenuClose(); }}
           >
-            <FolderPlus className="h-4 w-4 mr-2" />
+            <FolderPlus className="h-4 w-4" />
             Create Folder
           </Button>
-
           <Button
-            className="flex-1"
+            size="sm"
             variant="outline"
+            className="flex-1 gap-2"
             onClick={() => setFileUploadDrawerOpen(true)}
           >
-            <Upload className="h-4 w-4 mr-2" />
+            <Upload className="h-4 w-4" />
             Upload File
           </Button>
-
           <Button
-            className="flex-1"
+            size="sm"
             variant="outline"
+            className="flex-1 gap-2"
             onClick={() => setFolderUploaDrawerOpen(true)}
           >
-            <FolderUp className="h-4 w-4 mr-2" />
+            <FolderUp className="h-4 w-4" />
             Upload Folder
           </Button>
         </div>
@@ -654,195 +564,76 @@ console.log("hgjhg",templateId)
       </div>
 
       {/* Folder Explorer */}
-      <div className="rounded-xl border border-border bg-white shadow-sm p-4">
-        <h2 className="text-base font-semibold text-foreground mb-3">Folder Explorer</h2>
-        {folderTree ? (
-          renderTree(folderTree)
-        ) : (
-          <p className="text-sm text-muted-foreground">Loading folder data...</p>
-        )}
+      <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
+        <div className="px-5 py-3.5 border-b border-gray-100 flex items-center gap-2">
+          <FolderClosedIcon size={15} className="text-gray-400" />
+          <h2 className="text-sm font-semibold text-gray-800">Folder Explorer</h2>
+        </div>
+        <div className="p-4">
+          {folderTree && folderTree.length > 0 ? (
+            renderTree(folderTree)
+          ) : (
+            <p className="text-sm text-gray-400 py-6 text-center">No folders yet. Create one to get started.</p>
+          )}
+        </div>
       </div>
 
       {/* Context Menu */}
-      <Menu
-        anchorEl={menuAnchorEl}
-        open={Boolean(menuAnchorEl)}
-        onClose={handleMenuClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-        transformOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        {(() => {
-          const isLocked = selectedFolderForMenu?.meta?.readOnly === true;
-          const isRead = selectedFolderForMenu?.meta?.readStatus === true;
-          const currentStatus =
-            selectedFolderForMenu?.meta?.signStatus || "sendForSignature";
-          const isApproved = selectedFolderForMenu?.meta?.authStatus === true;
-const restrictedNames = [
-  "Client Uploaded Documents",
-  "Firm Documents Shared with Client",
-  "Private",
-];
-
-const isRestricted =
-  restrictedNames.includes(selectedFolderForMenu?.name);
-
-          return (
-            <>
-              <MenuItem
-               disabled={isLocked || isRestricted}
-                onClick={() => {
-                  setMoveDrawerOpen(true);
-                  handleMenuClose();
-                }}
-                sx={{ fontSize: "0.8rem", py: 0.5 }}
-              >
-                <DriveFileMoveIcon sx={{ mr: 0.5, fontSize: 16 }} />
-                Move
-              </MenuItem>
-
-              <MenuItem
-                disabled={isLocked || isRestricted}
-                onClick={() => {
-                  deleteItem(selectedFolderForMenu);
-                  handleMenuClose();
-                }}
-                sx={{ fontSize: "0.8rem", py: 0.5 }}
-              >
-                <DeleteIcon sx={{ mr: 0.5, fontSize: 16 }} />
-                Delete
-              </MenuItem>
-
-              <MenuItem
-                disabled={isLocked}
-                onClick={() => {
-                  setNewFolderDrawerOpen(true);
-                  handleMenuClose();
-                }}
-                sx={{ fontSize: "0.8rem", py: 0.5 }}
-              >
-                <FolderIcon sx={{ mr: 0.5, fontSize: 16 }} />
-                New Folder
-              </MenuItem>
-
-              <MenuItem
-                disabled={isLocked}
-                onClick={() => {
-                  setFileUploadDrawerOpen(true);
-                  handleMenuClose();
-                }}
-                sx={{ fontSize: "0.8rem", py: 0.5 }}
-              >
-                <UploadFileIcon sx={{ mr: 0.5, fontSize: 16 }} />
-                New File
-              </MenuItem>
-
-              <MenuItem
-                disabled={isLocked}
-                onClick={() => {
-                  setFolderUploaDrawerOpen(true);
-                  handleMenuClose();
-                }}
-                sx={{ fontSize: "0.8rem", py: 0.5 }}
-              >
-                <DriveFolderUploadIcon sx={{ mr: 0.5, fontSize: 16 }} />
-                Upload Folder
-              </MenuItem>
-
-              <MenuItem
-                disabled={isLocked}
-                onClick={() => {
-                  SetRenameDrawer(true);
-                  handleMenuClose();
-                }}
-                sx={{ fontSize: "0.8rem", py: 0.5 }}
-              >
-                <DriveFileMoveIcon sx={{ mr: 0.5, fontSize: 16 }} />
-                Edit
-              </MenuItem>
-
-              {/* <MenuItem
-                disabled={isLocked}
-                onClick={() => {
-                  toggleSignStatus(selectedFolderForMenu);
-                  handleMenuClose();
-                }}
-                sx={{ fontSize: "0.8rem", py: 0.5 }}
-              >
-                <PenTool
-                  size={16}
-                  color={
-                    currentStatus === "signatureCompleted"
-                      ? "#1976d2"
-                      : "#807878ff"
-                  }
-                  style={{ marginRight: 6 }}
-                />
-                {statusTextMap[currentStatus]}
-              </MenuItem> */}
-
-              {/* <MenuItem
-                disabled={isLocked}
-                onClick={() => {
-                  toggleReadStatus(selectedFolderForMenu);
-                  handleMenuClose();
-                }}
-                sx={{ fontSize: "0.8rem", py: 0.5 }}
-              >
-                <Eye
-                  size={16}
-                  color={
-                    isLocked
-                      ? "#f5ecec"
-                      : isRead
-                      ? "#1976d2"
-                      : "#807878ff"
-                  }
-                  style={{ marginRight: 6 }}
-                />
-                {isRead ? "Mark Unread" : "Mark Read"}
-              </MenuItem> */}
-
-              {/* <MenuItem
-                disabled={isLocked}
-                onClick={() => {
-                  toggleApprovalStatus(selectedFolderForMenu);
-                  handleMenuClose();
-                }}
-                sx={{ fontSize: "0.8rem", py: 0.5 }}
-              >
-                <Stamp
-                  size={16}
-                  color={
-                    isApproved ? "#1976d2" : "#807878ff"
-                  }
-                  style={{ marginRight: 6 }}
-                />
-                {
-                  approvalStatusTextMap[
-                    selectedFolderForMenu?.meta?.authStatus ||
-                      "sendForApproval"
-                  ]
-                }
-              </MenuItem> */}
-
-              <MenuItem
-                onClick={() => {
-                  toggleReadOnly(selectedFolderForMenu);
-                  handleMenuClose();
-                }}
-                sx={{ fontSize: "0.8rem", py: 0.5 }}
-              >
-                {isLocked ? (
-                  <LockOpenIcon sx={{ mr: 0.5, fontSize: 16 }} />
-                ) : (
-                  <LockIcon sx={{ mr: 0.5, fontSize: 16 }} />
-                )}
+      {Boolean(menuAnchorEl) && (() => {
+        const isLocked = selectedFolderForMenu?.meta?.readOnly === true;
+        const restrictedNames = ["Client Uploaded Documents", "Firm Documents Shared with Client", "Private"];
+        const isRestricted = restrictedNames.includes(selectedFolderForMenu?.name);
+        return (
+          <>
+            <div className="fixed inset-0 z-30" onClick={handleMenuClose} />
+            <div
+              className="fixed z-40 bg-white border border-gray-100 rounded-xl shadow-xl w-48 py-1.5 overflow-hidden"
+              style={{
+                top: menuAnchorEl?.getBoundingClientRect().bottom + window.scrollY + 4,
+                left: menuAnchorEl?.getBoundingClientRect().right - 192 + window.scrollX
+              }}
+            >
+              <button type="button" disabled={isLocked || isRestricted}
+                onClick={() => { setMoveDrawerOpen(true); handleMenuClose(); }}
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-40 transition-colors">
+                <BsArrowsMove size={13} /> Move
+              </button>
+              <button type="button" disabled={isLocked}
+                onClick={() => { setNewFolderDrawerOpen(true); handleMenuClose(); }}
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-40 transition-colors">
+                <MdFolder size={13} /> New Folder
+              </button>
+              <button type="button" disabled={isLocked}
+                onClick={() => { setFileUploadDrawerOpen(true); handleMenuClose(); }}
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-40 transition-colors">
+                <MdUploadFile size={13} /> New File
+              </button>
+              <button type="button" disabled={isLocked}
+                onClick={() => { setFolderUploaDrawerOpen(true); handleMenuClose(); }}
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-40 transition-colors">
+                <MdDriveFolderUpload size={13} /> Upload Folder
+              </button>
+              <button type="button" disabled={isLocked}
+                onClick={() => { SetRenameDrawer(true); handleMenuClose(); }}
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-40 transition-colors">
+                <BsPencil size={13} /> Rename
+              </button>
+              <div className="my-1 h-px bg-gray-100 mx-2" />
+              <button type="button"
+                onClick={() => { toggleReadOnly(selectedFolderForMenu); handleMenuClose(); }}
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                {isLocked ? <MdLockOpen size={13} /> : <MdLock size={13} />}
                 {isLocked ? "Unlock" : "Lock"}
-              </MenuItem>
-            </>
-          );
-        })()}
-      </Menu>
+              </button>
+              <button type="button" disabled={isLocked || isRestricted}
+                onClick={() => { deleteItem(selectedFolderForMenu); handleMenuClose(); }}
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 disabled:opacity-40 transition-colors">
+                <BsTrash size={13} /> Delete
+              </button>
+            </div>
+          </>
+        );
+      })()}
     </div>
   );
 };

@@ -1,469 +1,4 @@
-// import React, { useEffect, useState } from "react";
-// import {
-//   Box,
-//   Button,
-//   Typography,
-//   IconButton,
-//   Drawer,
-//   List,
-//   ListItemButton,
-//   TextField,
-// } from "@mui/material";
-// import CloseIcon from "@mui/icons-material/Close";
-// import axios from "axios";
-// import { useParams } from "react-router-dom";
-// import { useNavigate } from "react-router-dom";
-// import ComposeEmailDrawer from "./ComposeDrawer";
 
-// const EmailViewer = ({ type }) => {
-//   const { data } = useParams();
-// const navigate = useNavigate();
-
-
-//   const [threads, setThreads] = useState([]);
-//   const [selectedThreadId, setSelectedThreadId] = useState(null);
-//   const [replyText, setReplyText] = useState("");
-//   const [previewFile, setPreviewFile] = useState(null);
-//   const [openDrawer, setOpenDrawer] = useState(false);
-
-//   useEffect(() => {
-//     fetchEmailSyncedContactsAndEmails();
-//   }, [type]);
-//   const SUPPORT_EMAIL = "support@snptaxandfinancials.com";
-//   const [contactMap, setContactMap] = useState({});
-
-//   // 🔹 Fetch Emails
-//   const fetchEmailSyncedContactsAndEmails = async () => {
-//     try {
-//       const contactsRes = await axios.get(
-//         `https://www.snptaxes.com/api/accounts/${data}/contacts`,
-//       );
-// console.log("contactsRes", contactsRes.data.data);
-//       const syncedEmails = (contactsRes.data.data || [])
-//         .filter((item) => item.canEmailSync && item.contact?.email)
-//         .map((item) => item.contact.email);
-//       console.log("syncedEmails", syncedEmails);
-//       const contactMap = {};
-//       (contactsRes.data.data || []).forEach((item) => {
-//         if (item.canEmailSync && item.contact?.email) {
-//           contactMap[item.contact.email.toLowerCase()] =
-//             item.contact.contactName || item.contact.email;
-//         }
-//       });
-//       setContactMap(contactMap);
-
-//       if (!syncedEmails.length) return;
-
-//       //   const emailsRes = await axios.post(
-//       //     "http://127.0.0.1:8015/emailsync/messagesList/messages",
-//       //     { emails: syncedEmails, folder: type }
-//       //   );
-
-//       //   setThreads(emailsRes.data.threads || []);
-//       const emailsRes = await axios.post(
-//         "http://127.0.0.1:8015/emailsync/messagesList/messages",
-//         { emails: syncedEmails, folder: type },
-//       );
-
-//       const filteredThreads = (emailsRes.data.threads || []).filter(
-//         (thread) => {
-//           return thread.messages.some((msg) => {
-//             const from = msg.from?.toLowerCase() || "";
-//             const to = msg.to?.toLowerCase() || "";
-
-//             const isFromContact = syncedEmails.some((e) => from.includes(e));
-//             const isToContact = syncedEmails.some((e) => to.includes(e));
-
-//             const isFromSupport = from.includes(SUPPORT_EMAIL);
-//             const isToSupport = to.includes(SUPPORT_EMAIL);
-
-//             // 📥 INBOX: Contact → Support
-//             if (type === "inbox") {
-//               return isFromContact && isToSupport;
-//             }
-
-//             // 📤 SENT: Support → Contact
-//             if (type === "sent") {
-//               return isFromSupport && isToContact;
-//             }
-
-//             return false;
-//           });
-//         },
-//       );
-
-//       setThreads(filteredThreads);
-
-//       //   console.log("email thredas",emailsRes.data.threads || []);
-//       console.log("Filtered inbox:", filteredThreads);
-//     } catch (error) {
-//       console.error("Error fetching emails", error);
-//     }
-//   };
-// const unreadCount = threads.filter(t => !t.latest?.read).length;
-// useEffect(() => {
-//   navigate(".", { state: { unreadCount } });
-// }, [unreadCount]);
-//   // 🔹 Extract name
-//   const getName = (from) => from?.replace(/<.*?>/g, "").trim();
-
-//   // 🔹 Thread title
-//   //   const formatThreadTitle = (thread) => {
-//   //     const names = new Set();
-
-//   //     thread.messages.forEach((msg) => {
-//   //       const name = getName(msg.from);
-
-//   //       if (name?.toLowerCase().includes("support@snptaxandfinancials.com")) {
-//   //         names.add("me");
-//   //       } else {
-//   //         names.add(name?.split(" ")[0].toLowerCase());
-//   //       }
-//   //     });
-
-//   //     const count = thread.messages.length;
-
-//   //     return count > 1
-//   //       ? `${[...names].join(", ")} ${count}`
-//   //       : `${[...names].join(", ")}`;
-//   //   };
-
-//   const formatThreadTitle = (thread) => {
-//     let contactEmail = "";
-//     let contactName = "Unknown";
-
-//     thread.messages.forEach((msg) => {
-//       const from = msg.from?.toLowerCase() || "";
-//       const to = msg.to?.toLowerCase() || "";
-
-//       if (from.includes(SUPPORT_EMAIL)) {
-//         contactEmail = to;
-//       } else {
-//         contactEmail = from;
-//       }
-//     });
-
-//     const email = Object.keys(contactMap).find((e) => contactEmail.includes(e));
-
-//     if (email) {
-//       contactName = contactMap[email];
-//     } else {
-//       contactName = getName(contactEmail);
-//     }
-
-//     const count = thread.messages.length;
-
-//     if (type === "sent") {
-//       return `me → ${contactName} (${count})`;
-//     }
-
-//     return `${contactName} → me (${count})`;
-//   };
-
-//   // 🔹 Preview text
-//   const getPreview = (html, length = 80) => {
-//     const text = html.replace(/<[^>]*>?/gm, "");
-//     return text.length > length ? text.slice(0, length) + "..." : text;
-//   };
-
-//   // 🔹 Attachment preview
-//   const openAttachment = (attachment) => {
-//     const byteCharacters = atob(attachment.data);
-//     const byteNumbers = new Array(byteCharacters.length);
-
-//     for (let i = 0; i < byteCharacters.length; i++) {
-//       byteNumbers[i] = byteCharacters.charCodeAt(i);
-//     }
-
-//     const blob = new Blob([new Uint8Array(byteNumbers)], {
-//       type: attachment.mimeType,
-//     });
-
-//     setPreviewFile({
-//       ...attachment,
-//       url: URL.createObjectURL(blob),
-//     });
-//   };
-
-//   // 🔹 Send Reply
-//   const sendReply = async () => {
-//     const thread = threads.find((t) => t._id === selectedThreadId);
-//     if (!thread) return;
-
-//     const lastEmail = thread.messages[thread.messages.length - 1];
-
-//     await axios.post("http://127.0.0.1:8015/emailsync/user/reply", {
-//       to: lastEmail.from,
-//       subject: lastEmail.subject || "No Subject",
-//       message: replyText,
-//     });
-
-//     setReplyText("");
-//     alert("Reply sent!");
-//   };
-
-//   // 🔹 Mark Read
-//   const markThreadAsRead = async (threadId) => {
-//     try {
-//       await axios.patch(
-//         "http://127.0.0.1:8015/emailsync/messagesList/threads/mark-read",
-//         { threadId },
-//       );
-
-//       fetchEmailSyncedContactsAndEmails();
-//     } catch (err) {
-//       console.error("Mark read failed", err);
-//     }
-//   };
-
-//   const selectedThread = threads.find((t) => t._id === selectedThreadId);
-
-//   return (
-//     <>
-//       {/* Top Bar */}
-//       <Box
-//         sx={{
-//           height: "60px",
-//           border: "1px solid #ddd",
-//           borderRadius: 2,
-//           mb: 3,
-//           display: "flex",
-//           alignItems: "center",
-//           justifyContent: "flex-end",
-//           px: 2,
-//         }}
-//       >
-//         <Button variant="contained" onClick={() => setOpenDrawer(true)}>
-//           New Email
-//         </Button>
-//       </Box>
-
-//       {/* Main Layout */}
-//       <Box
-//         sx={{
-//           display: "flex",
-//           height: "90vh",
-//           bgcolor: "#fff",
-//           border: "1px solid #ddd",
-//           borderRadius: 2,
-//         }}
-//       >
-//         {/* LEFT: Inbox / Sent */}
-//         <Box
-//           sx={{
-//             width: "35%",
-//             borderRight: "1px solid #ddd",
-//             overflowY: "auto",
-//           }}
-//         >
-//           <List>
-//             {threads.map((thread) => {
-//               const latest = thread.latest;
-
-//               return (
-//                 <ListItemButton
-//                   key={thread._id}
-//                   onClick={() => {
-//                     setSelectedThreadId(thread._id);
-//                     markThreadAsRead(thread._id);
-//                   }}
-//                   sx={{
-//                     borderBottom: "1px solid #eee",
-//                     "&:hover": { bgcolor: "#f5f5f5" },
-//                     bgcolor:
-//                       selectedThreadId === thread._id
-//                         ? "#f0f4ff"
-//                         : "transparent",
-//                   }}
-//                 >
-//                   <Box>
-//                     <Typography
-//                       fontWeight={latest.read ? 400 : 700}
-//                       color={"red"}
-//                     >
-//                       {formatThreadTitle(thread)}
-//                     </Typography>
-
-//                     <Typography fontWeight={latest.read ? 400 : 600}>
-//                       {latest.subject || "(No Subject)"}
-//                     </Typography>
-
-//                     <Typography variant="caption" color="text.secondary">
-//                       {getPreview(latest.body)}
-//                     </Typography>
-//                   </Box>
-//                 </ListItemButton>
-//               );
-//             })}
-//           </List>
-//         </Box>
-
-//         {/* RIGHT: Email Viewer */}
-//         <Box sx={{ width: "65%", p: 2, overflowY: "auto" }}>
-//           {selectedThread ? (
-//             <>
-//               <Box
-//                 sx={{
-//                   display: "flex",
-//                   justifyContent: "space-between",
-//                   alignItems: "center",
-//                   mb: 2,
-//                   borderBottom: "1px solid #ddd",
-//                   pb: 1,
-//                 }}
-//               >
-//                 <Typography variant="h6">
-//                   {selectedThread.latest.subject}
-//                 </Typography>
-
-//                 <CloseIcon
-//                   sx={{ cursor: "pointer", color: "#555" }}
-//                   onClick={() => setSelectedThreadId(null)}
-//                 />
-//               </Box>
-
-//               {selectedThread.messages.map((email) => (
-//                 <Box
-//                   key={email.messageId}
-//                   sx={{ borderBottom: "1px solid #ddd", mb: 2, pb: 2 }}
-//                 >
-//                   <Typography fontWeight="bold">
-//                     {getName(email.from)}
-//                   </Typography>
-
-//                   <Typography variant="caption" color="text.secondary">
-//                     {new Date(email.createdAt).toLocaleString()}
-//                   </Typography>
-
-//                   <Box
-//                     sx={{ mt: 1 }}
-//                     dangerouslySetInnerHTML={{ __html: email.body }}
-//                   />
-
-//                   {email.attachments?.length > 0 && (
-//                     <Box sx={{ mt: 2 }}>
-//                       <Typography fontWeight="bold">Attachments</Typography>
-
-//                       <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
-//                         {email.attachments.map((att, i) => (
-//                           <Box
-//                             key={i}
-//                             onClick={() => openAttachment(att)}
-//                             sx={{
-//                               border: "1px solid #ddd",
-//                               borderRadius: 2,
-//                               p: 1,
-//                               cursor: "pointer",
-//                               bgcolor: "#fff",
-//                               "&:hover": { bgcolor: "#f0f0f0" },
-//                             }}
-//                           >
-//                             <Typography fontSize={13}>
-//                               {att.filename}
-//                             </Typography>
-//                           </Box>
-//                         ))}
-//                       </Box>
-//                     </Box>
-//                   )}
-//                 </Box>
-//               ))}
-
-//               {/* 🔹 Reply Box */}
-//               {type === "inbox" && (
-//                 <Box sx={{ mt: 3, borderTop: "1px solid #ddd", pt: 2 }}>
-//                   <Typography fontWeight="bold" mb={1}>
-//                     Reply
-//                   </Typography>
-
-//                   <TextField
-//                     fullWidth
-//                     multiline
-//                     rows={5}
-//                     placeholder="Write your reply..."
-//                     value={replyText}
-//                     onChange={(e) => setReplyText(e.target.value)}
-//                   />
-
-//                   <Box
-//                     sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}
-//                   >
-//                     <Button variant="contained" onClick={sendReply}>
-//                       Send
-//                     </Button>
-//                   </Box>
-//                 </Box>
-//               )}
-//             </>
-//           ) : (
-//             <Typography color="text.secondary">
-//               Select an email to read
-//             </Typography>
-//           )}
-//         </Box>
-//       </Box>
-
-//       {/* Attachment Preview */}
-//       {previewFile && (
-//         <Box
-//           onClick={() => setPreviewFile(null)}
-//           sx={{
-//             position: "fixed",
-//             top: 0,
-//             left: 0,
-//             width: "100vw",
-//             height: "100vh",
-//             bgcolor: "rgba(0,0,0,0.7)",
-//             display: "flex",
-//             alignItems: "center",
-//             justifyContent: "center",
-//             zIndex: 9999,
-//           }}
-//         >
-//           <Box
-//             onClick={(e) => e.stopPropagation()}
-//             sx={{
-//               width: "85%",
-//               height: "90%",
-//               bgcolor: "#fff",
-//               borderRadius: 2,
-//               overflow: "hidden",
-//             }}
-//           >
-//             <Box
-//               sx={{
-//                 p: 1,
-//                 borderBottom: "1px solid #ddd",
-//                 display: "flex",
-//                 justifyContent: "space-between",
-//               }}
-//             >
-//               <Typography fontWeight="bold">{previewFile.filename}</Typography>
-//               <Button onClick={() => setPreviewFile(null)}>Close</Button>
-//             </Box>
-
-//             <Box sx={{ height: "100%" }}>
-//               <iframe
-//                 src={previewFile.url}
-//                 style={{ width: "100%", height: "100%", border: "none" }}
-//                 title="Preview"
-//               />
-//             </Box>
-//           </Box>
-//         </Box>
-//       )}
-
-//       {/* Compose Drawer */}
-//       <ComposeEmailDrawer
-//   open={openDrawer}
-//   onClose={() => setOpenDrawer(false)}
-// />
-
-//     </>
-//   );
-// };
-
-// export default EmailViewer;
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
@@ -745,24 +280,23 @@ const formatThreadTitle = (thread) => {
 
   return (
     <>
-      <div style={{ display: "flex", height: "100%", overflow: "hidden", backgroundColor: "#fff" }}>
+      <div className="flex h-full overflow-hidden bg-white">
 
         {/* ── LEFT: Thread list panel ── */}
-        <div style={{ width: 340, minWidth: 340, display: "flex", flexDirection: "column", borderRight: "1px solid #f0f0f0", height: "100%", overflow: "hidden" }}>
+        <div className="w-[320px] shrink-0 flex flex-col border-r border-gray-100 h-full overflow-hidden">
 
           {/* Search + Compose header */}
-          <div style={{ padding: "12px 12px 10px", borderBottom: "1px solid #f0f0f0", flexShrink: 0 }}>
-            <div style={{ position: "relative", marginBottom: 8 }}>
-              <Search size={13} style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "#bbb", pointerEvents: "none" }} />
+          <div className="px-3 pt-3 pb-2.5 border-b border-gray-100 shrink-0 space-y-2">
+            <div className="relative">
+              <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none" />
               <Input
                 placeholder="Search"
-                style={{ paddingLeft: 30, height: 32, fontSize: 12, borderRadius: 8, border: "1px solid #eee", backgroundColor: "#fafafa" }}
+                className="pl-8 h-8 text-xs rounded-lg border-gray-200 bg-gray-50"
               />
             </div>
             <ShadButton
               size="sm"
-              className="w-full h-8 text-xs rounded-lg gap-1.5"
-              style={{ backgroundColor: "#00ACC1", color: "#fff" }}
+              className="w-full h-8 text-xs rounded-lg gap-1.5 bg-cyan-500 hover:bg-cyan-600 text-white"
               onClick={() => setOpenDrawer(true)}
             >
               <Pencil size={11} />
@@ -771,10 +305,11 @@ const formatThreadTitle = (thread) => {
           </div>
 
           {/* Thread list */}
-          <div style={{ flex: 1, overflowY: "auto" }}>
+          <div className="flex-1 overflow-y-auto">
             {threads.length === 0 ? (
-              <div style={{ padding: 32, textAlign: "center", color: "#bbb", fontSize: 13 }}>
-                No emails found
+              <div className="flex flex-col items-center justify-center py-12 gap-2">
+                <span className="text-3xl opacity-20">✉</span>
+                <p className="text-xs text-gray-400">No emails found</p>
               </div>
             ) : (
               threads.map((thread) => {
@@ -791,48 +326,44 @@ const formatThreadTitle = (thread) => {
                   <div
                     key={thread._id}
                     onClick={() => { setSelectedThreadId(thread._id); markThreadAsRead(thread._id); }}
-                    style={{
-                      display: "flex",
-                      alignItems: "flex-start",
-                      gap: 10,
-                      padding: "11px 14px",
-                      cursor: "pointer",
-                      borderBottom: "1px solid #f8f8f8",
-                      borderLeft: isSelected ? "3px solid #00ACC1" : "3px solid transparent",
-                      backgroundColor: isSelected ? "rgba(0,172,193,0.05)" : "transparent",
-                      transition: "background 0.15s ease",
-                    }}
-                    onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.backgroundColor = "#fafafa"; }}
-                    onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.backgroundColor = "transparent"; }}
+                    className={`flex items-start gap-2.5 px-3.5 py-3 cursor-pointer border-b border-gray-50 transition-colors ${
+                      isSelected
+                        ? "border-l-2 border-l-cyan-500 bg-cyan-50/60"
+                        : "border-l-2 border-l-transparent hover:bg-gray-50"
+                    }`}
                   >
-                    {/* Colored initials avatar */}
-                    <ShadAvatar className="h-9 w-9 shrink-0 mt-0.5">
-                      <AvatarFallback style={{ backgroundColor: avatarBg, color: "#fff", fontSize: "0.65rem", fontWeight: 700 }}>
+                    {/* Avatar */}
+                    <ShadAvatar className="h-8 w-8 shrink-0 mt-0.5">
+                      <AvatarFallback style={{ backgroundColor: avatarBg }} className="text-white text-[10px] font-bold">
                         {initials}
                       </AvatarFallback>
                     </ShadAvatar>
 
                     {/* Content */}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
-                        <span style={{ fontSize: 12.5, fontWeight: isUnread ? 700 : 500, color: "#1a1a1a", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 168 }}>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-0.5">
+                        <span className={`text-[12px] truncate max-w-[140px] ${
+                          isUnread ? "font-bold text-gray-900" : "font-medium text-gray-700"
+                        }`}>
                           {formatThreadTitle(thread)}
                         </span>
-                        <span style={{ fontSize: 10.5, color: "#bbb", flexShrink: 0, marginLeft: 4 }}>
+                        <span className="text-[10px] text-gray-300 shrink-0 ml-1">
                           {getRelativeTime(latest?.createdAt || latest?.date)}
                         </span>
                       </div>
-                      <div style={{ fontSize: 12, fontWeight: isUnread ? 600 : 400, color: "#333", marginBottom: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      <div className={`text-[11.5px] truncate mb-0.5 ${
+                        isUnread ? "font-semibold text-gray-800" : "text-gray-500"
+                      }`}>
                         {latest?.subject || "(No Subject)"}
                       </div>
-                      <div style={{ fontSize: 11, color: "#aaa", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                        {getPreview(latest?.body || "", 60)}
+                      <div className="text-[11px] text-gray-400 truncate">
+                        {getPreview(latest?.body || "", 55)}
                       </div>
                     </div>
 
-                    {/* Unread indicator */}
+                    {/* Unread dot */}
                     {isUnread && (
-                      <div style={{ width: 7, height: 7, borderRadius: "50%", backgroundColor: "#00ACC1", flexShrink: 0, marginTop: 5 }} />
+                      <div className="w-2 h-2 rounded-full bg-cyan-500 shrink-0 mt-1.5" />
                     )}
                   </div>
                 );
@@ -842,15 +373,15 @@ const formatThreadTitle = (thread) => {
         </div>
 
         {/* ── RIGHT: Email viewer panel ── */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "100%", overflow: "hidden", backgroundColor: "#fff" }}>
+        <div className="flex-1 flex flex-col h-full overflow-hidden bg-white">
           {selectedThread ? (
             <>
-              {/* Subject + action buttons */}
-              <div style={{ padding: "16px 22px 12px", borderBottom: "1px solid #f0f0f0", display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexShrink: 0 }}>
-                <h2 style={{ fontSize: "1.1rem", fontWeight: 700, color: "#1a1a1a", margin: 0, flex: 1, marginRight: 16, lineHeight: 1.3 }}>
+              {/* Subject + action bar */}
+              <div className="flex items-start justify-between px-5 py-4 border-b border-gray-100 shrink-0">
+                <h2 className="text-base font-bold text-gray-800 leading-snug flex-1 mr-4 truncate">
                   {selectedThread.latest?.subject || "(No Subject)"}
                 </h2>
-                <div style={{ display: "flex", gap: 2, alignItems: "center" }}>
+                <div className="flex items-center gap-0.5 shrink-0">
                   <ShadButton variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100">
                     <Reply size={15} />
                   </ShadButton>
@@ -863,64 +394,63 @@ const formatThreadTitle = (thread) => {
                 </div>
               </div>
 
-              {/* Messages — scrollable area */}
-              <div style={{ flex: 1, overflowY: "auto", padding: "0 22px 16px" }}>
+              {/* Messages — scrollable */}
+              <div className="flex-1 overflow-y-auto px-5 pb-4">
                 {selectedThread.messages.map((email, idx) => (
                   <div key={email.messageId || idx}>
                     {/* From / To header */}
-                    <div style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: "16px 0 10px" }}>
+                    <div className="flex items-start gap-3 py-4">
                       <ShadAvatar className="h-9 w-9 shrink-0">
-                        <AvatarFallback style={{ backgroundColor: getAvatarColor(email.from || ""), color: "#fff", fontSize: "0.65rem", fontWeight: 700 }}>
+                        <AvatarFallback style={{ backgroundColor: getAvatarColor(email.from || "") }} className="text-white text-[10px] font-bold">
                           {getInitialsFromStr(email.from || "")}
                         </AvatarFallback>
                       </ShadAvatar>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between">
                           <div>
-                            <span style={{ fontSize: 13, fontWeight: 600, color: "#222" }}>{getName(email.from)}</span>
-                            <span style={{ fontSize: 11, color: "#aaa", marginLeft: 8 }}>
+                            <span className="text-sm font-semibold text-gray-800">{getName(email.from)}</span>
+                            <span className="text-xs text-gray-400 ml-2">
                               to {Array.isArray(email.to) ? email.to.join(", ") : email.to}
                             </span>
                           </div>
-                          <span style={{ fontSize: 11, color: "#bbb", flexShrink: 0 }}>
+                          <span className="text-[11px] text-gray-300 shrink-0 ml-2">
                             {new Date(email.createdAt).toLocaleString()}
                           </span>
                         </div>
                       </div>
                     </div>
 
-                    <Separator style={{ opacity: 0.5 }} />
+                    <Separator className="opacity-50" />
 
                     {/* Email body */}
                     <div
-                      style={{ padding: "14px 0 8px", fontSize: 14, color: "#333", lineHeight: 1.75 }}
+                      className="py-4 text-sm text-gray-700 leading-relaxed"
                       dangerouslySetInnerHTML={{ __html: email.body }}
                     />
 
                     {/* Attachments */}
                     {email.attachments?.length > 0 && (
-                      <div style={{ marginBottom: 12 }}>
-                        <p style={{ fontSize: 12, fontWeight: 600, color: "#777", marginBottom: 8, display: "flex", alignItems: "center", gap: 4 }}>
+                      <div className="mb-3">
+                        <p className="flex items-center gap-1 text-xs font-semibold text-gray-400 mb-2">
                           <Paperclip size={12} /> Attachments
                         </p>
-                        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                        <div className="flex flex-wrap gap-2">
                           {email.attachments.map((att, i) => (
-                            <div
+                            <button
                               key={i}
+                              type="button"
                               onClick={() => openAttachment(att)}
-                              style={{ border: "1px solid #eee", borderRadius: 8, padding: "5px 10px", cursor: "pointer", fontSize: 12, color: "#555", backgroundColor: "#fafafa" }}
-                              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#f0f0f0"}
-                              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "#fafafa"}
+                              className="border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-600 bg-gray-50 hover:bg-gray-100 transition-colors"
                             >
                               {att.filename}
-                            </div>
+                            </button>
                           ))}
                         </div>
                       </div>
                     )}
 
                     {idx < selectedThread.messages.length - 1 && (
-                      <Separator style={{ margin: "8px 0", opacity: 0.3 }} />
+                      <Separator className="my-2 opacity-30" />
                     )}
                   </div>
                 ))}
@@ -928,31 +458,17 @@ const formatThreadTitle = (thread) => {
 
               {/* Reply box */}
               {type === "inbox" && (
-                <div style={{ borderTop: "1px solid #f0f0f0", padding: "12px 22px 14px", flexShrink: 0 }}>
+                <div className="border-t border-gray-100 px-5 py-3 shrink-0">
                   <textarea
-                    placeholder="Type your response.."
+                    placeholder="Type your response…"
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
-                    style={{
-                      width: "100%",
-                      minHeight: 72,
-                      border: "1px solid #eee",
-                      borderRadius: 10,
-                      padding: "10px 12px",
-                      fontSize: 13,
-                      color: "#333",
-                      resize: "none",
-                      outline: "none",
-                      fontFamily: "inherit",
-                      backgroundColor: "#fafafa",
-                      boxSizing: "border-box",
-                    }}
+                    className="w-full min-h-[72px] rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-700 resize-none outline-none focus:ring-2 focus:ring-cyan-300 focus:border-transparent placeholder:text-gray-300 transition-colors"
                   />
-                  <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 8 }}>
+                  <div className="flex justify-end mt-2">
                     <ShadButton
                       size="sm"
-                      className="h-8 px-4 text-xs rounded-lg gap-1.5"
-                      style={{ backgroundColor: "#00ACC1", color: "#fff" }}
+                      className="h-8 px-4 text-xs rounded-lg gap-1.5 bg-cyan-500 hover:bg-cyan-600 text-white"
                       onClick={sendReply}
                     >
                       <SendIcon size={12} />
@@ -963,9 +479,9 @@ const formatThreadTitle = (thread) => {
               )}
             </>
           ) : (
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-              <div style={{ fontSize: 40, marginBottom: 12, opacity: 0.3 }}>✉</div>
-              <p style={{ fontSize: 13, color: "#bbb" }}>Select an email to read</p>
+            <div className="flex-1 flex flex-col items-center justify-center gap-3">
+              <span className="text-5xl opacity-20">✉</span>
+              <p className="text-sm text-gray-400">Select an email to read</p>
             </div>
           )}
         </div>
@@ -974,24 +490,20 @@ const formatThreadTitle = (thread) => {
       {/* Attachment preview modal */}
       {previewFile && (
         <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60"
           onClick={() => setPreviewFile(null)}
-          style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", backgroundColor: "rgba(0,0,0,0.65)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999 }}
         >
           <div
+            className="w-[85%] h-[90%] bg-white rounded-xl overflow-hidden flex flex-col shadow-2xl"
             onClick={(e) => e.stopPropagation()}
-            style={{ width: "85%", height: "90%", backgroundColor: "#fff", borderRadius: 12, overflow: "hidden", display: "flex", flexDirection: "column" }}
           >
-            <div style={{ padding: "10px 16px", borderBottom: "1px solid #eee", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
-              <span style={{ fontWeight: 600, fontSize: 13 }}>{previewFile.filename}</span>
-              <ShadButton variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => setPreviewFile(null)}>
+            <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100 shrink-0">
+              <span className="text-sm font-semibold text-gray-800">{previewFile.filename}</span>
+              <ShadButton variant="ghost" size="sm" className="h-7 w-7 p-0 rounded-lg" onClick={() => setPreviewFile(null)}>
                 <X size={15} />
               </ShadButton>
             </div>
-            <iframe
-              src={previewFile.url}
-              style={{ flex: 1, border: "none" }}
-              title="Preview"
-            />
+            <iframe src={previewFile.url} className="flex-1 border-none" title="Preview" />
           </div>
         </div>
       )}

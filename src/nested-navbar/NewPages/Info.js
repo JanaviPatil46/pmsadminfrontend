@@ -1,31 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import {
-  Box,
-  Typography,
-  Paper,
-  Divider,
-  Chip,
-  Button,
-  Switch,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  Grid,
-  DialogActions,
-  Avatar,
-  IconButton,
-  Drawer,
-  Autocomplete,
-  TextField,Tooltip
-} from "@mui/material";
-
 import AccountContactDrawer from "../../AccountContactForm/AccountContactDrawer";
 import ContactForm from "../../Pages/UpdateContact";
 import MenuDropdown from "./MenuDropdown";
-import CloseIcon from "@mui/icons-material/Close";
 import UploadProfilePicture from "./UploadProfilePicture";
+import { IoClose } from "react-icons/io5";
 const AccountDetails = () => {
   const { data } = useParams();
   const [account, setAccount] = useState(null);
@@ -38,20 +18,17 @@ const AccountDetails = () => {
   const [addContactDrawerOpen, setAddContactDrawerOpen] = useState(false);
   const [availableContacts, setAvailableContacts] = useState([]);
   const [selectedContacts, setSelectedContacts] = useState([]);
-const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
+  const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
   const fetchAccountDetails = async () => {
     try {
       const res = await axios.get(
         `https://www.snptaxes.com/api/accounts/${data}`
       );
       setAccount(res.data);
-      console.log("account details", res.data.profilePicture);
-      console.log("accounts details", res.data);
     } catch (error) {
       console.error("Error fetching account details:", error);
     }
   };
-  // console.log("account profilepicture", account.profilePicture);
   useEffect(() => {
     fetchAccountDetails();
   }, [data]);
@@ -120,17 +97,15 @@ const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
   };
   // Send activation email function
   const sendActivationEmail = async (contact) => {
-    // console.log("contact",contact)
     const ContactId = contact.contact._id;
     try {
-      const response = await axios.post(
+      await axios.post(
         `https://www.snptaxes.com/api/contacts/${ContactId}/resend-activation`,
         {
           email: contact.contact.email,
           contactId: ContactId,
         }
       );
-      console.log("Activation email sent successfully:", response.data);
       return true;
     } catch (error) {
       console.error("Error sending activation email:", error);
@@ -145,19 +120,6 @@ const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
         `https://www.snptaxes.com/api/accounts/${account._id}/contact/${selectedContact.contact._id}`,
         { canLogin: newCanLoginValue }
       );
-      // If enabling login access, send activation email
-      // if (newCanLoginValue) {
-      //   const emailSent = await sendActivationEmail(selectedContact);
-
-      //   if (emailSent) {
-      //     // Show success message
-      //     alert(`Activation email sent to ${selectedContact.contact.email}`);
-      //   } else {
-      //     alert(
-      //       `Failed to send activation email to ${selectedContact.contact.email}`
-      //     );
-      //   }
-      // }
       setAccount((prev) => ({
         ...prev,
         contacts: prev.contacts.map((c) =>
@@ -301,391 +263,264 @@ const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
 
   // Handle opening contact edit drawer
   const handleOpenContactEditDrawer = (contactData) => {
-    console.log("Opening drawer with contact:", contactData);
     setSelectedContactForEdit(contactData.contact);
     setContactEditDrawerOpen(true);
   };
   const handleContactUpdated = () => {
     fetchAccountDetails();
   };
-  if (!account) return <Typography>Loading...</Typography>;
+  const [contactSearch, setContactSearch] = useState("");
+  const filteredAvailableContacts = availableContacts.filter((c) =>
+    `${c.contactName} ${c.email}`.toLowerCase().includes(contactSearch.toLowerCase())
+  );
+
+  if (!account) return (
+    <div className="flex items-center justify-center h-40">
+      <div className="flex flex-col items-center gap-2">
+        <div className="w-6 h-6 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
+        <p className="text-sm text-gray-400">Loading account details…</p>
+      </div>
+    </div>
+  );
+
+  const saveBtnCls = "rounded-lg px-4 py-2 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] transition-colors";
+  const cancelBtnCls = "rounded-lg px-4 py-2 text-sm font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors";
+  const toggleCls = "w-9 h-5 bg-gray-200 rounded-full peer peer-checked:bg-blue-500 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4";
 
   return (
-    <Box sx={{ p: 3 }}>
-      {/* Top bar button */}
+    <div className="p-4 md:p-6 space-y-4">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
 
-      <Grid container spacing={3}>
-        {/* ✅ LEFT SIDE - ACCOUNT DETAILS */}
-        <Grid item xs={12} md={6} p={2}>
-          <Paper sx={{ p: 3 }}>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              {" "}
-              <Typography variant="h5" fontWeight="bold">
-                Account Details
-              </Typography>
-              {/* <Button
-                variant="contained"
-                color="primary"
+        {/* LEFT — Account Details */}
+        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+            <h2 className="text-sm font-semibold text-gray-800">Account Details</h2>
+            <span title={storedData?.teammember?.manageAccounts === false ? "You don't have permission to edit accounts" : ""}>
+              <button type="button"
                 onClick={() => setDrawerOpen(true)}
                 disabled={storedData?.teammember?.manageAccounts === false}
-                sx={{ mb: 3 }}
-              >
-                Edit Account
-              </Button> */}
-              <Tooltip
-  title={
-    storedData?.teammember?.manageAccounts === false
-      ? "You don't have permission to edit accounts"
-      : ""
-  }
-  disableHoverListener={storedData?.teammember?.manageAccounts !== false}
->
-  <span>
-    <Button
-      variant="contained"
-      onClick={() => setDrawerOpen(true)}
-      disabled={storedData?.teammember?.manageAccounts === false}
-    >
-      Edit
-    </Button>
-  </span>
-</Tooltip>
+                className={`rounded-lg px-3 py-1.5 text-xs font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] transition-colors ${
+                  storedData?.teammember?.manageAccounts === false ? 'opacity-40 cursor-not-allowed' : ''
+                }`}
+              >Edit</button>
+            </span>
+          </div>
 
-            </Box>
+          <div className="px-5 py-4 space-y-5">
+            {/* Avatar + Name */}
+            <div className="flex items-center gap-4">
+              <UploadProfilePicture
+                accountId={account._id}
+                currentImage={account.profilePicture}
+                onUploadSuccess={fetchAccountDetails}
+              />
+              <div>
+                <p className="font-semibold text-gray-900">{account.accountName}</p>
+                <p className="text-xs text-gray-400 mt-0.5">{account.clientType}</p>
+              </div>
+            </div>
 
-            <Divider sx={{ my: 2 }} />
+            <div className="border-t border-gray-100" />
 
-{/* Avatar + Name + Profile Upload */}
-<Box sx={{ display: "flex", alignItems: "center", gap: 2, mt: 2 }}>
-  <UploadProfilePicture
-    accountId={account._id}
-   currentImage={account.profilePicture}
-    onUploadSuccess={fetchAccountDetails}
-  />
-  <Box>
-    <Typography variant="h6" fontWeight="bold">
-      {account.accountName}
-    </Typography>
-    <Typography color="text.secondary">
-      {account.clientType}
-    </Typography>
-  </Box>
-</Box>
+            {/* Tags */}
+            <div>
+              <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-2">Tags</p>
+              <div className="flex flex-wrap gap-1.5">
+                {accountTags?.length > 0 ? (
+                  accountTags.map((tag) => (
+                    <span key={tag._id}
+                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold text-white"
+                      style={{ backgroundColor: tag.tagColour }}
+                    >{tag.tagName}</span>
+                  ))
+                ) : <span className="text-xs text-gray-300">No tags assigned</span>}
+              </div>
+            </div>
 
+            {/* Team Members */}
+            <div>
+              <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-2">Team Members</p>
+              <div className="flex flex-wrap gap-1.5">
+                {assignedMembers?.length > 0 ? (
+                  assignedMembers.map((m) => (
+                    <span key={m._id} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs border border-gray-200 bg-gray-50 text-gray-600">
+                      {m.username}
+                    </span>
+                  ))
+                ) : <span className="text-xs text-gray-300">No members assigned</span>}
+              </div>
+            </div>
+          </div>
+        </div>
 
-            <Typography variant="h6" sx={{ mt: 3 }}>
-              Account Info
-            </Typography>
+        {/* RIGHT — Contacts */}
+        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+            <h2 className="text-sm font-semibold text-gray-800">Contacts</h2>
+            <button type="button" onClick={() => setAddContactDrawerOpen(true)}
+              className="text-xs font-semibold text-[var(--color-save-btn)] hover:underline uppercase tracking-wide">
+              + Add Contact
+            </button>
+          </div>
 
-            {/* ✅ TAGS */}
-            <Typography variant="body1" sx={{ mt: 1, fontWeight: "bold" }}>
-              Tags
-            </Typography>
-            <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mt: 1 }}>
-              {accountTags?.length > 0 ? (
-                accountTags.map((tag) => (
-                  <Chip
-                    key={tag._id}
-                    label={tag.tagName}
-                    sx={{
-                      backgroundColor: tag.tagColour,
-                      color: "white",
-                      fontWeight: "bold",
-                    }}
-                  />
-                ))
-              ) : (
-                <Typography color="text.secondary">—</Typography>
-              )}
-            </Box>
+          {/* Column headers */}
+          <div className="grid grid-cols-[1fr_auto] items-center px-5 py-2 bg-gray-50 border-b border-gray-100">
+            <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide">Contact</span>
+            <div className="flex items-center gap-5 mr-8">
+              <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide w-10 text-center">Login</span>
+              <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide w-10 text-center">Notify</span>
+              <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide w-14 text-center">Email Sync</span>
+            </div>
+          </div>
 
-            {/* ✅ TEAM MEMBERS */}
-            <Typography variant="body1" sx={{ mt: 3, fontWeight: "bold" }}>
-              Team Members
-            </Typography>
-            <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mt: 1 }}>
-              {assignedMembers?.length > 0 ? (
-                assignedMembers.map((m) => (
-                  <Chip key={m._id} label={m.username} variant="outlined" />
-                ))
-              ) : (
-                <Typography color="text.secondary">—</Typography>
-              )}
-            </Box>
-          </Paper>
-        </Grid>
-
-        {/* ✅ RIGHT SIDE - CONTACTS */}
-        <Grid item xs={12} md={6} p={2}>
-          <Paper sx={{ p: 3 }}>
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-            >
-              <Typography variant="h5" fontWeight="bold">
-                Contacts
-              </Typography>
-
-              <Button
-                variant="text"
-                color="primary"
-                onClick={() => setAddContactDrawerOpen(true)}
-              >
-                ADD CONTACT
-              </Button>
-            </Box>
-
-            <Divider sx={{ my: 2 }} />
-
-            {/* Table Header */}
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-              sx={{ px: 2, py: 1, fontWeight: "bold", color: "gray" }}
-            >
-              <Box flex={1}></Box>
-              <Box width={260} display="flex" justifyContent="space-between">
-                <Typography>Login</Typography>
-                <Typography>Notify</Typography>
-                <Typography>Email Sync</Typography>
-              </Box>
-            </Box>
-
-            <Divider />
-
-            {/* Contact List */}
+          {/* Contact rows */}
+          <div className="divide-y divide-gray-100">
             {account.contacts?.length > 0 ? (
               account.contacts.map((c) => (
-                <Box key={c.contact._id}>
-                  <Box
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    sx={{ px: 2, py: 2 }}
-                  >
-                    {/* Contact name/email */}
-                    <Box flex={1}>
-                      {/* <Typography
-                        fontWeight="bold"
-                        sx={{ cursor: "pointer" }}
-                        onClick={() => handleOpenContactEditDrawer(c)}
-                        
-                      >
-                        {c.contact.contactName}
-                      </Typography> */}
-                      <Tooltip
-  title={
-    storedData?.teammember?.manageContacts === false
-      ? "You don't have permission to edit contacts"
-      : ""
-  }
-  disableHoverListener={storedData?.teammember?.manageContacts !== false}
->
-  <span>
-    <Typography
-      fontWeight="bold"
-      sx={{
-        cursor:
-          storedData?.teammember?.manageContacts === false
-            ? "not-allowed"
-            : "pointer",
-        color:
-          storedData?.teammember?.manageContacts === false
-            ? "gray"
-            : "inherit",
-        opacity: storedData?.teammember?.manageContacts === false ? 0.6 : 1,
-      }}
-      onClick={() => {
-        if (storedData?.teammember?.manageContacts === false) return; // 🚫 Block click
-        handleOpenContactEditDrawer(c); // ✅ Allowed
-      }}
-    >
-      {c.contact.contactName}
-    </Typography>
-  </span>
-</Tooltip>
-
-                      <Typography color="text.secondary" fontSize={14}>
-                        {c.contact.email || "-"}
-                      </Typography>
-                    </Box>
-
-                    {/* Switches */}
-                    <Box
-                      width={260}
-                      display="flex"
-                      justifyContent="space-between"
-                      alignItems="center"
-                    >
-                      <Switch
-                        checked={c.canLogin}
-                        onChange={() => handleSwitchClick(c)}
-                        color="primary"
-                        disabled
-                      />
-                      <Switch
-                        checked={c.canNotify}
-                        onChange={() => handleNotifyToggle(c)}
-                        color="primary"
-                        disabled
-                      />
-                      <Switch
-                        checked={c.canEmailSync}
-                        onChange={() => handleEmailSyncToggle(c)}
-                        color="primary"
-                        disabled
-                      />
-                      <MenuDropdown
-                        contact={c}
-                        onUnlink={handleUnlinkContact}
-                        onResetPassword={handleResetPassword}
-                      />
-                    </Box>
-                  </Box>
-
-                  <Divider />
-                </Box>
+                <div key={c.contact._id} className="grid grid-cols-[1fr_auto] items-center px-5 py-3 hover:bg-gray-50 transition-colors">
+                  <div>
+                    <span
+                      title={storedData?.teammember?.manageContacts === false ? "You don't have permission to edit contacts" : ""}
+                      className={`text-sm font-medium block ${
+                        storedData?.teammember?.manageContacts === false
+                          ? 'text-gray-400 cursor-not-allowed opacity-60'
+                          : 'text-gray-800 cursor-pointer hover:text-blue-600'
+                      }`}
+                      onClick={() => {
+                        if (storedData?.teammember?.manageContacts === false) return;
+                        handleOpenContactEditDrawer(c);
+                      }}
+                    >{c.contact.contactName}</span>
+                    <span className="text-xs text-gray-400 mt-0.5 block">{c.contact.email || "—"}</span>
+                  </div>
+                  <div className="flex items-center gap-5 mr-2">
+                    <label className="relative inline-flex items-center w-10 justify-center cursor-not-allowed">
+                      <input type="checkbox" className="sr-only peer" checked={c.canLogin} disabled onChange={() => handleSwitchClick(c)} />
+                      <div className={toggleCls}></div>
+                    </label>
+                    <label className="relative inline-flex items-center w-10 justify-center cursor-not-allowed">
+                      <input type="checkbox" className="sr-only peer" checked={c.canNotify} disabled onChange={() => handleNotifyToggle(c)} />
+                      <div className={toggleCls}></div>
+                    </label>
+                    <label className="relative inline-flex items-center w-14 justify-center cursor-not-allowed">
+                      <input type="checkbox" className="sr-only peer" checked={c.canEmailSync} disabled onChange={() => handleEmailSyncToggle(c)} />
+                      <div className={toggleCls}></div>
+                    </label>
+                    <MenuDropdown contact={c} onUnlink={handleUnlinkContact} onResetPassword={handleResetPassword} />
+                  </div>
+                </div>
               ))
             ) : (
-              <Typography sx={{ p: 2 }}>No contacts found</Typography>
+              <div className="flex flex-col items-center justify-center py-10 gap-2">
+                <p className="text-sm text-gray-400">No contacts linked</p>
+                <button type="button" onClick={() => setAddContactDrawerOpen(true)}
+                  className="text-xs text-blue-500 hover:underline">Add a contact</button>
+              </div>
             )}
-          </Paper>
-        </Grid>
-      </Grid>
+          </div>
+        </div>
+      </div>
 
-      {/* Drawer */}
+      {/* Account edit drawer */}
       <AccountContactDrawer
         open={drawerOpen}
-        onClose={() => {
-          setDrawerOpen(false);
-          fetchAccountDetails();
-        }}
+        onClose={() => { setDrawerOpen(false); fetchAccountDetails(); }}
         accountId={account._id}
       />
 
-      {/* Dialog */}
-      <Dialog open={dialogOpen} onClose={handleCancelToggle}>
-        <DialogTitle>Confirm Access Change</DialogTitle>
-        <DialogContent>
-          <Typography>
-            {newCanLoginValue
-              ? `Give portal access to ${selectedContact?.contact.email}?`
-              : `Remove portal access from ${selectedContact?.contact.email}?`}
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCancelToggle} variant="outlined">
-            Cancel
-          </Button>
-          <Button
-            onClick={handleConfirmToggle}
-            variant="contained"
-            color="primary"
-          >
-            Confirm
-          </Button>
-        </DialogActions>
-      </Dialog>
+      {/* Confirm access change modal */}
+      {dialogOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40" onClick={handleCancelToggle} />
+          <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-sm p-6">
+            <h2 className="text-base font-semibold text-gray-800 mb-2">Confirm Access Change</h2>
+            <p className="text-sm text-gray-500 leading-relaxed">
+              {newCanLoginValue
+                ? `Grant portal login access to ${selectedContact?.contact.email}?`
+                : `Remove portal login access from ${selectedContact?.contact.email}?`}
+            </p>
+            <div className="flex justify-end gap-2 mt-6">
+              <button type="button" onClick={handleCancelToggle} className={cancelBtnCls}>Cancel</button>
+              <button type="button" onClick={handleConfirmToggle} className={saveBtnCls}>Confirm</button>
+            </div>
+          </div>
+        </div>
+      )}
 
-      {/* Add Contact Drawer */}
-      <Drawer
-        anchor="right"
-        open={addContactDrawerOpen}
-        onClose={() => {
-          setAddContactDrawerOpen(false);
-          setSelectedContacts([]);
-        }}
-        PaperProps={{ sx: { width: 500, p: 5 } }}
-      >
-        <Box>
-          <Typography variant="h6" gutterBottom>
-            Add Contacts to Account
-          </Typography>
+      {/* Add Contact drawer */}
+      {addContactDrawerOpen && (
+        <div className="fixed inset-0 z-40 overflow-hidden">
+          <div className="absolute inset-0 bg-black/40" onClick={() => { setAddContactDrawerOpen(false); setSelectedContacts([]); }} />
+          <div className="absolute right-0 top-0 h-full w-full sm:w-[480px] bg-white shadow-2xl flex flex-col">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+              <h2 className="text-sm font-semibold text-gray-800">Add Contacts to Account</h2>
+              <button type="button" onClick={() => { setAddContactDrawerOpen(false); setSelectedContacts([]); setContactSearch(""); }}
+                className="text-gray-400 hover:text-gray-600">
+                <IoClose size={18} />
+              </button>
+            </div>
+            <div className="px-5 py-3 border-b border-gray-100">
+              <input
+                type="text"
+                className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-gray-400"
+                placeholder="Search by name or email…"
+                value={contactSearch}
+                onChange={(e) => setContactSearch(e.target.value)}
+              />
+            </div>
+            <div className="flex-1 overflow-y-auto divide-y divide-gray-100">
+              {filteredAvailableContacts.map((c) => (
+                <label key={c._id} className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 cursor-pointer">
+                  <input type="checkbox" className="h-4 w-4 rounded border-gray-300 accent-blue-600"
+                    checked={selectedContacts.some(s => s._id === c._id)}
+                    onChange={(e) => {
+                      if (e.target.checked) setSelectedContacts(prev => [...prev, c]);
+                      else setSelectedContacts(prev => prev.filter(s => s._id !== c._id));
+                    }}
+                  />
+                  <div>
+                    <p className="text-sm font-medium text-gray-800">{c.contactName}</p>
+                    <p className="text-xs text-gray-400">{c.email}</p>
+                  </div>
+                </label>
+              ))}
+              {filteredAvailableContacts.length === 0 && (
+                <p className="text-sm text-gray-400 px-5 py-6 text-center">No contacts found</p>
+              )}
+            </div>
+            <div className="flex justify-end gap-2 px-5 py-4 border-t border-gray-100">
+              <button type="button" onClick={() => { setAddContactDrawerOpen(false); setSelectedContacts([]); setContactSearch(""); }} className={cancelBtnCls}>Cancel</button>
+              <button type="button" onClick={handleLinkContacts} disabled={selectedContacts.length === 0}
+                className={`${saveBtnCls} ${selectedContacts.length === 0 ? 'opacity-40 cursor-not-allowed' : ''}`}>
+                Link {selectedContacts.length > 0 ? `${selectedContacts.length} ` : ""}Contact{selectedContacts.length !== 1 ? "s" : ""}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
-          <Autocomplete
-            multiple
-            options={availableContacts}
-            getOptionLabel={(option) =>
-              `${option.contactName} (${option.email})`
-            }
-            value={selectedContacts}
-            onChange={(event, newValue) => {
-              setSelectedContacts(newValue);
-            }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                // label="Select Contacts"
-                placeholder="Search contacts..."
-                variant="outlined"
-                fullWidth
+      {/* Edit Contact drawer */}
+      {contactEditDrawerOpen && (
+        <div className="fixed inset-0 z-40 overflow-hidden">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setContactEditDrawerOpen(false)} />
+          <div className="absolute right-0 top-0 h-full w-full sm:w-[600px] bg-white shadow-2xl flex flex-col">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+              <span className="text-sm font-semibold text-gray-800">Edit Contact</span>
+              <button type="button" onClick={() => setContactEditDrawerOpen(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
+                <IoClose size={18} />
+              </button>
+            </div>
+            {selectedContactForEdit && (
+              <ContactForm
+                selectedContact={selectedContactForEdit}
+                handleClose={() => setContactEditDrawerOpen(false)}
+                onContactUpdated={handleContactUpdated}
               />
             )}
-            sx={{ mb: 2 }}
-          />
-
-          <Box sx={{ flexGrow: 1 }} />
-
-          <Box sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}>
-            <Button
-              onClick={() => {
-                setAddContactDrawerOpen(false);
-                setSelectedContacts([]);
-              }}
-              variant="outlined"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleLinkContacts}
-              variant="contained"
-              disabled={selectedContacts.length === 0}
-            >
-              Link Contacts ({selectedContacts.length})
-            </Button>
-          </Box>
-        </Box>
-      </Drawer>
-      <Drawer
-        anchor="right"
-        open={contactEditDrawerOpen}
-        onClose={() => setContactEditDrawerOpen(false)}
-        sx={{ width: 600 }}
-      >
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: "20px",
-            ml: 1,
-          }}
-        >
-          <Typography sx={{ fontWeight: "bold" }} variant="h6">
-            Edit Contact
-          </Typography>
-          <IconButton onClick={() => setContactEditDrawerOpen(false)}>
-            <CloseIcon />
-          </IconButton>
-        </Box>
-        <Divider />
-        {selectedContactForEdit && (
-          <ContactForm
-            selectedContact={selectedContactForEdit}
-            handleClose={() => setContactEditDrawerOpen(false)}
-            onContactUpdated={handleContactUpdated}
-          />
-        )}
-      </Drawer>
-    </Box>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

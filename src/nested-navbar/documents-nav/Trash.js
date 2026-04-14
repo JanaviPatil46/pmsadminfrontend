@@ -1,34 +1,13 @@
-import React, { useState, useEffect } from "react";
-import {
-  Typography,
-  Box,
-  Paper,
-  IconButton,
-  Menu,
-  MenuItem,
-  TableCell,
-  TableHead,
-  TableRow,
-  TableBody,
-  Table,
-  TableContainer,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
-} from "@mui/material";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import DeleteIcon from "@mui/icons-material/Delete";
-import RestoreIcon from "@mui/icons-material/Restore";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import {
   Folder as FolderClosedIcon,
   FolderOpen as FolderOpenIcon,
+  MoreVertical,
+  RotateCcw,
+  Trash2,
+  Download,
 } from "lucide-react";
-
-import DownloadIcon from "@mui/icons-material/Download";
 import { toast } from "react-toastify";
 import {
   FaFilePdf,
@@ -38,23 +17,34 @@ import {
   FaFileAlt,
 } from "react-icons/fa";
 import { AiFillFileUnknown } from "react-icons/ai";
+
 const Trash = () => {
   const { data } = useParams();
   const FolderTreeView = ({ accountId }) => {
     const [expandedFolders, setExpandedFolders] = useState({});
-    const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+    const [menuOpenFor, setMenuOpenFor] = useState(null);
     const [selectedFolderForMenu, setSelectedFolderForMenu] = useState(null);
     const [error, setError] = useState(null);
     const [folderTree, setFolderTree] = useState([]);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [deleteConfirmText, setDeleteConfirmText] = useState("");
     const [itemToDelete, setItemToDelete] = useState(null);
+    const menuRef = useRef(null);
 
     useEffect(() => {
       fetchFolderTree(accountId);
     }, [accountId]);
 
-    // API call to fetch folder tree for a given template ID
+    useEffect(() => {
+      const handleClickOutside = (e) => {
+        if (menuRef.current && !menuRef.current.contains(e.target)) {
+          setMenuOpenFor(null);
+        }
+      };
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
     const fetchFolderTree = async (accountId) => {
       try {
         const res = await fetch(
@@ -71,25 +61,24 @@ const Trash = () => {
         setError("Error fetching folder tree");
       }
     };
-    const toggleFolder = (path, isReadOnly) => {
-      // if (isReadOnly) return;
+
+    const toggleFolder = (path) => {
       setExpandedFolders((prev) => ({
         ...prev,
         [path]: !prev[path],
       }));
     };
 
-    const handleMenuOpen = (event, folder) => {
-      event.stopPropagation();
-      setMenuAnchorEl(event.currentTarget);
+    const handleMenuOpen = (e, folder) => {
+      e.stopPropagation();
       setSelectedFolderForMenu(folder);
+      setMenuOpenFor(folder.path);
     };
 
     const handleMenuClose = () => {
-      setMenuAnchorEl(null);
+      setMenuOpenFor(null);
     };
 
-    // Update getAllChildrenPaths to work with item.path
     const getAllChildrenPaths = (item) => {
       const paths = [item.path];
       if (item.children && item.children.length > 0) {
@@ -110,9 +99,7 @@ const Trash = () => {
             body: JSON.stringify({ targetPath: item.path }),
           }
         );
-
         const data = await res.json();
-
         if (res.ok && data.success) {
           toast.success("Item restored successfully");
           fetchFolderTree(accountId);
@@ -123,6 +110,7 @@ const Trash = () => {
         toast.error("Error restoring item");
       }
     };
+
     const handleDownload = async (item) => {
       try {
         const res = await fetch(
@@ -130,20 +118,15 @@ const Trash = () => {
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              paths: item.path, // backend already supports string or array
-            }),
+            body: JSON.stringify({ paths: item.path }),
           }
         );
-
         if (!res.ok) {
           const err = await res.json();
           throw new Error(err.error || "Download failed");
         }
-
         const blob = await res.blob();
         const url = window.URL.createObjectURL(blob);
-
         const a = document.createElement("a");
         a.href = url;
         a.download = item.name || "download";
@@ -155,17 +138,10 @@ const Trash = () => {
         console.error("Download error:", err);
       }
     };
-    // 🗑️ Delete File or Folder (Universal)
+
     const deleteItem = async (item) => {
       console.log("Deleting item:", item);
       if (!item?.path) return alert("Invalid path");
-      // console.log("delete path", item.path);
-      // console.log("delete item", item);
-      // const confirmDelete = window.confirm(
-      //   `Are you sure you want to delete "${item.name}"? This cannot be undone!`
-      // );
-      // if (!confirmDelete) return;
-
       try {
         const response = await fetch(
           "https://www.snptaxes.com/api/accountsdoc/delete",
@@ -175,16 +151,12 @@ const Trash = () => {
             body: JSON.stringify({ targetPath: item.path }),
           }
         );
-
         const data = await response.json();
-
         if (response.ok && data.success) {
-          // alert(data.message);
           toast.success(data.message);
           setTimeout(() => {
             fetchFolderTree(accountId);
           }, 800);
-          //  fetchFolderTree(accountId);
         } else {
           alert(data.message || "Failed to delete");
           toast.error(data.message);
@@ -194,13 +166,11 @@ const Trash = () => {
         alert("Error deleting file or folder");
         toast.error(err);
       }
-
       handleMenuClose();
     };
 
     const getFileIcon = (fileName) => {
       const ext = fileName.split(".").pop().toLowerCase();
-
       switch (ext) {
         case "pdf":
           return <FaFilePdf color="#d32f2f" size={18} />;
@@ -225,18 +195,14 @@ const Trash = () => {
 
     const formatUploadedAt = (dateValue) => {
       if (!dateValue) return "";
-
-      // If already in "DEC-19 2025" format
       if (
         typeof dateValue === "string" &&
         /^[A-Z]{3}-\d{2} \d{4}$/.test(dateValue)
       ) {
         return dateValue;
       }
-
       const date = new Date(dateValue);
       if (isNaN(date)) return dateValue;
-
       return date
         .toLocaleDateString("en-US", {
           month: "short",
@@ -244,96 +210,56 @@ const Trash = () => {
           year: "numeric",
         })
         .toUpperCase()
-        .replace(",", "") // remove comma
-        .replace(" ", "-"); // replace first space with dash
+        .replace(",", "")
+        .replace(" ", "-");
     };
-  
-// const TrashedInfo = ({ meta }) => {
-//   if (!meta?.trash?.trashedAt) return null;
 
-//   const trashedAt = new Date(meta.trash.trashedAt);
-//   const now = new Date();
+    const TrashedInfo = ({ meta }) => {
+      if (!meta?.trash?.trashedAt) return null;
+      const trashedAt = new Date(meta.trash.trashedAt);
+      const now = new Date();
+      const TWO_HOURS_MS = 2 * 60 * 60 * 1000;
+      const diffTime = trashedAt.getTime() + TWO_HOURS_MS - now.getTime();
 
-//   // Calculate remaining time until 60 days
-//   const diffTime = trashedAt.getTime() + 60 * 24 * 60 * 60 * 1000 - now.getTime(); // 60 days in ms
-//   const remainingDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      if (diffTime <= 0) {
+        return (
+          <span className="text-xs font-semibold text-red-600">Deleting soon</span>
+        );
+      }
 
-//   // Format trashed date
-//   const formattedDate = trashedAt
-//     .toLocaleDateString("en-US", {
-//       month: "short",
-//       day: "2-digit",
-//       year: "numeric",
-//     })
-//     .toUpperCase()
-//     .replace(",", ""); // e.g., DEC-29 2025
+      const remainingMinutes = Math.ceil(diffTime / (1000 * 60));
+      const hours = Math.floor(remainingMinutes / 60);
+      const minutes = remainingMinutes % 60;
 
-//   return (
-//     <Typography variant="caption" sx={{ fontWeight: "bold" }}>
-//       {formattedDate} ({remainingDays > 0 ? `${remainingDays} day${remainingDays > 1 ? "s" : ""} left` : "Deleting soon"})
-//     </Typography>
-//   );
-// };
+      const formattedDate = trashedAt
+        .toLocaleDateString("en-US", {
+          month: "short",
+          day: "2-digit",
+          year: "numeric",
+        })
+        .toUpperCase()
+        .replace(",", "");
 
-const TrashedInfo = ({ meta }) => {
-  if (!meta?.trash?.trashedAt) return null;
-
-  const trashedAt = new Date(meta.trash.trashedAt);
-  const now = new Date();
-
-  const TWO_HOURS_MS = 2 * 60 * 60 * 1000;
-
-  // Remaining time
-  const diffTime = trashedAt.getTime() + TWO_HOURS_MS - now.getTime();
-
-  if (diffTime <= 0) {
-    return (
-      <Typography variant="caption" sx={{ fontWeight: "bold", color: "error.main" }}>
-        Deleting soon
-      </Typography>
-    );
-  }
-
-  const remainingMinutes = Math.ceil(diffTime / (1000 * 60));
-  const hours = Math.floor(remainingMinutes / 60);
-  const minutes = remainingMinutes % 60;
-
-  // Format trashed date
-  const formattedDate = trashedAt
-    .toLocaleDateString("en-US", {
-      month: "short",
-      day: "2-digit",
-      year: "numeric",
-    })
-    .toUpperCase()
-    .replace(",", "");
-
-  return (
-    <Typography variant="caption" sx={{ fontWeight: "bold" }}>
-      {formattedDate} (
-      {hours > 0 && `${hours} hr${hours > 1 ? "s" : ""} `}
-      {minutes > 0 && `${minutes} min${minutes > 1 ? "s" : ""}`} left)
-    </Typography>
-  );
-};
+      return (
+        <span className="text-xs font-semibold text-gray-600">
+          {formattedDate} (
+          {hours > 0 && `${hours} hr${hours > 1 ? "s" : ""} `}
+          {minutes > 0 && `${minutes} min${minutes > 1 ? "s" : ""}`} left)
+        </span>
+      );
+    };
 
     const findNewSystemTag = (item) => {
-      // console.log("Finding 'New' tag in item:", item);
-      // Check current item
       const newTag = item.meta?.tags?.find(
         (tag) => tag.isSystemTag && tag.tagName === "New"
       );
-
       if (newTag) return newTag;
-
-      // Check children recursively
       if (item.children && item.children.length > 0) {
         for (const child of item.children) {
           const childTag = findNewSystemTag(child);
           if (childTag) return childTag;
         }
       }
-
       return null;
     };
 
@@ -342,84 +268,99 @@ const TrashedInfo = ({ meta }) => {
         const fullPath = item.path;
         const meta = item.meta || {};
         const isFolder = item.type === "folder";
-
-        const showMenu =
-          level === 0 && (item.type === "folder" || item.type === "file");
-
-        const getAllChildrenPaths = (item) => {
-          const paths = [item.path];
-          if (item.children && item.children.length > 0) {
-            item.children.forEach((child) => {
-              paths.push(...getAllChildrenPaths(child));
-            });
-          }
-          return paths;
-        };
+        const showMenu = level === 0 && (item.type === "folder" || item.type === "file");
+        const isMenuOpen = menuOpenFor === item.path;
 
         return (
           <React.Fragment key={fullPath}>
-            <TableRow
-              sx={{
-                backgroundColor: level % 2 === 0 ? "#fafafa" : "white",
-                "&:hover": { backgroundColor: "#f5f5f5" },
-              }}
-            >
-              <TableCell sx={{ paddingLeft: level * 4 + 2 }}>
-                <Box sx={{ display: "flex", alignItems: "center" }}>
+            <tr className={level % 2 === 0 ? "bg-gray-50 hover:bg-gray-100" : "bg-white hover:bg-gray-50"}>
+              <td className="px-4 py-2 text-sm" style={{ paddingLeft: `${level * 16 + 16}px` }}>
+                <div className="flex items-center gap-1">
                   {isFolder ? (
                     <>
-                      <IconButton
-                        size="small"
+                      <button
+                        type="button"
+                        className="p-1 rounded hover:bg-gray-200 transition-colors"
                         onClick={() => toggleFolder(fullPath)}
-                        sx={{ mr: 0.5 }}
                       >
                         {expandedFolders[fullPath] ? (
-                          <FolderOpenIcon />
+                          <FolderOpenIcon size={18} className="text-yellow-500" />
                         ) : (
-                          <FolderClosedIcon />
+                          <FolderClosedIcon size={18} className="text-yellow-500" />
                         )}
-                      </IconButton>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          ml: 0.5,
-                          fontWeight: "medium",
-                          cursor: "pointer",
-                        }}
+                      </button>
+                      <span
+                        className="font-medium cursor-pointer text-gray-700 hover:text-gray-900"
                         onClick={() => toggleFolder(fullPath)}
                       >
-                        {item.name} (Trashed)
-                      </Typography>
+                        {item.name} <span className="text-xs text-gray-400">(Trashed)</span>
+                      </span>
                     </>
                   ) : (
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <Box sx={{ mr: 1 }}>{getFileIcon(item.name)}</Box>
-                      <Typography
-                        variant="body2"
-                        sx={{ cursor: "not-allowed" }}
-                      >
-                        {item.name} (Trashed)
-                      </Typography>
-                    </Box>
+                    <div className="flex items-center gap-2">
+                      {getFileIcon(item.name)}
+                      <span className="text-gray-600 cursor-not-allowed">
+                        {item.name} <span className="text-xs text-gray-400">(Trashed)</span>
+                      </span>
+                    </div>
                   )}
-                </Box>
-              </TableCell>
+                </div>
+              </td>
 
-              <TableCell>
+              <td className="px-4 py-2 text-sm">
                 {level === 0 && <TrashedInfo meta={meta} />}
-              </TableCell>
+              </td>
 
-              <TableCell align="right">
+              <td className="px-4 py-2 text-right relative">
                 {showMenu && (
-                  <IconButton
-                    size="small"
-                    onClick={(e) => handleMenuOpen(e, { ...item, fullPath })}
-                  >
-                    <MoreVertIcon />
-                  </IconButton>
+                  <div className="inline-block relative" ref={isMenuOpen ? menuRef : null}>
+                    <button
+                      type="button"
+                      className="p-1 rounded hover:bg-gray-200 transition-colors"
+                      onClick={(e) => handleMenuOpen(e, { ...item, fullPath })}
+                    >
+                      <MoreVertical size={16} className="text-gray-500" />
+                    </button>
+                    {isMenuOpen && (
+                      <div className="absolute right-0 top-8 z-50 bg-white border border-gray-200 rounded-lg shadow-lg py-1 min-w-[160px]">
+                        <button
+                          type="button"
+                          className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                          onClick={() => {
+                            restoreItem(selectedFolderForMenu);
+                            handleMenuClose();
+                          }}
+                        >
+                          <RotateCcw size={14} /> Restore
+                        </button>
+                        <button
+                          type="button"
+                          className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                          onClick={() => {
+                            setItemToDelete(selectedFolderForMenu);
+                            setDeleteConfirmText("");
+                            setDeleteDialogOpen(true);
+                            handleMenuClose();
+                          }}
+                        >
+                          <Trash2 size={14} /> Delete Permanently
+                        </button>
+                        <button
+                          type="button"
+                          className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                          onClick={() => {
+                            handleDownload(selectedFolderForMenu);
+                            handleMenuClose();
+                          }}
+                        >
+                          <Download size={14} /> Download
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 )}
-              </TableCell>
-            </TableRow>
+              </td>
+            </tr>
 
             {isFolder &&
               expandedFolders[fullPath] &&
@@ -432,165 +373,119 @@ const TrashedInfo = ({ meta }) => {
     };
 
     return (
-      <Box sx={{ margin: "auto", p: 3 }}>
-        <Paper elevation={3} sx={{ p: 2, mt: 3 }}>
-          <Typography variant="h6" gutterBottom>
-            📜 Folder Explorer
-          </Typography>
-<Box
-  sx={{
-    mb: 2,
-    p: 1.5,
-    borderRadius: 1,
-    backgroundColor: "#fff8e1",
-    border: "1px solid #ffe082",
-  }}
->
-  <Typography variant="body2" sx={{ fontWeight: 500 }}>
-    ⚠️ Items in Trash will be <strong>permanently deleted after 60 days</strong>.
-    <br />
-    Please restore important files or folders before this period.
-  </Typography>
-</Box>
+      <div className="p-4 md:p-6">
+        {/* Page header */}
+        <div className="mb-4">
+          <h2 className="text-base font-semibold text-gray-800">Trash</h2>
+          <p className="text-xs text-gray-400 mt-0.5">Deleted files and folders</p>
+        </div>
+
+        {/* Warning banner */}
+        <div className="flex items-start gap-3 mb-4 p-4 rounded-xl bg-amber-50 border border-amber-200">
+          <span className="text-amber-500 text-lg leading-none mt-0.5">⚠️</span>
+          <p className="text-sm text-amber-800">
+            Items in Trash will be <strong>permanently deleted after 60 days</strong>. Restore important files before this period.
+          </p>
+        </div>
+
+        {/* Table card */}
+        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
           {folderTree && folderTree.length > 0 ? (
-            <>
-              <TableContainer>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Name</TableCell>
-
-                      <TableCell>Trashed</TableCell>
-
-                      <TableCell align="right">Actions</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>{renderTrashedRows(folderTree)}</TableBody>
-                </Table>
-              </TableContainer>
-            </>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-gray-50 border-b border-gray-200">
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Name</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Time Remaining</th>
+                    <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wide">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {renderTrashedRows(folderTree)}
+                </tbody>
+              </table>
+            </div>
           ) : (
-            <Typography sx={{ p: 2, textAlign: "center" }}>
-              🗑️ Trash is empty.
-            </Typography>
+            <div className="flex flex-col items-center justify-center py-16 gap-3">
+              <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+                <Trash2 size={20} className="text-gray-300" />
+              </div>
+              <p className="text-sm font-medium text-gray-400">Trash is empty</p>
+              <p className="text-xs text-gray-300">Deleted files and folders will appear here</p>
+            </div>
           )}
-        </Paper>
-        <Menu
-          anchorEl={menuAnchorEl}
-          open={Boolean(menuAnchorEl)}
-          onClose={handleMenuClose}
-        >
-          {selectedFolderForMenu && (
-            <>
-              <MenuItem
-                onClick={() => {
-                  restoreItem(selectedFolderForMenu);
-                  handleMenuClose();
-                }}
-              >
-                <RestoreIcon sx={{ mr: 1 }} />
-                Restore
-              </MenuItem>
+        </div>
 
-              {/* <MenuItem
-                onClick={() => {
-                  deleteItem(selectedFolderForMenu);
-                  handleMenuClose();
-                }}
-                sx={{ color: "error.main" }}
-              > */}
-              <MenuItem
-                onClick={() => {
-                  setItemToDelete(selectedFolderForMenu);
-                  setDeleteConfirmText("");
-                  setDeleteDialogOpen(true);
-                  handleMenuClose();
-                }}
-                sx={{ color: "error.main" }}
-              >
-                <DeleteIcon sx={{ mr: 1 }} />
-                Delete Permanently
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  handleDownload(selectedFolderForMenu);
-                  handleMenuClose();
-                }}
-              >
-                <DownloadIcon sx={{ mr: 1 }} />
-                Download
-              </MenuItem>
-            </>
-          )}
-        </Menu>
-
-        <Dialog
-          open={deleteDialogOpen}
-          onClose={() => setDeleteDialogOpen(false)}
-          maxWidth="xs"
-          fullWidth
-        >
-          <DialogTitle sx={{ color: "error.main" }}>
-            Delete Permanently
-          </DialogTitle>
-
-          <DialogContent>
-            <Typography variant="body2" sx={{ mb: 2 }}>
-              This action <strong>cannot be undone</strong>.
-              <br />
-              Type <strong>DELETE</strong> to confirm permanent deletion of:
-            </Typography>
-
-            <Typography variant="subtitle2" sx={{ mb: 1 }}>
-              {itemToDelete?.name}
-            </Typography>
-
-            <TextField
-              autoFocus
-              fullWidth
-              placeholder="Type DELETE"
-              value={deleteConfirmText}
-              onChange={(e) => setDeleteConfirmText(e.target.value)}
-              error={
-                deleteConfirmText.length > 0 && deleteConfirmText !== "DELETE"
-              }
-              helperText={
-                deleteConfirmText && deleteConfirmText !== "DELETE"
-                  ? "You must type DELETE exactly"
-                  : " "
-              }
-            />
-          </DialogContent>
-
-          <DialogActions>
-            <Button
-              onClick={() => setDeleteDialogOpen(false)}
-              variant="outlined"
-            >
-              Cancel
-            </Button>
-
-            <Button
-              variant="contained"
-              color="error"
-              disabled={deleteConfirmText !== "DELETE"}
-              onClick={async () => {
-                await deleteItem(itemToDelete);
-                setDeleteDialogOpen(false);
-                setItemToDelete(null);
-              }}
-            >
-              Delete Permanently
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Box>
+        {/* Delete confirm modal */}
+        {deleteDialogOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/40" onClick={() => setDeleteDialogOpen(false)} />
+            <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-2">
+                <span className="w-7 h-7 rounded-full bg-red-100 flex items-center justify-center">
+                  <Trash2 size={14} className="text-red-600" />
+                </span>
+                <h3 className="text-sm font-semibold text-gray-800">Delete Permanently</h3>
+              </div>
+              <div className="px-6 py-4 space-y-3">
+                <p className="text-sm text-gray-500 leading-relaxed">
+                  This action <strong className="text-gray-800">cannot be undone</strong>. Type{" "}
+                  <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs font-mono text-red-600">DELETE</code>{" "}
+                  to confirm permanent deletion of:
+                </p>
+                <p className="text-sm font-semibold text-gray-800 bg-gray-50 rounded-lg px-3 py-2">
+                  {itemToDelete?.name}
+                </p>
+                <div>
+                  <input
+                    autoFocus
+                    type="text"
+                    placeholder="Type DELETE to confirm"
+                    value={deleteConfirmText}
+                    onChange={(e) => setDeleteConfirmText(e.target.value)}
+                    className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 transition-colors ${
+                      deleteConfirmText.length > 0 && deleteConfirmText !== "DELETE"
+                        ? "border-red-300 focus:ring-red-200 bg-red-50"
+                        : "border-gray-200 focus:ring-blue-200 bg-gray-50"
+                    }`}
+                  />
+                  {deleteConfirmText && deleteConfirmText !== "DELETE" && (
+                    <p className="text-xs text-red-500 mt-1.5">You must type DELETE exactly</p>
+                  )}
+                </div>
+              </div>
+              <div className="px-6 py-4 border-t border-gray-100 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setDeleteDialogOpen(false)}
+                  className="rounded-lg px-4 py-2 text-sm font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  disabled={deleteConfirmText !== "DELETE"}
+                  onClick={async () => {
+                    await deleteItem(itemToDelete);
+                    setDeleteDialogOpen(false);
+                    setItemToDelete(null);
+                  }}
+                  className="rounded-lg px-4 py-2 text-sm font-medium bg-red-600 text-white hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  Delete Permanently
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     );
   };
+
   return (
-    <Box>
+    <div>
       <FolderTreeView accountId={data} />
-    </Box>
+    </div>
   );
 };
 

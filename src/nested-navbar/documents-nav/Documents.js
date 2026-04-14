@@ -2,23 +2,10 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import {
-  Box,
-  Typography,
-  IconButton,
-  Input,
-  Menu,
-  MenuItem,
-  Collapse,
-  Divider,
-  Autocomplete,
-  TextField,
-  Button,
-} from "@mui/material";
+import { BsThreeDotsVertical } from "react-icons/bs";
 import { HiDocumentArrowUp } from "react-icons/hi2";
 import { FaRegFolderClosed } from "react-icons/fa6";
 import { MdOutlineDriveFolderUpload } from "react-icons/md";
-import { BsThreeDotsVertical } from "react-icons/bs";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import CreateFolder from "./AdminPortal/CreateFolder";
@@ -27,7 +14,7 @@ import UploadFolder from "./AdminPortal/folderUpload";
 // import DocumentManager from "./DocumentManager"
 import UploadDoc from "./Firm Docs Shared With Client/UplodDoc";
 import CreateFolderInFirm from "./Firm Docs Shared With Client/CreateFolder";
-import { Folder, FolderOpen, InsertDriveFile } from "@mui/icons-material";
+import { FolderOpen as FolderOpenIcon, FolderClosed as FolderClosedIcon, FileText } from "lucide-react";
 import FileExplorer from "./FileExplorer";
 import EditNameDrawer from "./EditNameDrawer";
 import MoveFile from "./MoveFile";
@@ -224,53 +211,28 @@ const Documents = () => {
     return items.map((item) => {
       if (item.folder) {
         return (
-          <div key={item.id} style={{ paddingLeft: "20px" }}>
-            <div
-              style={{
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                paddingRight: "8px",
-              }}
-            >
+          <div key={item.id} className="pl-5">
+            <div className="flex items-center justify-between pr-2">
               <div
-                style={{ display: "flex", alignItems: "center", gap: "8px" }}
+                className="flex items-center gap-2 cursor-pointer py-1.5 hover:bg-gray-50 rounded-lg px-2 flex-1 transition-colors"
                 onClick={() => handleToggle(item.id)}
               >
-                <span>{item.isOpen ? "📂" : "📁"}</span>
-                <span>{item.folder}</span>
+                <span className="text-sm">{item.isOpen ? "📂" : "📁"}</span>
+                <span className="text-sm font-medium text-gray-700">{item.folder}</span>
                 {item.sealed && (
-                  <span
-                    style={{
-                      backgroundColor: "#d50000",
-                      color: "#fff",
-                      padding: "2px 6px",
-                      borderRadius: "8px",
-                      fontSize: "12px",
-                    }}
-                  >
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-600 text-white">
                     Sealed
                   </span>
                 )}
               </div>
-              {/* <div style={{ position: "relative" }}>
-                <IconButton
+              {item.folder !== "Client Uploaded Documents" && (
+                <button
+                  type="button"
                   onClick={(e) => handleMenuOpen(e, item)}
-                  size="small"
+                  className="h-6 w-6 flex items-center justify-center rounded text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
                 >
-                  <BsThreeDotsVertical />
-                </IconButton>
-              </div> */}
-               {item.folder !== "Client Uploaded Documents" && (
-                <div style={{ position: "relative" }}>
-                  <IconButton
-                    onClick={(e) => handleMenuOpen(e, item)}
-                    size="small"
-                  >
-                    <BsThreeDotsVertical />
-                  </IconButton>
-                </div>
+                  <BsThreeDotsVertical size={13} />
+                </button>
               )}
             </div>
             {item.isOpen && item.contents?.length > 0 && (
@@ -280,43 +242,28 @@ const Documents = () => {
         );
       } else {
         return (
-          <div
-            key={item.id}
-            style={{
-              paddingLeft: "40px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              paddingRight: "8px",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <span>📄</span>
+          <div key={item.id} className="pl-10 flex items-center justify-between pr-2 py-0.5">
+            <div className="flex items-center gap-2">
+              <span className="text-sm">📄</span>
               <span
                 onClick={() => handleFileOpen(item)}
-                style={{ cursor: "pointer" }}
+                className="text-sm text-blue-600 hover:underline cursor-pointer"
               >
                 {item.file}
               </span>
               {item.sealed && (
-                <span
-                  style={{
-                    backgroundColor: "#d50000",
-                    color: "#fff",
-                    padding: "2px 6px",
-                    borderRadius: "8px",
-                    fontSize: "12px",
-                  }}
-                >
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-600 text-white">
                   Sealed
                 </span>
               )}
             </div>
-            <div style={{ position: "relative" }}>
-              <IconButton onClick={(e) => handleMenuOpen(e, item)} size="small">
-                <BsThreeDotsVertical />
-              </IconButton>
-            </div>
+            <button
+              type="button"
+              onClick={(e) => handleMenuOpen(e, item)}
+              className="h-6 w-6 flex items-center justify-center rounded text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+            >
+              <BsThreeDotsVertical size={13} />
+            </button>
           </div>
         );
       }
@@ -336,43 +283,27 @@ const Documents = () => {
         const selectFolder = () => setSelectedFolderId(item.id);
 
         return (
-          <div key={index} style={{ marginLeft: "20px", marginBottom: "4px" }}>
-            <div
-              style={{
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                paddingRight: "8px",
-                borderRadius: "4px",
-              }}
-              onClick={selectFolder}
-            >
+          <div key={index} className="ml-5 mb-1">
+            <div className="flex items-center justify-between pr-2" onClick={selectFolder}>
               <div
+                className="flex items-center gap-2 cursor-pointer py-1.5 hover:bg-gray-50 rounded-lg px-2 flex-1 transition-colors"
                 onClick={toggleFolder}
-                style={{ display: "flex", alignItems: "center", gap: "8px" }}
               >
-                <span>{item.isOpen ? "📂" : "📁"}</span>
-                <span>{item.folder}</span>
+                <span className="text-sm">{item.isOpen ? "📂" : "📁"}</span>
+                <span className="text-sm font-medium text-gray-700">{item.folder}</span>
               </div>
-              {/* <IconButton
-                onClick={(e) => handlePrivateMenuOpen(e, item)}
-                size="small"
-                style={{ marginLeft: "auto" }}
-              >
-                <BsThreeDotsVertical />
-              </IconButton> */}
-               {item.folder !== "Private" && (
-                <IconButton
+              {item.folder !== "Private" && (
+                <button
+                  type="button"
                   onClick={(e) => handlePrivateMenuOpen(e, item)}
-                  size="small"
-                  style={{ marginLeft: "auto" }}
+                  className="h-6 w-6 flex items-center justify-center rounded text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
                 >
-                  <BsThreeDotsVertical />
-                </IconButton>
+                  <BsThreeDotsVertical size={13} />
+                </button>
               )}
             </div>
             {item.isOpen && item.contents?.length > 0 && (
-              <div style={{ marginTop: "4px" }}>
+              <div className="mt-1">
                 {renderPrivateFolderContents(item.contents, (newContents) => {
                   const updated = contents.map((f, i) =>
                     i === index ? { ...f, contents: newContents } : f
@@ -384,58 +315,22 @@ const Documents = () => {
           </div>
         );
       } else if (item.file) {
-        // return (
-        //   <div
-        //     key={index}
-        //     style={{
-        //       marginLeft: "40px",
-        //       padding: "4px 8px",
-        //       fontSize: "15px",
-
-        //       display: "flex",
-        //       alignItems: "center",
-        //     }}
-        //   >
-        //     <span style={{ marginRight: "8px" }}>📄</span>
-
-        //     <span
-        //       onClick={() => handleFileOpen(item)}
-        //       style={{
-        //         cursor: "pointer",
-
-        //       }}
-        //     >
-        //       {item.file}
-        //     </span>
-
-        //   </div>
-        // );
-
         return (
-          <div
-            key={index}
-            style={{
-              marginLeft: "40px",
-              padding: "4px 8px",
-              fontSize: "15px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
+          <div key={index} className="ml-10 flex items-center justify-between py-1 pr-2">
             <div
-              style={{ display: "flex", alignItems: "center", gap: "8px" }}
+              className="flex items-center gap-2 cursor-pointer"
               onClick={() => handleFileOpen(item)}
             >
-              <span>📄</span>
-              <span style={{ cursor: "pointer" }}>{item.file}</span>
+              <span className="text-sm">📄</span>
+              <span className="text-sm text-blue-600 hover:underline">{item.file}</span>
             </div>
-            <IconButton
+            <button
+              type="button"
               onClick={(e) => handlePrivateMenuOpen(e, item)}
-              size="small"
+              className="h-6 w-6 flex items-center justify-center rounded text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
             >
-              <BsThreeDotsVertical />
-            </IconButton>
+              <BsThreeDotsVertical size={13} />
+            </button>
           </div>
         );
       }
@@ -483,80 +378,54 @@ const Documents = () => {
   const [openFolders, setOpenFolders] = useState({});
   const renderFolder = (folder) => {
     return (
-      <Box key={folder.folderName} sx={{ ml: 2 }}>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            cursor: "pointer",
-            my: 1,
-          }}
+      <div key={folder.folderName} className="ml-3">
+        <div
+          className="flex items-center gap-2 cursor-pointer py-1.5 hover:bg-gray-50 rounded-lg px-2 transition-colors"
           onClick={() => toggleFirmFolder(folder.folderName)}
         >
           {openFolders[folder.folderName] ? (
-            <FolderOpen color="primary" />
+            <FolderOpenIcon size={16} className="text-amber-400 shrink-0" />
           ) : (
-            <Folder color="primary" />
+            <FolderClosedIcon size={16} className="text-amber-400 shrink-0" />
           )}
-          <Typography variant="body1" sx={{ ml: 1 }}>
-            {folder.folderName}
-          </Typography>
-        </Box>
+          <span className="text-sm font-medium text-gray-700">{folder.folderName}</span>
+        </div>
 
-        <Collapse in={openFolders[folder.folderName]}>
-          <Box sx={{ ml: 3 }}>
+        {openFolders[folder.folderName] && (
+          <div className="ml-5">
             {folder.structure?.map((item, index) => (
               <React.Fragment key={index}>
                 {item.subfolders?.map((subfolder) => (
-                  <Box key={subfolder.name} sx={{ ml: 2 }}>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        cursor: "pointer",
-                        my: 1,
-                      }}
+                  <div key={subfolder.name} className="ml-2">
+                    <div
+                      className="flex items-center gap-2 cursor-pointer py-1.5 hover:bg-gray-50 rounded-lg px-2 transition-colors"
                       onClick={() => toggleFirmFolder(subfolder.name)}
                     >
                       {openFolders[subfolder.name] ? (
-                        <FolderOpen color="primary" />
+                        <FolderOpenIcon size={15} className="text-amber-400 shrink-0" />
                       ) : (
-                        <Folder color="primary" />
+                        <FolderClosedIcon size={15} className="text-amber-400 shrink-0" />
                       )}
-                      <Typography variant="body1" sx={{ ml: 1 }}>
-                        {subfolder.name}
-                      </Typography>
-                    </Box>
+                      <span className="text-sm text-gray-700">{subfolder.name}</span>
+                    </div>
 
-                    <Collapse in={openFolders[subfolder.name]}>
-                      <Box sx={{ ml: 3 }}>
+                    {openFolders[subfolder.name] && (
+                      <div className="ml-5">
                         {subfolder.files.map((file, fileIndex) => (
-                          <Box
-                            key={fileIndex}
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              my: 1,
-                            }}
-                          >
-                            <InsertDriveFile color="action" />
-                            <Typography
-                              variant="body2"
-                              sx={{ ml: 1, color: "text.secondary" }}
-                            >
-                              {file}
-                            </Typography>
-                          </Box>
+                          <div key={fileIndex} className="flex items-center gap-2 py-1 px-2">
+                            <FileText size={14} className="text-gray-400 shrink-0" />
+                            <span className="text-xs text-gray-600">{file}</span>
+                          </div>
                         ))}
-                      </Box>
-                    </Collapse>
-                  </Box>
+                      </div>
+                    )}
+                  </div>
                 ))}
               </React.Fragment>
             ))}
-          </Box>
-        </Collapse>
-      </Box>
+          </div>
+        )}
+      </div>
     );
   };
 
@@ -783,446 +652,190 @@ const Documents = () => {
       });
   };
 
-  if (error) return <div>Error: {error}</div>;
+  if (error) return <div className="p-4 text-sm text-red-600">Error: {error}</div>;
   if (!combinedFolderStructure || !privateStructFolder) return <div></div>;
+
   return (
-    <Box>
-      <Box
-        sx={{
-          backgroundColor: "#fff",
-          borderRadius: "8px",
-          padding: "16px",
-          maxWidth: "800px",
-        }}
-      >
-        <Box sx={{ display: "flex", gap: 2 }}>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <IconButton
-              component="label"
-              htmlFor="fileInput"
-              sx={{ color: "#e87800" }}
-            >
-              <HiDocumentArrowUp size={24} />
-            </IconButton>
-            <Typography
-              variant="body1"
-              component="label"
-              htmlFor="fileInput"
-              sx={{ cursor: "pointer" }}
-            >
-              Upload Document
-            </Typography>
-            <Input
+    <div className="space-y-5">
+      {/* Client Docs toolbar */}
+      <div className="bg-white rounded-xl border border-gray-200 p-4">
+        <div className="flex flex-wrap items-center gap-3">
+          <label htmlFor="fileInput" className="flex items-center gap-2 cursor-pointer px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700">
+            <HiDocumentArrowUp size={18} className="text-orange-500" />
+            Upload Document
+            <input
               type="file"
               id="fileInput"
-              onChange={(e) => {
-                handleFileChange(e);
-                handleFileUpload();
-              }}
-              sx={{ display: "none" }}
+              className="hidden"
+              onChange={(e) => { handleFileChange(e); handleFileUpload(); }}
             />
-          </Box>
+          </label>
 
-          <Box
-            sx={{ display: "flex", alignItems: "center", gap: 1 }}
+          <button
+            type="button"
             onClick={handleCreateFolderClick}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700"
           >
-            <IconButton sx={{ color: "#e87800" }}>
-              <FaRegFolderClosed size={20} />
-            </IconButton>
-            <Typography variant="body1" sx={{ cursor: "pointer" }}>
-              Create Folder
-            </Typography>
-          </Box>
+            <FaRegFolderClosed size={16} className="text-orange-500" />
+            Create Folder
+          </button>
 
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 1,
-              cursor: "pointer",
-            }}
+          <button
+            type="button"
             onClick={() => folderInputRef.current.click()}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700"
           >
-            <IconButton sx={{ color: "#e87800" }}>
-              <MdOutlineDriveFolderUpload size={24} />
-            </IconButton>
-            <Typography variant="body1">Upload Folder</Typography>
+            <MdOutlineDriveFolderUpload size={18} className="text-orange-500" />
+            Upload Folder
             <input
               type="file"
               ref={folderInputRef}
-              style={{ display: "none" }}
+              className="hidden"
               webkitdirectory="true"
               directory="true"
               onChange={handleFolderSelection}
             />
-          </Box>
+          </button>
 
-          <Button
-            variant="contained"
-            color="primary"
+          <button
+            type="button"
             onClick={() => setShowAutocomplete((prev) => !prev)}
-            sx={{
-              backgroundColor: "var(--color-save-btn)",
-              "&:hover": { backgroundColor: "var(--color-save-hover-btn)" },
-              borderRadius: "15px",
-            }}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] transition-colors"
           >
             Assign Folder Template
-          </Button>
-        </Box>
+          </button>
+        </div>
 
         {showAutocomplete && (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 3, mt: 2 }}>
-            <Autocomplete
-              options={optionFolders}
-              getOptionLabel={(option) => option.label}
-              value={selectedTemplate}
-              onChange={(event, newValue) => handleSelectTemplate(newValue)}
-              isOptionEqualToValue={(option, value) =>
-                option.value === value.value
-              }
-              renderOption={(props, option) => (
-                <Box
-                  component="li"
-                  {...props}
-                  sx={{ cursor: "pointer", margin: "5px 10px" }} // Add cursor pointer style
-                >
-                  {option.label}
-                </Box>
-              )}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  sx={{ backgroundColor: "#fff" }}
-                  placeholder="Select Folder "
-                  variant="outlined"
-                  size="small"
-                />
-              )}
-              sx={{ width: "30%", marginTop: "8px" }}
-              clearOnEscape // Enable clearable functionality
-            />
-            <Box mt={2}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={assignfoldertemp}
-                disabled={!selectedTemplate}
-                sx={{
-                  backgroundColor: "var(--color-save-btn)", // Normal background
-
-                  "&:hover": {
-                    backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                  },
-                  borderRadius: "15px",
-                  width: "80px",
+          <div className="flex items-end gap-3 mt-4 pt-4 border-t border-gray-100">
+            <div className="w-72">
+              <label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-1.5">Folder Template</label>
+              <select
+                value={selectedTemplate?.value || ""}
+                onChange={(e) => {
+                  const opt = optionFolders.find(o => o.value === e.target.value);
+                  handleSelectTemplate(opt || null);
                 }}
+                className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 transition-colors"
               >
-                Save
-              </Button>
-            </Box>
-          </Box>
+                <option value="">Select Folder Template</option>
+                {optionFolders.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            </div>
+            <button
+              type="button"
+              onClick={assignfoldertemp}
+              disabled={!selectedTemplate}
+              className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] disabled:opacity-50 transition-colors"
+            >
+              Save
+            </button>
+          </div>
         )}
-      </Box>
+      </div>
 
-      <Box>
+      {/* Client uploaded documents tree */}
+      <div className="bg-white rounded-xl border border-gray-200 p-4">
+        <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-3">Client Uploaded Documents</p>
         <div>{renderTree(combinedFolderStructure)}</div>
-      </Box>
+      </div>
 
-      <Box>
+      {/* Private folders tree */}
+      <div className="bg-white rounded-xl border border-gray-200 p-4">
+        <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-3">Private Documents</p>
         {renderPrivateFolderContents(
           privateStructFolder.folders,
-          (newFolders) =>
-            setPrivateStructFolder({
-              ...privateStructFolder,
-              folders: newFolders,
-            })
+          (newFolders) => setPrivateStructFolder({ ...privateStructFolder, folders: newFolders })
         )}
-      </Box>
+      </div>
 
-      <Box sx={{ mt: 2, borderBottom: "2px solid grey" }}></Box>
+      <div className="border-t border-gray-200" />
 
-      <Box>
-        <Box
-          sx={{
-            backgroundColor: "#fff",
-            borderRadius: "8px",
-            padding: "16px",
-            maxWidth: "800px",
-          }}
-        >
-          <Box sx={{ display: "flex", gap: 2 }}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <IconButton
-                component="label"
-                htmlFor="firmDocFileInput"
-                sx={{ color: "#e87800" }}
-              >
-                <HiDocumentArrowUp size={24} />
-              </IconButton>
-              <Typography
-                variant="body1"
-                component="label"
-                htmlFor="firmDocFileInput"
-                sx={{ cursor: "pointer" }}
-              >
-                Upload Document in firm
-              </Typography>
-              <Input
-                type="file"
-                id="firmDocFileInput"
-                onChange={(e) => {
-                  handleNewFileChange(e);
-                  handleOpenDrawer();
-                }}
-                sx={{ display: "none" }}
-              />
-            </Box>
+      {/* Firm docs section */}
+      <div className="bg-white rounded-xl border border-gray-200 p-4">
+        <div className="flex flex-wrap items-center gap-3 mb-4">
+          <label htmlFor="firmDocFileInput" className="flex items-center gap-2 cursor-pointer px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700">
+            <HiDocumentArrowUp size={18} className="text-orange-500" />
+            Upload Document in firm
+            <input
+              type="file"
+              id="firmDocFileInput"
+              className="hidden"
+              onChange={(e) => { handleNewFileChange(e); handleOpenDrawer(); }}
+            />
+          </label>
 
-            <Box
-              sx={{ display: "flex", alignItems: "center", gap: 1 }}
-              onClick={handleNewFolderClick}
-            >
-              <IconButton sx={{ color: "#e87800" }}>
-                <FaRegFolderClosed size={20} />
-              </IconButton>
-              <Typography variant="body1" sx={{ cursor: "pointer" }}>
-                Create Folder in firm
-              </Typography>
-            </Box>
-          </Box>
-        </Box>
-        <Box>
-          
-          <FileExplorer accountId={data} refreshTrigger={refreshKey} />
-        </Box>
-      </Box>
+          <button
+            type="button"
+            onClick={handleNewFolderClick}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700"
+          >
+            <FaRegFolderClosed size={16} className="text-orange-500" />
+            Create Folder in firm
+          </button>
+        </div>
+        <FileExplorer accountId={data} refreshTrigger={refreshKey} />
+      </div>
 
-      {/* <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleMenuClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-        transformOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        {selectedItem?.folder === "Client Uploaded Documents" ? (
-          <>
-            <MenuItem onClick={() => handleMenuAction("new-folder")} disabled>
-              New Folder
-            </MenuItem>
-            <MenuItem disabled onClick={() => handleMenuAction("edit")}>
-              Edit
-            </MenuItem>
-           
-          </>
-        ) : (
-          <>
-           
-            <MenuItem onClick={() => {
-           
-              handleEdit(selectedItem);
-              handleMenuClose();
-           
-          }}>Edit</MenuItem>
-            <MenuItem onClick={() =>{ handleDelete(selectedItem); handleMenuClose();}}>
-              Delete
-            </MenuItem>
+      {/* Client docs context menu */}
+      {Boolean(anchorEl) && (
+        <>
+          <div className="fixed inset-0 z-30" onClick={handleMenuClose} />
+          <div
+            className="fixed z-40 bg-white border border-gray-200 rounded-xl shadow-xl w-48 py-1 overflow-hidden"
+            style={{ top: anchorEl?.getBoundingClientRect?.()?.bottom ?? 0, left: anchorEl?.getBoundingClientRect?.()?.left ?? 0 }}
+          >
+            {selectedItem?.folder === "Client Uploaded Documents" ? (
+              <>
+                {["New Folder", "Edit", "Move", "Seal/Unseal", "Delete"].map((label) => (
+                  <button key={label} type="button" disabled className="w-full text-left px-4 py-2 text-sm text-gray-400 cursor-not-allowed">{label}</button>
+                ))}
+              </>
+            ) : selectedItem?.folder ? (
+              <>
+                <button type="button" className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" onClick={() => { handleEdit(selectedItem); handleMenuClose(); }}>Edit</button>
+                <button type="button" className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" onClick={() => { handleFileMove(); handleMenuClose(); handleMove(selectedItem); }}>Move</button>
+                <button type="button" className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" onClick={() => handleMenuAction(selectedItem?.sealed ? "unseal" : "seal")}>{selectedItem?.sealed ? "Unseal" : "Seal"}</button>
+                <button type="button" className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50" onClick={() => { handleDelete(selectedItem); handleMenuClose(); }}>Delete</button>
+              </>
+            ) : (
+              <>
+                <button type="button" className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" onClick={() => { handleEdit(selectedItem); handleMenuClose(); }}>Edit</button>
+                <button type="button" className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" onClick={() => handleMenuAction(selectedItem?.sealed ? "unseal" : "seal")}>{selectedItem?.sealed ? "Unseal" : "Seal"}</button>
+                <button type="button" className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" onClick={() => { handleFileMove(); handleMenuClose(); handleMove(selectedItem); }}>Move</button>
+                <button type="button" className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" onClick={() => handleFileOpen(selectedItem)}>Download</button>
+                <button type="button" className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50" onClick={() => { handleDelete(selectedItem); handleMenuClose(); }}>Delete</button>
+              </>
+            )}
+          </div>
+        </>
+      )}
 
-            <MenuItem
-              onClick={() =>
-                handleMenuAction(selectedItem?.sealed ? "unseal" : "seal")
-              }
-            >
-              {selectedItem?.sealed ? "Unseal" : "Seal"}
-            </MenuItem>
-
-             
-
-<MenuItem onClick={() => {
-           
-              handleFileMove();
-              handleMenuClose();
-              handleMove(selectedItem);
-           
-          }}>Move</MenuItem>
-
-          </>
-        )}
-      </Menu> */}
-
-     <Menu
-    anchorEl={anchorEl}
-    open={Boolean(anchorEl)}
-    onClose={handleMenuClose}
-    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-    transformOrigin={{ vertical: "top", horizontal: "right" }}
-  >
-    {selectedItem?.folder === "Client Uploaded Documents" ? (
-      // Disable all options for the parent folder
-      <>
-        <MenuItem disabled>New Folder</MenuItem>
-        <MenuItem disabled>Edit</MenuItem>
-        <MenuItem disabled>Move</MenuItem>
-        <MenuItem disabled>Seal/Unseal</MenuItem>
-        <MenuItem disabled>Delete</MenuItem>
-      </>
-    ) : selectedItem?.folder ? (
-      // Folder menu options (for non-parent folders)
-      <>
-        {/* <MenuItem onClick={() => handleMenuAction("new-folder")}>
-          New Folder
-        </MenuItem> */}
-        <MenuItem onClick={() => {
-          handleEdit(selectedItem);
-          handleMenuClose();
-        }}>
-          Edit
-        </MenuItem>
-        <MenuItem onClick={() => {
-          handleFileMove();
-          handleMenuClose();
-          handleMove(selectedItem);
-        }}>
-          Move
-        </MenuItem>
-        <MenuItem onClick={() =>
-          handleMenuAction(selectedItem?.sealed ? "unseal" : "seal")
-        }>
-          {selectedItem?.sealed ? "Unseal" : "Seal"}
-        </MenuItem>
-        <MenuItem onClick={() => { 
-          handleDelete(selectedItem); 
-          handleMenuClose();
-        }}>
-          Delete
-        </MenuItem>
-      </>
-    ) : (
-      // File menu options
-      <>
-        <MenuItem onClick={() => {
-          handleEdit(selectedItem);
-          handleMenuClose();
-        }}>
-          Edit
-        </MenuItem>
-        <MenuItem onClick={() => { 
-          handleDelete(selectedItem); 
-          handleMenuClose();
-        }}>
-          Delete
-        </MenuItem>
-        <MenuItem onClick={() =>
-          handleMenuAction(selectedItem?.sealed ? "unseal" : "seal")
-        }>
-          {selectedItem?.sealed ? "Unseal" : "Seal"}
-        </MenuItem>
-        <MenuItem onClick={() => {
-          handleFileMove();
-          handleMenuClose();
-          handleMove(selectedItem);
-        }}>
-          Move
-        </MenuItem>
-        <MenuItem onClick={() => handleFileOpen(selectedItem)}>
-          Download
-        </MenuItem>
-      </>
-    )}
-  </Menu>
-
-      {/* <Menu
-        anchorEl={privateAnchorEl}
-        open={Boolean(privateAnchorEl)}
-        onClose={handlePrivateCloseMenu}
-      >
-        <MenuItem
-          onClick={() => {
-            if (selectedItem?.folder !== "Private") {
-              handleEdit(selectedItem);
-              handlePrivateCloseMenu();
-            }
-          }}
-          disabled={selectedItem?.folder === "Private"}
-        >
-          Edit
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            if (selectedItem?.folder !== "Private") {
-              handleDelete(selectedItem);
-              handlePrivateCloseMenu();
-            }
-          }}
-          disabled={selectedItem?.folder === "Private"}
-        >
-          Delete
-        </MenuItem>
-         <MenuItem onClick={() => {
-           
-              handleFileMove();
-              handleMenuClose();
-              handleMove(selectedItem);
-           
-          }}>Move</MenuItem>
-      </Menu> */}
-      <Menu
-    anchorEl={privateAnchorEl}
-    open={Boolean(privateAnchorEl)}
-    onClose={handlePrivateCloseMenu}
-  >
-    {selectedItem?.folder ? (
-      // Private folder menu options
-      <>
-        <MenuItem onClick={() => {
-          handleEdit(selectedItem);
-          handlePrivateCloseMenu();
-        }}>
-          Edit
-        </MenuItem>
-        <MenuItem onClick={() => {
-          handleFileMove();
-          handlePrivateCloseMenu();
-          handleMove(selectedItem);
-        }}>
-          Move
-        </MenuItem>
-        <MenuItem onClick={() => { 
-          handleDelete(selectedItem); 
-          handlePrivateCloseMenu();
-        }}>
-          Delete
-        </MenuItem>
-      </>
-    ) : (
-      // Private file menu options
-      <>
-        <MenuItem onClick={() => {
-          handleEdit(selectedItem);
-          handlePrivateCloseMenu();
-        }}>
-          Edit
-        </MenuItem>
-        <MenuItem onClick={() => { 
-          handleDelete(selectedItem); 
-          handlePrivateCloseMenu();
-        }}>
-          Delete
-        </MenuItem>
-        <MenuItem onClick={() => {
-          handleFileMove();
-          handlePrivateCloseMenu();
-          handleMove(selectedItem);
-        }}>
-          Move
-        </MenuItem>
-        <MenuItem onClick={() => handleFileOpen(selectedItem)}>
-          Download
-        </MenuItem>
-      </>
-    )}
-  </Menu>
+      {/* Private docs context menu */}
+      {Boolean(privateAnchorEl) && (
+        <>
+          <div className="fixed inset-0 z-30" onClick={handlePrivateCloseMenu} />
+          <div
+            className="fixed z-40 bg-white border border-gray-200 rounded-xl shadow-xl w-48 py-1 overflow-hidden"
+            style={{ top: privateAnchorEl?.getBoundingClientRect?.()?.bottom ?? 0, left: privateAnchorEl?.getBoundingClientRect?.()?.left ?? 0 }}
+          >
+            {selectedItem?.folder ? (
+              <>
+                <button type="button" className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" onClick={() => { handleEdit(selectedItem); handlePrivateCloseMenu(); }}>Edit</button>
+                <button type="button" className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" onClick={() => { handleFileMove(); handlePrivateCloseMenu(); handleMove(selectedItem); }}>Move</button>
+                <button type="button" className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50" onClick={() => { handleDelete(selectedItem); handlePrivateCloseMenu(); }}>Delete</button>
+              </>
+            ) : (
+              <>
+                <button type="button" className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" onClick={() => { handleEdit(selectedItem); handlePrivateCloseMenu(); }}>Edit</button>
+                <button type="button" className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" onClick={() => { handleFileMove(); handlePrivateCloseMenu(); handleMove(selectedItem); }}>Move</button>
+                <button type="button" className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" onClick={() => handleFileOpen(selectedItem)}>Download</button>
+                <button type="button" className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50" onClick={() => { handleDelete(selectedItem); handlePrivateCloseMenu(); }}>Delete</button>
+              </>
+            )}
+          </div>
+        </>
+      )}
 
       <EditNameDrawer
         open={drawerOpen}
@@ -1287,7 +900,7 @@ const Documents = () => {
         onClose={() => setIsFolderCreate(false)}
         accountId={data}
       />
-    </Box>
+    </div>
   );
 };
 

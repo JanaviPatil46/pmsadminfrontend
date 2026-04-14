@@ -23,7 +23,6 @@
 // export default TemplateName
 
 import React from "react";
-import { TextField, Button, Box, Typography, InputLabel } from "@mui/material";
 
 function TemplateName({
   handleSaveTemplate,
@@ -33,55 +32,35 @@ function TemplateName({
 }) {
   return (
     <>
-      <Typography variant="h5">Create folder template</Typography>
-      <Box display="flex" flexDirection="column" gap={2} mt={3}>
-        <Box>
-          <InputLabel sx={{ color: "black" }}>Template Name</InputLabel>
-          <TextField
+      <h2 className="text-lg font-semibold">Create folder template</h2>
+      <div className="flex flex-col gap-4 mt-4">
+        <div>
+          <label className="block text-xs text-black font-medium mb-1">Template Name</label>
+          <input
+            type="text"
             placeholder="Template Name"
             value={tempName}
             onChange={(e) => setTempName(e.target.value)}
-            fullWidth
-            size="small"
-            margin="normal"
+            className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm mt-1 focus:outline-none focus:ring-1 focus:ring-blue-400"
           />
-        </Box>
-        <Box display="flex" gap={2}>
-          <Button
-            variant="contained"
-            color="primary"
+        </div>
+        <div className="flex gap-2">
+          <button
+            type="button"
             onClick={handleSaveTemplate}
-            sx={{
-              backgroundColor: "var(--color-save-btn)", // Normal background
-
-              "&:hover": {
-                backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-              },
-              borderRadius: "15px",
-              width: "80px",
-            }}
+            className="rounded-full px-5 py-1.5 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)]"
           >
             Save
-          </Button>
-          <Button
-            variant="outlined"
+          </button>
+          <button
+            type="button"
             onClick={handleCancel}
-            sx={{
-              borderColor: "var(--color-border-cancel-btn)", // Normal background
-              color: "var(--color-save-btn)",
-              "&:hover": {
-                backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                color: "#fff",
-                border: "none",
-              },
-              width: "80px",
-              borderRadius: "15px",
-            }}
+            className="rounded-full px-5 py-1.5 text-sm font-medium border border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white"
           >
             Cancel
-          </Button>
-        </Box>
-      </Box>
+          </button>
+        </div>
+      </div>
     </>
   );
 }

@@ -903,35 +903,13 @@
 
 // export default ChatDetails;
 
-import {
-  Box,
-  Typography,
-  Divider,
-  Grid,
-  Checkbox,
-  IconButton,
-  Button,
-  Menu,
-  MenuItem,
-  List,
-  ListItem,
-  ListItemText,
-  TextField,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-} from "@mui/material";
 import { toast } from "react-toastify";
 import React, { useEffect, useState, useRef, useContext } from "react";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import CloseIcon from "@mui/icons-material/Close";
-import EditIcon from "@mui/icons-material/Edit";
 import Editor from "./Texteditor";
 import { LoginContext } from "../../../Sidebar/Context/Context";
 import axios from "axios";
-import DeleteIcon from "@mui/icons-material/Delete";
-import AddIcon from "@mui/icons-material/Add";
+import { IoClose } from "react-icons/io5";
+import { MdMoreVert, MdAdd, MdDeleteOutline } from "react-icons/md";
 
 const ChatDetails = ({
   chat,
@@ -1441,112 +1419,78 @@ const ChatDetails = ({
     }
   };
 
+  const inputCls = "w-full rounded border border-gray-200 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-400";
+
   if (!chat) return null;
 
   return (
-    <Box sx={{ display: "flex" }}>
-      {/* Edit Dialog */}
-      <Dialog
-        open={editDialogOpen}
-        onClose={handleCancelEdit}
-        maxWidth="md"
-        fullWidth
-      >
-        <DialogTitle>Edit Message</DialogTitle>
-        <DialogContent>
-          <Box sx={{ mt: 2, minHeight: 200 }}>
-            <Editor 
-              onChange={setEditContent} 
-              value={editContent} 
-            />
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCancelEdit}>Cancel</Button>
-          <Button 
-            onClick={handleSaveEdit} 
-            variant="contained"
-            disabled={!editContent.trim()}
-          >
-            Save Changes
-          </Button>
-        </DialogActions>
-      </Dialog>
+    <div className="flex">
+      {/* Edit Message Modal */}
+      {editDialogOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/30" onClick={handleCancelEdit} />
+          <div className="relative bg-white rounded-lg shadow-xl w-full max-w-2xl p-6">
+            <h2 className="text-base font-semibold mb-3">Edit Message</h2>
+            <div className="mt-2 min-h-[200px]">
+              <Editor onChange={setEditContent} value={editContent} />
+            </div>
+            <div className="flex justify-end gap-2 mt-4">
+              <button type="button" onClick={handleCancelEdit}
+                className="rounded-full px-5 py-1.5 text-sm font-medium border border-gray-300 text-gray-600 hover:bg-gray-50">
+                Cancel
+              </button>
+              <button type="button" onClick={handleSaveEdit}
+                disabled={!editContent.trim()}
+                className={`rounded-full px-5 py-1.5 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] ${
+                  !editContent.trim() ? 'opacity-50 cursor-not-allowed' : ''
+                }`}>
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Chat Area */}
-      <Box sx={{ flex: 1, overflow: "hidden", pr: showTasks ? 2 : 0 }}>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Box>
-            <Typography variant="h6" gutterBottom>
-              {chat.accountid.accountName}
-            </Typography>
-            <Typography variant="subtitle2" gutterBottom>
-              {chat.chatsubject}
-            </Typography>
-          </Box>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            {tasks.length > 0 ? (
-              <Typography
-                variant="subtitle2"
-                fontWeight={600}
-                sx={{ cursor: "pointer" }}
-                onClick={toggleTasks}
-              >
-                Client Tasks:{" "}
-                {`${tasks.filter((task) => task.checked).length}/${tasks.length}`}
-              </Typography>
-            ) : (
-              <Typography
-                variant="subtitle2"
-                fontWeight={600}
-                sx={{ cursor: "pointer", color: "primary.main" }}
-                onClick={toggleTasks}
-              >
-                + Add Client Task
-              </Typography>
-            )}
+      <div className={`flex-1 overflow-hidden ${showTasks ? 'pr-2' : ''}`}>
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-base font-semibold">{chat.accountid.accountName}</p>
+            <p className="text-sm text-gray-500">{chat.chatsubject}</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <button type="button" onClick={toggleTasks}
+              className="text-sm font-semibold cursor-pointer text-[var(--color-save-btn)] hover:underline">
+              {tasks.length > 0
+                ? `Client Tasks: ${tasks.filter(t => t.checked).length}/${tasks.length}`
+                : "+ Add Client Task"}
+            </button>
+            <div className="relative">
+              <button type="button" onClick={(e) => setChatAnchorEl(e.currentTarget)}
+                className="p-1 rounded hover:bg-gray-100 text-gray-600">
+                <MdMoreVert size={20} />
+              </button>
+              {Boolean(chatanchorEl) && (
+                <div className="absolute right-0 top-8 z-50 bg-white border border-gray-200 rounded-lg shadow-md w-44">
+                  <button type="button" className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
+                    onClick={() => handleArchiveThread(chatId)}>
+                    {chat.active ? "Archive Thread" : "Activate Thread"}
+                  </button>
+                  <button type="button" className="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-50"
+                    onClick={() => { handleDeleteThread(); handleChatMenuClose(); }}>
+                    Delete
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
 
-            <IconButton
-              sx={{ cursor: "pointer" }}
-              onClick={(e) => setChatAnchorEl(e.currentTarget)}
-            >
-              <MoreVertIcon />
-            </IconButton>
-            <Menu
-              anchorEl={chatanchorEl}
-              open={Boolean(chatanchorEl)}
-              onClose={handleChatMenuClose}
-            >
-              <MenuItem
-                onClick={() => {
-                  handleArchiveThread(chatId);
-                }}
-              >
-                {chat.active ? "Archive Thread" : "Activate Thread"}
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  handleDeleteThread();
-                  handleChatMenuClose();
-                }}
-              >
-                Delete
-              </MenuItem>
-            </Menu>
-          </Box>
-        </Box>
+        <hr className="my-2 border-gray-200" />
 
-        <Divider sx={{ my: 1 }} />
-
-        <Box height={"40vh"} sx={{ overflowY: "auto", mt: 1, mb: 1 }}>
-          {Array.isArray(chat.description) &&
-            chat.description.length > 0 &&
+        {/* Messages */}
+        <div className="overflow-y-auto mt-1 mb-1" style={{ height: '40vh' }}>
+          {Array.isArray(chat.description) && chat.description.length > 0 &&
             chat.description.map((desc, index) => (
               <MessageItem
                 key={desc._id || index}
@@ -1567,111 +1511,65 @@ const ChatDetails = ({
                 canEditMessage={canEditMessage}
                 hasMenuOptions={hasMenuOptions}
               />
-            ))}
-        </Box>
+            ))
+          }
+        </div>
 
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: "1fr auto",
-            gap: 2,
-            alignItems: "start",
-            height: "35vh",
-            overflowY: "auto",
-          }}
-        >
-          {replyTo && (
-            <ReplyPreview replyTo={replyTo} setReplyTo={setReplyTo} />
-          )}
-          <Box sx={{ display: "flex", gap: 3, alignItems: "center" }}>
+        {/* Reply + Editor */}
+        <div className="grid gap-2 overflow-y-auto" style={{ gridTemplateColumns: '1fr auto', height: '35vh' }}>
+          {replyTo && <ReplyPreview replyTo={replyTo} setReplyTo={setReplyTo} />}
+          <div className="flex gap-3 items-end">
             <Editor onChange={handleEditorChange} value={editorContent} />
-            <Button
-              onClick={() => updateChatDescription()}
-              variant="contained"
-              sx={{ height: "fit-content", alignSelf: "end" }}
-            >
+            <button type="button" onClick={() => updateChatDescription()}
+              className="rounded-full px-5 py-1.5 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] self-end shrink-0">
               Send
-            </Button>
-          </Box>
-        </Box>
-      </Box>
+            </button>
+          </div>
+        </div>
+      </div>
 
       {/* Tasks Panel */}
       {showTasks && (
-        <Box
-          sx={{
-            width: 300,
-            borderLeft: "1px solid #e0e0e0",
-            pl: 2,
-            pr: 1,
-            overflowY: "auto",
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              pt: 2,
-              pb: 1,
-            }}
-          >
-            <Typography variant="h6">Client Tasks</Typography>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <IconButton onClick={handleAddTask} color="primary">
-                <AddIcon />
-              </IconButton>
-              <IconButton onClick={toggleTasks} color="primary">
-                <CloseIcon />
-              </IconButton>
-            </Box>
-          </Box>
-
-          <List>
+        <div className="w-[300px] border-l border-gray-200 pl-3 pr-1 overflow-y-auto">
+          <div className="flex items-center justify-between pt-3 pb-2">
+            <span className="text-base font-semibold">Client Tasks</span>
+            <div className="flex items-center gap-1">
+              <button type="button" onClick={handleAddTask} className="p-1 rounded hover:bg-gray-100 text-blue-600">
+                <MdAdd size={18} />
+              </button>
+              <button type="button" onClick={toggleTasks} className="p-1 rounded hover:bg-gray-100 text-blue-600">
+                <IoClose size={18} />
+              </button>
+            </div>
+          </div>
+          <div className="space-y-1">
             {tasks.map((task) => (
-              <ListItem
-                key={task.id}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  px: 0,
-                }}
-              >
-                <Checkbox
+              <div key={task.id} className="flex items-center gap-2">
+                <input type="checkbox" className="h-4 w-4 rounded border-gray-300 cursor-pointer"
                   checked={task.checked}
                   onChange={() => handleTaskToggle(task.id)}
                 />
-                <TextField
+                <input type="text"
+                  className={`flex-1 rounded border border-gray-200 px-2 py-1 text-sm ${
+                    task.checked ? 'line-through text-gray-400' : ''
+                  }`}
                   value={task.text}
-                  onChange={(e) =>
-                    handleTaskTextChange(task.id, e.target.value)
-                  }
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  sx={{
-                    mr: 1,
-                    textDecoration: task.checked ? "line-through" : "none",
-                    input: {
-                      color: task.checked ? "#777" : "inherit",
-                    },
-                  }}
+                  onChange={(e) => handleTaskTextChange(task.id, e.target.value)}
                 />
-                <IconButton
-                  onClick={() => handleDeleteTask(task.id)}
-                  color="error"
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </ListItem>
+                <button type="button" onClick={() => handleDeleteTask(task.id)}
+                  className="p-1 text-red-400 hover:text-red-600">
+                  <MdDeleteOutline size={16} />
+                </button>
+              </div>
             ))}
-          </List>
-          <Button variant="outlined" sx={{ mt: 2 }} onClick={resendClientTask}>
+          </div>
+          <button type="button" onClick={resendClientTask}
+            className="mt-3 rounded-full px-4 py-1.5 text-sm font-medium border border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white">
             Resend Client Task
-          </Button>
-        </Box>
+          </button>
+        </div>
       )}
-    </Box>
+    </div>
   );
 };
 
@@ -1710,161 +1608,63 @@ const MessageItem = ({
     senderDisplayName = "You";
   }
 
+  const [menuOpen, setMenuOpen] = useState(false);
+
   return (
-    <Box
-      ref={(el) => {
-        if (desc._id) {
-          messageRefs.current[desc._id] = el;
-        }
-      }}
-      sx={{
-        display: "flex",
-        justifyContent: isClient ? "flex-start" : "flex-end",
-        mb: 2,
-        position: "relative",
-      }}
+    <div
+      ref={(el) => { if (desc._id) messageRefs.current[desc._id] = el; }}
+      className={`flex mb-3 ${isClient ? 'justify-start' : 'justify-end'}`}
     >
-      <Box
-        sx={{
-          maxWidth: "75%",
-          backgroundColor:
-            desc._id === highlightedId
-              ? "#fff2b3"
-              : isAdmin
-                ? "#ffe6e6"
-                : "#e6f0ff",
-          p: 2,
-          borderRadius: 2,
-          borderTopLeftRadius: isClient ? 16 : 4,
-          borderTopRightRadius: isClient ? 4 : 16,
-          boxShadow: 1,
-          position: "relative",
-        }}
+      <div
+        className={`max-w-[75%] p-3 rounded-xl shadow-sm relative ${
+          desc._id === highlightedId ? 'bg-yellow-100' :
+          isAdmin ? 'bg-red-50 rounded-tl-sm' : 'bg-blue-50 rounded-tr-sm'
+        }`}
       >
         {desc.replyTo && (
-          <ReplyPreviewItem
-            desc={desc}
-            chat={chat}
-            messageRefs={messageRefs}
-            setHighlightedId={setHighlightedId}
-          />
+          <ReplyPreviewItem desc={desc} chat={chat} messageRefs={messageRefs} setHighlightedId={setHighlightedId} />
         )}
-
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            color: "#333",
-          }}
-        >
-          <Typography
-            variant="subtitle2"
-            component="p"
-            gutterBottom
-            sx={{ fontWeight: "600" }}
-          >
-            {senderDisplayName}
-          </Typography>
-
-          {showMenuIcon && (
-            <MoreVertIcon
-              fontSize="small"
-              sx={{ cursor: "pointer" }}
-              onClick={(e) => handleMenuClick(e, desc)}
-            />
-          )}
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={() => setAnchorEl(null)}
-            PaperProps={{
-              elevation: 1,
-              sx: {
-                boxShadow: "none",
-                borderRadius: "8px",
-                border: "1px solid #ccc",
-              },
-            }}
-          >
-            {/* Reply option is always available for all messages */}
-            <MenuItem
-              onClick={() => {
-                setReplyTo(selectedMessage);
-                setAnchorEl(null);
-              }}
-            >
-              Reply
-            </MenuItem>
-            
-            {/* Edit and Delete options - only for admin messages */}
-            {selectedMessage?.fromwhome?.toLowerCase() === "admin" && (
-              <>
-                {/* Edit option - only if within 10 minutes */}
-                {canEditMessage(selectedMessage.time) && (
-
-                  <Box>
-                  <MenuItem
-                    onClick={() => handleEditMessage(selectedMessage)}
-                  >
-                    {/* <EditIcon fontSize="small" sx={{ mr: 1 }} /> */}
-                    Edit
-                  </MenuItem>
-                   {/* Delete option - always available for admin */}
-                <MenuItem
-                  onClick={() => {
-                    handleDeleteMessage(selectedMessage);
-                    setAnchorEl(null);
-                  }}
-                >
-                  {/* <DeleteIcon fontSize="small" sx={{ mr: 1 }} /> */}
-                  Delete
-                </MenuItem>
-                </Box>
+        <div className="flex justify-between items-start gap-2 text-gray-800">
+          <p className="text-xs font-semibold mb-1">{senderDisplayName}</p>
+          <div className="relative">
+            <button type="button" onClick={(e) => { handleMenuClick(e, desc); setMenuOpen(true); }}
+              className="text-gray-400 hover:text-gray-700">
+              <MdMoreVert size={16} />
+            </button>
+            {Boolean(anchorEl) && menuOpen && (
+              <div className="absolute right-0 top-5 z-50 bg-white border border-gray-200 rounded-lg shadow-md w-32">
+                <button type="button" className="block w-full text-left px-3 py-1.5 text-sm hover:bg-gray-50"
+                  onClick={() => { setReplyTo(selectedMessage); setAnchorEl(null); setMenuOpen(false); }}>
+                  Reply
+                </button>
+                {selectedMessage?.fromwhome?.toLowerCase() === "admin" && canEditMessage(selectedMessage?.time) && (
+                  <>
+                    <button type="button" className="block w-full text-left px-3 py-1.5 text-sm hover:bg-gray-50"
+                      onClick={() => { handleEditMessage(selectedMessage); setMenuOpen(false); }}>
+                      Edit
+                    </button>
+                    <button type="button" className="block w-full text-left px-3 py-1.5 text-sm text-red-500 hover:bg-gray-50"
+                      onClick={() => { handleDeleteMessage(selectedMessage); setAnchorEl(null); setMenuOpen(false); }}>
+                      Delete
+                    </button>
+                  </>
                 )}
-                
-               
-              </>
+              </div>
             )}
-          </Menu>
-        </Box>
-
-        <Typography
-          variant="body2"
-          sx={{ whiteSpace: "pre-wrap", color: "#333" }}
-          dangerouslySetInnerHTML={{
-            __html:
-              typeof desc.message === "string"
-                ? desc.message
-                : "No message available",
-          }}
+          </div>
+        </div>
+        <div
+          className="text-sm text-gray-800 whitespace-pre-wrap"
+          dangerouslySetInnerHTML={{ __html: typeof desc.message === "string" ? desc.message : "No message available" }}
         />
-        <Typography
-          variant="caption"
-          sx={{
-            display: "block",
-            textAlign: "right",
-            color: "gray",
-            mt: 1,
-          }}
-        >
+        <p className="text-xs text-gray-400 text-right mt-1">
           {messageTime}
           {isAdmin && !isEditable && desc.time && (
-            <Typography
-              component="span"
-              variant="caption"
-              sx={{
-                display: "block",
-                fontStyle: "italic",
-                color: "#888",
-                mt: 0.5,
-              }}
-            >
-              (Edit expired)
-            </Typography>
+            <span className="block italic text-gray-400">(Edit expired)</span>
           )}
-        </Typography>
-      </Box>
-    </Box>
+        </p>
+      </div>
+    </div>
   );
 };
 
@@ -1873,94 +1673,50 @@ const ReplyPreviewItem = ({ desc, chat, messageRefs, setHighlightedId }) => {
   if (!repliedMsg) return null;
 
   return (
-    <Box
-      sx={{
-        backgroundColor: "#f5f5f5",
-        borderLeft: "3px solid #1976d2",
-        px: 1,
-        py: 0.5,
-        mb: 1,
-      }}
-    >
-      <Typography
-        variant="caption"
-        fontWeight="bold"
-        sx={{ cursor: "pointer", color: "#1976d2" }}
+    <div className="bg-gray-100 border-l-[3px] border-blue-500 px-2 py-1 mb-2 rounded">
+      <span
+        className="text-xs font-bold text-blue-600 cursor-pointer"
         onClick={() => {
           const el = messageRefs.current[desc.replyTo];
           if (el) {
-            el.scrollIntoView({
-              behavior: "smooth",
-              block: "center",
-            });
+            el.scrollIntoView({ behavior: "smooth", block: "center" });
             setHighlightedId(desc.replyTo);
             setTimeout(() => setHighlightedId(null), 2000);
           }
         }}
       >
-        {repliedMsg.fromwhome === "client"
-          ? repliedMsg.senderid?.username
-          : "You"}
-      </Typography>
-
-      <Typography
-        variant="body2"
-        sx={{ fontStyle: "italic", color: "#555" }}
+        {repliedMsg.fromwhome === "client" ? repliedMsg.senderid?.username : "You"}
+      </span>
+      <div
+        className="text-xs italic text-gray-500"
         dangerouslySetInnerHTML={{
-          __html:
-            repliedMsg.message?.length > 100
-              ? repliedMsg.message.slice(0, 100) + "..."
-              : repliedMsg.message,
+          __html: repliedMsg.message?.length > 100
+            ? repliedMsg.message.slice(0, 100) + "..."
+            : repliedMsg.message,
         }}
       />
-    </Box>
+    </div>
   );
 };
 
 const ReplyPreview = ({ replyTo, setReplyTo }) => (
-  <Box
-    sx={{
-      gridColumn: "1 / -1",
-      mb: 1,
-      p: 1.5,
-      backgroundColor: "#f4f6f8",
-      borderLeft: "4px solid #1976d2",
-      borderRadius: 1,
-      position: "relative",
-    }}
-  >
-    <Typography variant="body2" fontWeight="bold" sx={{ mb: 0.5 }}>
-      Replying to:{" "}
-      {replyTo.fromwhome === "client"
-        ? replyTo.senderid?.username
-        : "You" || "Admin"}
-    </Typography>
-
-    <Typography
-      variant="body2"
-      sx={{ fontStyle: "italic", whiteSpace: "pre-wrap", pr: 4 }}
+  <div className="col-span-full mb-2 p-3 bg-[#f4f6f8] border-l-4 border-blue-500 rounded relative">
+    <p className="text-sm font-bold mb-1">
+      Replying to: {replyTo.fromwhome === "client" ? replyTo.senderid?.username : "You" || "Admin"}
+    </p>
+    <div
+      className="text-sm italic whitespace-pre-wrap pr-6"
       dangerouslySetInnerHTML={{
-        __html:
-          replyTo.message?.length > 100
-            ? `${replyTo.message.slice(0, 100)}...`
-            : replyTo.message,
+        __html: replyTo.message?.length > 100
+          ? `${replyTo.message.slice(0, 100)}...`
+          : replyTo.message,
       }}
     />
-
-    <IconButton
-      size="small"
-      onClick={() => setReplyTo(null)}
-      sx={{
-        position: "absolute",
-        top: 6,
-        right: 6,
-        color: "#777",
-        "&:hover": { color: "#000" },
-      }}
-    >
-      <CloseIcon fontSize="small" />
-    </IconButton>
-  </Box>
+    <button type="button" onClick={() => setReplyTo(null)}
+      className="absolute top-1.5 right-1.5 p-1 text-gray-400 hover:text-gray-800">
+      <IoClose size={14} />
+    </button>
+  </div>
 );
 
 export default ChatDetails;

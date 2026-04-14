@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { NavLink, Link, Outlet } from "react-router-dom";
-import { IoArrowBackSharp } from "react-icons/io5";
-import { FaRegEye } from "react-icons/fa";
+import { ArrowLeft, ExternalLink } from "lucide-react";
 import Cookies from 'js-cookie';
 import { useParams } from "react-router-dom";
-import { Box, Typography } from "@mui/material";
 import axios from "axios";
 const AccountsDash = () => {
   const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
@@ -65,58 +63,61 @@ const AccountsDash = () => {
   useEffect(() => {
     fetchAccountDetails();
   }, [data]);
-  return (
-    <Box>
-      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-        <Link to="/clients/accounts/activeaccounts">
-          <IoArrowBackSharp style={{ fontSize: "25px" }} />
-        </Link>
-        <FaRegEye style={{ cursor: "pointer", color: "#007bff" }} />
-        <Typography sx={{ fontWeight: "bold" }}>{accName}</Typography>
-      </Box>
-      <Box className="firmtemp">
-        <Box
-          className="firmtemp-nav"
-          sx={{
-            display: "flex",
+  const navItems = [
+    [`/clients/accounts/accountsdash/overview/${data}`, "Overview"],
+    [`/clients/accounts/accountsdash/info/${data}`, "Info"],
+    [`/clients/accounts/accountsdash/docs/${data}/documents`, "Docs"],
+    [`/clients/accounts/accountsdash/communication/${data}`, "Communication"],
+    [`/clients/accounts/accountsdash/organizers/${data}`, "Organizers"],
+    [`/clients/accounts/accountsdash/invoices/${data}/invoice`, "Invoices"],
+    [`/clients/accounts/accountsdash/email/${data}/inbox`, "Email"],
+    [`/clients/accounts/accountsdash/proposals/${data}`, "Proposals & ELs"],
+    [`/clients/accounts/accountsdash/notes/${data}`, "Notes"],
+    [`/clients/accounts/accountsdash/workflow/${data}/pipelines`, "Workflow"],
+  ];
 
-            mt: 5,
-            flexWrap: "wrap", // Allow items to wrap to the next line if they overflow
-            justifyContent: "space-around", // Space out items evenly
-            "& a": {
-              // Styling for the NavLink components
-              textDecoration: "none",
-              padding: "8px 16px",
-              borderRadius: "4px",
-             
-              "&:hover": {
-                backgroundColor: "var(--color-save-btn)",
-                color: "white",
-              },
-              "&.active": {
-                backgroundColor: "var(--color-save-btn)",
-                color: "white",
-              },
-            },
-          }}
+  return (
+    <div className="min-h-screen bg-gray-50/40">
+      {/* Top header bar */}
+      <div className="bg-white border-b border-gray-100 px-4 py-3 flex items-center gap-3 shadow-sm">
+        <Link
+          to="/clients/accounts/activeaccounts"
+          className="flex items-center justify-center w-8 h-8 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-800 transition-colors no-underline"
         >
-          <NavLink to={`/clients/accounts/accountsdash/overview/${data}`}> Overview </NavLink>
-          <NavLink to={`/clients/accounts/accountsdash/info/${data}`}> Info</NavLink>
-          <NavLink to={`/clients/accounts/accountsdash/docs/${data}/documents`}> Docs</NavLink>
-          <NavLink to={`/clients/accounts/accountsdash/communication/${data}`}> Communication</NavLink>
-          <NavLink to={`/clients/accounts/accountsdash/organizers/${data}`}> Organizers</NavLink>
-          <NavLink to={`/clients/accounts/accountsdash/invoices/${data}/invoice`}> Invoices</NavLink>
-          <NavLink to={`/clients/accounts/accountsdash/email/${data}/inbox`}>Email</NavLink>
-          <NavLink to={`/clients/accounts/accountsdash/proposals/${data}`}> Proposals & ELs</NavLink>
-          <NavLink to={`/clients/accounts/accountsdash/notes/${data}`}> Notes</NavLink>
-          <NavLink to={`/clients/accounts/accountsdash/workflow/${data}/pipelines`}> Workflow</NavLink>
-          {/* <NavLink to={`/clients/accounts/accountsdash/setpassword/${data}`}> Set Password</NavLink> */}
-        </Box>
-      </Box>
-      <Box pl={3} pr={3}>
+          <ArrowLeft size={16} />
+        </Link>
+        <div className="flex items-center gap-2">
+          <span className="font-semibold text-gray-900 text-base leading-none">{accName}</span>
+          <ExternalLink size={13} className="text-gray-400 cursor-pointer hover:text-blue-500 transition-colors" />
+        </div>
+      </div>
+
+      {/* Sub-navigation */}
+      <div className="bg-white border-b border-gray-100 px-4 py-0">
+        <div className="flex items-center gap-0 overflow-x-auto scrollbar-hide">
+          {navItems.map(([to, label]) => (
+            <NavLink
+              key={to}
+              to={to}
+              className={({ isActive }) =>
+                `no-underline whitespace-nowrap px-4 py-3 text-sm font-medium transition-all duration-150 border-b-2 ${
+                  isActive
+                    ? "border-[var(--color-save-btn)] text-[var(--color-save-btn)]"
+                    : "border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300"
+                }`
+              }
+            >
+              {label}
+            </NavLink>
+          ))}
+        </div>
+      </div>
+
+      {/* Page content */}
+      <div className="px-4 py-4">
         <Outlet />
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 };
 

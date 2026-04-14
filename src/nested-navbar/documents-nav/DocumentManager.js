@@ -349,30 +349,17 @@ const Folder = ({
   };
 
   return (
-    <div style={{ marginLeft: 16 }}>
+    <div className="ml-4">
       <div
         onClick={toggleFolder}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          cursor: "pointer",
-          // fontWeight: isSelected ? "bold" : "normal",
-          fontWeight:"bold",
-          // backgroundColor: isSelected ? "#e0f7fa" : "transparent",
-          padding: "6px 10px",
-          borderRadius: "6px",
-          transition: "background-color 0.2s ease",
-        }}
+        className="flex items-center gap-1.5 cursor-pointer font-semibold text-sm text-gray-700 px-2.5 py-1.5 rounded-lg hover:bg-gray-50 transition-colors"
       >
-        <span style={{ marginRight: 6 }}>
-          {isOpen ? "📂" : "📁"}
-        </span>
+        <span>{isOpen ? "📂" : "📁"}</span>
         <span>{name}</span>
       </div>
 
       {isOpen && (
-        <div style={{ marginLeft: 16, paddingLeft: 6, borderLeft: "1px dashed #ccc" }}>
-          {/* Subfolders */}
+        <div className="ml-4 pl-2 border-l border-dashed border-gray-200">
           {Object.entries(content).map(([subfolder, subcontent]) =>
             subfolder !== "files" ? (
               <Folder
@@ -388,55 +375,42 @@ const Folder = ({
             ) : null
           )}
 
-          {/* Files */}
           {content.files && content.files.length > 0 ? (
             content.files
               .filter((f) => f.filename !== "#$default.txt")
               .map((file) => (
                 <div
                   key={file._id}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    padding: "4px 8px",
-                    borderRadius: "4px",
-                    margin: "2px 0",
-                    backgroundColor: "#f9f9f9",
-                    fontSize: "14px",
-                  }}
+                  className="flex items-center justify-between px-2 py-1.5 rounded-lg my-0.5 bg-gray-50 text-sm"
                 >
-                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <div className="flex items-center gap-1.5 text-gray-600">
                     📄 {file.filename}
                   </div>
-                  <div style={{ display: "flex", gap: "6px" }}>
+                  <div className="flex items-center gap-2">
                     {file.permissions?.canDownload && (
                       <a
                         href={`http://127.0.0.1:8000/${file.filePath}/${file.filename}`}
                         download
                         title="Download"
+                        className="text-blue-500 hover:text-blue-700 text-xs"
                       >
                         ⬇️
                       </a>
                     )}
                     {file.permissions?.canUpdate && (
-                      <button onClick={() => onEdit(file)} title="Edit">
+                      <button onClick={() => onEdit(file)} title="Edit" className="text-gray-400 hover:text-gray-600 text-xs">
                         ✏️
                       </button>
                     )}
                     {file.permissions?.canDelete && (
-                      <button onClick={() => onDelete(file)} title="Delete">
+                      <button onClick={() => onDelete(file)} title="Delete" className="text-gray-400 hover:text-red-500 text-xs">
                         🗑️
                       </button>
                     )}
                   </div>
                 </div>
               ))
-          ) : (
-            <div style={{ fontStyle: "italic", color: "#aaa", marginTop: 4 }}>
-              {/* No files available. */}
-            </div>
-          )}
+          ) : null}
         </div>
       )}
     </div>
@@ -455,7 +429,7 @@ const DocumentManager = ({ folderName, contents, onPathSelect, selectedPath }) =
   };
 
   return (
-    <div style={{ fontFamily: "Segoe UI, sans-serif", fontSize: "15px" }}>
+    <div className="text-sm">
       {Object.entries(folderStructure).map(([folder, content]) => (
         <Folder
           key={folder}

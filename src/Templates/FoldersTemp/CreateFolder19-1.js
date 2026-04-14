@@ -1,12 +1,5 @@
 import { FaTimes } from "react-icons/fa";
 
-import {
-  Drawer,
-  IconButton,
-  Typography,
-  TextField,Box,
-  Button,
-} from "@mui/material";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -69,39 +62,32 @@ export default function CreateFolder({
         };
         const selectFolder = () => setSelectedFolderId(item.id);
         return (
-          <Box key={index} style={{ marginLeft: "20px" }}>
-            <Box
-              style={{
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                backgroundColor:
-                  selectedFolderId === item.id ? "#e0f7fa" : "transparent",
-              }}
+          <div key={index} style={{ marginLeft: "20px" }}>
+            <div
+              style={{ cursor: "pointer", display: "flex", alignItems: "center",
+                backgroundColor: selectedFolderId === item.id ? "#e0f7fa" : "transparent" }}
               onClick={selectFolder}
             >
-              <Box onClick={toggleFolder}>
+              <div onClick={toggleFolder}>
                 {item.isOpen ? "📂" : "📁"}{" "}
                 <strong style={{ marginLeft: "5px" }}>{item.folder}</strong>
-              </Box>
-            </Box>
+              </div>
+            </div>
             {item.isOpen && item.contents && item.contents.length > 0 && (
-              <Box>
+              <div>
                 {renderContents(item.contents, (newContents) => {
                   const updatedFolders = contents.map((folder, i) =>
                     i === index ? { ...folder, contents: newContents } : folder
                   );
                   setContents(updatedFolders);
                 })}
-              </Box>
+              </div>
             )}
-          </Box>
+          </div>
         );
       } else if (item.file) {
         return (
-          <Box key={index} style={{ marginLeft: "40px" }}>
-            📄 {item.file}
-          </Box>
+          <div key={index} style={{ marginLeft: "40px" }}>📄 {item.file}</div>
         );
       }
       return null;
@@ -228,73 +214,45 @@ export default function CreateFolder({
     }
   }, [newFolderPath]);
   
-  if (error) {
-    return <Box>Error: {error}</Box>;
-  }
-
-  if (!structFolder) {
-    return <Box></Box>;
-  }
+  if (error) return <div>Error: {error}</div>;
+  if (!structFolder) return <div></div>;
+  if (!isFolderFormOpen) return null;
 
   return (
-    <Drawer
-      anchor="right"
-      open={isFolderFormOpen}
-      onClose={handleFormClose}
-      PaperProps={{ sx: { width: 600 } }} // Set width of the Drawer
-    >
-      <Box style={{ padding: 16 }}>
-        <Box sx={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-          <Typography
-           fontSize={"20px"}
-          >
-            Create Folder
-           
-          </Typography>
-          <IconButton aria-label="close" onClick={handleFormClose}>
-              <FaTimes style={{ color: "#1976d3",}} />
-            </IconButton>
-        </Box>
-
-        <Box
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-            marginTop: "16px",
-          }}
-        >
-          <TextField
-            fullWidth
-            size="small"
+    <div className="fixed inset-0 z-40 overflow-hidden">
+      <div className="absolute inset-0 bg-black/30" onClick={handleFormClose} />
+      <div className="absolute right-0 top-0 h-full w-[600px] bg-white shadow-xl p-4 overflow-y-auto">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold">Create Folder</h2>
+          <button type="button" onClick={handleFormClose} className="text-blue-600 hover:text-blue-800">
+            <FaTimes />
+          </button>
+        </div>
+        <div className="flex items-center gap-2 mt-2">
+          <input
+            type="text"
+            className="flex-1 border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
             placeholder="Create Folder"
-            margin="normal"
-            variant="outlined"
             value={newFolderName}
             onChange={(e) => setNewFolderName(e.target.value)}
           />
-          
-        </Box>
-        <Box mt={1}>
-        {renderContents(structFolder.folders, (newFolders) =>
-          setStructFolder({ ...structFolder, folders: newFolders })
-        )}
-        </Box>
-        
-        <Box mt={3}>
-        <Button
+        </div>
+        <div className="mt-2">
+          {renderContents(structFolder.folders, (newFolders) =>
+            setStructFolder({ ...structFolder, folders: newFolders })
+          )}
+        </div>
+        <div className="mt-4">
+          <button
+            type="button"
             disabled={!selectedFolderId}
-            size="small"
             onClick={handleCreateFolder}
-            variant="contained"
-            color="primary"
-
+            className="px-4 py-1.5 rounded text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-40"
           >
             Create and Save
-          </Button>
-        </Box>
-        
-      </Box>
-    </Drawer>
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

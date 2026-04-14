@@ -1,62 +1,15 @@
-import React, { useState, useEffect,  } from "react";
-import {
-  Button,
-  Typography,
-  Box,
-  Paper,
-  IconButton,
-  Menu,
-  MenuItem,
-  FormControl,
-  Alert,
-  Select,
-  CircularProgress,
-  InputLabel,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  TextField,
-  DialogActions,
-  Chip,
-  Tooltip,
-  Checkbox,
-  TableCell,
-  TableHead,
-  TableRow,
-  TableBody,
-  Table,
-  TableContainer,
-} from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
+import React, { useState, useEffect } from "react";
 import customCss from "./docuseal-dark-theme.css";
 import { DocusealBuilder } from "@docuseal/react";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import DeleteIcon from "@mui/icons-material/Delete";
-import DriveFileMoveIcon from "@mui/icons-material/DriveFileMove";
 import FileUploadDrawer from "./drawers/FileUploadDrawer";
 import CreteFolderDrawer from "./drawers/CreteFolderDrawer";
 import FolderUploadDrawer from "./drawers/FolderUploadDrawer";
 import RenameDrawer from "./drawers/RenameDrawer";
 import MoveDrawer from "./drawers/MoveDrawer";
-import {
-  Folder as FolderIcon,
-  InsertDriveFile as FileIcon,
-  Lock as LockIcon,
-  LockOpen as LockOpenIcon,
-} from "@mui/icons-material";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import UploadFileIcon from "@mui/icons-material/UploadFile";
-import DriveFolderUploadIcon from "@mui/icons-material/DriveFolderUpload";
-import { Eye, PenTool, Stamp, Lock } from "lucide-react";
-import {
-  Folder as FolderClosedIcon,
-  FolderOpen as FolderOpenIcon,
-} from "lucide-react";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import HighlightOffIcon from "@mui/icons-material/HighlightOff";
-import CancelIcon from "@mui/icons-material/Cancel";
-import DownloadIcon from "@mui/icons-material/Download";
+import { Eye, PenTool, Stamp, Lock, FolderOpen as FolderOpenIcon, FolderClosed as FolderClosedIcon, Folder as FolderIcon, Upload, FolderPlus, Download, MoveRight, Trash2, LockOpen, X, ChevronDown, Loader2 } from "lucide-react";
+import { BsThreeDotsVertical } from "react-icons/bs";
 import { toast } from "react-toastify";
 import {
   FaFilePdf,
@@ -66,6 +19,8 @@ import {
   FaFileAlt,
 } from "react-icons/fa";
 import { AiFillFileUnknown } from "react-icons/ai";
+import { Button } from "../../components/ui/button";
+import { Badge } from "../../components/ui/badge";
 
 const DOCS_MANAGMENTS = process.env.REACT_APP_CLIENT_DOCS_MANAGE;
 const DocsFolderTree = () => {
@@ -1088,338 +1043,85 @@ const handleBulkTrash = async () => {
       }
     };
     const renderTree = (items, level = 0, parentPath = "") => {
-      const UploadedInfo = ({ meta }) => {
-        // console.log("uploaded meta", meta);
-        if (!meta) return null;
-
-        return (
-          <Typography variant="caption" sx={{ fontWeight: "bold" }}>
-            {meta.uploadedAt}
-          </Typography>
-        );
-      };
-
-      const getStatusChip = (meta) => {
-        // console.log("meta status", meta);
-        const chips = [];
-
-        // ======= SIGNATURE STATUS =======
-        if (SIGN_STATUSES.includes(meta.signStatus)) {
-          let color = "default";
-
-          if (meta.signStatus === "pendingSignature") color = "warning";
-          if (meta.signStatus === "signatureCompleted") color = "success";
-
-          chips.push(
-            <Chip
-              key="signChip"
-              label={statusTextMap[meta.signStatus]}
-              size="small"
-              variant="outlined"
-              color={color}
-            />
-          );
-        }
-
-        // ======= APPROVAL STATUS =======
+      const getStatusBadge = (meta) => {
+        const badges = [];
+        const signColorMap = { pendingSignature: "bg-amber-50 text-amber-700 border-amber-200", signatureCompleted: "bg-green-50 text-green-700 border-green-200" };
+        const approvalColorMap = { pendingApproval: "bg-amber-50 text-amber-700 border-amber-200", approvalCompleted: "bg-green-50 text-green-700 border-green-200", canceledApproval: "bg-red-50 text-red-700 border-red-200" };
+        const invoiceColorMap = { pendingpayment: "bg-amber-50 text-amber-700 border-amber-200", paymentcompleted: "bg-green-50 text-green-700 border-green-200" };
+        if (SIGN_STATUSES.includes(meta.signStatus)) badges.push(<span key="sign" className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border ${signColorMap[meta.signStatus] || "bg-gray-50 text-gray-600 border-gray-200"}`}>{statusTextMap[meta.signStatus]}</span>);
         if (APPROVAL_STATUSES.includes(meta.authStatus)) {
-          let color = "default";
-          let chip = (
-            <Chip
-              key="approvalChip"
-              label={approvalStatusTextMap[meta.authStatus]}
-              size="small"
-              variant="outlined"
-              color={color}
-            />
-          );
-
-          if (meta.authStatus === "pendingApproval") color = "warning";
-          if (meta.authStatus === "approvalCompleted") color = "success";
-          if (meta.authStatus === "canceledApproval") color = "error";
-
-          // Handle tooltip only for canceled approval
-          if (meta.authStatus === "canceledApproval" && meta.cancelReason) {
-            chip = (
-              <Tooltip title={meta.cancelReason} placement="top-end">
-                <Chip
-                  key="approvalCanceledChip"
-                  label="Approval Canceled"
-                  size="small"
-                  variant="outlined"
-                  color="error"
-                  sx={{ cursor: "pointer" }}
-                />
-              </Tooltip>
-            );
-          } else {
-            chip = (
-              <Chip
-                key="approvalChip"
-                label={approvalStatusTextMap[meta.authStatus]}
-                size="small"
-                variant="outlined"
-                color={color}
-              />
-            );
-          }
-
-          chips.push(chip);
+          const cls = approvalColorMap[meta.authStatus] || "bg-gray-50 text-gray-600 border-gray-200";
+          const label = meta.authStatus === "canceledApproval" && meta.cancelReason ? `Canceled: ${meta.cancelReason}` : approvalStatusTextMap[meta.authStatus];
+          badges.push(<span key="approval" title={meta.cancelReason || ""} className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border cursor-default ${cls}`}>{label}</span>);
         }
-        // ⭐ NEW — INVOICE LOCK STATUS
-        if (INVOICE_LOCK_STATUSES.includes(meta.lockInvoiceStatus)) {
-          let color = "default";
-          if (meta.lockInvoiceStatus === "pendingpayment") color = "warning";
-          if (meta.lockInvoiceStatus === "paymentcompleted") color = "success";
-
-          chips.push(
-            <Chip
-              key="invoiceLockChip"
-              label={invoiceStatusTextMap[meta.lockInvoiceStatus]}
-              size="small"
-              variant="outlined"
-              color={color}
-            />
-          );
-        }
-        // ======= SHOW NOTHING IF NO STATUS =======
-        if (chips.length === 0) return null;
-
-        return <Box sx={{ display: "flex", gap: 1, ml: 1 }}>{chips}</Box>;
+        if (INVOICE_LOCK_STATUSES.includes(meta.lockInvoiceStatus)) badges.push(<span key="invoice" className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border ${invoiceColorMap[meta.lockInvoiceStatus] || "bg-gray-50 text-gray-600 border-gray-200"}`}>{invoiceStatusTextMap[meta.lockInvoiceStatus]}</span>);
+        if (badges.length === 0) return null;
+        return <div className="flex items-center gap-1 ml-1">{badges}</div>;
       };
 
       return (
         <>
-          <Box component="ul" sx={{ listStyle: "none", pl: level * 2, mb: 1 }}>
+          <ul className="list-none" style={{ paddingLeft: level * 16 }}>
             {items.map((item) => {
-              const fullPath = parentPath
-                ? `${parentPath}/${item.name}`
-                : item.name;
+              const fullPath = parentPath ? `${parentPath}/${item.name}` : item.name;
               const meta = item.meta || {};
-
               const getColor = (status) => (status ? "#1976d2" : "#9e9e9e");
-
-              const StatusIcons = () => (
-                <Box
-                  sx={{ display: "flex", gap: 1, alignItems: "center", ml: 1 }}
-                >
-                  <Eye size={16} color={getColor(meta.readStatus)} />
-                  <PenTool size={16} color={getColor(meta.signStatus)} />
-                  <Stamp size={16} color={getColor(meta.authStatus)} />
-                  <Lock
-                    size={16}
-                    color={meta.readOnly ? "#e53935" : "#9e9e9e"}
-                  />
-                </Box>
-              );
-
               const handleSafeFileClick = () => {
-                if (meta.readOnly) {
-                  alert("This file is locked and cannot be opened.");
-                  return;
-                }
+                if (meta.readOnly) { alert("This file is locked and cannot be opened."); return; }
                 handleFileClick(fullPath, item.name, meta);
               };
-
               return (
-                <li key={fullPath} style={{ marginBottom: 8 }}>
+                <li key={fullPath} className="mb-1">
                   {item.type === "folder" ? (
-                    <Box
-                      sx={{
-                        p: 1,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        borderRadius: 2,
-                        cursor: "pointer",
-                        backgroundColor: "#fff",
-                        "&:hover": { backgroundColor: "#f5f5f5" },
-                        transition: "background-color 0.2s ease-in-out",
-                      }}
+                    <div
+                      className="flex items-center justify-between px-2 py-1.5 rounded-lg cursor-pointer bg-white hover:bg-gray-50 transition-colors"
                       onClick={() => toggleFolder(fullPath, meta.readOnly)}
                     >
-                      <Box
-                        display="flex"
-                        alignItems="center"
-                        sx={{ flexGrow: 1, gap: 1 }}
-                      >
-                        {expandedFolders[fullPath] ? (
-                          <FolderOpenIcon color="#1976d2" size={18} />
-                        ) : (
-                          <FolderClosedIcon color="#757575" size={18} />
-                        )}
-
-                        <Typography variant="body1" fontWeight="medium">
-                          {item.name}
-                          {meta.readOnly && (
-                            <Typography
-                              variant="caption"
-                              sx={{ color: "red", fontWeight: "bold", ml: 1 }}
-                            >
-                              (Locked)
-                            </Typography>
-                          )}
-                        </Typography>
-                      </Box>
-
-                      <IconButton
-                        size="small"
-                        onClick={(e) =>
-                          handleMenuOpen(e, { ...item, fullPath })
-                        }
-                      >
-                        <MoreVertIcon size={16} />
-                      </IconButton>
-                    </Box>
+                      <div className="flex items-center gap-2 flex-1">
+                        {expandedFolders[fullPath] ? <FolderOpenIcon size={16} className="text-blue-500 shrink-0" /> : <FolderClosedIcon size={16} className="text-gray-500 shrink-0" />}
+                        <span className="text-sm font-medium text-gray-700">{item.name}</span>
+                        {meta.readOnly && <span className="text-[10px] font-semibold text-red-500">(Locked)</span>}
+                      </div>
+                      <button type="button" onClick={(e) => { e.stopPropagation(); handleMenuOpen(e, { ...item, fullPath }); }} className="h-6 w-6 flex items-center justify-center rounded text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+                        <BsThreeDotsVertical size={13} />
+                      </button>
+                    </div>
                   ) : (
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        pl: 4,
-                        mb: 1,
-                        borderRadius: 2,
-                        "&:hover .file-menu-icon": { opacity: 1 },
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          mr: 1,
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 2,
-                        }}
-                      >
+                    <div className="flex items-center justify-between pl-8 pr-2 py-1 rounded-lg hover:bg-gray-50 group transition-colors">
+                      <div className="flex items-center gap-2 mr-2">
                         {getFileIcon(item.name)}
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            flex: 1,
-                            wordBreak: "break-word",
-                            color: meta.readOnly ? "#999" : "#1976d2",
-                            textDecoration: meta.readOnly
-                              ? "none"
-                              : "underline",
-                            cursor: meta.readOnly ? "not-allowed" : "pointer",
-                          }}
+                        <span
+                          className={`text-sm ${meta.readOnly ? "text-gray-400 cursor-not-allowed" : "text-blue-600 hover:underline cursor-pointer"}`}
                           onClick={handleSafeFileClick}
                         >
                           {item.name}
-                        </Typography>
-                      </Box>
-                      <Box>
-                        {/* 🧾 Uploaded info */}
-                        <UploadedInfo meta={meta} />
-                      </Box>
-                      <Box>{getStatusChip(meta)}</Box>
-
-                      <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <StatusIcons />
-
-                        <Box
-                          className="file-menu-icon"
-                          sx={{
-                            width: 8,
-                            height: 8,
-                            borderRadius: "50%",
-                            backgroundColor: "#1976d2",
-                            opacity: 0,
-                            transition: "opacity 0.2s",
-                            cursor: "pointer",
-                            mr: 1,
-                            ml: 1,
-                          }}
-                          onClick={(e) =>
-                            handleMenuOpen(e, { ...item, fullPath })
-                          }
-                        />
-                      </Box>
-                    </Box>
+                        </span>
+                        {meta.readOnly && <span className="text-[10px] font-semibold text-red-500">(Locked)</span>}
+                      </div>
+                      <div className="flex items-center gap-2 ml-auto">
+                        <span className="text-[11px] font-semibold text-gray-400">{meta.uploadedAt}</span>
+                        {getStatusBadge(meta)}
+                        <div className="flex items-center gap-1">
+                          <Eye size={13} color={getColor(meta.readStatus)} />
+                          <PenTool size={13} color={getColor(meta.signStatus)} />
+                          <Stamp size={13} color={getColor(meta.authStatus)} />
+                          <Lock size={13} color={meta.readOnly ? "#e53935" : "#9e9e9e"} />
+                        </div>
+                        <button type="button" onClick={(e) => handleMenuOpen(e, { ...item, fullPath })} className="h-6 w-6 flex items-center justify-center rounded text-gray-400 hover:text-gray-600 hover:bg-gray-100 opacity-0 group-hover:opacity-100 transition-all">
+                          <BsThreeDotsVertical size={13} />
+                        </button>
+                      </div>
+                    </div>
                   )}
-
-                  {expandedFolders[fullPath] &&
-                    item.children &&
-                    item.children.length > 0 && (
-                      <Box
-                        sx={{
-                          ml: 2,
-                          mt: 1,
-                          borderLeft: "2px dashed #ccc",
-                          pl: 2,
-                        }}
-                      >
-                        {renderTree(item.children, level + 1, fullPath)}
-                      </Box>
-                    )}
+                  {expandedFolders[fullPath] && item.children && item.children.length > 0 && (
+                    <div className="ml-4 mt-0.5 border-l-2 border-dashed border-gray-200 pl-2">
+                      {renderTree(item.children, level + 1, fullPath)}
+                    </div>
+                  )}
                 </li>
               );
             })}
-          </Box>
-
-          {/* Your dialogs remain unchanged */}
-          <Dialog
-            open={openDialog}
-            onClose={() => setOpenDialog(false)}
-            fullWidth
-            maxWidth="lg"
-          >
-            <DialogTitle>
-              {items.name}
-              <IconButton
-                aria-label="close"
-                onClick={() => setOpenDialog(false)}
-                style={{ position: "absolute", right: 8, top: 8 }}
-              >
-                <CloseIcon />
-              </IconButton>
-            </DialogTitle>
-
-            <DialogContent dividers>
-              {token && showBuilderFor && (
-                <DocusealBuilder
-                  token={token}
-                  customCss={customCss}
-                  onComplete={() => {
-                    console.log("DocuSeal finished sending document");
-                    setShowBuilderFor(null);
-                    setOpenDialog(false);
-                  }}
-                />
-              )}
-            </DialogContent>
-          </Dialog>
-
-          <Dialog
-            open={openApprovalDialog}
-            onClose={handleCloseDialog}
-            fullWidth
-            maxWidth="sm"
-          >
-            <DialogTitle>Request Approval</DialogTitle>
-            <DialogContent>
-              <TextField
-                multiline
-                rows={4}
-                fullWidth
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Type a short description or note..."
-              />
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleCloseDialog}>Cancel</Button>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleRequestApproval}
-                // disabled={!description.trim()}
-                disabled={!description.trim() || sending}
-              >
-                Send
-              </Button>
-            </DialogActions>
-          </Dialog>
+          </ul>
         </>
       );
     };
@@ -1449,104 +1151,23 @@ const handleBulkTrash = async () => {
     };
     const UploadedInfo = ({ meta }) => {
       if (!meta?.uploadedAt) return null;
-
-      return (
-        <Typography variant="caption" sx={{ fontWeight: "bold" }}>
-          {formatUploadedAt(meta.uploadedAt)}
-        </Typography>
-      );
+      return <span className="text-[11px] font-semibold text-gray-400">{formatUploadedAt(meta.uploadedAt)}</span>;
     };
-    // const UploadedInfo = ({ meta }) => {
-    //   if (!meta) return null;
-
-    //   return (
-    //     <Typography variant="caption" sx={{ fontWeight: "bold" }}>
-    //       {meta.uploadedAt}
-    //     </Typography>
-    //   );
-    // };
     const getStatusChip = (meta, isFolder) => {
-      // Return null for folders - don't show status chips for folders
       if (isFolder) return null;
-
-      const chips = [];
-
-      // ======= SIGNATURE STATUS =======
-      if (SIGN_STATUSES.includes(meta.signStatus)) {
-        let color = "default";
-
-        if (meta.signStatus === "pendingSignature") color = "warning";
-        if (meta.signStatus === "signatureCompleted") color = "success";
-
-        chips.push(
-          <Chip
-            key="signChip"
-            label={statusTextMap[meta.signStatus]}
-            size="small"
-            variant="outlined"
-            color={color}
-          />
-        );
-      }
-
-      // ======= APPROVAL STATUS =======
+      const badges = [];
+      const signColorMap = { pendingSignature: "bg-amber-50 text-amber-700 border-amber-200", signatureCompleted: "bg-green-50 text-green-700 border-green-200" };
+      const approvalColorMap = { pendingApproval: "bg-amber-50 text-amber-700 border-amber-200", approvalCompleted: "bg-green-50 text-green-700 border-green-200", canceledApproval: "bg-red-50 text-red-700 border-red-200" };
+      const invoiceColorMap = { pendingpayment: "bg-amber-50 text-amber-700 border-amber-200", paymentcompleted: "bg-green-50 text-green-700 border-green-200" };
+      if (SIGN_STATUSES.includes(meta.signStatus)) badges.push(<span key="sign" className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border ${signColorMap[meta.signStatus] || "bg-gray-50 text-gray-600 border-gray-200"}`}>{statusTextMap[meta.signStatus]}</span>);
       if (APPROVAL_STATUSES.includes(meta.authStatus)) {
-        let color = "default";
-        let chip;
-
-        if (meta.authStatus === "pendingApproval") color = "warning";
-        if (meta.authStatus === "approvalCompleted") color = "success";
-        if (meta.authStatus === "canceledApproval") color = "error";
-
-        if (meta.authStatus === "canceledApproval" && meta.cancelReason) {
-          chip = (
-            <Tooltip title={meta.cancelReason} placement="top-end">
-              <Chip
-                key="approvalCanceledChip"
-                label="Approval Canceled"
-                size="small"
-                variant="outlined"
-                color="error"
-                sx={{ cursor: "pointer" }}
-              />
-            </Tooltip>
-          );
-        } else {
-          chip = (
-            <Chip
-              key="approvalChip"
-              label={approvalStatusTextMap[meta.authStatus]}
-              size="small"
-              variant="outlined"
-              color={color}
-            />
-          );
-        }
-
-        chips.push(chip);
+        const cls = approvalColorMap[meta.authStatus] || "bg-gray-50 text-gray-600 border-gray-200";
+        const label = meta.authStatus === "canceledApproval" && meta.cancelReason ? `Canceled: ${meta.cancelReason}` : approvalStatusTextMap[meta.authStatus];
+        badges.push(<span key="approval" title={meta.cancelReason || ""} className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border cursor-default ${cls}`}>{label}</span>);
       }
-
-      // ======= INVOICE LOCK STATUS =======
-      if (INVOICE_LOCK_STATUSES.includes(meta.lockInvoiceStatus)) {
-        let color = "default";
-        if (meta.lockInvoiceStatus === "pendingpayment") color = "warning";
-        if (meta.lockInvoiceStatus === "paymentcompleted") color = "success";
-
-        chips.push(
-          <Chip
-            key="invoiceLockChip"
-            label={invoiceStatusTextMap[meta.lockInvoiceStatus]}
-            size="small"
-            variant="outlined"
-            color={color}
-          />
-        );
-      }
-
-      // ======= SHOW NOTHING IF NO STATUS =======
-      if (chips.length === 0) return null;
-
-      return <Box sx={{ display: "flex", gap: 1 }}>{chips}</Box>;
+      if (INVOICE_LOCK_STATUSES.includes(meta.lockInvoiceStatus)) badges.push(<span key="invoice" className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border ${invoiceColorMap[meta.lockInvoiceStatus] || "bg-gray-50 text-gray-600 border-gray-200"}`}>{invoiceStatusTextMap[meta.lockInvoiceStatus]}</span>);
+      if (badges.length === 0) return null;
+      return <div className="flex items-center gap-1">{badges}</div>;
     };
     const findNewSystemTag = (item) => {
       // console.log("Finding 'New' tag in item:", item);
@@ -1570,193 +1191,72 @@ const handleBulkTrash = async () => {
 
     const renderTableRows = (items, level = 0, parentPath = "") => {
       return items.map((item) => {
-        // console.log("itemlist", item);
-        // const fullPath = parentPath ? `${parentPath}/${item.name}` : item.name;
         const fullPath = item.path;
         const meta = item.meta || {};
         const isFolder = item.type === "folder";
         const isSelected = selectedItems.has(fullPath);
-        // Update the helper function to use item.path for children
-        const getAllChildrenPaths = (item) => {
-          const paths = [item.path];
-          if (item.children && item.children.length > 0) {
-            item.children.forEach((child) => {
-              paths.push(...getAllChildrenPaths(child));
-            });
-          }
-          return paths;
-        };
-
-        // Update isFolderPartiallySelected to use item.path
-        const isPartiallySelected = isFolder
-          ? isFolderPartiallySelected(item)
-          : false;
-        const handleSafeFileClick = () => {
-          if (meta.readOnly) {
-            alert("This file is locked and cannot be opened.");
-            return;
-          }
-          if (!isFolder) {
-            handleFileClick(fullPath, item.name, meta);
-          }
-        };
-
+        const isPartiallySelected = isFolder ? isFolderPartiallySelected(item) : false;
         const inheritedNewTag = isFolder ? findNewSystemTag(item) : null;
-
+        const handleSafeFileClick = () => {
+          if (meta.readOnly) { alert("This file is locked and cannot be opened."); return; }
+          if (!isFolder) handleFileClick(fullPath, item.name, meta);
+        };
         return (
           <React.Fragment key={fullPath}>
-            <TableRow
-              sx={{
-                backgroundColor: level % 2 === 0 ? "#fafafa" : "white",
-                "&:hover": { backgroundColor: "#f5f5f5" },
-              }}
-            >
-              {/* Checkbox Column - Only checkboxes here */}
-              <TableCell sx={{ width: "50px", paddingLeft: 2 }}>
-                {isFolder ? (
-                  <Checkbox
-                    size="small"
-                    checked={isSelected}
-                    indeterminate={isPartiallySelected}
-                    onChange={() => handleFolderSelect(item)}
-                  />
-                ) : (
-                  <Checkbox
-                    size="small"
-                    checked={isSelected}
-                    onChange={() => handleSelectItem(fullPath)}
-                  />
-                )}
-              </TableCell>
-
-              {/* Name Column with indentation */}
-              <TableCell sx={{ paddingLeft: level * 4 + 2 }}>
-                <Box sx={{ display: "flex", alignItems: "center" }}>
+            <tr className={`${level % 2 === 0 ? "bg-gray-50/60" : "bg-white"} hover:bg-blue-50/30 transition-colors`}>
+              {/* Checkbox */}
+              <td className="w-10 px-3 py-2">
+                <input
+                  type="checkbox"
+                  checked={isSelected}
+                  ref={(el) => { if (el) el.indeterminate = isPartiallySelected; }}
+                  onChange={() => isFolder ? handleFolderSelect(item) : handleSelectItem(fullPath)}
+                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-300"
+                />
+              </td>
+              {/* Name */}
+              <td className="py-2" style={{ paddingLeft: `${level * 16 + 8}px` }}>
+                <div className="flex items-center gap-1.5">
                   {isFolder ? (
                     <>
-                      <IconButton
-                        size="small"
-                        onClick={() => toggleFolder(fullPath, meta.readOnly)}
-                        disabled={meta.readOnly}
-                        sx={{ mr: 0.5 }}
-                      >
-                        {expandedFolders[fullPath] ? (
-                          <FolderOpenIcon color="#1976d2" />
-                        ) : (
-                          <FolderClosedIcon color="#757575" />
-                        )}
-                      </IconButton>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          ml: 0.5,
-                          fontWeight: "medium",
-                          color: meta.readOnly ? "#999" : "inherit",
-                          cursor: "pointer",
-                        }}
-                        onClick={() => toggleFolder(fullPath, meta.readOnly)}
-                      >
-                        {item.name} {/* 🔴 NEW TAG for folder */}
-                        {/* 🔥 Inherited "New" system tag */}
-                        {inheritedNewTag && (
-                          <Chip
-                            label={inheritedNewTag.tagName}
-                            size="small"
-                            sx={{
-                              backgroundColor: inheritedNewTag.tagColour,
-                              color: "#fff",
-                              height: 18,
-                              fontSize: "0.7rem",
-                              ml: 0.8,
-                            }}
-                          />
-                        )}
-                        {meta.readOnly && (
-                          <Typography
-                            component="span"
-                            variant="caption"
-                            sx={{ color: "error.main", ml: 1 }}
-                          >
-                            (Locked)
-                          </Typography>
-                        )}
-                      </Typography>
+                      <button type="button" onClick={() => toggleFolder(fullPath, meta.readOnly)} disabled={meta.readOnly} className="shrink-0 disabled:opacity-40">
+                        {expandedFolders[fullPath] ? <FolderOpenIcon size={16} className="text-blue-500" /> : <FolderClosedIcon size={16} className="text-gray-500" />}
+                      </button>
+                      <button type="button" onClick={() => toggleFolder(fullPath, meta.readOnly)} className={`text-sm font-medium ${meta.readOnly ? "text-gray-400" : "text-gray-700 hover:text-gray-900"} flex items-center gap-1`}>
+                        {item.name}
+                        {inheritedNewTag && <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-bold text-white" style={{ backgroundColor: inheritedNewTag.tagColour || "#1976d2" }}>{inheritedNewTag.tagName}</span>}
+                        {meta.readOnly && <span className="text-[10px] font-semibold text-red-500">(Locked)</span>}
+                      </button>
                     </>
                   ) : (
                     <>
-                      <Box sx={{ mr: 1 }}>{getFileIcon(item.name)}</Box>
-                      <Box sx={{ display: "flex", flexDirection: "column" }}>
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            color: meta.readOnly ? "#999" : "#1976d2",
-                            textDecoration: meta.readOnly
-                              ? "none"
-                              : "underline",
-                            cursor: meta.readOnly ? "not-allowed" : "pointer",
-                          }}
-                          onClick={handleSafeFileClick}
-                        >
-                          {item.name}{" "}
-                          {meta.readOnly && (
-                            <Typography
-                              component="span"
-                              variant="caption"
-                              sx={{ color: "error.main", ml: 1 }}
-                            >
-                              (Locked)
-                            </Typography>
-                          )}
-                          {meta.tags?.map((tag, index) => (
-                            <Chip
-                              key={index}
-                              label={tag.tagName}
-                              size="small"
-                              sx={{
-                                backgroundColor: tag.tagColour || "#e0e0e0",
-                                color: "#fff",
-                                height: 18,
-                                fontSize: "0.7rem",
-                                ml: 0.5,
-                              }}
-                            />
-                          ))}
-                        </Typography>
-                        {/* Status chips for files only */}
-                      </Box>
+                      <span className="shrink-0">{getFileIcon(item.name)}</span>
+                      <span
+                        className={`text-sm ${meta.readOnly ? "text-gray-400 cursor-not-allowed" : "text-blue-600 hover:underline cursor-pointer"} flex items-center gap-1 flex-wrap`}
+                        onClick={handleSafeFileClick}
+                      >
+                        {item.name}
+                        {meta.readOnly && <span className="text-[10px] font-semibold text-red-500">(Locked)</span>}
+                        {meta.tags?.map((tag, idx) => <span key={idx} className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-bold text-white ml-1" style={{ backgroundColor: tag.tagColour || "#9e9e9e" }}>{tag.tagName}</span>)}
+                      </span>
                     </>
                   )}
-                </Box>
-              </TableCell>
-              <TableCell>
-                <Box sx={{ mt: 0.5 }}>{getStatusChip(meta, isFolder)}</Box>
-              </TableCell>
-
-              {/* Last Modified Column */}
-              <TableCell>
-                <UploadedInfo meta={meta} />
-              </TableCell>
-              <TableCell>
-                <Typography variant="caption" sx={{ fontWeight: "bold" }}>
-                  {meta.uploadedBy}
-                </Typography>
-              </TableCell>
-              {/* Actions Column */}
-              <TableCell align="right">
-                <IconButton
-                  size="small"
-                  onClick={(e) => handleMenuOpen(e, { ...item, fullPath })}
-                >
-                  <MoreVertIcon />
-                </IconButton>
-              </TableCell>
-            </TableRow>
-
-            {/* Render children if folder is expanded */}
-            {isFolder &&
-              expandedFolders[fullPath] &&
-              item.children &&
-              item.children.length > 0 &&
+                </div>
+              </td>
+              {/* Status */}
+              <td className="py-2 px-2">{getStatusChip(meta, isFolder)}</td>
+              {/* Uploaded */}
+              <td className="py-2 px-2"><UploadedInfo meta={meta} /></td>
+              {/* User */}
+              <td className="py-2 px-2"><span className="text-[11px] font-semibold text-gray-500">{meta.uploadedBy}</span></td>
+              {/* Actions */}
+              <td className="py-2 px-2 text-right">
+                <button type="button" onClick={(e) => handleMenuOpen(e, { ...item, fullPath })} className="h-6 w-6 flex items-center justify-center rounded text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors ml-auto">
+                  <BsThreeDotsVertical size={13} />
+                </button>
+              </td>
+            </tr>
+            {isFolder && expandedFolders[fullPath] && item.children && item.children.length > 0 &&
               renderTableRows(item.children, level + 1, fullPath)}
           </React.Fragment>
         );
@@ -1764,124 +1264,47 @@ const handleBulkTrash = async () => {
     };
 
     return (
-      <Box sx={{ margin: "auto", p: 3 }}>
+      <div className="mx-auto p-4">
         {/* Action Buttons */}
-        <Box sx={{ p: 3, maxWidth: "1000px", mx: "auto" }}>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: { xs: "column", sm: "row" },
-              gap: 1,
-              maxWidth: "600px",
-              width: "100%",
-              mx: "auto",
-              my: 3,
-            }}
-          >
+        <div className="px-3 pb-3 max-w-4xl mx-auto">
+          <div className="flex flex-col sm:flex-row gap-2 max-w-lg mx-auto my-4">
             <Button
-              variant="contained"
-              fullWidth
-              startIcon={<FolderIcon />}
-              onClick={() => {
-                setNewFolderDrawerOpen(true);
-                handleMenuClose();
-              }}
+              size="sm"
+              className="flex-1 gap-2"
+              onClick={() => { setNewFolderDrawerOpen(true); handleMenuClose(); }}
             >
-              Create Folder
+              <FolderPlus size={15} /> Create Folder
             </Button>
-
             <Button
-              variant="contained"
-              fullWidth
-              startIcon={<UploadFileIcon />}
+              size="sm"
+              variant="outline"
+              className="flex-1 gap-2"
               onClick={() => setFileUploadDrawerOpen(true)}
             >
-              Upload File
+              <Upload size={15} /> Upload File
             </Button>
-
             <Button
-              variant="contained"
-              fullWidth
-              startIcon={<DriveFolderUploadIcon />}
+              size="sm"
+              variant="outline"
+              className="flex-1 gap-2"
               onClick={() => setFolderUploaDrawerOpen(true)}
             >
-              Upload Folder
+              <FolderPlus size={15} /> Upload Folder
             </Button>
-          </Box>
+          </div>
 
-          {/* 🔴 BULK OPERATIONS TOOLBAR - Shows when items are selected */}
+          {/* Bulk operations toolbar */}
           {selectedItems.size > 0 && (
-            <Paper
-              elevation={2}
-              sx={{
-                p: 2,
-                mb: 3,
-                bgcolor: "#e3f2fd",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                flexWrap: "wrap",
-                gap: 1,
-              }}
-            >
-              <Typography variant="subtitle1" fontWeight="bold">
-                {selectedItems.size} item(s) selected
-              </Typography>
-
-              <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-                <Button
-                  variant="contained"
-                  size="small"
-                  startIcon={<DriveFileMoveIcon />}
-                  onClick={() => setBulkMoveDrawerOpen(true)}
-                  disabled={bulkOperationLoading}
-                >
-                  Move
-                </Button>
-
-                <Button
-                  variant="contained"
-                  size="small"
-                  startIcon={<LockIcon />}
-                  onClick={() => setBulkLockDialogOpen(true)}
-                  disabled={bulkOperationLoading}
-                >
-                  Lock/Unlock
-                </Button>
-
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  size="small"
-                  startIcon={<DeleteIcon />}
-                  onClick={handleBulkTrash}
-                  //onClick={handleBulkDelete}
-                  disabled={bulkOperationLoading}
-                >
-                  Delete
-                </Button>
-
-                <Button
-                  variant="contained"
-                  color="primary"
-                  size="small"
-                  startIcon={<DownloadIcon />}
-                  onClick={handleBulkDownload}
-                  disabled={bulkOperationLoading}
-                >
-                  Download
-                </Button>
-
-                <Button
-                  variant="outlined"
-                  size="small"
-                  onClick={() => setSelectedItems(new Set())}
-                  disabled={bulkOperationLoading}
-                >
-                  Clear Selection
-                </Button>
-              </Box>
-            </Paper>
+            <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 mb-4 rounded-xl bg-blue-50 border border-blue-200">
+              <span className="text-sm font-semibold text-blue-700">{selectedItems.size} item(s) selected</span>
+              <div className="flex flex-wrap gap-2">
+                <Button size="sm" variant="outline" disabled={bulkOperationLoading} onClick={() => setBulkMoveDrawerOpen(true)} className="gap-1.5 border-blue-200 text-blue-700 hover:bg-blue-100"><MoveRight size={13} /> Move</Button>
+                <Button size="sm" variant="outline" disabled={bulkOperationLoading} onClick={() => setBulkLockDialogOpen(true)} className="gap-1.5 border-blue-200 text-blue-700 hover:bg-blue-100"><Lock size={13} /> Lock/Unlock</Button>
+                <Button size="sm" variant="destructive" disabled={bulkOperationLoading} onClick={handleBulkTrash} className="gap-1.5"><Trash2 size={13} /> Delete</Button>
+                <Button size="sm" variant="outline" disabled={bulkOperationLoading} onClick={handleBulkDownload} className="gap-1.5 border-blue-200 text-blue-700 hover:bg-blue-100"><Download size={13} /> Download</Button>
+                <Button size="sm" variant="ghost" disabled={bulkOperationLoading} onClick={() => setSelectedItems(new Set())} className="gap-1.5 text-gray-500">Clear</Button>
+              </div>
+            </div>
           )}
 
           {/* Drawers */}
@@ -1947,625 +1370,315 @@ const handleBulkTrash = async () => {
               setSelectedItems(new Set()); // Clear selection
             }}
           />
-        </Box>
+        </div>
 
         {/* Folder Explorer */}
-        {/* <Paper elevation={3} sx={{ p: 2 }}>
-          <Typography variant="h6" gutterBottom>
-            📜 Folder Explorer
-          </Typography>
-          {folderTree ? (
-            renderTree(folderTree)
-          ) : (
-            <Typography>Loading folder data...</Typography>
-          )}
-        </Paper> */}
-        <Paper elevation={3} sx={{ p: 2, mt: 3 }}>
-          <Typography variant="h6" gutterBottom>
-            📜 Folder Explorer
-          </Typography>
-
+        <div className="bg-white rounded-2xl border border-gray-100 mt-4 overflow-hidden shadow-sm">
+          <div className="px-5 py-3.5 border-b border-gray-100 flex items-center gap-2">
+            <FolderIcon size={14} className="text-gray-400" />
+            <h3 className="text-sm font-semibold text-gray-800">Folder Explorer</h3>
+          </div>
           {folderTree && folderTree.length > 0 ? (
             <>
-              <TableContainer>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell sx={{ width: "50px" }}>
-                        <Checkbox
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-gray-50 border-b border-gray-200">
+                      <th className="w-10 px-3 py-2">
+                        <input
+                          type="checkbox"
                           checked={selectAll}
-                          indeterminate={selectedItems.size > 0 && !selectAll}
+                          ref={(el) => { if (el) el.indeterminate = selectedItems.size > 0 && !selectAll; }}
                           onChange={handleSelectAll}
+                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-300"
                         />
-                      </TableCell>
-                      <TableCell>Name</TableCell>
-                      <TableCell>Status</TableCell>
-                      <TableCell>Uploaded</TableCell>
-                      <TableCell>User</TableCell>
-                      <TableCell align="right">Actions</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>{renderTableRows(folderTree)}</TableBody>
-                </Table>
-              </TableContainer>
-
-              {/* Selected Items Summary */}
+                      </th>
+                      <th className="py-2 px-2 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Name</th>
+                      <th className="py-2 px-2 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Status</th>
+                      <th className="py-2 px-2 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Uploaded</th>
+                      <th className="py-2 px-2 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">User</th>
+                      <th className="py-2 px-2 text-[11px] font-semibold text-gray-500 uppercase tracking-wide text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>{renderTableRows(folderTree)}</tbody>
+                </table>
+              </div>
               {selectedItems.size > 0 && (
-                <Paper elevation={1} sx={{ p: 2, mt: 2, bgcolor: "#e3f2fd" }}>
-                  <Typography variant="body2">
-                    {selectedItems.size} item(s) selected
-                  </Typography>
-                </Paper>
+                <div className="px-4 py-2 bg-blue-50 border-t border-blue-100">
+                  <span className="text-xs font-medium text-blue-700">{selectedItems.size} item(s) selected</span>
+                </div>
               )}
             </>
           ) : (
-            <Typography sx={{ p: 2, textAlign: "center" }}>
-              Loading folder data...
-            </Typography>
+            <p className="p-6 text-center text-sm text-gray-400">Loading folder data...</p>
           )}
-        </Paper>
-        {/* 🔴 Bulk Lock Dialog */}
-        <Dialog
-          open={bulkLockDialogOpen}
-          onClose={() => setBulkLockDialogOpen(false)}
-        >
-          <DialogTitle>Lock/Unlock Selected Items</DialogTitle>
-          <DialogContent>
-            <Typography>
-              Do you want to lock or unlock the {selectedItems.size} selected
-              item(s)?
-            </Typography>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setBulkLockDialogOpen(false)}>Cancel</Button>
-            <Button
-              onClick={() => handleBulkLock("unlock")}
-              color="primary"
-              disabled={bulkOperationLoading}
-            >
-              Unlock
-            </Button>
-            <Button
-              onClick={() => handleBulkLock("lock")}
-              color="warning"
-              variant="contained"
-              disabled={bulkOperationLoading}
-            >
-              Lock
-            </Button>
-          </DialogActions>
-        </Dialog>
+        </div>
+        {/* Bulk Lock Dialog */}
+        {bulkLockDialogOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/40" onClick={() => setBulkLockDialogOpen(false)} />
+            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm">
+              <div className="px-5 py-4 border-b border-gray-100">
+                <h2 className="text-sm font-semibold text-gray-800">Lock/Unlock Selected Items</h2>
+              </div>
+              <div className="px-5 py-4">
+                <p className="text-sm text-gray-600">Do you want to lock or unlock the {selectedItems.size} selected item(s)?</p>
+              </div>
+              <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100">
+                <button type="button" onClick={() => setBulkLockDialogOpen(false)} className="rounded-lg px-4 py-2 text-sm font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">Cancel</button>
+                <button type="button" disabled={bulkOperationLoading} onClick={() => handleBulkLock("unlock")} className="rounded-lg px-4 py-2 text-sm font-medium text-blue-600 border border-blue-200 hover:bg-blue-50 disabled:opacity-50 transition-colors">Unlock</button>
+                <button type="button" disabled={bulkOperationLoading} onClick={() => handleBulkLock("lock")} className="rounded-lg px-4 py-2 text-sm font-medium text-white bg-amber-500 hover:bg-amber-600 disabled:opacity-50 transition-colors">Lock</button>
+              </div>
+            </div>
+          </div>
+        )}
 
-        <Dialog
-          open={openDialog}
-          onClose={() => setOpenDialog(false)}
-          fullWidth
-          maxWidth="lg"
-        >
-          <DialogTitle>
-            {/* {items.name} */}
-            {selectedFolderForMenu?.name || "Document"}
-            <IconButton
-              aria-label="close"
-              onClick={() => setOpenDialog(false)}
-              style={{ position: "absolute", right: 8, top: 8 }}
-            >
-              <CloseIcon />
-            </IconButton>
-          </DialogTitle>
+        {/* DocuSeal Signature Dialog */}
+        {openDialog && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/40" onClick={() => setOpenDialog(false)} />
+            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-6xl flex flex-col max-h-[90vh]">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0">
+                <h2 className="text-sm font-semibold text-gray-800">{selectedFolderForMenu?.name || "Document"}</h2>
+                <button type="button" onClick={() => setOpenDialog(false)} className="h-7 w-7 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+                  <X size={15} />
+                </button>
+              </div>
+              <div className="flex-1 overflow-auto p-4">
+                {token && showBuilderFor && (
+                  <DocusealBuilder token={token} customCss={customCss} onComplete={() => { console.log("DocuSeal finished sending document"); setShowBuilderFor(null); setOpenDialog(false); }} />
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
-          <DialogContent dividers>
-            {token && showBuilderFor && (
-              <DocusealBuilder
-                token={token}
-                customCss={customCss}
-                onComplete={() => {
-                  console.log("DocuSeal finished sending document");
-                  setShowBuilderFor(null);
-                  setOpenDialog(false);
-                }}
-              />
-            )}
-          </DialogContent>
-        </Dialog>
-
-        <Dialog
-          open={openApprovalDialog}
-          onClose={handleCloseDialog}
-          fullWidth
-          maxWidth="sm"
-        >
-          <DialogTitle>Request Approval</DialogTitle>
-          <DialogContent>
-            <TextField
-              multiline
-              rows={4}
-              fullWidth
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Type a short description or note..."
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseDialog}>Cancel</Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleRequestApproval}
-              // disabled={!description.trim()}
-              disabled={!description.trim() || sending}
-            >
-              Send
-            </Button>
-          </DialogActions>
-        </Dialog>
-        <Menu
-          anchorEl={menuAnchorEl}
-          open={Boolean(menuAnchorEl)}
-          onClose={handleMenuClose}
-          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-          transformOrigin={{ vertical: "top", horizontal: "right" }}
-        >
-          {(() => {
-            if (!selectedFolderForMenu) return null;
-
-            const item = selectedFolderForMenu;
-            const isFolder = item.type === "folder";
-            const isLocked = item?.meta?.readOnly === true;
-
-            // Determine doc category (adjust this logic if needed)
-            const path = item.path.toLowerCase();
-            let docType = "client"; // default
-            if (path.includes("firm")) docType = "firm";
-            if (path.includes("private")) docType = "private";
-const PROTECTED_FOLDERS = [
-  "Client Uploaded Documents",
-  "Firm Documents Shared with Client",
-  "Private",
-];
-const isProtectedFolder =
-  isFolder && PROTECTED_FOLDERS.includes(item.name);
-
-            const menuItems = [];
-
-            // -------------------------------
-            // 📁 FOLDER TYPE
-            // -------------------------------
-            if (isFolder) {
-              if (docType === "client") {
-                menuItems.push(
-                  {
-                    icon: <FolderIcon />,
-                    label: "New Folder",
-                    action: () => setNewFolderDrawerOpen(true),
-                  },
-                  {
-                    icon: <DriveFileMoveIcon />,
-                    label: "Edit",
-                    action: () => SetRenameDrawer(true),
-                  },
-                  {
-                    icon: <DriveFileMoveIcon />,
-                    label: "Move",
-                    action: () => setMoveDrawerOpen(true),
-                  },
-                  {
-                    icon: <DeleteIcon />,
-                    label: "Delete",
-                    // action: () => deleteItem(item),
-                    action: () => trashItem(item),
-                     disabled: isProtectedFolder,
-                  },
-                  {
-                    icon: <DownloadIcon />,
-                    label: "Download",
-                    action: () => handleDownload(item),
-                  },
-                  {
-                    icon: <UploadFileIcon />,
-                    label: "New File",
-                    action: () => setFileUploadDrawerOpen(true),
-                  },
-                  {
-                    icon: <DriveFolderUploadIcon />,
-                    label: "Upload Folder",
-                    action: () => setFolderUploaDrawerOpen(true),
-                  },
-                  {
-                    icon: <LockIcon />,
-                    label: isLocked ? "Unlock" : "Lock",
-                    action: () => toggleReadOnly(item),
-                  }
-                );
-              } else if (docType === "firm") {
-                menuItems.push(
-                  {
-                    icon: <FolderIcon />,
-                    label: "New Folder",
-                    action: () => setNewFolderDrawerOpen(true),
-                  },
-                  {
-                    icon: <DriveFileMoveIcon />,
-                    label: "Edit",
-                    action: () => SetRenameDrawer(true),
-                  },
-                  {
-                    icon: <DriveFileMoveIcon />,
-                    label: "Move",
-                    action: () => setMoveDrawerOpen(true),
-                  },
-                  {
-                    icon: <UploadFileIcon />,
-                    label: "New File",
-                    action: () => setFileUploadDrawerOpen(true),
-                  },
-                  {
-                    icon: <DownloadIcon />,
-                    label: "Download",
-                    action: () => handleDownload(item),
-                  },
-                  {
-                    icon: <DriveFolderUploadIcon />,
-                    label: "Upload Folder",
-                    action: () => setFolderUploaDrawerOpen(true),
-                  },
-                  {
-                    icon: <DeleteIcon />,
-                    label: "Delete",
-                   // action: () => deleteItem(item),
-                   action: () => trashItem(item),
-                    disabled: isProtectedFolder,
-                  }
-                );
-              } else if (docType === "private") {
-                menuItems.push(
-                  {
-                    icon: <FolderIcon />,
-                    label: "New Folder",
-                    action: () => setNewFolderDrawerOpen(true),
-                  },
-                  {
-                    icon: <UploadFileIcon />,
-                    label: "New File",
-                    action: () => setFileUploadDrawerOpen(true),
-                  },
-                  {
-                    icon: <DriveFileMoveIcon />,
-                    label: "Move",
-                    action: () => setMoveDrawerOpen(true),
-                  },
-                  {
-                    icon: <DriveFileMoveIcon />,
-                    label: "Edit",
-                    action: () => SetRenameDrawer(true),
-                  },
-                  {
-                    icon: <DeleteIcon />,
-                    label: "Delete",
-                    //action: () => deleteItem(item),
-                       action: () => trashItem(item),
-                        disabled: isProtectedFolder,
-                  },
-                  {
-                    icon: <DownloadIcon />,
-                    label: "Download",
-                    action: () => handleDownload(item),
-                  }
-                );
-              }
+        {/* Approval Dialog */}
+        {openApprovalDialog && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/40" onClick={handleCloseDialog} />
+            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md flex flex-col">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                <h2 className="text-sm font-semibold text-gray-800">Request Approval</h2>
+                <button type="button" onClick={handleCloseDialog} className="h-7 w-7 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"><X size={15} /></button>
+              </div>
+              <div className="px-5 py-4">
+                <label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-1.5">Description / Note</label>
+                <textarea rows={4} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Type a short description or note..." className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 placeholder:text-gray-400 resize-none transition-colors" />
+              </div>
+              <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100">
+                <button type="button" onClick={handleCloseDialog} className="rounded-lg px-4 py-2 text-sm font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">Cancel</button>
+                <button type="button" onClick={handleRequestApproval} disabled={!description.trim() || sending} className="rounded-lg px-4 py-2 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] disabled:opacity-50 transition-colors">Send</button>
+              </div>
+            </div>
+          </div>
+        )}
+        {/* Context Menu */}
+        {Boolean(menuAnchorEl) && (() => {
+          if (!selectedFolderForMenu) return null;
+          const item = selectedFolderForMenu;
+          const isFolder = item.type === "folder";
+          const isLocked = item?.meta?.readOnly === true;
+          const path = item.path.toLowerCase();
+          let docType = "client";
+          if (path.includes("firm")) docType = "firm";
+          if (path.includes("private")) docType = "private";
+          const PROTECTED_FOLDERS = ["Client Uploaded Documents", "Firm Documents Shared with Client", "Private"];
+          const isProtectedFolder = isFolder && PROTECTED_FOLDERS.includes(item.name);
+          const menuItems = [];
+          if (isFolder) {
+            if (docType === "client") {
+              menuItems.push(
+                { label: "New Folder", action: () => setNewFolderDrawerOpen(true) },
+                { label: "Edit", action: () => SetRenameDrawer(true) },
+                { label: "Move", action: () => setMoveDrawerOpen(true) },
+                { label: "Delete", action: () => trashItem(item), disabled: isProtectedFolder, danger: true },
+                { label: "Download", action: () => handleDownload(item) },
+                { label: "New File", action: () => setFileUploadDrawerOpen(true) },
+                { label: "Upload Folder", action: () => setFolderUploaDrawerOpen(true) },
+                { label: isLocked ? "Unlock" : "Lock", action: () => toggleReadOnly(item) },
+              );
+            } else if (docType === "firm") {
+              menuItems.push(
+                { label: "New Folder", action: () => setNewFolderDrawerOpen(true) },
+                { label: "Edit", action: () => SetRenameDrawer(true) },
+                { label: "Move", action: () => setMoveDrawerOpen(true) },
+                { label: "New File", action: () => setFileUploadDrawerOpen(true) },
+                { label: "Download", action: () => handleDownload(item) },
+                { label: "Upload Folder", action: () => setFolderUploaDrawerOpen(true) },
+                { label: "Delete", action: () => trashItem(item), disabled: isProtectedFolder, danger: true },
+              );
+            } else if (docType === "private") {
+              menuItems.push(
+                { label: "New Folder", action: () => setNewFolderDrawerOpen(true) },
+                { label: "New File", action: () => setFileUploadDrawerOpen(true) },
+                { label: "Move", action: () => setMoveDrawerOpen(true) },
+                { label: "Edit", action: () => SetRenameDrawer(true) },
+                { label: "Delete", action: () => trashItem(item), disabled: isProtectedFolder, danger: true },
+                { label: "Download", action: () => handleDownload(item) },
+              );
             }
-
-            // -------------------------------
-            // 📄 FILE TYPE
-            // -------------------------------
-            else {
-              if (docType === "client") {
-                menuItems.push(
-                  {
-                    icon: <DriveFileMoveIcon />,
-                    label: "Edit",
-                    action: () => SetRenameDrawer(true),
-                  },
-                  {
-                    icon: <DriveFileMoveIcon />,
-                    label: "Move",
-                    action: () => setMoveDrawerOpen(true),
-                  },
-                  {
-                    icon: <LockIcon />,
-                    label: isLocked ? "Unlock" : "Lock",
-                    action: () => toggleReadOnly(item),
-                  },
-                  {
-                    icon: <DeleteIcon />,
-                    label: "Delete",
-                    //action: () => deleteItem(item),
-                       action: () => trashItem(item),
-                  },
-                  {
-                    icon: <DownloadIcon />,
-                    label: "Download",
-                    action: () => handleDownload(item),
-                  }
-                );
-              } else if (docType === "firm") {
-                const currentStatus =
-                  item.meta?.signStatus || "sendForSignature";
-                const approvalStatus =
-                  item.meta?.authStatus || "sendForApproval";
-                const invoiceStatus = item.meta?.lockInvoiceStatus;
-
-                const isSignatureDisabled =
-                  currentStatus === "pendingSignature" ||
-                  currentStatus === "signatureCompleted";
-
-                const isApprovalCompleted =
-                  approvalStatus === "approvalCompleted";
-                // const isApprovalPending = approvalStatus === "pendingApproval";
-                const isApprovalCanceled =
-                  approvalStatus === "canceledApproval";
-
-                let invoiceLabel = "Lock Invoice";
-                if (invoiceStatus === "pendingpayment")
-                  invoiceLabel = "Unlock Invoice";
-                if (invoiceStatus === "paymentcompleted" || !invoiceStatus)
-                  invoiceLabel = "Lock Invoice";
-
-                menuItems.push(
-                  {
-                    icon: <DriveFileMoveIcon />,
-                    label: "Edit",
-                    action: () => SetRenameDrawer(true),
-                  },
-                  {
-                    icon: <DriveFileMoveIcon />,
-                    label: "Move",
-                    action: () => setMoveDrawerOpen(true),
-                  }
-                );
-                // SIGNATURE MENU
-                if (currentStatus === "pendingSignature") {
-                  menuItems.push({
-                    icon: <CancelIcon />,
-                    label: "Cancel Signature Request",
-                    action: () => cancelSignature(item),
-                  });
-                } else {
-                  menuItems.push({
-                    icon: <PenTool size={16} />,
-                    label: statusTextMap[currentStatus],
-                    action: () => toggleSignStatus(item),
-                    disabled: isSignatureDisabled,
-                  });
-                }
-
-                // ---------------- APPROVAL MENU LOGIC ----------------
-                if (approvalStatus === "sendForApproval") {
-                  menuItems.push({
-                    icon: <Stamp size={16} />,
-                    label: "Send For Approval",
-                    action: () => toggleApprovalStatus(item),
-                    // action: () => handleOpenApprovalDialog(item),
-                  });
-                }
-
-                if (approvalStatus === "pendingApproval") {
-                  menuItems.push({
-                    icon: <CancelIcon />,
-                    label: "Cancel Approval Request",
-                    action: () => handleCancelApproval(item),
-                  });
-                }
-
-                if (isApprovalCompleted) {
-                  menuItems.push({
-                    icon: <Stamp size={16} />,
-                    label: "Approved",
-                    disabled: true,
-                  });
-                }
-
-                if (isApprovalCanceled) {
-                  menuItems.push({
-                    icon: <Stamp size={16} />,
-                    label: "Approval Canceled",
-                    disabled: true,
-                  });
-                }
-
-                // ---------------- INVOICE LOCK ----------------
-                menuItems.push({
-                  icon:
-                    invoiceStatus === "pendingpayment" ? (
-                      <LockOpenIcon />
-                    ) : (
-                      <LockIcon />
-                    ),
-                  label: invoiceLabel,
-                  action: () => toggleInvoiceLock(item),
-                });
-
-                // ---------------- DELETE ----------------
-                menuItems.push({
-                  icon: <DeleteIcon />,
-                  label: "Delete",
-                  //action: () => deleteItem(item),
-                    action: () => trashItem(item),
-                });
-                menuItems.push({
-                  icon: <DownloadIcon />,
-                  label: "Download",
-                  action: () => handleDownload(item),
-                });
-              } else if (docType === "private") {
-                menuItems.push(
-                  {
-                    icon: <DriveFileMoveIcon />,
-                    label: "Edit",
-                    action: () => SetRenameDrawer(true),
-                  },
-                  {
-                    icon: <DeleteIcon />,
-                    label: "Delete",
-                   // action: () => deleteItem(item),
-                      action: () => trashItem(item),
-                  },
-                  {
-                    icon: <DownloadIcon />,
-                    label: "Download",
-                    action: () => handleDownload(item),
-                  },
-                  {
-                    icon: <DriveFileMoveIcon />,
-                    label: "Move",
-                    action: () => setMoveDrawerOpen(true),
-                  }
-                );
+          } else {
+            if (docType === "client") {
+              menuItems.push(
+                { label: "Edit", action: () => SetRenameDrawer(true) },
+                { label: "Move", action: () => setMoveDrawerOpen(true) },
+                { label: isLocked ? "Unlock" : "Lock", action: () => toggleReadOnly(item) },
+                { label: "Delete", action: () => trashItem(item), danger: true },
+                { label: "Download", action: () => handleDownload(item) },
+              );
+            } else if (docType === "firm") {
+              const currentStatus = item.meta?.signStatus || "sendForSignature";
+              const approvalStatus = item.meta?.authStatus || "sendForApproval";
+              const invoiceStatus = item.meta?.lockInvoiceStatus;
+              const isSignatureDisabled = currentStatus === "pendingSignature" || currentStatus === "signatureCompleted";
+              const isApprovalCompleted = approvalStatus === "approvalCompleted";
+              const isApprovalCanceled = approvalStatus === "canceledApproval";
+              let invoiceLabel = "Lock Invoice";
+              if (invoiceStatus === "pendingpayment") invoiceLabel = "Unlock Invoice";
+              menuItems.push(
+                { label: "Edit", action: () => SetRenameDrawer(true) },
+                { label: "Move", action: () => setMoveDrawerOpen(true) },
+              );
+              if (currentStatus === "pendingSignature") {
+                menuItems.push({ label: "Cancel Signature Request", action: () => cancelSignature(item) });
+              } else {
+                menuItems.push({ label: statusTextMap[currentStatus], action: () => toggleSignStatus(item), disabled: isSignatureDisabled });
               }
+              if (approvalStatus === "sendForApproval") menuItems.push({ label: "Send For Approval", action: () => toggleApprovalStatus(item) });
+              if (approvalStatus === "pendingApproval") menuItems.push({ label: "Cancel Approval Request", action: () => handleCancelApproval(item) });
+              if (isApprovalCompleted) menuItems.push({ label: "Approved", disabled: true });
+              if (isApprovalCanceled) menuItems.push({ label: "Approval Canceled", disabled: true });
+              menuItems.push({ label: invoiceLabel, action: () => toggleInvoiceLock(item) });
+              menuItems.push({ label: "Delete", action: () => trashItem(item), danger: true });
+              menuItems.push({ label: "Download", action: () => handleDownload(item) });
+            } else if (docType === "private") {
+              menuItems.push(
+                { label: "Edit", action: () => SetRenameDrawer(true) },
+                { label: "Delete", action: () => trashItem(item), danger: true },
+                { label: "Download", action: () => handleDownload(item) },
+                { label: "Move", action: () => setMoveDrawerOpen(true) },
+              );
             }
-
-            return menuItems.map(({ icon, label, action, disabled }) => (
-              <MenuItem
-                key={label}
-                disabled={(label !== "Unlock" && isLocked) || disabled}
-                // disabled={label !== "Unlock" && isLocked} // allow unlock even if locked
-                onClick={() => {
-                  action();
-                  handleMenuClose();
-                }}
-                sx={{ fontSize: "0.8rem", py: 0.5 }}
+          }
+          return (
+            <>
+              <div className="fixed inset-0 z-30" onClick={handleMenuClose} />
+              <div
+                className="fixed z-40 bg-white border border-gray-200 rounded-xl shadow-xl w-52 py-1 overflow-hidden"
+                style={{ top: menuAnchorEl?.getBoundingClientRect?.()?.bottom ?? 0, left: menuAnchorEl?.getBoundingClientRect?.()?.left ?? 0 }}
               >
-                {React.cloneElement(icon, { sx: { mr: 0.5, fontSize: 16 } })}
-                {label}
-              </MenuItem>
-            ));
-          })()}
-        </Menu>
-        <Dialog
-          open={invoiceDialogOpen}
-          onClose={() => setInvoiceDialogOpen(false)}
-          fullWidth
-          maxWidth="md"
-        >
-          <DialogTitle>Select Invoices To Lock</DialogTitle>
-
-          <DialogContent dividers>
-            {invoiceList.length === 0 && (
-              <Typography textAlign="center" color="text.secondary" p={2}>
-                No invoices found
-              </Typography>
-            )}
-
-            <Box sx={{ overflowX: "auto", mt: 1 }}>
-              <Table sx={{ minWidth: 650 }}>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Select</TableCell>
-                    <TableCell>Invoice #</TableCell>
-                    <TableCell>Description</TableCell>
-                    <TableCell>Created At</TableCell>
-                    <TableCell>Amount</TableCell>
-                  </TableRow>
-                </TableHead>
-
-                <TableBody>
-                  {invoiceList.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={5}>No invoices found.</TableCell>
-                    </TableRow>
-                  ) : (
-                    invoiceList.map((inv) => {
-                      const id = inv._id;
-                      const checked = selectedInvoices.includes(id);
-
-                      return (
-                        <TableRow
-                          key={id}
-                          hover
-                          sx={{
-                            cursor: "pointer",
-                            bgcolor: checked ? "#e3f2fd" : "inherit",
-                          }} // optional: highlight selected
-                          onClick={() => {
-                            setSelectedInvoices((prev) => {
-                              const updated = prev.includes(id)
-                                ? prev.filter((x) => x !== id)
-                                : [...prev, id];
-
-                              console.log("Selected invoices:", updated); // <-- log here
-                              return updated;
-                            });
-                          }}
-                        >
-                          <TableCell>
-                            <Checkbox checked={checked} />
-                          </TableCell>
-                          <TableCell>{inv.invoicenumber}</TableCell>
-                          <TableCell>{inv.description || "—"}</TableCell>
-                          <TableCell>
-                            {new Date(inv.createdAt).toLocaleDateString()}
-                          </TableCell>
-                          <TableCell>₹{inv.summary?.total}</TableCell>
-                        </TableRow>
-                      );
-                    })
-                  )}
-                </TableBody>
-              </Table>
-            </Box>
-          </DialogContent>
-
-          <DialogActions>
-            <Button onClick={() => setInvoiceDialogOpen(false)}>Cancel</Button>
-            <Button variant="contained" onClick={handleSubmit}>
-              Lock Invoice
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Box>
+                {menuItems.map(({ label, action, disabled: d, danger }) => (
+                  <button
+                    key={label}
+                    type="button"
+                    disabled={(label !== "Unlock" && isLocked) || d}
+                    onClick={() => { if (action) action(); handleMenuClose(); }}
+                    className={`w-full text-left px-4 py-2 text-sm ${danger ? "text-red-600 hover:bg-red-50" : "text-gray-700 hover:bg-gray-50"} disabled:opacity-40 disabled:cursor-not-allowed`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </>
+          );
+        })()}
+        {/* Invoice Lock Dialog */}
+        {invoiceDialogOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/40" onClick={() => setInvoiceDialogOpen(false)} />
+            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl flex flex-col max-h-[85vh]">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0">
+                <h2 className="text-sm font-semibold text-gray-800">Select Invoices To Lock</h2>
+                <button type="button" onClick={() => setInvoiceDialogOpen(false)} className="h-7 w-7 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"><X size={15} /></button>
+              </div>
+              <div className="flex-1 overflow-auto">
+                {invoiceList.length === 0 ? (
+                  <p className="p-6 text-center text-sm text-gray-400">No invoices found</p>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="bg-gray-50 border-b border-gray-200">
+                          <th className="py-2 px-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Select</th>
+                          <th className="py-2 px-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Invoice #</th>
+                          <th className="py-2 px-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Description</th>
+                          <th className="py-2 px-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Created At</th>
+                          <th className="py-2 px-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Amount</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {invoiceList.map((inv) => {
+                          const id = inv._id;
+                          const checked = selectedInvoices.includes(id);
+                          return (
+                            <tr
+                              key={id}
+                              className={`border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors ${checked ? "bg-blue-50" : ""}`}
+                              onClick={() => setSelectedInvoices((prev) => {
+                                const updated = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
+                                console.log("Selected invoices:", updated);
+                                return updated;
+                              })}
+                            >
+                              <td className="py-2 px-3"><input type="checkbox" checked={checked} readOnly className="rounded border-gray-300 text-blue-600" /></td>
+                              <td className="py-2 px-3 text-sm text-gray-700">{inv.invoicenumber}</td>
+                              <td className="py-2 px-3 text-sm text-gray-600">{inv.description || "—"}</td>
+                              <td className="py-2 px-3 text-sm text-gray-600">{new Date(inv.createdAt).toLocaleDateString()}</td>
+                              <td className="py-2 px-3 text-sm text-gray-700">₹{inv.summary?.total}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100 shrink-0">
+                <button type="button" onClick={() => setInvoiceDialogOpen(false)} className="rounded-lg px-4 py-2 text-sm font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">Cancel</button>
+                <button type="button" onClick={handleSubmit} className="rounded-lg px-4 py-2 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] transition-colors">Lock Invoice</button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     );
   };
   return (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h5" gutterBottom>
-        Apply Template to Account
-      </Typography>
-
-      <FormControl fullWidth sx={{ mb: 2 }}>
-        <InputLabel id="template-label">Select Template</InputLabel>
-        <Select
-          labelId="template-label"
-          value={selectedTemplate}
-          label="Select Template"
-          onChange={(e) => setSelectedTemplate(e.target.value)}
-        >
-          <MenuItem value="">
-            <em>Choose a template</em>
-          </MenuItem>
-          {templates.map((template) => (
-            <MenuItem key={template._id} value={template._id}>
-              {template.templatename}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-
-      <Button
-        variant="contained"
-        color="primary"
-        disabled={loading || !selectedTemplate}
-        onClick={applyTemplateToAccount}
-        sx={{ textTransform: "none" }}
-      >
-        {loading ? (
-          <CircularProgress size={24} color="inherit" />
-        ) : (
-          "Apply Template"
-        )}
-      </Button>
-
+    <div className="p-4 md:p-6 space-y-6">
+      {/* Apply Template Card */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+        <div className="mb-4">
+          <h2 className="text-base font-semibold text-gray-900 tracking-tight">Apply Folder Template</h2>
+          <p className="text-xs text-gray-400 mt-0.5">Assign a folder template structure to this account</p>
+        </div>
+        <div className="flex flex-col sm:flex-row items-end gap-3 max-w-lg">
+          <div className="flex-1">
+            <label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-1.5">Select Template</label>
+            <select
+              value={selectedTemplate}
+              onChange={(e) => setSelectedTemplate(e.target.value)}
+              className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 transition-colors"
+            >
+              <option value="">Choose a template...</option>
+              {templates.map((template) => (
+                <option key={template._id} value={template._id}>{template.templatename}</option>
+              ))}
+            </select>
+          </div>
+          <Button
+            size="sm"
+            disabled={loading || !selectedTemplate}
+            onClick={applyTemplateToAccount}
+            className="shrink-0 gap-2"
+          >
+            {loading ? <Loader2 size={14} className="animate-spin" /> : null}
+            Apply Template
+          </Button>
+        </div>
+      </div>
       <FolderTreeView accountId={data} />
-    </Box>
+    </div>
   );
 };
 

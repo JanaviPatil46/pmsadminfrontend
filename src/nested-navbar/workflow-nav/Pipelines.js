@@ -4,15 +4,12 @@
 import React, { useEffect, useState ,useContext} from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { Typography, Box, Dialog, DialogActions, DialogContent, DialogTitle, Button, Drawer, Checkbox, Alert, Select, MenuItem, Chip } from "@mui/material";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "./style.css"
-import { useNavigate } from "react-router-dom";
 import EditJobDrawer from "../../Workflow/updateJobCard"
-import DeleteIcon from "@mui/icons-material/Delete";
-import ArchiveIcon from '@mui/icons-material/Archive'; 
+import { Trash2, Archive } from "lucide-react";
 import { differenceInMinutes, differenceInHours, differenceInDays } from "date-fns";
 import { LoginContext } from "../../Sidebar/Context/Context";
 const ItemTypes = {
@@ -250,7 +247,7 @@ const handleJobUpdates = async (jobId, automations) => {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <Box>
+      <div>
         {loading && <p>Loading pipeline data...</p>}
         {uniquePipelines.map((pipeline, index) => (
           <Pipeline
@@ -263,7 +260,7 @@ const handleJobUpdates = async (jobId, automations) => {
             handleDrop={handleDrop}
           />
         ))}
-      </Box>
+      </div>
       
       {/* Automation Drawer */}
       <AutomationDrawer
@@ -363,80 +360,73 @@ const Pipeline = ({ pipeline, jobData, moveJob, fetchJobList, data, handleDrop }
   };
 
   return (
-    <Box sx={{ border: "1px solid gray", borderRadius: '10px', marginBottom: '15px',  }}>
-      <h3 style={{ marginLeft: '15px' }}>{pipeline.pipelineName}</h3>
+    <div className="border border-gray-300 rounded-xl mb-4">
+      <h3 className="ml-4 mt-3 font-semibold text-sm text-gray-800">{pipeline.pipelineName}</h3>
       {checkedJobIds.length > 0 && (
-        <Box>
-          <Box sx={{display:'flex', alignItems:'center', gap:2}}>
-            <DeleteIcon
+        <div className="px-4 pb-2">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              className="flex items-center gap-1 text-red-500 hover:text-red-700 transition-colors"
               onClick={() => handleDialogOpen("delete")}
-              sx={{
-                marginLeft: "15px",
-                color: "red",
-                cursor: "pointer",
-                transform: "scale(1)",
-              }}
-            />
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <ArchiveIcon sx={{ marginRight: 1, cursor:'pointer' }} 
-                onClick={() => handleDialogOpen("archive")}
-              />
-              <p>Archive</p>
-            </Box>
-          </Box>
-          <Dialog open={openDialog} onClose={handleDialogClose}>
-            <DialogTitle>
-              {dialogType === "delete" ? "Confirm Delete" : "Confirm Archive"}
-            </DialogTitle>
-            <DialogContent>
-              Are you sure you want to{" "}
-              {dialogType === "delete" ? "delete" : "archive"} these jobs?
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleDialogClose} color="secondary">
-                Cancel
-              </Button>
-              <Button
-                onClick={dialogType === "delete" ? handleDelete : handleArchive}
-                color="primary"
-              >
-                Confirm
-              </Button>
-            </DialogActions>
-          </Dialog>
-        </Box>
+            >
+              <Trash2 size={16} />
+              <span className="text-xs font-medium">Delete</span>
+            </button>
+            <button
+              type="button"
+              className="flex items-center gap-1 text-gray-600 hover:text-gray-800 transition-colors"
+              onClick={() => handleDialogOpen("archive")}
+            >
+              <Archive size={16} />
+              <span className="text-xs font-medium">Archive</span>
+            </button>
+          </div>
+
+          {openDialog && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <div className="absolute inset-0 bg-black/40" onClick={handleDialogClose} />
+              <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm">
+                <div className="px-5 py-4 border-b border-gray-100">
+                  <h2 className="text-sm font-semibold text-gray-800">
+                    {dialogType === "delete" ? "Confirm Delete" : "Confirm Archive"}
+                  </h2>
+                </div>
+                <div className="px-5 py-4">
+                  <p className="text-sm text-gray-600">
+                    Are you sure you want to {dialogType === "delete" ? "delete" : "archive"} these jobs?
+                  </p>
+                </div>
+                <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100">
+                  <button type="button" onClick={handleDialogClose} className="rounded-lg px-4 py-2 text-sm font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">Cancel</button>
+                  <button type="button" onClick={dialogType === "delete" ? handleDelete : handleArchive} className="rounded-lg px-4 py-2 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] transition-colors">Confirm</button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       )}
-      
-      <Box
-        className="stage-container"
-        display="flex"
-        gap={2}
-        sx={{
-          padding: 2,
-          width:'auto',
-          overflowX: "auto",
-          whiteSpace: "nowrap",
-        }}
-      >
+
+      <div className="stage-container flex gap-4 p-4 overflow-x-auto whitespace-nowrap">
         {pipeline.stages.map((stage, stageIndex) => (
           <Stage
             key={stageIndex}
             stage={stage}
             jobs={jobData.filter(
               (job) =>
-                job.PipelineId === pipeline._id && 
-                job.Stages && 
+                job.PipelineId === pipeline._id &&
+                job.Stages &&
                 job.Stages.some(s => s.name === stage.name)
             )}
             moveJob={(jobId, targetStage) => moveJob(jobId, targetStage, stage)}
             onCheckboxChange={handleJobCheckboxChange}
             handleDrop={handleDrop}
-             fetchJobList={fetchJobList}
+            fetchJobList={fetchJobList}
             data={data}
           />
         ))}
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 };
 
@@ -457,57 +447,31 @@ const Stage = ({ stage, jobs, moveJob, onCheckboxChange, handleDrop,data,fetchJo
     setVisibleJobsCount(prevCount => prevCount + 50);
   };
   return (
-    <Box
+    <div
       ref={drop}
-      className={`stage ${isOver ? "drag-over" : ""}`}
-      sx={{
-        minWidth: '250px',
-        backgroundColor: '#f5f5f5',
-        borderRadius: '8px',
-        padding: '10px',
-        marginRight: '10px',
-      }}
+      className={`stage min-w-[250px] bg-gray-100 rounded-lg p-3 mr-3 ${isOver ? "drag-over" : ""}`}
     >
-     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-          {stage.name}
-        </Typography>
-        <Typography variant="caption" sx={{ color: 'gray' }}>
-          {jobs.length > 0 && <span>({jobs.length})</span>}
-          
-        </Typography>
-      </Box>
+      <div className="flex items-center justify-between">
+        <span className="font-semibold text-sm text-gray-800">{stage.name}</span>
+        {jobs.length > 0 && <span className="text-xs text-gray-400">({jobs.length})</span>}
+      </div>
 
-{/*       
-      {jobs.map((job) => (
-        <Job key={job.id} job={job} onCheckboxChange={onCheckboxChange} />
-      ))} */}
-       {/* Only show the visible jobs */}
-       <Box sx={{mt:2}}>
-          {jobs.slice(0, visibleJobsCount).map((job) => (
-        <Job  fetchJobList={fetchJobList}
-            data={data} key={job.id} job={job} onCheckboxChange={onCheckboxChange} />
-      ))}
-       </Box>
-    
-      
-      {/* Show "Load More" button if there are more jobs to show */}
+      <div className="mt-2">
+        {jobs.slice(0, visibleJobsCount).map((job) => (
+          <Job fetchJobList={fetchJobList} data={data} key={job.id} job={job} onCheckboxChange={onCheckboxChange} />
+        ))}
+      </div>
+
       {jobs.length > visibleJobsCount && (
-        <Button 
+        <button
+          type="button"
           onClick={loadMoreJobs}
-          variant="contained"
-          size="small"
-          sx={{
-            width: '100%',
-            marginTop: '8px',
-            // color: 'primary.main',
-            textTransform: 'none',
-          }}
+          className="w-full mt-2 py-1.5 rounded-lg text-xs font-medium bg-[var(--color-save-btn)] text-white hover:bg-[var(--color-save-hover-btn)] transition-colors"
         >
           Load More ({jobs.length - visibleJobsCount} more)
-        </Button>
+        </button>
       )}
-    </Box>
+    </div>
   );
 };
 
@@ -686,78 +650,46 @@ const Job = ({ job, onCheckboxChange,data,fetchJobList }) => {
   };
  
 
-   return (
-
+  return (
     <>
-        <Box
-    className={`job-card ${isDragging ? "dragging" : ""}`}
-      ref={drag}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      sx={{
-        padding: 2,
-        border: "1px solid #ddd",
-        marginTop: 2,
-        width: "auto",
-        background: isDragging ? "#f0f0f0" : "#f9f9f9",
-        textAlign: "left",
-        opacity: isDragging ? 0.5 : 1,
-        borderRadius: '8px',
-        cursor: 'pointer',
-        position: "relative",
-        transition: "transform 0.2s ease",
-        boxShadow:"02.s ease"
-      }}
-    >
-      {(isHovered || isChecked) && (
-        <input
-          type="checkbox"
-          checked={isChecked}
-          onChange={handleCheckboxChange}
-          style={{
-            position: "absolute",
-            top: 10,
-            right: 10,
-            cursor: "pointer",
-            transform: "scale(1.2)",
-          }}
-        />
-      )}
-      <p>{job.Account.join(", ")}</p>
-    <strong style={{"color": 'red'}}  onClick={handleEditClick}><p>{truncateName(job.Name)}</p></strong>  
-      <Typography
-        variant="body2"
-        color="text.secondary"
-        sx={{ 
-          marginBottom: "8px",
-          whiteSpace: "normal",
-          wordBreak: "break-word",
-          overflowWrap: "break-word",
-          lineHeight: "1.5",
-        }}
+      <div
+        className={`job-card relative border border-gray-200 rounded-lg p-3 mt-2 text-left transition-all duration-200 cursor-pointer ${isDragging ? "opacity-50 bg-gray-100" : "bg-gray-50 hover:shadow-md"}`}
+        ref={drag}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
       >
-        {job.JobAssignee.join(", ")}
-      </Typography>
-      <p>{truncateDescription(stripHtmlTags(job.Description))}</p>
-      <span style={getPriorityStyle(job.Priority)}>{job.Priority}</span>
-      <p>Start Date: {formatDate(job.StartDate)}</p>
-      <p>Due Date: {formatDate(job.DueDate)}</p>
-      <p>
-        {timeAgo(job.updatedAt)}
-      </p>
-    </Box>
-    <EditJobDrawer
+        {(isHovered || isChecked) && (
+          <input
+            type="checkbox"
+            checked={isChecked}
+            onChange={handleCheckboxChange}
+            className="absolute top-2.5 right-2.5 cursor-pointer scale-125"
+          />
+        )}
+        <p className="text-xs text-gray-500 mb-0.5">{job.Account.join(", ")}</p>
+        <strong className="text-red-500 text-xs block mb-1 cursor-pointer" onClick={handleEditClick}>
+          {truncateName(job.Name)}
+        </strong>
+        <p className="text-xs text-gray-500 mb-1 break-words whitespace-normal leading-relaxed">
+          {job.JobAssignee.join(", ")}
+        </p>
+        <p className="text-xs text-gray-600 mb-1">{truncateDescription(stripHtmlTags(job.Description))}</p>
+        <span className="text-[11px] font-medium rounded-full px-2 py-0.5" style={getPriorityStyle(job.Priority)}>{job.Priority}</span>
+        <p className="text-xs text-gray-500 mt-1">Start Date: {formatDate(job.StartDate)}</p>
+        <p className="text-xs text-gray-500">Due Date: {formatDate(job.DueDate)}</p>
+        <p className="text-xs text-gray-400 mt-1">{timeAgo(job.updatedAt)}</p>
+      </div>
+      <EditJobDrawer
         open={isEditDrawerOpen}
         onClose={() => setIsEditDrawerOpen(false)}
         jobId={job.id}
-        // fetchJobData={fetchJobList}
         fetchJobData={() => fetchJobList(data)}
         accountOptions={accountOptions}
         pipelineOptions={pipelineOptions}
         tagOptions={tagOptions}
         userOptions={userOptions}
         clientFacingOptions={clientFacingOptions}
-        theme={{ breakpoints: { down: () => false } }} // Mock theme object
+        theme={{ breakpoints: { down: () => false } }}
         isSmallScreen={false}
       />
     </>
@@ -1610,275 +1542,169 @@ const { logindata } = useContext(LoginContext);
     },
   }));
 
+  if (!open) return null;
+
   return (
-    <Drawer anchor="right" open={open} onClose={onClose}>
-      <Box sx={{ width: 500, padding: 2 }}>
-        <Typography variant="h6">Automations for {accountName}</Typography>
+    <div className="fixed inset-0 z-50 flex">
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div className="relative ml-auto w-full max-w-[500px] h-full bg-white shadow-2xl flex flex-col overflow-hidden">
+        <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+          <h2 className="text-base font-semibold text-gray-800">Automations for {accountName}</h2>
+          <button type="button" onClick={onClose} className="p-1 rounded hover:bg-gray-100 transition-colors text-gray-500 hover:text-gray-700 text-lg font-bold">&times;</button>
+        </div>
 
-        {automations.length > 0 ? (
-          automations.map((automation, index) => {
-            const currentTagData = tagData[index] || {};
-            const templateName = templateData[index] || "Loading...";
-            const hasMatchingTags = checkTagMatch(automation.selectedTags, accountId);
+        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
+          {automations.length > 0 ? (
+            automations.map((automation, index) => {
+              const currentTagData = tagData[index] || {};
+              const templateName = templateData[index] || "Loading...";
+              const hasMatchingTags = checkTagMatch(automation.selectedTags, accountId);
 
-            return (
-              <Box key={index} sx={{ marginBottom: 2, p: 2, border: "1px solid #e0e0e0", borderRadius: 2 }}>
-                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                  <Checkbox
-                    checked={selectedAutomationIndices.includes(index)}
-                    onChange={() => handleAutomationSelection(index)}
-                    disabled={!hasMatchingTags}
-                  />
-                  <Typography variant="h6" component="span" sx={{ ml: 1 }}>
-                    {automation.type}
-                  </Typography>
-                  {!hasMatchingTags && (
-                    <Typography
-                      variant="body2"
-                      color="error"
-                      sx={{ fontStyle: "italic", ml: 2 }}
-                    >
-                      The tags do not match the account
-                    </Typography>
+              return (
+                <div key={index} className="border border-gray-200 rounded-xl p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <input
+                      type="checkbox"
+                      className="w-4 h-4 rounded border-gray-300 accent-[var(--color-save-btn)] cursor-pointer"
+                      checked={selectedAutomationIndices.includes(index)}
+                      onChange={() => handleAutomationSelection(index)}
+                      disabled={!hasMatchingTags}
+                    />
+                    <span className="text-sm font-semibold text-gray-800">{automation.type}</span>
+                    {!hasMatchingTags && (
+                      <span className="text-xs text-red-500 italic ml-1">The tags do not match the account</span>
+                    )}
+                  </div>
+
+                  {automation.selectedtemp && (
+                    <div className="mb-3">
+                      <p className="text-xs font-semibold text-gray-700 mb-0.5">Template:</p>
+                      <p className="text-xs text-gray-500">{templateName}</p>
+                    </div>
                   )}
-                </Box>
 
-                {/* Template Information */}
-                {automation.selectedtemp && (
-                  <Box sx={{ mb: 2 }}>
-                    <Typography variant="subtitle1" fontWeight="bold">
-                      Template:
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary">
-                      {templateName}
-                    </Typography>
-                  </Box>
-                )}
+                  {currentTagData.selectedTags && currentTagData.selectedTags.length > 0 && (
+                    <div className="mb-3">
+                      <p className="text-xs font-semibold text-gray-700 mb-1">Condition Tags:</p>
+                      <div className="flex flex-wrap gap-1">
+                        {currentTagData.selectedTags.map((tag) => (
+                          <span key={tag._id} className="inline-block px-2 py-0.5 rounded-full text-[10px] font-medium text-white" style={{ backgroundColor: tag.tagColour }}>
+                            {tag.tagName}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
-                {/* Selected Tags (Condition Tags) */}
-                {currentTagData.selectedTags && currentTagData.selectedTags.length > 0 && (
-                  <Box sx={{ mb: 2 }}>
-                    <Typography variant="subtitle1" fontWeight="bold">
-                      Condition Tags:
-                    </Typography>
-                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: 1 }}>
-                      {currentTagData.selectedTags.map((tag) => (
-                        <Chip
-                          key={tag._id}
-                          label={tag.tagName}
-                          sx={{
-                            backgroundColor: tag.tagColour,
-                            color: "#fff",
-                            fontWeight: "500",
-                            borderRadius: "20px",
-                          }}
-                          size="small"
-                        />
-                      ))}
-                    </Box>
-                  </Box>
-                )}
- {/* Add Tags for Update account tags */}
-                {automation.type === "Update account tags" &&
-                  currentTagData.addTags &&
-                  currentTagData.addTags.length > 0 && (
-                    <Box sx={{ mb: 2 }}>
-                      <Typography variant="subtitle1" fontWeight="bold" color="success.main">
-                        Add Tags:
-                      </Typography>
-                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: 1 }}>
+                  {automation.type === "Update account tags" && currentTagData.addTags && currentTagData.addTags.length > 0 && (
+                    <div className="mb-3">
+                      <p className="text-xs font-semibold text-green-600 mb-1">Add Tags:</p>
+                      <div className="flex flex-wrap gap-1">
                         {currentTagData.addTags.map((tag) => (
-                          <Chip
-                            key={tag._id}
-                            label={tag.tagName}
-                            sx={{
-                              backgroundColor: tag.tagColour,
-                              color: "#fff",
-                              fontWeight: "500",
-                              borderRadius: "20px",
-                              border: "2px solid #4caf50",
-                            }}
-                            size="small"
-                          />
+                          <span key={tag._id} className="inline-block px-2 py-0.5 rounded-full text-[10px] font-medium text-white border-2 border-green-400" style={{ backgroundColor: tag.tagColour }}>
+                            {tag.tagName}
+                          </span>
                         ))}
-                      </Box>
-                    </Box>
+                      </div>
+                    </div>
                   )}
 
-                {/* Remove Tags for Update account tags */}
-                {automation.type === "Update account tags" &&
-                  currentTagData.removeTags &&
-                  currentTagData.removeTags.length > 0 && (
-                    <Box sx={{ mb: 2 }}>
-                      <Typography variant="subtitle1" fontWeight="bold" color="error.main">
-                        Remove Tags:
-                      </Typography>
-                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: 1 }}>
+                  {automation.type === "Update account tags" && currentTagData.removeTags && currentTagData.removeTags.length > 0 && (
+                    <div className="mb-3">
+                      <p className="text-xs font-semibold text-red-600 mb-1">Remove Tags:</p>
+                      <div className="flex flex-wrap gap-1">
                         {currentTagData.removeTags.map((tag) => (
-                          <Chip
-                            key={tag._id}
-                            label={tag.tagName}
-                            sx={{
-                              backgroundColor: tag.tagColour,
-                              color: "#fff",
-                              fontWeight: "500",
-                              borderRadius: "20px",
-                              border: "2px solid #f44336",
-                              textDecoration: "line-through",
-                            }}
-                            size="small"
-                          />
+                          <span key={tag._id} className="inline-block px-2 py-0.5 rounded-full text-[10px] font-medium text-white border-2 border-red-400 line-through" style={{ backgroundColor: tag.tagColour }}>
+                            {tag.tagName}
+                          </span>
                         ))}
-                      </Box>
-                    </Box>
+                      </div>
+                    </div>
                   )}
 
-                {/* Client Status Information */}
-                {automation.type === "Update client-facing job status" && (
-                  <Box sx={{ mb: 2 }}>
-                    <Typography variant="subtitle1" fontWeight="bold">
-                      Client Status:
-                    </Typography>
-                    
-                    {/* Display status with colored dot */}
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
+                  {automation.type === "Update client-facing job status" && (
+                    <div className="mb-3">
+                      <p className="text-xs font-semibold text-gray-700 mb-1">Client Status:</p>
                       {automation.selectedClientStatus && (
-                        <>
-                          <Box
-                            sx={{
-                              width: 12,
-                              height: 12,
-                              borderRadius: '50%',
-                              backgroundColor: clientStatusOptions?.find(
-                                opt => opt.value === automation.selectedClientStatus
-                              )?.clientfacingColour || '#ccc'
-                            }}
+                        <div className="flex items-center gap-1.5 mt-1">
+                          <div
+                            className="w-3 h-3 rounded-full flex-shrink-0"
+                            style={{ backgroundColor: clientStatusOptions?.find(opt => opt.value === automation.selectedClientStatus)?.clientfacingColour || "#ccc" }}
                           />
-                          <Typography variant="body2">
-                            {clientStatusOptions?.find(
-                              opt => opt.value === automation.selectedClientStatus
-                            )?.label || automation.selectedClientStatus || "Not set"}
-                          </Typography>
-                        </>
+                          <span className="text-xs text-gray-700">
+                            {clientStatusOptions?.find(opt => opt.value === automation.selectedClientStatus)?.label || automation.selectedClientStatus || "Not set"}
+                          </span>
+                        </div>
                       )}
-                    </Box>
-                
-                    {/* Display visibility setting */}
-                    <Typography variant="body2" sx={{ mt: 1 }}>
-                      Visibility: {automation.status ? "Visible to client" : "Hidden from client"}
-                    </Typography>
-                
-                    {/* Display status description if available */}
-                    {automation.statusDescription && (
-                      <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
-                        Description: {automation.statusDescription}
-                      </Typography>
-                    )}
-                  </Box>
-                )}
+                      <p className="text-xs text-gray-500 mt-1">Visibility: {automation.status ? "Visible to client" : "Hidden from client"}</p>
+                      {automation.statusDescription && (
+                        <p className="text-xs text-gray-400 mt-1">Description: {automation.statusDescription}</p>
+                      )}
+                    </div>
+                  )}
 
-                {/* Job Assignees Information */}
-                {automation.type === "Update job assignees" && (
-                  <Box sx={{ mb: 2 }}>
-                    <Typography variant="subtitle1" fontWeight="bold">
-                      Job Assignees:
-                    </Typography>
-                    
-                    {/* Add Assignees */}
-                    {automation.addAssignees && automation.addAssignees.length > 0 && (
-                      <Box sx={{ mt: 1 }}>
-                        <Typography variant="body2" color="success.main">
-                          Add Assignees:
-                        </Typography>
-                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: 1 }}>
-                          {automation.addAssignees.map((assignee) => (
-                            <Chip
-                              key={assignee._id}
-                              label={assignee.name || assignee.username || "Unknown"}
-                              sx={{
-                                backgroundColor: "#4caf50",
-                                color: "#fff",
-                                borderRadius: "20px",
-                              }}
-                              size="small"
-                            />
-                          ))}
-                        </Box>
-                      </Box>
-                    )}
-                
-                    {/* Remove Assignees */}
-                    {automation.removeAssignees && automation.removeAssignees.length > 0 && (
-                      <Box sx={{ mt: 1 }}>
-                        <Typography variant="body2" color="error.main">
-                          Remove Assignees:
-                        </Typography>
-                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: 1 }}>
-                          {automation.removeAssignees.map((assignee) => (
-                            <Chip
-                              key={assignee._id}
-                              label={assignee.name || assignee.username || "Unknown"}
-                              sx={{
-                                backgroundColor: "#f44336",
-                                color: "#fff",
-                                borderRadius: "20px",
-                                textDecoration: "line-through",
-                              }}
-                              size="small"
-                            />
-                          ))}
-                        </Box>
-                      </Box>
-                    )}
-                  </Box>
-                )}
-                {/* Warning for Account Tags Automation */}
-                {automation.type === "Update account tags" && (
-                  <Alert severity="warning" sx={{ mt: 2 }}>
-                    This automation can affect conditions for automations below
-                  </Alert>
-                )}
-              </Box>
-            );
-          })
-        ) : (
-          <Typography>No automations available</Typography>
-        )}
+                  {automation.type === "Update job assignees" && (
+                    <div className="mb-3">
+                      <p className="text-xs font-semibold text-gray-700 mb-1">Job Assignees:</p>
+                      {automation.addAssignees && automation.addAssignees.length > 0 && (
+                        <div className="mt-1">
+                          <p className="text-xs text-green-600 font-medium mb-1">Add Assignees:</p>
+                          <div className="flex flex-wrap gap-1">
+                            {automation.addAssignees.map((assignee) => (
+                              <span key={assignee._id} className="inline-block px-2 py-0.5 rounded-full text-[10px] font-medium text-white bg-green-500">
+                                {assignee.name || assignee.username || "Unknown"}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {automation.removeAssignees && automation.removeAssignees.length > 0 && (
+                        <div className="mt-2">
+                          <p className="text-xs text-red-600 font-medium mb-1">Remove Assignees:</p>
+                          <div className="flex flex-wrap gap-1">
+                            {automation.removeAssignees.map((assignee) => (
+                              <span key={assignee._id} className="inline-block px-2 py-0.5 rounded-full text-[10px] font-medium text-white bg-red-500 line-through">
+                                {assignee.name || assignee.username || "Unknown"}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
-        <Box sx={{ display: "flex", alignItems: "center", gap: 3, mt: 3 }}>
-          <Button
+                  {automation.type === "Update account tags" && (
+                    <div className="mt-2 flex items-start gap-2 bg-yellow-50 border border-yellow-200 rounded-lg px-3 py-2">
+                      <span className="text-yellow-500 text-sm mt-0.5">&#9888;</span>
+                      <p className="text-xs text-yellow-700">This automation can affect conditions for automations below</p>
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          ) : (
+            <p className="text-sm text-gray-500">No automations available</p>
+          )}
+        </div>
+
+        <div className="px-5 py-4 border-t border-gray-100 flex items-center gap-3">
+          <button
+            type="button"
             onClick={handleMove}
-            variant="contained"
-            color="primary"
-            sx={{
-              backgroundColor: "var(--color-save-btn)",
-              "&:hover": { backgroundColor: "var(--color-save-hover-btn)" },
-              width: "80px",
-              borderRadius: "15px",
-            }}
+            className="px-5 py-2 rounded-2xl text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] transition-colors w-20"
           >
             Move
-          </Button>
-          <Button
+          </button>
+          <button
+            type="button"
             onClick={onClose}
-            variant="outlined"
-            sx={{
-              borderColor: "var(--color-border-cancel-btn)",
-              color: "var(--color-save-btn)",
-              "&:hover": {
-                backgroundColor: "var(--color-save-hover-btn)",
-                color: "#fff",
-                border: "none",
-              },
-              width: "80px",
-              borderRadius: "15px",
-            }}
+            className="px-5 py-2 rounded-2xl text-sm font-medium border border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white hover:border-transparent transition-colors w-20"
           >
             Close
-          </Button>
-        </Box>
-      </Box>
-    </Drawer>
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 // const AutomationDrawer = ({

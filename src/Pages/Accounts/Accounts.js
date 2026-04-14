@@ -71,7 +71,6 @@
 
 // export default Accounts;
 
-import { Box, Typography } from "@mui/material";
 import React, { useState, useCallback } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 
@@ -85,9 +84,9 @@ const Accounts = () => {
 
   return (
     <>
-      <Box>
-        <Typography variant="h4" gutterBottom={"10px"}>Accounts</Typography>
-      </Box>
+      <div>
+        <h4 className="text-2xl font-semibold mb-2">Accounts</h4>
+      </div>
 
       {/* <Box
         sx={{
@@ -133,9 +132,9 @@ const Accounts = () => {
         </NavLink>
       </Box> */}
 
-      <Box mt={2}>
+      <div className="mt-2">
         <Outlet context={{ refreshAccountsData, refreshCount }} />
-      </Box>
+      </div>
     </>
   );
 };

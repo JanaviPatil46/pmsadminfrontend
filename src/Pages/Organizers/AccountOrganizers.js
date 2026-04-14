@@ -1,13 +1,12 @@
-import { Box, Typography } from "@mui/material";
 import React from "react";
 import { NavLink, Outlet } from "react-router-dom";
 
 const AccountOrganizers = () => {
   return (
     <>
-    <Box >
-      <Typography variant="h4" gutterBottom={"10px"}>Organizers</Typography>
-    </Box>
+    <div>
+      <h4 className="text-2xl font-semibold mb-2">Organizers</h4>
+    </div>
 
     {/* <Box sx={{border:'2px solid red',p:'10px'}}>
       <NavLink
@@ -42,55 +41,33 @@ const AccountOrganizers = () => {
       </NavLink>
     </Box> */}
 
-<Box
-    sx={{
-      display: "flex",
-      alignItems: "center",
-      backgroundColor: "#EBF0F5", // Light grayish-blue background
-      borderRadius: "12px",
-      padding: "6px",
-    width:'max-content'
-    }}
-  >
+<div className="flex items-center bg-[#EBF0F5] rounded-xl p-1.5 w-max">
     <NavLink
       to="/organizers/active"
-      style={({ isActive }) => ({
-        padding: "8px 16px",
-        borderRadius: "10px",
-        fontSize: "15px",
-        cursor: "pointer",
-        textDecoration: "none",
-        fontWeight: isActive ? "bold" : "normal",
-        color: isActive ? "var(--color-save-btn)" : "#333",
-        backgroundColor: isActive ? "#fff" : "transparent",
-        transition: "all 0.3s ease",
-      })}
+      className={({ isActive }) =>
+        `px-4 py-2 rounded-lg text-sm cursor-pointer no-underline transition-all ${
+          isActive ? "font-bold text-[var(--color-save-btn)] bg-white" : "text-gray-700"
+        }`
+      }
     >
       Active
     </NavLink>
     <NavLink
       to="/organizers/archived"
-      style={({ isActive }) => ({
-        padding: "8px 16px",
-        borderRadius: "10px",
-        fontSize: "15px",
-        cursor: "pointer",
-        textDecoration: "none",
-        fontWeight: isActive ? "bold" : "normal",
-        color: isActive ? "var(--color-save-btn)" : "#333",
-        backgroundColor: isActive ? "#fff" : "transparent",
-        transition: "all 0.3s ease",
-      })}
+      className={({ isActive }) =>
+        `px-4 py-2 rounded-lg text-sm cursor-pointer no-underline transition-all ${
+          isActive ? "font-bold text-[var(--color-save-btn)] bg-white" : "text-gray-700"
+        }`
+      }
     >
       Archived
     </NavLink>
-    
-  </Box>
+  </div>
 
 
-    <Box mt={2}>
+    <div className="mt-2">
       <Outlet />
-    </Box>
+    </div>
   </>
   )
 }

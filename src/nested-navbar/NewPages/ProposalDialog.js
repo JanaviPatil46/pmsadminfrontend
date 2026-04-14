@@ -2,30 +2,10 @@
 
 
 import React, { useState, useRef } from "react";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  Box,
-  List,
-  ListItemButton,
-  Typography,
-  Divider,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  TextField,
-  Button,
-  ButtonGroup,
-  FormControlLabel,
-  Checkbox,
-  ListItemText,
-  ListItemIcon
-} from "@mui/material";
 import SignatureCanvas from "react-signature-canvas";
 import axios from "axios";
-import CloseIcon from "@mui/icons-material/Close";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import { IoClose } from "react-icons/io5";
+import { FaCheckCircle } from "react-icons/fa";
 import HTMLReactParser from "html-react-parser";
 import { toast } from "react-toastify";
 
@@ -108,232 +88,165 @@ const ProposalPreviewDialog = ({ open, handleClose, proposal }) => {
     }
   };
 
-  return (
-    <Dialog open={open} onClose={handleClose} fullScreen>
-      <DialogTitle sx={{ display: "flex", justifyContent: "space-between" }}>
-        {proposal?.general?.proposalName || "Proposal"}
-        <CloseIcon sx={{ cursor: "pointer" }} onClick={handleClose} />
-      </DialogTitle>
+  if (!open) return null;
 
-      <DialogContent sx={{ display: "flex", height: "75vh", p: 0 }}>
-        
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col bg-white">
+      {/* Title bar */}
+      <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200">
+        <span className="text-base font-semibold">{proposal?.general?.proposalName || "Proposal"}</span>
+        <IoClose className="cursor-pointer text-xl text-gray-500 hover:text-gray-700" onClick={handleClose} />
+      </div>
+
+      <div className="flex flex-1 overflow-hidden" style={{ height: "calc(100vh - 56px)" }}>
         {/* LEFT SIDE MENU */}
-        <Box sx={{ width: "28%", borderRight: "1px solid #ddd" }}>
-          <List>
+        <div className="w-[28%] border-r border-gray-200 overflow-y-auto">
+          <ul>
             {steps.map((step) => (
-              <ListItemButton
-                key={step.id}
-                selected={activeStep === step.id}
-                onClick={() => handleStepClick(step.id)}
-                sx={{
-                  // Apply green color when signed
-                  ...(isSigned && {
-                    color: "success.main",
-                    "& .MuiListItemText-primary": {
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1,
-                    },
-                  }),
-                }}
-              >
-                {/* Show checkmark icon when signed */}
-                {isSigned && (
-                  <ListItemIcon sx={{ minWidth: "auto", mr: 1 }}>
-                    <CheckCircleOutlineIcon 
-                      fontSize="small" 
-                      sx={{ color: "success.main" }} 
-                    />
-                  </ListItemIcon>
-                )}
-                <ListItemText 
-                  primary={step.label}
-                  sx={{
-                    // Ensure text color changes when signed
-                    color: isSigned ? "success.main" : "inherit",
-                  }}
-                />
-              </ListItemButton>
+              <li key={step.id}>
+                <button
+                  type="button"
+                  onClick={() => handleStepClick(step.id)}
+                  className={`w-full text-left flex items-center gap-2 px-4 py-3 text-sm transition-colors ${
+                    activeStep === step.id ? "bg-blue-50 font-medium" : "hover:bg-gray-50"
+                  } ${isSigned ? "text-green-600" : ""}`}
+                >
+                  {isSigned && <FaCheckCircle className="text-green-500 shrink-0" size={14} />}
+                  {step.label}
+                </button>
+              </li>
             ))}
-          </List>
-        </Box>
+          </ul>
+        </div>
 
         {/* RIGHT CONTENT */}
-        <Box sx={{ flexGrow: 1, overflowY: "auto", p: 2 }} onScroll={handleScroll}>
+        <div className="flex-1 overflow-y-auto p-5" onScroll={handleScroll}>
 
-          {/* ✅ INTRODUCTION */}
+          {/* INTRODUCTION */}
           {proposal?.general?.introductionEnabled && (
-            <Box ref={introRef} sx={{ mb: 3 }}>
-              <Typography variant="h6">{proposal?.introduction?.title || "Introduction"}</Typography>
-              {HTMLReactParser(proposal?.introduction?.description || "")}
-              <Divider sx={{ my: 2 }} />
-            </Box>
+            <div ref={introRef} className="mb-6">
+              <h2 className="text-lg font-semibold mb-2">{proposal?.introduction?.title || "Introduction"}</h2>
+              <div className="text-sm">{HTMLReactParser(proposal?.introduction?.description || "")}</div>
+              <hr className="my-4 border-gray-200" />
+            </div>
           )}
 
-          {/* ✅ TERMS */}
+          {/* TERMS */}
           {proposal?.general?.termsEnabled && (
-            <Box ref={termsRef} sx={{ mb: 3 }}>
-              <Typography variant="h6">Terms & Conditions</Typography>
-              {HTMLReactParser(proposal?.terms?.description || "")}
-              <Divider sx={{ my: 2 }} />
-            </Box>
+            <div ref={termsRef} className="mb-6">
+              <h2 className="text-lg font-semibold mb-2">Terms &amp; Conditions</h2>
+              <div className="text-sm">{HTMLReactParser(proposal?.terms?.description || "")}</div>
+              <hr className="my-4 border-gray-200" />
+            </div>
           )}
 
-          {/* ✅ SERVICES - ITEMIZED */}
+          {/* SERVICES - ITEMIZED */}
           {proposal?.general?.servicesEnabled && proposal?.services?.option === "services" && (
-            <Box ref={servicesRef} sx={{ mb: 3 }}>
-              <Typography variant="h6" sx={{ mb: 2 }}>Services</Typography>
-
-              <Box sx={{ border: "1px solid #e5e7eb", borderRadius: "10px", overflow: "hidden" }}>
-                <Box sx={{
-                  p: 1, fontWeight: "bold",
-                  display: "grid", gridTemplateColumns: "3fr 1fr 1fr 1fr 1fr"
-                }}>
-                  <Typography>Service</Typography>
-                  <Typography textAlign="right">Rate</Typography>
-                  <Typography textAlign="right">Qty</Typography>
-                  <Typography textAlign="right">Tax</Typography>
-                  <Typography textAlign="right">Amount</Typography>
-                </Box>
-
+            <div ref={servicesRef} className="mb-6">
+              <h2 className="text-lg font-semibold mb-3">Services</h2>
+              <div className="border border-gray-200 rounded-lg overflow-hidden">
+                <div className="grid grid-cols-[3fr_1fr_1fr_1fr_1fr] p-2 font-bold text-sm">
+                  <span>Service</span>
+                  <span className="text-right">Rate</span>
+                  <span className="text-right">Qty</span>
+                  <span className="text-right">Tax</span>
+                  <span className="text-right">Amount</span>
+                </div>
                 {proposal?.services?.itemizedData?.lineItems?.map((item, i) => {
                   const rate = Number(item.rate || 0);
                   const qty = Number(item.quantity || 1);
                   const taxRate = proposal?.services?.itemizedData?.taxRate || 0;
-
                   const base = rate * qty;
                   const tax = item.tax ? (base * taxRate) / 100 : 0;
                   const total = base + tax;
-
                   return (
-                    <Box key={i} sx={{
-                      p: 1,
-                      borderTop: "1px solid #e5e7eb",
-                      display: "grid",
-                      gridTemplateColumns: "3fr 1fr 1fr 1fr 1fr"
-                    }}>
-                      <Box>
-                        <Typography fontWeight="bold">{item.productorService}</Typography>
-                        <Typography fontSize={12} color="text.secondary">{item.description}</Typography>
-                      </Box>
-
-                      <Typography textAlign="right">${rate.toFixed(2)}</Typography>
-                      <Typography textAlign="right">{qty}</Typography>
-                      <Typography textAlign="right">${tax.toFixed(2)}</Typography>
-                      <Typography textAlign="right">${total.toFixed(2)}</Typography>
-                    </Box>
+                    <div key={i} className="grid grid-cols-[3fr_1fr_1fr_1fr_1fr] p-2 border-t border-gray-200 text-sm">
+                      <div>
+                        <p className="font-bold">{item.productorService}</p>
+                        <p className="text-xs text-gray-500">{item.description}</p>
+                      </div>
+                      <span className="text-right">${rate.toFixed(2)}</span>
+                      <span className="text-right">{qty}</span>
+                      <span className="text-right">${tax.toFixed(2)}</span>
+                      <span className="text-right">${total.toFixed(2)}</span>
+                    </div>
                   );
                 })}
-
-                <Box sx={{
-                  borderTop: "1px solid #e5e7eb",
-                  p: 1,
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  fontWeight: "bold"
-                }}>
+                <div className="border-t border-gray-200 p-2 flex justify-end font-bold text-sm">
                   Total: ${proposal?.services?.itemizedData?.totalAmount?.toFixed(2)}
-                </Box>
-              </Box>
-
-              <Divider sx={{ my: 2 }} />
-            </Box>
+                </div>
+              </div>
+              <hr className="my-4 border-gray-200" />
+            </div>
           )}
 
-          {/* ✅ SERVICES - INVOICE MODE */}
+          {/* SERVICES - INVOICE MODE */}
           {proposal?.general?.servicesEnabled && proposal?.services?.option === "invoice" && (
-            <Box ref={servicesRef} sx={{ mb: 3 }}>
-              <Typography variant="h6" sx={{ mb: 2 }}>Invoice</Typography>
+            <div ref={servicesRef} className="mb-6">
+              <h2 className="text-lg font-semibold mb-3">Invoice</h2>
+              <div className="mb-3 space-y-3">
+                <div>
+                  <p className="font-bold text-sm">Amount</p>
+                  <div className="bg-gray-50 p-2 rounded-lg text-sm">${proposal?.services?.invoices?.[0]?.totalAmount?.toFixed(2)}</div>
+                </div>
+                <div>
+                  <p className="font-bold text-sm mt-2">Invoice will be issued</p>
+                  <div className="bg-gray-50 p-2 rounded-lg text-sm">{proposal?.services?.invoices?.[0]?.issueinvoice || "N/A"}</div>
+                </div>
+                <div>
+                  <p className="font-bold text-sm mt-2">Description</p>
+                  <div className="bg-gray-50 p-2 rounded-lg text-sm">{proposal?.services?.invoices?.[0]?.description || "N/A"}</div>
+                </div>
+              </div>
 
-              <Box sx={{ mb: 2 }}>
-                <Typography fontWeight="bold">Amount</Typography>
-                <Box sx={{ bgcolor: "#f9fafb", p: 1, borderRadius: "8px" }}>
-                  ${proposal?.services?.invoices?.[0]?.totalAmount?.toFixed(2)}
-                </Box>
-
-                <Typography fontWeight="bold" sx={{ mt: 2 }}>Invoice will be issued</Typography>
-                <Box sx={{ bgcolor: "#f9fafb", p: 1, borderRadius: "8px" }}>
-                  {proposal?.services?.invoices?.[0]?.issueinvoice || "N/A"}
-                </Box>
-
-                <Typography fontWeight="bold" sx={{ mt: 2 }}>Description</Typography>
-                <Box sx={{ bgcolor: "#f9fafb", p: 1, borderRadius: "8px" }}>
-                  {proposal?.services?.invoices?.[0]?.description || "N/A"}
-                </Box>
-              </Box>
-
-              <Accordion>
-                <AccordionSummary expandIcon={<span>▼</span>}>
-                  <Typography fontWeight="bold">Invoice details</Typography>
-                </AccordionSummary>
-
-                <AccordionDetails>
-                  <Box sx={{ border: "1px solid #e5e7eb", borderRadius: "10px", overflow: "hidden" }}>
-                    <Box sx={{
-                      bgcolor: "#f9fafb", p: 1, fontWeight: "bold",
-                      display: "grid", gridTemplateColumns: "3fr 1fr 1fr 1fr 1fr"
-                    }}>
-                      <Typography>Service</Typography>
-                      <Typography textAlign="right">Rate</Typography>
-                      <Typography textAlign="right">Qty</Typography>
-                      <Typography textAlign="right">Tax</Typography>
-                      <Typography textAlign="right">Amount</Typography>
-                    </Box>
-
-                    {proposal?.services?.invoices?.[0]?.lineItems?.map((item, i) => {
-                      const rate = Number(item.rate || 0);
-                      const qty = Number(item.quantity || 1);
-                      const taxRate = proposal?.services?.invoices?.[0]?.taxRate || 0;
-
-                      const base = rate * qty;
-                      const tax = item.tax ? (base * taxRate) / 100 : 0;
-                      const total = base + tax;
-
-                      return (
-                        <Box key={i} sx={{
-                          p: 1,
-                          borderTop: "1px solid #e5e7eb",
-                          display: "grid",
-                          gridTemplateColumns: "3fr 1fr 1fr 1fr 1fr"
-                        }}>
-                          <Box>
-                            <Typography fontWeight="bold">{item.productorService}</Typography>
-                            <Typography fontSize={12} color="text.secondary">{item.description}</Typography>
-                          </Box>
-
-                          <Typography textAlign="right">${rate.toFixed(2)}</Typography>
-                          <Typography textAlign="right">{qty}</Typography>
-                          <Typography textAlign="right">${tax.toFixed(2)}</Typography>
-                          <Typography textAlign="right">${total.toFixed(2)}</Typography>
-                        </Box>
-                      );
-                    })}
-
-                    <Box sx={{
-                      borderTop: "1px solid #e5e7eb",
-                      p: 1,
-                      display: "flex",
-                      justifyContent: "flex-end",
-                      fontWeight: "bold"
-                    }}>
-                      Total: ${proposal?.services?.invoices?.[0]?.totalAmount?.toFixed(2)}
-                    </Box>
-                  </Box>
-                </AccordionDetails>
-              </Accordion>
-
-              <Divider sx={{ my: 2 }} />
-            </Box>
+              {/* Accordion-style invoice details */}
+              <details className="border border-gray-200 rounded-lg overflow-hidden">
+                <summary className="p-2 font-bold text-sm cursor-pointer bg-gray-50">Invoice details ▼</summary>
+                <div className="border border-gray-200 rounded-lg overflow-hidden m-2">
+                  <div className="grid grid-cols-[3fr_1fr_1fr_1fr_1fr] p-2 font-bold text-sm bg-gray-50">
+                    <span>Service</span>
+                    <span className="text-right">Rate</span>
+                    <span className="text-right">Qty</span>
+                    <span className="text-right">Tax</span>
+                    <span className="text-right">Amount</span>
+                  </div>
+                  {proposal?.services?.invoices?.[0]?.lineItems?.map((item, i) => {
+                    const rate = Number(item.rate || 0);
+                    const qty = Number(item.quantity || 1);
+                    const taxRate = proposal?.services?.invoices?.[0]?.taxRate || 0;
+                    const base = rate * qty;
+                    const tax = item.tax ? (base * taxRate) / 100 : 0;
+                    const total = base + tax;
+                    return (
+                      <div key={i} className="grid grid-cols-[3fr_1fr_1fr_1fr_1fr] p-2 border-t border-gray-200 text-sm">
+                        <div>
+                          <p className="font-bold">{item.productorService}</p>
+                          <p className="text-xs text-gray-500">{item.description}</p>
+                        </div>
+                        <span className="text-right">${rate.toFixed(2)}</span>
+                        <span className="text-right">{qty}</span>
+                        <span className="text-right">${tax.toFixed(2)}</span>
+                        <span className="text-right">${total.toFixed(2)}</span>
+                      </div>
+                    );
+                  })}
+                  <div className="border-t border-gray-200 p-2 flex justify-end font-bold text-sm">
+                    Total: ${proposal?.services?.invoices?.[0]?.totalAmount?.toFixed(2)}
+                  </div>
+                </div>
+              </details>
+              <hr className="my-4 border-gray-200" />
+            </div>
           )}
 
-          {/* ✅ PAYMENTS */}
+          {/* PAYMENTS */}
           {proposal?.general?.paymentsEnabled && (
-            <Box ref={paymentsRef} sx={{ mb: 3 }}>
-              <Typography variant="h6">Payments</Typography>
-              <Typography><b>Method:</b> {proposal?.payments?.method}</Typography>
-              <Typography><b>Amount:</b> ${proposal?.payments?.amount}</Typography>
-              <Divider sx={{ my: 2 }} />
-            </Box>
+            <div ref={paymentsRef} className="mb-6">
+              <h2 className="text-lg font-semibold mb-2">Payments</h2>
+              <p className="text-sm"><b>Method:</b> {proposal?.payments?.method}</p>
+              <p className="text-sm"><b>Amount:</b> ${proposal?.payments?.amount}</p>
+              <hr className="my-4 border-gray-200" />
+            </div>
           )}
 
           {/* ✅ SIGNATURE SECTION */}
@@ -518,68 +431,38 @@ const ProposalPreviewDialog = ({ open, handleClose, proposal }) => {
             )}
           </Box> */}
           {/* SIGNATURE SECTION */}
-<Box ref={signatureRef} sx={{ mb: 4 }}>
-  <Typography variant="h6" sx={{ mb: 2 }}>
-    Sign & Accept
-  </Typography>
-  <Divider sx={{ mb: 2 }} />
+          <div ref={signatureRef} className="mb-8">
+            <h2 className="text-lg font-semibold mb-2">Sign &amp; Accept</h2>
+            <hr className="mb-4 border-gray-200" />
 
-  {/* SHOW ONLY WHEN SIGNED */}
-  {proposal?.status === "Signed" ? (
-    <>
-      <Typography sx={{ mb: 2 }} color="text.secondary">
-        Signed on {new Date(proposal.signedAt).toLocaleString()}
-      </Typography>
+            {proposal?.status === "Signed" ? (
+              <div>
+                <p className="text-sm text-gray-500 mb-2">
+                  Signed on {new Date(proposal.signedAt).toLocaleString()}
+                </p>
+                <p className="font-bold text-sm mb-2">Signature:</p>
+                {proposal?.signature?.startsWith("data:image") ? (
+                  <img src={proposal.signature} alt="signature"
+                    className="max-w-[300px] border border-gray-200 bg-white p-2 mt-2" />
+                ) : (
+                  <div className="text-2xl mt-2 p-5 border border-gray-300 bg-gray-50 rounded-md"
+                    style={{ fontFamily: "cursive" }}>
+                    {proposal.signature}
+                  </div>
+                )}
+                <button type="button" disabled
+                  className="mt-4 px-4 py-2 rounded text-sm font-medium text-white bg-blue-400 opacity-70 cursor-not-allowed">
+                  Already Signed
+                </button>
+              </div>
+            ) : (
+              <p className="text-sm text-red-500 mt-2">Proposal is not signed yet.</p>
+            )}
+          </div>
 
-      <Typography fontWeight="bold">Signature:</Typography>
-
-      {/* IF SIGNATURE IS IMAGE */}
-      {proposal?.signature?.startsWith("data:image") ? (
-        <img
-          src={proposal.signature}
-          alt="signature"
-          style={{
-            maxWidth: 300,
-            border: "1px solid #ddd",
-            background: "white",
-            padding: 10,
-            marginTop: 10,
-          }}
-        />
-      ) : (
-        /* IF SIGNATURE IS TYPED */
-        <div
-          style={{
-            fontSize: 24,
-            fontFamily: "cursive",
-            border: "1px solid #ccc",
-            padding: 20,
-            background: "#f7f7f7",
-            marginTop: 10,
-            borderRadius: 6,
-          }}
-        >
-          {proposal.signature}
         </div>
-      )}
-
-      <Button variant="contained" disabled sx={{ mt: 2, opacity: 0.7 }}>
-        Already Signed
-      </Button>
-    </>
-  ) : (
-    <>
-      {/* UNSIGNED — SHOW NOTHING */}
-      <Typography color="error" sx={{ mt: 2 }}>
-        Proposal is not signed yet.
-      </Typography>
-    </>
-  )}
-</Box>
-
-        </Box>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 };
 

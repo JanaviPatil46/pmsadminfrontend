@@ -1,70 +1,60 @@
-import React ,{useState}from 'react'
-import { IconButton, Menu, MenuItem, ListItemIcon, ListItemText } from '@mui/material';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import LinkOffIcon from '@mui/icons-material/LinkOff';
-import VpnKeyIcon from '@mui/icons-material/VpnKey';
+import React, { useState, useRef, useEffect } from 'react'
+import { MoreVertical, LinkIcon, KeyRound } from 'lucide-react'
+
 const MenuDropdown = ({ contact, onUnlink, onResetPassword }) => {
-    const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
 
-  const handleClick = (event) => {
-    event.stopPropagation();
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  useEffect(() => {
+    const handleOutside = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handleOutside);
+    return () => document.removeEventListener('mousedown', handleOutside);
+  }, []);
 
   const handleUnlinkClick = () => {
     onUnlink(contact);
-    handleClose();
+    setOpen(false);
   };
 
   const handleResetPasswordClick = () => {
     onResetPassword(contact);
-    handleClose();
+    setOpen(false);
   };
 
   return (
-    <>
-     <IconButton
-        onClick={handleClick}
-        size="small"
-        sx={{ ml: 1 }}
+    <div className="relative inline-block ml-1" ref={ref}>
+      <button
+        onClick={(e) => { e.stopPropagation(); setOpen((o) => !o); }}
+        className="p-1 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
       >
-        <MoreVertIcon />
-      </IconButton>
-      
-      <Menu
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-        onClick={(e) => e.stopPropagation()}
-        PaperProps={{
-          elevation: 3,
-          sx: {
-            mt: 1,
-            minWidth: 160,
-          }
-        }}
-        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-      >
-        <MenuItem onClick={handleUnlinkClick}>
-          <ListItemIcon>
-            <LinkOffIcon fontSize="small" color="error" />
-          </ListItemIcon>
-          <ListItemText primary="Unlink" primaryTypographyProps={{ color: 'error' }} />
-        </MenuItem>
-        
-        <MenuItem onClick={handleResetPasswordClick} disabled={!contact.canLogin}>
-          <ListItemIcon>
-            <VpnKeyIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText primary="Reset Password" />
-        </MenuItem>
-      </Menu></>
+        <MoreVertical size={16} />
+      </button>
+
+      {open && (
+        <>
+          <div className="fixed inset-0 z-30" onClick={() => setOpen(false)} />
+          <div className="absolute right-0 z-40 mt-1 w-44 bg-white rounded-lg border border-gray-100 shadow-lg py-1">
+            <button
+              onClick={handleUnlinkClick}
+              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+            >
+              <LinkIcon size={14} />
+              Unlink
+            </button>
+            <button
+              onClick={handleResetPasswordClick}
+              disabled={!contact.canLogin}
+              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <KeyRound size={14} />
+              Reset Password
+            </button>
+          </div>
+        </>
+      )}
+    </div>
   )
 }
 

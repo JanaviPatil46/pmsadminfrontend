@@ -2,17 +2,10 @@
 
 
 import React, { useState, useEffect } from 'react';
-import { 
-  Avatar,
-  Button,
-  CircularProgress,
-  Box,
-  Typography
-} from '@mui/material';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import EditIcon from '@mui/icons-material/Edit';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { Button } from '../../components/ui/button';
+import { Upload, Pencil, Loader2 } from 'lucide-react';
 
 const ProfilePictureUpload = ({ accountId, currentImage, onUploadSuccess }) => {
   const [image, setImage] = useState(null);
@@ -71,65 +64,54 @@ console.log("Preview Image:", preview);
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-      <Box sx={{ position: 'relative' }}>
-        <Avatar
-          src={preview || currentImage}
-          sx={{ width: 120, height: 120, border: '2px solid #eee' }}
+    <div className="flex flex-col items-center gap-4">
+      <div className="relative">
+        <img
+          src={preview || currentImage || '/default-avatar.png'}
+          alt="Profile"
+          className="w-28 h-28 rounded-full object-cover border-2 border-gray-200"
+          onError={(e) => { e.target.src = '/default-avatar.png'; }}
         />
         <input
           accept="image/*"
-          style={{ display: 'none' }}
+          className="hidden"
           id="profile-picture-upload"
           type="file"
           onChange={handleImageChange}
         />
-        <label htmlFor="profile-picture-upload">
-          <Box
-            component="span"
-            sx={{
-              position: 'absolute',
-              bottom: 0,
-              right: 0,
-              borderRadius: '10px',
-              cursor: 'pointer',
-              padding: '6px 8px',
-              backgroundColor: 'primary.main',
-              '&:hover': { backgroundColor: 'primary.dark' },
-            }}
-          >
-            <EditIcon sx={{ color: 'white' }} fontSize="small" />
-          </Box>
+        <label
+          htmlFor="profile-picture-upload"
+          className="absolute bottom-0 right-0 bg-primary text-white rounded-lg p-1.5 cursor-pointer hover:bg-primary/90 transition-colors"
+        >
+          <Pencil size={14} />
         </label>
-      </Box>
+      </div>
 
       {image && (
         <>
-          <Typography variant="body2" sx={{ mt: 1 }}>
+          <p className="text-xs text-gray-500 mt-1">
             {image.name} ({Math.round(image.size / 1024)} KB)
-          </Typography>
-
+          </p>
           <Button
-            variant="contained"
-            color="primary"
-            startIcon={<CloudUploadIcon />}
             onClick={handleUpload}
             disabled={isUploading}
-            fullWidth
-            sx={{ mt: 2 }}
+            className="w-full mt-2"
           >
             {isUploading ? (
               <>
-                <CircularProgress size={24} color="inherit" />
-                <Box sx={{ ml: 1 }}>Uploading...</Box>
+                <Loader2 size={16} className="animate-spin mr-2" />
+                Uploading...
               </>
             ) : (
-              'Upload Profile Picture'
+              <>
+                <Upload size={16} className="mr-2" />
+                Upload Profile Picture
+              </>
             )}
           </Button>
         </>
       )}
-    </Box>
+    </div>
   );
 };
 

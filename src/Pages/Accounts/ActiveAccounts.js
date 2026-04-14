@@ -1,62 +1,21 @@
 import React, { useEffect, useState, useContext } from "react";
-import {
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Drawer,
-  TablePagination,
-  Chip,
-  Tooltip,
-  Autocomplete,
-  Box,
-  Divider,
-  Typography,
-  OutlinedInput,
-  MenuItem as MuiMenuItem,
-  FormControl,
-  InputLabel,
-  Menu,
-  Button,
-  IconButton,
-  Select,
-  MenuItem,
-  TextField,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Checkbox,
-  Paper,ListItemText
-} from "@mui/material";
 import axios from "axios";
-import DeleteIcon from "@mui/icons-material/Delete";
 import { RxCross2 } from "react-icons/rx";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Outlet } from "react-router-dom";
-import ListIcon from "@mui/icons-material/List";
-import EmailIcon from "@mui/icons-material/Email";
-import TagIcon from "@mui/icons-material/Tag";
-import PersonIcon from "@mui/icons-material/Person";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { MdDeleteOutline, MdMoreVert } from "react-icons/md";
+import { FiList, FiMail, FiTag, FiUser, FiBell } from "react-icons/fi";
+import { IoClose } from "react-icons/io5";
 import SendAccountEmail from "../BulkActions/SendAccountEmail";
 import AddJobs from "../BulkActions/AddJobs";
 import AddBulkOrganizer from "../BulkActions/AddBulkOrganizer";
 import ManageTags from "../BulkActions/ManageTags";
 import ManageTeams from "../BulkActions/ManageTeams";
-import { useTheme } from "@mui/material/styles";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import CloseIcon from "@mui/icons-material/Close";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import { CircularProgress } from "@mui/material";
-import Avatar from "@mui/material/Avatar";
-import AvatarGroup from "@mui/material/AvatarGroup";
 import "../account.css";
 import { useNavigate } from "react-router-dom";
-import TagsMultiSelectDropDown from "./TagsMultiSelectDropDown.js"
-import TeamMemberMultiSelectDropDown from "./TeamMemberMultiSelectDropDown.js"
+import TagsMultiSelectDropDown from "./TagsMultiSelectDropDown.js";
+import TeamMemberMultiSelectDropDown from "./TeamMemberMultiSelectDropDown.js";
 import { LoginContext } from "../../Sidebar/Context/Context.js";
 import Cookies from 'js-cookie';
 const FixedColumnTable = () => {
@@ -66,15 +25,11 @@ const FixedColumnTable = () => {
   console.log(logindata);
   useEffect(() => {
     if (logindata?.user?.id) {
-      // Check if logindata and user.id exist
       setLoginUserId(logindata.user.id);
     }
   }, [logindata]);
   console.log("userid", loginuserid);
   const navigate = useNavigate();
-  const theme = useTheme();
-
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
   const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
   const [accountData, setAccountData] = useState([]);
@@ -576,1027 +531,332 @@ useEffect(() => {
  
 
 
+  const saveBtnCls = "rounded-full px-4 py-1.5 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)]";
+  const cancelBtnCls = "rounded-full px-4 py-1.5 text-sm font-medium border border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white";
+  const inputCls = "rounded border border-gray-200 px-2 py-1 text-xs bg-white focus:outline-none focus:ring-1 focus:ring-blue-400";
+
   return (
     <>
-      <div style={{ display: "flex" }}>
-       
-
-        <Drawer
-          anchor="right"
-          open={isSidebarOpen}
-          onClose={handleCloseSidebar}
-          PaperProps={{
-            id: "tag-drawer",
-            sx: {
-              borderRadius: isSmallScreen ? "0" : "10px 0 0 10px",
-              width: isSmallScreen ? "100%" : 700,
-              maxWidth: "100%",
-              [theme.breakpoints.down("sm")]: {
-                width: "100%",
-              },
-            },
-          }}
-        >
-          <div style={{ padding: 16, position: "relative" }}>
-            <DialogTitle>
-              Bulk-edit login, notify, email sync
-              <Typography variant="subtitle1">
-                For a selected account
-              </Typography>
-              <IconButton
-                onClick={handleCloseSidebar}
-                style={{ position: "absolute", right: 8, top: 8 }}
-              >
-                <CloseIcon />
-              </IconButton>
-            </DialogTitle>
-
-            <DialogContent dividers>
-              <Typography variant="body2" color="textSecondary" gutterBottom>
-                Bulk edit updates all email addresses linked to the selected
-                accounts. You can adjust settings per contact within each
-                account's Info section.
-              </Typography>
-              <Typography variant="body2" color="textSecondary">
-                Your clients will be able to access their portal through their
-                email address and receive notifications. Additionally, you can
-                automatically see all email history if you enable email sync.
-              </Typography>
-
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Settings</TableCell>
-                      <TableCell>Action</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {[
-                      {
-                        label: "Login",
-                        setting: "login",
-                        icon: <PersonIcon />,
-                      },
-                      {
-                        label: "Notify",
-                        setting: "notify",
-                        icon: <NotificationsIcon />,
-                      },
-                      {
-                        label: "Email sync",
-                        setting: "emailSync",
-                        icon: <EmailIcon />,
-                      },
-                    ].map((setting, index) => (
-                      <TableRow key={index}>
-                        <TableCell>
-                          <div
-                            style={{ display: "flex", alignItems: "center" }}
-                          >
-                            {setting.icon}
-                            <Typography
-                              variant="body2"
-                              style={{ marginLeft: 8 }}
-                            >
-                              {setting.label}
-                            </Typography>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Select
-                            value={settings[setting.setting]} // Controlled value based on state
-                            onChange={(e) =>
-                              handleSettingChange(
-                                setting.setting,
-                                e.target.value
-                              )
-                            } // Handle change
-                            displayEmpty
-                            inputProps={{ "aria-label": "Without label" }}
-                            sx={{ width: "150px" }}
-                          >
-                            <MenuItem value="Assign to all">
-                              Assign to all
-                            </MenuItem>
-                            <MenuItem value="Remove from all">
-                              Remove from all
-                            </MenuItem>
-                            <MenuItem value="Do nothing">Do nothing</MenuItem>
-                          </Select>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </DialogContent>
-
-            <DialogActions>
-              <Button
-                variant="contained"
-                onClick={handleupdatecontacts}
-                sx={{
-                  backgroundColor: "var(--color-save-btn)", // Normal background
-
-                  "&:hover": {
-                    backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                  },
-                  width: "80px",
-                  borderRadius: "15px",
-                }}
-              >
-                Save
-              </Button>
-              <Button
-                variant="outlined"
-                onClick={handleCloseSidebar}
-                sx={{
-                  borderColor: "var(--color-border-cancel-btn)", // Normal background
-                  color: "var(--color-save-btn)",
-                  "&:hover": {
-                    backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                    color: "#fff",
-                    border: "none",
-                  },
-                  width: "80px",
-                  borderRadius: "15px",
-                }}
-              >
-                Cancel
-              </Button>
-            </DialogActions>
+      {/* Filters dropdown */}
+      {Boolean(anchorEl) && (
+        <div className="fixed inset-0 z-30" onClick={handleClose}>
+          <div className="absolute bg-white border border-gray-200 rounded-lg shadow-md w-44" style={{ top: 60, left: 8 }} onClick={e => e.stopPropagation()}>
+            {["accountName", "type", "teamMember", "tags"].map(f => (
+              <button key={f} type="button" className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
+                onClick={() => { toggleFilter(f); handleClose(); }}>
+                {f === "accountName" ? "Account Name" : f === "teamMember" ? "Team Member" : f.charAt(0).toUpperCase() + f.slice(1)}
+              </button>
+            ))}
           </div>
-        </Drawer>
+        </div>
+      )}
 
-        <Menu
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={handleClose}
-        >
-          <MenuItem
-            onClick={() => {
-              toggleFilter("accountName");
-              handleClose();
-            }}
-          >
-            Account Name
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              toggleFilter("type");
-              handleClose();
-            }}
-          >
-            Type
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              toggleFilter("teamMember");
-              handleClose();
-            }}
-          >
-            Team Member
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              toggleFilter("tags");
-              handleClose();
-            }}
-          >
-            Tags
-          </MenuItem>
-        </Menu>
-      </div>
+      {/* Bulk-edit sidebar (login/notify/emailsync) */}
+      {isSidebarOpen && (
+        <div className="fixed inset-0 z-40 overflow-hidden">
+          <div className="absolute inset-0 bg-black/30" onClick={handleCloseSidebar} />
+          <div className="absolute right-0 top-0 h-full w-[700px] bg-white shadow-xl flex flex-col p-4">
+            <div className="flex items-start justify-between mb-2">
+              <div>
+                <h2 className="text-base font-semibold">Bulk-edit login, notify, email sync</h2>
+                <p className="text-sm text-gray-500">For a selected account</p>
+              </div>
+              <button type="button" onClick={handleCloseSidebar} className="text-gray-500 hover:text-gray-800 mt-1"><IoClose size={20}/></button>
+            </div>
+            <hr className="border-gray-200 mb-3"/>
+            <p className="text-xs text-gray-500 mb-1">Bulk edit updates all email addresses linked to the selected accounts. You can adjust settings per contact within each account's Info section.</p>
+            <p className="text-xs text-gray-500 mb-3">Your clients will be able to access their portal through their email address and receive notifications. Additionally, you can automatically see all email history if you enable email sync.</p>
+            <table className="w-full text-sm border-collapse">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="text-left py-2 px-3 font-semibold text-gray-700">Settings</th>
+                  <th className="text-left py-2 px-3 font-semibold text-gray-700">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { label: "Login", setting: "login", icon: <FiUser size={14}/> },
+                  { label: "Notify", setting: "notify", icon: <FiBell size={14}/> },
+                  { label: "Email sync", setting: "emailSync", icon: <FiMail size={14}/> },
+                ].map((s, i) => (
+                  <tr key={i} className="border-b border-gray-100">
+                    <td className="py-2 px-3"><div className="flex items-center gap-2">{s.icon}<span>{s.label}</span></div></td>
+                    <td className="py-2 px-3">
+                      <select className={`${inputCls} w-40`} value={settings[s.setting] ?? ""}
+                        onChange={(e) => handleSettingChange(s.setting, e.target.value)}>
+                        <option value="">— select —</option>
+                        <option value="Assign to all">Assign to all</option>
+                        <option value="Remove from all">Remove from all</option>
+                        <option value="Do nothing">Do nothing</option>
+                      </select>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div className="flex gap-2 mt-4">
+              <button type="button" onClick={handleupdatecontacts} className={saveBtnCls}>Save</button>
+              <button type="button" onClick={handleCloseSidebar} className={cancelBtnCls}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {loading ? (
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          {" "}
-          <CircularProgress style={{ fontSize: "300px", color: "blue" }} />
-        </Box>
-      ) : // userRole === "TeamMember" && !viewAllAccounts ?
-      userRole === "TeamMember" &&
-        !viewAllAccounts &&
-        (!accountData || accountData.length === 0) ? (
-        <Typography
-          sx={{
-            textAlign: "center",
-            fontSize: "18px",
-            fontWeight: "bold",
-            color: "red",
-            marginTop: "20px",
-          }}
-        >
-          You do not have permission to view accounts.
-        </Typography>
+        <div className="flex items-center justify-center py-16">
+          <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      ) : userRole === "TeamMember" && !viewAllAccounts && (!accountData || accountData.length === 0) ? (
+        <p className="text-center text-lg font-bold text-red-500 mt-5">You do not have permission to view accounts.</p>
       ) : (
         accountData.length > 0 && (
-          <Box>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 3, mt: 1 }}>
-              <Box
-                sx={{
-                  width: "50px",
-                  padding: "4px 8px",
-                  cursor: "pointer",
-                  color: "#3f51b5",
-                }}
-                onClick={handleFilterButtonClick}
-              >
-                
-                Filters
-                
-              </Box>
-              <Box>
-                {selected.length > 0 && (
-                  <div
-                    data-test="clients-bulk-actions-panel"
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "12px",
-                      padding: "10px",
-                      // marginBottom: "20px",
-                      // borderBottom: "1px solid #ddd",
-                      // backgroundColor: "#f5f5f5",
-                    }}
-                  >
-                    <Button
-                      variant="text"
-                      startIcon={<ListIcon />}
-                      onClick={handleAssignOrganizer}
-                      // disabled={!storedData?.teammember?.manageOrganizers}
-                      disabled={
-                        storedData?.teammember?.manageOrganizers === false
-                      }
-                    >
-                      Send Organizer
-                    </Button>
-                    <Button
-                      variant="text"
-                      startIcon={<ListIcon />}
-                      onClick={handleAddJob}
-                      // disabled={!storedData?.teammember?.managePipelines}
-                      disabled={
-                        storedData?.teammember?.managePipelines === false
-                      }
-                    >
-                      Add Job
-                    </Button>
-                    <Button
-                      variant="text"
-                      startIcon={<PersonIcon />}
-                      onClick={handleManageTeam}
-                      // disabled={!storedData?.teammember?.assignTeamMates}
-                      disabled={
-                        storedData?.teammember?.assignTeamMates === false
-                      }
-                    >
-                      Manage Team
-                    </Button>
-                    <Button
-                      variant="text"
-                      startIcon={<EmailIcon />}
-                      disabled={selected.length === 0}
-                      onClick={handleSendEmail}
-                    >
-                      Send Email
-                    </Button>
-                    <Button
-                      variant="text"
-                      startIcon={<TagIcon />}
-                      onClick={handleManageTags}
-                    >
-                      Manage Tags
-                    </Button>
-                    <Button
-                      variant="text"
-                      startIcon={<MoreVertIcon />}
-                      onClick={handleMoreActionsClick}
-                    >
-                      More Actions
-                    </Button>
+          <div>
+            {/* Toolbar */}
+            <div className="flex flex-wrap items-center gap-3 mt-2">
+              <button type="button" onClick={handleFilterButtonClick} className="text-sm text-blue-600 cursor-pointer hover:underline px-2 py-1">Filters</button>
 
-                    {/* Dropdown menu for additional actions */}
-                    <Menu
-                      anchorEl={anchorE2}
-                      open={Boolean(anchorE2)}
-                      onClose={handleClose}
-                      anchorOrigin={{
-                        vertical: "bottom",
-                        horizontal: "left",
-                      }}
-                      transformOrigin={{
-                        vertical: "top",
-                        horizontal: "left",
-                      }}
-                    >
-                      <MenuItem
-                        onClick={handleArchiveAccount}
-                        // disabled={!storedData?.teammember?.manageAccounts}
-                        disabled={
-                          storedData?.teammember?.manageAccounts === false
-                        }
-                      >
-                        Archive Account
-                      </MenuItem>
-                      <MenuItem onClick={handleEditLoginNotifyEmailSync}>
-                        Edit login notify emailSync
-                      </MenuItem>
-                    </Menu>
+              {/* Bulk actions */}
+              {selected.length > 0 && (
+                <div className="flex flex-wrap items-center gap-3" data-test="clients-bulk-actions-panel">
+                  <button type="button" onClick={handleAssignOrganizer}
+                    disabled={storedData?.teammember?.manageOrganizers === false}
+                    className="flex items-center gap-1 text-sm text-gray-700 hover:text-blue-600 disabled:opacity-40">
+                    <FiList size={14}/> Send Organizer
+                  </button>
+                  <button type="button" onClick={handleAddJob}
+                    disabled={storedData?.teammember?.managePipelines === false}
+                    className="flex items-center gap-1 text-sm text-gray-700 hover:text-blue-600 disabled:opacity-40">
+                    <FiList size={14}/> Add Job
+                  </button>
+                  <button type="button" onClick={handleManageTeam}
+                    disabled={storedData?.teammember?.assignTeamMates === false}
+                    className="flex items-center gap-1 text-sm text-gray-700 hover:text-blue-600 disabled:opacity-40">
+                    <FiUser size={14}/> Manage Team
+                  </button>
+                  <button type="button" onClick={handleSendEmail} disabled={selected.length === 0}
+                    className="flex items-center gap-1 text-sm text-gray-700 hover:text-blue-600 disabled:opacity-40">
+                    <FiMail size={14}/> Send Email
+                  </button>
+                  <button type="button" onClick={handleManageTags}
+                    className="flex items-center gap-1 text-sm text-gray-700 hover:text-blue-600">
+                    <FiTag size={14}/> Manage Tags
+                  </button>
+                  <div className="relative">
+                    <button type="button" onClick={handleMoreActionsClick}
+                      className="flex items-center gap-1 text-sm text-gray-700 hover:text-blue-600">
+                      <MdMoreVert size={16}/> More Actions
+                    </button>
+                    {Boolean(anchorE2) && (
+                      <div className="absolute left-0 top-6 z-50 bg-white border border-gray-200 rounded-lg shadow-md w-52">
+                        <button type="button" className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
+                          disabled={storedData?.teammember?.manageAccounts === false}
+                          onClick={handleArchiveAccount}>Archive Account</button>
+                        <button type="button" className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
+                          onClick={handleEditLoginNotifyEmailSync}>Edit login notify emailSync</button>
+                      </div>
+                    )}
                   </div>
-                )}
-              </Box>
+                </div>
+              )}
 
-            
-              {/* Account Name Filter */}
+              {/* Active filters */}
               {showFilters.accountName && (
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    // marginBottom: "10px",
-                  }}
-                >
-                  <TextField
-                    name="accountName"
-                    value={filters.accountName}
-                    onChange={handleFilterChange}
-                    placeholder="Filter by Account Name"
-                    variant="outlined"
-                    size="small"
-                    style={{ marginRight: "10px" }}
-                  />
-                  <DeleteIcon
-                    onClick={() => clearFilter("accountName")}
-                    style={{ cursor: "pointer", color: "red" }}
-                  />
+                <div className="flex items-center gap-1">
+                  <input type="text" name="accountName" value={filters.accountName} onChange={handleFilterChange}
+                    placeholder="Filter by Account Name" className={inputCls} />
+                  <button type="button" onClick={() => clearFilter("accountName")} className="text-red-400 hover:text-red-600"><MdDeleteOutline size={16}/></button>
                 </div>
               )}
-
-              {/* Type Filter */}
               {showFilters.type && (
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    // marginBottom: "10px",
-                  }}
-                >
-                  <FormControl
-                    variant="outlined"
-                    size="small"
-                    style={{ marginRight: "10px", width: "150px" }}
-                  >
-                    <InputLabel>Type</InputLabel>
-                    <Select
-                      name="type"
-                      value={filters.type}
-                      onChange={handleFilterChange}
-                      label="Type"
-                    >
-                      <MenuItem value="">All</MenuItem>
-                      <MenuItem value="Individual">Individual</MenuItem>
-                      <MenuItem value="Company">Company</MenuItem>
-                    </Select>
-                  </FormControl>
-                  <DeleteIcon
-                    onClick={() => clearFilter("type")}
-                    style={{ cursor: "pointer", color: "red" }}
-                  />
+                <div className="flex items-center gap-1">
+                  <select name="type" value={filters.type} onChange={handleFilterChange} className={`${inputCls} w-36`}>
+                    <option value="">All</option>
+                    <option value="Individual">Individual</option>
+                    <option value="Company">Company</option>
+                  </select>
+                  <button type="button" onClick={() => clearFilter("type")} className="text-red-400 hover:text-red-600"><MdDeleteOutline size={16}/></button>
                 </div>
               )}
-             
-  
-{showFilters.teamMember && (
-  <div style={{ display: "flex", alignItems: "center" }}>
-    <Box sx={{ mr: 3 }}>
-     
-      <TeamMemberMultiSelectDropDown
-  value={filters.teamMember}   // just array of IDs like ["689c4d64...", "6880af58..."]
-  onChange={(newValue) => {
-    console.log("Selected team members:", newValue);
-    setFilters(prev => ({ 
-      ...prev, 
-      teamMember: newValue      // newValue will already be array of IDs
-    }));
-    setPage(0);
-  }}
-  width="250px"
-  LOGIN_API={LOGIN_API}
-/>
-
-    </Box>
-    <DeleteIcon
-      onClick={() => clearFilter("teamMember")}
-      style={{ cursor: "pointer", color: "red", marginLeft: 5 }}
-    />
-  </div>
-)}
-              {/* Tags Filter */}
+              {showFilters.teamMember && (
+                <div className="flex items-center gap-1">
+                  <TeamMemberMultiSelectDropDown
+                    value={filters.teamMember}
+                    onChange={(newValue) => { setFilters(prev => ({ ...prev, teamMember: newValue })); setPage(0); }}
+                    width="250px"
+                    LOGIN_API={LOGIN_API}
+                  />
+                  <button type="button" onClick={() => clearFilter("teamMember")} className="text-red-400 hover:text-red-600 ml-1"><MdDeleteOutline size={16}/></button>
+                </div>
+              )}
               {showFilters.tags && (
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    width: "250px",
-                    gap: 3,
-                    // marginBottom: "10px",
-                  }}
-                >
-                 
-                  <Box mr={3}> <TagsMultiSelectDropDown
-  value={filters.tags.map(tag => ({
-    value: tag.tagName,
-    label: tag.tagName,
-    colour: tag.tagColour
-  }))}
-  onChange={(newValue) => {
-    setFilters(prev => ({
-      ...prev,
-      tags: newValue.map(item => ({
-        tagName: item.value,
-        tagColour: item.colour
-      }))
-    }));
-  }}
-  options={uniqueTags.map(tag => ({
-    value: tag.tagName,
-    label: tag.tagName,
-    colour: tag.tagColour
-  }))}
-  width="250px"
-  placeholder="Select tags..."
-/></Box>
-                 
-                  <DeleteIcon
-                    onClick={() => clearFilter("tags")}
-                    style={{ cursor: "pointer", color: "red" }}
+                <div className="flex items-center gap-1">
+                  <TagsMultiSelectDropDown
+                    value={filters.tags.map(tag => ({ value: tag.tagName, label: tag.tagName, colour: tag.tagColour }))}
+                    onChange={(newValue) => setFilters(prev => ({ ...prev, tags: newValue.map(item => ({ tagName: item.value, tagColour: item.colour })) }))}
+                    options={uniqueTags.map(tag => ({ value: tag.tagName, label: tag.tagName, colour: tag.tagColour }))}
+                    width="250px"
+                    placeholder="Select tags..."
                   />
+                  <button type="button" onClick={() => clearFilter("tags")} className="text-red-400 hover:text-red-600"><MdDeleteOutline size={16}/></button>
                 </div>
               )}
-            </Box>
-            <TableContainer sx={{ mt: 2 }}>
-              <Table style={{ tableLayout: "fixed", width: "100%" }}>
-                <TableHead>
-                  <TableRow>
-                    <TableCell
-                      padding="checkbox"
-                      style={{
-                        position: "sticky",
-                        left: 0,
-                        zIndex: 1,
-                        background: "#fff",
-                        fontSize: "2px", // Set a professional font size
-                        fontWeight: "bold",
-                        textAlign: "center",
-                      }}
-                    >
-                      <Checkbox
-                        checked={selected.length === accountData.length}
-                        onChange={() => {
-                          if (selected.length === accountData.length) {
-                            setSelected([]);
-                          } else {
-                            const allSelected = accountData.map(
-                              (item) => item.id
-                            );
-                          
-                            setSelected(allSelected);
-                          }
-                        }}
+            </div>
+
+            {/* Table */}
+            <div className="overflow-x-auto mt-2">
+              <table className="w-full text-xs" style={{ tableLayout: "fixed" }}>
+                <thead>
+                  <tr className="border-b border-gray-200 bg-white">
+                    <th className="sticky left-0 bg-white z-10 w-10 py-3 px-2 text-center">
+                      <input type="checkbox" className="h-4 w-4 rounded"
+                        checked={selected.length === accountData.length && accountData.length > 0}
+                        onChange={() => selected.length === accountData.length ? setSelected([]) : setSelected(accountData.map(i => i.id))}
                       />
-                    </TableCell>
-                    <TableCell
-                      onClick={() => {
-                        if (sortBy === "Name") {
-                          setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-                        } else {
-                          setSortBy("Name");
-                          setSortOrder("asc");
-                        }
-                      }}
-                      style={{
-                        cursor: "pointer",
-                        position: "sticky",
-                        left: 50,
-                        zIndex: 1,
-                        background: "#fff",
-                        fontSize: "12px",
-                        fontWeight: "bold",
-                        padding: "16px", // Add more padding for better spacing
-                      }}
-                      width="200"
-                    >
-                      Account Name{" "}
-                      {sortBy === "Name" && (sortOrder === "asc" ? "▲" : "▼")}
-                    </TableCell>
-                    <TableCell
-                      style={{
-                        fontSize: "12px",
-                        fontWeight: "bold",
-                        padding: "16px",
-                      }}
-                      width="100"
-                    >
-                      Type
-                    </TableCell>
-                    <TableCell
-                      style={{
-                        fontSize: "12px",
-                        fontWeight: "bold",
-                        padding: "16px",
-                      }}
-                      width="250"
-                    >
-                      Email
-                    </TableCell>
-                    <TableCell
-                      style={{
-                        fontSize: "12px",
-                        fontWeight: "bold",
-                        padding: "16px",
-                      }}
-                      width="200"
-                      height="60"
-                    >
-                      Team Members
-                    </TableCell>
-                    <TableCell
-                      style={{
-                        fontSize: "12px",
-                        fontWeight: "bold",
-                        padding: "16px",
-                      }}
-                      width="200"
-                    >
-                      Tags
-                    </TableCell>
-                    <TableCell
-                      style={{
-                        fontSize: "12px",
-                        fontWeight: "bold",
-                        padding: "16px",
-                      }}
-                      width="100"
-                    >
-                      Invoices
-                    </TableCell>
-                    <TableCell
-                      style={{
-                        fontSize: "12px",
-                        fontWeight: "bold",
-                        padding: "16px",
-                      }}
-                      width="100"
-                    >
-                      Proposals
-                    </TableCell>
-                    <TableCell
-                      style={{
-                        fontSize: "12px",
-                        fontWeight: "bold",
-                        padding: "16px",
-                      }}
-                      width="100"
-                    >
-                      Chats
-                    </TableCell>
-                    <TableCell
-                      style={{
-                        fontSize: "12px",
-                        fontWeight: "bold",
-                        padding: "16px",
-                      }}
-                      width="100"
-                    >
-                      Pending Organizers
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
+                    </th>
+                    <th className="sticky left-10 bg-white z-10 w-48 py-3 px-4 text-left font-bold cursor-pointer"
+                      onClick={() => { if (sortBy === "Name") setSortOrder(sortOrder === "asc" ? "desc" : "asc"); else { setSortBy("Name"); setSortOrder("asc"); } }}>
+                      Account Name {sortBy === "Name" && (sortOrder === "asc" ? "▲" : "▼")}
+                    </th>
+                    {["Type", "Email", "Team Members", "Tags", "Invoices", "Proposals", "Chats", "Pending Organizers"].map(h => (
+                      <th key={h} className="py-3 px-4 text-left font-bold whitespace-nowrap">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
                   {paginatedData.map((row) => {
                     const isSelected = selected.indexOf(row.id) !== -1;
                     return (
-                      <TableRow
-                        key={row.id}
-                        hover
-                        onClick={() => handleSelect(row.id)}
-                        role="checkbox"
-                        tabIndex={-1}
-                        selected={isSelected}
-                        style={{
-                          cursor: "pointer",
-                          transition: "background-color 0.3s ease",
-                          "&:hover": {
-                            backgroundColor: "#f4f4f4", // Add hover effect
-                          },
-                        }}
-                      >
-                        <TableCell
-                          padding="checkbox"
-                          style={{
-                            position: "sticky",
-                            left: 0,
-                            zIndex: 1,
-                            background: "#fff",
-                            fontSize: "12px",
-                            textAlign: "center",
-                            padding: "4px 8px",
-                            lineHeight: "1",
-                            // padding: "2px", // Adjust padding for better spacing
-                          }}
-                        >
-                          <Checkbox checked={isSelected} />
-                        </TableCell>
-                        <TableCell
-                          style={{
-                            position: "sticky",
-                            left: 50,
-                            zIndex: 1,
-                            background: "#fff",
-                            fontSize: "12px",
-                            fontWeight: "normal",
-                          }}
-                        >
-                          <Link
-                            to={`/clients/accounts/accountsdash/overview/${row.id}`}
-                            style={{ textDecoration: "none", color: "#3f51b5" }}
-                          >
-                            {row.Name}
-                          </Link>
-                        </TableCell>
-                        <TableCell
-                          style={{
-                            fontSize: "12px",
-                            padding: "4px 8px",
-                            lineHeight: "1",
-                          }}
-                        >
-                          {row.Type}
-                        </TableCell>
-                        <TableCell
-                          style={{
-                            fontSize: "12px",
-                            padding: "4px 8px",
-                            lineHeight: "1",
-                          }}
-                        >
-                          {row.Follow
-                            ? (() => {
-                                const emails = row.Follow.split(",").map(
-                                  (email) => email.trim()
-                                );
-                                return (
-                                  <Tooltip
-                                    title={emails.join("\n")}
-                                    arrow
-                                    placement="top"
-                                  >
-                                    <Typography
-                                      sx={{
-                                        cursor: "pointer",
-                                        fontSize: "12px",
-                                      }}
-                                    >
-                                      {emails[0]}{" "}
-                                      {emails.length > 1
-                                        ? `+${emails.length - 1}`
-                                        : ""}
-                                    </Typography>
-                                  </Tooltip>
-                                );
-                              })()
-                            : ""}
-                        </TableCell>
-                        <TableCell
-                          style={{
-                            fontSize: "12px",
-                            padding: "4px 8px",
-                            lineHeight: "1",
-                          }}
-                        >
-                          <Box sx={{ display: "flex", alignItems: "center" }}>
-                            {row.Team.length > 0 && (
-                              <>
-                                <Tooltip
-                                  title={row.Team[0].username}
-                                  placement="top"
-                                >
-                                  <span style={{ marginRight: 8 }}>
-                                    {row.Team[0].username}
-                                  </span>
-                                </Tooltip>
-
-                                {row.Team.length > 1 && (
-                                  <Tooltip
-                                    title={row.Team.slice(1)
-                                      .map((member) => member.username)
-                                      .join(", ")}
-                                    placement="top"
-                                  >
-                                    <Typography
-                                      variant="body2"
-                                      sx={{
-                                        marginLeft: "2px",
-                                        cursor: "pointer",
-                                        fontSize: "10px",
-                                        color: "#555",
-                                      }}
-                                    >
-                                      +{row.Team.length - 1}
-                                    </Typography>
-                                  </Tooltip>
-                                )}
-                              </>
-                            )}
-                          </Box>
-                        </TableCell>
-                        <TableCell
-                          style={{
-                            fontSize: "12px",
-                            padding: "4px 8px",
-                            lineHeight: "1",
-                          }}
-                        >
-                          {Array.isArray(row.Tags) && row.Tags.length > 0 ? (
-                            row.Tags.length > 1 ? (
-                              <Tooltip
-                                title={
-                                  <div>
-                                    {row.Tags.map((tag) => (
-                                      <div
-                                        key={tag._id}
-                                        style={{
-                                          background: tag.tagColour,
-                                          color: "#fff",
-                                          borderRadius: "8px",
-                                          padding: "2px 8px",
-                                          marginBottom: "2px",
-                                          fontSize: "10px",
-                                        }}
-                                      >
-                                        {tag.tagName}
-                                      </div>
-                                    ))}
-                                  </div>
-                                }
-                                placement="top"
-                              >
-                                <span
-                                  style={{
-                                    background: row.Tags[0].tagColour,
-                                    color: "#fff",
-                                    borderRadius: "8px",
-                                    padding: "2px 8px",
-                                    fontSize: "10px",
-                                    cursor: "pointer",
-                                  }}
-                                >
-                                  {row.Tags[0].tagName}
-                                </span>
-                              </Tooltip>
-                            ) : (
-                              row.Tags.map((tag) => (
-                                <span
-                                  key={tag._id}
-                                  style={{
-                                    background: tag.tagColour,
-                                    color: "#fff",
-                                    borderRadius: "8px",
-                                    padding: "2px 8px",
-                                    fontSize: "10px",
-                                    marginLeft: "3px",
-                                  }}
-                                >
-                                  {tag.tagName}
-                                </span>
-                              ))
-                            )
-                          ) : null}
-                          {Array.isArray(row.Tags) && row.Tags.length > 1 && (
-                            <span
-                              style={{
-                                marginLeft: "5px",
-                                fontSize: "10px",
-                                color: "#555",
-                              }}
-                            >
-                              +{row.Tags.length - 1}
+                      <tr key={row.id} onClick={() => handleSelect(row.id)}
+                        className={`border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors ${ isSelected ? 'bg-blue-50' : '' }`}>
+                        <td className="sticky left-0 bg-white z-10 py-1 px-2 text-center">
+                          <input type="checkbox" className="h-4 w-4 rounded" checked={isSelected} onChange={() => handleSelect(row.id)} onClick={e => e.stopPropagation()} />
+                        </td>
+                        <td className="sticky left-10 bg-white z-10 py-1 px-4">
+                          <Link to={`/clients/accounts/accountsdash/overview/${row.id}`}
+                            className="text-blue-600 hover:underline" onClick={e => e.stopPropagation()}>{row.Name}</Link>
+                        </td>
+                        <td className="py-1 px-4">{row.Type}</td>
+                        <td className="py-1 px-4">
+                          {row.Follow ? (() => {
+                            const emails = row.Follow.split(",").map(e => e.trim());
+                            return <span title={emails.join("\n")} className="cursor-pointer">{emails[0]}{emails.length > 1 ? ` +${emails.length - 1}` : ""}</span>;
+                          })() : ""}
+                        </td>
+                        <td className="py-1 px-4">
+                          {row.Team.length > 0 && (
+                            <span className="text-xs">
+                              <span title={row.Team[0].username}>{row.Team[0].username}</span>
+                              {row.Team.length > 1 && (
+                                <span title={row.Team.slice(1).map(m => m.username).join(", ")} className="ml-1 text-[10px] text-gray-500 cursor-pointer">+{row.Team.length - 1}</span>
+                              )}
                             </span>
                           )}
-                        </TableCell>
-                        <TableCell
-                          style={{
-                            fontSize: "12px",
-                            padding: "4px 8px",
-                            lineHeight: "1",
-                          }}
-                        >
-                          {row.Invoices}
-                        </TableCell>
-                        <TableCell
-                          style={{
-                            fontSize: "12px",
-                            padding: "4px 8px",
-                            lineHeight: "1",
-                          }}
-                        >
-                          {row.Proposals}
-                        </TableCell>
-                        <TableCell
-                          style={{
-                            fontSize: "12px",
-                            padding: "4px 8px",
-                            lineHeight: "1",
-                          }}
-                        >
-                          {row.Unreadchats}
-                        </TableCell>
-                        <TableCell
-                          style={{
-                            fontSize: "12px",
-                            padding: "4px 8px",
-                            lineHeight: "1",
-                          }}
-                        >
-                          {row.Pendingorganizers}
-                        </TableCell>
-                      </TableRow>
+                        </td>
+                        <td className="py-1 px-4">
+                          {Array.isArray(row.Tags) && row.Tags.length > 0 && (
+                            <span className="flex flex-wrap gap-0.5">
+                              {row.Tags.slice(0, 1).map(tag => (
+                                <span key={tag._id} title={row.Tags.map(t => t.tagName).join(", ")}
+                                  className="inline-block px-2 py-0.5 rounded-full text-[10px] text-white cursor-pointer"
+                                  style={{ backgroundColor: tag.tagColour }}>{tag.tagName}</span>
+                              ))}
+                              {row.Tags.length > 1 && <span className="text-[10px] text-gray-500 ml-1">+{row.Tags.length - 1}</span>}
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-1 px-4">{row.Invoices}</td>
+                        <td className="py-1 px-4">{row.Proposals}</td>
+                        <td className="py-1 px-4">{row.Unreadchats}</td>
+                        <td className="py-1 px-4">{row.Pendingorganizers}</td>
+                      </tr>
                     );
                   })}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                </tbody>
+              </table>
+            </div>
 
-            <TablePagination
-              rowsPerPageOptions={[30, 40, 50, 60, 100]}
-              component="div"
-              count={filteredData.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            />
-          </Box>
+            {/* Pagination */}
+            <div className="flex items-center justify-between mt-3 text-xs text-gray-600">
+              <div className="flex items-center gap-2">
+                <span>Rows per page:</span>
+                <select className={inputCls} value={rowsPerPage} onChange={handleChangeRowsPerPage}>
+                  {[30,40,50,60,100].map(n => <option key={n} value={n}>{n}</option>)}
+                </select>
+              </div>
+              <div className="flex items-center gap-2">
+                <span>{page * rowsPerPage + 1}–{Math.min((page + 1) * rowsPerPage, filteredData.length)} of {filteredData.length}</span>
+                <button type="button" disabled={page === 0} onClick={() => handleChangePage(null, page - 1)}
+                  className="px-2 py-1 rounded border border-gray-200 disabled:opacity-40 hover:bg-gray-50">‹</button>
+                <button type="button" disabled={(page + 1) * rowsPerPage >= filteredData.length} onClick={() => handleChangePage(null, page + 1)}
+                  className="px-2 py-1 rounded border border-gray-200 disabled:opacity-40 hover:bg-gray-50">›</button>
+              </div>
+            </div>
+          </div>
         )
       )}
 
-      <Drawer
-        anchor="right"
-        open={isDrawerOpen}
-        onClose={handleDrawerClose}
-        PaperProps={{
-          id: "tag-drawer",
-          sx: {
-            borderRadius: isSmallScreen ? "0" : "10px 0 0 10px",
-            width: isSmallScreen ? "100%" : 700,
-            maxWidth: "100%",
-            [theme.breakpoints.down("sm")]: {
-              width: "100%",
-            },
-          },
-        }}
-      >
-        <Box
-          sx={{ borderRadius: isSmallScreen ? "0" : "15px" }}
-          role="presentation"
-        >
-          {isSendEmailOpen && (
-            <Box p={2}>
-              <Box
-                display="flex"
-                alignItems="center"
-                justifyContent="space-between"
-              >
-                <Typography variant="h6">New Email</Typography>
-                <IconButton onClick={handleFormClose} sx={{ color: "blue" }}>
-                  <RxCross2 fontSize="large" />
-                </IconButton>
-              </Box>
-
-              <Divider sx={{ my: 2 }} />
-
-              <SendAccountEmail
-                selectedAccounts={selected}
-                onClose={handleFormClose}
-              />
-            </Box>
-          )}
-
-          {isCreateJobOpen && (
-            <Box p={2} className="right-drawers">
-              <Box
-                display="flex"
-                alignItems="center"
-                justifyContent="space-between"
-              >
-                <Typography variant="h6">Create job</Typography>
-                <IconButton onClick={handleFormClose} sx={{ color: "blue" }}>
-                  <RxCross2 fontSize="large" />
-                </IconButton>
-              </Box>
-
-              <AddJobs selectedAccounts={selected} onClose={handleFormClose} />
-            </Box>
-          )}
-
-          {isCreateOrganizerOpen && (
-            <Box p={2}>
-              <Box
-                display="flex"
-                alignItems="center"
-                justifyContent="space-between"
-              >
-                <Typography variant="h6">Create Organizer</Typography>
-                <IconButton onClick={handleFormClose} sx={{ color: "blue" }}>
-                  <RxCross2 fontSize="large" />
-                </IconButton>
-              </Box>
-
-              <AddBulkOrganizer
-                selectedAccounts={selected}
-                onClose={handleFormClose}
-              />
-            </Box>
-          )}
-
-          {isManageTagsOpen && (
-            <Box p={2}>
-              <Box
-                display="flex"
-                alignItems="center"
-                justifyContent="space-between"
-              >
-                <Typography variant="h6">Assign Tags for </Typography>
-
-                <Typography variant="body1" sx={{ marginRight: 2 }}>
-                  {selected
-                    .map((id) => {
-                      const account = accountData.find(
-                        (account) => account.id === id
-                      );
-                      return account ? account.Name : id; // Fallback to ID if name is not found
-                    })
-                    .join(", ")}{" "}
-                  {/* Joining account names with commas */}
-                </Typography>
-
-                <IconButton onClick={handleFormClose} sx={{ color: "blue" }}>
-                  <RxCross2 fontSize="large" />
-                </IconButton>
-              </Box>
-
-              <Divider sx={{ my: 2 }} />
-
-              <ManageTags
-                selectedAccounts={selected}
-                onClose={handleFormClose}
-                fetchData={fetchData}
-              />
-            </Box>
-          )}
-
-          {isManageTeamOpen && (
-            <Box p={2}>
-              <Box
-                display="flex"
-                alignItems="center"
-                justifyContent="space-between"
-              >
-                <Typography variant="h6">Assign Team for</Typography>
-
-                <Typography variant="body1" sx={{ marginRight: 2 }}>
-                  {selected
-                    .map((id) => {
-                      const account = accountData.find(
-                        (account) => account.id === id
-                      );
-                      return account ? account.Name : id; // Fallback to ID if name is not found
-                    })
-                    .join(", ")}{" "}
-                  {/* Joining account names with commas */}
-                </Typography>
-                <IconButton onClick={handleFormClose} sx={{ color: "blue" }}>
-                  <RxCross2 fontSize="large" />
-                </IconButton>
-              </Box>
-
-              <Divider sx={{ my: 2 }} />
-
-              <ManageTeams
-                selectedAccounts={selected}
-                onClose={handleFormClose}
-                fetchAccountData={fetchData}
-              />
-            </Box>
-          )}
-        </Box>
-      </Drawer>
+      {/* Bulk action drawers */}
+      {isDrawerOpen && (
+        <div className="fixed inset-0 z-40 overflow-hidden">
+          <div className="absolute inset-0 bg-black/30" onClick={handleDrawerClose} />
+          <div className="absolute right-0 top-0 h-full w-[700px] bg-white shadow-xl overflow-y-auto rounded-tl-2xl rounded-bl-2xl">
+            {isSendEmailOpen && (
+              <div className="p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-base font-semibold">New Email</span>
+                  <button type="button" onClick={handleFormClose} className="text-blue-600 hover:text-blue-800"><RxCross2 size={20}/></button>
+                </div>
+                <hr className="border-gray-200 mb-3"/>
+                <SendAccountEmail selectedAccounts={selected} onClose={handleFormClose} />
+              </div>
+            )}
+            {isCreateJobOpen && (
+              <div className="p-4 right-drawers">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-base font-semibold">Create job</span>
+                  <button type="button" onClick={handleFormClose} className="text-blue-600 hover:text-blue-800"><RxCross2 size={20}/></button>
+                </div>
+                <AddJobs selectedAccounts={selected} onClose={handleFormClose} />
+              </div>
+            )}
+            {isCreateOrganizerOpen && (
+              <div className="p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-base font-semibold">Create Organizer</span>
+                  <button type="button" onClick={handleFormClose} className="text-blue-600 hover:text-blue-800"><RxCross2 size={20}/></button>
+                </div>
+                <AddBulkOrganizer selectedAccounts={selected} onClose={handleFormClose} />
+              </div>
+            )}
+            {isManageTagsOpen && (
+              <div className="p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <span className="text-base font-semibold">Assign Tags for </span>
+                    <span className="text-sm text-gray-600">{selected.map(id => accountData.find(a => a.id === id)?.Name || id).join(", ")}</span>
+                  </div>
+                  <button type="button" onClick={handleFormClose} className="text-blue-600 hover:text-blue-800"><RxCross2 size={20}/></button>
+                </div>
+                <hr className="border-gray-200 mb-3"/>
+                <ManageTags selectedAccounts={selected} onClose={handleFormClose} fetchData={fetchData} />
+              </div>
+            )}
+            {isManageTeamOpen && (
+              <div className="p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <span className="text-base font-semibold">Assign Team for </span>
+                    <span className="text-sm text-gray-600">{selected.map(id => accountData.find(a => a.id === id)?.Name || id).join(", ")}</span>
+                  </div>
+                  <button type="button" onClick={handleFormClose} className="text-blue-600 hover:text-blue-800"><RxCross2 size={20}/></button>
+                </div>
+                <hr className="border-gray-200 mb-3"/>
+                <ManageTeams selectedAccounts={selected} onClose={handleFormClose} fetchAccountData={fetchData} />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </>
   );
 };

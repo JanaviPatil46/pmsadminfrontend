@@ -1,28 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Navigate, useParams } from "react-router-dom";
-import {
-  Box,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  IconButton,
-  Menu,
-  MenuItem,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Button,
-} from "@mui/material";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { useParams, useNavigate } from "react-router-dom";
 import { GoDotFill } from "react-icons/go";
+import { MoreVertical } from "lucide-react";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
 const ArchivedJobs = () => {
   const JOBS_API = process.env.REACT_APP_ADD_JOBS_URL;
   const [jobData, setJobData] = useState([]);
@@ -39,7 +19,6 @@ const ArchivedJobs = () => {
       .then((response) => response.json())
       .then((result) => {
         setJobData(result.jobList || []);
-        console.log("joblist",result)
       })
       .catch((error) => {
         console.error("Error fetching job list:", error);
@@ -103,7 +82,6 @@ const ArchivedJobs = () => {
     fetch(archiveUrl, requestOptions)
       .then((response) => response.json())
       .then((result) => {
-        console.log("Active result:", result);
         toast.success("Job activated  successfully");
         navigate(`/clients/accounts/accountsdash/workflow/${data}/activejobs`)
         setJobData((prevJobs) =>
@@ -129,7 +107,6 @@ const ArchivedJobs = () => {
     fetch(deleteUrl, requestOptions)
       .then((response) => response.json())
       .then((result) => {
-        console.log("Delete result:", result);
         toast.success("Job deleted successfully")
         setJobData((prevJobs) =>
           prevJobs.filter((job) => job.id !== selectedJobId)
@@ -141,222 +118,78 @@ const ArchivedJobs = () => {
       });
   };
   return (
-    <Box sx={{ padding: 2 }}>
-      {/* <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell><strong>Name</strong></TableCell>
-              <TableCell><strong>Job Assignee(s)</strong></TableCell>
-              <TableCell><strong>Pipeline</strong></TableCell>
-              <TableCell><strong>Stage</strong></TableCell>
-           
-              <TableCell><strong>Starts In</strong></TableCell>
-              <TableCell><strong>Due In</strong></TableCell>
-              <TableCell><strong>Status</strong></TableCell>
-              <TableCell><strong>Settings</strong></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
+    <div className="p-4">
+      <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
+        <table className="w-full text-left border-collapse">
+          <thead>
+            <tr className="bg-gray-50 border-b border-gray-200">
+              {["Name","Job Assignee(s)","Pipeline","Stage","Starts In","Due In","Status","Settings"].map((col) => (
+                <th key={col} className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">{col}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
             {jobData.map((job) => (
-              <TableRow key={job.id}>
-                <TableCell>{job.Name}</TableCell>
-                <TableCell>{job.JobAssignee.join(", ")}</TableCell>
-                <TableCell>{job.Pipeline}</TableCell>
-                <TableCell>{job.Stage.join(", ")}</TableCell>
-               
-                <TableCell>{formatDate(job.StartDate)}</TableCell>
-                <TableCell>{formatDate(job.DueDate)}</TableCell>
-<TableCell>
+              <tr key={job.id} className="hover:bg-gray-50 transition-colors">
+                <td className="px-4 py-2.5 text-xs text-gray-800 whitespace-nowrap">{job.Name}</td>
+                <td className="px-4 py-2.5 text-xs text-gray-700 whitespace-nowrap">{job.JobAssignee.join(", ")}</td>
+                <td className="px-4 py-2.5 text-xs text-gray-700 whitespace-nowrap">{job.Pipeline}</td>
+                <td className="px-4 py-2.5 text-xs text-gray-700 whitespace-nowrap">{job.Stages?.map(stage => stage.name).join(", ")}</td>
+                <td className="px-4 py-2.5 text-xs text-gray-700 whitespace-nowrap">{formatDate(job.StartDate)}</td>
+                <td className="px-4 py-2.5 text-xs text-gray-700 whitespace-nowrap">{formatDate(job.DueDate)}</td>
+                <td className="px-4 py-2.5 text-xs whitespace-nowrap">
                   {job.ClientFacingStatus ? (
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                      }}
+                    <div className="flex items-center gap-1.5">
+                      <GoDotFill style={{ color: job.ClientFacingStatus.statusColor, fontSize: "18px" }} />
+                      <span className="text-gray-700">{job.ClientFacingStatus.statusName}</span>
+                    </div>
+                  ) : ""}
+                </td>
+                <td className="px-4 py-2.5 text-xs">
+                  <div className="relative inline-block">
+                    <button
+                      type="button"
+                      className="p-1 rounded hover:bg-gray-100 transition-colors"
+                      onClick={(e) => { e.stopPropagation(); handleSettingsClick(e, job.id); }}
                     >
-                      <GoDotFill
-                        style={{
-                          color: job.ClientFacingStatus.statusColor,
-                          fontSize: "25px",
-                        }}
-                      />
-                      <span>{job.ClientFacingStatus.statusName}</span>
-                    </Box>
-                  ) : (
-                    ""
-                  )}
-                </TableCell>
-                 <TableCell>
-                  <IconButton
-                     onClick={(event) => handleSettingsClick(event, job.id)}
-                    aria-label="Settings"
-                  >
-                    <MoreVertIcon />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
+                      <MoreVertical size={15} className="text-gray-500" />
+                    </button>
+                    {Boolean(anchorEl) && selectedJobId === job.id && (
+                      <div className="absolute right-0 top-8 z-50 bg-white border border-gray-200 rounded-xl shadow-xl w-40 py-1 overflow-hidden">
+                        <div className="fixed inset-0 z-30" onClick={handleCloseMenu} />
+                        <div className="relative z-40">
+                          <button type="button" className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors" onClick={() => openConfirmationDialog("active")}>Active</button>
+                          <button type="button" className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors" onClick={() => openConfirmationDialog("delete")}>Delete</button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </td>
+              </tr>
             ))}
-          </TableBody>
-        </Table>
-      </TableContainer> */}
-       <TableContainer component={Paper}>
-        <Table sx={{width:'100%'}}>
-          <TableHead>
-            <TableRow>
-              <TableCell  style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="200">Name</TableCell>
-              <TableCell  style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="200">Job Assignee(s)</TableCell>
-              <TableCell  style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="200">Pipeline</TableCell>
-              <TableCell  style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="100">Stage</TableCell>
-              <TableCell  style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="100">Starts In</TableCell>
-              <TableCell  style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="100">Due In</TableCell>
-              <TableCell  style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="100">Status</TableCell>
-              <TableCell  style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      padding: "16px",
-                    }}
-                    width="100">Settings</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {jobData.map((job) => (
-              <TableRow key={job.id}>
-                <TableCell style={{
-                          fontSize: "12px",
-                          padding: "4px 8px",
-                          lineHeight: "1",
-                        }}>{job.Name}</TableCell>
-                <TableCell style={{
-                          fontSize: "12px",
-                          padding: "4px 8px",
-                          lineHeight: "1",
-                        }}>{job.JobAssignee.join(", ")}</TableCell>
-                <TableCell style={{
-                          fontSize: "12px",
-                          padding: "4px 8px",
-                          lineHeight: "1",
-                        }}>{job.Pipeline}</TableCell>
-                <TableCell style={{
-                          fontSize: "12px",
-                          padding: "4px 8px",
-                          lineHeight: "1",
-                        }}>{job.Stages?.map(stage => stage.name).join(", ")}</TableCell>
-               
-                <TableCell style={{
-                          fontSize: "12px",
-                          padding: "4px 8px",
-                          lineHeight: "1",
-                        }}>{formatDate(job.StartDate)}</TableCell>
-                <TableCell style={{
-                          fontSize: "12px",
-                          padding: "4px 8px",
-                          lineHeight: "1",
-                        }}>{formatDate(job.DueDate)}</TableCell>
-<TableCell style={{
-                          fontSize: "12px",
-                          padding: "4px 8px",
-                          lineHeight: "1",
-                        }}>
-                  {job.ClientFacingStatus ? (
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                      }}
-                    >
-                      <GoDotFill
-                        style={{
-                          color: job.ClientFacingStatus.statusColor,
-                          fontSize: "25px",
-                        }}
-                      />
-                      <span>{job.ClientFacingStatus.statusName}</span>
-                    </Box>
-                  ) : (
-                    ""
-                  )}
-                </TableCell>
-                 <TableCell style={{
-                          fontSize: "12px",
-                          padding: "4px 8px",
-                          lineHeight: "1",
-                        }}>
-                  <IconButton
-                     onClick={(event) => handleSettingsClick(event, job.id)}
-                    aria-label="Settings"
-                  >
-                    <MoreVertIcon />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-       <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleCloseMenu}
-      >
-        <MenuItem onClick={() => openConfirmationDialog("active")}>Active</MenuItem>
-        <MenuItem onClick={() => openConfirmationDialog("delete")}>Delete</MenuItem>
-      </Menu>
+          </tbody>
+        </table>
+      </div>
 
       {/* Confirmation Dialog */}
-      <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
-        <DialogTitle>Confirm Action</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Are you sure you want to {actionType} this job?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          
-          <Button onClick={handleConfirmAction} color="primary">
-            Confirm
-          </Button>
-          <Button onClick={handleCloseDialog}>Cancel</Button>
-        </DialogActions>
-      </Dialog>
-    </Box>
+      {isDialogOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40" onClick={handleCloseDialog} />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm">
+            <div className="px-5 py-4 border-b border-gray-100">
+              <h2 className="text-sm font-semibold text-gray-800">Confirm Action</h2>
+            </div>
+            <div className="px-5 py-4">
+              <p className="text-sm text-gray-600">Are you sure you want to {actionType} this job?</p>
+            </div>
+            <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100">
+              <button type="button" onClick={handleCloseDialog} className="rounded-lg px-4 py-2 text-sm font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">Cancel</button>
+              <button type="button" onClick={handleConfirmAction} className="rounded-lg px-4 py-2 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] transition-colors">Confirm</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 
