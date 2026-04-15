@@ -1426,7 +1426,7 @@ const MyAccount = () => {
       <div>
         <h1 className="text-2xl font-bold text-foreground mb-6">Account Settings</h1>
       </div>
-      <div className="account-settings space-y-6">
+      <div className="account-settings">
         {/* ===== PERSONAL DETAILS ===== */}
         <div className="accounts-details-user rounded-xl border bg-card p-5 shadow-sm">
           <div className="flex items-center justify-between mb-3">
@@ -1606,8 +1606,11 @@ const MyAccount = () => {
                     </tr>
                   ) : (
                     <tr key={row.label} className="hover:bg-muted/30 transition-colors">
-                      <td className={`py-3 px-4 text-sm text-foreground align-middle${row.indent ? " pl-8" : ""}`}>
-                        {row.label}
+                      <td className="py-3 px-4 text-sm text-foreground align-middle">
+                        {row.indent
+                          ? <span className="pl-4 block">{row.label}</span>
+                          : row.label
+                        }
                       </td>
                       <td className="py-3 px-4 w-28 align-middle">
                         <div className="flex justify-center items-center">

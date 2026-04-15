@@ -758,7 +758,9 @@ const checkTemplateName = async (name) => {
         <div className="mt-4 space-y-4">
           <div className="flex items-center justify-between">
             <Button onClick={handleCreateChat}>
-              <MessageCircle className="mr-2 h-4 w-4" /> Create Chat Template
+              {/* <MessageCircle className="mr-2 h-4 w-4" />  */}
+               <Plus className="h-4 w-4" />
+              Create New Chat
             </Button>
           </div>
 

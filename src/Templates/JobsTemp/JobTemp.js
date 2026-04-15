@@ -14,6 +14,7 @@ import { Button } from "../../components/ui/button";
 import { Switch } from "../../components/ui/switch";
 import { Label } from "../../components/ui/label";
 import { Textarea } from "../../components/ui/textarea";
+import { Plus } from "lucide-react";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../../components/ui/select";
 import { Trash2, MessageSquarePlus, FileText, Calendar, Users, Globe, MoreVertical, Pencil, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 dayjs.extend(customParseFormat);
@@ -828,7 +829,9 @@ console.log(raw)
           <div className="mt-4 space-y-4">
             <div className="flex items-center justify-between">
               <Button onClick={handleCreateJobTemplate}>
-                <FileText className="mr-2 h-4 w-4" /> Job Template
+                {/* <FileText className="mr-2 h-4 w-4" />  */}
+                <Plus className="h-4 w-4" />
+                Create New Job
               </Button>
             </div>
 

@@ -1,8 +1,14 @@
 .account-settings{
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-    padding-top: 20px;
+    grid-template-columns: 1fr;
+    gap: 24px;
+}
+
+@media (min-width: 768px) {
+    .account-settings{
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+    }
 }
 
 /* .accounts-details-user{

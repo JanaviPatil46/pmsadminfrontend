@@ -10,6 +10,7 @@ import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { Label } from "../../components/ui/label";
 import { Switch } from "../../components/ui/switch";
+
 import { CiMenuKebab } from "react-icons/ci";
 import { Eye, X, FileText, Receipt, MoreVertical, Plus, Percent, Pencil, Trash2, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 const InvoiceTemp = () => {
@@ -1054,7 +1055,9 @@ const InvoiceTemp = () => {
         <div className="mt-4 space-y-4">
           <div className="flex items-center justify-between">
             <Button onClick={handleCreateInvoiceTemp}>
-              <Receipt className="mr-2 h-4 w-4" /> Create Invoice Template
+              {/* <Receipt className="mr-2 h-4 w-4" />  */}
+               <Plus className="h-4 w-4" />
+              Create New Invoice
             </Button>
           </div>
 

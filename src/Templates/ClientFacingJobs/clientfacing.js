@@ -4,6 +4,7 @@ import { FormDrawer, FormDrawerFooter, FormSection, FormField } from "../../comp
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { Label } from "../../components/ui/label";
+import { Plus } from "lucide-react";
 import { Pencil, Trash2, Circle, Loader2 } from "lucide-react";
 const Clientfacing = () => {
   const CLIENT_FACING_API = process.env.REACT_APP_CLIENT_FACING_URL;
@@ -291,7 +292,8 @@ const validateForm = () => {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <Button onClick={handleDrawerOpen}>
-            Create status
+             <Plus className="h-4 w-4" />
+            Create New Status
           </Button>
         </div>
 

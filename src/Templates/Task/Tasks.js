@@ -7,6 +7,7 @@ import Editor from "../Texteditor/Editor";
 import Priority from "../Priority/Priority";
 import Status from "../Status/Status";
 import { toast } from "react-toastify";
+
 import axios from "axios";
 import debounce from "lodash.debounce";
 import MultiSelectDropdown from "../MultiSelectDropdown";
@@ -579,7 +580,9 @@ const handleUserChange = (newSelectedUsers) => {
           <div className="mt-4 space-y-4">
             <div className="flex items-center justify-between">
               <Button onClick={handleCreateTask}>
-                <ListChecks className="mr-2 h-4 w-4" /> Create Task Template
+                {/* <ListChecks className="mr-2 h-4 w-4" />  */}
+                 <Plus className="h-4 w-4" />
+                Create New Task
               </Button>
             </div>
 

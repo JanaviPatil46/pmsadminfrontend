@@ -9,6 +9,7 @@ import { FormPage, FormSection, FormField, FormRow, FormGrid, ShortcodePopover, 
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { Label } from "../../components/ui/label";
+import { Plus } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "../../components/ui/radio-group";
 import { Upload, Trash2, FileText, Mail, Paperclip, User, MoreVertical, Pencil, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 const EmailTemp = () => {
@@ -770,7 +771,9 @@ const EmailTemp = () => {
         <div className="mt-4 space-y-4">
           <div className="flex items-center justify-between">
             <Button onClick={handleCreateTemplate}>
-              <Mail className="mr-2 h-4 w-4" /> Create Template
+              {/* <Mail className="mr-2 h-4 w-4" />  */}
+              <Plus className="h-4 w-4" />
+              Create New Email
             </Button>
           </div>
 

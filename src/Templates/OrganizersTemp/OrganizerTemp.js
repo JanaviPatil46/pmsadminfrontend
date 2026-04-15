@@ -13,6 +13,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { FormPage, FormSection, FormField, FormRow, FormGrid, FormDrawer, FormDrawerFooter, ShortcodePopover } from "../../components/ui/form-layout";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
+
 import { Label } from "../../components/ui/label";
 import { Switch } from "../../components/ui/switch";
 import { GripVertical, Settings, Eye, Plus, ChevronLeft, ChevronRight, X, MoreVertical, Pencil, Trash2, Loader2, ClipboardList } from "lucide-react";
@@ -1410,7 +1411,7 @@ const [repeatedSections, setRepeatedSections] = useState({});
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <Button onClick={handleCreateInvoiceClick}>
-                <ClipboardList className="mr-2 h-4 w-4" /> Create Template
+                <Plus className="h-4 w-4" /> Create New Organizer
               </Button>
             </div>
 

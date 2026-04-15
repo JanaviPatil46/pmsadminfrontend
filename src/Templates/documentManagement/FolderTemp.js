@@ -284,7 +284,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
-import { MoreVertical, Pencil, PenLine, Trash2, FolderOpen } from "lucide-react";
+import { MoreVertical, Pencil, PenLine, Trash2, FolderOpen, Plus } from "lucide-react";
 
 const FolderTemplateList = () => {
   const [templates, setTemplates] = useState([]);
@@ -413,9 +413,10 @@ const FolderTemplateList = () => {
   return (
     <div className="p-5 space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-foreground">Folder Templates</h2>
+        {/* <h2 className="text-lg font-semibold text-foreground">Folder Templates</h2> */}
         <Button onClick={handleCreateTemplate}>
-        Create Templa
+        <Plus className="h-4 w-4" />
+        Create New Folder
       </Button>
       </div>
 
