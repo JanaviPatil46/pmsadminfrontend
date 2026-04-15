@@ -108,8 +108,7 @@ const fetchPrprosalsAllData = async () => {
         <h1 className="text-2xl font-bold tracking-tight text-foreground">Proposals & ELs</h1>
         <Button
           onClick={handleCreateProposal}
-          className="rounded-full px-5"
-          style={{ backgroundColor: "var(--color-save-btn)" }}
+          className="rounded-full px-5 bg-primary text-white hover:bg-primary/90"
         >
           New Proposals & ELs
         </Button>

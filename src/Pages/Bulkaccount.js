@@ -503,15 +503,15 @@ console.log("email rawe",raw)
     // Don't clear createdAccounts to keep the results visible
   };
 
-  const inputCls = "w-full h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:bg-slate-50 disabled:text-slate-400";
+  const inputCls = "w-full h-9 rounded-lg border border-border bg-background px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:bg-muted disabled:text-muted-foreground";
 
   return (
   <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
-    <h1 className="text-2xl font-bold tracking-tight text-slate-800 text-center">Add Multiple Clients</h1>
+    <h1 className="text-2xl font-bold tracking-tight text-foreground text-center">Add Multiple Clients</h1>
 
     <form onSubmit={handleSubmit} className="space-y-5">
       {clients.map((client, index) => (
-        <div key={index} className="relative rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4">
+        <div key={index} className="relative rounded-2xl border border-border bg-card p-5 shadow-sm space-y-4">
           {clients.length > 1 && (
             <button
               type="button"
@@ -523,16 +523,16 @@ console.log("email rawe",raw)
           )}
 
           <div>
-            <p className="text-sm font-semibold text-slate-700">
+            <p className="text-sm font-semibold text-foreground">
               {client.isAlias ? `Alias Client #${client.aliasNumber}` : `Client #${index + 1}`}
               {client.isAlias && (
-                <span className="ml-2 text-xs font-normal text-slate-400">(Based on Client #{clients.findIndex(c => !c.isAlias) + 1})</span>
+                <span className="ml-2 text-xs font-normal text-muted-foreground">(Based on Client #{clients.findIndex(c => !c.isAlias) + 1})</span>
               )}
             </p>
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-slate-600 mb-1">Account Name <span className="text-red-500">*</span></label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Account Name <span className="text-destructive">*</span></label>
             <input
               type="text"
               className={inputCls}
@@ -545,24 +545,24 @@ console.log("email rawe",raw)
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="text-sm text-slate-600">Individual</span>
+            <span className="text-sm text-muted-foreground">Individual</span>
             <button
               type="button"
               disabled={client.isAlias}
               onClick={() => handleChange(index, "clientType", client.clientType === "Company" ? "Individual" : "Company")}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none disabled:opacity-50 ${
-                client.clientType === "Company" ? "bg-indigo-600" : "bg-slate-300"
+                client.clientType === "Company" ? "bg-primary" : "bg-muted-foreground/30"
               }`}
             >
               <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
                 client.clientType === "Company" ? "translate-x-6" : "translate-x-1"
               }`} />
             </button>
-            <span className="text-sm text-slate-600">Company</span>
+            <span className="text-sm text-muted-foreground">Company</span>
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-slate-600 mb-1">Folder Template</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Folder Template</label>
             <Select
               options={folderTemplates}
               value={client.folderTemplate}
@@ -576,17 +576,17 @@ console.log("email rawe",raw)
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-medium text-slate-600 mb-1">First Name <span className="text-red-500">*</span></label>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">First Name <span className="text-destructive">*</span></label>
               <input type="text" className={inputCls} value={client.firstName} onChange={(e) => handleChange(index, "firstName", e.target.value)} required disabled={client.isAlias} placeholder="First Name" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-600 mb-1">Last Name <span className="text-red-500">*</span></label>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Last Name <span className="text-destructive">*</span></label>
               <input type="text" className={inputCls} value={client.lastName} onChange={(e) => handleChange(index, "lastName", e.target.value)} required disabled={client.isAlias} placeholder="Last Name" />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-slate-600 mb-1">Phone Number</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Phone Number</label>
             <PhoneInput
               country="in"
               value={client.phoneNumber}
@@ -597,39 +597,39 @@ console.log("email rawe",raw)
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-slate-600 mb-1">Email <span className="text-red-500">*</span></label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Email <span className="text-destructive">*</span></label>
             <input type="email" className={inputCls} value={client.email} onChange={(e) => handleChange(index, "email", e.target.value)} required disabled={client.isAlias} placeholder="Email address" />
             {client.isAlias && (
-              <p className="text-xs text-slate-400 mt-1">Alias email automatically generated from base client</p>
+              <p className="text-xs text-muted-foreground mt-1">Alias email automatically generated from base client</p>
             )}
           </div>
 
           {!client.isAlias && (
-            <div className="rounded-xl bg-slate-50 border border-slate-200 p-4 space-y-3">
-              <p className="text-xs font-semibold text-slate-600">Alias Configuration</p>
+            <div className="rounded-xl bg-muted/50 border border-border p-4 space-y-3">
+              <p className="text-xs font-semibold text-muted-foreground">Alias Configuration</p>
               <div className="flex items-end gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">Number of Aliases</label>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">Number of Aliases</label>
                   <input
                     type="number"
-                    className="w-28 h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                    className="w-28 h-9 rounded-lg border border-border bg-background px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                     value={client.aliasConfig?.count || 0}
                     onChange={(e) => handleChange(index, "aliasCount", e.target.value)}
                     min={0}
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">Starting Number</label>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">Starting Number</label>
                   <input
                     type="number"
-                    className="w-32 h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                    className="w-32 h-9 rounded-lg border border-border bg-background px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                     value={client.aliasConfig?.startingNumber || 1}
                     onChange={(e) => handleChange(index, "startingNumber", e.target.value)}
                     min={1}
                   />
                 </div>
               </div>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-muted-foreground">
                 {client.aliasConfig?.count > 0
                   ? `Will create ${client.aliasConfig.count} alias clients on submit (starting from ${client.aliasConfig.startingNumber})`
                   : "No alias clients will be created for this account"}
@@ -643,7 +643,7 @@ console.log("email rawe",raw)
         <button
           type="submit"
           disabled={loading}
-          className="inline-flex items-center gap-2 rounded-xl bg-green-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-700 disabled:bg-slate-200 disabled:text-slate-400 transition-colors min-w-[200px] justify-center"
+          className="inline-flex items-center gap-2 rounded-xl bg-success px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-success/90 disabled:bg-muted disabled:text-muted-foreground transition-colors min-w-[200px] justify-center"
         >
           {loading ? (
             <svg className="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
@@ -653,7 +653,7 @@ console.log("email rawe",raw)
         <button
           type="button"
           onClick={handleClearForm}
-          className="rounded-xl border border-slate-300 px-6 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors min-w-[140px]"
+          className="rounded-xl border border-border px-6 py-2.5 text-sm font-semibold text-foreground hover:bg-muted transition-colors min-w-[140px]"
         >
           Clear Form
         </button>
@@ -661,31 +661,31 @@ console.log("email rawe",raw)
     </form>
 
     {createdAccounts.length > 0 && (
-      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-        <div className="px-5 py-4 border-b border-slate-100">
-          <h2 className="text-base font-semibold text-slate-800">Created Accounts ({createdAccounts.length})</h2>
+      <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
+        <div className="px-5 py-4 border-b border-border">
+          <h2 className="text-base font-semibold text-foreground">Created Accounts ({createdAccounts.length})</h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b bg-slate-50">
+              <tr className="border-b bg-muted">
                 {["Account Name","Email","Type","Created At","Time (ms)"].map(h => (
-                  <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">{h}</th>
+                  <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {createdAccounts.map((account, index) => (
-                <tr key={index} className="border-b hover:bg-slate-50 transition-colors">
-                  <td className="px-4 py-3 font-medium text-slate-800">{account.AccountName}</td>
-                  <td className="px-4 py-3 text-slate-600">{account.Email}</td>
+                <tr key={index} className="border-b hover:bg-muted/40 transition-colors">
+                  <td className="px-4 py-3 font-medium text-foreground">{account.AccountName}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{account.Email}</td>
                   <td className="px-4 py-3">
                     <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
-                      account.IsAlias ? 'bg-amber-100 text-amber-700' : 'bg-indigo-100 text-indigo-700'
+                      account.IsAlias ? 'bg-warning/10 text-warning' : 'bg-primary/10 text-primary'
                     }`}>{account.IsAlias ? `Alias #${account.AliasNumber}` : 'Base'}</span>
                   </td>
-                  <td className="px-4 py-3 text-slate-500 text-xs">{account.CreatedAt}</td>
-                  <td className="px-4 py-3 text-slate-500">{account.DurationMs}</td>
+                  <td className="px-4 py-3 text-muted-foreground text-xs">{account.CreatedAt}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{account.DurationMs}</td>
                 </tr>
               ))}
             </tbody>

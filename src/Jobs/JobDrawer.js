@@ -1900,9 +1900,9 @@ console.log("Sending chat to account...", raw);
     // Render function
     return (
       <div className="p-4">
-        <h2 className="text-base font-semibold text-gray-800 mb-4 flex flex-wrap gap-1">
+        <h2 className="text-base font-semibold text-foreground mb-4 flex flex-wrap gap-1">
           Automations for
-          <span className="font-normal text-gray-600">
+          <span className="font-normal text-muted-foreground">
             {combinedaccountValues
               .map((accountId) => {
                 const account = accountdata.find((a) => a._id === accountId);
@@ -1920,7 +1920,7 @@ console.log("Sending chat to account...", raw);
               (accountId) => checkTagMatch(automation.selectedTags, accountId)
             );
             return (
-              <div key={index} className="border border-gray-200 rounded-xl p-4 space-y-3">
+              <div key={index} className="border border-border rounded-xl p-4 space-y-3">
                 {/* Checkbox + type */}
                 <div className="flex items-center gap-2">
                   <input
@@ -1928,9 +1928,9 @@ console.log("Sending chat to account...", raw);
                     checked={selectedAutomations.includes(index)}
                     onChange={() => handleCheckboxChange(index)}
                     disabled={!allAccountsHaveMatchingTags}
-                    className="h-4 w-4 accent-blue-600"
+                    className="h-4 w-4 accent-primary"
                   />
-                  <span className="text-sm font-semibold text-gray-800">{automation.type}</span>
+                  <span className="text-sm font-semibold text-foreground">{automation.type}</span>
                   {!allAccountsHaveMatchingTags && (
                     <span className="text-xs text-red-500 italic ml-2">The tags do not match the account</span>
                   )}
@@ -1939,15 +1939,15 @@ console.log("Sending chat to account...", raw);
                 {/* Template */}
                 {automation.selectedtemp && (
                   <div>
-                    <p className="text-xs font-bold text-gray-700">Template:</p>
-                    <p className="text-xs text-gray-500">{templateName}</p>
+                    <p className="text-xs font-bold text-foreground">Template:</p>
+                    <p className="text-xs text-muted-foreground">{templateName}</p>
                   </div>
                 )}
 
                 {/* Condition Tags */}
                 {currentTagData.selectedTags && currentTagData.selectedTags.length > 0 && (
                   <div>
-                    <p className="text-xs font-bold text-gray-700 mb-1">Condition Tags:</p>
+                    <p className="text-xs font-bold text-foreground mb-1">Condition Tags:</p>
                     <div className="flex flex-wrap gap-1">
                       {currentTagData.selectedTags.map((tag) => (
                         <span key={tag._id} className="text-xs text-white px-2 py-0.5 rounded-full font-medium"
@@ -1992,29 +1992,29 @@ console.log("Sending chat to account...", raw);
                 {/* Client Status */}
                 {automation.type === "Update client-facing job status" && (
                   <div className="space-y-1">
-                    <p className="text-xs font-bold text-gray-700">Client Status:</p>
+                    <p className="text-xs font-bold text-foreground">Client Status:</p>
                     {automation.selectedClientStatus && (
                       <div className="flex items-center gap-2">
                         <span className="w-3 h-3 rounded-full inline-block"
                           style={{ backgroundColor: clientStatusOptions?.find(o => o.value === automation.selectedClientStatus)?.clientfacingColour || "#ccc" }} />
-                        <span className="text-xs text-gray-600">
+                        <span className="text-xs text-muted-foreground">
                           {clientStatusOptions?.find(o => o.value === automation.selectedClientStatus)?.label || automation.selectedClientStatus || "Not set"}
                         </span>
                       </div>
                     )}
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-muted-foreground">
                       Visibility: {automation.status ? "Visible to client" : "Hidden from client"}
                     </p>
                     {automation.statusDescription && (
-                      <p className="text-xs text-gray-400">Description: {automation.statusDescription}</p>
+                      <p className="text-xs text-muted-foreground">Description: {automation.statusDescription}</p>
                     )}
                   </div>
                 )}
 
                 {/* Warning */}
                 {automation.type === "Update account tags" && (
-                  <div className="flex items-start gap-2 bg-yellow-50 border border-yellow-300 rounded-lg p-3 mt-2">
-                    <span className="text-yellow-600 text-xs">⚠️ This automation can affect conditions for automations below</span>
+                  <div className="flex items-start gap-2 bg-warning/10 border border-warning/30 rounded-lg p-3 mt-2">
+                    <span className="text-warning text-xs">⚠️ This automation can affect conditions for automations below</span>
                   </div>
                 )}
               </div>
@@ -2024,11 +2024,11 @@ console.log("Sending chat to account...", raw);
 
         <div className="flex items-center gap-3 mt-6">
           <button type="button" onClick={handleMove} disabled={isProcessing}
-            className="rounded-full px-5 py-1.5 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] transition-colors disabled:opacity-50">
+            className="rounded-full px-5 py-1.5 text-sm font-medium text-white bg-primary hover:bg-primary/90 transition-colors disabled:opacity-50">
             Move
           </button>
           <button type="button" onClick={() => setDrawerOpen(false)} disabled={isProcessing}
-            className="rounded-full px-5 py-1.5 text-sm font-medium border border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white hover:border-transparent transition-colors disabled:opacity-50">
+            className="rounded-full px-5 py-1.5 text-sm font-medium border border-border text-primary hover:bg-primary hover:text-white hover:border-transparent transition-colors disabled:opacity-50">
             Close
           </button>
         </div>
@@ -2040,17 +2040,17 @@ console.log("Sending chat to account...", raw);
     handleNewDrawerClose();
   };
 
-  const inputCls = "w-full border border-gray-300 rounded px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-blue-400";
-  const labelCls = "block text-sm font-medium text-gray-700 mb-1";
-  const btnPrimary = "rounded-full px-5 py-1.5 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] transition-colors";
-  const btnOutline = "rounded-full px-5 py-1.5 text-sm font-medium border border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white hover:border-transparent transition-colors";
+  const inputCls = "w-full border border-border rounded px-3 py-1.5 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-primary/40";
+  const labelCls = "block text-sm font-medium text-foreground mb-1";
+  const btnPrimary = "rounded-full px-5 py-1.5 text-sm font-medium text-white bg-primary hover:bg-primary/90 transition-colors";
+  const btnOutline = "rounded-full px-5 py-1.5 text-sm font-medium border border-border text-primary hover:bg-primary hover:text-white hover:border-transparent transition-colors";
 
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
-        <h2 className="text-base font-semibold text-gray-800">Add Job</h2>
-        <button type="button" onClick={handleClose} className="text-gray-400 hover:text-gray-700">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+        <h2 className="text-base font-semibold text-foreground">Add Job</h2>
+        <button type="button" onClick={handleClose} className="text-muted-foreground hover:text-foreground">
           <RxCross2 size={18} />
         </button>
       </div>
@@ -2151,9 +2151,9 @@ console.log("Sending chat to account...", raw);
           {/* Start and Due Date */}
           <div className="mt-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-semibold text-gray-800">Start and Due Date</span>
+              <span className="text-sm font-semibold text-foreground">Start and Due Date</span>
               <label className="flex items-center gap-2 cursor-pointer absolutes-dates">
-                <span className="text-xs text-gray-600">Absolute Date</span>
+                <span className="text-xs text-muted-foreground">Absolute Date</span>
                 <div className="relative inline-flex items-center">
                   <input
                     type="checkbox"
@@ -2161,7 +2161,7 @@ console.log("Sending chat to account...", raw);
                     onChange={(e) => handleAbsolutesDates(e.target.checked)}
                     className="sr-only peer"
                   />
-                  <div className="w-10 h-5 bg-gray-200 rounded-full peer peer-checked:bg-blue-600 transition-colors after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5" />
+                  <div className="w-10 h-5 bg-muted rounded-full peer peer-checked:bg-primary transition-colors after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5" />
                 </div>
               </label>
             </div>
@@ -2169,7 +2169,7 @@ console.log("Sending chat to account...", raw);
             {absoluteDate && (
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
-                  <span className="text-sm text-gray-600 w-20 shrink-0">Start Date</span>
+                  <span className="text-sm text-muted-foreground w-20 shrink-0">Start Date</span>
                   <input
                     type="date"
                     className={inputCls}
@@ -2178,7 +2178,7 @@ console.log("Sending chat to account...", raw);
                   />
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-sm text-gray-600 w-20 shrink-0">Due Date</span>
+                  <span className="text-sm text-muted-foreground w-20 shrink-0">Due Date</span>
                   <input
                     type="date"
                     className={inputCls}
@@ -2192,7 +2192,7 @@ console.log("Sending chat to account...", raw);
             {!absoluteDate && (
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
-                  <span className="text-sm text-gray-600 w-20 shrink-0">Start In</span>
+                  <span className="text-sm text-muted-foreground w-20 shrink-0">Start In</span>
                   <input
                     type="text"
                     placeholder="0"
@@ -2209,7 +2209,7 @@ console.log("Sending chat to account...", raw);
                   </select>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-sm text-gray-600 w-20 shrink-0">Due In</span>
+                  <span className="text-sm text-muted-foreground w-20 shrink-0">Due In</span>
                   <input
                     type="text"
                     placeholder="0"
@@ -2232,9 +2232,9 @@ console.log("Sending chat to account...", raw);
           {/* Client-facing status */}
           <div className="mt-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-bold text-gray-800">Client-facing status</span>
+              <span className="text-sm font-bold text-foreground">Client-facing status</span>
               <label className="flex items-center gap-2 cursor-pointer">
-                <span className="text-xs text-gray-600">Show in Client portal</span>
+                <span className="text-xs text-muted-foreground">Show in Client portal</span>
                 <div className="relative inline-flex items-center">
                   <input
                     type="checkbox"
@@ -2242,7 +2242,7 @@ console.log("Sending chat to account...", raw);
                     onChange={(e) => handleClientFacing(e.target.checked)}
                     className="sr-only peer"
                   />
-                  <div className="w-10 h-5 bg-gray-200 rounded-full peer peer-checked:bg-blue-600 transition-colors after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5" />
+                  <div className="w-10 h-5 bg-muted rounded-full peer peer-checked:bg-primary transition-colors after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5" />
                 </div>
               </label>
             </div>
@@ -2250,7 +2250,7 @@ console.log("Sending chat to account...", raw);
             {clientFacingStatus && (
               <div className="mt-3 space-y-3">
                 <div>
-                  <p className="text-sm text-gray-700 mb-1">Job name for client</p>
+                  <p className="text-sm text-foreground mb-1">Job name for client</p>
                   <input
                     name="subject"
                     value={inputText + selectedJobShortcut}
@@ -2260,7 +2260,7 @@ console.log("Sending chat to account...", raw);
                   />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-700 mb-1">Status</p>
+                  <p className="text-sm text-foreground mb-1">Status</p>
                   <select
                     value={selectedJob?.value || ""}
                     onChange={(e) => {
@@ -2284,7 +2284,7 @@ console.log("Sending chat to account...", raw);
                     rows={3}
                     className={inputCls}
                   />
-                  <p className="text-xs text-gray-400 text-right mt-1">{charCount}/{charLimit}</p>
+                  <p className="text-xs text-muted-foreground text-right mt-1">{charCount}/{charLimit}</p>
                 </div>
               </div>
             )}
@@ -2294,7 +2294,7 @@ console.log("Sending chat to account...", raw);
       </div>
 
       {/* Footer actions */}
-      <div className="flex items-center gap-4 px-4 py-3 border-t border-gray-100">
+      <div className="flex items-center gap-4 px-4 py-3 border-t border-border">
         <button type="button" className={btnPrimary} onClick={createjob}>Add</button>
         <button type="button" className={btnOutline} onClick={handleClose}>Cancel</button>
       </div>

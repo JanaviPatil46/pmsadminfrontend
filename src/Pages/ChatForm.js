@@ -1,46 +1,10 @@
-import React, { useState, useEffect, useContext } from "react";
-import {
-  //   Drawer,
-  Box,
-  //   Typography,
-  //   InputLabel,
-  //   IconButton,
-  //   Autocomplete,
-  //   TextField,
-  //   FormControl,
-  //   Select,
-  //   MenuItem,
-  //   OutlinedInput,
-  //   Chip,
-  //   Checkbox,
-  //   FormControlLabel,
-  //   Switch,
-  Button,
-} from "@mui/material";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { PiDotsSixVerticalBold } from "react-icons/pi";
 import { FiPlusCircle } from "react-icons/fi";
 import { RiDeleteBin6Line } from "react-icons/ri";
-import {
-  Container,
-  Typography,
-  Chip,
-  Drawer,
-  TextField,
-  InputLabel,
-  Autocomplete,
-  Switch,
-  FormControlLabel,
-  Divider,
-  List,
-  ListItem,
-  ListItemText,
-  Popover,
-  IconButton,
-  Checkbox,
-} from "@mui/material";
+import { X } from "lucide-react";
 import AccountMultiSelectDropdown from "../Templates/AccountMultiSelectDropdown";
-import CloseIcon from "@mui/icons-material/Close";
 import { toast } from "react-toastify";
 import EditorShortcodes from "../Templates/Texteditor/EditorShortcodes";
 import { LoginContext } from "../Sidebar/Context/Context";
@@ -132,9 +96,8 @@ const ChatForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   const [filteredShortcuts, setFilteredShortcuts] = useState([]);
   const [selectedOption, setSelectedOption] = useState("contacts");
 
-  const [anchorEl, setAnchorEl] = useState(null);
+  const shortcodeRef = useRef(null);
   const toggleDropdown = (event) => {
-    setAnchorEl(event.currentTarget);
     setShowDropdown(!showDropdown);
   };
   const handleAddShortcut = (shortcut) => {
@@ -339,7 +302,7 @@ useEffect(() => {
   //   }
   // }, [selectedOption]);
   const handleCloseDropdown = () => {
-    setAnchorEl(null);
+    setShowDropdown(false);
   };
 
   //for texteditor.
@@ -533,207 +496,129 @@ useEffect(() => {
       .then((result) => console.log(result))
       .catch((error) => console.error(error));
   };
+  const inputCls = "w-full border border-border rounded px-3 py-1.5 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-primary/40";
+  const labelCls = "block text-sm font-medium text-foreground mb-1";
+
   return (
     <>
-      <Box>
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          padding={1.5}
-        >
-          <Typography variant="h6">New Chat</Typography>
-          <IconButton onClick={handleClose}>
-            <CloseIcon />
-          </IconButton>
-        </Box>
-        <Box sx={{ padding: "0 10px", height: "83vh", overflowY: "auto" }}>
-          <Box p={1}>
-            <Box ml={1} mr={3}>
-              <InputLabel sx={{ color: "black" }}>To</InputLabel>
+      <div>
+        <div className="flex justify-between items-center px-4 py-3 border-b border-border">
+          <h2 className="text-base font-semibold text-foreground">New Chat</h2>
+          <button type="button" onClick={handleClose} className="text-muted-foreground hover:text-foreground">
+            <X size={18} />
+          </button>
+        </div>
+        <div className="px-2.5 overflow-y-auto" style={{ height: "83vh" }}>
+          <div className="p-1 space-y-4">
+
+            <div className="mx-1 mr-3">
+              <label className={labelCls}>To</label>
               <AccountMultiSelectDropdown
                 value={selectedaccount}
                 onChange={handleAccountChange}
                 placeholder="Accounts"
-                
               />
-            </Box>
+            </div>
 
-            <Box m={1}>
-              <InputLabel sx={{ color: "black" }}> Template</InputLabel>
-              <Autocomplete
-                options={invoiceoptions}
-             getOptionLabel={(option) => option.label || ""}
-                value={selectInvoiceTemp}
-                onChange={handleInvoiceTempChange}
-                isOptionEqualToValue={(option, value) =>
-                  option.value === value.value
-                }
-                renderOption={(props, option) => (
-                  <Box
-                    component="li"
-                    {...props}
-                    sx={{ cursor: "pointer", margin: "5px 10px" }} // Add cursor pointer style
-                  >
-                    {option.label}
-                  </Box>
-                )}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    sx={{ backgroundColor: "#fff" }}
-                    placeholder="Job Template"
-                    variant="outlined"
-                    size="small"
-                  />
-                )}
-                sx={{ width: "100%", marginTop: "8px" }}
-                clearOnEscape // Enable clearable functionality
-              />
-            </Box>
+            <div className="mx-1">
+              <label className={labelCls}>Template</label>
+              <select
+                className={inputCls + " mt-1"}
+                value={selectInvoiceTemp?.value || ""}
+                onChange={(e) => {
+                  const opt = invoiceoptions.find(o => o.value === e.target.value);
+                  handleInvoiceTempChange(null, opt || null);
+                }}
+              >
+                <option value="">Job Template</option>
+                {invoiceoptions.map(o => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
+                ))}
+              </select>
+            </div>
 
-            <Box m={1}>
-              <InputLabel sx={{ color: "black" }}>Subject</InputLabel>
-              <TextField
-                sx={{ mt: 2 }}
-                fullWidth
+            <div className="mx-1">
+              <label className={labelCls}>Subject</label>
+              <input
+                className={inputCls + " mt-1" + (inputTextError ? " border-destructive" : "")}
                 name="subject"
                 value={inputText + selectedShortcut}
                 onChange={handlechatsubject}
                 placeholder="Subject"
-                size="small"
-                error={!!inputTextError}
               />
-            </Box>
+            </div>
 
-            <Box m={1}>
-              <Button
-                variant="contained"
-                color="primary"
+            <div className="mx-1 relative" ref={shortcodeRef}>
+              <button
+                type="button"
                 onClick={toggleDropdown}
-                // sx={{ mt: 2 }}
-                sx={{
-                  backgroundColor: "var(--color-save-btn)", // Normal background
-
-                  "&:hover": {
-                    backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                  },
-                  borderRadius: "15px",
-                  mt: 2,
-                }}
+                className="rounded-full px-4 py-1.5 text-sm font-medium text-white bg-primary hover:bg-primary/90 transition-colors"
               >
                 Add Shortcode
-              </Button>
+              </button>
 
-              <Popover
-                open={showDropdown}
-                anchorEl={anchorEl}
-                onClose={handleCloseDropdown}
-                anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "left",
-                }}
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "left",
-                }}
-              >
-                <Box>
-                  <List
-                    className="dropdown-list"
-                    sx={{ width: "300px", height: "300px", cursor: "pointer" }}
-                  >
-                    {filteredShortcuts.map((shortcut, index) => (
-                      <ListItem
-                        key={index}
-                        onClick={() => handleAddShortcut(shortcut.value)}
-                      >
-                        <ListItemText
-                          primary={shortcut.title}
-                          primaryTypographyProps={{
-                            style: {
-                              fontWeight: shortcut.isBold ? "bold" : "normal",
-                            },
-                          }}
-                        />
-                      </ListItem>
-                    ))}
-                  </List>
-                </Box>
-              </Popover>
-            </Box>
+              {showDropdown && (
+                <div className="absolute left-0 top-full mt-1 z-50 w-[300px] max-h-[300px] overflow-y-auto bg-card border border-border rounded-lg shadow-lg">
+                  {filteredShortcuts.map((shortcut, index) => (
+                    <div
+                      key={index}
+                      onClick={() => handleAddShortcut(shortcut.value)}
+                      className={`px-4 py-2 text-sm cursor-pointer hover:bg-muted ${
+                        shortcut.isBold ? "font-bold text-foreground" : "font-normal text-muted-foreground"
+                      }`}
+                    >
+                      {shortcut.title}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
-            <Box sx={{ m: 1 }}>
+            <div className="mx-1">
               <EditorShortcodes
                 initialContent={description}
                 onChange={handleEditorChange}
               />
-            </Box>
+            </div>
 
-            <Box mt={5}>
-              <Box display={"flex"} alignItems={"center"}>
-                <Box>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={absoluteDate}
-                        onChange={(event) =>
-                          handleAbsolutesDates(event.target.checked)
-                        }
-                        color="primary"
-                      />
-                    }
+            <div className="mt-5">
+              <div className="flex items-center gap-3">
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={absoluteDate}
+                    onChange={(e) => handleAbsolutesDates(e.target.checked)}
+                    className="sr-only peer"
                   />
-                </Box>
-                <Typography variant="h6">Send reminders to clients</Typography>
-              </Box>
+                  <div className="w-10 h-5 bg-muted rounded-full peer peer-checked:bg-primary transition-colors after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5" />
+                </label>
+                <span className="text-base font-semibold text-foreground">Send reminders to clients</span>
+              </div>
               {absoluteDate && (
-                <Box mb={3}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 3,
-                      mt: 2,
-                      m: 1,
-                    }}
-                  >
-                    <Box>
-                      <InputLabel sx={{ color: "black" }}>
-                        Days until next reminder
-                      </InputLabel>
-                      <TextField
-                        // margin="normal"
-                        fullWidth
-                        name="Daysuntilnextreminder"
-                        value={daysuntilNextReminder}
-                        onChange={(e) =>
-                          setDaysuntilNextReminder(e.target.value)
-                        }
-                        placeholder="Days until next reminder"
-                        size="small"
-                        sx={{ mt: 2 }}
-                      />
-                    </Box>
-
-                    <Box>
-                      <InputLabel sx={{ color: "black" }}>
-                        No Of reminders
-                      </InputLabel>
-                      <TextField
-                        fullWidth
-                        name="No Of reminders"
-                        value={noOfReminder}
-                        onChange={(e) => setNoOfReminder(e.target.value)}
-                        placeholder="NoOfreminders"
-                        size="small"
-                        sx={{ mt: 2 }}
-                      />
-                    </Box>
-                  </Box>
-                </Box>
+                <div className="flex items-center gap-4 mt-3 mx-1">
+                  <div className="flex-1">
+                    <label className={labelCls}>Days until next reminder</label>
+                    <input
+                      className={inputCls + " mt-1"}
+                      name="Daysuntilnextreminder"
+                      value={daysuntilNextReminder}
+                      onChange={(e) => setDaysuntilNextReminder(e.target.value)}
+                      placeholder="Days until next reminder"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className={labelCls}>No Of reminders</label>
+                    <input
+                      className={inputCls + " mt-1"}
+                      name="No Of reminders"
+                      value={noOfReminder}
+                      onChange={(e) => setNoOfReminder(e.target.value)}
+                      placeholder="No of reminders"
+                    />
+                  </div>
+                </div>
               )}
-            </Box>
+            </div>
 
             {/* <DragDropContext onDragEnd={handleDragEnd}>
               <Box
@@ -823,131 +708,87 @@ useEffect(() => {
                 )}
               </Droppable>
             </DragDropContext> */}
-             <DragDropContext onDragEnd={handleDragEnd}>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            m: 2,
-                          }}
-                        >
-                          <Typography variant="h6">Client tasks</Typography>
-                          <Box
-                            sx={{ cursor: "pointer" }}
-                            onClick={handleAddSubtask}
-                            style={{ margin: "10px", color: "#1976d3" }}
-                          >
-                            <FiPlusCircle /> Add Subtasks
-                          </Box>
-                        </Box>
-            
-                        <Droppable droppableId="subtaskList">
-                          {(provided) => (
-                            <div
-                              className="subtask-input"
-                              {...provided.droppableProps}
-                              ref={provided.innerRef}
-                            >
-                              {(subtasks.length > 0
-                                ? subtasks
-                                : []
-                              ).map((subtask, index) => (
-                                <Draggable
-                                  key={subtask.id}
-                                  draggableId={subtask.id}
-                                  index={index}
-                                >
-                                  {(provided) => (
-                                    <div
-                                      ref={provided.innerRef}
-                                      {...provided.draggableProps}
-                                      {...provided.dragHandleProps}
-                                    >
-                                      <Box
-                                        display="flex"
-                                        gap="30px"
-                                        alignItems="center"
-                                        m={1}
-                                      >
-                                        <Checkbox
-                                          style={{ cursor: "pointer" }}
-                                          checked={checkedSubtasks.includes(subtask.id)}
-                                          onChange={() =>
-                                            handleCheckboxChange(
-                                              subtask.id,
-                                              subtask.checked
-                                            )
-                                          }
-                                        />
-                                        <TextField
-                                          placeholder="Things To do"
-                                          value={subtask.text}
-                                          size="small"
-                                          margin="normal"
-                                          fullWidth
-                                          onChange={(e) =>
-                                            handleInputChange(subtask.id, e.target.value)
-                                          }
-                                          variant="outlined"
-                                        />
-                                        <IconButton
-                                          onClick={() => handleDeleteSubtask(subtask.id)}
-                                          style={{ cursor: "pointer" }}
-                                        >
-                                          <RiDeleteBin6Line />
-                                        </IconButton>
-                                        <IconButton style={{ cursor: "move" }}>
-                                          <PiDotsSixVerticalBold />
-                                        </IconButton>
-                                      </Box>
-                                    </div>
-                                  )}
-                                </Draggable>
-                              ))}
-            
-                              {provided.placeholder}
-                            </div>
-                          )}
-                        </Droppable>
-                      </DragDropContext>
-          </Box>
-        </Box>
-        <Box mt={2} sx={{ display: "flex", alignItems: "center", gap: 2,ml:2 }}>
-            <Button
-              variant="contained"
-              sx={{
-                backgroundColor: "var(--color-save-btn)", // Normal background
+            <DragDropContext onDragEnd={handleDragEnd}>
+              <div className="flex items-center justify-between mx-2 my-2">
+                <span className="text-base font-semibold text-foreground">Client tasks</span>
+                <button
+                  type="button"
+                  onClick={handleAddSubtask}
+                  className="flex items-center gap-1 text-sm text-primary hover:text-primary/80 cursor-pointer"
+                >
+                  <FiPlusCircle /> Add Subtasks
+                </button>
+              </div>
 
-                "&:hover": {
-                  backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                },
-                borderRadius: "15px",
-              }}
-              onClick={saveChat}
-            >
-              Create Chat
-            </Button>
-            <Button
-              onClick={handleClose}
-              variant="outlined"
-              sx={{
-                borderColor: "var(--color-border-cancel-btn)", // Normal background
-                color: "var(--color-save-btn)",
-                "&:hover": {
-                  backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                  color: "#fff",
-                  border: "none",
-                },
-                width: "80px",
-                borderRadius: "15px",
-              }}
-              
-            >
-              Cancel
-            </Button>
-          </Box>
-      </Box>
+              <Droppable droppableId="subtaskList">
+                {(provided) => (
+                  <div
+                    className="subtask-input"
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                  >
+                    {(subtasks.length > 0 ? subtasks : []).map((subtask, index) => (
+                      <Draggable key={subtask.id} draggableId={subtask.id} index={index}>
+                        {(provided) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                          >
+                            <div className="flex items-center gap-4 mx-1 my-1">
+                              <input
+                                type="checkbox"
+                                className="h-4 w-4 accent-primary cursor-pointer shrink-0"
+                                checked={checkedSubtasks.includes(subtask.id)}
+                                onChange={() => handleCheckboxChange(subtask.id, subtask.checked)}
+                              />
+                              <input
+                                className={inputCls}
+                                placeholder="Things To do"
+                                value={subtask.text}
+                                onChange={(e) => handleInputChange(subtask.id, e.target.value)}
+                              />
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteSubtask(subtask.id)}
+                                className="text-muted-foreground hover:text-destructive cursor-pointer shrink-0"
+                              >
+                                <RiDeleteBin6Line size={16} />
+                              </button>
+                              <span className="text-muted-foreground cursor-move shrink-0">
+                                <PiDotsSixVerticalBold size={16} />
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
+
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 px-4 py-3 border-t border-border">
+          <button
+            type="button"
+            onClick={saveChat}
+            className="rounded-full px-5 py-1.5 text-sm font-medium text-white bg-primary hover:bg-primary/90 transition-colors"
+          >
+            Create Chat
+          </button>
+          <button
+            type="button"
+            onClick={handleClose}
+            className="rounded-full px-5 py-1.5 text-sm font-medium border border-border text-primary hover:bg-primary hover:text-white hover:border-transparent transition-colors"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
     </>
   );
 };

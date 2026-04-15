@@ -1335,8 +1335,8 @@ const fetchInvoiceData = async () => {
         <Button
           type="button"
           onClick={handleOpen}
-          className="rounded-full px-5"
-          style={{ backgroundColor: "var(--color-save-btn)" }}
+          className="rounded-full px-5
+          bg-primary text-white hover:bg-primary/90"
         >
           Create Invoice
         </Button>
@@ -1358,20 +1358,20 @@ const fetchInvoiceData = async () => {
             ) : billingInvoice.map((row) => (
               <tr key={row._id} className="border-b hover:bg-muted/30 transition-colors">
                 <td className="px-4 py-3">
-                  <span className="text-sm text-indigo-600 cursor-pointer hover:underline font-medium" onClick={() => handleAccountDash(row._id, row.account._id)}>
+                  <span className="text-sm text-primary cursor-pointer hover:underline font-medium" onClick={() => handleAccountDash(row._id, row.account._id)}>
                     {row.account.accountName}
                   </span>
                 </td>
                 <td className="px-4 py-3">
-                  <span className="text-sm text-indigo-600 cursor-pointer hover:underline font-medium" onClick={() => handleEdit(row._id)}>
+                  <span className="text-sm text-primary cursor-pointer hover:underline font-medium" onClick={() => handleEdit(row._id)}>
                     {row.invoicenumber}
                   </span>
                 </td>
                 <td className="px-4 py-3">
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
-                    row.invoiceStatus === "Paid" ? "bg-green-50 text-green-700 border-green-200" :
-                    row.invoiceStatus === "Overdue" ? "bg-red-50 text-red-700 border-red-200" :
-                    "bg-yellow-50 text-yellow-700 border-yellow-200"
+                    row.invoiceStatus === "Paid" ? "bg-success/10 text-success border-success/20" :
+                    row.invoiceStatus === "Overdue" ? "bg-destructive/10 text-destructive border-destructive/20" :
+                    "bg-warning/10 text-warning border-warning/20"
                   }`}>{row.invoiceStatus}</span>
                 </td>
                 <td className="px-4 py-3 text-sm text-muted-foreground">
@@ -1408,7 +1408,7 @@ const fetchInvoiceData = async () => {
             <div className="flex items-center justify-between px-5 py-4 border-b border-border">
               <h2 className="text-lg font-semibold text-foreground">Create Invoice</h2>
               <div className="flex items-center gap-3">
-                <button onClick={handleOpenpreviewDrawer} className="flex items-center gap-1.5 text-sm text-indigo-600 hover:text-indigo-800 transition-colors">
+                <button onClick={handleOpenpreviewDrawer} className="flex items-center gap-1.5 text-sm text-primary hover:text-primary/80 transition-colors">
                   <FileText className="h-4 w-4" /> Preview
                 </button>
                 <button onClick={handleClose} className="text-muted-foreground hover:text-foreground transition-colors">
@@ -1605,7 +1605,7 @@ const fetchInvoiceData = async () => {
                           </td>
                           <td className="px-3 py-2 text-sm font-medium">{row.amount}</td>
                           <td className="px-3 py-2">
-                            <input type="checkbox" name="tax" checked={row.tax} onChange={(e) => handleInputChange(index, e)} className="w-4 h-4 accent-indigo-600" />
+                            <input type="checkbox" name="tax" checked={row.tax} onChange={(e) => handleInputChange(index, e)} className="w-4 h-4 accent-primary" />
                           </td>
                           <td className="px-3 py-2">
                             <div className="relative">
@@ -1630,10 +1630,10 @@ const fetchInvoiceData = async () => {
 
                 {/* Add row buttons */}
                 <div className="flex items-center gap-5">
-                  <button onClick={() => addRow()} className="flex items-center gap-1.5 text-sm text-indigo-600 hover:text-indigo-800 transition-colors">
+                  <button onClick={() => addRow()} className="flex items-center gap-1.5 text-sm text-primary hover:text-primary/80 transition-colors">
                     <Plus className="h-4 w-4" /> Line item
                   </button>
-                  <button onClick={() => addRow(true)} className="flex items-center gap-1.5 text-sm text-indigo-600 hover:text-indigo-800 transition-colors">
+                  <button onClick={() => addRow(true)} className="flex items-center gap-1.5 text-sm text-primary hover:text-primary/80 transition-colors">
                     <Percent className="h-4 w-4" /> Discount
                   </button>
                 </div>
@@ -1672,7 +1672,7 @@ const fetchInvoiceData = async () => {
 
             {/* Drawer Footer */}
             <div className="flex items-center gap-3 px-5 py-4 border-t border-border">
-              <Button onClick={createinvoice} className="rounded-full px-5" style={{ backgroundColor: "var(--color-save-btn)" }}>Save</Button>
+              <Button onClick={createinvoice} className="rounded-full px-5 bg-primary text-white hover:bg-primary/90">Save</Button>
               <Button onClick={handleClose} variant="outline" className="rounded-full px-5">Cancel</Button>
             </div>
           </div>
@@ -1689,7 +1689,7 @@ const fetchInvoiceData = async () => {
               <button onClick={handleClosepreviewDrawer} className="text-muted-foreground hover:text-foreground"><X className="h-5 w-5" /></button>
             </div>
             <div className="p-6 space-y-4">
-              <h2 className="text-2xl font-bold text-orange-500">Invoice</h2>
+              <h2 className="text-2xl font-bold text-primary">Invoice</h2>
               <div className="flex items-center justify-between">
                 <span className="text-sm">{selectedaccount?.label || "[ACCOUNT NAME]"}</span>
                 <span className="text-sm text-muted-foreground">Invoice number: <span className="text-foreground font-medium">{invoicenumber || "[INVOICE_NUMBER]"}</span></span>
@@ -1702,7 +1702,7 @@ const fetchInvoiceData = async () => {
               <div className="rounded-xl border border-border overflow-hidden mt-4">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b bg-orange-50">
+                    <tr className="border-b bg-muted">
                       {["Product/Service", "Description", "Rate ($)", "Qty", "Amount"].map(h => (
                         <th key={h} className="text-xs font-semibold text-left px-4 py-3">{h}</th>
                       ))}
@@ -1730,7 +1730,7 @@ const fetchInvoiceData = async () => {
               </div>
             </div>
             <div className="flex items-center gap-3 px-6 py-4 border-t border-border">
-              <Button onClick={createinvoice} className="rounded-full px-5" style={{ backgroundColor: "var(--color-save-btn)" }}>Save &amp; Exit</Button>
+              <Button onClick={createinvoice} className="rounded-full px-5 bg-primary text-white hover:bg-primary/90">Save &amp; Exit</Button>
             </div>
           </div>
         </div>
@@ -1784,7 +1784,7 @@ const fetchInvoiceData = async () => {
               </div>
             </div>
             <div className="flex items-center gap-3 px-5 py-4 border-t border-border">
-              <Button onClick={createservicetemp} className="rounded-full px-5" style={{ backgroundColor: "var(--color-save-btn)" }}>Save</Button>
+              <Button onClick={createservicetemp} className="rounded-full px-5 bg-primary text-white hover:bg-primary/90">Save</Button>
               <Button onClick={handleNewDrawerClose} variant="outline" className="rounded-full px-5">Cancel</Button>
             </div>
           </div>
@@ -1808,7 +1808,7 @@ const fetchInvoiceData = async () => {
               </div>
             </div>
             <div className="flex items-center gap-3 px-5 py-4 border-t border-border">
-              <Button onClick={createCategory} className="rounded-full px-5" style={{ backgroundColor: "var(--color-save-btn)" }}>Create</Button>
+              <Button onClick={createCategory} className="rounded-full px-5 bg-primary text-white hover:bg-primary/90">Create</Button>
               <Button onClick={handleCategoryFormClose} variant="outline" className="rounded-full px-5">Cancel</Button>
             </div>
           </div>
@@ -1853,7 +1853,7 @@ const fetchInvoiceData = async () => {
               </label>
             </div>
             <div className="flex items-center gap-3 px-5 py-4 border-t border-border">
-              <Button onClick={handleSaveChanges} className="rounded-full px-5" style={{ backgroundColor: "var(--color-save-btn)" }}>Save</Button>
+              <Button onClick={handleSaveChanges} className="rounded-full px-5 bg-primary text-white hover:bg-primary/90">Save</Button>
               <Button onClick={handleEditDrawerClose} variant="outline" className="rounded-full px-5">Cancel</Button>
             </div>
           </div>

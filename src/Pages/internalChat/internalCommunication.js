@@ -346,8 +346,7 @@ const InternalCommunication = () => {
         <h1 className="text-2xl font-bold tracking-tight text-foreground">Communications</h1>
         <Button
           onClick={() => setOpen(true)}
-          className="rounded-full px-5"
-          style={{ backgroundColor: "var(--color-save-btn)" }}
+          className="rounded-full px-5 bg-primary text-white hover:bg-primary/90"
         >
           New Communication
         </Button>
@@ -364,8 +363,7 @@ const InternalCommunication = () => {
           </div>
           <Button
             onClick={() => setOpen(true)}
-            className="rounded-full px-5 mt-2"
-            style={{ backgroundColor: "var(--color-save-btn)" }}
+            className="rounded-full px-5 mt-2 bg-primary text-white hover:bg-primary/90"
           >
             Create New Communication
           </Button>
@@ -386,7 +384,7 @@ const InternalCommunication = () => {
                   key={index}
                   onClick={() => handleShowChat(chat._id)}
                   className={`cursor-pointer rounded-lg border p-3 transition-colors hover:bg-muted/60 ${
-                    isSelected ? "bg-muted border-indigo-300" : "bg-background border-border"
+                    isSelected ? "bg-muted border-primary/30" : "bg-background border-border"
                   }`}
                 >
                   <div className="flex items-center justify-between mb-1">
@@ -395,7 +393,7 @@ const InternalCommunication = () => {
                     </span>
                     <div className="flex items-center gap-2">
                       {unreadCount > 0 && (
-                        <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-green-500 text-white text-[10px] font-bold">
+                        <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-success text-white text-[10px] font-bold">
                           {unreadCount}
                         </span>
                       )}

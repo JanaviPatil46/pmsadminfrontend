@@ -1581,11 +1581,8 @@ const cleanSubjectText = (subject = "") => {
         href={buildAccountLink(mongoId)}
         target="_blank"
         rel="noopener noreferrer"
-        style={{
-          color: "#2f3fd3",
-          fontWeight: isBold ? "bold" : "normal",
-          textDecoration: "none",
-        }}
+        className="text-primary font-medium no-underline"
+        style={{ fontWeight: isBold ? "bold" : "normal" }}
       >
         {text}
       </a>
@@ -1596,33 +1593,36 @@ const cleanSubjectText = (subject = "") => {
 
   return (
     <>
-      <div style={{ display: "flex", height: "100%", overflow: "hidden", backgroundColor: "#fff" }}>
+      <div className="flex h-full overflow-hidden bg-card">
 
         {/* ── LEFT: Thread list panel ── */}
-        <div style={{ width: 340, minWidth: 340, display: "flex", flexDirection: "column", borderRight: "1px solid #f0f0f0", height: "100%", overflow: "hidden" }}>
+        <div style={{ width: 340, minWidth: 340 }} className="flex flex-col border-r border-border h-full overflow-hidden">
 
           {/* Search + tabs + filter header */}
-          <div style={{ padding: "12px 12px 10px", borderBottom: "1px solid #f0f0f0", flexShrink: 0 }}>
+          <div style={{ padding: "12px 12px 10px", flexShrink: 0 }} className="border-b border-border">
             <div style={{ position: "relative", marginBottom: 8 }}>
-              <Search size={13} style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "#bbb", pointerEvents: "none" }} />
+              <Search size={13} style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }} className="text-muted-foreground" />
               <Input
                 placeholder="Search emails"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                style={{ paddingLeft: 30, height: 32, fontSize: 12, borderRadius: 8, border: "1px solid #eee", backgroundColor: "#fafafa" }}
+                style={{ paddingLeft: 30, height: 32, fontSize: 12, borderRadius: 8 }}
+                className="border-border bg-muted/40"
               />
             </div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <div style={{ display: "flex", gap: 2 }}>
                 <button
                   onClick={() => setTab(0)}
-                  style={{ padding: "3px 14px", borderRadius: 20, fontSize: 11.5, fontWeight: 500, border: "none", cursor: "pointer", backgroundColor: tab === 0 ? "#00ACC1" : "transparent", color: tab === 0 ? "#fff" : "#666", transition: "all 0.2s" }}
+                  style={{ padding: "3px 14px", borderRadius: 20, fontSize: 11.5, fontWeight: 500, border: "none", cursor: "pointer", transition: "all 0.2s" }}
+                  className={tab === 0 ? "bg-primary text-white" : "bg-transparent text-muted-foreground"}
                 >
                   Inbox
                 </button>
                 <button
                   onClick={() => setTab(1)}
-                  style={{ padding: "3px 14px", borderRadius: 20, fontSize: 11.5, fontWeight: 500, border: "none", cursor: "pointer", backgroundColor: tab === 1 ? "#00ACC1" : "transparent", color: tab === 1 ? "#fff" : "#666", transition: "all 0.2s" }}
+                  style={{ padding: "3px 14px", borderRadius: 20, fontSize: 11.5, fontWeight: 500, border: "none", cursor: "pointer", transition: "all 0.2s" }}
+                  className={tab === 1 ? "bg-primary text-white" : "bg-transparent text-muted-foreground"}
                 >
                   Archived
                 </button>
@@ -1630,7 +1630,7 @@ const cleanSubjectText = (subject = "") => {
               <ShadButton
                 variant="ghost"
                 size="sm"
-                className="h-7 w-7 p-0 rounded-lg text-gray-400 hover:text-[#00ACC1] hover:bg-[rgba(0,172,193,0.08)]"
+                className="h-7 w-7 p-0 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10"
                 onClick={toggleFilterDrawer(true)}
               >
                 <SlidersHorizontal size={14} />
@@ -1641,8 +1641,8 @@ const cleanSubjectText = (subject = "") => {
           {/* Thread list */}
           <div style={{ flex: 1, overflowY: "auto" }}>
             {filteredThreads.length === 0 ? (
-              <div style={{ padding: 32, textAlign: "center", color: "#bbb", fontSize: 13 }}>
-                <Mail size={32} style={{ margin: "0 auto 10px", opacity: 0.25, display: "block" }} />
+              <div className="text-muted-foreground text-[13px] text-center" style={{ padding: 32 }}>
+                <Mail size={32} className="mx-auto mb-2.5 block opacity-25" />
                 No emails found
               </div>
             ) : (
@@ -1663,13 +1663,13 @@ const cleanSubjectText = (subject = "") => {
                       gap: 11,
                       padding: "12px 14px 12px 11px",
                       cursor: "pointer",
-                      borderBottom: "1px solid #f4f4f5",
-                      borderLeft: isSelected ? "3px solid #00ACC1" : "3px solid transparent",
-                      backgroundColor: isSelected ? "rgba(0,172,193,0.06)" : "transparent",
+                      borderBottom: "1px solid hsl(var(--border))",
+                      borderLeft: isSelected ? "3px solid hsl(var(--primary))" : "3px solid transparent",
+                      backgroundColor: isSelected ? "hsl(var(--primary) / 0.06)" : "transparent",
                       transition: "background 0.15s ease",
                     }}
-                    onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.backgroundColor = "#f9fafb"; }}
-                    onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.backgroundColor = isSelected ? "rgba(0,172,193,0.06)" : "transparent"; }}
+                    onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.backgroundColor = "hsl(var(--muted))"; }}
+                    onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.backgroundColor = isSelected ? "hsl(var(--primary) / 0.06)" : "transparent"; }}
                   >
                     <ShadAvatar className="h-8 w-8 shrink-0 mt-0.5">
                       <AvatarFallback style={{ backgroundColor: avatarBg, color: "#fff", fontSize: "0.6rem", fontWeight: 700, letterSpacing: "0.02em" }}>
@@ -1679,23 +1679,23 @@ const cleanSubjectText = (subject = "") => {
 
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 3 }}>
-                        <span style={{ fontSize: 13, fontWeight: isUnread ? 700 : 500, color: "#111827", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 170 }}>
+                        <span style={{ fontSize: 13, fontWeight: isUnread ? 700 : 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 170 }} className="text-foreground">
                           {latest?.from?.replace(/<.*?>/g, "").trim() || "Unknown"}
                         </span>
-                        <span style={{ fontSize: 11, color: isUnread ? "#00ACC1" : "#9ca3af", flexShrink: 0, marginLeft: 6, fontWeight: isUnread ? 600 : 400 }}>
+                        <span style={{ fontSize: 11, flexShrink: 0, marginLeft: 6, fontWeight: isUnread ? 600 : 400 }} className={isUnread ? "text-primary" : "text-muted-foreground"}>
                           {getRelativeTime(latest?.createdAt)}
                         </span>
                       </div>
-                      <div style={{ fontSize: 12.5, fontWeight: isUnread ? 600 : 400, color: isUnread ? "#1f2937" : "#4b5563", marginBottom: 3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      <div style={{ fontSize: 12.5, fontWeight: isUnread ? 600 : 400, marginBottom: 3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} className={isUnread ? "text-foreground" : "text-muted-foreground"}>
                         {cleanSubjectText(latest?.subject || "") || "(No Subject)"}
                       </div>
-                      <div style={{ fontSize: 11.5, color: "#9ca3af", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", lineHeight: 1.3 }}>
+                      <div style={{ fontSize: 11.5, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", lineHeight: 1.3 }} className="text-muted-foreground">
                         {getPreview(latest?.body || "").slice(0, 65)}
                       </div>
                     </div>
 
                     {isUnread && (
-                      <div style={{ width: 6, height: 6, borderRadius: "50%", backgroundColor: "#00ACC1", flexShrink: 0, marginTop: 7 }} />
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary shrink-0 mt-[7px]" />
                     )}
                   </div>
                 );
@@ -1705,12 +1705,12 @@ const cleanSubjectText = (subject = "") => {
         </div>
 
         {/* ── RIGHT: Thread reader panel ── */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "100%", overflow: "hidden", backgroundColor: "#fff" }}>
+        <div className="flex flex-col flex-1 h-full overflow-hidden bg-card">
           {selectedThread ? (
             <>
               {/* Subject header + action buttons */}
-              <div style={{ padding: "16px 22px 12px", borderBottom: "1px solid #f0f0f0", display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexShrink: 0 }}>
-                <h2 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#1a1a1a", margin: 0, flex: 1, marginRight: 16, lineHeight: 1.4 }}>
+              <div style={{ padding: "16px 22px 12px", flexShrink: 0 }} className="border-b border-border flex justify-between items-start">
+                <h2 style={{ fontSize: "1.05rem", fontWeight: 700, margin: 0, flex: 1, marginRight: 16, lineHeight: 1.4 }} className="text-foreground">
                   {renderLinkedSubject(selectedThread.latest?.subject, true)}
                 </h2>
                 <div style={{ display: "flex", gap: 4, alignItems: "center", flexShrink: 0 }}>
@@ -1718,7 +1718,7 @@ const cleanSubjectText = (subject = "") => {
                     <ShadButton
                       variant="ghost"
                       size="sm"
-                      className="h-8 px-2 text-xs rounded-lg gap-1.5 text-gray-500 hover:text-[#00ACC1] hover:bg-[rgba(0,172,193,0.07)]"
+                      className="h-8 px-2 text-xs rounded-lg gap-1.5 text-muted-foreground hover:text-primary hover:bg-primary/10"
                       onClick={(e) => { e.stopPropagation(); markThreadAsRead(expandedThreadId); }}
                     >
                       <CheckCheck size={14} />
@@ -1728,7 +1728,7 @@ const cleanSubjectText = (subject = "") => {
                   <ShadButton
                     variant="ghost"
                     size="sm"
-                    className="h-8 px-2 text-xs rounded-lg gap-1.5 text-gray-500 hover:bg-gray-100"
+                    className="h-8 px-2 text-xs rounded-lg gap-1.5 text-muted-foreground hover:bg-muted"
                     onClick={(e) => { e.stopPropagation(); archiveThread(expandedThreadId, !selectedThread.latest?.archived); }}
                   >
                     {selectedThread.latest?.archived
@@ -1739,7 +1739,7 @@ const cleanSubjectText = (subject = "") => {
                   <ShadButton
                     variant="ghost"
                     size="sm"
-                    className="h-8 w-8 p-0 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                    className="h-8 w-8 p-0 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted"
                     onClick={() => handleExpandThread(expandedThreadId)}
                   >
                     <X size={15} />
@@ -1763,7 +1763,7 @@ const cleanSubjectText = (subject = "") => {
                     const emailInitials = getInitialsFromStr(email.from || "");
 
                     return (
-                      <div key={email.messageId} style={{ padding: "4px 0", borderBottom: idx < arr.length - 1 ? "1px solid #f3f4f6" : "none" }}>
+                      <div key={email.messageId} style={{ padding: "4px 0", borderBottom: idx < arr.length - 1 ? "1px solid hsl(var(--border))" : "none" }}>
                         {/* Message header — always visible */}
                         <div
                           onClick={() => handleExpandMessage(email.messageId)}
@@ -1776,7 +1776,7 @@ const cleanSubjectText = (subject = "") => {
                             borderRadius: 8,
                             transition: "background 0.12s",
                           }}
-                          onMouseEnter={(e) => { if (!isExpanded) e.currentTarget.style.backgroundColor = "#f9fafb"; }}
+                          onMouseEnter={(e) => { if (!isExpanded) e.currentTarget.style.backgroundColor = "hsl(var(--muted))"; }}
                           onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "transparent"; }}
                         >
                           <ShadAvatar className="h-8 w-8 shrink-0 mt-0.5">
@@ -1786,11 +1786,11 @@ const cleanSubjectText = (subject = "") => {
                           </ShadAvatar>
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
-                              <span style={{ fontSize: 13.5, fontWeight: 600, color: "#111827" }}>
+                              <span style={{ fontSize: 13.5, fontWeight: 600 }} className="text-foreground">
                                 {email.from?.replace(/<.*?>/g, "").trim()}
                               </span>
                               <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0, marginLeft: 10 }}>
-                                <span style={{ fontSize: 11, color: "#9ca3af" }}>
+                                <span style={{ fontSize: 11 }} className="text-muted-foreground">
                                   {new Date(email.createdAt).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}
                                 </span>
                                 {isExpanded
@@ -1800,7 +1800,7 @@ const cleanSubjectText = (subject = "") => {
                               </div>
                             </div>
                             {!isExpanded && (
-                              <p style={{ fontSize: 12.5, color: "#6b7280", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                              <p style={{ fontSize: 12.5, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} className="text-muted-foreground">
                                 {getPreview(email.body || "").slice(0, 130)}
                               </p>
                             )}
@@ -1809,21 +1809,22 @@ const cleanSubjectText = (subject = "") => {
 
                         {/* Expanded body — card wrapper */}
                         {isExpanded && (
-                          <div style={{ marginLeft: 44, marginBottom: 12, backgroundColor: "#f9fafb", borderRadius: 10, border: "1px solid #f0f0f0", padding: "16px 18px" }}>
+                          <div style={{ marginLeft: 44, marginBottom: 12, borderRadius: 10, padding: "16px 18px" }} className="bg-muted/40 border border-border">
                             {email.subject && hasMongoIdTag(email.subject) && (
                               <div style={{ marginBottom: 10, fontSize: 12.5, fontWeight: 600 }}>
                                 {renderLinkedSubject(email.subject, true)}
                               </div>
                             )}
                             <div
-                              style={{ fontSize: 14, color: "#374151", lineHeight: 1.8, wordBreak: "break-word" }}
+                              style={{ fontSize: 14, lineHeight: 1.8, wordBreak: "break-word" }}
+                              className="text-foreground"
                               dangerouslySetInnerHTML={{ __html: email.body }}
                             />
 
                             {/* Attachments */}
                             {email.attachments?.length > 0 && (
-                              <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid #e5e7eb" }}>
-                                <p style={{ fontSize: 11.5, fontWeight: 600, color: "#6b7280", marginBottom: 10, display: "flex", alignItems: "center", gap: 5, textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                              <div style={{ marginTop: 16, paddingTop: 14 }} className="border-t border-border">
+                                <p style={{ fontSize: 11.5, fontWeight: 600, marginBottom: 10, display: "flex", alignItems: "center", gap: 5, textTransform: "uppercase", letterSpacing: "0.04em" }} className="text-muted-foreground">
                                   <Paperclip size={11} />
                                   {email.attachments.length} attachment{email.attachments.length > 1 ? "s" : ""}
                                 </p>
@@ -1832,14 +1833,15 @@ const cleanSubjectText = (subject = "") => {
                                     <div
                                       key={i}
                                       onClick={(e) => { e.stopPropagation(); openAttachment(att); }}
-                                      style={{ border: "1px solid #e5e7eb", borderRadius: 8, padding: "8px 12px", cursor: "pointer", minWidth: 140, backgroundColor: "#fff", transition: "border-color 0.15s, box-shadow 0.15s" }}
-                                      onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#00ACC1"; e.currentTarget.style.boxShadow = "0 0 0 2px rgba(0,172,193,0.1)"; }}
-                                      onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#e5e7eb"; e.currentTarget.style.boxShadow = "none"; }}
+                                      style={{ borderRadius: 8, padding: "8px 12px", cursor: "pointer", minWidth: 140, transition: "border-color 0.15s, box-shadow 0.15s" }}
+                                      className="border border-border bg-card"
+                                      onMouseEnter={(e) => { e.currentTarget.style.borderColor = "hsl(var(--primary))"; e.currentTarget.style.boxShadow = "0 0 0 2px hsl(var(--primary) / 0.1)"; }}
+                                      onMouseLeave={(e) => { e.currentTarget.style.borderColor = "hsl(var(--border))"; e.currentTarget.style.boxShadow = "none"; }}
                                     >
-                                      <p style={{ fontSize: 12, fontWeight: 600, color: "#374151", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                      <p style={{ fontSize: 12, fontWeight: 600, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} className="text-foreground">
                                         {att.filename}
                                       </p>
-                                      <p style={{ fontSize: 11, color: "#9ca3af", margin: "3px 0 0" }}>
+                                      <p style={{ fontSize: 11, margin: "3px 0 0" }} className="text-muted-foreground">
                                         {Math.round((att.data.length * 3) / 4 / 1024)} KB
                                       </p>
                                     </div>
@@ -1855,9 +1857,9 @@ const cleanSubjectText = (subject = "") => {
               </div>
             </>
           ) : (
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-              <Mail size={40} style={{ color: "#ddd", marginBottom: 12 }} />
-              <p style={{ fontSize: 13, color: "#bbb", margin: 0 }}>Select an email to read</p>
+            <div className="flex flex-col flex-1 items-center justify-center">
+              <Mail size={40} className="text-muted-foreground/30 mb-3" />
+              <p className="text-sm text-muted-foreground" style={{ margin: 0 }}>Select an email to read</p>
             </div>
           )}
         </div>
@@ -1867,14 +1869,14 @@ const cleanSubjectText = (subject = "") => {
       {previewFile && (
         <div
           onClick={() => setPreviewFile(null)}
-          style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", backgroundColor: "rgba(0,0,0,0.65)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999 }}
+          className="fixed inset-0 flex items-center justify-center z-[9999] bg-black/65"
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            style={{ width: "85%", height: "90%", backgroundColor: "#fff", borderRadius: 12, overflow: "hidden", display: "flex", flexDirection: "column" }}
+            className="bg-card rounded-xl overflow-hidden flex flex-col" style={{ width: "85%", height: "90%" }}
           >
-            <div style={{ padding: "10px 16px", borderBottom: "1px solid #eee", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
-              <span style={{ fontWeight: 600, fontSize: 13 }}>{previewFile.filename}</span>
+            <div style={{ padding: "10px 16px", flexShrink: 0 }} className="border-b border-border flex justify-between items-center">
+              <span className="font-semibold text-[13px] text-foreground">{previewFile.filename}</span>
               <ShadButton variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => setPreviewFile(null)}>
                 <X size={15} />
               </ShadButton>
@@ -1899,35 +1901,37 @@ const cleanSubjectText = (subject = "") => {
           style={{ width: 300 }}
         >
           <SheetHeader
-            style={{ padding: "14px 20px", borderBottom: "1px solid #f0f0f0", display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}
+            style={{ padding: "14px 20px" }}
+            className="border-b border-border flex flex-row items-center justify-between"
           >
-            <SheetTitle style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.9rem", fontWeight: 600 }}>
-              <SlidersHorizontal size={15} style={{ color: "#00ACC1" }} />
+            <SheetTitle className="flex items-center gap-2 text-[0.9rem] font-semibold">
+              <SlidersHorizontal size={15} className="text-primary" />
               Filters
             </SheetTitle>
-            <ShadButton variant="ghost" size="sm" className="h-7 w-7 p-0 text-gray-400 hover:text-gray-600" onClick={() => setFilterDrawerOpen(false)}>
+            <ShadButton variant="ghost" size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground" onClick={() => setFilterDrawerOpen(false)}>
               <X size={15} />
             </ShadButton>
           </SheetHeader>
 
           <div style={{ flex: 1, overflowY: "auto", padding: "16px 20px" }}>
-            <p style={{ fontSize: 11, fontWeight: 600, color: "#888", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 10 }}>
+            <p style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 10 }} className="text-muted-foreground">
               Email Type
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
               {Object.keys(checkedItems).map((key) => (
                 <label
                   key={key}
-                  style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 10px", borderRadius: 8, cursor: "pointer", fontSize: 13, color: "#333", backgroundColor: checkedItems[key] ? "rgba(0,172,193,0.06)" : "transparent", transition: "background 0.15s" }}
-                  onMouseEnter={(e) => { if (!checkedItems[key]) e.currentTarget.style.backgroundColor = "#fafafa"; }}
-                  onMouseLeave={(e) => { if (!checkedItems[key]) e.currentTarget.style.backgroundColor = checkedItems[key] ? "rgba(0,172,193,0.06)" : "transparent"; }}
+                  style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 10px", borderRadius: 8, cursor: "pointer", fontSize: 13, backgroundColor: checkedItems[key] ? "hsl(var(--primary) / 0.06)" : "transparent", transition: "background 0.15s" }}
+                  className="text-foreground"
+                  onMouseEnter={(e) => { if (!checkedItems[key]) e.currentTarget.style.backgroundColor = "hsl(var(--muted))"; }}
+                  onMouseLeave={(e) => { if (!checkedItems[key]) e.currentTarget.style.backgroundColor = checkedItems[key] ? "hsl(var(--primary) / 0.06)" : "transparent"; }}
                 >
                   <input
                     type="checkbox"
                     name={key}
                     checked={checkedItems[key]}
                     onChange={handleCheckboxChange}
-                    style={{ accentColor: "#00ACC1", width: 14, height: 14, flexShrink: 0 }}
+                    className="accent-primary shrink-0" style={{ width: 14, height: 14 }}
                   />
                   <span style={{ fontWeight: checkedItems[key] ? 600 : 400 }}>
                     {key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, " $1")}
@@ -1937,7 +1941,7 @@ const cleanSubjectText = (subject = "") => {
             </div>
           </div>
 
-          <div style={{ borderTop: "1px solid #f0f0f0", padding: "12px 20px", display: "flex", justifyContent: "flex-end", gap: 8, flexShrink: 0 }}>
+          <div style={{ padding: "12px 20px", flexShrink: 0 }} className="border-t border-border flex justify-end gap-2">
             <ShadButton
               variant="outline"
               size="sm"
@@ -1948,8 +1952,7 @@ const cleanSubjectText = (subject = "") => {
             </ShadButton>
             <ShadButton
               size="sm"
-              className="h-8 px-4 text-xs rounded-lg"
-              style={{ backgroundColor: "#00ACC1", color: "#fff" }}
+              className="h-8 px-4 text-xs rounded-lg bg-primary text-white hover:bg-primary/90"
               onClick={toggleFilterDrawer(false)}
             >
               Apply

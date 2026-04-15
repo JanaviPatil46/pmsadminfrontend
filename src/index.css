@@ -4,39 +4,36 @@
 
 
 :root {
-  --primary: 209 60% 49%;      
+  /* PRIMARY (fix this) */
+  --primary: 239 75% 59%;        /* indigo-500/600 */
   --primary-foreground: 0 0% 100%;
 
-  --background: 210 40% 98%;   
+  /* BACKGROUND */
+  --background: 210 40% 98%;     /* keep (good) */
   --foreground: 222 47% 11%;
 
+  /* CARDS */
   --card: 0 0% 100%;
   --card-foreground: 222 47% 11%;
 
-  --popover: 0 0% 100%;
-  --popover-foreground: 222 47% 11%;
-
-  --secondary: 210 20% 96%;
-  --secondary-foreground: 222 47% 11%;
-
-  --muted: 210 20% 94%;
+  /* MUTED TEXT */
+  --muted: 210 20% 96%;
   --muted-foreground: 215 16% 47%;
 
-  --accent: 210 20% 96%;
-  --accent-foreground: 222 47% 11%;
-
+  /* BORDERS */
   --border: 214 20% 88%;
   --input: 214 20% 88%;
-  --ring: 209 60% 49%;
+
+  /* HOVER FIX */
+  --ring: 239 58% 51%;
+
+  /* KEEP THESE */
+  --secondary: 210 20% 96%;
+  --accent: 210 20% 96%;
 
   --destructive: 0 84% 60%;
-  --destructive-foreground: 0 0% 100%;
-
   --success: 142 71% 48%;
-  --success-foreground: 0 0% 100%;
-
   --warning: 38 92% 50%;
-  --warning-foreground: 0 0% 100%;
 
   --radius: 0.5rem;
 }

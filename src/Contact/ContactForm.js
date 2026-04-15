@@ -235,17 +235,17 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
     const selectedValues = newSelectedTags.map((option) => option.value);
     setCombinedValues(selectedValues);
   };
-  const inputCls = "w-full border border-gray-300 rounded px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-blue-400";
-  const labelCls = "block text-sm font-medium text-gray-700 mb-1";
-  const btnPrimary = "rounded-full px-5 py-1.5 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] transition-colors";
-  const btnOutline = "rounded-full px-5 py-1.5 text-sm font-medium border border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white hover:border-transparent transition-colors";
+  const inputCls = "w-full border border-border rounded px-3 py-1.5 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-primary/40";
+  const labelCls = "block text-sm font-medium text-foreground mb-1";
+  const btnPrimary = "rounded-full px-5 py-1.5 text-sm font-medium text-white bg-primary hover:bg-primary/90 transition-colors";
+  const btnOutline = "rounded-full px-5 py-1.5 text-sm font-medium border border-border text-primary hover:bg-primary hover:text-white hover:border-transparent transition-colors";
 
   return (
     <div>
       {/* Header */}
-      <div className="flex justify-between items-center px-4 py-3 border-b border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-800">New Contact</h2>
-        <RxCross2 onClick={handleNewDrawerClose} className="cursor-pointer text-gray-500 hover:text-gray-800" size={18} />
+      <div className="flex justify-between items-center px-4 py-3 border-b border-border">
+        <h2 className="text-lg font-semibold text-foreground">New Contact</h2>
+        <RxCross2 onClick={handleNewDrawerClose} className="cursor-pointer text-muted-foreground hover:text-foreground" size={18} />
       </div>
 
       <form className="contact-form px-5 py-4 h-[90vh] overflow-y-auto space-y-4">
@@ -341,17 +341,17 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
           />
           {ssnError
             ? <p className="text-red-500 text-xs mt-1">{ssnError}</p>
-            : <p className="text-gray-400 text-xs mt-1">Format: 123-45-6789</p>}
+            : <p className="text-muted-foreground text-xs mt-1">Format: 123-45-6789</p>}
         </div>
 
         {/* Phone Numbers */}
         <div>
-          <h3 className="text-sm font-semibold text-gray-800 mb-2">Phone Numbers</h3>
+          <h3 className="text-sm font-semibold text-foreground mb-2">Phone Numbers</h3>
           <div className="space-y-3">
             {phoneNumbers.map((phone) => (
               <div key={phone.id} className="flex items-center gap-3">
                 {phone.isPrimary && (
-                  <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">Primary</span>
+                  <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">Primary</span>
                 )}
                 <div className="flex-1">
                   <PhoneInput
@@ -368,14 +368,14 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
             ))}
           </div>
           <button type="button" onClick={handleAddPhoneNumber}
-            className="flex items-center gap-2 text-blue-600 text-sm font-medium mt-3 hover:text-blue-800">
+            className="flex items-center gap-2 text-primary text-sm font-medium mt-3 hover:text-primary/80">
             <AiOutlinePlusCircle size={18} /> Add phone number
           </button>
         </div>
 
         {/* Address */}
         <div>
-          <h3 className="text-sm font-semibold text-gray-800 mb-3">Address</h3>
+          <h3 className="text-sm font-semibold text-foreground mb-3">Address</h3>
           <div className="space-y-3">
             <div>
               <label className={labelCls}>Country</label>
