@@ -1,22 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { RxCross2 } from "react-icons/rx";
-// import  from "react-select";
 import { RiAddCircleLine } from "react-icons/ri";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import draftToHtml from "draftjs-to-html";
 import htmlToDraft from "html-to-draftjs";
 import { Editor } from "react-draft-wysiwyg";
-import Switch from "react-switch";
 import { EditorState, convertToRaw, ContentState, Modifier } from "draft-js";
-import makeAnimated from "react-select/animated";
-import { LuConstruction } from "react-icons/lu";
-import { ToastContainer, toast } from "react-toastify";
-
+import { toast } from "react-toastify";
 import AccountMultiSelectDropdown from "../../Templates/AccountMultiSelectDropdown";
-
-import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
+import { Switch } from "../../components/ui/switch";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../../components/ui/select";
 
 // import 'react-toastify/dist/ReactToastify.css';
 const SendAccountEmail = ({ selectedAccounts, onClose }) => {
@@ -222,7 +219,6 @@ const SendAccountEmail = ({ selectedAccounts, onClose }) => {
   };
 
   //*********************************Drop Down Fill */
-  const animatedComponents = makeAnimated();
   const [userdata, setUserData] = useState([]);
   const [selecteduser, setSelectedUser] = useState();
 
@@ -584,114 +580,93 @@ const sendbulkEmail = () => {
     };
   }, []);
 
-  const inputCls = "w-full mt-1 rounded border border-gray-200 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-400";
-  const labelCls = "block text-sm font-medium text-gray-700 mb-0.5";
 
   return (
-    <div>
-      <div className="send-email-container">
-        <div className="contact-temp">
-          <label className={labelCls}>Email Template</label>
-          <select
-            className={inputCls}
-            value={emailTemplate?.value || ""}
-            onChange={(e) => {
-              const opt = emailoptions.find(o => o.value === e.target.value);
-              if (opt) handleEmailtemp(null, opt);
-            }}
-          >
-            <option value="">Email Template</option>
-            {emailoptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-          </select>
-        </div>
+    <div className="space-y-4 p-1">
+      <div className="space-y-1.5">
+        <Label>Email Template</Label>
+        <Select value={emailTemplate?.value || ""} onValueChange={(val) => { const opt = emailoptions.find(o => o.value === val); if (opt) handleEmailtemp(null, opt); }}>
+          <SelectTrigger><SelectValue placeholder="Email Template" /></SelectTrigger>
+          <SelectContent>
+            {emailoptions.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+          </SelectContent>
+        </Select>
+      </div>
 
-        <div className="mt-3">
-          <label className={labelCls}>From</label>
-          <select
-            className={inputCls}
-            value={selecteduser?.value || ""}
-            onChange={(e) => {
-              const opt = options.find(o => o.value === e.target.value);
-              if (opt) handleuserChange(null, opt);
-            }}
-          >
-            <option value="">From</option>
-            {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-          </select>
-        </div>
+      <div className="space-y-1.5">
+        <Label>From</Label>
+        <Select value={selecteduser?.value || ""} onValueChange={(val) => { const opt = options.find(o => o.value === val); if (opt) handleuserChange(null, opt); }}>
+          <SelectTrigger><SelectValue placeholder="From" /></SelectTrigger>
+          <SelectContent>
+            {options.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+          </SelectContent>
+        </Select>
+      </div>
 
-        <div className="mt-3">
-          <label className={labelCls}>To</label>
-          <AccountMultiSelectDropdown
-            value={selectedaccount}
-            onChange={handleAccountChange}
-            placeholder="Accounts"
-            options={accountoptions}
+      <div className="space-y-1.5">
+        <Label>To</Label>
+        <AccountMultiSelectDropdown
+          value={selectedaccount}
+          onChange={handleAccountChange}
+          placeholder="Accounts"
+          options={accountoptions}
+        />
+      </div>
+
+      <div className="space-y-1.5">
+        <Label>Subject</Label>
+        <div className="flex items-center gap-2">
+          <Input
+            value={emailSubject + selectedShortcut}
+            onChange={handleEmailInputChange}
+            placeholder="Subject"
           />
+          <Button type="button" variant="outline" size="sm" onClick={toggleDropdown} className="whitespace-nowrap gap-1">
+            <RiAddCircleLine /> Add Shortcode
+          </Button>
         </div>
 
-        <div className="mt-3">
-          <p className="text-sm font-medium text-gray-700 mb-1">Subject</p>
-          <div className="flex items-center gap-2">
-            <input
-              className={inputCls}
-              value={emailSubject + selectedShortcut}
-              onChange={handleEmailInputChange}
-              placeholder="Subject"
-            />
-            <button
-              type="button"
-              onClick={toggleDropdown}
-              className="flex items-center gap-1 whitespace-nowrap rounded px-3 py-1.5 text-sm text-blue-600 border border-blue-300 hover:bg-blue-50"
-            >
-              <RiAddCircleLine /> Add Shortcode
-            </button>
-          </div>
-
-          {showDropdown && (
-            <div className="dropdown border border-gray-200 rounded-lg shadow-lg bg-white mt-1 p-2" ref={dropdownRef}>
-              <div className="flex items-center gap-2 mb-2">
-                <input className={inputCls} placeholder="Search shortcuts" value={searchTerm} onChange={handleSearchChange} />
-                <button type="button" onClick={toggleDropdown} className="text-gray-500 hover:text-gray-700"><IoIosCloseCircleOutline fontSize="20px" /></button>
-              </div>
-              <ul className="dropdown-list max-h-48 overflow-y-auto">
-                {filteredShortcuts.map((shortcut) => (
-                  <li key={shortcut.title} onClick={() => handleAddShortcut(shortcut.value)}
-                    className="px-3 py-1 text-sm cursor-pointer hover:bg-gray-100"
-                    style={{ fontWeight: shortcut.isBold ? "bold" : "normal" }}
-                  >
-                    {shortcut.title}
-                  </li>
-                ))}
-              </ul>
+        {showDropdown && (
+          <div className="border border-border rounded-lg shadow-lg bg-card mt-1 p-2" ref={dropdownRef}>
+            <div className="flex items-center gap-2 mb-2">
+              <Input placeholder="Search shortcuts" value={searchTerm} onChange={handleSearchChange} />
+              <Button type="button" variant="ghost" size="icon" onClick={toggleDropdown}>
+                <IoIosCloseCircleOutline size={20} />
+              </Button>
             </div>
-          )}
-
-          <div className="mt-3">
-            <Editor editorState={editorState} wrapperClassName="demo-wrapper" editorClassName="demo-editor" toolbarCustomButtons={[<CustomToolbar />]} onEditorStateChange={setEditorState} />
+            <ul className="max-h-48 overflow-y-auto">
+              {filteredShortcuts.map((shortcut) => (
+                <li key={shortcut.title} onClick={() => handleAddShortcut(shortcut.value)}
+                  className="px-3 py-1 text-sm cursor-pointer hover:bg-muted rounded transition-colors"
+                  style={{ fontWeight: shortcut.isBold ? "bold" : "normal" }}
+                >
+                  {shortcut.title}
+                </li>
+              ))}
+            </ul>
           </div>
+        )}
+      </div>
 
-          <div className="flex items-center gap-2 mt-4">
-            <Switch checked={scheduledEmail} onChange={handleScheduledEmail} />
-            <span className="text-sm text-gray-600 cursor-pointer">Scheduled email</span>
-          </div>
+      <div>
+        <Editor editorState={editorState} wrapperClassName="demo-wrapper" editorClassName="demo-editor" toolbarCustomButtons={[<CustomToolbar />]} onEditorStateChange={setEditorState} />
+      </div>
 
-          {scheduledEmail && (
-            <div className="mt-3">
-              <p className="text-sm font-medium text-gray-700 mb-1">Date &amp; time</p>
-              <input type="datetime-local" className={inputCls} placeholder="Date &amp; time" />
-            </div>
-          )}
+      <div className="flex items-center gap-3">
+        <Switch checked={scheduledEmail} onCheckedChange={handleScheduledEmail} />
+        <Label className="cursor-pointer">Scheduled email</Label>
+      </div>
 
-          <div className="flex gap-3 mt-4">
-            <button type="button" onClick={sendbulkEmail} className="rounded-full px-5 py-1.5 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)]">
-              Send
-            </button>
-            <button type="button" onClick={handleCancel} className="rounded-full px-5 py-1.5 text-sm font-medium border border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white">
-              Cancel
-            </button>
-          </div>
+      {scheduledEmail && (
+        <div className="space-y-1.5">
+          <Label>Date &amp; time</Label>
+          <Input type="datetime-local" />
         </div>
+      )}
+
+      <div className="flex gap-3">
+        <Button variant="default" onClick={sendbulkEmail}>Send</Button>
+        <Button variant="outline" onClick={handleCancel}>Cancel</Button>
       </div>
     </div>
   );

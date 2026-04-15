@@ -9,6 +9,13 @@ import axios from "axios";
 import MultiSelectDropdown from "../../Templates/MultiSelectDropdown";
 import AccountMultiSelectDropdown from "../../Templates/AccountMultiSelectDropdown";
 import { LoginContext } from "../../Sidebar/Context/Context";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
+import { Textarea } from "../../components/ui/textarea";
+import { Switch } from "../../components/ui/switch";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../../components/ui/select";
+import { Checkbox } from "../../components/ui/checkbox";
 // Initialize the plugin
 dayjs.extend(customParseFormat);
 
@@ -1875,7 +1882,7 @@ const [clientFacingJobs, setClientFacingJobs] = useState([]);
     // Render function
     return (
       <div className="p-4">
-        <p className="text-base font-semibold mb-3">
+        <p className="text-base font-semibold text-foreground mb-3">
           Automations for{" "}
           <span className="font-bold">
             {combinedaccountValues
@@ -1895,16 +1902,14 @@ const [clientFacingJobs, setClientFacingJobs] = useState([]);
               checkTagMatch(automation.selectedTags, accountId)
             );
             return (
-              <div key={index} className="rounded-lg border border-gray-200 p-3">
+              <div key={index} className="rounded-lg border border-border bg-card p-3">
                 <div className="flex items-center gap-2 mb-2">
-                  <input
-                    type="checkbox"
-                    className="h-4 w-4 rounded border-gray-300"
+                  <Checkbox
                     checked={selectedAutomations.includes(index)}
-                    onChange={() => handleCheckboxChange(index)}
+                    onCheckedChange={() => handleCheckboxChange(index)}
                     disabled={!allAccountsHaveMatchingTags}
                   />
-                  <span className="text-sm font-semibold">{automation.type}</span>
+                  <span className="text-sm font-semibold text-foreground">{automation.type}</span>
                   {!allAccountsHaveMatchingTags && (
                     <span className="text-xs text-red-500 italic ml-2">The tags do not match the account</span>
                   )}
@@ -1912,14 +1917,14 @@ const [clientFacingJobs, setClientFacingJobs] = useState([]);
 
                 {automation.selectedtemp && (
                   <div className="mb-2">
-                    <p className="text-xs font-bold text-gray-700">Template:</p>
-                    <p className="text-xs text-gray-500">{templateName}</p>
+                    <p className="text-xs font-bold text-foreground">Template:</p>
+                    <p className="text-xs text-muted-foreground">{templateName}</p>
                   </div>
                 )}
 
                 {currentTagData.selectedTags?.length > 0 && (
                   <div className="mb-2">
-                    <p className="text-xs font-bold text-gray-700">Condition Tags:</p>
+                    <p className="text-xs font-bold text-foreground">Condition Tags:</p>
                     <div className="flex flex-wrap gap-1 mt-1">
                       {currentTagData.selectedTags.map((tag) => (
                         <span key={tag._id} className="inline-block rounded-full px-2 py-0.5 text-xs font-medium text-white" style={{ backgroundColor: tag.tagColour }}>{tag.tagName}</span>
@@ -1952,15 +1957,15 @@ const [clientFacingJobs, setClientFacingJobs] = useState([]);
 
                 {automation.type === "Update client-facing job status" && (
                   <div className="mb-2">
-                    <p className="text-xs font-bold text-gray-700">Client Status:</p>
+                    <p className="text-xs font-bold text-foreground">Client Status:</p>
                     {automation.selectedClientStatus && (
                       <div className="flex items-center gap-2 mt-1">
                         <span className="inline-block w-3 h-3 rounded-full" style={{ backgroundColor: clientStatusOptions?.find(o => o.value === automation.selectedClientStatus)?.clientfacingColour || '#ccc' }}></span>
                         <span className="text-xs">{clientStatusOptions?.find(o => o.value === automation.selectedClientStatus)?.label || automation.selectedClientStatus || "Not set"}</span>
                       </div>
                     )}
-                    <p className="text-xs mt-1">Visibility: {automation.status ? "Visible to client" : "Hidden from client"}</p>
-                    {automation.statusDescription && <p className="text-xs text-gray-500 mt-1">Description: {automation.statusDescription}</p>}
+                    <p className="text-xs text-foreground mt-1">Visibility: {automation.status ? "Visible to client" : "Hidden from client"}</p>
+                    {automation.statusDescription && <p className="text-xs text-muted-foreground mt-1">Description: {automation.statusDescription}</p>}
                   </div>
                 )}
 
@@ -1975,16 +1980,12 @@ const [clientFacingJobs, setClientFacingJobs] = useState([]);
         </div>
 
         <div className="flex items-center gap-3 mt-6">
-          <button type="button" onClick={handleMove} disabled={isProcessing} className="rounded-full px-5 py-1.5 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] disabled:opacity-40">Move</button>
-          <button type="button" onClick={() => setDrawerOpen(false)} className="rounded-full px-5 py-1.5 text-sm font-medium border border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white">Close</button>
+          <Button type="button" variant="default" onClick={handleMove} disabled={isProcessing}>Move</Button>
+          <Button type="button" variant="outline" onClick={() => setDrawerOpen(false)}>Close</Button>
         </div>
       </div>
     );
   };
-  const inputCls = "w-full mt-1 rounded border border-gray-200 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-400";
-  const labelCls = "block text-sm font-medium text-gray-700 mb-0.5";
-  const btnPrimary = "rounded-full px-5 py-1.5 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)]";
-  const btnOutline = "rounded-full px-5 py-1.5 text-sm font-medium border border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white";
 
   return (
     <div>
@@ -1992,8 +1993,8 @@ const [clientFacingJobs, setClientFacingJobs] = useState([]);
         <div className="mt-2 mb-1"><hr /></div>
         <div className="bulk-job-form" style={{ height: '88vh', overflowY: 'auto' }}>
           <div className="p-2 space-y-4">
-            <div>
-              <label className={labelCls}>Select Accounts</label>
+            <div className="space-y-1.5">
+              <Label>Select Accounts</Label>
               <AccountMultiSelectDropdown
                 value={selectedaccount}
                 onChange={handleAccountChange}
@@ -2002,40 +2003,43 @@ const [clientFacingJobs, setClientFacingJobs] = useState([]);
               />
             </div>
 
-            <div>
-              <label className="job-input-label">Pipeline</label>
-              <select className={inputCls} value={selectedPipeline?.value || ""}
-                onChange={(e) => { const opt = optionpipeline.find(o => o.value === e.target.value); if (opt) handlePipelineChange(opt); }}>
-                <option value="">Pipeline</option>
-                {optionpipeline.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </select>
+            <div className="space-y-1.5">
+              <Label>Pipeline</Label>
+              <Select value={selectedPipeline?.value || ""} onValueChange={(val) => { const opt = optionpipeline.find(o => o.value === val); if (opt) handlePipelineChange(opt); }}>
+                <SelectTrigger><SelectValue placeholder="Pipeline" /></SelectTrigger>
+                <SelectContent>
+                  {optionpipeline.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
 
-            <div>
-              <label className="job-input-label">Stage</label>
-              <select className={inputCls} value={selectedStage?.value || ""}
-                onChange={(e) => { const opt = stagesoptions.find(o => o.value === e.target.value); handleStageChange(null, opt || null); }}>
-                <option value="">Stages</option>
-                {stagesoptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </select>
+            <div className="space-y-1.5">
+              <Label>Stage</Label>
+              <Select value={selectedStage?.value || ""} onValueChange={(val) => { const opt = stagesoptions.find(o => o.value === val); handleStageChange(null, opt || null); }}>
+                <SelectTrigger><SelectValue placeholder="Stages" /></SelectTrigger>
+                <SelectContent>
+                  {stagesoptions.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
 
-            <div>
-              <label className="job-input-label">Job Template</label>
-              <select className={inputCls} value={selectedtemp?.value || ""}
-                onChange={(e) => { const opt = optiontemp.find(o => o.value === e.target.value); if (opt) handletemp(null, opt); }}>
-                <option value="">Job Template</option>
-                {optiontemp.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </select>
+            <div className="space-y-1.5">
+              <Label>Job Template</Label>
+              <Select value={selectedtemp?.value || ""} onValueChange={(val) => { const opt = optiontemp.find(o => o.value === val); if (opt) handletemp(null, opt); }}>
+                <SelectTrigger><SelectValue placeholder="Job Template" /></SelectTrigger>
+                <SelectContent>
+                  {optiontemp.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
 
-            <div>
-              <label className="job-input-label">Name</label>
-              <input className={inputCls} value={jobName} onChange={(e) => setJobName(e.target.value)} placeholder="Job Name" />
+            <div className="space-y-1.5">
+              <Label>Name</Label>
+              <Input value={jobName} onChange={(e) => setJobName(e.target.value)} placeholder="Job Name" />
             </div>
 
-            <div>
-              <label className="job-input-label">Job Assignees</label>
+            <div className="space-y-1.5">
+              <Label>Job Assignees</Label>
               <MultiSelectDropdown value={selectedUser} onChange={handleUserChange} placeholder="Job Assignees" />
             </div>
 
@@ -2043,32 +2047,29 @@ const [clientFacingJobs, setClientFacingJobs] = useState([]);
               <Priority onPriorityChange={handlePriorityChange} selectedPriority={priority} />
             </div>
 
-            <div className="mt-3">
+            <div>
               <Editor initialContent={description} onChange={handleEditorChange} />
             </div>
 
-            <div className="mt-6">
+            <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-base font-semibold">Start and Due Date</span>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <span className="text-sm text-gray-600">Absolute Date</span>
-                  <div className="relative inline-flex items-center">
-                    <input type="checkbox" className="sr-only peer" checked={absoluteDate} onChange={(e) => handleAbsolutesDates(e.target.checked)} />
-                    <div className="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-[var(--color-save-btn)] after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5"></div>
-                  </div>
-                </label>
+                <Label className="text-base font-semibold">Start and Due Date</Label>
+                <div className="flex items-center gap-2">
+                  <Label className="text-sm font-normal text-muted-foreground">Absolute Date</Label>
+                  <Switch checked={absoluteDate} onCheckedChange={handleAbsolutesDates} />
+                </div>
               </div>
             </div>
 
             {absoluteDate && (
               <div className="space-y-3">
-                <div>
-                  <label className={labelCls}>Start Date</label>
-                  <input type="date" className={inputCls} value={startDate ? (typeof startDate === 'string' ? startDate : startDate.format?.('YYYY-MM-DD') || '') : ''} onChange={(e) => handleStartDateChange(e.target.value)} />
+                <div className="space-y-1.5">
+                  <Label>Start Date</Label>
+                  <Input type="date" value={startDate ? (typeof startDate === 'string' ? startDate : startDate.format?.('YYYY-MM-DD') || '') : ''} onChange={(e) => handleStartDateChange(e.target.value)} />
                 </div>
-                <div>
-                  <label className={labelCls}>Due Date</label>
-                  <input type="date" className={inputCls} value={dueDate ? (typeof dueDate === 'string' ? dueDate : dueDate.format?.('YYYY-MM-DD') || '') : ''} onChange={(e) => handleDueDateChange(e.target.value)} />
+                <div className="space-y-1.5">
+                  <Label>Due Date</Label>
+                  <Input type="date" value={dueDate ? (typeof dueDate === 'string' ? dueDate : dueDate.format?.('YYYY-MM-DD') || '') : ''} onChange={(e) => handleDueDateChange(e.target.value)} />
                 </div>
               </div>
             )}
@@ -2076,54 +2077,52 @@ const [clientFacingJobs, setClientFacingJobs] = useState([]);
             {!absoluteDate && (
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm whitespace-nowrap">Start In</span>
-                  <input className={inputCls} placeholder="0" value={startsin} onChange={(e) => setstartsin(e.target.value)} />
-                  <select className={inputCls} value={startsInDuration || ""} onChange={(e) => handleStartInDateChange(null, { value: e.target.value })}>
-                    {dayOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-                  </select>
+                  <span className="text-sm text-foreground whitespace-nowrap">Start In</span>
+                  <Input placeholder="0" value={startsin} onChange={(e) => setstartsin(e.target.value)} />
+                  <Select value={startsInDuration || ""} onValueChange={(val) => handleStartInDateChange(null, { value: val })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>{dayOptions.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}</SelectContent>
+                  </Select>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm whitespace-nowrap">Due In</span>
-                  <input className={inputCls} placeholder="0" value={duein} onChange={(e) => setduein(e.target.value)} />
-                  <select className={inputCls} value={dueinduration || ""} onChange={(e) => handleDueInDateChange(null, { value: e.target.value })}>
-                    {dayOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-                  </select>
+                  <span className="text-sm text-foreground whitespace-nowrap">Due In</span>
+                  <Input placeholder="0" value={duein} onChange={(e) => setduein(e.target.value)} />
+                  <Select value={dueinduration || ""} onValueChange={(val) => handleDueInDateChange(null, { value: val })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>{dayOptions.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}</SelectContent>
+                  </Select>
                 </div>
               </div>
             )}
 
-            <div className="mt-3">
+            <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-bold">Client-facing status</span>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <span className="text-sm text-gray-600">Show in Client portal</span>
-                  <div className="relative inline-flex items-center">
-                    <input type="checkbox" className="sr-only peer" checked={clientFacingStatus} onChange={(e) => handleClientFacing(e.target.checked)} />
-                    <div className="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-[var(--color-save-btn)] after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5"></div>
-                  </div>
-                </label>
+                <Label className="text-sm font-bold">Client-facing status</Label>
+                <div className="flex items-center gap-2">
+                  <Label className="text-sm font-normal text-muted-foreground">Show in Client portal</Label>
+                  <Switch checked={clientFacingStatus} onCheckedChange={handleClientFacing} />
+                </div>
               </div>
 
               {clientFacingStatus && (
-                <div className="mt-3 space-y-3">
-                  <div>
-                    <label className={labelCls}>Job name for client</label>
-                    <input className={inputCls} name="subject" value={inputText + selectedJobShortcut} onChange={handlechatsubject} placeholder="Job name for client" />
+                <div className="space-y-3">
+                  <div className="space-y-1.5">
+                    <Label>Job name for client</Label>
+                    <Input name="subject" value={inputText + selectedJobShortcut} onChange={handlechatsubject} placeholder="Job name for client" />
                   </div>
-                  <div>
-                    <label className={labelCls}>Status</label>
-                    <select className={inputCls} value={selectedJob?.value || ""}
-                      onChange={(e) => { const opt = optionstatus.find(o => o.value === e.target.value); if (opt) handleJobChange(null, opt); }}>
-                      <option value="">Select Client Facing Job</option>
-                      {optionstatus.map(o => (
-                        <option key={o.value} value={o.value}>{o.label}</option>
-                      ))}
-                    </select>
+                  <div className="space-y-1.5">
+                    <Label>Status</Label>
+                    <Select value={selectedJob?.value || ""} onValueChange={(val) => { const opt = optionstatus.find(o => o.value === val); if (opt) handleJobChange(null, opt); }}>
+                      <SelectTrigger><SelectValue placeholder="Select Client Facing Job" /></SelectTrigger>
+                      <SelectContent>
+                        {optionstatus.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
                   </div>
-                  <div className="relative">
-                    <label className={labelCls}>Description</label>
-                    <textarea className={`${inputCls} resize-none`} rows={3} value={clientDescription} onChange={handleChange} placeholder="Description" />
-                    <span className="absolute bottom-2 right-2 text-xs text-gray-400">{charCount}/{charLimit}</span>
+                  <div className="relative space-y-1.5">
+                    <Label>Description</Label>
+                    <Textarea rows={3} value={clientDescription} onChange={handleChange} placeholder="Description" />
+                    <span className="absolute bottom-2 right-2 text-xs text-muted-foreground">{charCount}/{charLimit}</span>
                   </div>
                 </div>
               )}
@@ -2131,15 +2130,15 @@ const [clientFacingJobs, setClientFacingJobs] = useState([]);
           </div>
 
           <div className="mt-3"><hr /></div>
-          <div className="flex items-center gap-5 pt-3 px-2 pb-4">
-            <button type="button" onClick={createjob} className={btnPrimary}>Add</button>
-            <button type="button" onClick={handleJobFormClose} className={btnOutline}>Cancel</button>
+          <div className="flex items-center gap-3 pt-3 px-2 pb-4">
+            <Button type="button" variant="default" onClick={createjob}>Add</Button>
+            <Button type="button" variant="outline" onClick={handleJobFormClose}>Cancel</Button>
           </div>
         </div>
       </form>
 
       {drawerOpen && (
-        <div className="fixed inset-y-0 right-0 z-50 w-[550px] bg-white shadow-2xl overflow-y-auto">
+        <div className="fixed inset-y-0 right-0 z-50 w-[550px] bg-background shadow-2xl overflow-y-auto border-l border-border">
           <DrawerContent selectedAccounts={combinedaccountValues} />
         </div>
       )}

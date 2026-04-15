@@ -1,70 +1,23 @@
-import React, { useState, useEffect, useMemo ,useContext} from "react";
-import {
-  Menu,
-  useMediaQuery,
-  Checkbox,
-  Autocomplete,
-  Switch,
-  FormControlLabel,
-  Box,
-  Button,
-  Drawer,
-  Typography,
-  IconButton,
-  Divider,
-  Select,
-  MenuItem,
-  InputLabel,
-  TextField,
-  FormControl,
-  FormLabel,
-  InputAdornment,
-  Popover,
-  ListItem,
-  List,
-  ListItemText,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-} from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import Grid from "@mui/material/Unstable_Grid2";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import React, { useState, useEffect, useContext } from "react";
 import { LoginContext } from "../../Sidebar/Context/Context";
 import { AiOutlinePlusCircle } from "react-icons/ai";
 import { CiDiscount1 } from "react-icons/ci";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { RiCloseLine } from "react-icons/ri";
-import "../../Billing/Invoices";
+import { RxCross2 } from "react-icons/rx";
+import { MdOutlinePreview } from "react-icons/md";
+import { X, ChevronLeft } from "lucide-react";
 import { toast } from "react-toastify";
 import dayjs from "dayjs";
-// import { useNavigate } from "react-router-dom";
-import {
-  MaterialReactTable,
-  useMaterialReactTable,
-} from "material-react-table";
-import { CiMenuKebab } from "react-icons/ci";
 import CreatableSelect from "react-select/creatable";
 import { useParams } from "react-router-dom";
-import { RxCross2 } from "react-icons/rx";
-import { useTheme } from "@mui/material/styles";
-import PlagiarismIcon from "@mui/icons-material/Plagiarism";
-import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 const CreateInvoice = ({ charLimit = 4000, onClose }) => {
   const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
   const SERVICE_API = process.env.REACT_APP_SERVICES_URL;
   const INVOICE_API = process.env.REACT_APP_INVOICE_TEMP_URL;
  
   const { data } = useParams();
-  const theme = useTheme();
   //   const navigate = useNavigate();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const [invoiceTemplates, setInvoiceTemplates] = useState([]);
   const [selectedaccount, setSelectedaccount] = useState(null);
   const [accountdata, setaccountdata] = useState([]);
@@ -1023,1445 +976,458 @@ const setDefaultTeamMember = (users) => {
   const handleOpenpreviewDrawer = () => setpreviewDrawerOpen(true);
   const handleClosepreviewDrawer = () => setpreviewDrawerOpen(false);
 
+  const inputCls = "w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring";
+  const labelCls = "block text-sm font-medium text-foreground mb-1";
+  const btnPrimary = "px-4 py-2 rounded-full text-sm font-medium text-white bg-primary hover:bg-primary/90 transition-colors disabled:opacity-50";
+  const btnOutline = "px-4 py-2 rounded-full text-sm font-medium border border-border text-foreground hover:bg-muted transition-colors";
+
   return (
-    <Box>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          mr: 2,
-        }}
-      >
-        <Typography p={2} variant="h6">
-          Create Invoice
-        </Typography>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Box
-            onClick={handleOpenpreviewDrawer}
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              cursor: "pointer",
-              color: "primary.main",
-            }}
-          >
-            <PlagiarismIcon sx={{ marginRight: 0.5 }} fontsize="small" />
-            <Typography color="primary">Preview</Typography>
-          </Box>
-
-          <Box onClick={onClose} sx={{ cursor: "pointer" }}>
-            <CloseIcon />
-          </Box>
-        </Box>
-      </Box>
-      <Box>
-        <Drawer
-          anchor="right"
-          open={previewDrawerOpen}
-          onClose={handleClosepreviewDrawer}
-          PaperProps={{
-            sx: {
-              width: 800,
-              p: 2,
-              background: "#f8fafc",
-            },
-          }}
-        >
-          <Box sx={{ padding: 4 }}>
-            {/* Invoice Header */}
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <Typography>Preview</Typography>
-              <CloseIcon
-                sx={{ cursor: "pointer", color: "rgb(24, 118, 211)" }}
-                onClick={handleClosepreviewDrawer}
-              />
-            </Box>
-            <Divider sx={{ mt: 2 }} />
-
-            {/* Table */}
-            <TableContainer
-              component={Paper}
-              sx={{
-                background: "#fdfdfd",
-                marginBottom: 4,
-                height: { xs: "50vh", md: "auto" },
-                mt: 4,
-              }}
-            >
-              <Typography
-                variant="h5"
-                sx={{
-                  color: "#ff6700",
-                  fontWeight: "bold",
-                  marginBottom: 2,
-                  ml: 2,
-                  mt: 2,
-                }}
-              >
-                Invoice
-              </Typography>
-
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Typography sx={{ marginBottom: 2, ml: 2, fontSize: 13 }}>
-                  {selectedaccount?.label || "[ACCOUNT NAME]"}
-                </Typography>
-                <Typography fontSize={13}>
-                  Invoice number:{" "}
-                  <Typography
-                    component="span"
-                    sx={{
-                      color: "#cbd5e1",
-                      mr: 2,
-                      marginBottom: 2,
-                      fontSize: 13,
-                    }}
-                  >
-                   {invoicenumber || "[INVOICE_NUMBER]"} 
-                  </Typography>
-                </Typography>
-              </Box>
-
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Typography sx={{ marginBottom: 2, ml: 2, fontSize: 13 }}>
-                  {firstContactEmail || "[CONTACT EMAIL]"}
-                </Typography>
-                <Typography fontSize={13}>
-                  Date:{" "}
-                  <Typography
-                    component="span"
-                    sx={{ mr: 2, marginBottom: 2, fontSize: 13 }}
-                  >
-                    {startDate ? startDate.format("YYYY-MM-DD") : ""}
-                  </Typography>
-                </Typography>
-              </Box>
-
-              <Box sx={{ ml: 2, marginBottom: 5 }}>
-                <Typography sx={{ fontSize: 13 }}>
-                  Description: {description}
-                </Typography>
-              </Box>
-
-              <Table sx={{ marginBottom: 5 }}>
-                <TableHead>
-                  <TableRow sx={{ background: "#fff8f5" }}>
-                    <TableCell>
-                      <strong>Product/Service</strong>
-                    </TableCell>
-
-                    <TableCell>
-                      <strong>Description</strong>
-                    </TableCell>
-
-                    <TableCell align="right">
-                      <strong>Rate ($)</strong>
-                    </TableCell>
-                    <TableCell align="right">
-                      <strong>Qty</strong>
-                    </TableCell>
-                    <TableCell align="right">
-                      <strong>Amount</strong>
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
+    <div className="flex flex-col h-full">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+        <h2 className="text-base font-semibold text-foreground">Create Invoice</h2>
+        <div className="flex items-center gap-3">
+          <button onClick={handleOpenpreviewDrawer} className="flex items-center gap-1 text-sm text-primary hover:text-primary/80">
+            <MdOutlinePreview className="text-base" /> Preview
+          </button>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+      </div>
+      {/* Preview Drawer */}
+      {previewDrawerOpen && (
+        <div className="fixed inset-0 z-50 flex">
+          <div className="fixed inset-0 bg-black/40" onClick={handleClosepreviewDrawer} />
+          <div className="ml-auto relative z-50 w-full max-w-[800px] bg-background h-full overflow-y-auto shadow-2xl p-8">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-base font-semibold text-foreground">Preview</h3>
+              <button onClick={handleClosepreviewDrawer} className="text-muted-foreground hover:text-foreground"><X className="h-5 w-5" /></button>
+            </div>
+            <hr className="border-border mb-6" />
+            <h2 className="text-xl font-bold text-primary mb-4">Invoice</h2>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-sm text-foreground">{selectedaccount?.label || "[ACCOUNT NAME]"}</span>
+              <span className="text-sm text-muted-foreground mr-2">Invoice number: <span className="text-foreground">{invoicenumber || "[INVOICE_NUMBER]"}</span></span>
+            </div>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-sm text-foreground">{firstContactEmail || "[CONTACT EMAIL]"}</span>
+              <span className="text-sm text-muted-foreground mr-2">Date: <span className="text-foreground">{startDate ? startDate.format("YYYY-MM-DD") : ""}</span></span>
+            </div>
+            <p className="text-sm text-muted-foreground mb-6">Description: {description}</p>
+            <div className="overflow-x-auto rounded-lg border border-border mb-6">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b bg-muted/40">
+                    <th className="text-left px-4 py-2 text-xs font-bold text-foreground">Product/Service</th>
+                    <th className="text-left px-4 py-2 text-xs font-bold text-foreground">Description</th>
+                    <th className="text-right px-4 py-2 text-xs font-bold text-foreground">Rate ($)</th>
+                    <th className="text-right px-4 py-2 text-xs font-bold text-foreground">Qty</th>
+                    <th className="text-right px-4 py-2 text-xs font-bold text-foreground">Amount</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
                   {rows.map((row, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{row.productName}</TableCell>
-                      <TableCell>{row.description}</TableCell>
-                      <TableCell align="right">{row.rate || "$0.00"}</TableCell>
-                      <TableCell align="right">{row.qty || "1"}</TableCell>
-                      <TableCell align="right">
-                        {row.amount || "$0.00"}
-                      </TableCell>
-                    </TableRow>
+                    <tr key={index} className={`hover:bg-muted/20 ${index % 2 === 0 ? "bg-card" : "bg-muted/10"}`}>
+                      <td className="px-4 py-2 text-sm text-foreground">{row.productName}</td>
+                      <td className="px-4 py-2 text-sm text-muted-foreground">{row.description}</td>
+                      <td className="px-4 py-2 text-sm text-foreground text-right">{row.rate || "$0.00"}</td>
+                      <td className="px-4 py-2 text-sm text-foreground text-right">{row.qty || "1"}</td>
+                      <td className="px-4 py-2 text-sm text-foreground text-right">{row.amount || "$0.00"}</td>
+                    </tr>
                   ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                </tbody>
+              </table>
+            </div>
+            <div className="ml-auto w-full max-w-xs border border-border rounded-lg overflow-hidden mb-6">
+              <table className="w-full text-sm">
+                <tbody className="divide-y divide-border">
+                  <tr><td className="px-4 py-2 font-semibold text-foreground">Subtotal</td><td className="px-4 py-2 text-right text-foreground">${subtotal || "0.00"}</td></tr>
+                  <tr><td className="px-4 py-2 font-semibold text-foreground">Tax Rate</td><td className="px-4 py-2 text-right text-foreground">{taxRate || "0.00"}%</td></tr>
+                  <tr><td className="px-4 py-2 font-semibold text-foreground">Tax Total</td><td className="px-4 py-2 text-right text-foreground">${taxTotal?.toFixed(2) || "0.00"}</td></tr>
+                  <tr className="bg-muted/30"><td className="px-4 py-2 font-bold text-foreground">Total</td><td className="px-4 py-2 text-right font-bold text-foreground">${totalAmount || "0.00"}</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <button onClick={createinvoice} className={btnPrimary}>Save &amp; Exit</button>
+          </div>
+        </div>
+      )}
 
-            <Table sx={{ width: "50%", ml: "auto" }}>
-              <TableBody>
-                <TableRow>
-                  <TableCell>
-                    <strong>Subtotal:</strong>
-                  </TableCell>
-                  <TableCell>${subtotal || "0.00"}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>
-                    <strong>Tax Rate:</strong>
-                  </TableCell>
-                  <TableCell>{taxRate || "0.00"}%</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>
-                    <strong>Tax Total:</strong>
-                  </TableCell>
-                  <TableCell>${taxTotal?.toFixed(2) || "0.00"}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell sx={{ fontWeight: "bold" }}>
-                    <strong>Total:</strong>
-                  </TableCell>
-                  <TableCell sx={{ fontWeight: "bold" }}>
-                    ${totalAmount || "0.00"}
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-
-            {/* Footer Buttons */}
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginTop: 3,
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className={labelCls}>Account name, ID or email</label>
+            <select
+              className={inputCls}
+              value={selectedaccount?.value || ""}
+              onChange={(e) => {
+                const opt = accountoptions.find(o => o.value === e.target.value);
+                handleAccountChange(null, opt || null);
               }}
             >
-              <Button
-                variant="contained"
-                onClick={createinvoice}
-                sx={{
-                  backgroundColor: "var(--color-save-btn)", // Normal background
-
-                  "&:hover": {
-                    backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                  },
-                  borderRadius: "15px",
-                }}
-              >
-                Save & Exit
-              </Button>
-            </Box>
-          </Box>
-        </Drawer>
-      </Box>
-
-      <Box
-        p={2}
-        sx={{ height: "80vh", overflowY: "auto" }}
-        className="create-invoice"
-      >
-        <Box>
-          <Grid
-            container
-            rowSpacing={1}
-            columnSpacing={{ xs: 1, sm: 2, md: 3 }}
-          >
-            <Grid xs={6}>
-              <Box>
-                <InputLabel sx={{ color: "black" }}>
-                  Account name, ID or email
-                </InputLabel>
-
-                <Autocomplete
-                  options={accountoptions} // Ensure this is an array of objects with { label, value }
-                  value={selectedaccount} // Display the selected account
-                  onChange={handleAccountChange} // Update the selected account on change
-                  getOptionLabel={(option) => option.label || ""} // Safely access label
-                  isOptionEqualToValue={(option, value) =>
-                    option.value === value.value
-                  } // Compare values correctly
-                  renderOption={(props, option) => (
-                    <Box
-                      component="li"
-                      {...props}
-                      sx={{ cursor: "pointer", margin: "5px 10px" }} // Add cursor pointer style
-                    >
-                      {option.label}
-                    </Box>
-                  )}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      placeholder="Select Account"
-                      variant="outlined"
-                      size="small"
-                      sx={{ backgroundColor: "#fff" }}
-                    />
-                  )}
-                  sx={{ width: "100%", marginTop: "8px" }}
-                />
-              </Box>
-            </Grid>
-            <Grid xs={6}>
-              <Box>
-                <InputLabel sx={{ color: "black" }}>
-                  Invoice Template
-                </InputLabel>
-                <Autocomplete
-                  options={invoiceoptions}
-                  sx={{ mt: 1, mb: 2, backgroundColor: "#fff" }}
-                  size="small"
-                  value={selectInvoiceTemp}
-                  onChange={handleInvoiceTempChange}
-                  isOptionEqualToValue={(option, value) =>
-                    option.value === value.value
-                  }
-                  getOptionLabel={(option) => option.label || ""}
-                  renderInput={(params) => (
-                    <TextField {...params} placeholder="Invoice Template" />
-                  )}
-                  isClearable={true}
-                />
-                {errors.invoiceTemplate && (
-                  <Typography sx={{ color: "red", fontSize: 12 }}>
-                    {errors.invoiceTemplate}
-                  </Typography>
-                )}
-              </Box>
-            </Grid>
-          </Grid>
-          <Grid
-            container
-            rowSpacing={1}
-            columnSpacing={{ xs: 1, sm: 2, md: 3 }}
-          >
-            <Grid xs={6}>
-              <Box>
-                <InputLabel sx={{ color: "black" }}>Invoice Number</InputLabel>
-                {/* <TextField
-                  fullWidth
-                  onChange={(e) => setinvoicenumber(e.target.value)}
-                  placeholder="Invoice Number"
-                  size="small"
-                  sx={{ mt: 1 }}
-                /> */}
-                  <TextField
-                  fullWidth
-                  value={isLoadingInvoiceNumber ? "Loading..." : invoicenumber}
-                  placeholder="Invoice Number"
-                  size="small"
-                  sx={{ mt: 1 }}
-                  InputProps={{
-                    readOnly: true, // Make it read-only since it's auto-generated
-                  }}
-                  helperText="Auto-generated invoice number"
-                  disabled={isLoadingInvoiceNumber}
-                />
-              </Box>
-            </Grid>
-            <Grid xs={6}>
-              <Box>
-                <InputLabel sx={{ color: "black" }}>
-                  Choose payment method
-                </InputLabel>
-                <Autocomplete
-                  size="small"
-                  fullWidth
-                  sx={{ mt: 1 }}
-                  options={paymentsOptions}
-                  getOptionLabel={(option) => option?.label || ""}
-                  onChange={handlePaymentOptionChange}
-                  value={paymentMode}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      placeholder="Select Payment Mode"
-                      variant="outlined"
-                    />
-                  )}
-                  isOptionEqualToValue={(option, value) =>
-                    option.value === value?.value
-                  }
-                  clearOnEscape
-                />
-              </Box>
-            </Grid>
-          </Grid>
-          <Grid
-            container
-            rowSpacing={1}
-            columnSpacing={{ xs: 1, sm: 2, md: 3 }}
-            mt={2}
-          >
-            <Grid xs={6}>
-              <Box>
-                <FormControl fullWidth>
-                  <FormLabel sx={{ marginBottom: "8px", color: "black" }}>
-                    Date
-                  </FormLabel>
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    {/* <DatePicker
-                      format="MM/DD/YYYY"
-                      sx={{ width: "100%", backgroundColor: "#fff" }}
-                      selected={startDate}
-                      onChange={handleStartDateChange}
-                      renderInput={(params) => (
-                        <TextField {...params} size="small" />
-                      )}
-                    /> */}
-                    <DatePicker
-  format="MM/DD/YYYY"
-  sx={{ width: "100%", backgroundColor: "#fff" }}
-  value={startDate} // Default to today's date
-  onChange={handleStartDateChange}
-/>
-                  </LocalizationProvider>
-                </FormControl>
-              </Box>
-            </Grid>
-            <Grid xs={6}>
-              <Box>
-                <label className="email-input-label">Team Member</label>
-                <Autocomplete
-                  options={options}
-                  sx={{ mt: 2, mb: 2, backgroundColor: "#fff" }}
-                  size="small"
-                  value={selecteduser}
-                  onChange={handleuserChange}
-                  isOptionEqualToValue={(option, value) =>
-                    option.value === value.value
-                  }
-                  getOptionLabel={(option) => option.label || ""}
-                  renderInput={(params) => (
-                    <TextField {...params} placeholder="Team Member" />
-                  )}
-                  isClearable={true}
-                />
-              </Box>
-            </Grid>
-          </Grid>
-          <Box sx={{ position: "relative", mt: 2 }}>
-            <InputLabel sx={{ color: "black" }}>Description</InputLabel>
-            <TextField
-              fullWidth
-              size="small"
-              margin="normal"
+              <option value="">Select Account</option>
+              {accountoptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className={labelCls}>Invoice Template</label>
+            <select
+              className={inputCls}
+              value={selectInvoiceTemp?.value || ""}
+              onChange={(e) => {
+                const opt = invoiceoptions.find(o => o.value === e.target.value);
+                if (opt) handleInvoiceTempChange(null, opt);
+              }}
+            >
+              <option value="">Invoice Template</option>
+              {invoiceoptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+            {errors.invoiceTemplate && <p className="text-xs text-destructive mt-1">{errors.invoiceTemplate}</p>}
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className={labelCls}>Invoice Number</label>
+            <input
               type="text"
-              value={description}
-              onChange={handleChange}
-              placeholder="Description"
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <Typography
-                      sx={{
-                        color: "gray",
-                        fontSize: "12px",
-                        position: "absolute",
-                        bottom: "15px",
-                        right: "15px",
-                      }}
-                    >
-                      {charCount}/{charLimit}
-                    </Typography>
-                  </InputAdornment>
-                ),
-              }}
+              className={`${inputCls} bg-muted/40 cursor-not-allowed`}
+              value={isLoadingInvoiceNumber ? "Loading..." : invoicenumber}
+              readOnly
+              disabled={isLoadingInvoiceNumber}
+              placeholder="Invoice Number"
             />
-          </Box>
-          <Box>
-            <Button
-              variant="contained"
-              onClick={toggleDropdown}
-              sx={{
-                backgroundColor: "var(--color-save-btn)", // Normal background
-
-                "&:hover": {
-                  backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                },
-                mt: 2,
-                borderRadius: "15px",
+            <p className="text-xs text-muted-foreground mt-1">Auto-generated invoice number</p>
+          </div>
+          <div>
+            <label className={labelCls}>Choose payment method</label>
+            <select
+              className={inputCls}
+              value={paymentMode?.value || ""}
+              onChange={(e) => {
+                const opt = paymentsOptions.find(o => o.value === e.target.value);
+                handlePaymentOptionChange(null, opt || null);
               }}
             >
-              Add Shortcode
-            </Button>
-
-            <Popover
-              open={showDropdown}
-              anchorEl={anchorEl}
-              onClose={handleCloseDropdown}
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "left",
-              }}
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "left",
-              }}
-            >
-              <Box>
-                <List
-                  className="dropdown-list"
-                  sx={{ width: "300px", height: "300px", cursor: "pointer" }}
-                >
-                  {filteredShortcuts.map((shortcut, index) => (
-                    <ListItem
-                      key={index}
-                      onClick={() => handleAddShortcut(shortcut.value)}
-                    >
-                      <ListItemText
-                        primary={shortcut.title}
-                        primaryTypographyProps={{
-                          style: {
-                            fontWeight: shortcut.isBold ? "bold" : "normal",
-                          },
-                        }}
-                      />
-                    </ListItem>
-                  ))}
-                </List>
-              </Box>
-            </Popover>
-          </Box>
-          <Box mt={2}>
-            <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-              Additioal
-            </Typography>
-            <Box mt={2}>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={payInvoice}
-                    onChange={handlePayInvoiceChange}
-                    color="primary"
-                  />
-                }
-                label={"Pay invoice using client credits"}
-              />
-            </Box>
-            <Box mt={1}>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={emailInvoice}
-                    onChange={handleEmailInvoiceChange}
-                    color="primary"
-                  />
-                }
-                label={"Email invoice to client"}
-              />
-            </Box>
-            <Box mt={1}>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={reminders}
-                    onChange={handleRemindersChange}
-                    color="primary"
-                  />
-                }
-                label={"Reminders"}
-              />
-            </Box>
-            <Box mt={1}>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={scheduledInvoice}
-                    onChange={handleScheduledInvoiceChange}
-                    color="primary"
-                  />
-                }
-                label={"Scheduled invoice"}
-              />
-            </Box>
-          </Box>
-
-          <Box className="invoice-section-three">
-            <Box>
-              <Typography sx={{ mt: 2, fontWeight: "bold" }} variant="h5">
-                Line Items
-              </Typography>
-              <p style={{ color: "grey" }}>
-                Client-facing itemized list of products and services
-              </p>
-            </Box>
-
-            <Box sx={{ overflowX: "auto", width: "100%" }}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>PRODUCT OR SERVICE</TableCell>
-                    <TableCell>DESCRIPTION</TableCell>
-                    <TableCell>RATE</TableCell>
-                    <TableCell>QTY</TableCell>
-                    <TableCell>AMOUNT</TableCell>
-                    <TableCell>TAX</TableCell>
-                    <TableCell />
-                    <TableCell />
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {rows.map((row, index) => (
-                    <TableRow key={index}>
-                      <TableCell>
-                        <CreatableSelect
-                          // placeholder='Product or Service'
-                          placeholder={
-                            row.isDiscount
-                              ? "Reason for discount"
-                              : "Product or Service"
-                          }
-                          options={serviceoptions}
-                          // value={serviceoptions.find(option => option.label === row.productName) || { label: row.productName, value: row.productName }}
-                          value={
-                            row.productName
-                              ? serviceoptions.find(
-                                  (option) => option.label === row.productName
-                                ) || {
-                                  label: row.productName,
-                                  value: row.productName,
-                                }
-                              : null
-                          }
-                          onChange={(selectedOption) =>
-                            handleServiceChange(index, selectedOption)
-                          }
-                          onInputChange={(inputValue, actionMeta) =>
-                            handleServiceInputChange(
-                              inputValue,
-                              actionMeta,
-                              index
-                            )
-                          }
-                          isClearable
-                          styles={{
-                            container: (provided) => ({
-                              ...provided,
-                              width: "180px",
-                            }),
-                            control: (provided) => ({
-                              ...provided,
-                              width: "180px",
-                            }),
-                            menuPortal: (provided) => ({
-                              ...provided,
-                              zIndex: 9999,
-                            }),
-                          }}
-                          menuPortalTarget={document.body}
-                        />
-                      </TableCell>
-
-                      <TableCell>
-                        <input
-                          type="text"
-                          name="description"
-                          value={row.description}
-                          onChange={(e) => handleInputChange(index, e)}
-                          style={{ border: "none" }}
-                          placeholder="Description"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <input
-                          type="text"
-                          name="rate"
-                          value={row.rate}
-                          onChange={(e) => handleInputChange(index, e)}
-                          style={{ border: "none" }}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <input
-                          type="text"
-                          name="qty"
-                          value={row.qty}
-                          onChange={(e) => handleInputChange(index, e)}
-                          style={{ border: "none" }}
-                        />
-                      </TableCell>
-                      <TableCell
-                        className={row.isDiscount ? "discount-amount" : ""}
-                      >
-                        {row.amount}
-                      </TableCell>
-                      <TableCell>
-                        <Checkbox
-                          name="tax"
-                          checked={row.tax}
-                          onChange={(e) => handleInputChange(index, e)}
-                        />
-                      </TableCell>
-
-                      <TableCell>
-                        <IconButton
-                          onClick={(event) => handleMenuOpen(event, index)}
-                        >
-                          <BsThreeDotsVertical />
-                        </IconButton>
-                        <Menu
-                          anchorEl={anchorElNew}
-                          open={Boolean(anchorElNew) && selectedRow === index}
-                          onClose={handleMenuClose}
-                          anchorOrigin={{ vertical: "top", horizontal: "left" }}
-                          transformOrigin={{
-                            vertical: "top",
-                            horizontal: "left",
-                          }}
-                        >
-                          <MenuItem
-                            onClick={() => handleEditService(row, index)}
-                          >
-                            Edit
-                          </MenuItem>
-                          <MenuItem onClick={handleDeleteService}>
-                            Delete
-                          </MenuItem>
-                          <MenuItem onClick={() => handleSaveAsNewService(row)}>
-                            Save as new service
-                          </MenuItem>
-                          <MenuItem onClick={handleDuplicate}>
-                            Duplicate
-                          </MenuItem>
-                        </Menu>
-                      </TableCell>
-                      <TableCell>
-                        <IconButton onClick={() => deleteRow(index)}>
-                          <RiCloseLine />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </Box>
-
-            <Box
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "20px",
-                marginTop: "20px",
+              <option value="">Select Payment Mode</option>
+              {paymentsOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className={labelCls}>Date</label>
+            <input
+              type="date"
+              className={inputCls}
+              value={startDate ? startDate.format("YYYY-MM-DD") : ""}
+              onChange={(e) => handleStartDateChange(dayjs(e.target.value))}
+            />
+          </div>
+          <div>
+            <label className={labelCls}>Team Member</label>
+            <select
+              className={inputCls}
+              value={selecteduser?.value || ""}
+              onChange={(e) => {
+                const opt = options.find(o => o.value === e.target.value);
+                handleuserChange(null, opt || null);
               }}
             >
-              <Box
-                onClick={() => addRow()}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "5px",
-                  cursor: "pointer",
-                  color: "blue",
-                  fontSize: "18px",
-                }}
-              >
-                <AiOutlinePlusCircle /> Line item
-              </Box>
-              <Box
-                onClick={() => addRow(true)}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "5px",
-                  cursor: "pointer",
-                  color: "blue",
-                  fontSize: "18px",
-                }}
-              >
-                <CiDiscount1 /> Discount
-              </Box>
-            </Box>
-            {errors.lineItems && (
-              <Typography sx={{ color: "red", fontSize: 12 }}>
-                {errors.lineItems}
-              </Typography>
-            )}
-            <Box>
-              <Box>
-                <Typography sx={{ mt: 2, mb: 2 }} variant="h5">
-                  Summary
-                </Typography>
-              </Box>
-              <TableContainer component={Paper}>
-                <Table sx={{ backgroundColor: "#fff" }}>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>SUBTOTAL</TableCell>
-                      <TableCell>TAX RATE</TableCell>
-                      <TableCell>TAX TOTAL</TableCell>
-                      <TableCell>TOTAL</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell>
-                        $
-                        <input
-                          type="number"
-                          value={subtotal}
-                          onChange={handleSubtotalChange}
-                          style={{ border: "none" }}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <input
-                          type="number"
-                          value={taxRate}
-                          onChange={handleTaxRateChange}
-                          style={{ border: "none" }}
-                        />
-                        %
-                      </TableCell>
-                      <TableCell>${taxTotal.toFixed(2)}</TableCell>
-                      <TableCell>${totalAmount}</TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Box>
-          </Box>
-
-          <Box sx={{ pt: 4, display: "flex", alignItems: "center", gap: 5 }}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={createinvoice}
-              sx={{
-                backgroundColor: "var(--color-save-btn)", // Normal background
-
-                "&:hover": {
-                  backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                },
-                width: "80px",
-                borderRadius: "15px",
-              }}
-            >
-              Save
-            </Button>
-            <Button
-              variant="outlined"
-              onClick={onClose}
-              sx={{
-                borderColor: "var(--color-border-cancel-btn)", // Normal background
-                color: "var(--color-save-btn)",
-                "&:hover": {
-                  backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                  color: "#fff",
-                  border: "none",
-                },
-                width: "80px",
-                borderRadius: "15px",
-              }}
-            >
-              Cancel
-            </Button>
-          </Box>
-
-          {/* save as nwe service */}
-          <Drawer
-            anchor="right"
-            open={isNewDrawerOpen}
-            onClose={handleNewDrawerClose}
-            PaperProps={{
-              sx: {
-                borderRadius: isSmallScreen ? "0" : "10px 0 0 10px",
-                width: isSmallScreen ? "100%" : "650px",
-                zIndex: 1000,
-              },
-            }}
-          >
-            <Box
-              role="presentation"
-              sx={{ borderRadius: isSmallScreen ? "0" : "15px" }}
-            >
-              <Box>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    p: 2,
-                    borderBottom: "1px solid grey",
-                  }}
-                >
-                  <Typography variant="h6">Create Service</Typography>
-                  <RxCross2
-                    onClick={handleNewDrawerClose}
-                    style={{ cursor: "pointer" }}
-                  />
-                </Box>
-              </Box>
-              <form style={{ margin: "15px" }}>
-                <Box>
-                  <Box>
-                    <InputLabel sx={{ color: "black" }}>
-                      Service Name
-                    </InputLabel>
-                    <TextField
-                      // margin="normal"
-                      fullWidth
-                      name="ServiceName"
-                      placeholder="Service Name"
-                      size="small"
-                      margin="normal"
-                      value={selectedRowData?.productName || ""} // Use selected row data
-                      onChange={(e) =>
-                        setSelectedRowData({
-                          ...selectedRowData,
-                          productName: e.target.value,
-                        })
-                      }
-                    />
-                  </Box>
-                  <Box sx={{ mt: 1 }}>
-                    <InputLabel sx={{ color: "black" }}>Description</InputLabel>
-                    <TextField
-                      fullWidth
-                      name="Description"
-                      placeholder="Description"
-                      size="small"
-                      margin="normal"
-                      value={selectedRowData?.description || ""} // Use selected row data
-                      onChange={(e) =>
-                        setSelectedRowData({
-                          ...selectedRowData,
-                          description: e.target.value,
-                        })
-                      }
-                    />
-                  </Box>
-
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                    <Box width="50%">
-                      <Typography sx={{ color: "black" }}>Rate</Typography>
-                      <TextField
-                        fullWidth
-                        name="Rate"
-                        placeholder="Rate"
-                        size="small"
-                        sx={{ mt: 1 }}
-                        value={selectedRowData?.rate || ""} // Use selected row data
-                        onChange={(e) =>
-                          setSelectedRowData({
-                            ...selectedRowData,
-                            rate: e.target.value,
-                          })
-                        }
-                      />
-                    </Box>
-
-                    <Box width="50%">
-                      <Typography sx={{ color: "black" }}>Rate Type</Typography>
-                      <Autocomplete
-                        size="small"
-                        fullWidth
-                        sx={{ mt: 1 }}
-                        options={Rateoptions}
-                        getOptionLabel={(option) => option?.label || ""}
-                        value={selectedOption}
-                        onChange={handleRateTypeChange}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            variant="outlined"
-                            placeholder="Select Rate Type"
-                          />
-                        )}
-                        isOptionEqualToValue={(option, value) =>
-                          option.value === value.value
-                        }
-                        renderOption={(props, option) => (
-                          <Box
-                            component="li"
-                            {...props}
-                            sx={{
-                              margin: "4px",
-                              cursor: "pointer",
-                            }}
-                          >
-                            <Typography>{option.label}</Typography>
-                          </Box>
-                        )}
-                      />
-                    </Box>
-                  </Box>
-                  <Box mt={2}>
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={selectedRowData?.tax || false} // Use the tax value from state
-                          onChange={(event) =>
-                            handleServiceSwitch(event.target.checked)
-                          }
-                          color="primary"
-                        />
-                      }
-                      label={"Tax"}
-                    />
-                  </Box>
-                  <Box>
-                    <Box>
-                      <Typography
-                        variant="h5"
-                        gutterBottom
-                        sx={{ fontWeight: "bold", mt: 2 }}
-                      >
-                        Category
-                      </Typography>
-                    </Box>
-                    <Box>
-                      <InputLabel sx={{ color: "black", mt: 2 }}>
-                        Category Name
-                      </InputLabel>
-                      <Autocomplete
-                        size="small"
-                        fullWidth
-                        sx={{ mt: 2 }}
-                        options={categoryoptions}
-                        getOptionLabel={(option) => option.label} // Adjust based on your data structure
-                        value={selectedCategory}
-                        onChange={handleCategoryChange}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            placeholder="Category Name"
-                            variant="outlined"
-                          />
-                        )}
-                        clearOnEscape // Equivalent to isClearable
-                        isOptionEqualToValue={(option, value) =>
-                          option.value === value.value
-                        } // Compare options for equality
-                      />
-                    </Box>
-                  </Box>
-                  <Box>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={setCategoryFormOpen}
-                      sx={{
-                        backgroundColor: "var(--color-save-btn)", // Normal background
-
-                        "&:hover": {
-                          backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                        },
-                        borderRadius: "15px",
-                        mt: 4,
-                        ml: 1,
-                      }}
-                    >
-                      Create category
-                    </Button>
-
-                    {/* category form */}
-                    <Drawer
-                      anchor="right"
-                      open={isCategoryFormOpen}
-                      onClose={handleCategoryFormClose}
-                      PaperProps={{
-                        sx: {
-                          borderRadius: isSmallScreen ? "0" : "10px 0 0 10px",
-                          width: isSmallScreen ? "100%" : "650px",
-                          maxWidth: "100%",
-                        },
-                      }}
-                    >
-                      <Box>
-                        <Box
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            padding: "20px",
-                          }}
-                        >
-                          <ArrowBackRoundedIcon
-                            onClick={handleCategoryFormClose}
-                            style={{ cursor: "pointer" }}
-                          />
-                        </Box>
-                        <Divider />
-                      </Box>
-                      <Box p={3}>
-                        <InputLabel sx={{ color: "black", mt: 2 }}>
-                          Category Name
-                        </InputLabel>
-
-                        <TextField
-                          fullWidth
-                          name="Rate"
-                          placeholder="Category Name"
-                          size="small"
-                          margin="normal"
-                          value={categorycreate}
-                          onChange={(e) => setcategorycreate(e.target.value)}
-                        />
-                      </Box>
-                      <Box
-                        sx={{
-                          pt: 2,
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 5,
-                          margin: "8px",
-                          ml: 3,
-                        }}
-                      >
-                        <Button
-                          variant="contained"
-                          onClick={createCategory}
-                          sx={{
-                            backgroundColor: "var(--color-save-btn)", // Normal background
-
-                            "&:hover": {
-                              backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                            },
-                            width: "80px",
-                            borderRadius: "15px",
-                          }}
-                        >
-                          Create
-                        </Button>
-                        <Button
-                          variant="outlined"
-                          onClick={handleCategoryFormClose}
-                          sx={{
-                            borderColor: "var(--color-border-cancel-btn)", // Normal background
-                            color: "var(--color-save-btn)",
-                            "&:hover": {
-                              backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                              color: "#fff",
-                              border: "none",
-                            },
-                            width: "80px",
-                            borderRadius: "15px",
-                          }}
-                        >
-                          Cancel
-                        </Button>
-                      </Box>
-                    </Drawer>
-                  </Box>
-                  <Box
-                    sx={{
-                      pt: 5,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 5,
-                      ml: 1,
-                    }}
+              <option value="">Team Member</option>
+              {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
+        </div>
+        <div className="relative">
+          <label className={labelCls}>Description</label>
+          <textarea
+            className={`${inputCls} min-h-[80px] resize-none pb-6`}
+            value={description}
+            onChange={handleChange}
+            placeholder="Description"
+          />
+          <span className="absolute bottom-2 right-3 text-xs text-muted-foreground">{charCount}/{charLimit}</span>
+        </div>
+        <div className="relative">
+          <button onClick={toggleDropdown} className={`${btnPrimary} mt-1`}>Add Shortcode</button>
+          {showDropdown && (
+            <>
+              <div className="fixed inset-0 z-20" onClick={handleCloseDropdown} />
+              <div className="absolute z-30 mt-1 w-72 h-72 overflow-y-auto bg-card border border-border rounded-lg shadow-lg">
+                {filteredShortcuts.map((shortcut, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleAddShortcut(shortcut.value)}
+                    className={`w-full text-left px-4 py-2 text-sm hover:bg-muted transition-colors ${shortcut.isBold ? "font-bold text-foreground" : "text-muted-foreground"}`}
                   >
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={createservicetemp}
-                      sx={{
-                        backgroundColor: "var(--color-save-btn)", // Normal background
-
-                        "&:hover": {
-                          backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                        },
-                        width: "80px",
-                        borderRadius: "15px",
-                      }}
-                    >
-                      Save
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      onClick={handleNewDrawerClose}
-                      sx={{
-                        borderColor: "var(--color-border-cancel-btn)", // Normal background
-                        color: "var(--color-save-btn)",
-                        "&:hover": {
-                          backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                          color: "#fff",
-                          border: "none",
-                        },
-                        width: "80px",
-                        borderRadius: "15px",
-                      }}
-                    >
-                      Cancel
-                    </Button>
-                  </Box>
-                </Box>
-              </form>
-            </Box>
-          </Drawer>
-          {/* category  */}
-          <Drawer
-            anchor="right"
-            open={isCategoryFormOpen}
-            onClose={handleCategoryFormClose}
-            PaperProps={{
-              sx: {
-                borderRadius: isSmallScreen ? "0" : "10px 0 0 10px",
-                width: isSmallScreen ? "100%" : "650px",
-                maxWidth: "100%",
-              },
-            }}
-          >
-            <Box>
-              <Box
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: "20px",
-                }}
+                    {shortcut.title}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+        <div className="space-y-2">
+          <h3 className="text-sm font-bold text-foreground">Additional</h3>
+          {[
+            { label: "Pay invoice using client credits", checked: payInvoice, onChange: handlePayInvoiceChange },
+            { label: "Email invoice to client", checked: emailInvoice, onChange: handleEmailInvoiceChange },
+            { label: "Reminders", checked: reminders, onChange: handleRemindersChange },
+            { label: "Scheduled invoice", checked: scheduledInvoice, onChange: handleScheduledInvoiceChange },
+          ].map(({ label, checked, onChange }) => (
+            <label key={label} className="flex items-center gap-3 cursor-pointer select-none">
+              <div
+                onClick={() => onChange({ target: { checked: !checked } })}
+                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${checked ? "bg-primary" : "bg-muted"}`}
               >
-                <ArrowBackRoundedIcon
-                  onClick={handleCategoryFormClose}
-                  style={{ cursor: "pointer" }}
-                />
-              </Box>
-              <Divider />
-            </Box>
-            <Box p={3}>
-              <InputLabel sx={{ color: "black", mt: 2 }}>
-                Category Name
-              </InputLabel>
+                <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${checked ? "translate-x-4" : "translate-x-1"}`} />
+              </div>
+              <span className="text-sm text-foreground">{label}</span>
+            </label>
+          ))}
+        </div>
 
-              <TextField
-                fullWidth
-                name="Rate"
-                placeholder="Category Name"
-                size="small"
-                margin="normal"
-                value={categorycreate}
-                onChange={(e) => setcategorycreate(e.target.value)}
-              />
-            </Box>
-            <Box
-              sx={{
-                pt: 2,
-                display: "flex",
-                alignItems: "center",
-                gap: 5,
-                margin: "8px",
-                ml: 3,
-              }}
-            >
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={createCategory}
-                sx={{
-                  backgroundColor: "var(--color-save-btn)", // Normal background
-
-                  "&:hover": {
-                    backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                  },
-                  width: "80px",
-                  borderRadius: "15px",
-                }}
-              >
-                Create
-              </Button>
-              <Button
-                variant="outlined"
-                onClick={handleCategoryFormClose}
-                sx={{
-                  borderColor: "var(--color-border-cancel-btn)", // Normal background
-                  color: "var(--color-save-btn)",
-                  "&:hover": {
-                    backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                    color: "#fff",
-                    border: "none",
-                  },
-                  width: "80px",
-                  borderRadius: "15px",
-                }}
-              >
-                Cancel
-              </Button>
-            </Box>
-          </Drawer>
-
-          {/* edit service */}
-          <Drawer
-            anchor="right"
-            open={isEditDrawerOpen}
-            onClose={handleEditDrawerClose}
-            PaperProps={{
-              sx: {
-                borderRadius: isSmallScreen ? "0" : "10px 0 0 10px",
-                width: isSmallScreen ? "100%" : "650px",
-                zIndex: 1000,
-              },
-            }}
-          >
-            <Box
-              role="presentation"
-              sx={{ borderRadius: isSmallScreen ? "0" : "15px" }}
-            >
-              <Box>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    p: 2,
-                    borderBottom: "1px solid grey",
-                  }}
-                >
-                  <Typography variant="h6">Edit Item</Typography>
-                  <RxCross2
-                    onClick={handleEditDrawerClose}
-                    style={{ cursor: "pointer" }}
-                  />
-                </Box>
-                <Box p={2}>
-                  <Typography variant="h6" fontWeight="bold">
-                    Product or service
-                  </Typography>
-                  <TextField
-                    size="small"
-                    margin="normal"
-                    value={selectedRowData?.productName || ""}
-                    fullWidth
-                    onChange={(e) =>
-                      setSelectedRowData({
-                        ...selectedRowData,
-                        productName: e.target.value,
-                      })
-                    }
-                  />
-                  <Box>
-                    <Typography>Description</Typography>
-                    <TextField
-                      size="small"
-                      margin="normal"
-                      value={selectedRowData?.description || ""}
-                      fullWidth
-                      multiline
-                      onChange={(e) =>
-                        setSelectedRowData({
-                          ...selectedRowData,
-                          description: e.target.value,
-                        })
-                      }
-                    />
-                  </Box>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "10px",
-                      mt: 1,
-                    }}
-                  >
-                    <Box>
-                      <Typography>Rate</Typography>
-                      <TextField
-                        size="small"
-                        margin="normal"
-                        value={selectedRowData?.rate || ""}
-                        fullWidth
-                        onChange={(e) =>
-                          setSelectedRowData({
-                            ...selectedRowData,
-                            rate: e.target.value,
-                          })
-                        }
+        {/* Line Items */}
+        <div>
+          <h3 className="text-base font-bold text-foreground">Line Items</h3>
+          <p className="text-xs text-muted-foreground mb-3">Client-facing itemized list of products and services</p>
+          <div className="overflow-x-auto rounded-lg border border-border">
+            <table className="w-full text-sm min-w-[700px]">
+              <thead>
+                <tr className="border-b bg-muted/40">
+                  <th className="text-left px-3 py-2 text-xs font-bold text-foreground w-48">Product or Service</th>
+                  <th className="text-left px-3 py-2 text-xs font-bold text-foreground">Description</th>
+                  <th className="text-left px-3 py-2 text-xs font-bold text-foreground w-24">Rate</th>
+                  <th className="text-left px-3 py-2 text-xs font-bold text-foreground w-16">Qty</th>
+                  <th className="text-left px-3 py-2 text-xs font-bold text-foreground w-24">Amount</th>
+                  <th className="text-center px-3 py-2 text-xs font-bold text-foreground w-12">Tax</th>
+                  <th className="w-10" />
+                  <th className="w-8" />
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {rows.map((row, index) => (
+                  <tr key={index} className={`${index % 2 === 0 ? "bg-card" : "bg-muted/10"} hover:bg-primary/5`}>
+                    <td className="px-3 py-2">
+                      <CreatableSelect
+                        placeholder={row.isDiscount ? "Reason for discount" : "Product or Service"}
+                        options={serviceoptions}
+                        value={row.productName ? (serviceoptions.find(o => o.label === row.productName) || { label: row.productName, value: row.productName }) : null}
+                        onChange={(sel) => handleServiceChange(index, sel)}
+                        onInputChange={(val, meta) => handleServiceInputChange(val, meta, index)}
+                        isClearable
+                        styles={{ container: (p) => ({ ...p, width: "180px" }), control: (p) => ({ ...p, width: "180px" }), menuPortal: (p) => ({ ...p, zIndex: 9999 }) }}
+                        menuPortalTarget={document.body}
                       />
-                    </Box>
-                    <Box>
-                      <Typography>QTY</Typography>
-                      <TextField
-                        size="small"
-                        margin="normal"
-                        value={selectedRowData?.qty || ""}
-                        fullWidth
-                        onChange={(e) =>
-                          setSelectedRowData({
-                            ...selectedRowData,
-                            qty: e.target.value,
-                          })
-                        }
-                      />
-                    </Box>
-                    <Box>
-                      <Typography>Amount</Typography>
-                      <TextField
-                        size="small"
-                        margin="normal"
-                        fullWidth
-                        disabled
-                        value={totalamount}
-                      />
-                    </Box>
-                  </Box>
-                  <Box mt={2}>
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={selectedRowData?.tax}
-                          onChange={(event) =>
-                            handleServiceWitch(event.target.checked)
-                          }
-                          color="primary"
-                        />
-                      }
-                      label={"Tax"}
-                    />
-                  </Box>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 2,
-                      mt: 2,
-                    }}
-                  >
-                    <Button
-                      variant="contained"
-                      onClick={handleSaveChanges}
-                      sx={{
-                        backgroundColor: "var(--color-save-btn)", // Normal background
+                    </td>
+                    <td className="px-3 py-2">
+                      <input type="text" name="description" value={row.description} onChange={(e) => handleInputChange(index, e)} placeholder="Description" className="w-full bg-transparent text-sm text-foreground outline-none border-b border-border focus:border-primary" />
+                    </td>
+                    <td className="px-3 py-2">
+                      <input type="text" name="rate" value={row.rate} onChange={(e) => handleInputChange(index, e)} className="w-20 bg-transparent text-sm text-foreground outline-none border-b border-border focus:border-primary" />
+                    </td>
+                    <td className="px-3 py-2">
+                      <input type="text" name="qty" value={row.qty} onChange={(e) => handleInputChange(index, e)} className="w-12 bg-transparent text-sm text-foreground outline-none border-b border-border focus:border-primary" />
+                    </td>
+                    <td className={`px-3 py-2 text-sm text-foreground ${row.isDiscount ? "text-destructive" : ""}`}>{row.amount}</td>
+                    <td className="px-3 py-2 text-center">
+                      <input type="checkbox" name="tax" checked={row.tax} onChange={(e) => handleInputChange(index, e)} className="accent-primary h-4 w-4 cursor-pointer" />
+                    </td>
+                    <td className="px-2 py-2 relative">
+                      <button onClick={(e) => handleMenuOpen(e, index)} className="p-1 rounded text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
+                        <BsThreeDotsVertical className="text-sm" />
+                      </button>
+                      {Boolean(anchorElNew) && selectedRow === index && (
+                        <>
+                          <div className="fixed inset-0 z-30" onClick={handleMenuClose} />
+                          <div className="absolute right-0 z-40 mt-1 w-40 bg-card border border-border rounded-lg shadow-lg py-1">
+                            <button onClick={() => handleEditService(row, index)} className="w-full text-left px-4 py-2 text-xs text-foreground hover:bg-muted">Edit</button>
+                            <button onClick={handleDeleteService} className="w-full text-left px-4 py-2 text-xs text-destructive hover:bg-destructive/10">Delete</button>
+                            <button onClick={() => handleSaveAsNewService(row)} className="w-full text-left px-4 py-2 text-xs text-foreground hover:bg-muted">Save as new service</button>
+                            <button onClick={handleDuplicate} className="w-full text-left px-4 py-2 text-xs text-foreground hover:bg-muted">Duplicate</button>
+                          </div>
+                        </>
+                      )}
+                    </td>
+                    <td className="px-2 py-2">
+                      <button onClick={() => deleteRow(index)} className="p-1 rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors">
+                        <RiCloseLine className="text-sm" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="flex items-center gap-5 mt-3">
+            <button onClick={() => addRow()} className="flex items-center gap-1.5 text-sm text-primary hover:text-primary/80 transition-colors">
+              <AiOutlinePlusCircle className="text-base" /> Line item
+            </button>
+            <button onClick={() => addRow(true)} className="flex items-center gap-1.5 text-sm text-primary hover:text-primary/80 transition-colors">
+              <CiDiscount1 className="text-base" /> Discount
+            </button>
+          </div>
+          {errors.lineItems && <p className="text-xs text-destructive mt-1">{errors.lineItems}</p>}
+        </div>
 
-                        "&:hover": {
-                          backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                        },
-                        width: "80px",
-                        borderRadius: "15px",
-                      }}
-                    >
-                      Save
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      onClick={handleEditDrawerClose}
-                      sx={{
-                        borderColor: "var(--color-border-cancel-btn)", // Normal background
-                        color: "var(--color-save-btn)",
-                        "&:hover": {
-                          backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                          color: "#fff",
-                          border: "none",
-                        },
-                        width: "80px",
-                        borderRadius: "15px",
-                      }}
-                    >
-                      {" "}
-                      Cancel
-                    </Button>
-                  </Box>
-                </Box>
-              </Box>
-            </Box>
-          </Drawer>
-        </Box>
-      </Box>
-    </Box>
+        {/* Summary */}
+        <div>
+          <h3 className="text-base font-bold text-foreground mb-3">Summary</h3>
+          <div className="overflow-x-auto rounded-lg border border-border">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b bg-muted/40">
+                  <th className="text-left px-4 py-2 text-xs font-bold text-foreground">Subtotal</th>
+                  <th className="text-left px-4 py-2 text-xs font-bold text-foreground">Tax Rate</th>
+                  <th className="text-left px-4 py-2 text-xs font-bold text-foreground">Tax Total</th>
+                  <th className="text-left px-4 py-2 text-xs font-bold text-foreground">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="px-4 py-2 text-foreground">$<input type="number" value={subtotal} onChange={handleSubtotalChange} className="w-20 bg-transparent outline-none border-b border-border focus:border-primary" /></td>
+                  <td className="px-4 py-2 text-foreground"><input type="number" value={taxRate} onChange={handleTaxRateChange} className="w-16 bg-transparent outline-none border-b border-border focus:border-primary" />%</td>
+                  <td className="px-4 py-2 text-foreground">${taxTotal.toFixed(2)}</td>
+                  <td className="px-4 py-2 font-semibold text-foreground">${totalAmount}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Footer buttons */}
+        <div className="flex items-center gap-4 pt-2 pb-6">
+          <button onClick={createinvoice} className={btnPrimary}>Save</button>
+          <button onClick={onClose} className={btnOutline}>Cancel</button>
+        </div>
+
+        {/* Create Service Drawer */}
+        {isNewDrawerOpen && (
+          <div className="fixed inset-0 z-50 flex">
+            <div className="fixed inset-0 bg-black/40" onClick={handleNewDrawerClose} />
+            <div className="ml-auto relative z-50 w-full max-w-[650px] bg-background h-full overflow-y-auto shadow-2xl">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+                <h3 className="text-base font-semibold text-foreground">Create Service</h3>
+                <button onClick={handleNewDrawerClose} className="text-muted-foreground hover:text-foreground"><RxCross2 /></button>
+              </div>
+              <div className="p-4 space-y-4">
+                <div>
+                  <label className={labelCls}>Service Name</label>
+                  <input type="text" className={inputCls} placeholder="Service Name" value={selectedRowData?.productName || ""} onChange={(e) => setSelectedRowData({ ...selectedRowData, productName: e.target.value })} />
+                </div>
+                <div>
+                  <label className={labelCls}>Description</label>
+                  <input type="text" className={inputCls} placeholder="Description" value={selectedRowData?.description || ""} onChange={(e) => setSelectedRowData({ ...selectedRowData, description: e.target.value })} />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className={labelCls}>Rate</label>
+                    <input type="text" className={inputCls} placeholder="Rate" value={selectedRowData?.rate || ""} onChange={(e) => setSelectedRowData({ ...selectedRowData, rate: e.target.value })} />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Rate Type</label>
+                    <select className={inputCls} value={selectedRateOption?.value || ""} onChange={(e) => { const opt = Rateoptions.find(o => o.value === e.target.value); handleRateTypeChange(null, opt || null); }}>
+                      <option value="">Select Rate Type</option>
+                      {Rateoptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                    </select>
+                  </div>
+                </div>
+                <label className="flex items-center gap-3 cursor-pointer select-none">
+                  <div onClick={() => handleServiceSwitch(!(selectedRowData?.tax || false))} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${selectedRowData?.tax ? "bg-primary" : "bg-muted"}`}>
+                    <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${selectedRowData?.tax ? "translate-x-4" : "translate-x-1"}`} />
+                  </div>
+                  <span className="text-sm text-foreground">Tax</span>
+                </label>
+                <div>
+                  <h4 className="text-sm font-bold text-foreground mb-2">Category</h4>
+                  <label className={labelCls}>Category Name</label>
+                  <select className={inputCls} value={selectedCategory?.value || ""} onChange={(e) => { const opt = categoryoptions.find(o => o.value === e.target.value); handleCategoryChange(null, opt || null); }}>
+                    <option value="">Category Name</option>
+                    {categoryoptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                  </select>
+                </div>
+                <button onClick={() => setCategoryFormOpen(true)} className={`${btnPrimary} mt-2`}>Create category</button>
+                <div className="flex gap-4 pt-4">
+                  <button onClick={createservicetemp} className={btnPrimary}>Save</button>
+                  <button onClick={handleNewDrawerClose} className={btnOutline}>Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Category Form Drawer */}
+        {isCategoryFormOpen && (
+          <div className="fixed inset-0 z-50 flex">
+            <div className="fixed inset-0 bg-black/40" onClick={handleCategoryFormClose} />
+            <div className="ml-auto relative z-50 w-full max-w-[650px] bg-background h-full overflow-y-auto shadow-2xl">
+              <div className="flex items-center px-4 py-3 border-b border-border">
+                <button onClick={handleCategoryFormClose} className="text-muted-foreground hover:text-foreground mr-3"><ChevronLeft className="h-5 w-5" /></button>
+                <h3 className="text-base font-semibold text-foreground">Create Category</h3>
+              </div>
+              <div className="p-4 space-y-4">
+                <div>
+                  <label className={labelCls}>Category Name</label>
+                  <input type="text" className={inputCls} placeholder="Category Name" value={categorycreate || ""} onChange={(e) => setcategorycreate(e.target.value)} />
+                </div>
+                <div className="flex gap-4 pt-2">
+                  <button onClick={createCategory} className={btnPrimary}>Create</button>
+                  <button onClick={handleCategoryFormClose} className={btnOutline}>Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Item Drawer */}
+        {isEditDrawerOpen && (
+          <div className="fixed inset-0 z-50 flex">
+            <div className="fixed inset-0 bg-black/40" onClick={handleEditDrawerClose} />
+            <div className="ml-auto relative z-50 w-full max-w-[650px] bg-background h-full overflow-y-auto shadow-2xl">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+                <h3 className="text-base font-semibold text-foreground">Edit Item</h3>
+                <button onClick={handleEditDrawerClose} className="text-muted-foreground hover:text-foreground"><RxCross2 /></button>
+              </div>
+              <div className="p-4 space-y-4">
+                <div>
+                  <label className={labelCls}>Product or service</label>
+                  <input type="text" className={inputCls} value={selectedRowData?.productName || ""} onChange={(e) => setSelectedRowData({ ...selectedRowData, productName: e.target.value })} />
+                </div>
+                <div>
+                  <label className={labelCls}>Description</label>
+                  <textarea className={`${inputCls} min-h-[80px] resize-none`} value={selectedRowData?.description || ""} onChange={(e) => setSelectedRowData({ ...selectedRowData, description: e.target.value })} />
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <label className={labelCls}>Rate</label>
+                    <input type="text" className={inputCls} value={selectedRowData?.rate || ""} onChange={(e) => setSelectedRowData({ ...selectedRowData, rate: e.target.value })} />
+                  </div>
+                  <div>
+                    <label className={labelCls}>QTY</label>
+                    <input type="text" className={inputCls} value={selectedRowData?.qty || ""} onChange={(e) => setSelectedRowData({ ...selectedRowData, qty: e.target.value })} />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Amount</label>
+                    <input type="text" className={`${inputCls} bg-muted/40 cursor-not-allowed`} value={totalamount} disabled readOnly />
+                  </div>
+                </div>
+                <label className="flex items-center gap-3 cursor-pointer select-none">
+                  <div onClick={() => handleServiceWitch(!(selectedRowData?.tax))} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${selectedRowData?.tax ? "bg-primary" : "bg-muted"}`}>
+                    <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${selectedRowData?.tax ? "translate-x-4" : "translate-x-1"}`} />
+                  </div>
+                  <span className="text-sm text-foreground">Tax</span>
+                </label>
+                <div className="flex gap-4 pt-2">
+                  <button onClick={handleSaveChanges} className={btnPrimary}>Save</button>
+                  <button onClick={handleEditDrawerClose} className={btnOutline}>Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 

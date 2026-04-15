@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { toast } from "react-toastify";
+import { Button } from "../../components/ui/button";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../../components/ui/select";
 
 const ManageTags = ({ selectedAccounts, onClose,fetchData }) => {
   const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
@@ -124,12 +126,12 @@ const ManageTags = ({ selectedAccounts, onClose,fetchData }) => {
 
   console.log(tagActions);
 
-  const thCls = "px-4 py-2 text-left text-xs font-bold text-gray-700 bg-gray-50 border-b border-gray-200";
-  const tdCls = "px-4 py-2 text-xs text-gray-700 border-b border-gray-100";
+  const thCls = "px-4 py-3 text-left text-xs font-semibold tracking-wide uppercase text-muted-foreground border-b border-border";
+  const tdCls = "px-4 py-3 text-sm text-foreground border-b border-border align-middle";
 
   return (
     <div>
-      <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm" style={{ height: '75vh', overflowY: 'auto' }}>
+      <div className="overflow-x-auto rounded-lg border border-border shadow-sm bg-white" style={{ height: '75vh', overflowY: 'auto' }}>
         <table className="w-full border-collapse">
           <thead>
             <tr>
@@ -139,7 +141,7 @@ const ManageTags = ({ selectedAccounts, onClose,fetchData }) => {
           </thead>
           <tbody>
             {tags.map((tag) => (
-              <tr key={tag._id} className="hover:bg-gray-50">
+              <tr key={tag._id} className="bg-white hover:bg-muted/30 transition-colors">
                 <td className={tdCls}>
                   <span
                     className="inline-block rounded-full px-2 py-0.5 text-xs font-medium text-white whitespace-nowrap"
@@ -149,15 +151,16 @@ const ManageTags = ({ selectedAccounts, onClose,fetchData }) => {
                   </span>
                 </td>
                 <td className={tdCls}>
-                  <select
-                    className="rounded border border-gray-200 px-2 py-1 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 w-40"
-                    value={tagActions[tag._id] || "Do nothing"}
-                    onChange={(e) => handleActionChange(tag._id, e.target.value)}
-                  >
-                    <option value="Assign to all">Assign to all</option>
-                    <option value="Remove from all">Remove from all</option>
-                    <option value="Do nothing">Do nothing</option>
-                  </select>
+                  <Select value={tagActions[tag._id] || "Do nothing"} onValueChange={(val) => handleActionChange(tag._id, val)}>
+                    <SelectTrigger className="w-40">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Assign to all">Assign to all</SelectItem>
+                      <SelectItem value="Remove from all">Remove from all</SelectItem>
+                      <SelectItem value="Do nothing">Do nothing</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </td>
               </tr>
             ))}
@@ -165,12 +168,8 @@ const ManageTags = ({ selectedAccounts, onClose,fetchData }) => {
         </table>
       </div>
       <div className="flex gap-3 mt-4">
-        <button onClick={sendbulkTags} className="rounded-full px-5 py-1.5 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)]">
-          Assign Tags
-        </button>
-        <button onClick={handleCancel} className="rounded-full px-5 py-1.5 text-sm font-medium border border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white">
-          Cancel
-        </button>
+        <Button variant="default" onClick={sendbulkTags}>Assign Tags</Button>
+        <Button variant="outline" onClick={handleCancel}>Cancel</Button>
       </div>
     </div>
   );

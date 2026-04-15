@@ -1,40 +1,4 @@
-import React, { useEffect, useState } from "react";
-import {
-  DialogActions,
-  Dialog,
-  DialogTitle,
-  Menu,
-  Checkbox,
-  DialogContent,
-  Autocomplete,
-  Switch,
-  FormControlLabel,
-  Box,
-  Button,
-  Drawer,
-  Typography,
-  Chip,
-  IconButton,
-  Divider,
-  Select,
-  MenuItem,
-  InputLabel,
-  TextField,
-  FormControl,
-  FormLabel,
-  InputAdornment,
-  Popover,
-  ListItem,
-  List,
-  ListItemText,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-} from "@mui/material";
+import React, { useEffect, useState, useRef } from "react";
 import { CiMenuKebab } from "react-icons/ci";
 import { toast } from "react-toastify";
 import { useNavigate, useParams, useRouteLoaderData } from "react-router-dom";
@@ -470,445 +434,154 @@ const Invoice = () => {
     }
   };
 
-  return (
-    <Box sx={{ mt: 2 }}>
-      <Button
-        variant="contained"
-        onClick={handleCreateInvoiceClick}
-        sx={{
-          backgroundColor: "var(--color-save-btn)", // Normal background
+  const getStatusClass = (status) => {
+    switch (status) {
+      case "Paid": return "bg-success/10 text-success border border-success/20";
+      case "Overdue": return "bg-destructive/10 text-destructive border border-destructive/20";
+      case "Pending": return "bg-warning/10 text-warning border border-warning/20";
+      default: return "bg-muted text-muted-foreground";
+    }
+  };
 
-          "&:hover": {
-            backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-          },
-          mb: 3,
-          borderRadius: "15px",
-        }}
+  return (
+    <div className="mt-2">
+      <button
+        onClick={handleCreateInvoiceClick}
+        className="mb-4 px-5 py-2 rounded-full text-sm font-medium text-white bg-primary hover:bg-primary/90 transition-colors"
       >
         New Invoice
-      </Button>
+      </button>
 
-      <TableContainer component={Paper} sx={{ overflow: "visible" }}>
-        <Table sx={{ width: "100%" }}>
-          <TableHead>
-            <TableRow>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Invoice #
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Status
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Posted
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Total
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Amount Paid
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Balance due
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Last Paid
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="250"
-              >
-                Description
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  padding: "16px",
-                }}
-                width="100"
-              >
-                Settings
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {Array.isArray(accountInvoicesData) ? (
-              accountInvoicesData.map((row) => (
-                <TableRow key={row._id}>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                      cursor: "pointer",
-                      color: "#3f51b5",
-                    }}
-                    onClick={() => handleEdit(row._id)}
-                  >
-                    {/* <Typography sx={{ cursor: "pointer",
-                      color: "#3f51b5", }} > */}
-                    {row.invoicenumber}{" "}
-                    {row.invoiceLabel && (
-                      <Chip
-                        label={row.invoiceLabel}
-                        size="small"
-                        color="warning"
-                        sx={{ ml: 1 }}
-                      />
-                    )}
-                    {/* </Typography> */}
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                      cursor: "pointer",
-                    }}
-                  >
+      <div className="bg-white rounded-xl border border-border shadow-sm overflow-x-auto">
+        <table className="w-full text-left min-w-[900px]">
+          <thead>
+            <tr className="border-b border-border">
+              <th className="text-xs font-semibold tracking-wide uppercase text-left px-4 py-3 text-muted-foreground">Invoice #</th>
+              <th className="text-xs font-semibold tracking-wide uppercase text-left px-4 py-3 text-muted-foreground">Status</th>
+              <th className="text-xs font-semibold tracking-wide uppercase text-left px-4 py-3 text-muted-foreground">Posted</th>
+              <th className="text-xs font-semibold tracking-wide uppercase text-left px-4 py-3 text-muted-foreground">Total</th>
+              <th className="text-xs font-semibold tracking-wide uppercase text-left px-4 py-3 text-muted-foreground">Amount Paid</th>
+              <th className="text-xs font-semibold tracking-wide uppercase text-left px-4 py-3 text-muted-foreground">Balance Due</th>
+              <th className="text-xs font-semibold tracking-wide uppercase text-left px-4 py-3 text-muted-foreground">Last Paid</th>
+              <th className="text-xs font-semibold tracking-wide uppercase text-left px-4 py-3 text-muted-foreground">Description</th>
+              <th className="text-xs font-semibold tracking-wide uppercase text-left px-4 py-3 text-muted-foreground">Settings</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border">
+            {Array.isArray(accountInvoicesData) && accountInvoicesData.map((row, idx) => (
+              <tr key={row._id} className="bg-white transition-colors hover:bg-muted/30">
+                <td
+                  className="text-xs px-4 py-2.5 leading-tight cursor-pointer text-primary hover:text-primary/80 font-medium"
+                  onClick={() => handleEdit(row._id)}
+                >
+                  {row.invoicenumber}{" "}
+                  {row.invoiceLabel && (
+                    <span className="ml-1 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-warning/10 text-warning border border-warning/20">
+                      {row.invoiceLabel}
+                    </span>
+                  )}
+                </td>
+                <td className="text-xs px-4 py-2.5 leading-tight">
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getStatusClass(row.invoiceStatus)}`}>
                     {row.invoiceStatus}
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                      cursor: "pointer",
-                    }}
-                  >
-                    {new Intl.DateTimeFormat("en-US", {
-                      day: "2-digit",
-                      month: "2-digit",
-                      year: "numeric",
-                    }).format(new Date(row.createdAt))}
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                      cursor: "pointer",
-                    }}
-                  >
-                    ${row.summary.total}
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                      cursor: "pointer",
-                    }}
-                  >
-                    ${row.paidAmount}
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                      cursor: "pointer",
-                    }}
-                  >
-                    ${row.summary.total - row.paidAmount}
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                      cursor: "pointer",
-                    }}
-                  >
-                    {row.lastPaid}
-                  </TableCell>
-                  <TableCell>{row.description}</TableCell>
-                  {/* <TableCell style={{
-                    fontSize: "12px",
-                    padding: "4px 8px",
-                    lineHeight: "1",
-                    cursor: "pointer",
-                  }}>
-                    <IconButton onClick={() => toggleMenu(row._id)} style={{ color: "#2c59fa" }}>
-                      <CiMenuKebab style={{ fontSize: "25px" }} />
-                      {openMenuId === row._id && (
-                        <Box
-                          sx={{
-                            position: "absolute",
-                            zIndex: 1,
-                            backgroundColor: "#fff",
-                            boxShadow: 1,
-                            borderRadius: 1,
-                            p: 1,
-
-                            right: "30px",
-                            m: 2,
-                            top: "10px",
-                            width: "150px",
-                            textAlign: "start",
-                          }}
-                        >
-                          <Typography sx={{ fontSize: "12px", fontWeight: "bold" }} onClick={() => handleEdit(row._id)}>
-                            Edit
-                          </Typography>
-
-                          <Typography sx={{ fontSize: "12px", fontWeight: "bold" }} onClick={() => handleDuplicate(row._id)}>
-                            Duplicate
-                          </Typography>
-                          <Typography sx={{ fontSize: "12px", fontWeight: "bold" }} onClick={() => handlePrint(row._id)}>
-                            Print
-                          </Typography>
-                          <Typography sx={{ fontSize: "12px", fontWeight: "bold" }} onClick={() => handleDownload(row._id)}>
-                            Download
-                          </Typography>
-
-                          <Typography sx={{ fontSize: "12px", color: "red", fontWeight: "bold" }} onClick={() => handleDelete(row._id)}>
-                            Delete
-                          </Typography>
-                         
-<Typography
-  sx={{ fontSize: "12px", fontWeight: "bold" }}
-  onClick={() => {
-     setOpenDialog(true);
-    setCurrentInvoice(row.invoicenumber);
-   
-  }}
->
-  Update Status
-</Typography>
-
-
-
-
-                        </Box>
-                      )}
-                    </IconButton>
-                  </TableCell> */}
-                  <TableCell
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 8px",
-                      lineHeight: "1",
-                    }}
-                  >
-                    <IconButton
+                  </span>
+                </td>
+                <td className="text-xs px-4 py-2.5 leading-tight text-foreground">
+                  {new Intl.DateTimeFormat("en-US", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                  }).format(new Date(row.createdAt))}
+                </td>
+                <td className="text-xs px-4 py-2.5 leading-tight text-foreground">${row.summary.total}</td>
+                <td className="text-xs px-4 py-2.5 leading-tight text-foreground">${row.paidAmount}</td>
+                <td className="text-xs px-4 py-2.5 leading-tight text-foreground">${row.summary.total - row.paidAmount}</td>
+                <td className="text-xs px-4 py-2.5 leading-tight text-muted-foreground">{row.lastPaid}</td>
+                <td className="text-xs px-4 py-2.5 leading-tight text-muted-foreground max-w-[200px] truncate">{row.description}</td>
+                <td className="text-xs px-4 py-2.5 leading-tight">
+                  <div className="relative inline-block">
+                    <button
                       onClick={(event) => toggleMenu(event, row._id)}
-                      style={{ color: "#2c59fa" }}
-                      size="small"
+                      className="p-1 rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
                     >
-                      <CiMenuKebab />
-                    </IconButton>
+                      <CiMenuKebab className="text-base" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-                    {/* MUI Menu */}
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
-              <div></div>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleMenuClose}
-        anchorOrigin={{
-          vertical: "top",
-          horizontal: "right",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "left",
-        }}
-        PaperProps={{
-          sx: {
-            mt: 3,
-            ml: 1,
-            boxShadow: 3,
-            borderRadius: 1,
-            minWidth: 120,
-            "& .MuiMenuItem-root": {
-              fontSize: "12px",
-              padding: "8px 16px",
-            },
-          },
-        }}
-      >
-        <MenuItem
-          onClick={() => handleEdit(tempIdget)}
-          sx={{
-            fontWeight: "bold",
-            "&:hover": {
-              backgroundColor: "#f5f5f5",
-            },
-          }}
-        >
-          Edit
-        </MenuItem>
-        <MenuItem
-          onClick={() => handleDelete(tempIdget)}
-          sx={{
-            color: "error.main",
-            fontWeight: "bold",
-            "&:hover": {
-              backgroundColor: "#ffebee",
-            },
-          }}
-        >
-          Delete
-        </MenuItem>
-        <MenuItem
-          onClick={() => handleDuplicate(tempIdget)}
-          sx={{
-            fontWeight: "bold",
-            "&:hover": {
-              backgroundColor: "#f5f5f5",
-            },
-          }}
-        >
-          Duplicate
-        </MenuItem>
-        <MenuItem
-          onClick={() => handlePrint(tempIdget)}
-          sx={{
-            fontWeight: "bold",
-            "&:hover": {
-              backgroundColor: "#f5f5f5",
-            },
-          }}
-        >
-          Print
-        </MenuItem>
-        <MenuItem
-          onClick={() => handleDownload(tempIdget)}
-          sx={{
-            fontWeight: "bold",
-            "&:hover": {
-              backgroundColor: "#f5f5f5",
-            },
-          }}
-        >
-          Download
-        </MenuItem>
-      </Menu>
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-        <DialogTitle>Update Invoice Status</DialogTitle>
-        <DialogContent>
-          <Autocomplete
-            options={["Paid", "Pending", "Overdue"]}
-            value={selectedStatus}
-            onChange={(event, newValue) => setSelectedStatus(newValue)}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                placeholder="Select Status"
-                sx={{ cursor: "pointer" }}
-              />
-            )}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-          <Button
-            onClick={() => {
-              handleUpdateStatus(currentInvoice, selectedStatus);
-              setOpenDialog(false);
+      {/* Dropdown Menu */}
+      {Boolean(anchorEl) && (
+        <>
+          <div className="fixed inset-0 z-30" onClick={handleMenuClose} />
+          <div
+            className="fixed z-40 bg-card border border-border rounded-lg shadow-lg py-1 min-w-[130px]"
+            style={{
+              top: anchorEl.getBoundingClientRect().bottom + 4,
+              left: anchorEl.getBoundingClientRect().left,
             }}
-            disabled={!selectedStatus}
           >
-            Update
-          </Button>
-        </DialogActions>
-      </Dialog>
+            <button onClick={() => handleEdit(tempIdget)} className="w-full text-left px-4 py-2 text-xs font-medium text-foreground hover:bg-muted transition-colors">Edit</button>
+            <button onClick={() => handleDelete(tempIdget)} className="w-full text-left px-4 py-2 text-xs font-medium text-destructive hover:bg-destructive/10 transition-colors">Delete</button>
+            <button onClick={() => handleDuplicate(tempIdget)} className="w-full text-left px-4 py-2 text-xs font-medium text-foreground hover:bg-muted transition-colors">Duplicate</button>
+            <button onClick={() => handlePrint(tempIdget)} className="w-full text-left px-4 py-2 text-xs font-medium text-foreground hover:bg-muted transition-colors">Print</button>
+            <button onClick={() => handleDownload(tempIdget)} className="w-full text-left px-4 py-2 text-xs font-medium text-foreground hover:bg-muted transition-colors">Download</button>
+          </div>
+        </>
+      )}
 
-      <Drawer
-        anchor="right"
-        open={showInvoiceTemplateForm}
-        onClose={handleClose}
-        classes={{ paper: "custom-right-drawer" }}
-        PaperProps={{
-          sx: {
-            width: "60%",
-            // padding: 2,
-          },
-        }}
-      >
-        <CreateInvoice onClose={handleClose} />
-      </Drawer>
+      {/* Update Status Dialog */}
+      {openDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/40" onClick={() => setOpenDialog(false)} />
+          <div className="relative z-50 w-[340px] bg-card rounded-xl p-6 shadow-2xl">
+            <h3 className="text-base font-semibold text-foreground mb-4">Update Invoice Status</h3>
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring mb-4"
+            >
+              <option value="">Select Status</option>
+              <option value="Paid">Paid</option>
+              <option value="Pending">Pending</option>
+              <option value="Overdue">Overdue</option>
+            </select>
+            <div className="flex justify-end gap-3">
+              <button onClick={() => setOpenDialog(false)} className="px-4 py-2 rounded-lg text-sm font-medium border border-border text-foreground hover:bg-muted transition-colors">Cancel</button>
+              <button
+                onClick={() => { handleUpdateStatus(currentInvoice, selectedStatus); setOpenDialog(false); }}
+                disabled={!selectedStatus}
+                className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >Update</button>
+            </div>
+          </div>
+        </div>
+      )}
 
-      <Drawer
-        anchor="right"
-        open={showInvoiceUpdateForm}
-        onClose={handleInvoiceUpdateClose}
-        selectedInvoice={handleEdit}
-        classes={{ paper: "custom-right-drawer" }}
-        PaperProps={{
-          sx: {
-            width: "60%",
-            // padding: 2,
-          },
-        }}
-      >
-        <UpdateInvoice
-          onClose={handleInvoiceUpdateClose}
-          invoiceData={invoiceId}
-        />
-      </Drawer>
-    </Box>
+      {/* Create Invoice Drawer */}
+      {showInvoiceTemplateForm && (
+        <div className="fixed inset-0 z-50 flex">
+          <div className="fixed inset-0 bg-black/40" onClick={handleClose} />
+          <div className="ml-auto relative z-50 w-full max-w-[60%] bg-background h-full overflow-y-auto shadow-2xl">
+            <CreateInvoice onClose={handleClose} />
+          </div>
+        </div>
+      )}
+
+      {/* Update Invoice Drawer */}
+      {showInvoiceUpdateForm && (
+        <div className="fixed inset-0 z-50 flex">
+          <div className="fixed inset-0 bg-black/40" onClick={handleInvoiceUpdateClose} />
+          <div className="ml-auto relative z-50 w-full max-w-[60%] bg-background h-full overflow-y-auto shadow-2xl">
+            <UpdateInvoice onClose={handleInvoiceUpdateClose} invoiceData={invoiceId} />
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

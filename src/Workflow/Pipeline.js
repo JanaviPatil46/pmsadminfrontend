@@ -2144,7 +2144,7 @@ const fetchJobData = async () => {
     };
     return (
       <div
-        className={`job-card ${isDragging ? "dragging" : ""} bg-white shadow-md rounded-xl p-4 transition-all hover:shadow-lg`}
+        className={`job-card ${isDragging ? "dragging" : ""} bg-card shadow-md rounded-xl p-4 transition-all hover:shadow-lg`}
         ref={drag}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -2170,7 +2170,7 @@ const fetchJobData = async () => {
           <p className="text-sm text-muted-foreground"><strong>Due:</strong> {dueDateFormatted}</p>
         </div>
 
-        <span className="text-xs text-gray-400 mt-2 block">{timeAgo()}</span>
+        <span className="text-xs text-muted-foreground mt-2 block">{timeAgo()}</span>
 
         {open && (
           <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -2666,32 +2666,32 @@ const fetchJobData = async () => {
         ) : (
           <>
             <h1 className="text-2xl font-bold mb-4">Pipeline List</h1>
-            <div className="bg-background rounded-xl border shadow-sm overflow-hidden">
+            <div className="bg-white rounded-xl border border-border shadow-sm overflow-hidden">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b bg-muted/40">
-                    <th className="text-xs font-bold text-left p-4">Pipeline Name</th>
-                    <th className="text-xs font-bold text-left p-4">Jobs</th>
-                    <th className="text-xs font-bold text-left p-4">Schedule</th>
-                    <th className="text-xs font-bold text-left p-4">Start Date</th>
-                    <th className="text-xs font-bold text-left p-4">End Date</th>
-                    <th className="text-xs font-bold text-left p-4">Setting</th>
+                  <tr className="border-b border-border">
+                    <th className="text-xs font-semibold tracking-wide uppercase text-left px-4 py-3 text-muted-foreground">Pipeline Name</th>
+                    <th className="text-xs font-semibold tracking-wide uppercase text-left px-4 py-3 text-muted-foreground">Jobs</th>
+                    <th className="text-xs font-semibold tracking-wide uppercase text-left px-4 py-3 text-muted-foreground">Schedule</th>
+                    <th className="text-xs font-semibold tracking-wide uppercase text-left px-4 py-3 text-muted-foreground">Start Date</th>
+                    <th className="text-xs font-semibold tracking-wide uppercase text-left px-4 py-3 text-muted-foreground">End Date</th>
+                    <th className="text-xs font-semibold tracking-wide uppercase text-left px-4 py-3 text-muted-foreground">Setting</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-border">
                   {pipelineData.map((pipeline, index) => (
-                    <tr key={index} className="border-b hover:bg-muted/30 transition-colors">
+                    <tr key={index} className="bg-white transition-colors hover:bg-muted/30">
                       <td
                         onClick={() => handleBoardsList(pipeline)}
-                        className="text-xs px-4 py-2 leading-tight cursor-pointer text-indigo-600 hover:text-indigo-800 font-medium"
+                        className="text-xs px-4 py-3 leading-tight cursor-pointer text-primary hover:text-primary/80 font-medium"
                       >
                         {pipeline.pipelineName}
                       </td>
-                      <td className="text-xs px-4 py-2 leading-tight"></td>
-                      <td className="text-xs px-4 py-2 leading-tight"></td>
-                      <td className="text-xs px-4 py-2 leading-tight"></td>
-                      <td className="text-xs px-4 py-2 leading-tight"></td>
-                      <td className="text-xs px-4 py-2 leading-tight">
+                      <td className="text-xs px-4 py-3 leading-tight text-muted-foreground"></td>
+                      <td className="text-xs px-4 py-3 leading-tight text-muted-foreground"></td>
+                      <td className="text-xs px-4 py-3 leading-tight text-muted-foreground"></td>
+                      <td className="text-xs px-4 py-3 leading-tight text-muted-foreground"></td>
+                      <td className="text-xs px-4 py-3 leading-tight">
                         <button className="p-1 rounded-md hover:bg-muted transition-colors">
                           <MoreVertical className="h-4 w-4 text-muted-foreground" />
                         </button>

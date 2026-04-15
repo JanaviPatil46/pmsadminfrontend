@@ -1,8 +1,14 @@
 import { useState, useEffect } from "react";
-import { Navigate, useParams, useSearchParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import AccountMultiSelectDropdown from "../../Templates/AccountMultiSelectDropdown";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
+import { Textarea } from "../../components/ui/textarea";
+import { Switch } from "../../components/ui/switch";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../../components/ui/select";
 
 const AddBulkOrganizer = ({ selectedAccounts, onClose }) => {
   console.log("selectedAccounts",selectedAccounts)
@@ -716,19 +722,16 @@ const handleYesNoChange = (value, elementText, sectionId) => {
     setSelectedAccount((prevSelected) => prevSelected.filter((value) => value !== valueToDelete));
   };
 
-  const inputCls = "w-full mt-1 rounded border border-gray-200 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-400";
-  const btnPrimary = "rounded-full px-5 py-1.5 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] disabled:opacity-40";
-  const btnOutline = "rounded-full px-5 py-1.5 text-sm font-medium border border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white";
   const optionBtn = (active) => `rounded-full px-4 py-1.5 text-sm font-medium border transition-colors ${
     active
-      ? "bg-[var(--color-save-btn)] text-white border-[var(--color-save-btn)]"
-      : "border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white"
+      ? "bg-primary text-white border-primary"
+      : "border-primary text-primary hover:bg-primary hover:text-white"
   }`;
 
   return (
-    <div className="max-w-2xl mx-auto px-4">
-      <div className="mt-4">
-        <p className="text-sm font-medium text-gray-700 mb-1">Accounts</p>
+    <div className="max-w-2xl mx-auto px-4 space-y-4 py-4">
+      <div className="space-y-1.5">
+        <Label>Accounts</Label>
         <AccountMultiSelectDropdown
           value={selectedaccount}
           onChange={handleAccountChange}
@@ -737,276 +740,82 @@ const handleYesNoChange = (value, elementText, sectionId) => {
         />
       </div>
 
-      <div className="mt-4">
-        <p className="text-sm font-medium text-gray-700 mb-1">Organizer Template</p>
-        <select className={inputCls} value={selectedOrganizerTemplate} onChange={handleOrganizerTemplateChange}>
-          <option value="">None</option>
-          {OrganizerTemplateOptions.map((opt) => (
-            <option key={opt.value} value={opt.value}>{opt.label}</option>
-          ))}
-        </select>
+      <div className="space-y-1.5">
+        <Label>Organizer Template</Label>
+        <Select value={selectedOrganizerTemplate} onValueChange={(val) => handleOrganizerTemplateChange({ target: { value: val } })}>
+          <SelectTrigger>
+            <SelectValue placeholder="None" />
+          </SelectTrigger>
+          <SelectContent>
+            {OrganizerTemplateOptions.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
-      <div className="mt-3">
-        <input className={inputCls} value={organizerName || ""} onChange={handleOrganizerNameChange} placeholder="Organizer Name" />
+      <div className="space-y-1.5">
+        <Label>Organizer Name</Label>
+        <Input value={organizerName || ""} onChange={handleOrganizerNameChange} placeholder="Organizer Name" />
       </div>
 
-      <div className="mt-3">
-        <button type="button" onClick={handlePreview} className={btnPrimary}>Preview Mode</button>
+      <div>
+        <Button type="button" variant="default" onClick={handlePreview}>Preview Mode</Button>
       </div>
 
-      <div className="flex items-center gap-3 mt-4">
-        <label className="relative inline-flex items-center cursor-pointer">
-          <input type="checkbox" className="sr-only peer" checked={reminder} onChange={(e) => handleAbsolutesDates(e.target.checked)} />
-          <div className="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-[var(--color-save-btn)] after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5"></div>
-        </label>
-        <span className="text-base font-semibold">Reminders</span>
+      <div className="flex items-center gap-3">
+        <Switch checked={reminder} onCheckedChange={handleAbsolutesDates} />
+        <Label className="text-base font-semibold cursor-pointer">Reminders</Label>
       </div>
 
       {reminder && (
-        <div className="flex items-center gap-4 mt-3">
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 mb-0.5">Days until next reminder</label>
-            <input className={inputCls} name="Daysuntilnextreminder" value={daysuntilNextReminder} onChange={(e) => setDaysuntilNextReminder(e.target.value)} placeholder="Days until next reminder" />
+        <div className="flex items-center gap-4">
+          <div className="flex-1 space-y-1.5">
+            <Label>Days until next reminder</Label>
+            <Input name="Daysuntilnextreminder" value={daysuntilNextReminder} onChange={(e) => setDaysuntilNextReminder(e.target.value)} placeholder="Days until next reminder" />
           </div>
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 mb-0.5">No. of reminders</label>
-            <input className={inputCls} name="noOfReminder" value={noOfReminder} onChange={(e) => setNoOfReminder(e.target.value)} placeholder="No of reminders" />
+          <div className="flex-1 space-y-1.5">
+            <Label>No. of reminders</Label>
+            <Input name="noOfReminder" value={noOfReminder} onChange={(e) => setNoOfReminder(e.target.value)} placeholder="No of reminders" />
           </div>
         </div>
       )}
 
-      <div className="flex gap-3 mt-5">
-        <button type="button" onClick={createOrganizerOfAccount} className={btnPrimary}>Create</button>
-        <button type="button" onClick={handleOrganizerFormClose} className={btnOutline}>Cancel</button>
+      <div className="flex gap-3">
+        <Button type="button" variant="default" onClick={createOrganizerOfAccount}>Create</Button>
+        <Button type="button" variant="outline" onClick={handleOrganizerFormClose}>Cancel</Button>
       </div>
 
       {previewDialogOpen && (
-        <div className="fixed inset-0 z-50 bg-white overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-background overflow-y-auto">
           <div className="p-6">
-            <div className="flex items-center justify-between border-2 border-blue-400 bg-blue-200 p-3 mb-4 rounded-xl">
+            <div className="flex items-center justify-between border-2 border-primary/40 bg-primary/10 p-3 mb-4 rounded-xl">
               <div>
                 <p className="font-bold">Preview mode</p>
                 <p className="text-sm">The client sees your organizer like this</p>
               </div>
-              <button type="button" onClick={handleClosePreview} className="text-blue-700 hover:underline text-sm font-medium">Back to edit</button>
+              <Button type="button" variant="ghost" size="sm" onClick={handleClosePreview}>Back to edit</Button>
             </div>
-            <p className="text-base font-medium mb-3">{organizerName}</p>
+            <p className="text-base font-medium text-foreground mb-3">{organizerName}</p>
 
-            <select className="w-full rounded border border-gray-200 px-3 py-1.5 text-sm mb-3" value={activeStep} onChange={handleDropdownChange}>
-              {visibleSections.map((section, index) => {
-                const visibleElements = section.formElements.filter((el) => shouldShowElement(el, section.id));
-                const answered = visibleElements.reduce((c, el) => c + (answeredElements[`${section.id}_${el.text}`] ? 1 : 0), 0);
-                return <option key={section.id} value={index}>{section.text} ({answered}/{visibleElements.length})</option>;
-              })}
-            </select>
+            <Select value={String(activeStep)} onValueChange={(val) => handleDropdownChange({ target: { value: val } })}>
+              <SelectTrigger className="mb-3">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {visibleSections.map((section, index) => {
+                  const visibleElements = section.formElements.filter((el) => shouldShowElement(el, section.id));
+                  const answered = visibleElements.reduce((c, el) => c + (answeredElements[`${section.id}_${el.text}`] ? 1 : 0), 0);
+                  return <SelectItem key={section.id} value={String(index)}>{section.text} ({answered}/{visibleElements.length})</SelectItem>;
+                })}
+              </SelectContent>
+            </Select>
 
-            <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
-              <div className="bg-blue-500 h-2 rounded-full transition-all" style={{ width: `${((activeStep + 1) / totalSteps) * 100}%` }}></div>
+            <div className="w-full bg-muted rounded-full h-2 mb-4">
+              <div className="bg-primary h-2 rounded-full transition-all" style={{ width: `${((activeStep + 1) / totalSteps) * 100}%` }}></div>
             </div>
 
             <div className="px-4 md:px-20">
-                  {/* {visibleSections.map(
-                    (section, sectionIndex) =>
-                      sectionIndex === activeStep && (
-                        <Box key={section.text}>
-                          {section.formElements.map(
-                            (element) =>
-                              shouldShowElement(element) && (
-                                <Box key={element.text}>
-                                  {(element.type === "Free Entry" || element.type === "Number" || element.type === "Email") && (
-                                    <Box>
-                                      <Typography fontSize="18px" mb={1} mt={1}>
-                                        {element.text}
-                                      </Typography>
-                                      <TextField
-                                        variant="outlined"
-                                        size="small"
-                                        multiline
-                                        fullWidth
-                                        // margin='normal'
-                                        placeholder={`${element.type} Answer`}
-                                        inputProps={{
-                                          type: element.type === "Free Entry" ? "text" : element.type.toLowerCase(),
-                                        }}
-                                        maxRows={8}
-                                        style={{ display: "block", marginTop: "15px" }}
-                                        value={inputValues[element.text] || ""}
-                                        onChange={(e) => handleInputChange(e, element.text)}
-                                      />
-                                    </Box>
-                                  )}
-
-                                  {element.type === "Radio Buttons" && (
-                                    <Box>
-                                      <Typography fontSize="18px" mb={1} mt={1}>
-                                        {element.text}
-                                      </Typography>
-                                      <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-                                        {element.options.map((option) => (
-                                          <Button key={option.text} variant={radioValues[element.text] === option.text ? "contained" : "outlined"} onClick={() => handleRadioChange(option.text, element.text)}  sx={{
-                                            width: '80px',
-                                            borderRadius: '15px',
-                                            ...(radioValues[element.text] === option.text
-                                              ? {
-                                                  backgroundColor: 'var(--color-save-btn)',  // Normal background
-                                                  '&:hover': {
-                                                    backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                                                  },
-                                                }
-                                              : {
-                                                  borderColor: 'var(--color-border-cancel-btn)',  // Normal border color
-                                                  color: 'var(--color-save-btn)',
-                                                  '&:hover': {
-                                                    backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                                                    color: '#fff',
-                                                    border: 'none',
-                                                  },
-                                                }),
-                                          }} >
-                                            {option.text}
-                                          </Button>
-                                        ))}
-                                      </Box>
-                                    </Box>
-                                  )}
-
-                                  {element.type === "Checkboxes" && (
-                                    <Box>
-                                      <Typography fontSize="18px">{element.text}</Typography>
-                                      <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-                                        {element.options.map((option) => (
-                                          <Button key={option.text} variant={checkboxValues[element.text]?.[option.text] ? "contained" : "outlined"} onClick={() => handleCheckboxChange(option.text, element.text)}     sx={{
-                                            width: '80px',
-                                            borderRadius: '15px',
-                                            ...(checkboxValues[element.text]?.[option.text]
-                                              ? {
-                                                  backgroundColor: 'var(--color-save-btn)',  // Normal background
-                                                  '&:hover': {
-                                                    backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                                                  },
-                                                }
-                                              : {
-                                                  borderColor: 'var(--color-border-cancel-btn)',  // Normal border color
-                                                  color: 'var(--color-save-btn)',
-                                                  '&:hover': {
-                                                    backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                                                    color: '#fff',
-                                                    border: 'none',
-                                                  },
-                                                }),
-                                          }}>
-                                            {option.text}
-                                          </Button>
-                                        ))}
-                                      </Box>
-                                    </Box>
-                                  )}
-
-                                  {element.type === "Yes/No" && (
-                                    <Box>
-                                      <Typography fontSize="18px">{element.text}</Typography>
-                                      <Box sx={{ display: "flex", gap: 1 }}>
-                                        {element.options.map((option) => (
-                                          <Button key={option.text} variant={selectedValue === option.text ? "contained" : "outlined"} onClick={(event) => handleChange(event, element.text)}  sx={{
-                                            width: '80px',
-                                            borderRadius: '15px',
-                                            ...(selectedValue === option.text
-                                              ? {
-                                                  backgroundColor: 'var(--color-save-btn)',  // Normal background
-                                                  '&:hover': {
-                                                    backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                                                  },
-                                                }
-                                              : {
-                                                  borderColor: 'var(--color-border-cancel-btn)',  // Normal border color
-                                                  color: 'var(--color-save-btn)',
-                                                  '&:hover': {
-                                                    backgroundColor: 'var(--color-save-hover-btn)',  // Hover background color
-                                                    color: '#fff',
-                                                    border: 'none',
-                                                  },
-                                                }),
-                                          }}>
-                                            {option.text}
-                                          </Button>
-                                        ))}
-                                      </Box>
-                                    </Box>
-                                  )}
-
-                                  {element.type === "Dropdown" && (
-                                    <Box>
-                                      <Typography fontSize="18px">{element.text}</Typography>
-                                      <FormControl fullWidth>
-                                        <Select value={selectedDropdownValue} onChange={(event) => handleDropdownValueChange(event, element.text)} size="small">
-                                          {element.options.map((option) => (
-                                            <MenuItem key={option.text} value={option.text}>
-                                              {option.text}
-                                            </MenuItem>
-                                          ))}
-                                        </Select>
-                                      </FormControl>
-                                    </Box>
-                                  )}
-
-                                  {element.type === "Date" && (
-                                    <Box>
-                                      <Typography fontSize="18px">{element.text}</Typography>
-                                      <DatePicker
-                                         format="MM/DD/YYYY"
-                                        sx={{ width: "100%", backgroundColor: "#fff" }}
-                                        selected={startDate}
-                                        onChange={handleStartDateChange}
-                                        renderInput={(params) => <TextField {...params} size="small" />}
-                                        onOpen={() =>
-                                          setAnsweredElements((prevAnswered) => ({
-                                            ...prevAnswered,
-                                            [element.text]: true,
-                                          }))
-                                        }
-                                      />
-                                    </Box>
-                                  )}
-                                 
-                                  {element.type === "File Upload" && (
-                                    <Box>
-                                      <Typography fontSize="18px" mb={1} mt={2}>
-                                        {element.text}
-                                      </Typography>
-
-                                      <Tooltip title="Unavailable in preview mode" placement="top">
-                                        <Box sx={{ position: "relative", width: "100%" }}>
-                                          <TextField
-                                            variant="outlined"
-                                            size="small"
-                                            fullWidth
-                                            // margin="normal"
-                                            disabled
-                                            placeholder="Add Document"
-                                            sx={{
-                                              cursor: "not-allowed",
-                                              "& .MuiInputBase-input": {
-                                                pointerEvents: "none",
-                                                cursor: "not-allowed",
-                                              },
-                                            }}
-                                          />
-                                        </Box>
-                                      </Tooltip>
-                                    </Box>
-                                  )}
-                                  {element.type === "Text Editor" && (
-                                    <Box mt={2} mb={2}>
-                                      <Typography>{stripHtmlTags(element.text)}</Typography>
-                                    </Box>
-                                  )}
-                                </Box>
-                              )
-                          )}
-                        </Box>
-                      )
-                  )} */}
               {visibleSections.map((section, sectionIndex) =>
                 sectionIndex === activeStep && (
                   <div key={section.id}>
@@ -1015,13 +824,12 @@ const handleYesNoChange = (value, elementText, sectionId) => {
                         shouldShowElement(element, section.id) && (
                           <div key={`${section.id}_${element.id}`} className="mb-4">
                             {element.type === "Text Editor" && (
-                              <p className="text-sm text-gray-700 my-3">{stripHtmlTags(element.text)}</p>
+                              <p className="text-sm text-foreground my-3">{stripHtmlTags(element.text)}</p>
                             )}
                             {(element.type === "Free Entry" || element.type === "Email") && (
                               <div>
-                                <p className="text-base mb-1 mt-2">{element.text}</p>
-                                <textarea
-                                  className="w-full rounded border border-gray-200 px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                <p className="text-base text-foreground mb-1 mt-2">{element.text}</p>
+                                <Textarea
                                   rows={3}
                                   placeholder={`${element.type} Answer`}
                                   value={inputValues[`${section.id}_${element.text}`] || ""}
@@ -1031,9 +839,11 @@ const handleYesNoChange = (value, elementText, sectionId) => {
                             )}
                             {element.type === "Number" && (
                               <div>
-                                <p className="text-base mb-1 mt-2">{element.text}</p>
-                                <input type="text" inputMode="numeric" pattern="[0-9]*"
-                                  className="w-full rounded border border-gray-200 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                <p className="text-base text-foreground mb-1 mt-2">{element.text}</p>
+                                <Input
+                                  type="text"
+                                  inputMode="numeric"
+                                  pattern="[0-9]*"
                                   placeholder="Number Answer"
                                   value={inputValues[`${section.id}_${element.text}`] || ""}
                                   onChange={(e) => handleInputChange({ target: { value: e.target.value.replace(/\D/g, "") } }, element.text, section.id)}
@@ -1042,60 +852,65 @@ const handleYesNoChange = (value, elementText, sectionId) => {
                             )}
                             {element.type === "Radio Buttons" && (
                               <div>
-                                <p className="text-base mb-1 mt-2">{element.text}</p>
+                                <p className="text-base text-foreground mb-1 mt-2">{element.text}</p>
                                 <div className="flex flex-wrap gap-2">
                                   {element.options.map((option) => (
-                                    <button key={option.text} type="button"
-                                      className={optionBtn(radioValues[`${section.id}_${element.text}`] === option.text)}
+                                    <Button key={option.text} type="button" size="sm"
+                                      variant={radioValues[`${section.id}_${element.text}`] === option.text ? "default" : "outline"}
+                                      className="rounded-full"
                                       onClick={() => handleRadioChange(option.text, element.text, section.id)}
-                                    >{option.text}</button>
+                                    >{option.text}</Button>
                                   ))}
                                 </div>
                               </div>
                             )}
                             {element.type === "Checkboxes" && (
                               <div>
-                                <p className="text-base mb-1 mt-2">{element.text}</p>
+                                <p className="text-base text-foreground mb-1 mt-2">{element.text}</p>
                                 <div className="flex flex-wrap gap-2">
                                   {element.options.map((option) => (
-                                    <button key={option.text} type="button"
-                                      className={optionBtn(!!checkboxValues[`${section.id}_${element.text}`]?.[option.text])}
+                                    <Button key={option.text} type="button" size="sm"
+                                      variant={!!checkboxValues[`${section.id}_${element.text}`]?.[option.text] ? "default" : "outline"}
+                                      className="rounded-full"
                                       onClick={() => handleCheckboxChange(option.text, element.text, section.id)}
-                                    >{option.text}</button>
+                                    >{option.text}</Button>
                                   ))}
                                 </div>
                               </div>
                             )}
                             {element.type === "Yes/No" && (
                               <div>
-                                <p className="text-base mb-1 mt-2">{element.text}</p>
+                                <p className="text-base text-foreground mb-1 mt-2">{element.text}</p>
                                 <div className="flex gap-2">
                                   {element.options.map((option) => (
-                                    <button key={option.text} type="button"
-                                      className={optionBtn(selectedYesNoValues[`${section.id}_${element.text}`] === option.text)}
+                                    <Button key={option.text} type="button" size="sm"
+                                      variant={selectedYesNoValues[`${section.id}_${element.text}`] === option.text ? "default" : "outline"}
+                                      className="rounded-full"
                                       onClick={() => handleYesNoChange(option.text, element.text, section.id)}
-                                    >{option.text}</button>
+                                    >{option.text}</Button>
                                   ))}
                                 </div>
                               </div>
                             )}
                             {element.type === "Dropdown" && (
                               <div>
-                                <p className="text-base mb-1 mt-2">{element.text}</p>
-                                <select
-                                  className="w-full rounded border border-gray-200 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                <p className="text-base text-foreground mb-1 mt-2">{element.text}</p>
+                                <Select
                                   value={selectedDropdownValues[`${section.id}_${element.text}`] || ""}
-                                  onChange={(e) => handleDropdownValueChange(e, element.text, section.id)}
+                                  onValueChange={(val) => handleDropdownValueChange({ target: { value: val } }, element.text, section.id)}
                                 >
-                                  {element.options.map((opt) => <option key={opt.text} value={opt.text}>{opt.text}</option>)}
-                                </select>
+                                  <SelectTrigger><SelectValue /></SelectTrigger>
+                                  <SelectContent>
+                                    {element.options.map((opt) => <SelectItem key={opt.text} value={opt.text}>{opt.text}</SelectItem>)}
+                                  </SelectContent>
+                                </Select>
                               </div>
                             )}
                             {element.type === "Date" && (
                               <div>
-                                <p className="text-base mb-1 mt-2">{element.text}</p>
-                                <input type="date"
-                                  className="w-full rounded border border-gray-200 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                <p className="text-base text-foreground mb-1 mt-2">{element.text}</p>
+                                <Input
+                                  type="date"
                                   value={startDate || ""}
                                   onChange={(e) => { handleStartDateChange(e.target.value); setAnsweredElements(p => ({ ...p, [`${section.id}_${element.text}`]: true })); }}
                                 />
@@ -1103,11 +918,9 @@ const handleYesNoChange = (value, elementText, sectionId) => {
                             )}
                             {element.type === "File Upload" && (
                               <div>
-                                <p className="text-base mb-1 mt-2">{element.text}</p>
+                                <p className="text-base text-foreground mb-1 mt-2">{element.text}</p>
                                 <div title="Unavailable in preview mode">
-                                  <input disabled placeholder="Add Document"
-                                    className="w-full rounded border border-gray-200 px-3 py-1.5 text-sm bg-gray-100 cursor-not-allowed"
-                                  />
+                                  <Input disabled placeholder="Add Document" />
                                 </div>
                               </div>
                             )}
@@ -1119,8 +932,8 @@ const handleYesNoChange = (value, elementText, sectionId) => {
               )}
 
               <div className="flex gap-3 mt-6">
-                <button type="button" disabled={activeStep === 0} onClick={handleBack} className={btnPrimary}>Back</button>
-                <button type="button" disabled={activeStep === totalSteps - 1} onClick={handleNext} className={btnPrimary}>Next</button>
+                <Button type="button" variant="default" disabled={activeStep === 0} onClick={handleBack}>Back</Button>
+                <Button type="button" variant="default" disabled={activeStep === totalSteps - 1} onClick={handleNext}>Next</Button>
               </div>
             </div>
           </div>

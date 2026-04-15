@@ -7,8 +7,8 @@ const DashInvoices = () => {
   const navLinkClass = ({ isActive }) =>
     `px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
       isActive
-        ? 'text-white'
-        : 'text-muted-foreground hover:text-white'
+        ? 'bg-primary text-white'
+        : 'bg-transparent text-muted-foreground hover:bg-primary/10 hover:text-foreground'
     }`;
 
   return (
@@ -17,14 +17,12 @@ const DashInvoices = () => {
         <NavLink
           to={`/clients/accounts/accountsdash/invoices/${data}/invoice`}
           className={navLinkClass}
-          style={({ isActive }) => isActive ? { backgroundColor: 'var(--color-save-btn)' } : { backgroundColor: 'transparent' }}
         >
           Invoice
         </NavLink>
         <NavLink
           to={`/clients/accounts/accountsdash/invoices/${data}/payments`}
           className={navLinkClass}
-          style={({ isActive }) => isActive ? { backgroundColor: 'var(--color-save-btn)' } : { backgroundColor: 'transparent' }}
         >
           Payments
         </NavLink>

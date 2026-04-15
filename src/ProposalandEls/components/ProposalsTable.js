@@ -100,8 +100,8 @@ toast.success("Proposal deleted successfully")
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[200px] gap-3">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
-        <span className="text-sm text-slate-500">Loading proposals...</span>
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        <span className="text-sm text-muted-foreground">Loading proposals...</span>
       </div>
     );
   }
@@ -109,7 +109,7 @@ toast.success("Proposal deleted successfully")
   if (error) {
     return (
       <div className="mx-auto max-w-4xl px-4 mt-4">
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="rounded-lg border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm text-destructive">
           Error: {error}
         </div>
       </div>
@@ -121,48 +121,48 @@ toast.success("Proposal deleted successfully")
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Proposals</h1>
-          <p className="mt-1 text-sm text-slate-500">{proposals.length} proposal(s) available</p>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Proposals</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{proposals.length} proposal(s) available</p>
         </div>
         <button
           onClick={handleCreateNew}
-          className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 hover:shadow-md active:scale-[0.98]"
+          className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary/90 hover:shadow-md active:scale-[0.98]"
         >
           <Plus className="h-4 w-4" /> Create New Proposal
         </button>
       </div>
 
       {proposals.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/50 py-16 px-6 text-center">
-          <div className="rounded-full bg-indigo-100 p-4 mb-4">
-            <FileText className="h-8 w-8 text-indigo-600" />
+        <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-muted/20 py-16 px-6 text-center">
+          <div className="rounded-full bg-primary/10 p-4 mb-4">
+            <FileText className="h-8 w-8 text-primary" />
           </div>
-          <h3 className="text-lg font-semibold text-slate-800">No proposals yet</h3>
-          <p className="mt-1 text-sm text-slate-500 max-w-sm">Get started by creating your first proposal template.</p>
+          <h3 className="text-lg font-semibold text-foreground">No proposals yet</h3>
+          <p className="mt-1 text-sm text-muted-foreground max-w-sm">Get started by creating your first proposal template.</p>
           <button
             onClick={handleCreateNew}
-            className="mt-6 inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 hover:shadow-md"
+            className="mt-6 inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary/90 hover:shadow-md"
           >
             <Plus className="h-4 w-4" /> Create Your First Proposal
           </button>
         </div>
       ) : (
-        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <div className="rounded-2xl border border-border bg-white shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
-                <tr className="border-b border-slate-100 bg-gradient-to-r from-indigo-600 to-indigo-700">
-                  <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-white">Template Name</th>
-                  <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-white text-right w-24">Actions</th>
+                <tr className="border-b border-border">
+                  <th className="px-6 py-4 text-xs font-semibold tracking-wide uppercase text-left text-muted-foreground">Template Name</th>
+                  <th className="px-6 py-4 text-xs font-semibold tracking-wide uppercase text-right text-muted-foreground w-24">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-border">
                 {proposals.map((proposal, idx) => (
-                  <tr key={proposal._id} className={`transition-colors hover:bg-indigo-50/40 ${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'}`}>
+                  <tr key={proposal._id} className="bg-white transition-colors hover:bg-muted/30">
                     <td className="px-6 py-4">
                       <Link
                         to={`/firmtemp/templates/proposals/proposal-form?edit=${proposal._id}`}
-                        className="text-sm font-medium text-indigo-600 hover:text-indigo-800 hover:underline transition-colors"
+                        className="text-sm font-medium text-primary hover:text-primary/80 hover:underline transition-colors"
                       >
                         {proposal.templatename}
                       </Link>
@@ -171,21 +171,21 @@ toast.success("Proposal deleted successfully")
                       <div className="relative inline-block" ref={menuOpen === proposal._id ? menuRef : null}>
                         <button
                           onClick={() => handleMenuOpen(proposal)}
-                          className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                          className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                         >
                           <MoreVertical className="h-4 w-4" />
                         </button>
                         {menuOpen === proposal._id && (
-                          <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-slate-200 bg-white py-1 shadow-lg animate-in fade-in slide-in-from-top-1">
+                          <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-border bg-card py-1 shadow-lg animate-in fade-in slide-in-from-top-1">
                             <button
                               onClick={() => { handleTemplateClick(selectedProposal); handleMenuClose(); }}
-                              className="flex w-full items-center px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                              className="flex w-full items-center px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors"
                             >
                               Edit
                             </button>
                             <button
                               onClick={handleDelete}
-                              className="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                              className="flex w-full items-center px-4 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors"
                             >
                               Delete
                             </button>
