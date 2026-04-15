@@ -276,15 +276,15 @@ const handleConfirmDelete = async () => {
   const cancelBtnCls = "rounded-full px-5 py-1.5 text-sm font-medium border border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white";
 
   return (
-    <div className="p-6 bg-[#f9fbfd] min-h-screen">
+    <div className="p-6 bg-background min-h-screen">
       {/* Top bar */}
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center bg-[#e8edf3] rounded-xl p-1.5 gap-1">
+        <div className="flex items-center bg-muted rounded-xl p-1.5 gap-1">
           {[{ label: "Active", val: "active" }, { label: "Archived", val: "archived" }].map(({ label, val }) => (
             <button key={val} type="button"
               onClick={() => handleViewChange(null, val)}
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                view === val ? 'bg-white font-bold text-[var(--color-save-btn)]' : 'text-gray-600'
+                view === val ? 'bg-card font-bold text-primary' : 'text-muted-foreground'
               }`}
             >{label}</button>
           ))}
@@ -309,8 +309,8 @@ const handleConfirmDelete = async () => {
       <div className="space-y-3">
         {filteredNotes.map((note) => (
           <div key={note.id}
-            className={`rounded-lg border bg-white p-4 ${
-              note.pinned ? 'border-l-4 border-l-yellow-400 border-gray-200' : 'border-gray-200'
+            className={`rounded-lg border bg-card p-4 ${
+              note.pinned ? 'border-l-4 border-l-warning border-border' : 'border-border'
             }`}
           >
             {editingNoteId === note.id ? (
@@ -324,7 +324,7 @@ const handleConfirmDelete = async () => {
             ) : (
               <div>
                 <div
-                  className="text-sm text-gray-800 mb-3 [&_img]:max-w-full [&_a]:break-all"
+                  className="text-sm text-foreground mb-3 [&_img]:max-w-full [&_a]:break-all"
                   dangerouslySetInnerHTML={{ __html: note.text || "No content available" }}
                 />
                 <div className="flex items-center justify-between">
@@ -332,34 +332,34 @@ const handleConfirmDelete = async () => {
                     {view === "active" ? (
                       <>
                         <button type="button" onClick={() => handleTogglePin(note.id)}
-                          className={`p-1 rounded hover:bg-gray-100 ${
-                            note.pinned ? 'text-blue-500' : 'text-gray-400'
+                          className={`p-1 rounded hover:bg-muted ${
+                            note.pinned ? 'text-primary' : 'text-muted-foreground'
                           }`}>
                           {note.pinned ? <MdPushPin size={16} /> : <MdOutlinePushPin size={16} />}
                         </button>
                         <button type="button" onClick={() => handleArchiveNote(note.id)}
-                          className="p-1 rounded hover:bg-gray-100 text-gray-400">
+                          className="p-1 rounded hover:bg-muted text-muted-foreground">
                           <MdArchive size={16} />
                         </button>
                         <button type="button" onClick={() => handleEditNote(note.id, note.text)}
-                          className="text-sm text-blue-600 cursor-pointer hover:underline">
+                          className="text-sm text-primary cursor-pointer hover:underline">
                           Edit
                         </button>
                       </>
                     ) : (
                       <>
                         <button type="button" onClick={() => handleUnarchiveNote(note.id)}
-                          className="flex items-center gap-1 text-sm text-blue-600 cursor-pointer hover:underline">
+                          className="flex items-center gap-1 text-sm text-primary cursor-pointer hover:underline">
                           <MdUnarchive size={16} /> Move to Active
                         </button>
                         <button type="button" onClick={() => handleDeleteClick(note.id)}
-                          className="flex items-center gap-1 text-sm text-red-500 cursor-pointer hover:underline">
+                          className="flex items-center gap-1 text-sm text-destructive cursor-pointer hover:underline">
                           <MdDelete size={16} /> Delete
                         </button>
                       </>
                     )}
                   </div>
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-muted-foreground">
                     {view === "active"
                       ? `Created by ${note.createdBy} on ${note.time}`
                       : `Archived by ${note.createdBy} on ${note.time}`}
@@ -375,14 +375,14 @@ const handleConfirmDelete = async () => {
       {deleteConfirmOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/30" onClick={() => setDeleteConfirmOpen(false)} />
-          <div className="relative bg-white rounded-lg shadow-xl w-full max-w-sm p-6">
-            <h2 className="text-base font-semibold mb-2">Delete the note?</h2>
-            <p className="text-sm text-gray-600">Are you sure you want to delete this note?</p>
-            <p className="text-sm text-gray-600 mt-1">This action is not reversible. If you proceed to delete the note, you will not be able to recover it.</p>
+          <div className="relative bg-card rounded-lg shadow-xl w-full max-w-sm p-6">
+            <h2 className="text-base font-semibold text-foreground mb-2">Delete the note?</h2>
+            <p className="text-sm text-muted-foreground">Are you sure you want to delete this note?</p>
+            <p className="text-sm text-muted-foreground mt-1">This action is not reversible. If you proceed to delete the note, you will not be able to recover it.</p>
             <p className="text-sm font-medium mt-4 mb-1">To proceed, type <strong>DELETE</strong> below.</p>
             <input
               type="text"
-              className="w-full rounded border border-gray-200 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full rounded border border-border px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               value={deleteConfirmationText}
               onChange={handleDeleteConfirmationChange}
               placeholder="Enter DELETE to confirm"
@@ -391,7 +391,7 @@ const handleConfirmDelete = async () => {
               <button type="button" onClick={() => setDeleteConfirmOpen(false)} className={cancelBtnCls}>Cancel</button>
               <button type="button" onClick={handleConfirmDelete} disabled={!isDeleteEnabled}
                 className={`rounded-full px-5 py-1.5 text-sm font-medium text-white ${
-                  isDeleteEnabled ? 'bg-red-500 hover:bg-red-600' : 'bg-red-200 cursor-not-allowed'
+                  isDeleteEnabled ? 'bg-destructive hover:bg-destructive/90' : 'bg-destructive/30 cursor-not-allowed'
                 }`}>
                 Delete
               </button>

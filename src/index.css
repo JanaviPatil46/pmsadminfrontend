@@ -1,11 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 
 :root {
-  /* PRIMARY (fix this) */
-  --primary: 239 75% 59%;        /* indigo-500/600 */
+  /* PRIMARY — indigo */
+  --primary: 239 75% 59%;
   --primary-foreground: 0 0% 100%;
 
   /* BACKGROUND */
@@ -24,7 +26,7 @@
   --border: 214 20% 88%;
   --input: 214 20% 88%;
 
-  /* HOVER FIX */
+  /* RING — indigo */
   --ring: 239 58% 51%;
 
   /* KEEP THESE */

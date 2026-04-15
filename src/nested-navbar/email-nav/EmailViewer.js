@@ -280,23 +280,23 @@ const formatThreadTitle = (thread) => {
 
   return (
     <>
-      <div className="flex h-full overflow-hidden bg-white">
+      <div className="flex h-full overflow-hidden bg-card">
 
         {/* ── LEFT: Thread list panel ── */}
-        <div className="w-[320px] shrink-0 flex flex-col border-r border-gray-100 h-full overflow-hidden">
+        <div className="w-[320px] shrink-0 flex flex-col border-r border-border h-full overflow-hidden">
 
           {/* Search + Compose header */}
-          <div className="px-3 pt-3 pb-2.5 border-b border-gray-100 shrink-0 space-y-2">
+          <div className="px-3 pt-3 pb-2.5 border-b border-border shrink-0 space-y-2">
             <div className="relative">
-              <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none" />
+              <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
               <Input
                 placeholder="Search"
-                className="pl-8 h-8 text-xs rounded-lg border-gray-200 bg-gray-50"
+                className="pl-8 h-8 text-xs rounded-lg border-border bg-muted"
               />
             </div>
             <ShadButton
               size="sm"
-              className="w-full h-8 text-xs rounded-lg gap-1.5 bg-cyan-500 hover:bg-cyan-600 text-white"
+              className="w-full h-8 text-xs rounded-lg gap-1.5 bg-primary hover:bg-primary/90 text-primary-foreground"
               onClick={() => setOpenDrawer(true)}
             >
               <Pencil size={11} />
@@ -309,7 +309,7 @@ const formatThreadTitle = (thread) => {
             {threads.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 gap-2">
                 <span className="text-3xl opacity-20">✉</span>
-                <p className="text-xs text-gray-400">No emails found</p>
+                <p className="text-xs text-muted-foreground">No emails found</p>
               </div>
             ) : (
               threads.map((thread) => {
@@ -326,10 +326,10 @@ const formatThreadTitle = (thread) => {
                   <div
                     key={thread._id}
                     onClick={() => { setSelectedThreadId(thread._id); markThreadAsRead(thread._id); }}
-                    className={`flex items-start gap-2.5 px-3.5 py-3 cursor-pointer border-b border-gray-50 transition-colors ${
+                    className={`flex items-start gap-2.5 px-3.5 py-3 cursor-pointer border-b border-border transition-colors ${
                       isSelected
-                        ? "border-l-2 border-l-cyan-500 bg-cyan-50/60"
-                        : "border-l-2 border-l-transparent hover:bg-gray-50"
+                        ? "border-l-2 border-l-primary bg-primary/5"
+                        : "border-l-2 border-l-transparent hover:bg-muted/50"
                     }`}
                   >
                     {/* Avatar */}
@@ -343,27 +343,27 @@ const formatThreadTitle = (thread) => {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-0.5">
                         <span className={`text-[12px] truncate max-w-[140px] ${
-                          isUnread ? "font-bold text-gray-900" : "font-medium text-gray-700"
+                          isUnread ? "font-bold text-foreground" : "font-medium text-foreground/80"
                         }`}>
                           {formatThreadTitle(thread)}
                         </span>
-                        <span className="text-[10px] text-gray-300 shrink-0 ml-1">
+                        <span className="text-[10px] text-muted-foreground shrink-0 ml-1">
                           {getRelativeTime(latest?.createdAt || latest?.date)}
                         </span>
                       </div>
                       <div className={`text-[11.5px] truncate mb-0.5 ${
-                        isUnread ? "font-semibold text-gray-800" : "text-gray-500"
+                        isUnread ? "font-semibold text-foreground" : "text-muted-foreground"
                       }`}>
                         {latest?.subject || "(No Subject)"}
                       </div>
-                      <div className="text-[11px] text-gray-400 truncate">
+                      <div className="text-[11px] text-muted-foreground truncate">
                         {getPreview(latest?.body || "", 55)}
                       </div>
                     </div>
 
                     {/* Unread dot */}
                     {isUnread && (
-                      <div className="w-2 h-2 rounded-full bg-cyan-500 shrink-0 mt-1.5" />
+                      <div className="w-2 h-2 rounded-full bg-primary shrink-0 mt-1.5" />
                     )}
                   </div>
                 );
@@ -373,22 +373,22 @@ const formatThreadTitle = (thread) => {
         </div>
 
         {/* ── RIGHT: Email viewer panel ── */}
-        <div className="flex-1 flex flex-col h-full overflow-hidden bg-white">
+        <div className="flex-1 flex flex-col h-full overflow-hidden bg-card">
           {selectedThread ? (
             <>
               {/* Subject + action bar */}
-              <div className="flex items-start justify-between px-5 py-4 border-b border-gray-100 shrink-0">
-                <h2 className="text-base font-bold text-gray-800 leading-snug flex-1 mr-4 truncate">
+              <div className="flex items-start justify-between px-5 py-4 border-b border-border shrink-0">
+                <h2 className="text-base font-bold text-foreground leading-snug flex-1 mr-4 truncate">
                   {selectedThread.latest?.subject || "(No Subject)"}
                 </h2>
                 <div className="flex items-center gap-0.5 shrink-0">
-                  <ShadButton variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100">
+                  <ShadButton variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted">
                     <Reply size={15} />
                   </ShadButton>
-                  <ShadButton variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50">
+                  <ShadButton variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10">
                     <Trash2 size={15} />
                   </ShadButton>
-                  <ShadButton variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100" onClick={() => setSelectedThreadId(null)}>
+                  <ShadButton variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted" onClick={() => setSelectedThreadId(null)}>
                     <X size={15} />
                   </ShadButton>
                 </div>
@@ -408,12 +408,12 @@ const formatThreadTitle = (thread) => {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between">
                           <div>
-                            <span className="text-sm font-semibold text-gray-800">{getName(email.from)}</span>
-                            <span className="text-xs text-gray-400 ml-2">
+                            <span className="text-sm font-semibold text-foreground">{getName(email.from)}</span>
+                            <span className="text-xs text-muted-foreground ml-2">
                               to {Array.isArray(email.to) ? email.to.join(", ") : email.to}
                             </span>
                           </div>
-                          <span className="text-[11px] text-gray-300 shrink-0 ml-2">
+                          <span className="text-[11px] text-muted-foreground shrink-0 ml-2">
                             {new Date(email.createdAt).toLocaleString()}
                           </span>
                         </div>
@@ -424,14 +424,14 @@ const formatThreadTitle = (thread) => {
 
                     {/* Email body */}
                     <div
-                      className="py-4 text-sm text-gray-700 leading-relaxed"
+                      className="py-4 text-sm text-foreground leading-relaxed"
                       dangerouslySetInnerHTML={{ __html: email.body }}
                     />
 
                     {/* Attachments */}
                     {email.attachments?.length > 0 && (
                       <div className="mb-3">
-                        <p className="flex items-center gap-1 text-xs font-semibold text-gray-400 mb-2">
+                        <p className="flex items-center gap-1 text-xs font-semibold text-muted-foreground mb-2">
                           <Paperclip size={12} /> Attachments
                         </p>
                         <div className="flex flex-wrap gap-2">
@@ -440,7 +440,7 @@ const formatThreadTitle = (thread) => {
                               key={i}
                               type="button"
                               onClick={() => openAttachment(att)}
-                              className="border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-600 bg-gray-50 hover:bg-gray-100 transition-colors"
+                              className="border border-border rounded-lg px-3 py-1.5 text-xs text-foreground bg-muted hover:bg-muted/70 transition-colors"
                             >
                               {att.filename}
                             </button>
@@ -458,17 +458,17 @@ const formatThreadTitle = (thread) => {
 
               {/* Reply box */}
               {type === "inbox" && (
-                <div className="border-t border-gray-100 px-5 py-3 shrink-0">
+                <div className="border-t border-border px-5 py-3 shrink-0">
                   <textarea
                     placeholder="Type your response…"
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
-                    className="w-full min-h-[72px] rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-700 resize-none outline-none focus:ring-2 focus:ring-cyan-300 focus:border-transparent placeholder:text-gray-300 transition-colors"
+                    className="w-full min-h-[72px] rounded-xl border border-border bg-muted px-3 py-2.5 text-sm text-foreground resize-none outline-none focus:ring-2 focus:ring-ring focus:border-transparent placeholder:text-muted-foreground transition-colors"
                   />
                   <div className="flex justify-end mt-2">
                     <ShadButton
                       size="sm"
-                      className="h-8 px-4 text-xs rounded-lg gap-1.5 bg-cyan-500 hover:bg-cyan-600 text-white"
+                      className="h-8 px-4 text-xs rounded-lg gap-1.5 bg-primary hover:bg-primary/90 text-primary-foreground"
                       onClick={sendReply}
                     >
                       <SendIcon size={12} />
@@ -481,7 +481,7 @@ const formatThreadTitle = (thread) => {
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center gap-3">
               <span className="text-5xl opacity-20">✉</span>
-              <p className="text-sm text-gray-400">Select an email to read</p>
+              <p className="text-sm text-muted-foreground">Select an email to read</p>
             </div>
           )}
         </div>
@@ -494,11 +494,11 @@ const formatThreadTitle = (thread) => {
           onClick={() => setPreviewFile(null)}
         >
           <div
-            className="w-[85%] h-[90%] bg-white rounded-xl overflow-hidden flex flex-col shadow-2xl"
+            className="w-[85%] h-[90%] bg-card rounded-xl overflow-hidden flex flex-col shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100 shrink-0">
-              <span className="text-sm font-semibold text-gray-800">{previewFile.filename}</span>
+            <div className="flex items-center justify-between px-4 py-2.5 border-b border-border shrink-0">
+              <span className="text-sm font-semibold text-foreground">{previewFile.filename}</span>
               <ShadButton variant="ghost" size="sm" className="h-7 w-7 p-0 rounded-lg" onClick={() => setPreviewFile(null)}>
                 <X size={15} />
               </ShadButton>

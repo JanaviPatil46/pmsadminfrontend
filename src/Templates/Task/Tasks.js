@@ -585,53 +585,99 @@ const handleUserChange = (newSelectedUsers) => {
 
             {loading ? (
               <div className="flex items-center justify-center py-20">
-                <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
               </div>
             ) : (
-              <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left">
+              <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+
+                {/* ── Mobile card list (< sm) ── */}
+                <div className="sm:hidden">
+                  {paginatedTasks.length === 0 ? (
+                    <p className="px-4 py-10 text-center text-sm text-muted-foreground">No task templates found.</p>
+                  ) : (
+                    <ul className="divide-y divide-border">
+                      {paginatedTasks.map((row) => (
+                        <li key={row._id} className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-muted/50 transition-colors">
+                          <button
+                            onClick={() => handleEdit(row._id)}
+                            className="flex-1 text-left text-sm font-medium text-primary hover:underline truncate"
+                          >
+                            {row.templatename}
+                          </button>
+                          <div className="relative shrink-0">
+                            <button
+                              onClick={(event) => toggleMenu(event, row._id)}
+                              className="inline-flex items-center justify-center rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                            >
+                              <MoreVertical className="h-4 w-4" />
+                            </button>
+                            {openMenuId === row._id && (
+                              <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-border bg-card py-1 shadow-lg">
+                                <button
+                                  onClick={() => { handleEdit(tempIdget); handleMenuClose(); }}
+                                  className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors"
+                                >
+                                  <Pencil className="h-3.5 w-3.5" /> Edit
+                                </button>
+                                <button
+                                  onClick={() => { handleDelete(tempIdget); }}
+                                  className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors"
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" /> Delete
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+
+                {/* ── Desktop / tablet table (sm+) ── */}
+                <div className="hidden sm:block overflow-x-auto">
+                  <table className="min-w-full text-left">
                     <thead>
-                      <tr className="border-b border-slate-100 bg-slate-50/60">
-                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Name</th>
-                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 w-24 text-right">Actions</th>
+                      <tr className="border-b border-border bg-muted/40">
+                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Name</th>
+                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-20 text-right">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-border">
                       {paginatedTasks.length === 0 ? (
                         <tr>
-                          <td colSpan={2} className="px-5 py-10 text-center text-sm text-slate-400">No task templates found.</td>
+                          <td colSpan={2} className="px-4 py-10 text-center text-sm text-muted-foreground">No task templates found.</td>
                         </tr>
                       ) : (
                         paginatedTasks.map((row) => (
-                          <tr key={row._id} className="group transition-colors hover:bg-slate-50/70">
-                            <td className="px-5 py-3">
+                          <tr key={row._id} className="group transition-colors hover:bg-muted/50">
+                            <td className="px-4 py-3">
                               <button
                                 onClick={() => handleEdit(row._id)}
-                                className="text-sm font-medium text-indigo-600 hover:text-indigo-800 hover:underline transition-colors"
+                                className="text-sm font-medium text-primary hover:text-primary/80 hover:underline transition-colors truncate max-w-xs md:max-w-md lg:max-w-none block"
                               >
                                 {row.templatename}
                               </button>
                             </td>
-                            <td className="px-5 py-3 text-right">
+                            <td className="px-4 py-3 text-right">
                               <div className="relative inline-block">
                                 <button
                                   onClick={(event) => toggleMenu(event, row._id)}
-                                  className="inline-flex items-center justify-center rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                                  className="inline-flex items-center justify-center rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                                 >
                                   <MoreVertical className="h-4 w-4" />
                                 </button>
                                 {openMenuId === row._id && (
-                                  <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-slate-200 bg-white py-1 shadow-lg animate-in fade-in-0 zoom-in-95">
+                                  <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-border bg-card py-1 shadow-lg animate-in fade-in-0 zoom-in-95">
                                     <button
                                       onClick={() => { handleEdit(tempIdget); handleMenuClose(); }}
-                                      className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                                      className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors"
                                     >
                                       <Pencil className="h-3.5 w-3.5" /> Edit
                                     </button>
                                     <button
                                       onClick={() => { handleDelete(tempIdget); }}
-                                      className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+                                      className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors"
                                     >
                                       <Trash2 className="h-3.5 w-3.5" /> Delete
                                     </button>
@@ -647,16 +693,16 @@ const handleUserChange = (newSelectedUsers) => {
                 </div>
 
                 {TaskTemplates.length > 0 && (
-                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-100 bg-slate-50/40 px-5 py-3">
-                    <p className="text-xs text-slate-500">
-                      Showing <span className="font-semibold text-slate-700">{page * rowsPerPage + 1}</span>–<span className="font-semibold text-slate-700">{Math.min((page + 1) * rowsPerPage, TaskTemplates.length)}</span> of{" "}
-                      <span className="font-semibold text-slate-700">{TaskTemplates.length}</span>
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-border bg-muted/30 px-4 py-3">
+                    <p className="text-xs text-muted-foreground">
+                      Showing <span className="font-semibold text-foreground">{page * rowsPerPage + 1}</span>–<span className="font-semibold text-foreground">{Math.min((page + 1) * rowsPerPage, TaskTemplates.length)}</span> of{" "}
+                      <span className="font-semibold text-foreground">{TaskTemplates.length}</span>
                     </p>
                     <div className="flex items-center gap-2">
                       <select
                         value={rowsPerPage}
                         onChange={(e) => handleChangeRowsPerPage({ target: { value: e.target.value } })}
-                        className="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-600 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        className="rounded-lg border border-border bg-card px-2 py-1.5 text-xs text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
                       >
                         {[30, 40, 50, 60, 100].map((opt) => (
                           <option key={opt} value={opt}>{opt} / page</option>
@@ -666,17 +712,17 @@ const handleUserChange = (newSelectedUsers) => {
                         <button
                           onClick={() => handleChangePage(null, page - 1)}
                           disabled={page === 0}
-                          className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 text-slate-500 shadow-sm transition-colors hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                          className="inline-flex items-center justify-center rounded-lg border border-border bg-card p-1.5 text-muted-foreground shadow-sm transition-colors hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                           <ChevronLeft className="h-4 w-4" />
                         </button>
-                        <span className="min-w-[3rem] text-center text-xs font-medium text-slate-600">
+                        <span className="min-w-[3rem] text-center text-xs font-medium text-muted-foreground">
                           {page + 1} / {Math.max(1, Math.ceil(TaskTemplates.length / rowsPerPage))}
                         </span>
                         <button
                           onClick={() => handleChangePage(null, page + 1)}
                           disabled={(page + 1) * rowsPerPage >= TaskTemplates.length}
-                          className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 text-slate-500 shadow-sm transition-colors hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                          className="inline-flex items-center justify-center rounded-lg border border-border bg-card p-1.5 text-muted-foreground shadow-sm transition-colors hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                           <ChevronRight className="h-4 w-4" />
                         </button>
@@ -785,7 +831,7 @@ const handleUserChange = (newSelectedUsers) => {
                           className="flex-1"
                         />
                         <select
-                          className="flex h-10 rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          className="flex h-10 rounded-lg border border-input bg-card px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                           value={startsInDuration || ""}
                           onChange={(e) => setStartsInDuration(e.target.value)}
                         >
@@ -804,7 +850,7 @@ const handleUserChange = (newSelectedUsers) => {
                           className="flex-1"
                         />
                         <select
-                          className="flex h-10 rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          className="flex h-10 rounded-lg border border-input bg-card px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                           value={dueinduration || ""}
                           onChange={(e) => setdueinduration(e.target.value)}
                         >
@@ -841,7 +887,7 @@ const handleUserChange = (newSelectedUsers) => {
                                   <div
                                     ref={provided.innerRef}
                                     {...provided.draggableProps}
-                                    className="flex items-center gap-2 rounded-lg border border-border bg-white p-2 shadow-sm"
+                                    className="flex items-center gap-2 rounded-lg border border-border bg-card p-2 shadow-sm"
                                   >
                                     <Checkbox
                                       checked={checkedSubtasks.includes(subtask.id)}

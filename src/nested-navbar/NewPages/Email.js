@@ -81,7 +81,7 @@ const unreadInbox = location.state?.unreadCount || 0;
 
   const navCls = ({ isActive }) =>
     `flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${
-      isActive ? 'bg-blue-50 font-bold text-blue-600' : 'text-gray-700 hover:bg-gray-100'
+      isActive ? 'bg-muted font-bold text-primary' : 'text-foreground hover:bg-muted'
     }`;
 
   return (
@@ -91,7 +91,7 @@ const unreadInbox = location.state?.unreadCount || 0;
         <NavLink to="inbox" className={navCls}>
           <span>Inbox</span>
           {unreadInbox > 0 && (
-            <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1 rounded-full bg-blue-500 text-white text-xs font-medium">
+            <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1 rounded-full bg-primary text-white text-xs font-medium">
               {unreadInbox}
             </span>
           )}

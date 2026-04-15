@@ -109,9 +109,9 @@ const handleToggleSection = (sectionId) => {
             onChange={(e) => setShowConditional(e.target.checked)}
             className="sr-only peer"
           />
-          <div className="w-10 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:bg-blue-600 transition-colors after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5" />
+          <div className="w-10 h-5 bg-muted peer-focus:outline-none rounded-full peer peer-checked:bg-primary transition-colors after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5" />
         </label>
-        <span className="text-sm text-gray-700">Show Hidden Questions</span>
+        <span className="text-sm text-foreground">Show Hidden Questions</span>
       </div>
 
       {filteredSections.length > 0 ? (
@@ -121,30 +121,30 @@ const handleToggleSection = (sectionId) => {
               <span className="flex-1 text-sm font-medium">
                 {section.text}
                 {section.sectionsettings?.conditional && showConditional && (
-                  <span className="ml-1 italic text-gray-400 text-xs">(Hidden Section)</span>
+                  <span className="ml-1 italic text-muted-foreground text-xs">(Hidden Section)</span>
                 )}
               </span>
-              <span className="text-xs text-gray-400 mr-2">
+              <span className="text-xs text-muted-foreground mr-2">
                 ({section.formElements.filter((el) => el.textvalue && (!el.questionsectionsettings?.conditional || showConditional)).length}
                 {" / "}
                 {section.formElements.filter((el) => !el.questionsectionsettings?.conditional || showConditional).length})
               </span>
-              <button type="button" className="p-1 text-gray-500">
+              <button type="button" className="p-1 text-muted-foreground">
                 {expandedSections.includes(section.id) ? <FaChevronUp size={12} /> : <FaChevronDown size={12} />}
               </button>
             </div>
 
             {expandedSections.includes(section.id) && (
-              <div className="overflow-x-auto rounded-lg border border-gray-200 mt-2">
+              <div className="overflow-x-auto rounded-lg border border-border mt-2">
                 <table className="w-full text-sm min-w-[650px]">
-                  <thead className="bg-gray-50">
+                  <thead className="bg-muted">
                     <tr>
                       <th className="text-left px-4 py-2 w-[40%] text-xs font-bold">Question</th>
                       <th className="text-left px-4 py-2 w-[40%] text-xs font-bold">Answer</th>
                       <th className="text-left px-4 py-2 w-[20%] text-xs font-bold">Reviewed</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody className="divide-y divide-border">
                     {section.formElements
                       .filter((formElement) => !formElement.questionsectionsettings?.conditional || showConditional)
                       .map((formElement) => (
@@ -154,7 +154,7 @@ const handleToggleSection = (sectionId) => {
                           </td>
                           <td className="px-4 py-2 text-xs">
                             {formElement.type === "Text Editor" ? (
-                              <span className="text-blue-600 cursor-pointer"
+                              <span className="text-primary cursor-pointer"
                                 onClick={() => handleOpenDrawer(formElement.text)}>
                                 Display
                               </span>
@@ -185,7 +185,7 @@ const handleToggleSection = (sectionId) => {
       )}
 
       <button type="button" onClick={onClose}
-        className="mt-2 px-4 py-1.5 text-sm rounded border border-gray-300 text-gray-700 hover:bg-gray-50">
+        className="mt-2 px-4 py-1.5 text-sm rounded border border-border text-foreground hover:bg-muted">
         Back
       </button>
 
@@ -193,10 +193,10 @@ const handleToggleSection = (sectionId) => {
       {drawerOpen && (
         <div className="fixed inset-0 z-50 overflow-hidden">
           <div className="absolute inset-0 bg-black/30" onClick={handleCloseDrawer} />
-          <div className="absolute right-0 top-0 h-full w-[600px] bg-white shadow-xl overflow-y-auto p-4">
+          <div className="absolute right-0 top-0 h-full w-[600px] bg-card shadow-xl overflow-y-auto p-4">
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm font-medium">Text Block Content</span>
-              <RxCross2 className="cursor-pointer text-gray-500" onClick={handleCloseDrawer} />
+              <RxCross2 className="cursor-pointer text-muted-foreground" onClick={handleCloseDrawer} />
             </div>
             <div dangerouslySetInnerHTML={{ __html: drawerContent }} />
           </div>

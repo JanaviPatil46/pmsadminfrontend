@@ -189,19 +189,19 @@ const countUnreadAdminMessages = (chat) => {
   return (
     <div className="flex flex-col h-full">
       {/* Top bar */}
-      <div className="flex items-center justify-between px-1 pb-3 border-b border-gray-100">
+      <div className="flex items-center justify-between px-1 pb-3 border-b border-border">
         <div className="flex items-center gap-3 flex-wrap">
-          <span className="text-base font-semibold text-gray-800">Chats &amp; Tasks</span>
+          <span className="text-base font-semibold text-foreground">Chats &amp; Tasks</span>
 
           {/* Active / Archived toggle pill */}
-          <div className="flex items-center bg-gray-100 rounded-xl p-1 gap-0.5">
+          <div className="flex items-center bg-muted rounded-xl p-1 gap-0.5">
             {[{ label: "Active", value: true }, { label: "Archived", value: false }].map(({ label, value }) => (
               <button key={label} type="button"
                 onClick={() => { if (isActiveTrue !== value) { setSelectedChat(null); setIsActiveTrue(value); } }}
                 className={`px-4 py-1.5 rounded-xl text-xs font-semibold transition-all ${
                   isActiveTrue === value
-                    ? 'bg-white shadow-sm text-[var(--color-save-btn)]'
-                    : 'text-gray-500 hover:text-gray-700'
+                    ? 'bg-card shadow-sm text-primary'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >{label}</button>
             ))}
@@ -209,14 +209,14 @@ const countUnreadAdminMessages = (chat) => {
 
           {/* Bulk actions */}
           {selectedChatIds.length > 0 && (
-            <div className="flex items-center gap-2 pl-2 border-l border-gray-200">
-              <span className="text-xs text-gray-400">{selectedChatIds.length} selected</span>
+            <div className="flex items-center gap-2 pl-2 border-l border-border">
+              <span className="text-xs text-muted-foreground">{selectedChatIds.length} selected</span>
               <button type="button" onClick={handleBulkDelete}
-                className="flex items-center gap-1 text-xs font-medium text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded-lg px-2.5 py-1.5 transition-colors">
+                className="flex items-center gap-1 text-xs font-medium text-destructive hover:text-destructive/80 bg-destructive/10 hover:bg-destructive/20 rounded-lg px-2.5 py-1.5 transition-colors">
                 <MdDeleteOutline size={14} /> Delete
               </button>
               <button type="button" onClick={handleBulkArchive}
-                className="flex items-center gap-1 text-xs font-medium text-gray-600 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 rounded-lg px-2.5 py-1.5 transition-colors">
+                className="flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground bg-muted hover:bg-muted/70 rounded-lg px-2.5 py-1.5 transition-colors">
                 <MdOutlineArchive size={14} /> {isActiveTrue ? "Archive" : "Unarchive"}
               </button>
             </div>
@@ -233,7 +233,7 @@ const countUnreadAdminMessages = (chat) => {
       <div className="flex gap-0 flex-1 min-h-0 pt-3" style={{ height: 'calc(100vh - 130px)' }}>
 
         {/* Chat list sidebar */}
-        <div className="w-[280px] shrink-0 h-full overflow-y-auto border-r border-gray-100 pr-2 space-y-1">
+        <div className="w-[280px] shrink-0 h-full overflow-y-auto border-r border-border pr-2 space-y-1">
           {chatList.length > 0 ? (
             chatList.map((chat, index) => {
               const unreadCount = countUnreadAdminMessages(chat);
@@ -244,8 +244,8 @@ const countUnreadAdminMessages = (chat) => {
                   onClick={() => handleShowChat(chat._id)}
                   className={`group relative rounded-xl px-3 py-3 cursor-pointer transition-colors border ${
                     isSelected
-                      ? 'bg-blue-50 border-blue-200'
-                      : 'bg-white border-gray-100 hover:bg-gray-50 hover:border-gray-200'
+                      ? 'bg-primary/5 border-primary/20'
+                      : 'bg-card border-border hover:bg-muted/50 hover:border-border'
                   }`}
                 >
                   {/* Row 1: checkbox + icon + account name + unread badge */}
@@ -253,26 +253,26 @@ const countUnreadAdminMessages = (chat) => {
                     <div className="flex items-center gap-2">
                       <input
                         type="checkbox"
-                        className="h-3.5 w-3.5 rounded border-gray-300 accent-blue-600"
+                        className="h-3.5 w-3.5 rounded border-border accent-primary"
                         checked={isChatSelected(chat._id)}
                         onChange={() => handleCheckboxChange(chat._id)}
                         onClick={(e) => e.stopPropagation()}
                       />
-                      <FaTelegram size={13} style={{ color: chat.chatstatus ? '#007bff' : '#16a34a' }} />
-                      <span className="text-[11px] text-gray-400 truncate max-w-[120px]">{chat.accountid?.accountName}</span>
+                      <FaTelegram size={13} className={chat.chatstatus ? 'text-primary' : 'text-success'} />
+                      <span className="text-[11px] text-muted-foreground truncate max-w-[120px]">{chat.accountid?.accountName}</span>
                     </div>
                     {unreadCount > 0 && (
-                      <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-green-500 text-white text-[10px] font-bold">
+                      <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-success text-white text-[10px] font-bold">
                         {unreadCount}
                       </span>
                     )}
                   </div>
                   {/* Row 2: subject */}
                   <p className={`text-sm font-semibold truncate ${
-                    unreadCount > 0 ? 'text-gray-900' : 'text-gray-700'
+                    unreadCount > 0 ? 'text-foreground' : 'text-foreground/80'
                   }`}>{chat.chatsubject}</p>
                   {/* Row 3: last message preview */}
-                  <p className="text-[11px] text-gray-400 truncate mt-0.5">
+                  <p className="text-[11px] text-muted-foreground truncate mt-0.5">
                     {(() => {
                       const messages = chat.description || [];
                       const latest = messages[messages.length - 1];
@@ -283,14 +283,14 @@ const countUnreadAdminMessages = (chat) => {
                     })()}
                   </p>
                   {/* Row 4: time */}
-                  <p className="text-[10px] text-gray-300 text-right mt-1">{formattedTime}</p>
+                  <p className="text-[10px] text-muted-foreground text-right mt-1">{formattedTime}</p>
                 </div>
               );
             })
           ) : (
             <div className="flex flex-col items-center justify-center py-12 gap-2">
-              <FaTelegram size={28} className="text-gray-200" />
-              <p className="text-xs text-gray-400">No chats to display</p>
+              <FaTelegram size={28} className="text-muted-foreground/30" />
+              <p className="text-xs text-muted-foreground">No chats to display</p>
             </div>
           )}
         </div>
@@ -309,10 +309,10 @@ const countUnreadAdminMessages = (chat) => {
             />
           ) : (
             <div className="flex flex-col items-center justify-center h-full gap-3">
-              <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center">
-                <FaTelegram size={24} className="text-gray-300" />
+              <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center">
+                <FaTelegram size={24} className="text-muted-foreground/40" />
               </div>
-              <p className="text-sm font-medium text-gray-400">Select a chat to view details</p>
+              <p className="text-sm font-medium text-muted-foreground">Select a chat to view details</p>
             </div>
           )}
         </div>

@@ -332,24 +332,24 @@ useEffect(() => {
     handleClose()
     ClearFileds()
   }
-  const fieldCls = "w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent placeholder:text-gray-400 transition-colors";
-  const labelCls = "block text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-1.5";
+  const fieldCls = "w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent placeholder:text-muted-foreground transition-colors";
+  const labelCls = "block text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-1.5";
 
   return (
     <>
       {open && (
         <div className="fixed inset-0 z-40 overflow-hidden" aria-modal="true">
           <div className="absolute inset-0 bg-black/40" onClick={handleClose} />
-          <div className="absolute right-0 top-0 h-full w-full sm:w-[580px] bg-white shadow-2xl flex flex-col">
+          <div className="absolute right-0 top-0 h-full w-full sm:w-[580px] bg-card shadow-2xl flex flex-col">
 
             {/* Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
               <div>
-                <span className="text-sm font-semibold text-gray-800">New Chat</span>
-                <p className="text-xs text-gray-400 mt-0.5">Create a new chat thread for this account</p>
+                <span className="text-sm font-semibold text-foreground">New Chat</span>
+                <p className="text-xs text-muted-foreground mt-0.5">Create a new chat thread for this account</p>
               </div>
               <button type="button" onClick={handleCloseDrawer}
-                className="h-7 w-7 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+                className="h-7 w-7 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
                 <IoClose size={18} />
               </button>
             </div>
@@ -408,12 +408,12 @@ useEffect(() => {
                   + Add Shortcode
                 </button>
                 {showDropdown && (
-                  <div className="absolute z-50 bg-white border border-gray-200 rounded-xl shadow-xl w-72 max-h-64 overflow-y-auto mt-1">
+                  <div className="absolute z-50 bg-card border border-border rounded-xl shadow-xl w-72 max-h-64 overflow-y-auto mt-1">
                     {filteredShortcuts.map((shortcut, index) => (
                       <div
                         key={index}
-                        className={`px-4 py-2 cursor-pointer hover:bg-gray-50 text-sm transition-colors ${
-                          shortcut.isBold ? 'font-semibold text-gray-700 bg-gray-50 border-b border-gray-100' : 'text-gray-600'
+                        className={`px-4 py-2 cursor-pointer hover:bg-muted text-sm transition-colors ${
+                          shortcut.isBold ? 'font-semibold text-foreground bg-muted border-b border-border' : 'text-muted-foreground'
                         }`}
                         onClick={() => handleAddShortcut(shortcut.value)}
                       >
@@ -431,22 +431,22 @@ useEffect(() => {
               </div>
 
               {/* Send reminders toggle */}
-              <div className="rounded-xl border border-gray-100 bg-gray-50 px-4 py-3">
+              <div className="rounded-xl border border-border bg-muted px-4 py-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-semibold text-gray-700">Send reminders to clients</p>
-                    <p className="text-xs text-gray-400 mt-0.5">Automatically send follow-up reminders</p>
+                    <p className="text-sm font-semibold text-foreground">Send reminders to clients</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Automatically send follow-up reminders</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" className="sr-only peer"
                       checked={absoluteDate}
                       onChange={(e) => handleAbsolutesDates(e.target.checked)}
                     />
-                    <div className="w-9 h-5 bg-gray-200 rounded-full peer peer-checked:after:translate-x-4 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-500"></div>
+                    <div className="w-9 h-5 bg-muted-foreground/30 rounded-full peer peer-checked:after:translate-x-4 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
                   </label>
                 </div>
                 {absoluteDate && (
-                  <div className="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-gray-200">
+                  <div className="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-border">
                     <div>
                       <label className={labelCls}>Days until next reminder</label>
                       <input type="text" className={fieldCls}
@@ -474,7 +474,7 @@ useEffect(() => {
                 <div className="flex items-center justify-between mb-2">
                   <label className={labelCls}>Client Tasks</label>
                   <button type="button" onClick={handleAddSubtask}
-                    className="flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors">
+                    className="flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary/80 transition-colors">
                     <FiPlusCircle size={13} /> Add Task
                   </button>
                 </div>
@@ -486,22 +486,22 @@ useEffect(() => {
                           <Draggable key={subtask.id} draggableId={subtask.id} index={index}>
                             {(provided) => (
                               <div ref={provided.innerRef} {...provided.draggableProps}>
-                                <div className="flex items-center gap-2 bg-white rounded-lg border border-gray-200 px-2 py-1.5">
-                                  <span {...provided.dragHandleProps} className="text-gray-300 hover:text-gray-500 cursor-grab">
+                                <div className="flex items-center gap-2 bg-card rounded-lg border border-border px-2 py-1.5">
+                                  <span {...provided.dragHandleProps} className="text-muted-foreground/40 hover:text-muted-foreground cursor-grab">
                                     <PiDotsSixVerticalBold size={14} />
                                   </span>
-                                  <input type="checkbox" className="h-3.5 w-3.5 rounded border-gray-300 accent-blue-600 cursor-pointer"
+                                  <input type="checkbox" className="h-3.5 w-3.5 rounded border-border accent-primary cursor-pointer"
                                     checked={checkedSubtasks.includes(subtask.id)}
                                     onChange={() => handleCheckboxChange(subtask.id, subtask.checked)}
                                   />
                                   <input type="text"
-                                    className="flex-1 text-sm bg-transparent border-none outline-none placeholder:text-gray-300"
+                                    className="flex-1 text-sm bg-transparent border-none outline-none placeholder:text-muted-foreground/40"
                                     placeholder="Task description"
                                     value={subtask.text}
                                     onChange={(e) => handleInputChange(subtask.id, e.target.value)}
                                   />
                                   <button type="button" onClick={() => handleDeleteSubtask(subtask.id)}
-                                    className="text-gray-300 hover:text-red-500 transition-colors">
+                                    className="text-muted-foreground/40 hover:text-destructive transition-colors">
                                     <RiDeleteBin6Line size={14} />
                                   </button>
                                 </div>
@@ -511,7 +511,7 @@ useEffect(() => {
                         ))}
                         {provided.placeholder}
                         {subtasks.length === 0 && (
-                          <p className="text-xs text-gray-300 text-center py-3">No tasks added yet</p>
+                          <p className="text-xs text-muted-foreground/50 text-center py-3">No tasks added yet</p>
                         )}
                       </div>
                     )}
@@ -521,9 +521,9 @@ useEffect(() => {
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100 shrink-0">
+            <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-border shrink-0">
               <button type="button" onClick={handleCloseDrawer}
-                className="rounded-lg px-4 py-2 text-sm font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
+                className="rounded-lg px-4 py-2 text-sm font-medium border border-border text-foreground hover:bg-muted transition-colors">
                 Cancel
               </button>
               <button type="button" onClick={saveChat}

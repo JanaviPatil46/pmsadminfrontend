@@ -132,23 +132,23 @@ const accountwiseChatlist = (data, isActiveTrue) => {
   };
 
   const EmptyState = ({ label }) => (
-    <div className="flex flex-col items-center py-8 text-gray-300">
+    <div className="flex flex-col items-center py-8 text-muted-foreground/40">
       <PiNotepad className="text-5xl mb-2" />
-      <p className="text-xs text-gray-400">{label}</p>
+      <p className="text-xs text-muted-foreground">{label}</p>
     </div>
   );
 
   const SectionHeader = ({ title, to }) => (
-    <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
-      <h3 className="text-sm font-semibold text-gray-800">{title}</h3>
-      <Link to={to} className="text-xs font-medium text-blue-500 hover:text-blue-600 no-underline transition-colors">View all</Link>
+    <div className="flex items-center justify-between px-5 py-3.5 border-b border-border">
+      <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+      <Link to={to} className="text-xs font-medium text-primary hover:text-primary/80 no-underline transition-colors">View all</Link>
     </div>
   );
 
   const TableHead = ({ cols }) => (
     <thead>
-      <tr className="bg-gray-50 border-b border-gray-100">
-        {cols.map(c => <th key={c} className="px-4 py-2.5 text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wide">{c}</th>)}
+      <tr className="bg-muted border-b border-border">
+        {cols.map(c => <th key={c} className="px-4 py-2.5 text-left text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">{c}</th>)}
       </tr>
     </thead>
   );
@@ -160,15 +160,15 @@ const accountwiseChatlist = (data, isActiveTrue) => {
       <div className="space-y-5">
 
         {/* Chats card */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
           <SectionHeader title="Chats" to={`/clients/accounts/accountsdash/communication/${data}`} />
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <TableHead cols={["Chat Subject"]} />
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-border/50">
                 {chats.length > 0 ? chats.map((chat) => (
-                  <tr key={chat._id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-2.5 text-xs text-gray-700">{chat.chatsubject}</td>
+                  <tr key={chat._id} className="hover:bg-muted/50 transition-colors">
+                    <td className="px-4 py-2.5 text-xs text-foreground">{chat.chatsubject}</td>
                   </tr>
                 )) : (
                   <tr><td><EmptyState label="No chats available" /></td></tr>
@@ -179,17 +179,17 @@ const accountwiseChatlist = (data, isActiveTrue) => {
         </div>
 
         {/* Organizers card */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
           <SectionHeader title="Organizers" to={`/clients/accounts/accountsdash/organizers/${data}`} />
           {organizerTemplatesData && organizerTemplatesData.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <TableHead cols={["Name", "Status"]} />
-                <tbody className="divide-y divide-gray-50">
+                <tbody className="divide-y divide-border/50">
                   {organizerTemplatesData.map((row) => (
-                    <tr key={row._id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-4 py-2.5 text-xs text-gray-700">{row.organizertemplateid?.organizerName || "Unnamed Template"}</td>
-                      <td className="px-4 py-2.5 text-xs text-gray-400">—</td>
+                    <tr key={row._id} className="hover:bg-muted/50 transition-colors">
+                      <td className="px-4 py-2.5 text-xs text-foreground">{row.organizertemplateid?.organizerName || "Unnamed Template"}</td>
+                      <td className="px-4 py-2.5 text-xs text-muted-foreground">—</td>
                     </tr>
                   ))}
                 </tbody>
@@ -201,17 +201,17 @@ const accountwiseChatlist = (data, isActiveTrue) => {
         </div>
 
         {/* Proposals card */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
           <SectionHeader title="Proposals & ELs" to={`/clients/accounts/accountsdash/proposals/${data}`} />
           {ProposalsTemplates && ProposalsTemplates.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <TableHead cols={["Name", "Status"]} />
-                <tbody className="divide-y divide-gray-50">
+                <tbody className="divide-y divide-border/50">
                   {ProposalsTemplates.map((row) => (
-                    <tr key={row._id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-4 py-2.5 text-xs text-gray-700">{row.proposalname}</td>
-                      <td className="px-4 py-2.5 text-xs text-gray-400">—</td>
+                    <tr key={row._id} className="hover:bg-muted/50 transition-colors">
+                      <td className="px-4 py-2.5 text-xs text-foreground">{row.proposalname}</td>
+                      <td className="px-4 py-2.5 text-xs text-muted-foreground">—</td>
                     </tr>
                   ))}
                 </tbody>
@@ -227,17 +227,17 @@ const accountwiseChatlist = (data, isActiveTrue) => {
       <div className="space-y-5">
 
         {/* Jobs card */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
           <SectionHeader title="Jobs" to={`/clients/accounts/accountsdash/workflow/${data}/activejobs`} />
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <TableHead cols={["Job Name", "Pipeline", "Stage"]} />
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-border/50">
                 {jobData.length > 0 ? jobData.map((job) => (
-                  <tr key={job.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-2.5 text-xs text-gray-700">{job.Name}</td>
-                    <td className="px-4 py-2.5 text-xs text-gray-500">{job.Pipeline}</td>
-                    <td className="px-4 py-2.5 text-xs text-gray-400">—</td>
+                  <tr key={job.id} className="hover:bg-muted/50 transition-colors">
+                    <td className="px-4 py-2.5 text-xs text-foreground">{job.Name}</td>
+                    <td className="px-4 py-2.5 text-xs text-muted-foreground">{job.Pipeline}</td>
+                    <td className="px-4 py-2.5 text-xs text-muted-foreground">—</td>
                   </tr>
                 )) : (
                   <tr><td colSpan={3}><EmptyState label="No jobs available" /></td></tr>
@@ -248,17 +248,17 @@ const accountwiseChatlist = (data, isActiveTrue) => {
         </div>
 
         {/* Invoices card */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
           <SectionHeader title="Unpaid Invoices" to={`/clients/accounts/accountsdash/invoices/${data}/invoice`} />
           {accountInvoicesData && accountInvoicesData.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <TableHead cols={["Invoice #", "Status"]} />
-                <tbody className="divide-y divide-gray-50">
+                <tbody className="divide-y divide-border/50">
                   {accountInvoicesData.map((row) => (
-                    <tr key={row._id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-4 py-2.5 text-xs text-gray-700">{row.invoicenumber}</td>
-                      <td className="px-4 py-2.5 text-xs text-gray-400">—</td>
+                    <tr key={row._id} className="hover:bg-muted/50 transition-colors">
+                      <td className="px-4 py-2.5 text-xs text-foreground">{row.invoicenumber}</td>
+                      <td className="px-4 py-2.5 text-xs text-muted-foreground">—</td>
                     </tr>
                   ))}
                 </tbody>

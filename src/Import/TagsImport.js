@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Papa from "papaparse";
 import { Button } from "../components/ui/button";
 import { Checkbox } from "../components/ui/checkbox";
+import { Upload, Tag } from "lucide-react";
 
 const TagsImport = () => {
   const [tags, setTags] = useState([]);
@@ -149,56 +150,76 @@ const TagsImport = () => {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold tracking-tight text-foreground">Import Tags</h1>
 
-      <div className="flex items-center gap-3">
-        <label className="cursor-pointer">
-          <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium border border-input bg-background hover:bg-muted transition-colors">
-            Import Tags
-          </span>
-          <input type="file" accept=".csv" hidden onChange={handleTagsFileUpload} />
-        </label>
-
-        {selectedTags.length > 0 && (
-          <Button
-            onClick={handleSaveSelectedTags}
-            className="rounded-full px-5"
-            style={{ backgroundColor: "var(--color-save-btn)" }}
-          >
-            Create Tags ({selectedTags.length})
-          </Button>
-        )}
-      </div>
-
-      {tags.length > 0 && (
-        <div className="bg-background rounded-xl border shadow-sm overflow-hidden">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b bg-muted/40">
-                <th className="px-4 py-3 w-10">
-                  <Checkbox
-                    checked={selectedTags.length === tags.length && tags.length > 0}
-                    onCheckedChange={handleSelectAllTags}
-                  />
-                </th>
-                <th className="text-xs font-semibold text-left px-4 py-3 text-muted-foreground uppercase tracking-wide">
-                  Tag Name
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {tags.map((tag, index) => (
-                <tr key={index} className={`border-b hover:bg-muted/30 transition-colors ${selectedTags.includes(tag) ? "bg-blue-50/50" : ""}`}>
-                  <td className="px-4 py-3">
-                    <Checkbox
-                      checked={selectedTags.includes(tag)}
-                      onCheckedChange={() => handleSelectTag(tag)}
-                    />
-                  </td>
-                  <td className="px-4 py-2.5 text-sm font-medium">{tag.tagName}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {tags.length === 0 ? (
+        <div className="flex items-center justify-center py-16">
+          <div className="flex flex-col items-center gap-5 rounded-2xl border-2 border-dashed border-border bg-muted/20 px-12 py-14 text-center w-full max-w-sm">
+            <div className="rounded-full bg-primary/10 p-5">
+              <Tag className="h-10 w-10 text-primary" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-base font-semibold text-foreground">Upload Tags CSV</h3>
+              <p className="text-sm text-muted-foreground">Select a <span className="font-medium">.csv</span> file to import tags</p>
+            </div>
+            <label className="cursor-pointer">
+              <span className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors cursor-pointer">
+                <Upload className="h-4 w-4" /> Choose CSV File
+              </span>
+              <input type="file" accept=".csv" hidden onChange={handleTagsFileUpload} />
+            </label>
+          </div>
         </div>
+      ) : (
+        <>
+          <div className="flex items-center gap-3">
+            <label className="cursor-pointer">
+              <span className="inline-flex items-center gap-2 rounded-full border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-muted transition-colors cursor-pointer">
+                <Upload className="h-4 w-4" /> Upload New CSV
+              </span>
+              <input type="file" accept=".csv" hidden onChange={handleTagsFileUpload} />
+            </label>
+
+            {selectedTags.length > 0 && (
+              <Button
+                onClick={handleSaveSelectedTags}
+                className="rounded-full px-5"
+                style={{ backgroundColor: "var(--color-save-btn)" }}
+              >
+                Create Tags ({selectedTags.length})
+              </Button>
+            )}
+          </div>
+
+          <div className="overflow-x-auto rounded-xl border shadow-sm bg-background">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b bg-muted/40">
+                  <th className="px-4 py-3 w-10">
+                    <Checkbox
+                      checked={selectedTags.length === tags.length && tags.length > 0}
+                      onCheckedChange={handleSelectAllTags}
+                    />
+                  </th>
+                  <th className="text-xs font-semibold text-left px-4 py-3 text-muted-foreground uppercase tracking-wide">
+                    Tag Name
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {tags.map((tag, index) => (
+                  <tr key={index} className={`border-b hover:bg-muted/30 transition-colors ${selectedTags.includes(tag) ? "bg-primary/5" : ""}`}>
+                    <td className="px-4 py-3">
+                      <Checkbox
+                        checked={selectedTags.includes(tag)}
+                        onCheckedChange={() => handleSelectTag(tag)}
+                      />
+                    </td>
+                    <td className="px-4 py-2.5 text-sm font-medium">{tag.tagName}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
     </div>
   );

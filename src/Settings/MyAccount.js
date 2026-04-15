@@ -1588,26 +1588,40 @@ const MyAccount = () => {
           </div>
           <hr className="border-border mb-4" />
           <div className="overflow-x-auto">
-            <table className="w-full text-left">
+            <table className="w-full min-w-[360px] text-left">
               <thead>
-                <tr className="border-b">
-                  <th className="py-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-1/2"></th>
-                  <th className="py-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground text-center">INBOX+</th>
-                  <th className="py-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground text-center">EMAIL</th>
+                <tr className="border-b border-border">
+                  <th className="py-3 px-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground"></th>
+                  <th className="py-3 px-4 w-28 text-xs font-semibold uppercase tracking-wider text-muted-foreground text-center">INBOX+</th>
+                  <th className="py-3 px-4 w-28 text-xs font-semibold uppercase tracking-wider text-muted-foreground text-center">EMAIL</th>
                 </tr>
               </thead>
-              <tbody className="divide-y">
-                {notificationRows.map((row) => (
-                  <tr key={row.label}>
-                    <td className={`py-2.5 px-3 text-sm text-foreground ${row.indent ? "pl-8" : ""}`}>{row.label}</td>
-                    <td className="py-2.5 px-3 text-center">
-                      {!row.isSpacer && <Checkbox checked={row.inboxChecked} onCheckedChange={row.onInboxChange} />}
-                    </td>
-                    <td className="py-2.5 px-3 text-center">
-                      {!row.isSpacer && <Checkbox checked={row.emailChecked} onCheckedChange={row.onEmailChange} />}
-                    </td>
-                  </tr>
-                ))}
+              <tbody className="divide-y divide-border">
+                {notificationRows.map((row) =>
+                  row.isSpacer ? (
+                    <tr key={row.label} className="bg-muted/40">
+                      <td colSpan={3} className="py-3 px-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        {row.label}
+                      </td>
+                    </tr>
+                  ) : (
+                    <tr key={row.label} className="hover:bg-muted/30 transition-colors">
+                      <td className={`py-3 px-4 text-sm text-foreground align-middle${row.indent ? " pl-8" : ""}`}>
+                        {row.label}
+                      </td>
+                      <td className="py-3 px-4 w-28 align-middle">
+                        <div className="flex justify-center items-center">
+                          <Checkbox checked={row.inboxChecked} onCheckedChange={row.onInboxChange} />
+                        </div>
+                      </td>
+                      <td className="py-3 px-4 w-28 align-middle">
+                        <div className="flex justify-center items-center">
+                          <Checkbox checked={row.emailChecked} onCheckedChange={row.onEmailChange} />
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                )}
               </tbody>
             </table>
           </div>
@@ -1646,7 +1660,7 @@ const MyAccount = () => {
           <hr className="border-border mb-4" />
           <div>
             <label className="block text-sm font-medium text-foreground mb-1.5">From</label>
-            <select value={SystemLang} onChange={(e) => setSystemLang(e.target.value)} className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring">
+            <select value={SystemLang} onChange={(e) => setSystemLang(e.target.value)} className="flex h-10 w-full rounded-lg border border-input bg-card px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring">
               <option value="">Select Language</option>
               {options.map((option) => (
                 <option key={option.value} value={option.value}>{option.label}</option>

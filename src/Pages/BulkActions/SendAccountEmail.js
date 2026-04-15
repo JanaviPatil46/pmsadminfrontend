@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { RiAddCircleLine } from "react-icons/ri";
 import { IoIosCloseCircleOutline } from "react-icons/io";
+import { Mail, X, Send, Clock } from "lucide-react";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import draftToHtml from "draftjs-to-html";
 import htmlToDraft from "html-to-draftjs";
@@ -31,46 +32,6 @@ const SendAccountEmail = ({ selectedAccounts, onClose }) => {
     { value: "contact_shortcuts", label: "Contact Shortcuts" },
     { value: "account_shortcuts", label: "Account Shortcuts" },
   ];
-  const customShortcutsStyles = {
-    container: (provided) => ({
-      ...provided,
-      // margin: '0 auto',
-      // marginTop: '50px',
-      // width: '300px',
-    }),
-    control: (provided) => ({
-      ...provided,
-      backgroundColor: "#f0f0f0",
-      borderColor: "#ccc",
-      border: "none",
-    }),
-    menu: (provided) => ({
-      ...provided,
-      backgroundColor: "#f9f9f9",
-    }),
-    option: (provided, state) => ({
-      ...provided,
-      backgroundColor: state.isFocused ? "#e6e6e6" : "#f9f9f9",
-      color: state.isSelected ? "#333" : "#000",
-      "&:active": {
-        backgroundColor: "#ddd",
-      },
-    }),
-    placeholder: (provided) => ({
-      ...provided,
-      color: "#999",
-    }),
-    singleValue: (provided) => ({
-      ...provided,
-      color: "#333",
-    }),
-  };
-  const customTempStyles = {
-    container: (provided) => ({
-      ...provided,
-      width: "400px",
-    }),
-  };
 
   const [inputText, setInputText] = useState("");
   const [selectedShortcut, setSelectedShortcut] = useState("");
@@ -582,91 +543,177 @@ const sendbulkEmail = () => {
 
 
   return (
-    <div className="space-y-4 p-1">
-      <div className="space-y-1.5">
-        <Label>Email Template</Label>
-        <Select value={emailTemplate?.value || ""} onValueChange={(val) => { const opt = emailoptions.find(o => o.value === val); if (opt) handleEmailtemp(null, opt); }}>
-          <SelectTrigger><SelectValue placeholder="Email Template" /></SelectTrigger>
-          <SelectContent>
-            {emailoptions.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
-          </SelectContent>
-        </Select>
-      </div>
+    <div className="flex flex-col h-full bg-background">
 
-      <div className="space-y-1.5">
-        <Label>From</Label>
-        <Select value={selecteduser?.value || ""} onValueChange={(val) => { const opt = options.find(o => o.value === val); if (opt) handleuserChange(null, opt); }}>
-          <SelectTrigger><SelectValue placeholder="From" /></SelectTrigger>
-          <SelectContent>
-            {options.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="space-y-1.5">
-        <Label>To</Label>
-        <AccountMultiSelectDropdown
-          value={selectedaccount}
-          onChange={handleAccountChange}
-          placeholder="Accounts"
-          options={accountoptions}
-        />
-      </div>
-
-      <div className="space-y-1.5">
-        <Label>Subject</Label>
+      {/* ── Header ── */}
+      <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
         <div className="flex items-center gap-2">
-          <Input
-            value={emailSubject + selectedShortcut}
-            onChange={handleEmailInputChange}
-            placeholder="Subject"
-          />
-          <Button type="button" variant="outline" size="sm" onClick={toggleDropdown} className="whitespace-nowrap gap-1">
-            <RiAddCircleLine /> Add Shortcode
-          </Button>
+          <div className="rounded-full bg-primary/10 p-1.5">
+            <Mail className="h-4 w-4 text-primary" />
+          </div>
+          <h2 className="text-base font-semibold text-foreground">Send Bulk Email</h2>
+        </div>
+        <button
+          onClick={handleCancel}
+          className="rounded-full p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+        >
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+
+      {/* ── Scrollable form body ── */}
+      <div className="flex-1 overflow-y-auto px-5 py-5 space-y-5">
+
+        {/* Template + From — 2-col on sm+ */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium text-foreground">Email Template</Label>
+            <Select
+              value={emailTemplate?.value || ""}
+              onValueChange={(val) => { const opt = emailoptions.find(o => o.value === val); if (opt) handleEmailtemp(null, opt); }}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select a template" />
+              </SelectTrigger>
+              <SelectContent>
+                {emailoptions.map(o => (
+                  <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium text-foreground">From</Label>
+            <Select
+              value={selecteduser?.value || ""}
+              onValueChange={(val) => { const opt = options.find(o => o.value === val); if (opt) handleuserChange(null, opt); }}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select sender" />
+              </SelectTrigger>
+              <SelectContent>
+                {options.map(o => (
+                  <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
-        {showDropdown && (
-          <div className="border border-border rounded-lg shadow-lg bg-card mt-1 p-2" ref={dropdownRef}>
-            <div className="flex items-center gap-2 mb-2">
-              <Input placeholder="Search shortcuts" value={searchTerm} onChange={handleSearchChange} />
-              <Button type="button" variant="ghost" size="icon" onClick={toggleDropdown}>
-                <IoIosCloseCircleOutline size={20} />
-              </Button>
-            </div>
-            <ul className="max-h-48 overflow-y-auto">
-              {filteredShortcuts.map((shortcut) => (
-                <li key={shortcut.title} onClick={() => handleAddShortcut(shortcut.value)}
-                  className="px-3 py-1 text-sm cursor-pointer hover:bg-muted rounded transition-colors"
-                  style={{ fontWeight: shortcut.isBold ? "bold" : "normal" }}
+        {/* To */}
+        <div className="space-y-1.5">
+          <Label className="text-sm font-medium text-foreground">To</Label>
+          <AccountMultiSelectDropdown
+            value={selectedaccount}
+            onChange={handleAccountChange}
+            placeholder="Select accounts"
+            options={accountoptions}
+          />
+        </div>
+
+        {/* Subject */}
+        <div className="space-y-1.5">
+          <Label className="text-sm font-medium text-foreground">Subject</Label>
+          <div className="flex items-center gap-2">
+            <Input
+              value={emailSubject + selectedShortcut}
+              onChange={handleEmailInputChange}
+              placeholder="Email subject"
+              className="flex-1"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={toggleDropdown}
+              className="shrink-0 gap-1.5 whitespace-nowrap"
+            >
+              <RiAddCircleLine className="h-4 w-4" /> Shortcode
+            </Button>
+          </div>
+
+          {showDropdown && (
+            <div
+              className="rounded-xl border border-border bg-card shadow-lg mt-1 overflow-hidden"
+              ref={dropdownRef}
+            >
+              <div className="flex items-center gap-2 p-3 border-b border-border">
+                <Input
+                  placeholder="Search shortcuts…"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  className="h-8 text-sm"
+                />
+                <button
+                  type="button"
+                  onClick={toggleDropdown}
+                  className="shrink-0 rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
                 >
-                  {shortcut.title}
-                </li>
-              ))}
-            </ul>
+                  <IoIosCloseCircleOutline size={18} />
+                </button>
+              </div>
+              <ul className="max-h-48 overflow-y-auto py-1">
+                {filteredShortcuts.map((shortcut) => (
+                  <li
+                    key={shortcut.title}
+                    onClick={() => handleAddShortcut(shortcut.value)}
+                    className="px-4 py-1.5 text-sm cursor-pointer hover:bg-muted transition-colors"
+                    style={{ fontWeight: shortcut.isBold ? "600" : "400" }}
+                  >
+                    {shortcut.title}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+
+        {/* Email Body */}
+        <div className="space-y-1.5">
+          <Label className="text-sm font-medium text-foreground">Email Body</Label>
+          <div className="rounded-xl border border-border overflow-hidden bg-background">
+            <Editor
+              editorState={editorState}
+              wrapperClassName="w-full"
+              editorClassName="px-3 min-h-[200px] text-sm text-foreground"
+              toolbarClassName="border-b border-border bg-muted/30 rounded-none"
+              toolbarCustomButtons={[<CustomToolbar />]}
+              onEditorStateChange={setEditorState}
+            />
+          </div>
+        </div>
+
+        {/* Scheduled email toggle */}
+        <div className="flex items-center gap-3 rounded-xl border border-border bg-muted/20 px-4 py-3">
+          <Switch checked={scheduledEmail} onCheckedChange={handleScheduledEmail} />
+          <div>
+            <Label className="text-sm font-medium text-foreground cursor-pointer">Scheduled email</Label>
+            <p className="text-xs text-muted-foreground">Send at a specific date and time</p>
+          </div>
+          <Clock className="h-4 w-4 text-muted-foreground ml-auto" />
+        </div>
+
+        {scheduledEmail && (
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium text-foreground">Date &amp; time</Label>
+            <Input type="datetime-local" className="w-full sm:w-auto" />
           </div>
         )}
       </div>
 
-      <div>
-        <Editor editorState={editorState} wrapperClassName="demo-wrapper" editorClassName="demo-editor" toolbarCustomButtons={[<CustomToolbar />]} onEditorStateChange={setEditorState} />
-      </div>
-
-      <div className="flex items-center gap-3">
-        <Switch checked={scheduledEmail} onCheckedChange={handleScheduledEmail} />
-        <Label className="cursor-pointer">Scheduled email</Label>
-      </div>
-
-      {scheduledEmail && (
-        <div className="space-y-1.5">
-          <Label>Date &amp; time</Label>
-          <Input type="datetime-local" />
-        </div>
-      )}
-
-      <div className="flex gap-3">
-        <Button variant="default" onClick={sendbulkEmail}>Send</Button>
-        <Button variant="outline" onClick={handleCancel}>Cancel</Button>
+      {/* ── Sticky footer ── */}
+      <div className="shrink-0 flex items-center justify-end gap-3 px-5 py-4 border-t border-border bg-muted/10">
+        <Button variant="outline" onClick={handleCancel} className="rounded-full px-5">
+          Cancel
+        </Button>
+        <Button
+          onClick={sendbulkEmail}
+          className="rounded-full px-5 gap-2"
+          style={{ backgroundColor: "var(--color-save-btn)" }}
+        >
+          <Send className="h-4 w-4" /> Send Emails
+        </Button>
       </div>
     </div>
   );

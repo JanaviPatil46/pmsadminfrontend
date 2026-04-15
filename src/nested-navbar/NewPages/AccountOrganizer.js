@@ -621,35 +621,35 @@ const AccountOrganizer = () => {
     );
   };
 
-  const fieldCls = "w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent placeholder:text-gray-400 transition-colors";
-  const labelCls = "block text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-1.5";
+  const fieldCls = "w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent placeholder:text-muted-foreground transition-colors";
+  const labelCls = "block text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-1.5";
   const saveBtnCls = "rounded-lg px-4 py-2 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] transition-colors";
-  const cancelBtnCls = "rounded-lg px-4 py-2 text-sm font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors";
+  const cancelBtnCls = "rounded-lg px-4 py-2 text-sm font-medium border border-border text-foreground hover:bg-muted transition-colors";
 
   return (
     <>
       <div className="p-4 md:p-6">
         {/* Page header */}
         <div className="mb-5">
-          <h2 className="text-base font-semibold text-gray-800">Create Organizer</h2>
-          <p className="text-xs text-gray-400 mt-0.5">Set up a new organizer for this account</p>
+          <h2 className="text-base font-semibold text-foreground">Create Organizer</h2>
+          <p className="text-xs text-muted-foreground mt-0.5">Set up a new organizer for this account</p>
         </div>
 
         {/* Form card */}
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-          <div className="divide-y divide-gray-100">
+        <div className="bg-card rounded-xl border border-border overflow-hidden">
+          <div className="divide-y divide-border">
 
             {/* Account */}
             <div className="px-5 py-4">
               <label className={labelCls}>Account</label>
-              <div className="flex flex-wrap gap-1.5 min-h-[38px] w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+              <div className="flex flex-wrap gap-1.5 min-h-[38px] w-full rounded-lg border border-border bg-muted px-3 py-2">
                 {selectedAccount.map((option) => (
-                  <span key={option.value} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 border border-blue-200 text-blue-700">
+                  <span key={option.value} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 border border-primary/20 text-primary">
                     {option.label}
                   </span>
                 ))}
                 {selectedAccount.length === 0 && (
-                  <span className="text-sm text-gray-300">No account selected</span>
+                  <span className="text-sm text-muted-foreground/50">No account selected</span>
                 )}
               </div>
             </div>
@@ -684,7 +684,7 @@ const AccountOrganizer = () => {
             {/* Preview button row */}
             <div className="px-5 py-4">
               <button type="button" onClick={handlePreview}
-                className="rounded-lg px-4 py-2 text-sm font-medium border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors">
+                className="rounded-lg px-4 py-2 text-sm font-medium border border-border text-foreground hover:bg-muted transition-colors">
                 Preview Mode
               </button>
             </div>
@@ -693,18 +693,18 @@ const AccountOrganizer = () => {
             <div className="px-5 py-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-semibold text-gray-700">Reminders</p>
-                  <p className="text-xs text-gray-400 mt-0.5">Send follow-up reminders to the client</p>
+                  <p className="text-sm font-semibold text-foreground">Reminders</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Send follow-up reminders to the client</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input type="checkbox" checked={reminder}
                     onChange={(e) => handleAbsolutesDates(e.target.checked)}
                     className="sr-only peer" />
-                  <div className="w-9 h-5 bg-gray-200 rounded-full peer peer-checked:bg-blue-500 transition-colors after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4" />
+                  <div className="w-9 h-5 bg-muted rounded-full peer peer-checked:bg-primary transition-colors after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4" />
                 </label>
               </div>
               {reminder && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-100">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 pt-4 border-t border-border">
                   <div>
                     <label className={labelCls}>Days until next reminder</label>
                     <input type="text" name="Daysuntilnextreminder" value={daysuntilNextReminder}
@@ -725,7 +725,7 @@ const AccountOrganizer = () => {
           </div>
 
           {/* Footer actions */}
-          <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100 bg-gray-50">
+          <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-border bg-muted">
             <button type="button" onClick={handleOrganizerFormClose} className={cancelBtnCls}>
               Cancel
             </button>
@@ -737,30 +737,30 @@ const AccountOrganizer = () => {
       </div>
 
       {previewDialogOpen && (
-        <div className="fixed inset-0 z-50 bg-gray-50 overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-muted overflow-y-auto">
           <div className="max-w-3xl mx-auto p-4 md:p-8">
             {/* Preview header banner */}
-            <div className="flex items-center justify-between bg-blue-600 rounded-xl px-5 py-4 mb-6">
+            <div className="flex items-center justify-between bg-primary rounded-xl px-5 py-4 mb-6">
               <div>
                 <p className="text-sm font-semibold text-white">Preview Mode</p>
-                <p className="text-xs text-blue-100 mt-0.5">This is how clients will see this organizer</p>
+                <p className="text-xs text-white/70 mt-0.5">This is how clients will see this organizer</p>
               </div>
               <button type="button" onClick={handleClosePreview}
-                className="rounded-lg px-3 py-1.5 text-xs font-semibold bg-white text-blue-700 hover:bg-blue-50 transition-colors">
+                className="rounded-lg px-3 py-1.5 text-xs font-semibold bg-white text-primary hover:bg-white/90 transition-colors">
                 ← Back to Edit
               </button>
             </div>
 
             {/* Organizer name */}
-            <h2 className="text-lg font-bold text-gray-800 mb-4">{organizerName}</h2>
+            <h2 className="text-lg font-bold text-foreground mb-4">{organizerName}</h2>
 
             {/* Section selector */}
-            <div className="bg-white rounded-xl border border-gray-200 px-4 py-3 mb-4">
-              <label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-1.5">Section</label>
+            <div className="bg-card rounded-xl border border-border px-4 py-3 mb-4">
+              <label className="block text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">Section</label>
               <select
                 value={activeStep}
                 onChange={handleDropdownChange}
-                className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+                className="w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               >
                 {visibleSections.map((section, index) => {
                   const visibleElements = section.formElements.filter((el) => shouldShowElement(el, section.id));
@@ -779,20 +779,20 @@ const AccountOrganizer = () => {
               {/* Progress bar */}
               <div className="mt-3">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-[11px] text-gray-400">Progress</span>
-                  <span className="text-[11px] font-semibold text-blue-600">
+                  <span className="text-[11px] text-muted-foreground">Progress</span>
+                  <span className="text-[11px] font-semibold text-primary">
                     {activeStep + 1} / {totalSteps}
                   </span>
                 </div>
-                <div className="w-full bg-gray-100 rounded-full h-1.5">
-                  <div className="bg-blue-500 h-1.5 rounded-full transition-all duration-300"
+                <div className="w-full bg-muted rounded-full h-1.5">
+                  <div className="bg-primary h-1.5 rounded-full transition-all duration-300"
                     style={{ width: `${((activeStep + 1) / totalSteps) * 100}%` }} />
                 </div>
               </div>
             </div>
 
             {/* Form content */}
-            <div className="bg-white rounded-xl border border-gray-200 px-5 py-5 md:px-8">
+            <div className="bg-card rounded-xl border border-border px-5 py-5 md:px-8">
                   {visibleSections.map(
                     (section, sectionIndex) =>
                       sectionIndex === activeStep && (
@@ -813,7 +813,7 @@ const AccountOrganizer = () => {
                                     <div className="my-2">
                                       <p className="text-lg mb-1 mt-1">{element.text}</p>
                                       <textarea
-                                        className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
+                                        className="w-full border border-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
                                         rows={3}
                                         placeholder={`${element.type} Answer`}
                                         value={inputValues[`${section.id}_${element.text}`] || ""}
@@ -829,7 +829,7 @@ const AccountOrganizer = () => {
                                       <input
                                         type="text"
                                         inputMode="numeric"
-                                        className="w-full border border-gray-300 rounded px-3 py-2 text-sm mt-2 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                                        className="w-full border border-border rounded px-3 py-2 text-sm mt-2 focus:outline-none focus:ring-1 focus:ring-ring"
                                         placeholder={`${element.type} Answer`}
                                         value={inputValues[`${section.id}_${element.text}`] || ""}
                                         onChange={(e) => {
@@ -907,7 +907,7 @@ const AccountOrganizer = () => {
                                       <select
                                         value={selectedDropdownValues[`${section.id}_${element.text}`] || ""}
                                         onChange={(event) => handleDropdownValueChange(event, element.text, section.id)}
-                                        className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
+                                        className="w-full border border-border rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
                                       >
                                         {element.options.map((option) => (
                                           <option key={option.text} value={option.text}>{option.text}</option>
@@ -922,7 +922,7 @@ const AccountOrganizer = () => {
                                       <p className="text-lg">{element.text}</p>
                                       <input
                                         type="date"
-                                        className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-white"
+                                        className="w-full border border-border rounded px-3 py-2 text-sm bg-card"
                                         value={startDate ? startDate.format("YYYY-MM-DD") : ""}
                                         onChange={(e) => {
                                           handleStartDateChange(e.target.value);
@@ -941,7 +941,7 @@ const AccountOrganizer = () => {
                                           type="text"
                                           disabled
                                           placeholder="Add Document"
-                                          className="w-full border border-gray-300 rounded px-3 py-2 text-sm cursor-not-allowed bg-gray-100"
+                                          className="w-full border border-border rounded px-3 py-2 text-sm cursor-not-allowed bg-muted"
                                         />
                                       </div>
                                     </div>
@@ -952,12 +952,12 @@ const AccountOrganizer = () => {
                         </div>
                       )
                   )}
-              <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between">
+              <div className="mt-6 pt-4 border-t border-border flex items-center justify-between">
                     <button type="button" disabled={activeStep === 0} onClick={handleBack}
-                      className="rounded-lg px-4 py-2 text-sm font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                      className="rounded-lg px-4 py-2 text-sm font-medium border border-border text-foreground hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
                       ← Back
                     </button>
-                    <span className="text-xs text-gray-400">
+                    <span className="text-xs text-muted-foreground">
                       Section {activeStep + 1} of {totalSteps}
                     </span>
                     <button type="button" disabled={activeStep === totalSteps - 1} onClick={handleNext}

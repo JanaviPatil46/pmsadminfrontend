@@ -1410,9 +1410,9 @@ const [uploadedFiles, setUploadedFiles] = useState({}); // Stores file names for
     return element.active === true;
   };
 
-  const inputCls = "w-full mt-1 rounded border border-gray-200 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:bg-gray-100 disabled:cursor-not-allowed";
+  const inputCls = "w-full mt-1 rounded border border-border px-3 py-2 text-sm bg-card focus:outline-none focus:ring-2 focus:ring-ring disabled:bg-muted disabled:cursor-not-allowed";
   const optionBtn = (active, disabled) => `rounded-full px-4 py-1.5 text-sm font-medium border transition-colors ${
-    disabled ? 'opacity-50 cursor-not-allowed border-gray-300 text-gray-400' :
+    disabled ? 'opacity-50 cursor-not-allowed border-border text-muted-foreground' :
     active ? 'bg-[var(--color-save-btn)] text-white border-[var(--color-save-btn)]' :
     'border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white'
   }`;
@@ -1420,11 +1420,11 @@ const [uploadedFiles, setUploadedFiles] = useState({}); // Stores file names for
   return (
     <>
     {open && (
-      <div className="fixed inset-0 z-50 bg-white flex flex-col overflow-hidden">
+      <div className="fixed inset-0 z-50 bg-card flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-3 border-b border-gray-200">
+        <div className="flex items-center justify-between px-6 py-3 border-b border-border">
           <p className="text-base font-semibold">{organizer?.organizerName || "Organizer"}</p>
-          <button type="button" onClick={handleClose} className="p-1 rounded hover:bg-gray-100 text-gray-600">
+          <button type="button" onClick={handleClose} className="p-1 rounded hover:bg-muted text-muted-foreground">
             <IoClose size={20} />
           </button>
         </div>
@@ -1433,7 +1433,7 @@ const [uploadedFiles, setUploadedFiles] = useState({}); // Stores file names for
         <div className="flex-1 overflow-y-auto p-6">
           {/* Section dropdown */}
           <select
-            className="w-full mb-3 rounded border border-gray-200 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="w-full mb-3 rounded border border-border px-3 py-1.5 text-sm bg-card focus:outline-none focus:ring-2 focus:ring-ring"
             value={activeStep}
             onChange={handleDropdownChange}
           >
@@ -1449,8 +1449,8 @@ const [uploadedFiles, setUploadedFiles] = useState({}); // Stores file names for
           </select>
 
           {/* Progress bar */}
-          <div className="w-full bg-gray-200 rounded-full h-2 mb-6">
-            <div className="bg-blue-500 h-2 rounded-full transition-all" style={{ width: `${((activeStep + 1) / totalSteps) * 100}%` }}></div>
+          <div className="w-full bg-muted rounded-full h-2 mb-6">
+            <div className="bg-primary h-2 rounded-full transition-all" style={{ width: `${((activeStep + 1) / totalSteps) * 100}%` }}></div>
           </div>
 
           <div className="px-4 md:px-20">
@@ -1462,7 +1462,7 @@ const [uploadedFiles, setUploadedFiles] = useState({}); // Stores file names for
                       <div key={`${section.id}_${element.id}`} className="mb-5">
 
                         {element.type === "Text Editor" && (
-                          <p className="text-sm text-gray-700 my-3" dangerouslySetInnerHTML={{ __html: element.text }} />
+                          <p className="text-sm text-foreground my-3" dangerouslySetInnerHTML={{ __html: element.text }} />
                         )}
 
                         {(element.type === "Free Entry" || element.type === "Email") && (
@@ -1598,8 +1598,8 @@ const [uploadedFiles, setUploadedFiles] = useState({}); // Stores file names for
                             </div>
                             {uploadedFiles[`${section.id}_${element.text}`] && (
                               <div className="flex items-center gap-2 mt-1">
-                                <span className="text-xs text-gray-500">Selected file: {uploadedFiles[`${section.id}_${element.text}`]}</span>
-                                <button type="button" className="text-gray-400 hover:text-red-500"
+                                <span className="text-xs text-muted-foreground">Selected file: {uploadedFiles[`${section.id}_${element.text}`]}</span>
+                                <button type="button" className="text-muted-foreground hover:text-destructive"
                                   disabled={isElementActive(element)}
                                   onClick={() => {
                                     const key = `${section.id}_${element.text}`;
@@ -1642,7 +1642,7 @@ const [uploadedFiles, setUploadedFiles] = useState({}); // Stores file names for
                   </button>
                 )}
               </div>
-              <span className="text-sm text-gray-500">Step {activeStep + 1} of {totalSteps}</span>
+              <span className="text-sm text-muted-foreground">Step {activeStep + 1} of {totalSteps}</span>
             </div>
           </div>
         </div>

@@ -412,8 +412,8 @@ const updateUsersEmail = async (contactId, newEmail) => {
       .catch((error) => console.error(error));
   };
 
-  const inputCls = "w-full border border-gray-300 rounded px-3 py-1.5 text-sm mt-1 focus:outline-none focus:ring-1 focus:ring-blue-400";
-  const labelCls = "block text-sm text-gray-700 font-medium";
+  const inputCls = "w-full border border-border rounded px-3 py-1.5 text-sm mt-1 focus:outline-none focus:ring-1 focus:ring-ring";
+  const labelCls = "block text-sm text-foreground font-medium";
 
   return (
     <form style={{ paddingRight: "3%", paddingLeft: "3%", height: "90vh", overflowY: "auto" }} className="contact-form">
@@ -475,10 +475,10 @@ const updateUsersEmail = async (contactId, newEmail) => {
             buttonStyle={{ borderTopLeftRadius: "8px", borderBottomLeftRadius: "8px" }}
             containerStyle={{ display: "flex", alignItems: "center", gap: "8px" }}
           />
-          <AiOutlineDelete onClick={() => handleDeletePhoneNumber(phone.id)} className="cursor-pointer text-red-500 shrink-0" />
+          <AiOutlineDelete onClick={() => handleDeletePhoneNumber(phone.id)} className="cursor-pointer text-destructive shrink-0" />
         </div>
       ))}
-      <div className="flex items-center gap-2 ml-1 cursor-pointer text-blue-600 font-semibold mt-1 mb-3"
+      <div className="flex items-center gap-2 ml-1 cursor-pointer text-primary font-semibold mt-1 mb-3"
         onClick={handleAddPhoneNumber}>
         <AiOutlinePlusCircle className="mt-1" />
         <span>Add phone number</span>
@@ -520,7 +520,7 @@ const updateUsersEmail = async (contactId, newEmail) => {
         <div className="flex justify-between items-center">
           <span className="font-bold text-sm">Linked accounts</span>
           <button type="button" onClick={handleDrawerOpen}
-            className="flex items-center gap-1 text-sm text-blue-600 hover:underline">
+            className="flex items-center gap-1 text-sm text-primary hover:underline">
             <AddCircle size={16} /> Link accounts
           </button>
         </div>
@@ -529,24 +529,24 @@ const updateUsersEmail = async (contactId, newEmail) => {
         {drawerOpen && (
           <div className="fixed inset-0 z-50 overflow-hidden">
             <div className="absolute inset-0 bg-black/30" onClick={handleDrawerClose} />
-            <div className="absolute right-0 top-0 h-full w-[700px] bg-white shadow-xl overflow-y-auto p-5">
+            <div className="absolute right-0 top-0 h-full w-[700px] bg-card shadow-xl overflow-y-auto p-5">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-base font-semibold">Link accounts</h2>
                 <button type="button" onClick={handleDrawerClose}>
-                  <IoClose className="text-gray-500 text-xl" />
+                  <IoClose className="text-muted-foreground text-xl" />
                 </button>
               </div>
               <input type="text" placeholder="Search" className={inputCls + " mb-4"} />
-              <div className="overflow-x-auto rounded-lg border border-gray-200">
+              <div className="overflow-x-auto rounded-lg border border-border">
                 <table className="w-full text-sm">
-                  <thead className="bg-gray-50">
+                  <thead className="bg-muted">
                     <tr>
                       <th className="px-3 py-2 w-10"></th>
                       <th className="text-left px-3 py-2 text-xs font-bold">ID</th>
                       <th className="text-left px-3 py-2 text-xs font-bold">Name</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody className="divide-y divide-border">
                     {accountDataAll.map((account) => (
                       <tr key={account.id}>
                         <td className="px-3 py-2">
@@ -576,28 +576,28 @@ const updateUsersEmail = async (contactId, newEmail) => {
         )}
 
         {/* Linked accounts table */}
-        <div className="mt-4 overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
+        <div className="mt-4 overflow-x-auto rounded-lg border border-border shadow-sm">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50">
+            <thead className="bg-muted">
               <tr>
                 <th className="text-left px-4 py-2 text-xs font-bold">Name</th>
                 <th className="text-left px-4 py-2 text-xs font-bold">Description</th>
                 <th className="px-4 py-2 w-10"></th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-border">
               {accountdata.map((account) => (
                 <tr key={account._id}>
                   <td className="px-4 py-2">
                     <a href={`/app/clients/${account._id}`} target="_blank" rel="noopener"
-                      className="text-blue-600 hover:underline text-sm">
+                      className="text-primary hover:underline text-sm">
                       {account.accountName}
                     </a>
                   </td>
-                  <td className="px-4 py-2 text-xs text-gray-600">{account.description}</td>
+                  <td className="px-4 py-2 text-xs text-muted-foreground">{account.description}</td>
                   <td className="px-4 py-2">
                     <button type="button" onClick={() => handleRemoveAccount(account._id)}
-                      className="text-gray-400 hover:text-red-500">
+                      className="text-muted-foreground hover:text-destructive">
                       <IoClose size={16} />
                     </button>
                   </td>

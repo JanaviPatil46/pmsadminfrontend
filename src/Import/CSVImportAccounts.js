@@ -3,6 +3,7 @@ import Papa from "papaparse";
 import axios from "axios";
 import { Button } from "../components/ui/button";
 import { Checkbox } from "../components/ui/checkbox";
+import { Upload, FileSpreadsheet } from "lucide-react";
 
 const AccountCSVImport = () => {
   const [rows, setRows] = useState([]);
@@ -102,69 +103,89 @@ const [isSaving, setIsSaving] = useState(false);
     <div className="space-y-6">
       <h1 className="text-2xl font-bold tracking-tight text-foreground">Import Accounts (CSV)</h1>
 
-      <div className="flex items-center gap-3">
-        <label className="cursor-pointer">
-          <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium border border-input bg-background hover:bg-muted transition-colors cursor-pointer">
-            Upload CSV
-          </span>
-          <input hidden type="file" accept=".csv" onChange={handleFileUpload} />
-        </label>
-
-        {selectedRows.length > 0 && (
-          <Button
-            onClick={handleSaveAccounts}
-            disabled={isSaving}
-            className="rounded-full px-5"
-            style={{ backgroundColor: "var(--color-save-btn)" }}
-          >
-            {isSaving ? "Saving..." : `Save Accounts (${selectedRows.length})`}
-          </Button>
-        )}
-      </div>
-
-      {rows.length > 0 && (
-        <div className="bg-background rounded-xl border shadow-sm overflow-hidden">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b bg-muted/40">
-                <th className="px-4 py-3 w-10">
-                  <Checkbox
-                    checked={selectedRows.length === rows.length && rows.length > 0}
-                    onCheckedChange={handleSelectAll}
-                    ref={(el) => {
-                      if (el) el.indeterminate = selectedRows.length > 0 && selectedRows.length < rows.length;
-                    }}
-                  />
-                </th>
-                {tableHeaders.map((h, i) => (
-                  <th key={i} className="text-xs font-semibold text-left px-4 py-3 text-muted-foreground uppercase tracking-wide">
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row, rowIndex) => (
-                <tr key={rowIndex} className={`border-b hover:bg-muted/30 transition-colors ${selectedRows.includes(rowIndex) ? "bg-blue-50/50" : ""}`}>
-                  <td className="px-4 py-3">
-                    <Checkbox
-                      checked={selectedRows.includes(rowIndex)}
-                      onCheckedChange={() => handleSelectRow(rowIndex)}
-                    />
-                  </td>
-                  <td className="px-4 py-2.5 text-sm">{row["id"]}</td>
-                  <td className="px-4 py-2.5 text-sm font-medium">{row["Account Name"]}</td>
-                  <td className="px-4 py-2.5 text-sm">{row["Account Type"]}</td>
-                  <td className="px-4 py-2.5 text-sm">{row["Tags"]}</td>
-                  <td className="px-4 py-2.5 text-sm">{row["Linked Contact #1"]}</td>
-                  <td className="px-4 py-2.5 text-sm">{row["Linked Contact #2"]}</td>
-                  <td className="px-4 py-2.5 text-sm">{row["Linked Contact #3"]}</td>
-                  <td className="px-4 py-2.5 text-sm">{row["Linked Contact #4"]}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {rows.length === 0 ? (
+        <div className="flex items-center justify-center py-16">
+          <div className="flex flex-col items-center gap-5 rounded-2xl border-2 border-dashed border-border bg-muted/20 px-12 py-14 text-center w-full max-w-sm">
+            <div className="rounded-full bg-primary/10 p-5">
+              <FileSpreadsheet className="h-10 w-10 text-primary" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-base font-semibold text-foreground">Upload Accounts CSV</h3>
+              <p className="text-sm text-muted-foreground">Select a <span className="font-medium">.csv</span> file to import accounts</p>
+            </div>
+            <label className="cursor-pointer">
+              <span className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors cursor-pointer">
+                <Upload className="h-4 w-4" /> Choose CSV File
+              </span>
+              <input hidden type="file" accept=".csv" onChange={handleFileUpload} />
+            </label>
+          </div>
         </div>
+      ) : (
+        <>
+          <div className="flex items-center gap-3">
+            <label className="cursor-pointer">
+              <span className="inline-flex items-center gap-2 rounded-full border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-muted transition-colors cursor-pointer">
+                <Upload className="h-4 w-4" /> Upload New CSV
+              </span>
+              <input hidden type="file" accept=".csv" onChange={handleFileUpload} />
+            </label>
+
+            {selectedRows.length > 0 && (
+              <Button
+                onClick={handleSaveAccounts}
+                disabled={isSaving}
+                className="rounded-full px-5"
+                style={{ backgroundColor: "var(--color-save-btn)" }}
+              >
+                {isSaving ? "Saving..." : `Save Accounts (${selectedRows.length})`}
+              </Button>
+            )}
+          </div>
+
+          <div className="overflow-x-auto rounded-xl border shadow-sm bg-background">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b bg-muted/40">
+                  <th className="px-4 py-3 w-10">
+                    <Checkbox
+                      checked={selectedRows.length === rows.length && rows.length > 0}
+                      onCheckedChange={handleSelectAll}
+                      ref={(el) => {
+                        if (el) el.indeterminate = selectedRows.length > 0 && selectedRows.length < rows.length;
+                      }}
+                    />
+                  </th>
+                  {tableHeaders.map((h, i) => (
+                    <th key={i} className="text-xs font-semibold text-left px-4 py-3 text-muted-foreground uppercase tracking-wide">
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((row, rowIndex) => (
+                  <tr key={rowIndex} className={`border-b hover:bg-muted/30 transition-colors ${selectedRows.includes(rowIndex) ? "bg-primary/5" : ""}`}>
+                    <td className="px-4 py-3">
+                      <Checkbox
+                        checked={selectedRows.includes(rowIndex)}
+                        onCheckedChange={() => handleSelectRow(rowIndex)}
+                      />
+                    </td>
+                    <td className="px-4 py-2.5 text-sm">{row["id"]}</td>
+                    <td className="px-4 py-2.5 text-sm font-medium">{row["Account Name"]}</td>
+                    <td className="px-4 py-2.5 text-sm">{row["Account Type"]}</td>
+                    <td className="px-4 py-2.5 text-sm">{row["Tags"]}</td>
+                    <td className="px-4 py-2.5 text-sm">{row["Linked Contact #1"]}</td>
+                    <td className="px-4 py-2.5 text-sm">{row["Linked Contact #2"]}</td>
+                    <td className="px-4 py-2.5 text-sm">{row["Linked Contact #3"]}</td>
+                    <td className="px-4 py-2.5 text-sm">{row["Linked Contact #4"]}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
     </div>
   );

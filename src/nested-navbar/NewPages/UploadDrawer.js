@@ -139,7 +139,7 @@ const UploadDocument = ({ open, onClose, file ,onUploadSuccess,onUploadError,acc
               borderRadius: "4px",
               backgroundColor:
                 selectedFolderId === item.id && selectedType === "public" 
-                  ? "#f0f7ff" 
+                  ? "hsl(var(--muted))" 
                   : "transparent",
               transition: "background-color 0.2s ease",
               "&:hover": {
@@ -162,7 +162,7 @@ const UploadDocument = ({ open, onClose, file ,onUploadSuccess,onUploadError,acc
               <strong
                 style={{
                   fontWeight: 500,
-                  color: "#333",
+                  color: "hsl(var(--foreground))",
                   fontSize: "14px",
                 }}
               >
@@ -190,7 +190,7 @@ const UploadDocument = ({ open, onClose, file ,onUploadSuccess,onUploadError,acc
             marginLeft: "40px",
             padding: "4px 8px",
             fontSize: "14px",
-            color: "#555",
+            color: "hsl(var(--muted-foreground))",
             display: "flex",
             alignItems: "center",
           }}
@@ -528,7 +528,7 @@ const handleSelectFolderPath = () => {
 
 
   if (error) {
-    return <div className="p-4 text-red-600 text-sm">Error: {error}</div>;
+    return <div className="p-4 text-destructive text-sm">Error: {error}</div>;
   }
 
   if (!structFolder || !privateStructFolder) {
@@ -540,26 +540,26 @@ const handleSelectFolderPath = () => {
   return (
     <div className="fixed inset-0 z-[1300] overflow-hidden">
       <div className="absolute inset-0 bg-black/30" onClick={onClose} />
-      <div className="absolute right-0 top-0 h-full w-[600px] bg-white shadow-xl flex flex-col">
-        <div className="flex items-center justify-between p-4 border-b border-gray-300">
+      <div className="absolute right-0 top-0 h-full w-[600px] bg-card shadow-xl flex flex-col">
+        <div className="flex items-center justify-between p-4 border-b border-border">
           <h2 className="text-base font-semibold">Select Folder to upload</h2>
-          <FaTimes className="cursor-pointer text-gray-500" onClick={onClose} />
+          <FaTimes className="cursor-pointer text-muted-foreground" onClick={onClose} />
         </div>
         <div className="flex-1 overflow-y-auto max-h-[500px] p-2">
           {renderContents(structFolder.folders, (newFolders) =>
             setStructFolder({ ...structFolder, folders: newFolders })
           )}
         </div>
-        <div className="flex gap-3 p-4 border-t border-gray-100">
+        <div className="flex gap-3 p-4 border-t border-border">
           <button
             type="button"
             disabled={!file}
             onClick={() => { handleSelectFolderPath(); handleSubmitfile(); }}
-            className="px-4 py-1.5 text-sm rounded text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50">
+            className="px-4 py-1.5 text-sm rounded text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] disabled:opacity-50">
             Upload
           </button>
           <button type="button" onClick={onClose}
-            className="px-4 py-1.5 text-sm rounded border border-gray-300 text-gray-700 hover:bg-gray-50">
+            className="px-4 py-1.5 text-sm rounded border border-border text-foreground hover:bg-muted">
             Cancel
           </button>
         </div>

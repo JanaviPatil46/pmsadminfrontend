@@ -91,16 +91,16 @@ const ProposalPreviewDialog = ({ open, handleClose, proposal }) => {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-white">
+    <div className="fixed inset-0 z-50 flex flex-col bg-card">
       {/* Title bar */}
-      <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200">
+      <div className="flex items-center justify-between px-5 py-3 border-b border-border">
         <span className="text-base font-semibold">{proposal?.general?.proposalName || "Proposal"}</span>
-        <IoClose className="cursor-pointer text-xl text-gray-500 hover:text-gray-700" onClick={handleClose} />
+        <IoClose className="cursor-pointer text-xl text-muted-foreground hover:text-foreground" onClick={handleClose} />
       </div>
 
       <div className="flex flex-1 overflow-hidden" style={{ height: "calc(100vh - 56px)" }}>
         {/* LEFT SIDE MENU */}
-        <div className="w-[28%] border-r border-gray-200 overflow-y-auto">
+        <div className="w-[28%] border-r border-border overflow-y-auto">
           <ul>
             {steps.map((step) => (
               <li key={step.id}>
@@ -108,10 +108,10 @@ const ProposalPreviewDialog = ({ open, handleClose, proposal }) => {
                   type="button"
                   onClick={() => handleStepClick(step.id)}
                   className={`w-full text-left flex items-center gap-2 px-4 py-3 text-sm transition-colors ${
-                    activeStep === step.id ? "bg-blue-50 font-medium" : "hover:bg-gray-50"
-                  } ${isSigned ? "text-green-600" : ""}`}
+                    activeStep === step.id ? "bg-primary/10 font-medium text-primary" : "hover:bg-muted"
+                  } ${isSigned ? "text-success" : ""}`}
                 >
-                  {isSigned && <FaCheckCircle className="text-green-500 shrink-0" size={14} />}
+                  {isSigned && <FaCheckCircle className="text-success shrink-0" size={14} />}
                   {step.label}
                 </button>
               </li>
@@ -127,7 +127,7 @@ const ProposalPreviewDialog = ({ open, handleClose, proposal }) => {
             <div ref={introRef} className="mb-6">
               <h2 className="text-lg font-semibold mb-2">{proposal?.introduction?.title || "Introduction"}</h2>
               <div className="text-sm">{HTMLReactParser(proposal?.introduction?.description || "")}</div>
-              <hr className="my-4 border-gray-200" />
+              <hr className="my-4 border-border" />
             </div>
           )}
 
@@ -136,7 +136,7 @@ const ProposalPreviewDialog = ({ open, handleClose, proposal }) => {
             <div ref={termsRef} className="mb-6">
               <h2 className="text-lg font-semibold mb-2">Terms &amp; Conditions</h2>
               <div className="text-sm">{HTMLReactParser(proposal?.terms?.description || "")}</div>
-              <hr className="my-4 border-gray-200" />
+              <hr className="my-4 border-border" />
             </div>
           )}
 
@@ -144,7 +144,7 @@ const ProposalPreviewDialog = ({ open, handleClose, proposal }) => {
           {proposal?.general?.servicesEnabled && proposal?.services?.option === "services" && (
             <div ref={servicesRef} className="mb-6">
               <h2 className="text-lg font-semibold mb-3">Services</h2>
-              <div className="border border-gray-200 rounded-lg overflow-hidden">
+              <div className="border border-border rounded-lg overflow-hidden">
                 <div className="grid grid-cols-[3fr_1fr_1fr_1fr_1fr] p-2 font-bold text-sm">
                   <span>Service</span>
                   <span className="text-right">Rate</span>
@@ -160,10 +160,10 @@ const ProposalPreviewDialog = ({ open, handleClose, proposal }) => {
                   const tax = item.tax ? (base * taxRate) / 100 : 0;
                   const total = base + tax;
                   return (
-                    <div key={i} className="grid grid-cols-[3fr_1fr_1fr_1fr_1fr] p-2 border-t border-gray-200 text-sm">
+                    <div key={i} className="grid grid-cols-[3fr_1fr_1fr_1fr_1fr] p-2 border-t border-border text-sm">
                       <div>
                         <p className="font-bold">{item.productorService}</p>
-                        <p className="text-xs text-gray-500">{item.description}</p>
+                        <p className="text-xs text-muted-foreground">{item.description}</p>
                       </div>
                       <span className="text-right">${rate.toFixed(2)}</span>
                       <span className="text-right">{qty}</span>
@@ -172,11 +172,11 @@ const ProposalPreviewDialog = ({ open, handleClose, proposal }) => {
                     </div>
                   );
                 })}
-                <div className="border-t border-gray-200 p-2 flex justify-end font-bold text-sm">
+                <div className="border-t border-border p-2 flex justify-end font-bold text-sm">
                   Total: ${proposal?.services?.itemizedData?.totalAmount?.toFixed(2)}
                 </div>
               </div>
-              <hr className="my-4 border-gray-200" />
+              <hr className="my-4 border-border" />
             </div>
           )}
 
@@ -187,23 +187,23 @@ const ProposalPreviewDialog = ({ open, handleClose, proposal }) => {
               <div className="mb-3 space-y-3">
                 <div>
                   <p className="font-bold text-sm">Amount</p>
-                  <div className="bg-gray-50 p-2 rounded-lg text-sm">${proposal?.services?.invoices?.[0]?.totalAmount?.toFixed(2)}</div>
+                  <div className="bg-muted p-2 rounded-lg text-sm">${proposal?.services?.invoices?.[0]?.totalAmount?.toFixed(2)}</div>
                 </div>
                 <div>
                   <p className="font-bold text-sm mt-2">Invoice will be issued</p>
-                  <div className="bg-gray-50 p-2 rounded-lg text-sm">{proposal?.services?.invoices?.[0]?.issueinvoice || "N/A"}</div>
+                  <div className="bg-muted p-2 rounded-lg text-sm">{proposal?.services?.invoices?.[0]?.issueinvoice || "N/A"}</div>
                 </div>
                 <div>
                   <p className="font-bold text-sm mt-2">Description</p>
-                  <div className="bg-gray-50 p-2 rounded-lg text-sm">{proposal?.services?.invoices?.[0]?.description || "N/A"}</div>
+                  <div className="bg-muted p-2 rounded-lg text-sm">{proposal?.services?.invoices?.[0]?.description || "N/A"}</div>
                 </div>
               </div>
 
               {/* Accordion-style invoice details */}
-              <details className="border border-gray-200 rounded-lg overflow-hidden">
-                <summary className="p-2 font-bold text-sm cursor-pointer bg-gray-50">Invoice details ▼</summary>
-                <div className="border border-gray-200 rounded-lg overflow-hidden m-2">
-                  <div className="grid grid-cols-[3fr_1fr_1fr_1fr_1fr] p-2 font-bold text-sm bg-gray-50">
+              <details className="border border-border rounded-lg overflow-hidden">
+                <summary className="p-2 font-bold text-sm cursor-pointer bg-muted">Invoice details ▼</summary>
+                <div className="border border-border rounded-lg overflow-hidden m-2">
+                  <div className="grid grid-cols-[3fr_1fr_1fr_1fr_1fr] p-2 font-bold text-sm bg-muted">
                     <span>Service</span>
                     <span className="text-right">Rate</span>
                     <span className="text-right">Qty</span>
@@ -218,10 +218,10 @@ const ProposalPreviewDialog = ({ open, handleClose, proposal }) => {
                     const tax = item.tax ? (base * taxRate) / 100 : 0;
                     const total = base + tax;
                     return (
-                      <div key={i} className="grid grid-cols-[3fr_1fr_1fr_1fr_1fr] p-2 border-t border-gray-200 text-sm">
+                      <div key={i} className="grid grid-cols-[3fr_1fr_1fr_1fr_1fr] p-2 border-t border-border text-sm">
                         <div>
                           <p className="font-bold">{item.productorService}</p>
-                          <p className="text-xs text-gray-500">{item.description}</p>
+                          <p className="text-xs text-muted-foreground">{item.description}</p>
                         </div>
                         <span className="text-right">${rate.toFixed(2)}</span>
                         <span className="text-right">{qty}</span>
@@ -230,12 +230,12 @@ const ProposalPreviewDialog = ({ open, handleClose, proposal }) => {
                       </div>
                     );
                   })}
-                  <div className="border-t border-gray-200 p-2 flex justify-end font-bold text-sm">
+                  <div className="border-t border-border p-2 flex justify-end font-bold text-sm">
                     Total: ${proposal?.services?.invoices?.[0]?.totalAmount?.toFixed(2)}
                   </div>
                 </div>
               </details>
-              <hr className="my-4 border-gray-200" />
+              <hr className="my-4 border-border" />
             </div>
           )}
 
@@ -245,7 +245,7 @@ const ProposalPreviewDialog = ({ open, handleClose, proposal }) => {
               <h2 className="text-lg font-semibold mb-2">Payments</h2>
               <p className="text-sm"><b>Method:</b> {proposal?.payments?.method}</p>
               <p className="text-sm"><b>Amount:</b> ${proposal?.payments?.amount}</p>
-              <hr className="my-4 border-gray-200" />
+              <hr className="my-4 border-border" />
             </div>
           )}
 
@@ -433,30 +433,30 @@ const ProposalPreviewDialog = ({ open, handleClose, proposal }) => {
           {/* SIGNATURE SECTION */}
           <div ref={signatureRef} className="mb-8">
             <h2 className="text-lg font-semibold mb-2">Sign &amp; Accept</h2>
-            <hr className="mb-4 border-gray-200" />
+            <hr className="mb-4 border-border" />
 
             {proposal?.status === "Signed" ? (
               <div>
-                <p className="text-sm text-gray-500 mb-2">
+                <p className="text-sm text-muted-foreground mb-2">
                   Signed on {new Date(proposal.signedAt).toLocaleString()}
                 </p>
                 <p className="font-bold text-sm mb-2">Signature:</p>
                 {proposal?.signature?.startsWith("data:image") ? (
                   <img src={proposal.signature} alt="signature"
-                    className="max-w-[300px] border border-gray-200 bg-white p-2 mt-2" />
+                    className="max-w-[300px] border border-border bg-card p-2 mt-2" />
                 ) : (
-                  <div className="text-2xl mt-2 p-5 border border-gray-300 bg-gray-50 rounded-md"
+                  <div className="text-2xl mt-2 p-5 border border-border bg-muted rounded-md"
                     style={{ fontFamily: "cursive" }}>
                     {proposal.signature}
                   </div>
                 )}
                 <button type="button" disabled
-                  className="mt-4 px-4 py-2 rounded text-sm font-medium text-white bg-blue-400 opacity-70 cursor-not-allowed">
+                  className="mt-4 px-4 py-2 rounded text-sm font-medium text-white bg-primary opacity-70 cursor-not-allowed">
                   Already Signed
                 </button>
               </div>
             ) : (
-              <p className="text-sm text-red-500 mt-2">Proposal is not signed yet.</p>
+              <p className="text-sm text-destructive mt-2">Proposal is not signed yet.</p>
             )}
           </div>
 

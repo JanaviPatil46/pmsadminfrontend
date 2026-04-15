@@ -69,7 +69,7 @@ console.log("Preview Image:", preview);
         <img
           src={preview || currentImage || '/default-avatar.png'}
           alt="Profile"
-          className="w-28 h-28 rounded-full object-cover border-2 border-gray-200"
+          className="w-28 h-28 rounded-full object-cover border-2 border-border"
           onError={(e) => { e.target.src = '/default-avatar.png'; }}
         />
         <input
@@ -89,7 +89,7 @@ console.log("Preview Image:", preview);
 
       {image && (
         <>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             {image.name} ({Math.round(image.size / 1024)} KB)
           </p>
           <Button

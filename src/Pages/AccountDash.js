@@ -77,23 +77,23 @@ const AccountsDash = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50/40">
+    <div className="min-h-screen bg-background">
       {/* Top header bar */}
-      <div className="bg-white border-b border-gray-100 px-4 py-3 flex items-center gap-3 shadow-sm">
+      <div className="bg-card border-b border-border px-4 py-3 flex items-center gap-3 shadow-sm">
         <Link
           to="/clients/accounts/activeaccounts"
-          className="flex items-center justify-center w-8 h-8 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-800 transition-colors no-underline"
+          className="flex items-center justify-center w-8 h-8 rounded-lg border border-border text-muted-foreground hover:bg-muted hover:text-foreground transition-colors no-underline"
         >
           <ArrowLeft size={16} />
         </Link>
         <div className="flex items-center gap-2">
-          <span className="font-semibold text-gray-900 text-base leading-none">{accName}</span>
-          <ExternalLink size={13} className="text-gray-400 cursor-pointer hover:text-blue-500 transition-colors" />
+          <span className="font-semibold text-foreground text-base leading-none">{accName}</span>
+          <ExternalLink size={13} className="text-muted-foreground cursor-pointer hover:text-primary transition-colors" />
         </div>
       </div>
 
       {/* Sub-navigation */}
-      <div className="bg-white border-b border-gray-100 px-4 py-0">
+      <div className="bg-card border-b border-border px-4 py-0">
         <div className="flex items-center gap-0 overflow-x-auto scrollbar-hide">
           {navItems.map(([to, label]) => (
             <NavLink
@@ -102,8 +102,8 @@ const AccountsDash = () => {
               className={({ isActive }) =>
                 `no-underline whitespace-nowrap px-4 py-3 text-sm font-medium transition-all duration-150 border-b-2 ${
                   isActive
-                    ? "border-[var(--color-save-btn)] text-[var(--color-save-btn)]"
-                    : "border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300"
+                    ? "border-primary text-primary"
+                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
                 }`
               }
             >

@@ -18,7 +18,7 @@ const Docs = () => {
   return (
     <div>
       <div className="px-1 pt-4 pb-0">
-        <div className="inline-flex items-center gap-1 bg-gray-100 rounded-xl p-1 flex-wrap">
+        <div className="inline-flex items-center gap-1 bg-muted rounded-xl p-1 flex-wrap">
           {navLinks.map(({ to, label }) => (
             <NavLink
               key={to}
@@ -26,8 +26,8 @@ const Docs = () => {
               className={({ isActive }) =>
                 `no-underline px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-150 ${
                   isActive
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-500 hover:text-gray-800 hover:bg-white/60'
+                    ? 'bg-card text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-card/60'
                 }`
               }
             >
@@ -36,7 +36,7 @@ const Docs = () => {
           ))}
         </div>
       </div>
-      <div className="h-px bg-gray-100 mt-3" />
+      <div className="h-px bg-border mt-3" />
       <div className="pt-4">
         <Outlet />
       </div>

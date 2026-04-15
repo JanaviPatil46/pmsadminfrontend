@@ -37,10 +37,6 @@
     align-items: center; /* Adjust margin as needed */
 }
 
-.login-details-user,.authentication
-{
-margin-top: 30px;
-} 
 .login-header{
     display: flex;
     justify-content: space-between;
@@ -73,9 +69,3 @@ margin-top: 30px;
     /* border-bottom: 2px solid blue; */
   }
   
-  .preferences{
-    padding-top: 15px;
-  }
-.emailsyns{
-    margin-top: 25px;
-}

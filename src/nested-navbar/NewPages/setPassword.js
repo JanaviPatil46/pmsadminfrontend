@@ -386,42 +386,42 @@ const handleSubmit = async () => {
   
   return (
     <div className="flex justify-center items-center mt-10">
-      <div className="bg-white rounded-xl shadow-md p-8 w-full max-w-[480px]">
+      <div className="bg-card rounded-xl shadow-md p-8 w-full max-w-[480px]">
         <h1 className="text-3xl font-semibold text-center mb-8">Reset Password</h1>
 
         <div className="mb-6 w-3/4 mx-auto">
-          <label htmlFor="password" className="block text-sm text-gray-700 mb-1">Password</label>
+          <label htmlFor="password" className="block text-sm text-foreground mb-1">Password</label>
           <div className="relative">
             <input
               id="password"
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={handlePasswordChange}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 text-sm my-2 focus:outline-none focus:ring-1 focus:ring-blue-400"
+              className="w-full border border-border rounded-lg px-3 py-2 pr-10 text-sm my-2 focus:outline-none focus:ring-1 focus:ring-ring"
             />
             <button
               type="button"
               onClick={handleTogglePasswordVisibility}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
               {showPassword ? <FaEye /> : <FaEyeSlash />}
             </button>
           </div>
         </div>
 
         <div className="mb-6 w-3/4 mx-auto">
-          <label htmlFor="confirmPassword" className="block text-sm text-gray-700 mb-1">Confirm Password</label>
+          <label htmlFor="confirmPassword" className="block text-sm text-foreground mb-1">Confirm Password</label>
           <div className="relative">
             <input
               id="confirmPassword"
               type={showPassword ? "text" : "password"}
               value={confirmPassword}
               onChange={handleConfirmPasswordChange}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 text-sm my-2 focus:outline-none focus:ring-1 focus:ring-blue-400"
+              className="w-full border border-border rounded-lg px-3 py-2 pr-10 text-sm my-2 focus:outline-none focus:ring-1 focus:ring-ring"
             />
             <button
               type="button"
               onClick={handleTogglePasswordVisibility}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
               {showPassword ? <FaEye /> : <FaEyeSlash />}
             </button>
           </div>
@@ -431,7 +431,7 @@ const handleSubmit = async () => {
           <button
             type="button"
             onClick={handleSubmit}
-            className="px-6 py-2 rounded text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+            className="px-6 py-2 rounded text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)]">
             Continue
           </button>
         </div>

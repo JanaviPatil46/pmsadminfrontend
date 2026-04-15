@@ -277,24 +277,24 @@ const AccountDetails = () => {
   if (!account) return (
     <div className="flex items-center justify-center h-40">
       <div className="flex flex-col items-center gap-2">
-        <div className="w-6 h-6 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
-        <p className="text-sm text-gray-400">Loading account details…</p>
+        <div className="w-6 h-6 border-2 border-border border-t-primary rounded-full animate-spin" />
+        <p className="text-sm text-muted-foreground">Loading account details…</p>
       </div>
     </div>
   );
 
   const saveBtnCls = "rounded-lg px-4 py-2 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] transition-colors";
-  const cancelBtnCls = "rounded-lg px-4 py-2 text-sm font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors";
-  const toggleCls = "w-9 h-5 bg-gray-200 rounded-full peer peer-checked:bg-blue-500 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4";
+  const cancelBtnCls = "rounded-lg px-4 py-2 text-sm font-medium border border-border text-muted-foreground hover:bg-muted transition-colors";
+  const toggleCls = "w-9 h-5 bg-muted rounded-full peer peer-checked:bg-primary after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4";
 
   return (
     <div className="p-4 md:p-6 space-y-4">
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
 
         {/* LEFT — Account Details */}
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-            <h2 className="text-sm font-semibold text-gray-800">Account Details</h2>
+        <div className="bg-card rounded-xl border border-border overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+            <h2 className="text-sm font-semibold text-foreground">Account Details</h2>
             <span title={storedData?.teammember?.manageAccounts === false ? "You don't have permission to edit accounts" : ""}>
               <button type="button"
                 onClick={() => setDrawerOpen(true)}
@@ -315,16 +315,16 @@ const AccountDetails = () => {
                 onUploadSuccess={fetchAccountDetails}
               />
               <div>
-                <p className="font-semibold text-gray-900">{account.accountName}</p>
-                <p className="text-xs text-gray-400 mt-0.5">{account.clientType}</p>
+                <p className="font-semibold text-foreground">{account.accountName}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{account.clientType}</p>
               </div>
             </div>
 
-            <div className="border-t border-gray-100" />
+            <div className="border-t border-border" />
 
             {/* Tags */}
             <div>
-              <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-2">Tags</p>
+              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-2">Tags</p>
               <div className="flex flex-wrap gap-1.5">
                 {accountTags?.length > 0 ? (
                   accountTags.map((tag) => (
@@ -333,30 +333,30 @@ const AccountDetails = () => {
                       style={{ backgroundColor: tag.tagColour }}
                     >{tag.tagName}</span>
                   ))
-                ) : <span className="text-xs text-gray-300">No tags assigned</span>}
+                ) : <span className="text-xs text-muted-foreground">No tags assigned</span>}
               </div>
             </div>
 
             {/* Team Members */}
             <div>
-              <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-2">Team Members</p>
+              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-2">Team Members</p>
               <div className="flex flex-wrap gap-1.5">
                 {assignedMembers?.length > 0 ? (
                   assignedMembers.map((m) => (
-                    <span key={m._id} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs border border-gray-200 bg-gray-50 text-gray-600">
+                    <span key={m._id} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs border border-border bg-muted text-muted-foreground">
                       {m.username}
                     </span>
                   ))
-                ) : <span className="text-xs text-gray-300">No members assigned</span>}
+                ) : <span className="text-xs text-muted-foreground">No members assigned</span>}
               </div>
             </div>
           </div>
         </div>
 
         {/* RIGHT — Contacts */}
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-            <h2 className="text-sm font-semibold text-gray-800">Contacts</h2>
+        <div className="bg-card rounded-xl border border-border overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+            <h2 className="text-sm font-semibold text-foreground">Contacts</h2>
             <button type="button" onClick={() => setAddContactDrawerOpen(true)}
               className="text-xs font-semibold text-[var(--color-save-btn)] hover:underline uppercase tracking-wide">
               + Add Contact
@@ -364,34 +364,34 @@ const AccountDetails = () => {
           </div>
 
           {/* Column headers */}
-          <div className="grid grid-cols-[1fr_auto] items-center px-5 py-2 bg-gray-50 border-b border-gray-100">
-            <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide">Contact</span>
+          <div className="grid grid-cols-[1fr_auto] items-center px-5 py-2 bg-muted border-b border-border">
+            <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Contact</span>
             <div className="flex items-center gap-5 mr-8">
-              <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide w-10 text-center">Login</span>
-              <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide w-10 text-center">Notify</span>
-              <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide w-14 text-center">Email Sync</span>
+              <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide w-10 text-center">Login</span>
+              <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide w-10 text-center">Notify</span>
+              <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide w-14 text-center">Email Sync</span>
             </div>
           </div>
 
           {/* Contact rows */}
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y divide-border">
             {account.contacts?.length > 0 ? (
               account.contacts.map((c) => (
-                <div key={c.contact._id} className="grid grid-cols-[1fr_auto] items-center px-5 py-3 hover:bg-gray-50 transition-colors">
+                <div key={c.contact._id} className="grid grid-cols-[1fr_auto] items-center px-5 py-3 hover:bg-muted/50 transition-colors">
                   <div>
                     <span
                       title={storedData?.teammember?.manageContacts === false ? "You don't have permission to edit contacts" : ""}
                       className={`text-sm font-medium block ${
                         storedData?.teammember?.manageContacts === false
-                          ? 'text-gray-400 cursor-not-allowed opacity-60'
-                          : 'text-gray-800 cursor-pointer hover:text-blue-600'
+                          ? 'text-muted-foreground cursor-not-allowed opacity-60'
+                          : 'text-foreground cursor-pointer hover:text-primary'
                       }`}
                       onClick={() => {
                         if (storedData?.teammember?.manageContacts === false) return;
                         handleOpenContactEditDrawer(c);
                       }}
                     >{c.contact.contactName}</span>
-                    <span className="text-xs text-gray-400 mt-0.5 block">{c.contact.email || "—"}</span>
+                    <span className="text-xs text-muted-foreground mt-0.5 block">{c.contact.email || "—"}</span>
                   </div>
                   <div className="flex items-center gap-5 mr-2">
                     <label className="relative inline-flex items-center w-10 justify-center cursor-not-allowed">
@@ -412,9 +412,9 @@ const AccountDetails = () => {
               ))
             ) : (
               <div className="flex flex-col items-center justify-center py-10 gap-2">
-                <p className="text-sm text-gray-400">No contacts linked</p>
+                <p className="text-sm text-muted-foreground">No contacts linked</p>
                 <button type="button" onClick={() => setAddContactDrawerOpen(true)}
-                  className="text-xs text-blue-500 hover:underline">Add a contact</button>
+                  className="text-xs text-[var(--color-primary)] hover:underline">Add a contact</button>
               </div>
             )}
           </div>
@@ -432,9 +432,9 @@ const AccountDetails = () => {
       {dialogOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/40" onClick={handleCancelToggle} />
-          <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-sm p-6">
-            <h2 className="text-base font-semibold text-gray-800 mb-2">Confirm Access Change</h2>
-            <p className="text-sm text-gray-500 leading-relaxed">
+          <div className="relative bg-card rounded-xl shadow-2xl w-full max-w-sm p-6">
+            <h2 className="text-base font-semibold text-foreground mb-2">Confirm Access Change</h2>
+            <p className="text-sm text-muted-foreground leading-relaxed">
               {newCanLoginValue
                 ? `Grant portal login access to ${selectedContact?.contact.email}?`
                 : `Remove portal login access from ${selectedContact?.contact.email}?`}
@@ -451,27 +451,27 @@ const AccountDetails = () => {
       {addContactDrawerOpen && (
         <div className="fixed inset-0 z-40 overflow-hidden">
           <div className="absolute inset-0 bg-black/40" onClick={() => { setAddContactDrawerOpen(false); setSelectedContacts([]); }} />
-          <div className="absolute right-0 top-0 h-full w-full sm:w-[480px] bg-white shadow-2xl flex flex-col">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-              <h2 className="text-sm font-semibold text-gray-800">Add Contacts to Account</h2>
+          <div className="absolute right-0 top-0 h-full w-full sm:w-[480px] bg-card shadow-2xl flex flex-col">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+              <h2 className="text-sm font-semibold text-foreground">Add Contacts to Account</h2>
               <button type="button" onClick={() => { setAddContactDrawerOpen(false); setSelectedContacts([]); setContactSearch(""); }}
-                className="text-gray-400 hover:text-gray-600">
+                className="text-muted-foreground hover:text-foreground">
                 <IoClose size={18} />
               </button>
             </div>
-            <div className="px-5 py-3 border-b border-gray-100">
+            <div className="px-5 py-3 border-b border-border">
               <input
                 type="text"
-                className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-gray-400"
+                className="w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground"
                 placeholder="Search by name or email…"
                 value={contactSearch}
                 onChange={(e) => setContactSearch(e.target.value)}
               />
             </div>
-            <div className="flex-1 overflow-y-auto divide-y divide-gray-100">
+            <div className="flex-1 overflow-y-auto divide-y divide-border">
               {filteredAvailableContacts.map((c) => (
-                <label key={c._id} className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 cursor-pointer">
-                  <input type="checkbox" className="h-4 w-4 rounded border-gray-300 accent-blue-600"
+                <label key={c._id} className="flex items-center gap-3 px-5 py-3 hover:bg-muted/50 cursor-pointer">
+                  <input type="checkbox" className="h-4 w-4 rounded border-border accent-primary"
                     checked={selectedContacts.some(s => s._id === c._id)}
                     onChange={(e) => {
                       if (e.target.checked) setSelectedContacts(prev => [...prev, c]);
@@ -479,16 +479,16 @@ const AccountDetails = () => {
                     }}
                   />
                   <div>
-                    <p className="text-sm font-medium text-gray-800">{c.contactName}</p>
-                    <p className="text-xs text-gray-400">{c.email}</p>
+                    <p className="text-sm font-medium text-foreground">{c.contactName}</p>
+                    <p className="text-xs text-muted-foreground">{c.email}</p>
                   </div>
                 </label>
               ))}
               {filteredAvailableContacts.length === 0 && (
-                <p className="text-sm text-gray-400 px-5 py-6 text-center">No contacts found</p>
+                <p className="text-sm text-muted-foreground px-5 py-6 text-center">No contacts found</p>
               )}
             </div>
-            <div className="flex justify-end gap-2 px-5 py-4 border-t border-gray-100">
+            <div className="flex justify-end gap-2 px-5 py-4 border-t border-border">
               <button type="button" onClick={() => { setAddContactDrawerOpen(false); setSelectedContacts([]); setContactSearch(""); }} className={cancelBtnCls}>Cancel</button>
               <button type="button" onClick={handleLinkContacts} disabled={selectedContacts.length === 0}
                 className={`${saveBtnCls} ${selectedContacts.length === 0 ? 'opacity-40 cursor-not-allowed' : ''}`}>
@@ -503,10 +503,10 @@ const AccountDetails = () => {
       {contactEditDrawerOpen && (
         <div className="fixed inset-0 z-40 overflow-hidden">
           <div className="absolute inset-0 bg-black/40" onClick={() => setContactEditDrawerOpen(false)} />
-          <div className="absolute right-0 top-0 h-full w-full sm:w-[600px] bg-white shadow-2xl flex flex-col">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-              <span className="text-sm font-semibold text-gray-800">Edit Contact</span>
-              <button type="button" onClick={() => setContactEditDrawerOpen(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
+          <div className="absolute right-0 top-0 h-full w-full sm:w-[600px] bg-card shadow-2xl flex flex-col">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+              <span className="text-sm font-semibold text-foreground">Edit Contact</span>
+              <button type="button" onClick={() => setContactEditDrawerOpen(false)} className="text-muted-foreground hover:text-foreground transition-colors">
                 <IoClose size={18} />
               </button>
             </div>

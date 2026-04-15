@@ -27,7 +27,7 @@ const MenuDropdown = ({ contact, onUnlink, onResetPassword }) => {
     <div className="relative inline-block ml-1" ref={ref}>
       <button
         onClick={(e) => { e.stopPropagation(); setOpen((o) => !o); }}
-        className="p-1 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+        className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
       >
         <MoreVertical size={16} />
       </button>
@@ -35,10 +35,10 @@ const MenuDropdown = ({ contact, onUnlink, onResetPassword }) => {
       {open && (
         <>
           <div className="fixed inset-0 z-30" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 z-40 mt-1 w-44 bg-white rounded-lg border border-gray-100 shadow-lg py-1">
+          <div className="absolute right-0 z-40 mt-1 w-44 bg-card rounded-lg border border-border shadow-lg py-1">
             <button
               onClick={handleUnlinkClick}
-              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors"
             >
               <LinkIcon size={14} />
               Unlink
@@ -46,7 +46,7 @@ const MenuDropdown = ({ contact, onUnlink, onResetPassword }) => {
             <button
               onClick={handleResetPasswordClick}
               disabled={!contact.canLogin}
-              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <KeyRound size={14} />
               Reset Password
