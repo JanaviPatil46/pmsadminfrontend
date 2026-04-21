@@ -50,7 +50,7 @@ const SectionItem = ({
     <div
       ref={(node) => drag(drop(node))}
       className={`flex items-center gap-2 rounded-lg border px-3 py-2 mb-2 cursor-move transition-colors ${
-        isSelected ? "border-primary bg-primary/5 shadow-sm" : "border-border bg-white hover:bg-accent/50"
+        isSelected ? "border-primary bg-primary/5 shadow-sm" : "border-border bg-card hover:bg-accent/50"
       }`}
       style={{ opacity: isDragging ? 0.5 : 1 }}
       onClick={() => onClick(section)}
@@ -313,9 +313,6 @@ const OrganizersTemp = () => {
     setSections([...sections, newSection]);
     setSelectedSection(newSection);
   };
-  console.log(sections);
-  // console.log(selectedSection)
-
   const handleSectionClick = (section) => {
     setSelectedSection(section);
   };
@@ -403,7 +400,6 @@ const OrganizersTemp = () => {
     );
   };
   const saveandexitOrganizerTemp = () => {
-    console.log(sections);
     if (!validateForm()) {
       return; // Prevent form submission if validation fails
     }
@@ -422,7 +418,6 @@ const OrganizersTemp = () => {
     const raw = JSON.stringify({
       templatename: templateName,
       organizerName: organizerName,
-
       sections: sections.map((section) => ({
         name: section.text,
         text: section.text,
@@ -437,26 +432,22 @@ const OrganizersTemp = () => {
             text: option.text,
           })),
           text: element.text,
-
           questionsectionsettings: element.questionsectionsettings || {},
         })),
       })),
-      organizersettings: organizersettings,
+      organizersettings,
       active: true,
     });
-
-    console.log(raw);
     const requestOptions = {
       method: "POST",
       headers: myHeaders,
       body: raw,
       redirect: "follow",
     };
-    const url = `${ORGANIZER_TEMP_API}/workflow/organizers/organizertemplate`;
+    const url = `${ORGANIZER_TEMP_API}/workflow/organizertemplate`;
     fetch(url, requestOptions)
       .then((response) => response.json())
       .then((result) => {
-        console.log(result);
         if (
           result &&
           result.message === "Organizer Template created successfully"
@@ -482,7 +473,6 @@ const OrganizersTemp = () => {
       .catch((error) => console.error(error));
   };
   const saveOrganizerTemp = () => {
-    console.log(sections);
     if (!validateForm()) {
       return; // Prevent form submission if validation fails
     }
@@ -591,8 +581,7 @@ const OrganizersTemp = () => {
           }
           return response.text();
         })
-        .then((result) => {
-          console.log(result);
+        .then(() => {
           toast.success("Item deleted successfully");
           handleMenuClose();
           fetchOrganizerTemplates();
@@ -699,8 +688,6 @@ const OrganizersTemp = () => {
       sections, // This contains all your sections and their elements
     };
 
-    // You can also use any other required data from your state here
-    console.log("Data for preview:", data);
   };
 
   const handleClosePreview = () => {
@@ -1111,8 +1098,6 @@ const [repeatedSections, setRepeatedSections] = useState({});
 
   // Helper function to clear all values for a specific section
   const clearSectionValues = useCallback((sectionId) => {
-    console.log(`Clearing values for section ${sectionId}`);
-    
     // Clear radio values for this section
     setRadioValues(prev => {
       const newValues = { ...prev };
@@ -1292,8 +1277,6 @@ const [repeatedSections, setRepeatedSections] = useState({});
   }, [radioValues, checkboxValues, selectedDropdownValues, selectedYesNoValues, repeatedSections]);
 
   const shouldShowSection = useCallback((section) => {
-    console.log("Checking visibility for section:", section);
-    
     // Check current visibility
     const isCurrentlyVisible = checkSectionVisibility(section);
     
@@ -1417,61 +1400,61 @@ const [repeatedSections, setRepeatedSections] = useState({});
 
             {loading ? (
               <div className="flex items-center justify-center py-20">
-                <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
               </div>
             ) : (
-              <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+              <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left">
                     <thead>
-                      <tr className="border-b border-slate-100 bg-slate-50/60">
-                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Template Name</th>
-                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Used in Pipelines</th>
-                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 w-24 text-right">Actions</th>
+                      <tr className="border-b border-border bg-muted/40">
+                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Template Name</th>
+                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Used in Pipelines</th>
+                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-24 text-right">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-border">
                       {paginatedOrganizers.length === 0 ? (
                         <tr>
-                          <td colSpan={3} className="px-5 py-10 text-center text-sm text-slate-400">No organizer templates found.</td>
+                          <td colSpan={3} className="px-5 py-10 text-center text-sm text-muted-foreground">No organizer templates found.</td>
                         </tr>
                       ) : (
                         paginatedOrganizers.map((row) => (
-                          <tr key={row._id} className="group transition-colors hover:bg-slate-50/70">
+                          <tr key={row._id} className="group transition-colors hover:bg-muted/50">
                             <td className="px-5 py-3">
                               <button
                                 onClick={() => handleEdit(row._id)}
-                                className="text-sm font-medium text-indigo-600 hover:text-indigo-800 hover:underline transition-colors"
+                                className="text-sm font-medium text-primary hover:text-primary/80 hover:underline transition-colors"
                               >
                                 {row.templatename}
                               </button>
                             </td>
-                            <td className="px-5 py-3 text-sm text-slate-500">—</td>
+                            <td className="px-5 py-3 text-sm text-muted-foreground">—</td>
                             <td className="px-5 py-3 text-right">
                               <div className="relative inline-block">
                                 <button
                                   onClick={(event) => toggleMenu(event, row._id)}
-                                  className="inline-flex items-center justify-center rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                                  className="inline-flex items-center justify-center rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                                 >
                                   <MoreVertical className="h-4 w-4" />
                                 </button>
                                 {openMenuId === row._id && (
-                                  <div className="absolute right-0 top-full z-50 mt-1 w-40 rounded-lg border border-slate-200 bg-white py-1 shadow-lg animate-in fade-in-0 zoom-in-95">
+                                  <div className="absolute right-0 top-full z-50 mt-1 w-40 rounded-lg border border-border bg-card py-1 shadow-lg animate-in fade-in-0 zoom-in-95">
                                     <button
                                       onClick={() => { handleEdit(tempIdget); handleMenuClose(); }}
-                                      className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                                      className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors"
                                     >
                                       <Pencil className="h-3.5 w-3.5" /> Edit
                                     </button>
                                     <button
                                       onClick={() => { handleDuplicateTemplate(tempIdget); handleMenuClose(); }}
-                                      className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-50 transition-colors"
+                                      className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-primary hover:bg-primary/10 transition-colors"
                                     >
                                       <ClipboardList className="h-3.5 w-3.5" /> Duplicate
                                     </button>
                                     <button
                                       onClick={() => { handleDelete(tempIdget); }}
-                                      className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+                                      className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors"
                                     >
                                       <Trash2 className="h-3.5 w-3.5" /> Delete
                                     </button>
@@ -1487,16 +1470,16 @@ const [repeatedSections, setRepeatedSections] = useState({});
                 </div>
 
                 {organizerTemplatesData.length > 0 && (
-                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-100 bg-slate-50/40 px-5 py-3">
-                    <p className="text-xs text-slate-500">
-                      Showing <span className="font-semibold text-slate-700">{page * rowsPerPage + 1}</span>–<span className="font-semibold text-slate-700">{Math.min((page + 1) * rowsPerPage, organizerTemplatesData.length)}</span> of{" "}
-                      <span className="font-semibold text-slate-700">{organizerTemplatesData.length}</span>
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-border bg-muted/30 px-5 py-3">
+                    <p className="text-xs text-muted-foreground">
+                      Showing <span className="font-semibold text-foreground">{page * rowsPerPage + 1}</span>–<span className="font-semibold text-foreground">{Math.min((page + 1) * rowsPerPage, organizerTemplatesData.length)}</span> of{" "}
+                      <span className="font-semibold text-foreground">{organizerTemplatesData.length}</span>
                     </p>
                     <div className="flex items-center gap-2">
                       <select
                         value={rowsPerPage}
                         onChange={(e) => handleChangeRowsPerPage({ target: { value: e.target.value } })}
-                        className="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-600 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        className="rounded-lg border border-border bg-card px-2 py-1.5 text-xs text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
                       >
                         {[30, 40, 50, 60, 100].map((opt) => (
                           <option key={opt} value={opt}>{opt} / page</option>
@@ -1506,17 +1489,17 @@ const [repeatedSections, setRepeatedSections] = useState({});
                         <button
                           onClick={() => handleChangePage(null, page - 1)}
                           disabled={page === 0}
-                          className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 text-slate-500 shadow-sm transition-colors hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                          className="inline-flex items-center justify-center rounded-lg border border-border bg-card p-1.5 text-muted-foreground shadow-sm transition-colors hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                           <ChevronLeft className="h-4 w-4" />
                         </button>
-                        <span className="min-w-[3rem] text-center text-xs font-medium text-slate-600">
+                        <span className="min-w-[3rem] text-center text-xs font-medium text-muted-foreground">
                           {page + 1} / {Math.max(1, Math.ceil(organizerTemplatesData.length / rowsPerPage))}
                         </span>
                         <button
                           onClick={() => handleChangePage(null, page + 1)}
                           disabled={(page + 1) * rowsPerPage >= organizerTemplatesData.length}
-                          className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 text-slate-500 shadow-sm transition-colors hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                          className="inline-flex items-center justify-center rounded-lg border border-border bg-card p-1.5 text-muted-foreground shadow-sm transition-colors hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                           <ChevronRight className="h-4 w-4" />
                         </button>
@@ -1675,7 +1658,7 @@ const [repeatedSections, setRepeatedSections] = useState({});
 
             {/* ===== PREVIEW DIALOG (full-screen overlay) ===== */}
             {previewDialogOpen && (
-              <div className="fixed inset-0 z-50 bg-white overflow-auto">
+              <div className="fixed inset-0 z-50 bg-background overflow-auto">
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <div className="max-w-4xl mx-auto p-6">
                     {/* Preview banner */}
@@ -1691,7 +1674,7 @@ const [repeatedSections, setRepeatedSections] = useState({});
 
                     {/* Section selector */}
                     <select
-                      className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring mb-3"
+                      className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring mb-3"
                       value={activeStep}
                       onChange={handleDropdownChange}
                     >
@@ -1743,7 +1726,7 @@ const [repeatedSections, setRepeatedSections] = useState({});
                                         <div>
                                           <Label className="text-base mb-1 block">{element.text}</Label>
                                           <textarea
-                                            className="flex min-h-[60px] w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                            className="flex min-h-[60px] w-full rounded-lg border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                                             placeholder={`${element.type} Answer`}
                                             rows={3}
                                             value={inputValues[`${section.id}_${element.text}`] || ""}
@@ -1834,7 +1817,7 @@ const [repeatedSections, setRepeatedSections] = useState({});
                                         <div>
                                           <Label className="text-base mb-1 block">{element.text}</Label>
                                           <select
-                                            className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                            className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                                             value={selectedDropdownValues[`${section.id}_${element.text}`] || ""}
                                             onChange={(event) => handleDropdownValueChange(event, element.text, section.id)}
                                           >

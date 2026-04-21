@@ -65,8 +65,7 @@ const JobTemp = ({ charLimit = 4000 }) => {
         throw new Error("Network response was not ok");
       }
       const data = await response.json();
-      setClientFacingJobs(data.clientFacingJobStatues); // Ensure data is set correctly
-      console.log(data);
+      setClientFacingJobs(data.clientFacingJobStatues);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -94,24 +93,13 @@ const JobTemp = ({ charLimit = 4000 }) => {
         }
         const data = await response.json();
 
-        console.log(data);
         setClientDescription(data.clientfacingjobstatuses.clientfacingdescription);
-        console.log(data.clientfacingjobstatuses.clientfacingdescription);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     }
   };
 
-  // const handleDescriptionAddShortcut = (shortcut) => {
-  //   const updatedTextValue = clientDescription + `[${shortcut}]`;
-  //   if (updatedTextValue.length <= charLimit) {
-  //     setClientDescription(updatedTextValue);
-  //     setCharCount(updatedTextValue.length);
-  //   }
-  //   setShowDropdownDescription(false);
-  // };
-//  const [cursorPosition, setCursorPosition] = useState(0);
   const descriptionFieldRef = useRef(null);
   const handleDescriptionAddShortcut = (shortcut) => {
     setClientDescription((prevText) => {
@@ -202,10 +190,6 @@ const textFieldRef = useRef(null);
 
     setShowDropdown(false);
 };
-  // const handleAddShortcut = (shortcut) => {
-  //   setJobName((prevText) => prevText + `[${shortcut}]`);
-  //   setShowDropdown(false);
-  // };
   const handleCreateJobTemplate = () => {
     setShowForm(true); // Show the form when button is clicked
   };
@@ -223,16 +207,6 @@ const textFieldRef = useRef(null);
   const handleDueDateChange = (date) => {
     setDueDate(date);
   };
-  // const handleCloseJobTemp = () => {
-
-  //     const confirmCancel = window.confirm("You have unsaved changes. are you sure you want to leave without saving?");
-  //     if (confirmCancel) {
-  //         // If user confirms, clear the form and hide it
-  //         setShowForm(false);
-
-  //     }
-
-  // }
   const [isFormDirty, setIsFormDirty] = useState(false);
   const handleCloseJobTemp = () => {
     if (isFormDirty) {
@@ -307,87 +281,6 @@ useEffect(() => {
   }
 }, [selectedOption]);
 
-  // useEffect(() => {
-  //   // Set shortcuts based on selected option
-  //   if (selectedOption === "contacts") {
-  //     const contactShortcuts = [
-  //       { title: "Account Shortcodes", isBold: true },
-  //       { title: "Account Name", isBold: false, value: "ACCOUNT_NAME" },
-  //       { title: "Custom field:Website", isBold: false, value: "ACCOUNT_CUSTOM_FIELD:Website" },
-  //       { title: "Contact Shortcodes", isBold: true },
-  //       { title: "Contact Name", isBold: false, value: "CONTACT_NAME" },
-  //       { title: "First Name", isBold: false, value: "FIRST_NAME" },
-  //       { title: "Middle Name", isBold: false, value: "MIDDLE_NAME" },
-  //       { title: "Last Name", isBold: false, value: "LAST_NAME" },
-  //       { title: "Phone number", isBold: false, value: "PHONE_NUMBER" },
-  //       { title: "Country", isBold: false, value: "COUNTRY" },
-  //       { title: "Company name", isBold: false, value: "COMPANY_NAME " },
-  //       { title: "Street address", isBold: false, value: "STREET_ADDRESS" },
-  //       { title: "City", isBold: false, value: "CITY" },
-  //       { title: "State/Province", isBold: false, value: "STATE / PROVINCE" },
-  //       { title: "Zip/Postal code", isBold: false, value: "ZIP / POSTAL CODE" },
-  //       { title: "Custom field:Email", isBold: false, value: "CONTACT_CUSTOM_FIELD:Email" },
-  //       { title: "Date Shortcodes", isBold: true },
-  //       { title: "Current day full date", isBold: false, value: "CURRENT_DAY_FULL_DATE" },
-  //       { title: "Current day number", isBold: false, value: "CURRENT_DAY_NUMBER" },
-  //       { title: "Current day name", isBold: false, value: "CURRENT_DAY_NAME" },
-  //       { title: "Current week", isBold: false, value: "CURRENT_WEEK" },
-  //       { title: "Current month number", isBold: false, value: "CURRENT_MONTH_NUMBER" },
-  //       { title: "Current month name", isBold: false, value: "CURRENT_MONTH_NAME" },
-  //       { title: "Current quarter", isBold: false, value: "CURRENT_QUARTER" },
-  //       { title: "Current year", isBold: false, value: "CURRENT_YEAR" },
-  //       { title: "Last day full date", isBold: false, value: "LAST_DAY_FULL_DATE" },
-  //       { title: "Last day number", isBold: false, value: "LAST_DAY_NUMBER" },
-  //       { title: "Last day name", isBold: false, value: "LAST_DAY_NAME" },
-  //       { title: "Last week", isBold: false, value: "LAST_WEEK" },
-  //       { title: "Last month number", isBold: false, value: "LAST_MONTH_NUMBER" },
-  //       { title: "Last month name", isBold: false, value: "LAST_MONTH_NAME" },
-  //       { title: "Last quarter", isBold: false, value: "LAST_QUARTER" },
-  //       { title: "Last_year", isBold: false, value: "LAST_YEAR" },
-  //       { title: "Next day full date", isBold: false, value: "NEXT_DAY_FULL_DATE" },
-  //       { title: "Next day number", isBold: false, value: "NEXT_DAY_NUMBER" },
-  //       { title: "Next day name", isBold: false, value: "NEXT_DAY_NAME" },
-  //       { title: "Next week", isBold: false, value: "NEXT_WEEK" },
-  //       { title: "Next month number", isBold: false, value: "NEXT_MONTH_NUMBER" },
-  //       { title: "Next month name", isBold: false, value: "NEXT_MONTH_NAME" },
-  //       { title: "Next quarter", isBold: false, value: "NEXT_QUARTER" },
-  //       { title: "Next year", isBold: false, value: "NEXT_YEAR" },
-  //     ];
-  //     setShortcuts(contactShortcuts);
-  //   } else if (selectedOption === "account") {
-  //     const accountShortcuts = [
-  //       { title: "Account Shortcodes", isBold: true },
-  //       { title: "Account Name", isBold: false, value: "ACCOUNT_NAME" },
-  //       { title: "Custom field:Website", isBold: false, value: "ACCOUNT_CUSTOM_FIELD:Website" },
-  //       { title: "Date Shortcodes", isBold: true },
-  //       { title: "Current day full date", isBold: false, value: "CURRENT_DAY_FULL_DATE" },
-  //       { title: "Current day number", isBold: false, value: "CURRENT_DAY_NUMBER" },
-  //       { title: "Current day name", isBold: false, value: "CURRENT_DAY_NAME" },
-  //       { title: "Current week", isBold: false, value: "CURRENT_WEEK" },
-  //       { title: "Current month number", isBold: false, value: "CURRENT_MONTH_NUMBER" },
-  //       { title: "Current month name", isBold: false, value: "CURRENT_MONTH_NAME" },
-  //       { title: "Current quarter", isBold: false, value: "CURRENT_QUARTER" },
-  //       { title: "Current year", isBold: false, value: "CURRENT_YEAR" },
-  //       { title: "Last day full date", isBold: false, value: "LAST_DAY_FULL_DATE" },
-  //       { title: "Last day number", isBold: false, value: "LAST_DAY_NUMBER" },
-  //       { title: "Last day name", isBold: false, value: "LAST_DAY_NAME" },
-  //       { title: "Last week", isBold: false, value: "LAST_WEEK" },
-  //       { title: "Last month number", isBold: false, value: "LAST_MONTH_NUMBER" },
-  //       { title: "Last month name", isBold: false, value: "LAST_MONTH_NAME" },
-  //       { title: "Last quarter", isBold: false, value: "LAST_QUARTER" },
-  //       { title: "Last_year", isBold: false, value: "LAST_YEAR" },
-  //       { title: "Next day full date", isBold: false, value: "NEXT_DAY_FULL_DATE" },
-  //       { title: "Next day number", isBold: false, value: "NEXT_DAY_NUMBER" },
-  //       { title: "Next day name", isBold: false, value: "NEXT_DAY_NAME" },
-  //       { title: "Next week", isBold: false, value: "NEXT_WEEK" },
-  //       { title: "Next month number", isBold: false, value: "NEXT_MONTH_NUMBER" },
-  //       { title: "Next month name", isBold: false, value: "NEXT_MONTH_NAME" },
-  //       { title: "Next quarter", isBold: false, value: "NEXT_QUARTER" },
-  //       { title: "Next year", isBold: false, value: "NEXT_YEAR" },
-  //     ];
-  //     setShortcuts(accountShortcuts);
-  //   }
-  // }, [selectedOption]);
   const handleCloseDropdown = () => {
     setShowDropdown(false);
     setAnchorEl(null);
@@ -401,7 +294,6 @@ useEffect(() => {
   const [combinedValues, setCombinedValues] = useState();
   const [userData, setUserData] = useState([]);
 
-  console.log(combinedValues);
   useEffect(() => {
     fetchData();
   }, []);
@@ -424,10 +316,8 @@ useEffect(() => {
   // };
   const handleUserChange = (newSelectedUsers) => {
     setSelectedUser(newSelectedUsers);
-    console.log(newSelectedUsers)
     const selectedValues = newSelectedUsers.map((option) => option.value);
     setCombinedValues(selectedValues);
-    console.log(selectedValues)
   };
   const options = userData.map((user) => ({
     value: user._id,
@@ -452,7 +342,6 @@ useEffect(() => {
       }
       const data = await response.json();
       setJobTemplates(data.JobTemplates);
-      console.log(data);
     } catch (error) {
       console.error("Error fetching job templates:", error);
     }
@@ -503,7 +392,6 @@ useEffect(() => {
         enddate: dueDate,
         clientfacingDescription: clientDescription,
       });
-      console.log(raw);
       const requestOptions = {
         method: "POST",
         headers: myHeaders,
@@ -513,28 +401,21 @@ useEffect(() => {
       const url = `${JOBS_API}/workflow/jobtemplate/jobtemplate`;
       fetch(url, requestOptions)
         .then((response) => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
+          if (!response.ok) throw new Error("Network response was not ok");
           return response.json();
         })
-        .then((result) => {
-          // Handle success
+        .then(() => {
           toast.success("Job Template created successfully");
           setShowForm(false);
           handleClear();
           fetchJobTemplatesData();
         })
         .catch((error) => {
-          // Handle errors
           console.error(error);
           toast.error("Failed to create Job Template");
         });
     } else if (absoluteDate === false) {
-      if (!validateForm()) {
-        // toast.error("Please fix the validation errors.");
-        return;
-      }
+      if (!validateForm()) return;
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
 
@@ -556,32 +437,25 @@ useEffect(() => {
         clientfacingstatus: selectedJob?.value,
         clientfacingDescription: clientDescription,
       });
-      console.log(raw);
       const requestOptions = {
         method: "POST",
         headers: myHeaders,
         body: raw,
         redirect: "follow",
       };
-      const url = `${JOBS_API}/workflow/jobtemplate/jobtemplate`;
-      fetch(url, requestOptions)
+      const url2 = `${JOBS_API}/workflow/jobtemplate/jobtemplate`;
+      fetch(url2, requestOptions)
         .then((response) => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
+          if (!response.ok) throw new Error("Network response was not ok");
           return response.json();
         })
-        .then((result) => {
-          // Handle success
+        .then(() => {
           toast.success("Job Template created successfully");
-          // setTimeout(() => window.location.reload(), 1000);
           setShowForm(false);
           handleClear();
           fetchJobTemplatesData();
-          // Additional logic after successful creation if needed
         })
         .catch((error) => {
-          // Handle errors
           console.error(error);
           toast.error("Failed to create Job Template");
         });
@@ -613,7 +487,6 @@ useEffect(() => {
         clientfacingstatus: selectedJob?.value,
         clientfacingDescription: clientDescription,
       });
-console.log(raw)
       const requestOptions = {
         method: "POST",
         headers: myHeaders,
@@ -623,28 +496,19 @@ console.log(raw)
       const url = `${JOBS_API}/workflow/jobtemplate/jobtemplate`;
       fetch(url, requestOptions)
         .then((response) => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
+          if (!response.ok) throw new Error("Network response was not ok");
           return response.json();
         })
-        .then((result) => {
-          // Handle success
+        .then(() => {
           toast.success("Job Template created successfully");
-          // handle;
-
           fetchJobTemplatesData();
         })
         .catch((error) => {
-          // Handle errors
           console.error(error);
           toast.error("Failed to create Job Template");
         });
     } else if (absoluteDate === false) {
-      if (!validateForm()) {
-        // toast.error("Please fix the validation errors.");
-        return;
-      }
+      if (!validateForm()) return;
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
 
@@ -667,29 +531,23 @@ console.log(raw)
         clientfacingDescription: clientDescription,
       });
 
-      const requestOptions = {
+      const requestOptions2 = {
         method: "POST",
         headers: myHeaders,
         body: raw,
         redirect: "follow",
       };
-      const url = `${JOBS_API}/workflow/jobtemplate/jobtemplate`;
-      fetch(url, requestOptions)
+      const url2 = `${JOBS_API}/workflow/jobtemplate/jobtemplate`;
+      fetch(url2, requestOptions2)
         .then((response) => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
+          if (!response.ok) throw new Error("Network response was not ok");
           return response.json();
         })
-        .then((result) => {
-          // Handle success
+        .then(() => {
           toast.success("Job Template created successfully");
-
           fetchJobTemplatesData();
-          // Additional logic after successful creation if needed
         })
         .catch((error) => {
-          // Handle errors
           console.error(error);
           toast.error("Failed to create Job Template");
         });
@@ -719,11 +577,10 @@ console.log(raw)
           }
           return response.json();
         })
-        .then((result) => {
-          console.log(result);
+        .then(() => {
           toast.success("Item deleted successfully");
           setShowForm(false);
-          handleMenuClose()
+          handleMenuClose();
           fetchJobTemplatesData();
         })
         .catch((error) => {
@@ -735,11 +592,7 @@ console.log(raw)
 
   const [tempIdget, setTempIdGet] = useState("");
   const [openMenuId, setOpenMenuId] = useState(null);
-  // const toggleMenu = (_id) => {
-  //   setOpenMenuId(openMenuId === _id ? null : _id);
-  //   setTempIdGet(_id);
-  // };
- const toggleMenu = (event, _id) => {
+  const toggleMenu = (event, _id) => {
     setAnchorEl(event.currentTarget);
     setOpenMenuId(_id);
     setTempIdGet(_id);
@@ -769,7 +622,6 @@ console.log(raw)
   const addCommentField = () => {
     setComments([...comments, ""]); // Add a new empty comment field
   };
-  console.log(comments);
   const handleCommentChange = (index, value) => {
     const updatedComments = [...comments];
     updatedComments[index] = value; // Update the specific comment field
@@ -837,30 +689,30 @@ console.log(raw)
 
             {loading ? (
               <div className="flex items-center justify-center py-20">
-                <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
               </div>
             ) : (
-              <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+              <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left">
                     <thead>
-                      <tr className="border-b border-slate-100 bg-slate-50/60">
-                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Name</th>
-                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 w-24 text-right">Actions</th>
+                      <tr className="border-b border-border bg-muted/40">
+                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Name</th>
+                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-24 text-right">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-border">
                       {paginatedJobs.length === 0 ? (
                         <tr>
-                          <td colSpan={2} className="px-5 py-10 text-center text-sm text-slate-400">No job templates found.</td>
+                          <td colSpan={2} className="px-5 py-10 text-center text-sm text-muted-foreground">No job templates found.</td>
                         </tr>
                       ) : (
                         paginatedJobs.map((row) => (
-                          <tr key={row._id} className="group transition-colors hover:bg-slate-50/70">
+                          <tr key={row._id} className="group transition-colors hover:bg-muted/50">
                             <td className="px-5 py-3">
                               <button
                                 onClick={() => handleEdit(row._id)}
-                                className="text-sm font-medium text-indigo-600 hover:text-indigo-800 hover:underline transition-colors"
+                                className="text-sm font-medium text-primary hover:text-primary/80 hover:underline transition-colors"
                               >
                                 {row.templatename}
                               </button>
@@ -869,21 +721,21 @@ console.log(raw)
                               <div className="relative inline-block">
                                 <button
                                   onClick={(event) => toggleMenu(event, row._id)}
-                                  className="inline-flex items-center justify-center rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                                  className="inline-flex items-center justify-center rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                                 >
                                   <MoreVertical className="h-4 w-4" />
                                 </button>
                                 {openMenuId === row._id && (
-                                  <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-slate-200 bg-white py-1 shadow-lg animate-in fade-in-0 zoom-in-95">
+                                  <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-border bg-card py-1 shadow-lg animate-in fade-in-0 zoom-in-95">
                                     <button
                                       onClick={() => { handleEdit(tempIdget); handleMenuClose(); }}
-                                      className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                                      className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors"
                                     >
                                       <Pencil className="h-3.5 w-3.5" /> Edit
                                     </button>
                                     <button
                                       onClick={() => { handleDelete(tempIdget); }}
-                                      className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+                                      className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors"
                                     >
                                       <Trash2 className="h-3.5 w-3.5" /> Delete
                                     </button>
@@ -899,16 +751,16 @@ console.log(raw)
                 </div>
 
                 {JobTemplates.length > 0 && (
-                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-100 bg-slate-50/40 px-5 py-3">
-                    <p className="text-xs text-slate-500">
-                      Showing <span className="font-semibold text-slate-700">{page * rowsPerPage + 1}</span>–<span className="font-semibold text-slate-700">{Math.min((page + 1) * rowsPerPage, JobTemplates.length)}</span> of{" "}
-                      <span className="font-semibold text-slate-700">{JobTemplates.length}</span>
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-border bg-muted/30 px-5 py-3">
+                    <p className="text-xs text-muted-foreground">
+                      Showing <span className="font-semibold text-foreground">{page * rowsPerPage + 1}</span>–<span className="font-semibold text-foreground">{Math.min((page + 1) * rowsPerPage, JobTemplates.length)}</span> of{" "}
+                      <span className="font-semibold text-foreground">{JobTemplates.length}</span>
                     </p>
                     <div className="flex items-center gap-2">
                       <select
                         value={rowsPerPage}
                         onChange={(e) => handleChangeRowsPerPage({ target: { value: e.target.value } })}
-                        className="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-600 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        className="rounded-lg border border-border bg-card px-2 py-1.5 text-xs text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
                       >
                         {[30, 40, 50, 60, 100].map((opt) => (
                           <option key={opt} value={opt}>{opt} / page</option>
@@ -918,17 +770,17 @@ console.log(raw)
                         <button
                           onClick={() => handleChangePage(null, page - 1)}
                           disabled={page === 0}
-                          className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 text-slate-500 shadow-sm transition-colors hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                          className="inline-flex items-center justify-center rounded-lg border border-border bg-card p-1.5 text-muted-foreground shadow-sm transition-colors hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                           <ChevronLeft className="h-4 w-4" />
                         </button>
-                        <span className="min-w-[3rem] text-center text-xs font-medium text-slate-600">
+                        <span className="min-w-[3rem] text-center text-xs font-medium text-muted-foreground">
                           {page + 1} / {Math.max(1, Math.ceil(JobTemplates.length / rowsPerPage))}
                         </span>
                         <button
                           onClick={() => handleChangePage(null, page + 1)}
                           disabled={(page + 1) * rowsPerPage >= JobTemplates.length}
-                          className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 text-slate-500 shadow-sm transition-colors hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                          className="inline-flex items-center justify-center rounded-lg border border-border bg-card p-1.5 text-muted-foreground shadow-sm transition-colors hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                           <ChevronRight className="h-4 w-4" />
                         </button>
@@ -961,7 +813,7 @@ console.log(raw)
             {/* ===== LEFT COLUMN: Main Form ===== */}
             <FormGrid.Main>
               {/* General Info Section */}
-              <FormSection title="General Information" icon={<FileText className="h-4 w-4" />}>
+              <FormSection title="General Information">
                 <FormField label="Template Name" error={templateNameError}>
                   <Input
                     placeholder="Template Name"
@@ -990,7 +842,7 @@ console.log(raw)
               </FormSection>
 
               {/* Assignment Section */}
-              <FormSection title="Assignment" icon={<Users className="h-4 w-4" />}>
+              <FormSection title="Assignment">
                 <FormField label="Job Assignees">
                   <MultiSelectDropdown
                     value={selectedUser}
@@ -1010,7 +862,7 @@ console.log(raw)
               </FormSection>
 
               {/* Scheduling Section */}
-              <FormSection title="Start and Due Date" icon={<Calendar className="h-4 w-4" />}>
+              <FormSection title="Start and Due Date">
                 <div className="flex items-center justify-between">
                   <Label className="text-sm font-medium">Use Absolute Dates</Label>
                   <Switch
@@ -1082,7 +934,7 @@ console.log(raw)
             {/* ===== RIGHT COLUMN: Sidebar ===== */}
             <FormGrid.Sidebar>
               {/* Client-Facing Section */}
-              <FormSection title="Client-Facing Status" icon={<Globe className="h-4 w-4" />}>
+              <FormSection title="Client-Facing Status">
                 <div className="flex items-center justify-between">
                   <Label className="text-sm font-medium">Show in Client Portal</Label>
                   <Switch
@@ -1150,10 +1002,7 @@ console.log(raw)
               </FormSection>
 
               {/* Comments Section */}
-              <FormSection
-                title="Comments"
-                icon={<MessageSquarePlus className="h-4 w-4" />}
-              >
+              <FormSection title="Comments">
                 <div className="space-y-3">
                   {comments.map((comment, index) => (
                     <div key={index} className="flex items-start gap-2">

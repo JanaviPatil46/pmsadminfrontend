@@ -42,7 +42,6 @@ const Tasks = () => {
   const [selectedUser, setSelectedUser] = useState([]);
   const [combinedValues, setCombinedValues] = useState();
   const [userData, setUserData] = useState([]);
-console.log("starts in number",startsin)
   const [checkedSubtasks, setCheckedSubtasks] = useState([]);
 
   const handleCheckboxChange = (id) => {
@@ -127,7 +126,6 @@ console.log("starts in number",startsin)
     setDescription(content);
   };
 
-  // console.log(combinedValues)
   useEffect(() => {
     fetchData();
   }, []);
@@ -137,7 +135,6 @@ console.log("starts in number",startsin)
       const url = `${LOGIN_API}/common/users/roles?roles=TeamMember,Admin`;
       const response = await fetch(url);
       const data = await response.json();
-      console.log("task assigne", data);
       setUserData(data);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -151,10 +148,8 @@ console.log("starts in number",startsin)
 // Add this handler function
 const handleUserChange = (newSelectedUsers) => {
   setSelectedUser(newSelectedUsers);
-  console.log(newSelectedUsers)
   const selectedValues = newSelectedUsers.map((option) => option.value);
   setCombinedValues(selectedValues);
-  console.log(selectedValues)
 };
   //Tag FetchData ================
   const [tags, setTags] = useState([]);
@@ -175,12 +170,10 @@ const handleUserChange = (newSelectedUsers) => {
     }
   };
   
-   const handleTagChange = (newSelectedTags) => {
+  const handleTagChange = (newSelectedTags) => {
     setSelectedTags(newSelectedTags);
-    console.log(newSelectedTags)
     const selectedValues = newSelectedTags.map((option) => option.value);
     setCombinedTagsValues(selectedValues);
-    console.log(selectedValues)
   };
   const [TaskTemplates, setTaskTemplates] = useState([]);
   useEffect(() => {
@@ -198,7 +191,6 @@ const handleUserChange = (newSelectedUsers) => {
         throw new Error("Failed to fetch task templates");
       }
       const data = await response.json();
-      // console.log(data)
       setTaskTemplates(data.TaskTemplates);
     } catch (error) {
       console.error("Error fetching task templates:", error);
@@ -209,18 +201,14 @@ const handleUserChange = (newSelectedUsers) => {
     }
   };
   const createTaskTemp = () => {
-    if (!validateForm()) {
-      return; // Prevent form submission if validation fails
-    }
+    if (!validateForm()) return;
 
     const subtaskData = subtasks.map(({ id, text }) => ({
       id,
       text,
-
-      checked: checkedSubtasks.includes(id), // Check if ID is in the checkedSubtasks array
+      checked: checkedSubtasks.includes(id),
     }));
 
-    // console.log(subtaskData);
     if (absoluteDate === true) {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
@@ -232,13 +220,11 @@ const handleUserChange = (newSelectedUsers) => {
         priority: priority,
         description: description,
         absolutedates: absoluteDate,
-        comments: "",
         startdate: startDate,
         enddate: dueDate,
         subtasks: subtaskData,
         issubtaskschecked: SubtaskSwitch,
       });
-      console.log(raw);
       const requestOptions = {
         method: "POST",
         headers: myHeaders,
@@ -248,27 +234,21 @@ const handleUserChange = (newSelectedUsers) => {
       const url = `${TASK_API}/workflow/tasks/tasktemplate/`;
       fetch(url, requestOptions)
         .then((response) => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
+          if (!response.ok) throw new Error("Network response was not ok");
           return response.json();
         })
-        .then((result) => {
-          // Handle success
+        .then(() => {
           toast.success("Task Template created successfully");
+          setShowForm(false);
           resetFields();
           fetchTaskData();
-          setShowForm(false);
         })
         .catch((error) => {
-          // Handle errors
           console.error(error);
           toast.error("Failed to create Task Template");
         });
     } else if (absoluteDate === false) {
-      if (!validateForm()) {
-        return; // Prevent form submission if validation fails
-      }
+      if (!validateForm()) return;
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
       const raw = JSON.stringify({
@@ -286,136 +266,25 @@ const handleUserChange = (newSelectedUsers) => {
         subtasks: subtaskData,
         issubtaskschecked: SubtaskSwitch,
       });
-      console.log(raw);
-      const requestOptions = {
+      const requestOptions2 = {
         method: "POST",
         headers: myHeaders,
         body: raw,
         redirect: "follow",
       };
-      const url = `${TASK_API}/workflow/tasks/tasktemplate/`;
-      fetch(url, requestOptions)
+      const url2 = `${TASK_API}/workflow/tasks/tasktemplate/`;
+      fetch(url2, requestOptions2)
         .then((response) => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
+          if (!response.ok) throw new Error("Network response was not ok");
           return response.json();
         })
-        .then((result) => {
-          // Handle success
+        .then(() => {
           toast.success("Task Template created successfully");
+          setShowForm(false);
           resetFields();
           fetchTaskData();
-          setShowForm(false);
         })
         .catch((error) => {
-          // Handle errors
-          console.error(error);
-          toast.error("Failed to create Task Template");
-        });
-    }
-  };
-  const createSaveTaskTemp = () => {
-    if (!validateForm()) {
-      return; // Prevent form submission if validation fails
-    }
-    
-    const subtaskData = subtasks.map(({ id, text }) => ({
-      id,
-      text,
-
-      checked: checkedSubtasks.includes(id), // Check if ID is in the checkedSubtasks array
-    }));
-
-    console.log(subtaskData);
-
-    if (absoluteDate === true) {
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      const raw = JSON.stringify({
-        templatename: templatename,
-        status: status,
-        taskassignees: combinedValues,
-        tasktags: combinedTagsValues,
-        priority: priority,
-        description: description,
-        absolutedates: absoluteDate,
-        comments: "",
-        startdate: startDate,
-        enddate: dueDate,
-        subtasks: subtaskData,
-        issubtaskschecked: SubtaskSwitch,
-      });
-      console.log(raw);
-      const requestOptions = {
-        method: "POST",
-        headers: myHeaders,
-        body: raw,
-        redirect: "follow",
-      };
-      const url = `${TASK_API}/workflow/tasks/tasktemplate/`;
-      fetch(url, requestOptions)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          return response.json();
-        })
-        .then((result) => {
-          // Handle success
-          toast.success("Task Template created successfully");
-        
-          fetchTaskData();
-        })
-        .catch((error) => {
-          // Handle errors
-          console.error(error);
-          toast.error("Failed to create Task Template");
-        });
-    } else if (absoluteDate === false) {
-      if (!validateForm()) {
-        return; // Prevent form submission if validation fails
-      }
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      const raw = JSON.stringify({
-        templatename: templatename,
-        status: status,
-        taskassignees: combinedValues,
-        tasktags: combinedTagsValues,
-        priority: priority,
-        description: description,
-        absolutedates: absoluteDate,
-        startsin: startsin,
-        startsinduration: startsInDuration,
-        duein: duein,
-        dueinduration: dueinduration,
-        subtasks: subtaskData,
-        issubtaskschecked: SubtaskSwitch,
-      });
-      console.log(raw);
-      const requestOptions = {
-        method: "POST",
-        headers: myHeaders,
-        body: raw,
-        redirect: "follow",
-      };
-      const url = `${TASK_API}/workflow/tasks/tasktemplate/`;
-      fetch(url, requestOptions)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          return response.json();
-        })
-        .then((result) => {
-          // Handle success
-          toast.success("Task Template created successfully");
-          // resetFields();
-          fetchTaskData();
-        })
-        .catch((error) => {
-          // Handle errors
           console.error(error);
           toast.error("Failed to create Task Template");
         });
@@ -438,6 +307,93 @@ const handleUserChange = (newSelectedUsers) => {
     setSubtaskSwitch(false);
     setSubtasks([]);
   };
+  const createSaveTaskTemp = () => {
+    if (!validateForm()) return;
+
+    const subtaskData = subtasks.map(({ id, text }) => ({
+      id,
+      text,
+      checked: checkedSubtasks.includes(id),
+    }));
+
+    if (absoluteDate === true) {
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      const raw = JSON.stringify({
+        templatename: templatename,
+        status: status,
+        taskassignees: combinedValues,
+        tasktags: combinedTagsValues,
+        priority: priority,
+        description: description,
+        absolutedates: absoluteDate,
+        startdate: startDate,
+        enddate: dueDate,
+        subtasks: subtaskData,
+        issubtaskschecked: SubtaskSwitch,
+      });
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+      const url = `${TASK_API}/workflow/tasks/tasktemplate/`;
+      fetch(url, requestOptions)
+        .then((response) => {
+          if (!response.ok) throw new Error("Network response was not ok");
+          return response.json();
+        })
+        .then(() => {
+          toast.success("Task Template created successfully");
+          fetchTaskData();
+        })
+        .catch((error) => {
+          console.error(error);
+          toast.error("Failed to create Task Template");
+        });
+    } else if (absoluteDate === false) {
+      if (!validateForm()) return;
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      const raw = JSON.stringify({
+        templatename: templatename,
+        status: status,
+        taskassignees: combinedValues,
+        tasktags: combinedTagsValues,
+        priority: priority,
+        description: description,
+        absolutedates: absoluteDate,
+        startsin: startsin,
+        startsinduration: startsInDuration,
+        duein: duein,
+        dueinduration: dueinduration,
+        subtasks: subtaskData,
+        issubtaskschecked: SubtaskSwitch,
+      });
+      const requestOptions2 = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+      const url2 = `${TASK_API}/workflow/tasks/tasktemplate/`;
+      fetch(url2, requestOptions2)
+        .then((response) => {
+          if (!response.ok) throw new Error("Network response was not ok");
+          return response.json();
+        })
+        .then(() => {
+          toast.success("Task Template created successfully");
+          fetchTaskData();
+        })
+        .catch((error) => {
+          console.error(error);
+          toast.error("Failed to create Task Template");
+        });
+    }
+  };
+
   const handleEdit = (_id) => {
     navigate("taskTempUpdate/" + _id);
   };
@@ -463,9 +419,8 @@ const handleUserChange = (newSelectedUsers) => {
           return response.text();
         })
         .then((result) => {
-          // console.log(result);
           toast.success("Item deleted successfully");
-          handleMenuClose()
+          handleMenuClose();
           fetchTaskData();
           // setshowOrganizerTemplateForm(false);
         })
@@ -751,7 +706,7 @@ const handleUserChange = (newSelectedUsers) => {
             <FormGrid>
               {/* ===== LEFT COLUMN: Task Details ===== */}
               <FormGrid.Main>
-                <FormSection title="General" icon={<FileText className="h-4 w-4" />}>
+                <FormSection title="General">
                   <FormRow cols={2}>
                     <FormField label="Template Name" error={templateNameError}>
                       <Input
@@ -793,7 +748,7 @@ const handleUserChange = (newSelectedUsers) => {
                   />
                 </FormSection>
 
-                <FormSection title="Start and Due Date" icon={<Calendar className="h-4 w-4" />}>
+                <FormSection title="Start and Due Date">
                   <div className="flex items-center justify-between">
                     <Label className="text-sm font-medium">Absolute Date</Label>
                     <Switch
@@ -807,7 +762,7 @@ const handleUserChange = (newSelectedUsers) => {
                       <FormField label="Start Date">
                         <DatePicker
                           format="MM/DD/YYYY"
-                          sx={{ width: '100%', backgroundColor: '#fff' }}
+                          sx={{ width: '100%' }}
                           value={startDate}
                           onChange={handleStartDateChange}
                         />
@@ -815,7 +770,7 @@ const handleUserChange = (newSelectedUsers) => {
                       <FormField label="Due Date">
                         <DatePicker
                           format="MM/DD/YYYY"
-                          sx={{ width: '100%', backgroundColor: '#fff' }}
+                          sx={{ width: '100%' }}
                           value={dueDate}
                           onChange={handleDueDateChange}
                         />
@@ -870,7 +825,7 @@ const handleUserChange = (newSelectedUsers) => {
 
               {/* ===== RIGHT COLUMN: Subtasks ===== */}
               <FormGrid.Sidebar>
-                <FormSection title="Subtasks" icon={<ListChecks className="h-4 w-4" />}>
+                <FormSection title="Subtasks">
                   <div className="flex items-center justify-between">
                     <Label className="text-sm font-medium">Enable Subtasks</Label>
                     <Switch

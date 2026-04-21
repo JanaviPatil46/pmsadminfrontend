@@ -40,7 +40,6 @@ const ProposalsTable = () => {
 
   const handleTemplateClick = (proposal) => {
 
-    console.log("proposal to edit", proposal)
     // Navigate to proposal form with the proposal ID
     navigate(`/firmtemp/templates/proposals/proposal-form?edit=${proposal._id}`);
   };
@@ -85,11 +84,8 @@ const handleDelete = async () => {
     if (!response.ok) {
       throw new Error("Failed to delete proposal");
     }
-toast.success("Proposal deleted successfully")
-    // ✅ Remove from UI without refresh
+    toast.success("Proposal deleted successfully");
     setProposals(prev => prev.filter(p => p._id !== selectedProposal._id));
-
-    console.log("Proposal deleted");
   } catch (err) {
     console.error("Delete error:", err);
   } finally {
@@ -147,7 +143,7 @@ toast.success("Proposal deleted successfully")
           </button>
         </div>
       ) : (
-        <div className="rounded-2xl border border-border bg-white shadow-sm overflow-hidden">
+        <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
@@ -158,7 +154,7 @@ toast.success("Proposal deleted successfully")
               </thead>
               <tbody className="divide-y divide-border">
                 {proposals.map((proposal, idx) => (
-                  <tr key={proposal._id} className="bg-white transition-colors hover:bg-muted/30">
+                  <tr key={proposal._id} className="bg-background transition-colors hover:bg-muted/30">
                     <td className="px-6 py-4">
                       <Link
                         to={`/firmtemp/templates/proposals/proposal-form?edit=${proposal._id}`}

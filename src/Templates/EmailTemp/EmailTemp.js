@@ -32,19 +32,8 @@ const EmailTemp = () => {
     setShowForm(true); // Show the form when button is clicked
   };
 
-  // const handleTempCancle = () => {
-  //     // Show confirmation dialog
-  //     const confirmCancel = window.confirm("You have unsaved changes. are you sure you want to leave without saving?");
-  //     if (confirmCancel) {
-  //         // If user confirms, clear the form and hide it
-  //         setShowForm(false);
-
-  //     }
-  // };
-
   const handleChange = (event) => {
     setSelectedOption(event.target.value);
-    console.log(event.target.value)
   };
 
   const toggleDropdown = (event) => {
@@ -79,11 +68,6 @@ const EmailTemp = () => {
 
     setShowDropdown(false);
   };
-  // const handleAddShortcut = (shortcut) => {
-  //   setInputText((prevText) => prevText + `[${shortcut}]`);
-  //   setShowDropdown(false);
-  // };
-
   useEffect(() => {
     // Simulate filtered shortcuts based on some logic (e.g., search)
     setFilteredShortcuts(
@@ -284,149 +268,6 @@ const EmailTemp = () => {
     label: user.username,
   }));
 
-  // const handleSaveExitTemplate = (e) => {
-  //     e.preventDefault();
-  //     if (!validateForm()) {
-  //         return; // Prevent form submission if validation fails
-  //     }
-  //     const myHeaders = new Headers();
-  //     myHeaders.append("Content-Type", "application/json");
-
-  //     const raw = JSON.stringify({
-  //         templatename: templateName,
-  //         from: selecteduser.value,
-  //         emailsubject: inputText,
-  //         emailbody: emailBody,
-  //     });
-
-  //     const requestOptions = {
-  //         method: "POST",
-  //         headers: myHeaders,
-  //         body: raw,
-  //         redirect: "follow"
-  //     };
-  //     console.log(raw)
-  //     const url = `${EMAIL_API}/workflow/emailtemplate`;
-  //     fetch(url, requestOptions)
-  //         .then((response) => {
-  //             if (!response.ok) {
-  //                 throw new Error("Network response was not ok");
-  //             }
-  //             return response.json();
-  //         })
-  //         .then((result) => {
-  //             toast.success('Email Template create successfully');
-  //             handleClearTemplate();
-  //             setShowForm(false);
-  //             fetchEmailTemplates();
-  //         })
-  //         .catch((error) => {
-  //             console.error(error);
-  //             toast.error('Failed to create Email Template');
-  //         });
-  // }
-
-  //   const handleSaveExitTemplate = (e) => {
-  //     e.preventDefault();
-  //     if (!validateForm()) {
-  //       return; // Prevent form submission if validation fails
-  //     }
-
-  //     const formData = new FormData();
-  //     formData.append("templatename", templateName);
-  //     formData.append("from", selecteduser.value);
-  //     formData.append("emailsubject", inputText);
-  //     formData.append("emailbody", emailBody);
-
-  //     // Append each selected file to formData
-  //     selectedFiles.forEach((file) => {
-  //       formData.append("files", file);
-  //     });
-
-  //     // // Logging FormData contents for debugging
-  //     // for (const [key, value] of formData.entries()) {
-  //     //   if (value instanceof File) {
-  //     //     console.log(`${key}: ${value.name} (size: ${value.size} bytes)`); // Logging file name and size
-  //     //   } else {
-  //     //     console.log(`${key}: ${value}`);
-  //     //   }
-  //     // }
-
-  //     const requestOptions = {
-  //       method: "POST",
-  //       body: formData,
-  //       redirect: "follow",
-  //     };
-  // console.log(formData)
-  //     const url = `${EMAIL_API}/workflow/emailtemplate`;
-  //     fetch(url, requestOptions)
-  //       .then((response) => {
-  //         if (!response.ok) {
-  //           throw new Error("Network response was not ok");
-  //         }
-  //         return response.json();
-  //       })
-  //       .then((result) => {
-  //         console.log(result);
-  //         toast.success("Email Template created successfully");
-  //         handleClearTemplate();
-  //         setShowForm(false);
-  //         fetchEmailTemplates();
-  //       })
-  //       .catch((error) => {
-  //         console.error("Error creating Email Template:", error);
-  //         toast.error("Failed to create Email Template");
-  //       });
-  //   };
-
-  // *****without files*****
-  // const handleSaveExitTemplate = (e) => {
-  //   e.preventDefault();
-  //   if (!validateForm()) {
-  //       return; // Prevent form submission if validation fails
-  //   }
-
-  //   const myHeaders = new Headers();
-  //   myHeaders.append("Content-Type", "application/json");
-
-  //   const raw = JSON.stringify({
-  //       templatename: templateName,
-  //       from: selecteduser.value,
-  //       emailsubject: inputText,
-  //       emailbody: emailBody,
-  //   });
-
-  //   const requestOptions = {
-  //       method: "POST",
-  //       headers: myHeaders,
-  //       body: raw,
-  //       redirect: "follow"
-  //   };
-  // console.log(raw)
-  //   // const url = `${EMAIL_API}/workflow/emailtemplate`;
-
-  //   fetch(`${EMAIL_API}/workflow/emailtemplate`, requestOptions)
-  //   .then((response) => response.json())
-
-  //  .then((result) => {
-  //         console.log(result)
-  //         if (result && result.message === "EmailTemplate  already exists") {
-  //           toast.success('Email Template  already exists');
-  //           // fetchData();
-  //         } else {
-  //           toast.success('Email Template created successfully');
-  //           setShowForm(false);
-  //           handleClearTemplate();
-  //            fetchEmailTemplates();
-  //         }
-  //       })
-  //       .catch((error) => {
-  //         console.error(error);
-  //         toast.error(error.message);
-  //       })
-
-  // };
-
   const handleSaveExitTemplate = async (e) => {
     e.preventDefault();
 
@@ -457,7 +298,6 @@ const EmailTemp = () => {
         body: formData, // Send FormData instead of JSON
         redirect: "follow",
       });
-      console.log("jaanvi patil", formData);
       const result = await response.json();
 
       if (result && result.message === "EmailTemplate already exists") {
@@ -504,16 +344,12 @@ const EmailTemp = () => {
         body: formData, // Send FormData instead of JSON
         redirect: "follow",
       });
-      console.log("jaanvi patil", formData);
       const result = await response.json();
 
       if (result && result.message === "EmailTemplate already exists") {
         toast.success("Email Template already exists");
       } else {
         toast.success("Email Template created successfully");
-        // setShowForm(false);
-        // handleClearTemplate();
-        // fetchEmailTemplates();
       }
     } catch (error) {
       console.error(error);
@@ -597,12 +433,7 @@ const EmailTemp = () => {
   const [tempIdget, setTempIdGet] = useState("");
   const [openMenuId, setOpenMenuId] = useState(null);
   
-  // const toggleMenu = (_id) => {
-  //   setOpenMenuId(openMenuId === _id ? null : _id);
-  //   setTempIdGet(_id);
-  // };
-
-     const toggleMenu = (event, _id) => {
+  const toggleMenu = (event, _id) => {
     setAnchorEl(event.currentTarget);
     setOpenMenuId(_id);
     setTempIdGet(_id);
@@ -612,20 +443,6 @@ const EmailTemp = () => {
     setOpenMenuId(null);
     setTempIdGet(null);
   };
-  // useEffect(() => {
-  //   const handleClickOutside = (event) => {
-  //     if (!event.target.closest(".menu-container")) {
-  //       setOpenMenuId(null);
-  //     }
-  //   };
-  //   document.addEventListener("mousedown", handleClickOutside);
-  //   return () => {
-  //     document.removeEventListener("mousedown", handleClickOutside);
-  //   };
-  // }, []);
-  
-
- 
   const handleTempCancle = () => {
     if (isFormDirty) {
       const confirmClose = window.confirm(
@@ -711,16 +528,9 @@ const EmailTemp = () => {
   
 
   const handleFileChange = (acceptedFiles) => {
-    console.log("acceptedFiles:", acceptedFiles); // Debugging: Check what is being passed
-    if (!acceptedFiles || !Array.isArray(acceptedFiles)) {
-      console.error("acceptedFiles is not an array:", acceptedFiles);
-      return;
-    }
+    if (!acceptedFiles || !Array.isArray(acceptedFiles)) return;
     setFiles((prevFiles) => [...prevFiles, ...acceptedFiles]);
   };
-
-
-  console.log(selectedFiles);
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(30);
@@ -779,31 +589,30 @@ const EmailTemp = () => {
 
           {loading ? (
             <div className="flex items-center justify-center py-20">
-              <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
           ) : (
-            <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-              {/* Table */}
+            <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left">
                   <thead>
-                    <tr className="border-b border-slate-100 bg-slate-50/60">
-                      <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Name</th>
-                      <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 w-24 text-right">Actions</th>
+                    <tr className="border-b border-border bg-muted/40">
+                      <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Name</th>
+                      <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-24 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-border">
                     {paginatedTasks.length === 0 ? (
                       <tr>
-                        <td colSpan={2} className="px-5 py-10 text-center text-sm text-slate-400">No email templates found.</td>
+                        <td colSpan={2} className="px-5 py-10 text-center text-sm text-muted-foreground">No email templates found.</td>
                       </tr>
                     ) : (
                       paginatedTasks.map((row) => (
-                        <tr key={row._id} className="group transition-colors hover:bg-slate-50/70">
+                        <tr key={row._id} className="group transition-colors hover:bg-muted/50">
                           <td className="px-5 py-3">
                             <button
                               onClick={() => handleEdit(row._id)}
-                              className="text-sm font-medium text-indigo-600 hover:text-indigo-800 hover:underline transition-colors"
+                              className="text-sm font-medium text-primary hover:text-primary/80 hover:underline transition-colors"
                             >
                               {row.templatename}
                             </button>
@@ -812,21 +621,21 @@ const EmailTemp = () => {
                             <div className="relative inline-block">
                               <button
                                 onClick={(event) => toggleMenu(event, row._id)}
-                                className="inline-flex items-center justify-center rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                                className="inline-flex items-center justify-center rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                               >
                                 <MoreVertical className="h-4 w-4" />
                               </button>
                               {openMenuId === row._id && (
-                                <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-slate-200 bg-white py-1 shadow-lg animate-in fade-in-0 zoom-in-95">
+                                <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-border bg-card py-1 shadow-lg animate-in fade-in-0 zoom-in-95">
                                   <button
                                     onClick={() => { handleEdit(tempIdget); handleMenuClose(); }}
-                                    className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                                    className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors"
                                   >
                                     <Pencil className="h-3.5 w-3.5" /> Edit
                                   </button>
                                   <button
                                     onClick={() => { handleDelete(tempIdget); }}
-                                    className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+                                    className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors"
                                   >
                                     <Trash2 className="h-3.5 w-3.5" /> Delete
                                   </button>
@@ -841,18 +650,17 @@ const EmailTemp = () => {
                 </table>
               </div>
 
-              {/* Pagination */}
               {emailTemplates.length > 0 && (
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-100 bg-slate-50/40 px-5 py-3">
-                  <p className="text-xs text-slate-500">
-                    Showing <span className="font-semibold text-slate-700">{page * rowsPerPage + 1}</span>–<span className="font-semibold text-slate-700">{Math.min((page + 1) * rowsPerPage, emailTemplates.length)}</span> of{" "}
-                    <span className="font-semibold text-slate-700">{emailTemplates.length}</span>
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-border bg-muted/30 px-5 py-3">
+                  <p className="text-xs text-muted-foreground">
+                    Showing <span className="font-semibold text-foreground">{page * rowsPerPage + 1}</span>–<span className="font-semibold text-foreground">{Math.min((page + 1) * rowsPerPage, emailTemplates.length)}</span> of{" "}
+                    <span className="font-semibold text-foreground">{emailTemplates.length}</span>
                   </p>
                   <div className="flex items-center gap-2">
                     <select
                       value={rowsPerPage}
                       onChange={(e) => handleChangeRowsPerPage({ target: { value: e.target.value } })}
-                      className="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-600 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="rounded-lg border border-border bg-card px-2 py-1.5 text-xs text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
                     >
                       {[30, 40, 50, 60, 100].map((opt) => (
                         <option key={opt} value={opt}>{opt} / page</option>
@@ -862,17 +670,17 @@ const EmailTemp = () => {
                       <button
                         onClick={() => handleChangePage(null, page - 1)}
                         disabled={page === 0}
-                        className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 text-slate-500 shadow-sm transition-colors hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                        className="inline-flex items-center justify-center rounded-lg border border-border bg-card p-1.5 text-muted-foreground shadow-sm transition-colors hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed"
                       >
                         <ChevronLeft className="h-4 w-4" />
                       </button>
-                      <span className="min-w-[3rem] text-center text-xs font-medium text-slate-600">
+                      <span className="min-w-[3rem] text-center text-xs font-medium text-muted-foreground">
                         {page + 1} / {Math.max(1, Math.ceil(emailTemplates.length / rowsPerPage))}
                       </span>
                       <button
                         onClick={() => handleChangePage(null, page + 1)}
                         disabled={(page + 1) * rowsPerPage >= emailTemplates.length}
-                        className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 text-slate-500 shadow-sm transition-colors hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                        className="inline-flex items-center justify-center rounded-lg border border-border bg-card p-1.5 text-muted-foreground shadow-sm transition-colors hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed"
                       >
                         <ChevronRight className="h-4 w-4" />
                       </button>
@@ -904,7 +712,7 @@ const EmailTemp = () => {
           <FormGrid>
             {/* ===== LEFT COLUMN: Email Form ===== */}
             <FormGrid.Main>
-              <FormSection title="Template Details" icon={<Mail className="h-4 w-4" />}>
+              <FormSection title="Template Details">
                 <FormField label="Template Name" error={templateNameError}>
                   <Input
                     name="templateName"
@@ -931,7 +739,7 @@ const EmailTemp = () => {
                 </FormField>
               </FormSection>
 
-              <FormSection title="Sender & Subject" icon={<User className="h-4 w-4" />}>
+              <FormSection title="Sender & Subject">
                 <FormField label="From" error={selectedUserError}>
                   <FormSelect
                     value={selecteduser?.value || ""}
@@ -975,7 +783,7 @@ const EmailTemp = () => {
 
             {/* ===== RIGHT COLUMN: Attachments ===== */}
             <FormGrid.Sidebar>
-              <FormSection title="Attachments" icon={<Paperclip className="h-4 w-4" />}>
+              <FormSection title="Attachments">
                 {/* Dropzone */}
                 <div
                   {...getRootProps()}

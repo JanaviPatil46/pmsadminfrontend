@@ -11,7 +11,6 @@ import { Button } from "../../components/ui/button";
 import { Label } from "../../components/ui/label";
 import { Switch } from "../../components/ui/switch";
 
-import { CiMenuKebab } from "react-icons/ci";
 import { Eye, X, FileText, Receipt, MoreVertical, Plus, Percent, Pencil, Trash2, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 const InvoiceTemp = () => {
   const INVOICE_API = process.env.REACT_APP_INVOICE_TEMP_URL;
@@ -27,10 +26,6 @@ const InvoiceTemp = () => {
   const handleCreateInvoiceTemp = () => {
     setShowForm(true);
   };
-  // const handleCloseInvoiceTemp = () => {
-  //   setShowForm(false);
-  // };
-
   const paymentsOptions = [
     { value: "Bank Debits", label: "Bank Debits" },
     { value: "Credit Card", label: "Credit Card" },
@@ -180,21 +175,6 @@ const InvoiceTemp = () => {
     setShowDropdown(false);
   };
 
-  // Calculate Summary Data
-  // const calculateSummary = () => {
-  //   const subtotal = rows.reduce((acc, row) => acc + (parseFloat(row.amount.replace('$', '')) || 0), 0).toFixed(2);
-  //   const taxRate = 0;
-  //   const taxTotal = (subtotal * (taxRate / 100)).toFixed(2);
-  //   const total = (parseFloat(subtotal) + parseFloat(taxTotal)).toFixed(2);
-
-  //   return {
-  //     subtotal: `$${subtotal}`,
-  //     taxRate: `${taxRate}%`,
-  //     taxTotal: `$${taxTotal}`,
-  //     total: `$${total}`,
-  //   };
-  // };
-
   //Integration
 
   const handleEdit = (_id) => {
@@ -215,7 +195,6 @@ const InvoiceTemp = () => {
       }
       const data = await response.json();
       setInvoiceTemplates(data.invoiceTemplate);
-      console.log(data);
     } catch (error) {
       console.error("Error fetching Invoice Templates:", error);
     }
@@ -228,8 +207,6 @@ const InvoiceTemp = () => {
   useEffect(() => {
     fetchInvoiceTemplates();
   }, []);
-
-  console.log(invoiceTemplates);
 
   const createInvoiceTemp = () => {
     if (!validateForm()) {
@@ -260,7 +237,6 @@ const InvoiceTemp = () => {
       active: "true",
     });
 
-    console.log(raw);
     const requestOptions = {
       method: "POST",
       headers: myHeaders,
@@ -271,27 +247,21 @@ const InvoiceTemp = () => {
     const url = `${INVOICE_API}/workflow/invoicetemp/invoicetemplate`;
     fetch(url, requestOptions)
       .then((response) => {
-        console.log(response);
         if (!response.ok) {
           throw new Error(response.statusText);
         }
         return response.json();
       })
       .then((result) => {
-        console.log(result.message);
         toast.success("InvoiceTemplate created successfully");
 
         if (result && result.message === "InvoiceTemplate created successfully") {
           setShowForm(false);
           fetchInvoiceTemplates();
           handleClear();
-        } else {
-          // toast.error(result.message || "Failed to create InvoiceTemplate");
         }
       })
-
       .catch((error) => {
-        console.log(error);
         const errorMessage = error.response && error.response.message ? error.response.message : "Failed to create InvoiceTemplate";
         toast.error(errorMessage);
       });
@@ -325,7 +295,6 @@ const InvoiceTemp = () => {
       active: "true",
     });
 
-    console.log(raw);
     const requestOptions = {
       method: "POST",
       headers: myHeaders,
@@ -336,25 +305,19 @@ const InvoiceTemp = () => {
     const url = `${INVOICE_API}/workflow/invoicetemp/invoicetemplate`;
     fetch(url, requestOptions)
       .then((response) => {
-        console.log(response);
         if (!response.ok) {
           throw new Error(response.statusText);
         }
         return response.json();
       })
       .then((result) => {
-        console.log(result.message);
         toast.success("Invoice created successfully");
 
         if (result && result.message === "InvoiceTemplate created successfully") {
           fetchInvoiceTemplates();
-        } else {
-          // toast.error(result.message || "Failed to create InvoiceTemplate");
         }
       })
-
       .catch((error) => {
-        console.log(error);
         const errorMessage = error.response && error.response.message ? error.response.message : "Failed to create InvoiceTemplate";
         toast.error(errorMessage);
       });
@@ -427,10 +390,8 @@ const InvoiceTemp = () => {
           return response.json();
         })
         .then((result) => {
-          console.log(result);
-
           toast.success("Item deleted successfully");
-          handleCloseOptions()
+          handleCloseOptions();
           fetchInvoiceTemplates();
         })
         .catch((error) => {
@@ -449,7 +410,6 @@ const InvoiceTemp = () => {
       const url = `${SERVICE_API}/workflow/services/servicetemplate`;
       const response = await fetch(url);
       const data = await response.json();
-      console.log(data.serviceTemplate);
       setServiceData(data.serviceTemplate);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -469,8 +429,6 @@ const InvoiceTemp = () => {
     fetch(url, requestOptions)
       .then((response) => response.json())
       .then((result) => {
-        console.log(result.serviceTemplate);
-
         const service = Array.isArray(result.serviceTemplate) ? result.serviceTemplate[0] : result.serviceTemplate;
         // const rate = typeof service.rate === 'number' ? service.rate : 0;
         const rate = service.rate ? parseFloat(service.rate.replace("$", "")) : 0;
@@ -489,7 +447,6 @@ const InvoiceTemp = () => {
         const updatedRows = [...rows];
         updatedRows[rowIndex] = { ...updatedRows[rowIndex], ...updatedRow };
 
-        console.log(updatedRows);
         setRows(updatedRows);
       })
       .catch((error) => console.error(error));
@@ -547,21 +504,7 @@ const InvoiceTemp = () => {
     setTaxTotal(tax);
     setTotalAmount((subtotal + tax).toFixed(2));
   };
-  // useEffect(() => {
-  //   const calculateSubtotal = () => {
-  //     let subtotal = 0;
-
-  //     rows.forEach((row) => {
-      
-  //       subtotal += parseFloat(row.amount.replace("$", "")) || 0;
-  //     });
-  //     console.log(subtotal);
-  //     setSubtotal(subtotal);
-  //     calculateTotal(subtotal, taxRate);
-  //   };
-  //   calculateSubtotal();
-  // }, [rows, taxRate]);
-    useEffect(() => {
+  useEffect(() => {
     const calculateSummary = () => {
       let subtotal = 0;
       let taxableAmount = 0;
@@ -617,11 +560,7 @@ const InvoiceTemp = () => {
   };
   const [tempIdget, setTempIdGet] = useState("");
   const [openMenuId, setOpenMenuId] = useState(null);
-  // const toggleMenu = (_id) => {
-  //   setOpenMenuId(openMenuId === _id ? null : _id);
-  //   setTempIdGet(_id);
-  // };
-   const toggleMenu = (event, _id) => {
+  const toggleMenu = (event, _id) => {
     setAnchorEl(event.currentTarget);
     setOpenMenuId(_id);
     setTempIdGet(_id);
@@ -632,62 +571,6 @@ const InvoiceTemp = () => {
     setTempIdGet(null);
   };
  
-  // useEffect(() => {
-  //   const handleClickOutside = (event) => {
-  //     if (!event.target.closest(".menu-container")) {
-  //       setOpenMenuId(null);
-  //     }
-  //   };
-  //   document.addEventListener("mousedown", handleClickOutside);
-  //   return () => {
-  //     document.removeEventListener("mousedown", handleClickOutside);
-  //   };
-  // }, []);
-  
-  const columns = [
-    {
-      accessorKey: "templatename", // Access the template name
-      header: "Name",
-      Cell: ({ row }) => (
-        <span className="text-blue-600 cursor-pointer font-bold" onClick={() => handleEdit(row.original._id)}>
-          {row.original.templatename}
-        </span>
-      ),
-    },
-    {
-      accessorKey: "settings", // Add settings column
-      header: "Settings",
-      Cell: ({ row }) => (
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => toggleMenu(row.original._id)}
-            className="rounded p-1 text-blue-600 hover:bg-blue-50 transition-colors"
-          >
-            <CiMenuKebab style={{ fontSize: "20px" }} />
-          </button>
-          {openMenuId === row.original._id && (
-            <div className="absolute left-8 top-0 z-10 w-24 rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
-              <button
-                type="button"
-                className="w-full px-3 py-1.5 text-left text-xs font-bold text-gray-700 hover:bg-gray-50"
-                onClick={() => handleEdit(row.original._id)}
-              >
-                Edit
-              </button>
-              <button
-                type="button"
-                className="w-full px-3 py-1.5 text-left text-xs font-bold text-red-500 hover:bg-red-50"
-                onClick={() => handleDelete(row.original._id)}
-              >
-                Delete
-              </button>
-            </div>
-          )}
-        </div>
-      ),
-    },
-  ];
   const [templatenameError, setTemplatenameError] = useState("");
   const [descriptionError, setDescriptionError] = useState("");
 
@@ -752,8 +635,6 @@ const InvoiceTemp = () => {
   //   setIsEditDrawerOpen(true);
   // };
   const handleEditService = (row, index) => {
-    console.log("Row data:", row);
-
     setSelectedRowData(row);
     setSelectedRowIndex(index); // Save the index of the selected row
     handleMenuClose();
@@ -774,26 +655,21 @@ const InvoiceTemp = () => {
     if (selectedRowIndex !== null) {
       const updatedRows = [...rows];
 
-      // Calculate the amount based on rate and qty
-      const rateValue = parseFloat(selectedRowData.rate.replace(/[^0-9.-]+/g, "")); // Removing currency symbol
-      const qtyValue = parseInt(selectedRowData.qty) || 0; // Convert to integer
-
-      const amount = (rateValue * qtyValue).toFixed(2); // Calculate amount
+      const rateValue = parseFloat(selectedRowData?.rate?.replace("$", "")) || 0;
+      const qtyValue = parseInt(selectedRowData?.qty) || 0;
+      const amount = (rateValue * qtyValue).toFixed(2);
       updatedRows[selectedRowIndex] = {
         ...selectedRowData,
-        amount: `$${amount}`, // Store amount in the correct format
-      }; // Update the row with new data including the calculated amount
+        amount: `$${amount}`,
+      };
 
-      setRows(updatedRows); // Update the state with the new rows
-
-      console.log("Updated Rows:", updatedRows);
+      setRows(updatedRows);
     }
 
     handleEditDrawerClose();
   };
 
   const handleDeleteService = () => {
-    console.log("Delete row:", selectedRow);
     deleteRow(selectedRow);
     handleMenuClose();
   };
@@ -805,8 +681,7 @@ const InvoiceTemp = () => {
         productName: rows[selectedRow].productName ? `${rows[selectedRow].productName} Copy` : "Copy",
       };
       const updatedRows = [...rows, duplicatedRow];
-      setRows(updatedRows); // Update the state with the duplicated row
-      console.log("Duplicated row:", duplicatedRow);
+      setRows(updatedRows);
     }
     handleMenuClose();
   };
@@ -832,7 +707,6 @@ const InvoiceTemp = () => {
 
   const handleRateTypeChange = (event, newValue) => {
     setSelectedRateOption(newValue);
-    console.log("Selected rate type:", newValue);
   };
   const [selectedCategory, setSelectedCategory] = useState(null);
   const handleCategoryChange = (event, newValue) => {
@@ -860,7 +734,6 @@ const InvoiceTemp = () => {
       category: selectedCategory ? selectedCategory.value : null,
       active: "true",
     });
-    console.log(raw);
     const requestOptions = {
       method: "POST",
       headers: myHeaders,
@@ -871,7 +744,6 @@ const InvoiceTemp = () => {
     fetch(url, requestOptions)
       .then((response) => response.json())
       .then((result) => {
-        console.log(result.message);
 
         if (result && result.message === "ServiceTemplate created successfully") {
           toast.success("ServiceTemplate created successfully");
@@ -916,7 +788,6 @@ const InvoiceTemp = () => {
       const url = `${CATEGORY_API}/workflow/category/categorys`;
       const response = await fetch(url);
       const data = await response.json();
-      console.log(data);
       setCategoryData(data.category);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -944,7 +815,6 @@ const InvoiceTemp = () => {
     fetch(url, requestOptions)
       .then((response) => response.json())
       .then((result) => {
-        console.log(result);
         if (result && result.message === "Category created successfully") {
           toast.success("Category created successfully");
           handleCategoryFormClose(false);
@@ -960,7 +830,6 @@ const InvoiceTemp = () => {
   const [selectedRowIndex, setSelectedRowIndex] = useState(null);
 
   const handleSaveAsNewService = (row) => {
-    console.log("Row data:", row);
     setSelectedRowData(row);
     setIsNewDrawerOpen(true); // Open the drawer if required
     handleMenuClose();
@@ -984,11 +853,9 @@ const InvoiceTemp = () => {
     const qty = selectedRowData?.qty || 0;
     const calculatedAmount = rate * qty;
 
-    console.log("Rate: ", rate, "Qty: ", qty, "Total Amount: $", calculatedAmount.toFixed(2));
     setTotalamount(`$${calculatedAmount.toFixed(2)}`);
   }, [selectedRowData?.rate, selectedRowData?.qty]);
 
-  console.log(totalamount);
   const [open, setOpen] = useState(false);
   const handleOpen = () => {
     setOpen(true);
@@ -1030,10 +897,6 @@ const InvoiceTemp = () => {
      }
    };
  
-  // const debouncedCheck = debounce((name) => {
-  //    if (name.trim()) checkTemplateName(name);
-  //    else setTemplatenameError('');
-  //  }, 500);
   const debouncedCheck = debounce((name) => {
   if (typeof name === 'string' && name.trim()) {
     checkTemplateName(name);
@@ -1063,30 +926,30 @@ const InvoiceTemp = () => {
 
           {loading ? (
             <div className="flex items-center justify-center py-20">
-              <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
           ) : (
-            <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+            <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left">
                   <thead>
-                    <tr className="border-b border-slate-100 bg-slate-50/60">
-                      <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Name</th>
-                      <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 w-24 text-right">Actions</th>
+                    <tr className="border-b border-border bg-muted/40">
+                      <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Name</th>
+                      <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-24 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-border">
                     {paginatedInvoices.length === 0 ? (
                       <tr>
-                        <td colSpan={2} className="px-5 py-10 text-center text-sm text-slate-400">No invoice templates found.</td>
+                        <td colSpan={2} className="px-5 py-10 text-center text-sm text-muted-foreground">No invoice templates found.</td>
                       </tr>
                     ) : (
                       paginatedInvoices.map((row) => (
-                        <tr key={row._id} className="group transition-colors hover:bg-slate-50/70">
+                        <tr key={row._id} className="group transition-colors hover:bg-muted/50">
                           <td className="px-5 py-3">
                             <button
                               onClick={() => handleEdit(row._id)}
-                              className="text-sm font-medium text-indigo-600 hover:text-indigo-800 hover:underline transition-colors"
+                              className="text-sm font-medium text-primary hover:text-primary/80 hover:underline transition-colors"
                             >
                               {row.templatename}
                             </button>
@@ -1095,21 +958,21 @@ const InvoiceTemp = () => {
                             <div className="relative inline-block">
                               <button
                                 onClick={(event) => toggleMenu(event, row._id)}
-                                className="inline-flex items-center justify-center rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                                className="inline-flex items-center justify-center rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                               >
                                 <MoreVertical className="h-4 w-4" />
                               </button>
                               {openMenuId === row._id && (
-                                <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-slate-200 bg-white py-1 shadow-lg animate-in fade-in-0 zoom-in-95">
+                                <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-border bg-card py-1 shadow-lg animate-in fade-in-0 zoom-in-95">
                                   <button
                                     onClick={() => { handleEdit(tempIdget); handleCloseOptions(); }}
-                                    className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                                    className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors"
                                   >
                                     <Pencil className="h-3.5 w-3.5" /> Edit
                                   </button>
                                   <button
                                     onClick={() => { handleDelete(tempIdget); }}
-                                    className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+                                    className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors"
                                   >
                                     <Trash2 className="h-3.5 w-3.5" /> Delete
                                   </button>
@@ -1125,16 +988,16 @@ const InvoiceTemp = () => {
               </div>
 
               {invoiceTemplates.length > 0 && (
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-100 bg-slate-50/40 px-5 py-3">
-                  <p className="text-xs text-slate-500">
-                    Showing <span className="font-semibold text-slate-700">{page * rowsPerPage + 1}</span>–<span className="font-semibold text-slate-700">{Math.min((page + 1) * rowsPerPage, invoiceTemplates.length)}</span> of{" "}
-                    <span className="font-semibold text-slate-700">{invoiceTemplates.length}</span>
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-border bg-muted/30 px-5 py-3">
+                  <p className="text-xs text-muted-foreground">
+                    Showing <span className="font-semibold text-foreground">{page * rowsPerPage + 1}</span>–<span className="font-semibold text-foreground">{Math.min((page + 1) * rowsPerPage, invoiceTemplates.length)}</span> of{" "}
+                    <span className="font-semibold text-foreground">{invoiceTemplates.length}</span>
                   </p>
                   <div className="flex items-center gap-2">
                     <select
                       value={rowsPerPage}
                       onChange={(e) => handleChangeRowsPerPage({ target: { value: e.target.value } })}
-                      className="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-600 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="rounded-lg border border-border bg-card px-2 py-1.5 text-xs text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >
                       {[30, 40, 50, 60, 100].map((opt) => (
                         <option key={opt} value={opt}>{opt} / page</option>
@@ -1144,17 +1007,17 @@ const InvoiceTemp = () => {
                       <button
                         onClick={() => handleChangePage(null, page - 1)}
                         disabled={page === 0}
-                        className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 text-slate-500 shadow-sm transition-colors hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                        className="inline-flex items-center justify-center rounded-lg border border-border bg-card p-1.5 text-muted-foreground shadow-sm transition-colors hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed"
                       >
                         <ChevronLeft className="h-4 w-4" />
                       </button>
-                      <span className="min-w-[3rem] text-center text-xs font-medium text-slate-600">
+                      <span className="min-w-[3rem] text-center text-xs font-medium text-muted-foreground">
                         {page + 1} / {Math.max(1, Math.ceil(invoiceTemplates.length / rowsPerPage))}
                       </span>
                       <button
                         onClick={() => handleChangePage(null, page + 1)}
                         disabled={(page + 1) * rowsPerPage >= invoiceTemplates.length}
-                        className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 text-slate-500 shadow-sm transition-colors hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                        className="inline-flex items-center justify-center rounded-lg border border-border bg-card p-1.5 text-muted-foreground shadow-sm transition-colors hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed"
                       >
                         <ChevronRight className="h-4 w-4" />
                       </button>
@@ -1189,7 +1052,7 @@ const InvoiceTemp = () => {
           <FormGrid>
             {/* ===== LEFT COLUMN: Invoice Settings ===== */}
             <FormGrid.Main>
-              <FormSection title="General" icon={<FileText className="h-4 w-4" />}>
+              <FormSection title="General">
                 <FormField label="Template Name" error={templatenameError}>
                   <Input
                     name="TemplateName"
@@ -1222,7 +1085,7 @@ const InvoiceTemp = () => {
 
                 <FormField label="Choose payment method">
                   <select
-                    className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     value={paymentMode?.value || ""}
                     onChange={(e) => {
                       const selected = paymentsOptions.find(o => o.value === e.target.value);
@@ -1292,10 +1155,10 @@ const InvoiceTemp = () => {
 
             {/* ===== RIGHT COLUMN: Line Items ===== */}
             <FormGrid.Sidebar>
-              <FormSection title="Line Items" icon={<Receipt className="h-4 w-4" />}>
+              <FormSection title="Line Items">
                 <p className="text-sm text-muted-foreground mb-4">Client-facing itemized list of products and services</p>
 
-                <div className="overflow-x-auto rounded-lg border border-border">
+                <div className="overflow-x-auto rounded-lg border border-border bg-card">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-border bg-muted/50">
@@ -1312,7 +1175,7 @@ const InvoiceTemp = () => {
                     <tbody>
                       {rows.map((row, index) => (
                         <tr key={index} className="border-b border-border last:border-0">
-                          <td className="sticky left-0 bg-white px-2 py-1.5" style={{ minWidth: 180 }}>
+                          <td className="sticky left-0 bg-card px-2 py-1.5" style={{ minWidth: 180 }}>
                             <CreatableSelect
                               placeholder={row.isDiscount ? "Reason for discount" : "Product or Service"}
                               options={serviceoptions}
@@ -1347,7 +1210,7 @@ const InvoiceTemp = () => {
                                 <MoreVertical className="h-4 w-4" />
                               </button>
                               {Boolean(anchorElNew) && selectedRow === index && (
-                                <div className="absolute right-0 top-full z-50 mt-1 w-48 rounded-lg border border-border bg-white py-1 shadow-lg">
+                                <div className="absolute right-0 top-full z-50 mt-1 w-48 rounded-lg border border-border bg-card py-1 shadow-lg">
                                   <button type="button" onClick={() => handleEditService(row, index)} className="w-full px-3 py-1.5 text-left text-sm hover:bg-accent">Edit</button>
                                   <button type="button" onClick={handleDeleteService} className="w-full px-3 py-1.5 text-left text-sm hover:bg-accent text-destructive">Delete</button>
                                   <button type="button" onClick={() => handleSaveAsNewService(row)} className="w-full px-3 py-1.5 text-left text-sm hover:bg-accent">Save as new service</button>
@@ -1379,16 +1242,16 @@ const InvoiceTemp = () => {
                 {/* Summary */}
                 <div className="mt-6">
                   <h4 className="text-base font-semibold mb-3">Summary</h4>
-                  <div className="rounded-lg border border-border bg-white overflow-hidden">
+                  <div className="rounded-lg border border-border bg-card overflow-hidden">
                     <div className="grid grid-cols-4 divide-x divide-border">
                       <div className="px-4 py-3">
                         <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">Subtotal</p>
                         <div className="flex items-center gap-1">
-                          <span className="text-sm text-slate-500">$</span>
+                          <span className="text-sm text-muted-foreground">$</span>
                           <input
                             value={subtotal}
                             onChange={handleSubtotalChange}
-                            className="w-full rounded border-0 bg-transparent px-0 py-0.5 text-sm font-medium text-slate-800 outline-none focus:ring-0"
+                            className="w-full rounded border-0 bg-transparent px-0 py-0.5 text-sm font-medium text-foreground outline-none focus:ring-0"
                           />
                         </div>
                       </div>
@@ -1398,18 +1261,18 @@ const InvoiceTemp = () => {
                           <input
                             value={taxRate}
                             onChange={handleTaxRateChange}
-                            className="w-full rounded border-0 bg-transparent px-0 py-0.5 text-sm font-medium text-slate-800 outline-none focus:ring-0"
+                            className="w-full rounded border-0 bg-transparent px-0 py-0.5 text-sm font-medium text-foreground outline-none focus:ring-0"
                           />
-                          <span className="text-sm text-slate-500">%</span>
+                          <span className="text-sm text-muted-foreground">%</span>
                         </div>
                       </div>
                       <div className="px-4 py-3">
                         <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">Tax Total</p>
-                        <p className="text-sm font-medium text-slate-800">${taxTotal.toFixed(2)}</p>
+                        <p className="text-sm font-medium text-foreground">${taxTotal.toFixed(2)}</p>
                       </div>
-                      <div className="px-4 py-3 bg-slate-50/60">
+                      <div className="px-4 py-3 bg-muted/40">
                         <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">Total</p>
-                        <p className="text-sm font-bold text-slate-900">${totalAmount}</p>
+                        <p className="text-sm font-bold text-foreground">${totalAmount}</p>
                       </div>
                     </div>
                   </div>
@@ -1426,7 +1289,7 @@ const InvoiceTemp = () => {
         {/* ===== PREVIEW DRAWER ===== */}
         <FormDrawer open={open} onClose={handleClose} title="Preview" width="xl">
           <div className="space-y-6">
-            <div className="rounded-lg border border-border bg-white p-6">
+            <div className="rounded-lg border border-border bg-card p-6">
               <h2 className="text-2xl font-bold text-orange-500 mb-4">Invoice</h2>
               <div className="flex justify-between mb-1">
                 <span className="text-sm text-muted-foreground">[ACCOUNT_NAME]</span>
@@ -1505,7 +1368,7 @@ const InvoiceTemp = () => {
               </FormField>
               <FormField label="Rate Type">
                 <select
-                  className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   value={selectedRateOption?.value || ""}
                   onChange={(e) => {
                     const opt = options.find(o => o.value === e.target.value);
@@ -1528,7 +1391,7 @@ const InvoiceTemp = () => {
           <FormSection title="Category">
             <FormField label="Category Name">
               <select
-                className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 value={selectedCategory?.value || ""}
                 onChange={(e) => {
                   const opt = categoryoptions.find(o => o.value === e.target.value);
