@@ -322,6 +322,18 @@ const JobDrawer = ({
 
   const [automations, setAutomations] = useState([]);
   const createjob = () => {
+    if (!selectedPipeline?.value) {
+      toast.error("Please select a pipeline.");
+      return;
+    }
+    if (!selectedStage?.value) {
+      toast.error("Please select a stage.");
+      return;
+    }
+    if (!selectedtemp?.value) {
+      toast.error("Please select a job template.");
+      return;
+    }
     // Find the details of the selected stage
     const selectedStageDetails =
       selectedPipelineDetails?.pipeline?.stages?.find(
@@ -344,9 +356,9 @@ const JobDrawer = ({
 
     const data = {
       accounts: combinedaccountValues,
-      stageid: selectedStage.value,
-      pipeline: selectedPipeline.value,
-      templatename: selectedtemp.value,
+      stageid: selectedStage?.value,
+      pipeline: selectedPipeline?.value,
+      templatename: selectedtemp?.value,
       jobname: jobName,
       jobassignees: combinedValues,
       priority: priority,

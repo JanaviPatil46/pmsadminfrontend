@@ -468,8 +468,12 @@ const [loading, setLoading] = useState(false);
 
   // Function to handle creating a job
   const createjob = () => {
-    if (!selectedStage) {
-      toast.error("Please select a stage");
+    if (!selectedStage?.value) {
+      toast.error("Please select a stage.");
+      return;
+    }
+    if (!selectedtemp?.value) {
+      toast.error("Please select a job template.");
       return;
     }
 
@@ -488,9 +492,9 @@ const [loading, setLoading] = useState(false);
 
     const data = {
       accounts: combinedaccountValues,
-      stageid: selectedStage.value,
+      stageid: selectedStage?.value,
       pipeline: pipelineId,
-      templatename: selectedtemp.value,
+      templatename: selectedtemp?.value,
       jobname: jobName,
       jobassignees: combinedValues,
       priority: priority,

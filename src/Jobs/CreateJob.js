@@ -498,6 +498,14 @@ const CreateJob = ({ charLimit = 4000 }) => {
   // };
   const [automations, setAutomations] = useState([]);
   const createjob = () => {
+    if (!selectedPipeline?.value) {
+      toast.error("Please select a pipeline.");
+      return;
+    }
+    if (!selectedtemp?.value) {
+      toast.error("Please select a job template.");
+      return;
+    }
     // Check if the first stage of the selected pipeline contains automations
     if (
       selectedPipelineDetails?.pipeline?.stages?.[0]?.automations?.length > 0
@@ -520,8 +528,8 @@ const CreateJob = ({ charLimit = 4000 }) => {
 
     const data = {
       accounts: combinedaccountValues,
-      pipeline: selectedPipeline.value,
-      templatename: selectedtemp.value,
+      pipeline: selectedPipeline?.value,
+      templatename: selectedtemp?.value,
       jobname: jobName,
       jobassignees: combinedValues,
       priority: priority,
