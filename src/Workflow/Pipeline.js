@@ -4,7 +4,7 @@ import { useDrag, DndProvider, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { X, MoreVertical, Loader2, AlertTriangle } from "lucide-react";
+import { X, MoreVertical, Loader2, AlertTriangle, Pencil, Trash2 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Checkbox } from "../components/ui/checkbox";
@@ -67,6 +67,37 @@ const Pipeline = ({ charLimit = 4000 }) => {
   const [jobs, setJobs] = useState([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const [selectedPipelineMenu, setSelectedPipelineMenu] = useState(null);
+
+  const togglePipelineMenu = (e, pipeline) => {
+    e.stopPropagation();
+    setOpenMenuId(openMenuId === pipeline._id ? null : pipeline._id);
+    setSelectedPipelineMenu(pipeline);
+  };
+  const closePipelineMenu = () => {
+    setOpenMenuId(null);
+    setSelectedPipelineMenu(null);
+  };
+  const handleDeletePipeline = async () => {
+    if (!selectedPipelineMenu) return;
+    const confirmed = window.confirm(`Delete pipeline "${selectedPipelineMenu.pipelineName}"?`);
+    if (!confirmed) return;
+    try {
+      const response = await fetch(
+        `${PIPELINE_API}/workflow/pipeline/pipelines/${selectedPipelineMenu._id}`,
+        { method: "DELETE" }
+      );
+      if (!response.ok) throw new Error("Failed to delete pipeline");
+      toast.success("Pipeline deleted successfully");
+      setPipelineData(prev => prev.filter(p => p._id !== selectedPipelineMenu._id));
+    } catch (err) {
+      toast.error("Failed to delete pipeline");
+    } finally {
+      closePipelineMenu();
+    }
+  };
+
   const handleDrawerOpen = () => {
     setIsDrawerOpen(true);
   };
@@ -2721,9 +2752,30 @@ const fetchJobData = async () => {
                         <td className="px-5 py-3 text-sm text-muted-foreground">—</td>
                         <td className="px-5 py-3 text-sm text-muted-foreground">—</td>
                         <td className="px-5 py-3">
-                          <button className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
-                            <MoreVertical className="h-4 w-4" />
-                          </button>
+                          <div className="relative inline-block">
+                            <button
+                              onClick={(e) => togglePipelineMenu(e, pipeline)}
+                              className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                            >
+                              <MoreVertical className="h-4 w-4" />
+                            </button>
+                            {openMenuId === pipeline._id && (
+                              <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-border bg-card py-1 shadow-lg animate-in fade-in-0 zoom-in-95">
+                                <button
+                                  onClick={() => { handleBoardsList(pipeline); closePipelineMenu(); }}
+                                  className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors"
+                                >
+                                  <Pencil className="h-3.5 w-3.5" /> Edit
+                                </button>
+                                <button
+                                  onClick={handleDeletePipeline}
+                                  className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors"
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" /> Delete
+                                </button>
+                              </div>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))
