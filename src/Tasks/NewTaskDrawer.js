@@ -23,28 +23,23 @@ import {
 } from "../components/ui/form-layout";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
-import { ArrowLeft, ListChecks, Calendar, Users, FileText, Tag } from "lucide-react";
 const NewTaskDrawer = ({ open, onClose, isEditMode, taskData }) => {
 
  
   const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
   const ACCOUNT_TASKS_API = process.env.REACT_APP_TASKS_API;
-  //****************Accounts */
   const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
   const [accountdata, setaccountdata] = useState([]);
   const [selectedaccount, setSelectedaccount] = useState(null);
 
   const handleAccountChange = (selectedOptions) => {
     setSelectedaccount(selectedOptions);
-    console.log("aacounts", selectedOptions);
-
-      fetchJobList(selectedOptions.value); // Fetch jobs based on selected account ID
-  
+    fetchJobList(selectedOptions.value);
   };
-useEffect(() => {
-  fetchAccountData();
-}, []);
 
+  useEffect(() => {
+    fetchAccountData();
+  }, []);
 const fetchAccountData = async () => {
   try {
     const storedUserRole = localStorage.getItem("userRole");
@@ -66,19 +61,14 @@ const fetchAccountData = async () => {
           : `https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=true`;
     }
 
-    console.log("Fetching accounts from:", url);
-
     const response = await fetch(url);
     const data = await response.json();
 
-    // Handle both response formats (Admin & TeamMember)
     const accounts = Array.isArray(data.accountlist)
       ? data.accountlist
       : Array.isArray(data.teamAccounts)
       ? data.teamAccounts
       : [];
-
-    console.log("Account list:", accounts);
 
     setaccountdata(accounts);
   } catch (error) {
@@ -92,38 +82,14 @@ const accountoptions = accountdata.map((account) => ({
   label: account.accountName,
 }));
 
-  // useEffect(() => {
-  //   fetchAccountData();
-  // }, []);
-
-  // const fetchAccountData = async () => {
-  //   try {
-  //     // const response = await fetch(`${ACCOUNT_API}/accounts/account/accountdetailslist/true`);
-  //      const url = "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true"
-  //         const response = await fetch(url);
-  //         const data = await response.json();
-  //     setaccountdata(data.accounts);
-  //     console.log("accountlist",data.accounts)
-  //   } catch (error) {
-  //     console.error("Error fetching data:", error);
-  //   }
-  // };
-
-  // // console.log(userdata);
-  // const accountoptions = accountdata.map((account) => ({
-  //   value: account._id,
-  //   label: account.accountName,
-  // }));
-
   //   *********joblist*******
   const JOBS_API = process.env.REACT_APP_ADD_JOBS_URL;
   const [joblist, setJoblist] = useState([]);
   const [selectedJob, setSelectedJob] = useState(null);
 
-  const handleJobChange = async (selectedOptions) => {
-    setSelectedJob(selectedOptions)
-    console.log(selectedOptions.value)
-  }
+  const handleJobChange = (selectedOptions) => {
+    setSelectedJob(selectedOptions);
+  };
 
   const fetchJobList = async (accountId) => {
     const requestOptions = {
@@ -137,7 +103,6 @@ const accountoptions = accountdata.map((account) => ({
     )
       .then((response) => response.json())
       .then((result) => {
-        console.log(result);
         setJoblist(result.jobList);
       })
       .catch((error) => console.error(error));
@@ -180,90 +145,30 @@ const accountoptions = accountdata.map((account) => ({
 
   const [subtasks, setSubtasks] = useState([]);
   const [checkedSubtasks, setCheckedSubtasks] = useState([]);
-  // const handleCheckboxChange = (subtaskId) => {
-  //   setSubtasks((prevSubtasks) =>
-  //     prevSubtasks.map((subtask) =>
-  //       subtask.id === subtaskId
-  //         ? { ...subtask, checked: true } // Always set checked to true
-  //         : subtask
-  //     )
-  //   );
-  
-  //   setCheckedSubtasks((prevCheckedSubtasks) =>
-  //     prevCheckedSubtasks.includes(subtaskId)
-  //       ? prevCheckedSubtasks // Keep already checked items
-  //       : [...prevCheckedSubtasks, subtaskId] // Add new checked item
-  //   );
-  // };
-
-// Fixed checkbox handler - properly toggles checked state
-     const handleCheckboxChange = (subtaskId) => {
-        // Update only the checked state of the specific subtask being changed
-        setSubtasks(prevSubtasks => 
-            prevSubtasks.map(subtask => 
-                subtask.id === subtaskId 
-                    ? { ...subtask, checked: !subtask.checked } // Toggle checked state for the clicked subtask
-                    : subtask // Keep other subtasks the same
-            )
-        );
-    
-        // Update checkedSubtasks to only reflect the clicked subtask's change
-        setCheckedSubtasks(prevCheckedSubtasks => {
-            // const isChecked = prevCheckedSubtasks.includes(subtaskId);
-    
-            // If the subtask is already checked, we want to remove it from the list
-            // if (isChecked) {
-            //     return prevCheckedSubtasks.filter(id => id !== subtaskId); // Remove if already checked
-            // }
-    
-            // If it is not checked, we add it to the checked list
-            return [...prevCheckedSubtasks, subtaskId]; // Add if not checked
-        });
-    };
-    // Fixed add subtask function
-  const handleAddSubtask = () => {
-    const newId = String(subtasks.length + 1);// Use timestamp for unique ID
-    setSubtasks([...subtasks, { 
-      id: newId, 
-      text: "", 
-      checked: false // Initialize with unchecked state
-    }]);
+  const handleCheckboxChange = (subtaskId) => {
+    setSubtasks(prevSubtasks =>
+      prevSubtasks.map(subtask =>
+        subtask.id === subtaskId
+          ? { ...subtask, checked: !subtask.checked }
+          : subtask
+      )
+    );
+    setCheckedSubtasks(prev => [...prev, subtaskId]);
   };
-  // const handleAddSubtask = () => {
-  //   const newId = String(subtasks.length + 1);
-  //   setSubtasks([...subtasks, { id: newId, text: "" }]);
-  // };
 
-  // const handleDragEnd = (result) => {
-  //   // Ensure a valid drop location
-  //   if (!result.destination) return;
+  const handleAddSubtask = () => {
+    const newId = String(subtasks.length + 1);
+    setSubtasks([...subtasks, { id: newId, text: "", checked: false }]);
+  };
 
-  //   // Reorder subtasks based on the drag-and-drop result
-  //   const newSubtasks = Array.from(subtasks);
-  //   const [reorderedItem] = newSubtasks.splice(result.source.index, 1);
-  //   newSubtasks.splice(result.destination.index, 0, reorderedItem);
-
-  //   // Update the state with the new order of subtasks
-  //   setSubtasks(newSubtasks);
-  // };
- // Fixed drag end handler
   const handleDragEnd = (result) => {
     if (!result.destination) return;
-
     const newSubtasks = Array.from(subtasks);
     const [reorderedItem] = newSubtasks.splice(result.source.index, 1);
     newSubtasks.splice(result.destination.index, 0, reorderedItem);
-
     setSubtasks(newSubtasks);
-  }
-  // const handleInputChange = (id, value) => {
-  //   setSubtasks(
-  //     subtasks.map((subtask) =>
-  //       subtask.id === id ? { ...subtask, text: value } : subtask
-  //     )
-  //   );
-  // };
- // Fixed input change handler
+  };
+
   const handleInputChange = (id, value) => {
     setSubtasks(subtasks.map(subtask =>
       subtask.id === id ? { ...subtask, text: value } : subtask
@@ -293,9 +198,7 @@ const accountoptions = accountdata.map((account) => ({
   };
   const handleStatusChange = (status) => {
     setStatus(status);
-    console.log(status);
   };
-  // const [description, setDescription] = useState('');
   const handleEditorChange = (content) => {
     setTaskDescription(content);
   };
@@ -320,10 +223,8 @@ const accountoptions = accountdata.map((account) => ({
     const [selectedUser, setSelectedUser] = useState([]);
   const handleUserChange = (newSelectedUsers) => {
     setSelectedUser(newSelectedUsers);
-    console.log(newSelectedUsers)
     const selectedValues = newSelectedUsers.map((option) => option.value);
     setCombinedValues(selectedValues);
-    console.log(selectedValues)
   };
   //Tag FetchData ================
   const [tags, setTags] = useState([]);
@@ -339,7 +240,6 @@ const accountoptions = accountdata.map((account) => ({
       const response = await fetch(url);
       const data = await response.json();
       setTags(data.tags);
-      //   console.log(data.tags)
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -348,10 +248,8 @@ const accountoptions = accountdata.map((account) => ({
  
   const handleTagChange = (newSelectedTags) => {
     setTagsNew(newSelectedTags);
-    console.log(newSelectedTags)
     const selectedValues = newSelectedTags.map((option) => option.value);
     setCombinedTagsValues(selectedValues);
-    console.log(selectedValues)
   };
  
   const [tempvalues, setTempValues] = useState();
@@ -366,25 +264,17 @@ const accountoptions = accountdata.map((account) => ({
         );
         const data = await response.json();
         
-        console.log("tasktemp",data)
         if (data.taskTemplate && Array.isArray(data.taskTemplate.taskassignees)) {
-          // Flatten the array in case of unnecessary nesting
           const flatAssignees = data.taskTemplate.taskassignees.flat();
-      
           if (flatAssignees.length > 0) {
-              const assigneesData = flatAssignees.map(assignee => ({
-                  value: assignee._id,
-                  label: assignee.username,
-              }));
-      
-              setSelectedUser(assigneesData);
-      
-              const selectedValues = assigneesData.map(option => option.value);
-              setCombinedValues(selectedValues);
-          } else {
-              console.log("taskassignees contains an unexpected structure.");
+            const assigneesData = flatAssignees.map(assignee => ({
+              value: assignee._id,
+              label: assignee.username,
+            }));
+            setSelectedUser(assigneesData);
+            setCombinedValues(assigneesData.map(o => o.value));
           }
-      }
+        }
         // Process tasktags
         if (
           data.taskTemplate.tasktags &&
@@ -393,49 +283,15 @@ const accountoptions = accountdata.map((account) => ({
           const tagsData = data.taskTemplate.tasktags.map((tag) => ({
             value: tag._id,
             label: tag.tagName,
-            color: tag.tagColour, // Include color if needed
-            customTagStyle: {
-              backgroundColor: tag.tagColour,
-              color: "#fff",
-              borderRadius: "30px",
-              alignItems: "center",
-              textAlign: "center",
-              marginBottom: "5px",
-              padding: "2px,8px",
-              fontSize: "10px",
-              // width: ${calculateWidth(tag.tagName)}px,
-              margin: "7px",
-              cursor: "pointer",
-            },
+            color: tag.tagColour,
           }));
-          // console.log("Tags Data:", tagsData); // Log the processed tagsData
-
-          setTagsNew(tagsData); // Assuming you have a setTags function to update your state
-          const selectedTagsValues = tagsData.map((option) => option.value);
-          setCombinedTagsValues(selectedTagsValues);
-          console.log("Tags Data:", selectedTagsValues);
-        } else {
-          console.log("tasktags is not defined or not an array.");
+          setTagsNew(tagsData);
+          setCombinedTagsValues(tagsData.map((o) => o.value));
         }
 
         setTempValues(data.taskTemplate);
         tempallvalue();
-
-        // Extract and process subtasks
-         // FIXED: Process subtasks with proper structure
-        // if (data.taskTemplate && Array.isArray(data.taskTemplate.subtasks)) {
-        //   const formattedSubtasks = data.taskTemplate.subtasks.map((subtask, index) => ({
-        //     id: subtask.id || `subtask-${index}-${Date.now()}`, // Ensure unique ID
-        //     text: subtask.text || "",
-        //     checked: subtask.checked || false // Ensure checked property exists
-        //   }));
-        //   console.log("Formatted Subtasks:", formattedSubtasks);
-        //   setSubtasks(formattedSubtasks);
-        // } else {
-        //   console.log("subtasks is not defined or not an array.");
-        //   setSubtasks([]); // Reset to empty array if no subtasks
-        // }
-         setSubtasks(data.taskTemplate.subtasks)
+        setSubtasks(data.taskTemplate.subtasks || []);
       } catch (error) {
         console.error("Error fetching template data:", error);
       }
@@ -448,7 +304,6 @@ const accountoptions = accountdata.map((account) => ({
   }, [tempvalues]);
   const tempallvalue = () => {
     if (tempvalues) {
-      console.log(tempvalues);
       setTempNameNew(tempvalues.templatename || "");
       setStatus(tempvalues.status || "");
       setTaskDescription(tempvalues.description || "");
@@ -458,17 +313,12 @@ const accountoptions = accountdata.map((account) => ({
       setDueDateNew(dayjs(tempvalues.enddate) || null);
 
       setSubtaskSwitch(tempvalues.issubtaskschecked || false);
-      // console.log(tempvalues.isclienttaskchecked)
       setSubtasks(tempvalues.subtasks);
     }
   };
 
   useEffect(() => {
     if (isEditMode && taskData) {
-
-      console.log("tasksData",taskData)
-      
-      // Pre-fill form fields with taskData
       setTempNameNew(taskData.taskList.Name  || "");
       setStatus(taskData.taskList.Status  || "");
       setTaskDescription(taskData.taskList.Descriptions || "");
@@ -477,20 +327,15 @@ const accountoptions = accountdata.map((account) => ({
       setDueDateNew(dayjs(taskData.taskList.DueDate ) || null);
       setSubtaskSwitch(taskData.taskList.SubtaskCheck || false);
 
-      // Pre-fill assignees
-      if (taskData.taskList && taskData.taskList.Assignees) {
+        if (taskData.taskList?.Assignees) {
         const assigneesData = taskData.taskList.Assignees.map((assignee) => ({
-            value: assignee._id,
-            label: assignee.username,
+          value: assignee._id,
+          label: assignee.username,
         }));
-    
         setSelectedUser(assigneesData);
-    
-        const selectedValues = assigneesData.map((option) => option.value);
-        setCombinedValues(selectedValues);
-    }
+        setCombinedValues(assigneesData.map((o) => o.value));
+      }
    
-      // Pre-fill tags
       if (taskData.taskList && Array.isArray(taskData.taskList.Tags)) {
         const tagsData = taskData.taskList.Tags.map((tag) => ({
           value: tag._id,
@@ -512,44 +357,34 @@ const accountoptions = accountdata.map((account) => ({
         setSubtasks([]);
       }
 
-      if (taskData.taskList && taskData.taskList.Accounts) {
-        const accountData = {
+      if (taskData.taskList?.Accounts) {
+        setSelectedaccount({
           value: taskData.taskList.Accounts._id,
-          label: taskData.taskList.Accounts.accountName  ,
-        };
-       
-        console.log(accountData);
-        setSelectedaccount(accountData)
+          label: taskData.taskList.Accounts.accountName,
+        });
       }
-
-      if (taskData.taskList && taskData.taskList.Job) {
-        const jobData = {
+      if (taskData.taskList?.Job) {
+        setSelectedJob({
           value: taskData.taskList.Job._id,
-          label: taskData.taskList.Job.Name ,
-        };
-       
-        console.log(jobData);
-        setSelectedJob(jobData)
+          label: taskData.taskList.Job.Name,
+        });
       }
-      if (taskData.taskList && taskData.taskList.TaskTemp) {
-        const taskTempData = {
+      if (taskData.taskList?.TaskTemp) {
+        setselectedTemp({
           value: taskData.taskList.TaskTemp._id,
-          label: taskData.taskList.TaskTemp.Name ,
-        };
-       
-        console.log(taskTempData);
-        setselectedTemp(taskTempData)
+          label: taskData.taskList.TaskTemp.Name,
+        });
       }
     }
   }, [isEditMode, taskData]);
-console.log("accounts",selectedaccount)
-
 
   const navigate = useNavigate();
-const [errors, setErrors] = useState({ account: false, template: false });
+  const [errors, setErrors] = useState({ account: false, template: false });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-const createTask = async () => {
-let hasError = false;
+  const createTask = async () => {
+    if (isSubmitting) return;
+    let hasError = false;
 
   if (!selectedaccount?.value) {
     setErrors((prev) => ({ ...prev, account: true }));
@@ -565,25 +400,19 @@ let hasError = false;
     setErrors((prev) => ({ ...prev, template: false }));
   }
 
-  if (hasError) {
-    toast.error("Please fill in the required fields");
-    return;
-  }
-  const myHeaders = new Headers();
-  myHeaders.append("Content-Type", "application/json");
-
-  // const subtaskData = subtasks.map(({ id, text }) => ({
-  //   id,
-  //   text,
-  //   checked: checkedSubtasks.includes(id),
-  // }));
+    if (hasError) {
+      toast.error("Please fill in the required fields");
+      return;
+    }
+    setIsSubmitting(true);
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
     const subtaskData = subtasks.map(({ id, text, checked }) => ({
-    id,
-    text,
-    checked: checked || false, // Use the checked property from subtask, default to false if undefined
-  }));
-  console.log("Subtask data being saved:", subtaskData);
-  const raw = JSON.stringify({
+      id,
+      text,
+      checked: checked || false,
+    }));
+    const raw = JSON.stringify({
     accounts: selectedaccount?.value,
     job: selectedJob?.value,
     templatename: selectedtemp?.value,
@@ -598,8 +427,7 @@ let hasError = false;
     enddate: DueDateNew,
     subtasks: subtaskData,
   });
-console.log("rew",raw)
-  const requestOptions = {
+    const requestOptions = {
     method: isEditMode ? "PATCH" : "POST",
     headers: myHeaders,
     body: raw,
@@ -610,40 +438,38 @@ console.log("rew",raw)
     ? `${ACCOUNT_TASKS_API}/accountstasks/updatatasks/${taskData.taskList.id}`
     : `${ACCOUNT_TASKS_API}/accountstasks/newtask`;
 
-  fetch(url, requestOptions)
-    .then((response) => response.json())
-    .then((result) => {
-      console.log("jaja",result);
-      toast.success(isEditMode ? "Task Updated successfully" : "Task Created successfully");
-      onClose();
-      
-
-      if (!isEditMode) {
-         // Navigate to the workflow page after task creation
-         if (selectedaccount?.value) {
-          navigate(`/clients/accounts/accountsdash/workflow/${selectedaccount.value}/pendingtasks`);
+    fetch(url, requestOptions)
+      .then((response) => response.json())
+      .then(() => {
+        toast.success(isEditMode ? "Task updated successfully" : "Task created successfully");
+        onClose();
+        if (!isEditMode) {
+          if (selectedaccount?.value) {
+            navigate(`/clients/accounts/accountsdash/workflow/${selectedaccount.value}/pendingtasks`);
+          }
+          setselectedTemp(null);
+          setSelectedJob(null);
+          setSelectedaccount(null);
+          setTempNameNew("");
+          setStatus("");
+          setCombinedValues([]);
+          setSelectedUser([]);
+          setPriority("");
+          setTaskDescription("");
+          setCombinedTagsValues([]);
+          setSubtaskSwitch(false);
+          setStartsDateNew(null);
+          setDueDateNew(null);
+          setSubtasks([]);
+          setCheckedSubtasks([]);
         }
-
-        // Clear all fields after successful submission
-        setselectedTemp(null);
-        setSelectedJob(null);
-        setSelectedaccount(null);
-        setTempNameNew("");
-        setStatus("");
-        setCombinedValues([]);
-        setSelectedUser([]);
-        setPriority("");
-        setTaskDescription("");
-        setCombinedTagsValues([]);
-        setSubtaskSwitch(false);
-        setStartsDateNew(null);
-        setDueDateNew(null);
-        setSubtasks([]);
-        setCheckedSubtasks([]);
-      }
-    })
-    .catch((error) => console.error(error));
-};
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error("Something went wrong. Please try again.");
+      })
+      .finally(() => setIsSubmitting(false));
+  };
   return (
     <FormDrawer
       open={open}
@@ -653,7 +479,7 @@ console.log("rew",raw)
       width="lg"
     >
       {/* ── Source Section ── */}
-      <FormSection title="Source" icon={<FileText className="h-4 w-4" />}>
+      <FormSection title="Source">
         <FormField label="Account" required error={errors.account ? "Account is required" : ""}>
           <FormSelect
             value={selectedaccount?.value || ""}
@@ -706,7 +532,7 @@ console.log("rew",raw)
       </FormSection>
 
       {/* ── Assignment & Status ── */}
-      <FormSection title="Assignment" icon={<Users className="h-4 w-4" />}>
+      <FormSection title="Assignment">
         <FormRow cols={2}>
           <FormField label="Task Assignee">
             <MultiSelectDropdown
@@ -750,7 +576,7 @@ console.log("rew",raw)
       </FormSection>
 
       {/* ── Tags ── */}
-      <FormSection title="Tags" icon={<Tag className="h-4 w-4" />}>
+      <FormSection title="Tags">
         <TagsMultiSelectDropDown
           value={tagsNew}
           onChange={handleTagChange}
@@ -759,7 +585,7 @@ console.log("rew",raw)
       </FormSection>
 
       {/* ── Dates ── */}
-      <FormSection title="Dates" icon={<Calendar className="h-4 w-4" />}>
+      <FormSection title="Dates">
         <FormRow cols={2}>
           <FormField label="Start Date">
             <FormDatePicker
@@ -777,7 +603,7 @@ console.log("rew",raw)
       </FormSection>
 
       {/* ── Subtasks ── */}
-      <FormSection title="Subtasks" icon={<ListChecks className="h-4 w-4" />}>
+      <FormSection title="Subtasks">
         <FormSwitchRow
           label="Enable Subtasks"
           description="Break this task into smaller steps"
@@ -820,12 +646,14 @@ console.log("rew",raw)
 
       {/* ── Footer Actions ── */}
       <FormDrawerFooter>
-        <Button variant="outline" onClick={onClose}>
-          <ArrowLeft className="h-4 w-4" />
-          Back
+        <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
+          Cancel
         </Button>
-        <Button onClick={createTask}>
-          {isEditMode ? "Update Task" : "Create Task"}
+        <Button onClick={createTask} disabled={isSubmitting}>
+          {isSubmitting
+            ? (isEditMode ? "Saving..." : "Creating...")
+            : (isEditMode ? "Save Changes" : "Create Task")
+          }
         </Button>
       </FormDrawerFooter>
     </FormDrawer>

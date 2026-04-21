@@ -32,7 +32,7 @@ const FormSubtaskItem = ({
   return (
     <div
       className={cn(
-        "group flex items-center gap-3 rounded-lg border border-border bg-white px-3 py-2 transition-all hover:border-input hover:shadow-sm",
+        "group flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-2 transition-all hover:border-input hover:shadow-sm",
         checked && "bg-muted/50 opacity-70",
         className
       )}

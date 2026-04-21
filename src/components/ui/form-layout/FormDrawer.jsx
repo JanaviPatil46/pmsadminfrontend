@@ -99,7 +99,7 @@ const FormDrawerFooter = ({ className, children, ...props }) => {
   return (
     <div
       className={cn(
-        "shrink-0 flex items-center gap-2 border-t border-border bg-white px-4 py-3 sm:gap-3 sm:px-6 sm:py-4",
+        "shrink-0 flex items-center justify-between gap-2 border-t border-border bg-background px-4 py-3 sm:gap-3 sm:px-6 sm:py-4",
         className
       )}
       {...props}
