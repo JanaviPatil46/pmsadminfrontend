@@ -2,9 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import "./pipeline.css";
 import { useDrag, DndProvider, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { RiDeleteBin5Line } from "react-icons/ri";
 import axios from "axios";
-import { IoClose } from "react-icons/io5";
 import { toast } from "react-toastify";
 import { X, MoreVertical, Loader2, AlertTriangle } from "lucide-react";
 import { Button } from "../components/ui/button";
@@ -1368,9 +1366,18 @@ const fetchJobData = async () => {
     if (!open) return null;
     return (
       <div className="fixed inset-0 z-50 flex">
-        <div className="fixed inset-0 bg-black/40" onClick={onClose} />
-        <div className="ml-auto relative z-50 w-full max-w-[500px] bg-background h-full overflow-y-auto shadow-2xl p-5 space-y-4">
-          <h2 className="text-lg font-semibold text-foreground">Automations for {accountName}</h2>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+        <div className="ml-auto relative z-50 w-full max-w-[480px] bg-background h-full flex flex-col shadow-2xl">
+          <div className="flex items-center justify-between border-b border-border px-5 py-4">
+            <div>
+              <h2 className="text-base font-semibold text-foreground">Automations</h2>
+              <p className="text-xs text-muted-foreground mt-0.5">{accountName}</p>
+            </div>
+            <button onClick={onClose} className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto p-5 space-y-4">
 
           {automations.length > 0 ? (
             automations.map((automation, index) => {
@@ -1467,9 +1474,9 @@ const fetchJobData = async () => {
                   )}
 
                   {automation.type === "Update account tags" && (
-                    <div className="flex items-center gap-2 mt-2 p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-sm">
-                      <AlertTriangle className="h-4 w-4 shrink-0" />
-                      This automation can affect conditions for automations below
+                    <div className="flex items-center gap-2 mt-2 p-3 rounded-lg bg-warning/10 border border-warning/20 text-warning-foreground text-sm" style={{backgroundColor:'hsl(var(--muted))',borderColor:'hsl(var(--border))'}}>
+                      <AlertTriangle className="h-4 w-4 shrink-0 text-amber-500" />
+                      <span className="text-muted-foreground">This automation can affect conditions for automations below</span>
                     </div>
                   )}
                 </div>
@@ -1479,9 +1486,10 @@ const fetchJobData = async () => {
             <p className="text-sm text-muted-foreground">No automations available</p>
           )}
 
-          <div className="flex items-center gap-3 pt-3">
-            <Button onClick={handleMove}>Move</Button>
-            <Button variant="outline" onClick={onClose}>Close</Button>
+          </div>
+          <div className="border-t border-border px-5 py-4 flex items-center gap-3">
+            <Button onClick={handleMove}>Move Job</Button>
+            <Button variant="outline" onClick={onClose}>Cancel</Button>
           </div>
         </div>
       </div>
@@ -1550,42 +1558,13 @@ const fetchJobData = async () => {
       return description;
     };
 
-    const getPriorityStyle = (priority) => {
-      switch (priority.toLowerCase()) {
-        case "urgent":
-          return {
-            color: "white",
-            backgroundColor: "#0E0402",
-            fontSize: "12px",
-            borderRadius: "50px",
-            padding: "3px 7px",
-          };
-        case "high":
-          return {
-            color: "white",
-            backgroundColor: "#fe676e",
-            fontSize: "12px",
-            borderRadius: "50px",
-            padding: "3px 7px",
-          }; // light red background
-        case "medium":
-          return {
-            color: "white",
-            backgroundColor: "#FFC300",
-            fontSize: "12px",
-            borderRadius: "50px",
-            padding: "3px 7px",
-          }; // light orange background
-        case "low":
-          return {
-            color: "white",
-            backgroundColor: "#56c288",
-            fontSize: "12px",
-            borderRadius: "50px",
-            padding: "3px 7px",
-          }; // light green background
-        default:
-          return {};
+    const getPriorityClass = (priority) => {
+      switch ((priority || "").toLowerCase()) {
+        case "urgent": return "bg-zinc-900 text-white";
+        case "high":   return "bg-red-500 text-white";
+        case "medium": return "bg-amber-400 text-white";
+        case "low":    return "bg-emerald-500 text-white";
+        default:       return "bg-muted text-muted-foreground";
       }
     };
 
@@ -2144,7 +2123,7 @@ const fetchJobData = async () => {
     };
     return (
       <div
-        className={`job-card ${isDragging ? "dragging" : ""} bg-card shadow-md rounded-xl p-4 transition-all hover:shadow-lg`}
+        className={`bg-card rounded-xl border border-border p-4 transition-all duration-150 hover:shadow-md hover:border-border/80 ${isDragging ? "opacity-50 shadow-xl scale-95" : ""}`}
         ref={drag}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -2153,9 +2132,11 @@ const fetchJobData = async () => {
         <div className="flex items-center justify-between mb-3">
           <span className="text-sm font-semibold text-foreground">{job.Account.join(", ")}</span>
           {isHovered ? (
-            <RiDeleteBin5Line onClick={handleOpen} className="cursor-pointer text-red-500" size={18} />
+            <button onClick={handleOpen} className="inline-flex h-6 w-6 items-center justify-center rounded-md text-destructive transition-colors hover:bg-destructive/10">
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+            </button>
           ) : (
-            <span className="automation-batch">1</span>
+            <span className="inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-primary/10 px-1.5 text-[10px] font-semibold text-primary">1</span>
           )}
         </div>
 
@@ -2163,7 +2144,7 @@ const fetchJobData = async () => {
         <p className="text-sm text-muted-foreground mb-2 break-words leading-relaxed">{job.JobAssignee.join(", ")}</p>
         <p className="text-sm text-muted-foreground mb-2">{truncateDescription(stripHtmlTags(job.Description))}</p>
 
-        <span style={getPriorityStyle(job.Priority)}>{job.Priority}</span>
+        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${getPriorityClass(job.Priority)}`}>{job.Priority}</span>
 
         <div className="mt-3 space-y-0.5">
           <p className="text-sm text-muted-foreground"><strong>Starts:</strong> {startDateFormatted}</p>
@@ -2243,9 +2224,13 @@ const fetchJobData = async () => {
     const truncatedStageName =
       stage.name.length > 30 ? `${stage.name.slice(0, 20)}...` : stage.name;
     return (
-      <div ref={drop} className={`stage ${isOver ? "drag-over" : ""}`}>
-        <p className="stage-name mb-3 break-words">{stage.name}</p>
-        {stageJobs.length > 0 && <p className="text-sm text-muted-foreground mb-3">({stageJobs.length})</p>}
+      <div ref={drop} style={{maxHeight:'calc(100vh - 160px)',overflowY:'auto'}} className={`min-w-[260px] max-w-[280px] rounded-xl border transition-colors duration-150 p-3 flex flex-col gap-2 ${isOver ? "border-primary/50 bg-primary/5" : "border-border bg-muted/20"}`}>
+        <div className="flex items-center gap-2 px-1 mb-1">
+          <p className="text-sm font-semibold text-foreground break-words flex-1">{stage.name}</p>
+          {stageJobs.length > 0 && (
+            <span className="inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-muted px-1.5 text-[10px] font-semibold text-muted-foreground">{stageJobs.length}</span>
+          )}
+        </div>
         {displayedJobs.map((job) => (
           <JobCard key={job.id} job={job} />
         ))}
@@ -2587,36 +2572,64 @@ const fetchJobData = async () => {
     <DndProvider backend={HTML5Backend}>
       <div className="p-6">
         {loading ? (
-          <div className="flex items-center justify-center h-screen">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <div className="space-y-4">
+            <div className="h-9 w-56 rounded-lg bg-muted animate-pulse" />
+            <div className="flex gap-4 overflow-x-auto pb-4">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="min-w-[260px] rounded-xl border border-border bg-card p-4 space-y-3">
+                  <div className="h-4 w-32 rounded bg-muted animate-pulse" />
+                  {[...Array(3)].map((_, j) => (
+                    <div key={j} className="rounded-xl border border-border bg-background p-3 space-y-2">
+                      <div className="h-3 w-24 rounded bg-muted animate-pulse" />
+                      <div className="h-3 w-full rounded bg-muted animate-pulse" />
+                      <div className="h-3 w-16 rounded bg-muted animate-pulse" />
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
           </div>
         ) : selectedPipeline ? (
           <>
-            <div className="mb-4">
-              <select
-                value={selectedPipelineOption?.value || ""}
-                onChange={(e) => {
-                  const option = optionpipeline.find((o) => o.value === e.target.value);
-                  handleSelectChange(e, option);
-                }}
-                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring pipeline-select"
-              >
-                <option value="" disabled>Search pipelines...</option>
-                {optionpipeline.map((opt) => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
-              <div className="flex items-center justify-between mt-3">
-                <Button variant="outline" onClick={handleBackToPipelineList}>
-                  Back to Pipeline List
-                </Button>
-                <Button onClick={handleDrawerOpen}>
-                  Add Jobs
-                </Button>
+            <div className="mb-5 space-y-3">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                <select
+                  value={selectedPipelineOption?.value || ""}
+                  onChange={(e) => {
+                    const option = optionpipeline.find((o) => o.value === e.target.value);
+                    handleSelectChange(e, option);
+                  }}
+                  className="flex-1 h-9 rounded-lg border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                >
+                  <option value="" disabled>Select pipeline…</option>
+                  {optionpipeline.map((opt) => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+                <div className="flex items-center gap-2">
+                  <div className="inline-flex items-center gap-1 rounded-lg border border-border bg-muted/40 p-0.5">
+                    {["active", "inactive"].map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => setFilterStatus(s)}
+                        className={[
+                          "rounded-md px-3 py-1.5 text-xs font-medium capitalize transition-all duration-150",
+                          filterStatus === s
+                            ? "bg-background text-foreground shadow-sm"
+                            : "text-muted-foreground hover:text-foreground",
+                        ].join(" ")}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                  <Button variant="outline" size="sm" onClick={handleBackToPipelineList}>← Back</Button>
+                  <Button size="sm" onClick={handleDrawerOpen}>+ Add Job</Button>
+                </div>
               </div>
             </div>
             <div>
-              <div className="stage-container flex gap-4">
+              <div className="flex gap-4 overflow-x-auto pb-4 items-start">
                 {stages.map((stage, index) => (
                   <Stage
                     key={stage._id || index}
@@ -2641,17 +2654,18 @@ const fetchJobData = async () => {
 
             {isDrawerOpen && (
               <div className="fixed inset-0 z-50 flex">
-                <div className="fixed inset-0 bg-black/40" onClick={handleDrawerClose} />
-                <div className="ml-auto relative z-50 w-full max-w-[500px] sm:rounded-l-xl bg-background h-full overflow-y-auto shadow-2xl" id="tag-drawer">
-                  <div className="flex items-center justify-between px-4 py-3 bg-muted">
-                    <h2 className="text-lg font-semibold">
-                      Add Job to {selectedPipeline ? selectedPipeline.pipelineName : ""}
-                    </h2>
-                    <button onClick={handleDrawerClose} className="text-muted-foreground hover:text-foreground">
-                      <X className="h-5 w-5" />
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={handleDrawerClose} />
+                <div className="ml-auto relative z-50 w-full max-w-[520px] bg-background h-full flex flex-col shadow-2xl">
+                  <div className="flex items-center justify-between border-b border-border px-5 py-4">
+                    <div>
+                      <h2 className="text-base font-semibold text-foreground">Add Job</h2>
+                      <p className="text-xs text-muted-foreground mt-0.5">{selectedPipeline?.pipelineName}</p>
+                    </div>
+                    <button onClick={handleDrawerClose} className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+                      <X className="h-4 w-4" />
                     </button>
                   </div>
-                  <div>
+                  <div className="flex-1 overflow-y-auto">
                     <AddJobs
                       stages={stages}
                       pipelineId={pipelineId}
@@ -2665,39 +2679,55 @@ const fetchJobData = async () => {
           </>
         ) : (
           <>
-            <h1 className="text-2xl font-bold mb-4">Pipeline List</h1>
-            <div className="bg-white rounded-xl border border-border shadow-sm overflow-hidden">
-              <table className="w-full">
+            <div className="mb-5 flex items-center justify-between">
+              <h1 className="text-xl font-semibold text-foreground">Pipelines</h1>
+            </div>
+            <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+              <table className="w-full text-left">
                 <thead>
-                  <tr className="border-b border-border">
-                    <th className="text-xs font-semibold tracking-wide uppercase text-left px-4 py-3 text-muted-foreground">Pipeline Name</th>
-                    <th className="text-xs font-semibold tracking-wide uppercase text-left px-4 py-3 text-muted-foreground">Jobs</th>
-                    <th className="text-xs font-semibold tracking-wide uppercase text-left px-4 py-3 text-muted-foreground">Schedule</th>
-                    <th className="text-xs font-semibold tracking-wide uppercase text-left px-4 py-3 text-muted-foreground">Start Date</th>
-                    <th className="text-xs font-semibold tracking-wide uppercase text-left px-4 py-3 text-muted-foreground">End Date</th>
-                    <th className="text-xs font-semibold tracking-wide uppercase text-left px-4 py-3 text-muted-foreground">Setting</th>
+                  <tr className="border-b border-border bg-muted/40">
+                    <th className="text-xs font-semibold tracking-wider uppercase px-5 py-3 text-muted-foreground">Pipeline Name</th>
+                    <th className="text-xs font-semibold tracking-wider uppercase px-5 py-3 text-muted-foreground">Jobs</th>
+                    <th className="text-xs font-semibold tracking-wider uppercase px-5 py-3 text-muted-foreground">Schedule</th>
+                    <th className="text-xs font-semibold tracking-wider uppercase px-5 py-3 text-muted-foreground">Start Date</th>
+                    <th className="text-xs font-semibold tracking-wider uppercase px-5 py-3 text-muted-foreground">End Date</th>
+                    <th className="text-xs font-semibold tracking-wider uppercase px-5 py-3 text-muted-foreground">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {pipelineData.map((pipeline, index) => (
-                    <tr key={index} className="bg-white transition-colors hover:bg-muted/30">
-                      <td
-                        onClick={() => handleBoardsList(pipeline)}
-                        className="text-xs px-4 py-3 leading-tight cursor-pointer text-primary hover:text-primary/80 font-medium"
-                      >
-                        {pipeline.pipelineName}
-                      </td>
-                      <td className="text-xs px-4 py-3 leading-tight text-muted-foreground"></td>
-                      <td className="text-xs px-4 py-3 leading-tight text-muted-foreground"></td>
-                      <td className="text-xs px-4 py-3 leading-tight text-muted-foreground"></td>
-                      <td className="text-xs px-4 py-3 leading-tight text-muted-foreground"></td>
-                      <td className="text-xs px-4 py-3 leading-tight">
-                        <button className="p-1 rounded-md hover:bg-muted transition-colors">
-                          <MoreVertical className="h-4 w-4 text-muted-foreground" />
-                        </button>
+                  {pipelineData.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="py-16 text-center">
+                        <div className="flex flex-col items-center gap-2">
+                          <svg className="h-8 w-8 text-muted-foreground/40" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7" /></svg>
+                          <p className="text-sm font-medium text-muted-foreground">No pipelines found</p>
+                          <p className="text-xs text-muted-foreground">Create a pipeline to get started</p>
+                        </div>
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    pipelineData.map((pipeline, index) => (
+                      <tr key={index} className="transition-colors hover:bg-muted/30">
+                        <td className="px-5 py-3">
+                          <button
+                            onClick={() => handleBoardsList(pipeline)}
+                            className="text-sm font-medium text-primary hover:underline text-left"
+                          >
+                            {pipeline.pipelineName}
+                          </button>
+                        </td>
+                        <td className="px-5 py-3 text-sm text-muted-foreground">—</td>
+                        <td className="px-5 py-3 text-sm text-muted-foreground">—</td>
+                        <td className="px-5 py-3 text-sm text-muted-foreground">—</td>
+                        <td className="px-5 py-3 text-sm text-muted-foreground">—</td>
+                        <td className="px-5 py-3">
+                          <button className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+                            <MoreVertical className="h-4 w-4" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
