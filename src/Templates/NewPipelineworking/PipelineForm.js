@@ -509,7 +509,7 @@ const PipelineForm = () => {
         const found = options.find((o) => o.value === e.target.value);
         onChange(null, found ?? null);
       }}
-      className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+      className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
     >
       <option value="">{placeholder}</option>
       {options.map((o) => (
@@ -551,7 +551,7 @@ const PipelineForm = () => {
               value={pipelineName}
               onChange={(e) => setPipelineName(e.target.value)}
               placeholder="Pipeline Name"
-              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
             />
           </div>
 

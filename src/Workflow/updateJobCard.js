@@ -347,7 +347,7 @@ const EditJobDrawer = ({
 
   return (
     <div className="fixed inset-0 z-50 flex">
-      <div className="fixed inset-0 bg-black/40" onClick={onClose} />
+      <div className="fixed inset-0 bg-foreground/40" onClick={onClose} />
       <div className="ml-auto relative z-50 w-full max-w-[500px] sm:rounded-l-xl bg-background h-full overflow-hidden shadow-2xl flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b">
@@ -361,12 +361,12 @@ const EditJobDrawer = ({
         <div className="flex-1 overflow-y-auto p-5 space-y-4 bulk-job-form">
           <div>
             <label className="text-sm font-medium">Account</label>
-            <Input value={selectedAccount} readOnly className="mt-1 bg-white" />
+            <Input value={selectedAccount} readOnly className="mt-1 bg-background" />
           </div>
 
           <div>
             <label className="text-sm font-medium">Job Name</label>
-            <Input value={jobName} onChange={(e) => setJobName(e.target.value)} className="mt-1 bg-white" />
+            <Input value={jobName} onChange={(e) => setJobName(e.target.value)} className="mt-1 bg-background" />
           </div>
 
           <div>
@@ -465,7 +465,7 @@ const EditJobDrawer = ({
               type="date"
               value={startDate ? dayjs(startDate).format("YYYY-MM-DD") : ""}
               onChange={(e) => handleStartDateChange(e.target.value ? dayjs(e.target.value) : null)}
-              className="mt-1 bg-white"
+              className="mt-1 bg-background"
             />
           </div>
 
@@ -475,7 +475,7 @@ const EditJobDrawer = ({
               type="date"
               value={dueDate ? dayjs(dueDate).format("YYYY-MM-DD") : ""}
               onChange={(e) => handleDueDateChange(e.target.value ? dayjs(e.target.value) : null)}
-              className="mt-1 bg-white"
+              className="mt-1 bg-background"
             />
           </div>
 
@@ -507,7 +507,7 @@ const EditJobDrawer = ({
                     value={inputText}
                     onChange={handleInputTextChange}
                     placeholder="Job name for client"
-                    className="mt-1 bg-white"
+                    className="mt-1 bg-background"
                   />
                 </div>
 
@@ -536,7 +536,7 @@ const EditJobDrawer = ({
                     placeholder="Description"
                     className="w-full mt-1 rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring min-h-[80px] resize-y"
                   />
-                  <span className="absolute bottom-3 right-3 text-xs text-gray-400">
+                  <span className="absolute bottom-3 right-3 text-xs text-muted-foreground">
                     {charCount}/{charLimit}
                   </span>
                 </div>

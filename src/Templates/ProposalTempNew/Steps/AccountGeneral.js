@@ -372,9 +372,9 @@ const handleAccountChange = (selectedAccount) => {
   };
 
   const StepCard = ({ title, description, checked, onChange, name }) => (
-    <div className={`rounded-xl border p-4 mb-3 transition-all hover:shadow-sm ${checked ? 'border-indigo-400 bg-indigo-50/50 border-2' : 'border-slate-200 bg-white'}`}>
+    <div className={`rounded-xl border p-4 mb-3 transition-all hover:shadow-sm ${checked ? 'border-blue-400 bg-blue-50/50 border-2' : 'border-slate-200 bg-white'}`}>
       <div className="flex items-center gap-3 mb-2">
-        <input type="checkbox" checked={checked} onChange={(e) => onChange(name, e.target.checked)} className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+        <input type="checkbox" checked={checked} onChange={(e) => onChange(name, e.target.checked)} className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
         <span className="text-base font-semibold text-slate-800">{title}</span>
       </div>
       <div className="flex items-start gap-1.5 ml-7">
@@ -401,17 +401,17 @@ const handleAccountChange = (selectedAccount) => {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-semibold text-indigo-600">General Information</h2>
+      <h2 className="text-2xl font-semibold text-blue-600">General Information</h2>
 
       {loading && (
         <div className="flex items-center justify-center gap-2 py-4">
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
           <span className="text-sm text-slate-500">Loading...</span>
         </div>
       )}
 
       <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-6 space-y-4">
-        <h3 className="text-base font-semibold text-indigo-600 mb-3">Basic Details</h3>
+        <h3 className="text-base font-semibold text-blue-600 mb-3">Basic Details</h3>
 
         {/* Account Selection */}
         <div className="space-y-1.5">
@@ -461,14 +461,14 @@ const handleAccountChange = (selectedAccount) => {
             onBlur={() => handleBlur('proposalName')}
             placeholder="Enter a name for this proposal"
             required
-            className={`flex h-10 w-full rounded-lg border bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${stepErrors.proposalName ? 'border-red-400' : 'border-slate-200'}`}
+            className={`flex h-10 w-full rounded-lg border bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${stepErrors.proposalName ? 'border-red-400' : 'border-slate-200'}`}
           />
           <p className="text-xs text-slate-400">{stepErrors.proposalName || 'Enter a name for this proposal'}</p>
         </div>
       </div>
 
       <div className="rounded-xl border border-slate-200 p-6">
-        <h3 className="text-base font-semibold text-indigo-600 mb-2">Configure Proposal Steps</h3>
+        <h3 className="text-base font-semibold text-blue-600 mb-2">Configure Proposal Steps</h3>
         <p className="text-xs text-slate-500 mb-4">
           Customize which steps to include in your proposal. Each step helps communicate different aspects of your service to clients.
         </p>

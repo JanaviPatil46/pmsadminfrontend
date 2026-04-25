@@ -21,7 +21,7 @@ const FormActions = ({ className, sticky, align = "right", children, ...props })
       className={cn(
         "flex flex-wrap items-center gap-2 py-3 sm:gap-3 sm:py-4",
         alignClasses[align],
-        sticky && "sticky bottom-0 z-10 -mx-4 border-t border-border bg-white/90 px-4 shadow-sticky backdrop-blur-sm sm:-mx-6 sm:px-6",
+        sticky && "sticky bottom-0 z-10 -mx-4 border-t border-border bg-background/90 px-4 shadow-sticky backdrop-blur-sm sm:-mx-6 sm:px-6",
         className
       )}
       {...props}

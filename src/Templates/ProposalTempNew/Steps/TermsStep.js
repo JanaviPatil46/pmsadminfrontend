@@ -179,7 +179,7 @@ const TermsStep = ({ formData, updateFormData, nextStep, prevStep, stepErrors, s
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-semibold text-indigo-600">Terms & Conditions</h2>
+      <h2 className="text-2xl font-semibold text-blue-600">Terms & Conditions</h2>
 
       <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-6 space-y-4">
         <p className="text-sm text-slate-500">
@@ -196,7 +196,7 @@ const TermsStep = ({ formData, updateFormData, nextStep, prevStep, stepErrors, s
             onBlur={() => handleBlur('title')}
             placeholder="Enter terms title"
             required
-            className={`flex h-10 w-full rounded-lg border bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${stepErrors.title ? 'border-red-400' : 'border-slate-200'}`}
+            className={`flex h-10 w-full rounded-lg border bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${stepErrors.title ? 'border-red-400' : 'border-slate-200'}`}
           />
           {stepErrors.title && <p className="text-xs text-red-500">{stepErrors.title}</p>}
         </div>

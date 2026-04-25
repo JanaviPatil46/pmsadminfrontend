@@ -1397,7 +1397,7 @@ const fetchJobData = async () => {
     if (!open) return null;
     return (
       <div className="fixed inset-0 z-50 flex">
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+        <div className="fixed inset-0 bg-foreground/50 backdrop-blur-sm" onClick={onClose} />
         <div className="ml-auto relative z-50 w-full max-w-[480px] bg-background h-full flex flex-col shadow-2xl">
           <div className="flex items-center justify-between border-b border-border px-5 py-4">
             <div>
@@ -2186,7 +2186,7 @@ const fetchJobData = async () => {
 
         {open && (
           <div className="fixed inset-0 z-50 flex items-center justify-center">
-            <div className="fixed inset-0 bg-black/40" onClick={handleClose} />
+            <div className="fixed inset-0 bg-foreground/40" onClick={handleClose} />
             <div className="relative z-50 w-[300px] bg-background rounded-xl p-6 shadow-2xl">
               <h3 className="text-lg font-semibold mb-2">Confirm Deletion</h3>
               <p className="text-sm text-muted-foreground mb-4">Are you sure you want to delete this job?</p>
@@ -2685,7 +2685,7 @@ const fetchJobData = async () => {
 
             {isDrawerOpen && (
               <div className="fixed inset-0 z-50 flex">
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={handleDrawerClose} />
+                <div className="fixed inset-0 bg-foreground/50 backdrop-blur-sm" onClick={handleDrawerClose} />
                 <div className="ml-auto relative z-50 w-full max-w-[520px] bg-background h-full flex flex-col shadow-2xl">
                   <div className="flex items-center justify-between border-b border-border px-5 py-4">
                     <div>

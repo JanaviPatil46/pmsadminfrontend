@@ -22,7 +22,7 @@ const FormComment = ({ className, value, onChange, onDelete, placeholder, ...pro
   return (
     <div
       className={cn(
-        "group flex items-start gap-2 rounded-lg border border-border bg-white p-3 transition-colors hover:border-input",
+        "group flex items-start gap-2 rounded-lg border border-border bg-background p-3 transition-colors hover:border-input",
         className
       )}
       {...props}

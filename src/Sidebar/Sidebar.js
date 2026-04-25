@@ -796,7 +796,7 @@ axios.request(config)
           </div>
 
           {/* Create new button */}
-          <button onClick={handleDrawerOpen} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-all shadow-sm hover:shadow-md">
+          <button onClick={handleDrawerOpen} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-all shadow-sm hover:shadow-md">
             <FaPlus size={10} />
             <span className="hidden sm:inline">New</span>
           </button>
@@ -812,9 +812,9 @@ axios.request(config)
               <PopoverTrigger asChild>
                 <div className="header-user-chip">
                   <StyledBadge overlap="circular" anchorOrigin={{ vertical: "bottom", horizontal: "right" }} variant="dot">
-                    <ShadAvatar className="h-8 w-8 border-2 border-indigo-100">
+                    <ShadAvatar className="h-8 w-8 border-2 border-blue-100">
                       <AvatarImage src={preview || currentImage} alt={username} />
-                      <AvatarFallback className="bg-indigo-50 text-indigo-600 text-[11px] font-semibold">
+                      <AvatarFallback className="bg-blue-50 text-blue-600 text-[11px] font-semibold">
                         {getInitials(username)}
                       </AvatarFallback>
                     </ShadAvatar>
@@ -828,9 +828,9 @@ axios.request(config)
               <PopoverContent align="end" sideOffset={8} className="p-0 w-[240px] rounded-xl shadow-xl overflow-hidden border border-slate-200/80">
                 <div className="popover-header">
                   <StyledBadge overlap="circular" anchorOrigin={{ vertical: "bottom", horizontal: "right" }} variant="dot">
-                    <ShadAvatar className="h-10 w-10 border-2 border-indigo-100">
+                    <ShadAvatar className="h-10 w-10 border-2 border-blue-100">
                       <AvatarImage src={preview || currentImage} alt={username} />
-                      <AvatarFallback className="bg-indigo-50 text-indigo-600 text-sm font-semibold">
+                      <AvatarFallback className="bg-blue-50 text-blue-600 text-sm font-semibold">
                         {getInitials(username)}
                       </AvatarFallback>
                     </ShadAvatar>
@@ -909,13 +909,13 @@ axios.request(config)
                           group flex items-center gap-2.5 rounded-lg transition-all duration-150 no-underline
                           ${isCollapsed ? "justify-center px-2 py-2.5" : "px-3 py-2"}
                           ${isActiveMenu
-                            ? "bg-indigo-50 text-indigo-700"
+                            ? "bg-blue-50 text-blue-700"
                             : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
                           }
                         `}
                       >
                         {/* Icon */}
-                        <span className={`text-[1.1rem] shrink-0 transition-colors duration-150 ${isActiveMenu ? "text-indigo-600" : "text-slate-400 group-hover:text-slate-600"}`}>
+                        <span className={`text-[1.1rem] shrink-0 transition-colors duration-150 ${isActiveMenu ? "text-blue-600" : "text-slate-400 group-hover:text-slate-600"}`}>
                           {iconMapping[item.icon] ? React.createElement(iconMapping[item.icon]) : null}
                         </span>
 
@@ -936,7 +936,7 @@ axios.request(config)
                         {/* Expand arrow */}
                         {!isCollapsed && item.submenu.length > 0 && (
                           <svg
-                            className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${openMenu === item._id ? "rotate-180" : ""} ${isActiveMenu ? "text-indigo-400" : "text-slate-300"}`}
+                            className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${openMenu === item._id ? "rotate-180" : ""} ${isActiveMenu ? "text-blue-400" : "text-slate-300"}`}
                             fill="none" stroke="currentColor" viewBox="0 0 24 24"
                           >
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -966,12 +966,12 @@ axios.request(config)
                                 group flex items-center gap-2 rounded-md transition-all duration-150 no-underline mb-0.5
                                 ${isCollapsed ? "justify-center px-2 py-2" : "px-2.5 py-1.5"}
                                 ${isActiveSubmenu
-                                  ? "bg-indigo-50/70 text-indigo-700"
+                                  ? "bg-blue-50/70 text-blue-700"
                                   : "text-slate-400 hover:bg-slate-50 hover:text-slate-600"
                                 }
                               `}
                             >
-                              <span className={`text-[0.95rem] shrink-0 transition-colors ${isActiveSubmenu ? "text-indigo-500" : "text-slate-300 group-hover:text-slate-500"}`}>
+                              <span className={`text-[0.95rem] shrink-0 transition-colors ${isActiveSubmenu ? "text-blue-500" : "text-slate-300 group-hover:text-slate-500"}`}>
                                 {iconMapping[subItem.icon] ? React.createElement(iconMapping[subItem.icon]) : null}
                               </span>
                               {!isCollapsed && (
@@ -1003,8 +1003,8 @@ axios.request(config)
         >
           <SheetHeader className="new-drawer-header">
             <SheetTitle className="new-drawer-title">
-              <span className="flex items-center justify-center w-5 h-5 rounded-md bg-indigo-50">
-                <FaPlus size={9} className="text-indigo-600" />
+              <span className="flex items-center justify-center w-5 h-5 rounded-md bg-blue-50">
+                <FaPlus size={9} className="text-blue-600" />
               </span>
               <span className="text-sm font-semibold text-slate-800">Create New</span>
             </SheetTitle>
@@ -1029,11 +1029,11 @@ axios.request(config)
                   group flex items-center gap-2.5 px-3 py-2 rounded-lg mb-0.5 no-underline transition-all duration-150
                   ${item.restricted
                     ? "opacity-40 cursor-not-allowed text-slate-400"
-                    : "text-slate-600 hover:bg-indigo-50 hover:text-indigo-700"
+                    : "text-slate-600 hover:bg-blue-50 hover:text-blue-700"
                   }
                 `}
               >
-                <span className={`text-[1rem] shrink-0 transition-colors ${item.restricted ? "text-slate-300" : "text-slate-400 group-hover:text-indigo-500"}`}>
+                <span className={`text-[1rem] shrink-0 transition-colors ${item.restricted ? "text-slate-300" : "text-slate-400 group-hover:text-blue-500"}`}>
                   {iconMapping[item.icon] ? React.createElement(iconMapping[item.icon]) : null}
                 </span>
                 <span className="text-[13px] font-medium">{item.label}</span>

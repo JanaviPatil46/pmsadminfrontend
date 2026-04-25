@@ -829,16 +829,16 @@ const ServicesComponent = ({
                       <input type="text" name="description" value={row.description} onChange={(e) => handleInputChange(rowIndex, e)} placeholder="Description" className="w-full border-0 bg-transparent text-sm focus:outline-none focus:ring-0" />
                     </td>
                     <td className="px-4 py-2">
-                      <input type="text" name="rate" value={row.rate} onChange={(e) => handleInputChange(rowIndex, e)} className={`w-20 rounded border bg-transparent px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 ${getRowError(rowIndex, 'rate') ? 'border-red-400' : 'border-slate-200'}`} />
+                      <input type="text" name="rate" value={row.rate} onChange={(e) => handleInputChange(rowIndex, e)} className={`w-20 rounded border bg-transparent px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 ${getRowError(rowIndex, 'rate') ? 'border-red-400' : 'border-slate-200'}`} />
                       {getRowError(rowIndex, 'rate') && <p className="text-xs text-red-500 mt-0.5">{getRowError(rowIndex, 'rate')}</p>}
                     </td>
                     <td className="px-4 py-2">
-                      <input type="text" name="quantity" value={row.quantity} onChange={(e) => handleInputChange(rowIndex, e)} className={`w-16 rounded border bg-transparent px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 ${getRowError(rowIndex, 'quantity') ? 'border-red-400' : 'border-slate-200'}`} />
+                      <input type="text" name="quantity" value={row.quantity} onChange={(e) => handleInputChange(rowIndex, e)} className={`w-16 rounded border bg-transparent px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 ${getRowError(rowIndex, 'quantity') ? 'border-red-400' : 'border-slate-200'}`} />
                       {getRowError(rowIndex, 'quantity') && <p className="text-xs text-red-500 mt-0.5">{getRowError(rowIndex, 'quantity')}</p>}
                     </td>
                     <td className="px-4 py-2 text-sm text-slate-700">${row.amount}</td>
                     <td className="px-4 py-2">
-                      <input type="checkbox" name="tax" checked={row.tax} onChange={(e) => handleInputChange(rowIndex, e)} className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+                      <input type="checkbox" name="tax" checked={row.tax} onChange={(e) => handleInputChange(rowIndex, e)} className="h-4 w-4 rounded border-slate-300 text-blue-600 border-slate-300 focus:ring-blue-500" />
                     </td>
                     <td className="px-4 py-2">
                       {itemizedData.rows.length > 1 && (
@@ -856,10 +856,10 @@ const ServicesComponent = ({
 
         {/* Add Row Buttons */}
         <div className="flex items-center gap-4 mt-2">
-          <button type="button" onClick={() => addRow()} className="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-700">
+          <button type="button" onClick={() => addRow()} className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700">
             <AiOutlinePlusCircle className="h-4 w-4" /> Line item
           </button>
-          <button type="button" onClick={() => addRow(true)} className="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-700">
+          <button type="button" onClick={() => addRow(true)} className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700">
             <CiDiscount1 className="h-4 w-4" /> Discount
           </button>
         </div>
@@ -881,7 +881,7 @@ const ServicesComponent = ({
                 <td className="px-4 py-3 text-sm font-medium text-slate-700">${itemizedData.subtotal || '0.00'}</td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-1">
-                    <input type="text" value={itemizedData.taxRate || '0'} onChange={handleTaxRateChange} className="w-16 rounded border border-slate-200 bg-transparent px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500" />
+                    <input type="text" value={itemizedData.taxRate || '0'} onChange={handleTaxRateChange} className="w-16 rounded border border-slate-200 bg-transparent px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" />
                     <span className="text-sm text-slate-500">%</span>
                   </div>
                 </td>

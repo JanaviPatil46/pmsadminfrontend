@@ -18,7 +18,7 @@ export function SelectTrigger({ className = "", children }) {
     <SelectPrimitive.Trigger
       className={`
         flex h-11 w-full items-center justify-between
-        rounded-md border border-slate-300 bg-white px-3 py-2
+        rounded-md border border-input bg-background px-3 py-2
         text-sm
         focus:outline-none focus:ring-2 focus:ring-primary
         ${className}
@@ -42,7 +42,7 @@ export function SelectContent({ children }) {
       <SelectPrimitive.Content
         className="
           z-50 min-w-[var(--radix-select-trigger-width)]
-          overflow-hidden rounded-md border bg-white shadow-md
+          overflow-hidden rounded-md border bg-popover shadow-md
           animate-in fade-in zoom-in-95
         "
       >
@@ -61,7 +61,7 @@ export function SelectItem({ value, children }) {
       className="
         relative flex w-full cursor-pointer select-none
         items-center rounded-sm py-2 pl-8 pr-2 text-sm
-        hover:bg-slate-100
+        hover:bg-accent hover:text-accent-foreground
       "
     >
       <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">

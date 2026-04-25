@@ -6,8 +6,8 @@
 
 
 :root {
-  /* PRIMARY — indigo */
-  --primary: 239 75% 59%;
+  /* PRIMARY — blue (oklch 62.3% 0.214 259.815) */
+  --primary: 217 89% 61%;
   --primary-foreground: 0 0% 100%;
 
   /* BACKGROUND */
@@ -33,8 +33,8 @@
   --border: 214 20% 88%;
   --input: 214 20% 88%;
 
-  /* RING — indigo */
-  --ring: 239 58% 51%;
+  /* RING — blue */
+  --ring: 217 89% 55%;
 
   /* KEEP THESE */
   --secondary: 210 20% 96%;

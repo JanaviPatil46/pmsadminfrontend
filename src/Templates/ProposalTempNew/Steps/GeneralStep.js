@@ -151,13 +151,13 @@ const handleUserChange = (newSelectedUsers) => {
   };
 
   const StepCard = ({ title, description, checked, onChange, name }) => (
-    <div className={`rounded-xl border p-4 mb-3 transition-all hover:shadow-sm ${checked ? 'border-indigo-400 bg-indigo-50/50 border-2' : 'border-slate-200 bg-white'}`}>
+    <div className={`rounded-xl border p-4 mb-3 transition-all hover:shadow-sm ${checked ? 'border-blue-400 bg-blue-50/50 border-2' : 'border-slate-200 bg-white'}`}>
       <div className="flex items-center gap-3 mb-2">
         <input
           type="checkbox"
           checked={checked}
           onChange={(e) => onChange(name, e.target.checked)}
-          className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+          className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
         />
         <span className="text-base font-semibold text-slate-800">{title}</span>
       </div>
@@ -170,10 +170,10 @@ const handleUserChange = (newSelectedUsers) => {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-semibold text-indigo-600">General Information</h2>
+      <h2 className="text-2xl font-semibold text-blue-600">General Information</h2>
 
       <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-6 space-y-4">
-        <h3 className="text-base font-semibold text-indigo-600 mb-3">Basic Details</h3>
+        <h3 className="text-base font-semibold text-blue-600 mb-3">Basic Details</h3>
 
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-slate-700">Template name (not visible to clients) *</label>
@@ -184,7 +184,7 @@ const handleUserChange = (newSelectedUsers) => {
             onChange={(e) => handleInputChange("templateName", e.target.value)}
             onBlur={() => handleBlur("templateName")}
             required
-            className={`flex h-10 w-full rounded-lg border bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${stepErrors.templatename ? 'border-red-400' : 'border-slate-200'}`}
+            className={`flex h-10 w-full rounded-lg border bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${stepErrors.templatename ? 'border-red-400' : 'border-slate-200'}`}
           />
           {stepErrors.templatename && <p className="text-xs text-red-500">{stepErrors.templatename}</p>}
         </div>
@@ -201,13 +201,13 @@ const handleUserChange = (newSelectedUsers) => {
             onKeyUp={handleTextFieldClick}
             required
             ref={textFieldRef}
-            className={`flex h-10 w-full rounded-lg border bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${stepErrors.proposalName ? 'border-red-400' : 'border-slate-200'}`}
+            className={`flex h-10 w-full rounded-lg border bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${stepErrors.proposalName ? 'border-red-400' : 'border-slate-200'}`}
           />
           {stepErrors.proposalName && <p className="text-xs text-red-500">{stepErrors.proposalName}</p>}
         </div>
 
         <div className="relative">
-          <button type="button" onClick={toggleDropdown} className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-2 text-xs font-medium text-white shadow-sm transition-colors hover:bg-indigo-700">
+          <button type="button" onClick={toggleDropdown} className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium text-white shadow-sm transition-colors hover:bg-blue-700">
             Add Shortcode
           </button>
           {showDropdown && (
@@ -236,7 +236,7 @@ const handleUserChange = (newSelectedUsers) => {
       </div>
 
       <div className="rounded-xl border border-slate-200 p-6">
-        <h3 className="text-base font-semibold text-indigo-600 mb-2">Configure Proposal Steps</h3>
+        <h3 className="text-base font-semibold text-blue-600 mb-2">Configure Proposal Steps</h3>
         <p className="text-xs text-slate-500 mb-4">
           Customize which steps to include in your proposal. Each step helps
           communicate different aspects of your service to clients.

@@ -25,7 +25,7 @@ const FormBadge = ({
 }) => {
   const variantClasses = {
     default: "bg-secondary text-secondary-foreground",
-    outline: "border border-border bg-white text-foreground",
+    outline: "border border-border bg-background text-foreground",
     colored: "",
   }
 

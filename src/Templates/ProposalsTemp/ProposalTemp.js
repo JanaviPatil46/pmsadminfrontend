@@ -1371,7 +1371,7 @@ useEffect(() => {
                 placeholder="Template name (not visible to clients)"
                 value={templatename}
                 onChange={(e) => settemplatename(e.target.value)}
-                className={`flex h-10 w-full rounded-lg border bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.templatename ? 'border-red-400' : 'border-slate-200'}`}
+                className={`flex h-10 w-full rounded-lg border bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:border-blue-500 ${errors.templatename ? 'border-red-400' : 'border-slate-200'}`}
               />
               {!!errors.templatename && (
                 <p className="text-xs text-red-500 mt-1">{errors.templatename}</p>
@@ -1397,7 +1397,7 @@ useEffect(() => {
                   onChange={handleProposalName}
                   onClick={(e) => setCursorPosition(e.target.selectionStart)}
                   placeholder="Proposal name (visible to clients)"
-                  className={`flex h-10 w-full rounded-lg border bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${proposalNameError ? 'border-red-400' : 'border-slate-200'}`}
+                  className={`flex h-10 w-full rounded-lg border bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:border-blue-500 ${proposalNameError ? 'border-red-400' : 'border-slate-200'}`}
                 />
                 {!!proposalNameError && (
                   <p className="text-xs text-red-500 mt-1">{proposalNameError}</p>
@@ -1406,7 +1406,7 @@ useEffect(() => {
                   <button
                     type="button"
                     onClick={toggleDropdown}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-2 text-xs font-medium text-white shadow-sm transition-colors hover:bg-indigo-700"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium text-white shadow-sm hover:bg-blue-700"
                   >
                     Add Shortcode
                   </button>
@@ -1438,7 +1438,7 @@ useEffect(() => {
                     type="checkbox"
                     checked={stepsVisibility.Introduction}
                     onChange={handleSwitchChange("Introduction")}
-                    className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                    className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:border-blue-500"
                   />
                   <span className="text-sm font-medium text-slate-700">Introduction</span>
                 </div>
@@ -1454,7 +1454,7 @@ useEffect(() => {
                     type="checkbox"
                     checked={stepsVisibility.Terms}
                     onChange={handleSwitchChange("Terms")}
-                    className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                    className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:border-blue-500"
                   />
                   <span className="text-sm font-medium text-slate-700">Terms</span>
                 </div>
@@ -1470,7 +1470,7 @@ useEffect(() => {
                     type="checkbox"
                     checked={stepsVisibility.ServicesInvoices}
                     onChange={handleSwitchChange("ServicesInvoices")}
-                    className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                    className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:border-blue-500"
                   />
                   <span className="text-sm font-medium text-slate-700">Services & Invoices</span>
                 </div>
@@ -1487,11 +1487,11 @@ useEffect(() => {
                       type="checkbox"
                       checked={stepsVisibility.CustomEmailMessage}
                       onChange={handleSwitchChange("CustomEmailMessage")}
-                      className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                      className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:border-blue-500"
                     />
                     <span className="text-sm font-medium text-slate-700">Custom message in email</span>
                   </div>
-                  <span className="rounded bg-indigo-600 px-2 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider">Best practice</span>
+                  <span className="rounded bg-blue-600 px-2 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider">Best practice</span>
                 </div>
                 <p className="text-xs text-slate-500 ml-7">
                   Your client will receive a link via email to view and sign this proposal.
@@ -1513,7 +1513,7 @@ useEffect(() => {
                     type="checkbox"
                     checked={stepsVisibility.Reminders}
                     onChange={handleSwitchChange("Reminders")}
-                    className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                    className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:border-blue-500"
                   />
                   <span className="text-sm font-medium text-slate-700">Reminders</span>
                 </div>
@@ -1526,7 +1526,7 @@ useEffect(() => {
                         value={daysuntilNextReminder}
                         onChange={(e) => setDaysuntilNextReminder(e.target.value)}
                         placeholder="Days"
-                        className="flex h-9 w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        className="flex h-9 w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm shadow-sm focus:outline-none focus:ring-2 focus:border-blue-500"
                       />
                     </div>
                     <div className="space-y-1">
@@ -1536,7 +1536,7 @@ useEffect(() => {
                         value={noOfReminder}
                         onChange={(e) => setNoOfReminder(e.target.value)}
                         placeholder="Count"
-                        className="flex h-9 w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        className="flex h-9 w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm shadow-sm focus:outline-none focus:ring-2 focus:border-blue-500"
                       />
                     </div>
                   </div>
@@ -1554,7 +1554,7 @@ useEffect(() => {
               placeholder="Introduction"
               value={introductionname}
               onChange={handleIntroductionName}
-              className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:border-blue-500"
             />
             <Editor
               onChange={handleIntroductionChange}
@@ -1574,7 +1574,7 @@ useEffect(() => {
               placeholder="Engagement letter"
               value={termsandconditionname}
               onChange={handleTermsandConditionName}
-              className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:border-blue-500"
             />
             <TermEditor onChange={handleTermsChange} content={termsContent} />
             {!!termsBodyError && (
@@ -1590,7 +1590,7 @@ useEffect(() => {
             {/* Invoice Option */}
             <div
               onClick={handleShowInvoiceForm}
-              className={`rounded-xl border p-4 cursor-pointer transition-all ${activeOption === "invoice" ? "border-indigo-400 bg-indigo-50 shadow-md ring-1 ring-indigo-200" : "border-slate-200 hover:border-slate-300"}`}
+              className={`rounded-xl border p-4 cursor-pointer transition-all ${activeOption === "invoice" ? "border-blue-400 bg-blue-50 shadow-md ring-1 ring-blue-200" : "border-slate-200 hover:border-slate-300"}`}
             >
               <p className="text-sm font-bold text-slate-800">Add invoice or ask for deposit</p>
               <p className="text-xs text-slate-500 mt-1">Create one-time or recurring invoice, or ask for deposit to sign</p>
@@ -1599,7 +1599,7 @@ useEffect(() => {
             {/* Service Option */}
             <div
               onClick={handleShowServiceForm}
-              className={`rounded-xl border p-4 cursor-pointer transition-all ${activeOption === "service" ? "border-indigo-400 bg-indigo-50 shadow-md ring-1 ring-indigo-200" : "border-slate-200 hover:border-slate-300"}`}
+              className={`rounded-xl border p-4 cursor-pointer transition-all ${activeOption === "service" ? "border-blue-400 bg-blue-50 shadow-md ring-1 ring-blue-200" : "border-slate-200 hover:border-slate-300"}`}
             >
               <p className="text-sm font-bold text-slate-800">Add itemized services without creating invoices</p>
               <p className="text-xs text-slate-500 mt-1">No invoice or deposit request will be created</p>
@@ -1664,7 +1664,7 @@ useEffect(() => {
                             </td>
                             <td className={`px-4 py-2 text-sm text-slate-600 ${row.isDiscount ? "text-red-500" : ""}`}>{row.amount}</td>
                             <td className="px-4 py-2">
-                              <input type="checkbox" name="tax" checked={row.tax} onChange={(e) => handleInputChange(index, e)} className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+                              <input type="checkbox" name="tax" checked={row.tax} onChange={(e) => handleInputChange(index, e)} className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:border-blue-500" />
                             </td>
                             <td className="px-4 py-2">
                               <div className="relative">
@@ -1695,10 +1695,10 @@ useEffect(() => {
 
                 {/* Add Row Buttons */}
                 <div className="flex items-center gap-4">
-                  <button onClick={() => addRow()} className="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-700">
+                  <button onClick={() => addRow()} className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700">
                     <AiOutlinePlusCircle className="h-4 w-4" /> Line item
                   </button>
-                  <button onClick={() => addRow(true)} className="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-700">
+                  <button onClick={() => addRow(true)} className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700">
                     <CiDiscount1 className="h-4 w-4" /> Discount
                   </button>
                 </div>
@@ -1735,44 +1735,44 @@ useEffect(() => {
                     <form className="mt-4 space-y-4">
                       <div className="space-y-1.5">
                         <label className="text-sm font-medium text-slate-700">Service Name</label>
-                        <input type="text" placeholder="Service Name" value={selectedRowData?.productName || ""} onChange={(e) => setSelectedRowData({ ...selectedRowData, productName: e.target.value })} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                        <input type="text" placeholder="Service Name" value={selectedRowData?.productName || ""} onChange={(e) => setSelectedRowData({ ...selectedRowData, productName: e.target.value })} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:border-blue-500" />
                       </div>
                       <div className="space-y-1.5">
                         <label className="text-sm font-medium text-slate-700">Description</label>
-                        <input type="text" placeholder="Description" value={selectedRowData?.description || ""} onChange={(e) => setSelectedRowData({ ...selectedRowData, description: e.target.value })} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                        <input type="text" placeholder="Description" value={selectedRowData?.description || ""} onChange={(e) => setSelectedRowData({ ...selectedRowData, description: e.target.value })} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:border-blue-500" />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1.5">
                           <label className="text-sm font-medium text-slate-700">Rate</label>
-                          <input type="text" placeholder="Rate" value={selectedRowData?.rate || ""} onChange={(e) => setSelectedRowData({ ...selectedRowData, rate: e.target.value })} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                          <input type="text" placeholder="Rate" value={selectedRowData?.rate || ""} onChange={(e) => setSelectedRowData({ ...selectedRowData, rate: e.target.value })} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:border-blue-500" />
                         </div>
                         <div className="space-y-1.5">
                           <label className="text-sm font-medium text-slate-700">Rate Type</label>
-                          <select value={selectedRateOption?.value || ""} onChange={(e) => { const opt = options.find(o => o.value === e.target.value); handleRateTypeChange(null, opt); }} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                          <select value={selectedRateOption?.value || ""} onChange={(e) => { const opt = options.find(o => o.value === e.target.value); handleRateTypeChange(null, opt); }} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:border-blue-500">
                             <option value="">Select Rate Type</option>
                             {options.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                           </select>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 mt-2">
-                        <input type="checkbox" checked={selectedRowData?.tax || false} onChange={(event) => handleServiceSwitch(event.target.checked)} className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+                        <input type="checkbox" checked={selectedRowData?.tax || false} onChange={(event) => handleServiceSwitch(event.target.checked)} className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:border-blue-500" />
                         <label className="text-sm text-slate-700">Tax</label>
                       </div>
 
                       <h4 className="text-base font-bold text-slate-800 pt-2">Category</h4>
                       <div className="space-y-1.5">
                         <label className="text-sm font-medium text-slate-700">Category Name</label>
-                        <select value={selectedCategory?.value || ""} onChange={(e) => { const opt = categoryoptions.find(o => o.value === e.target.value); handleCategoryChange(null, opt); }} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <select value={selectedCategory?.value || ""} onChange={(e) => { const opt = categoryoptions.find(o => o.value === e.target.value); handleCategoryChange(null, opt); }} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:border-blue-500">
                           <option value="">Category Name</option>
                           {categoryoptions.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                         </select>
                       </div>
-                      <button type="button" onClick={setCategoryFormOpen} className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-2 text-xs font-medium text-white shadow-sm hover:bg-indigo-700 mt-2">
+                      <button type="button" onClick={setCategoryFormOpen} className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium text-white shadow-sm hover:bg-blue-700 mt-2">
                         Create category
                       </button>
 
                       <div className="flex items-center gap-3 pt-4">
-                        <button type="button" onClick={createservicetemp} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700">Save</button>
+                        <button type="button" onClick={createservicetemp} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700">Save</button>
                         <button type="button" onClick={handleNewDrawerClose} className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">Cancel</button>
                       </div>
                     </form>
@@ -1788,10 +1788,10 @@ useEffect(() => {
                     <div className="mt-4 space-y-4">
                       <div className="space-y-1.5">
                         <label className="text-sm font-medium text-slate-700">Category Name</label>
-                        <input type="text" placeholder="Category Name" value={categorycreate} onChange={(e) => setcategorycreate(e.target.value)} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                        <input type="text" placeholder="Category Name" value={categorycreate} onChange={(e) => setcategorycreate(e.target.value)} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:border-blue-500" />
                       </div>
                       <div className="flex items-center gap-3">
-                        <button type="button" onClick={createCategory} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700">Create</button>
+                        <button type="button" onClick={createCategory} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700">Create</button>
                         <button type="button" onClick={handleCategoryFormClose} className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">Cancel</button>
                       </div>
                     </div>
@@ -1807,20 +1807,20 @@ useEffect(() => {
                     <div className="mt-4 space-y-4">
                       <div className="space-y-1.5">
                         <label className="text-sm font-bold text-slate-800">Product or service</label>
-                        <input type="text" value={selectedRowData?.productName || ""} onChange={(e) => setSelectedRowData({ ...selectedRowData, productName: e.target.value })} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                        <input type="text" value={selectedRowData?.productName || ""} onChange={(e) => setSelectedRowData({ ...selectedRowData, productName: e.target.value })} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:border-blue-500" />
                       </div>
                       <div className="space-y-1.5">
                         <label className="text-sm font-medium text-slate-700">Description</label>
-                        <textarea value={selectedRowData?.description || ""} onChange={(e) => setSelectedRowData({ ...selectedRowData, description: e.target.value })} className="flex min-h-[80px] w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                        <textarea value={selectedRowData?.description || ""} onChange={(e) => setSelectedRowData({ ...selectedRowData, description: e.target.value })} className="flex min-h-[80px] w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:border-blue-500" />
                       </div>
                       <div className="grid grid-cols-3 gap-3">
                         <div className="space-y-1.5">
                           <label className="text-sm font-medium text-slate-700">Rate</label>
-                          <input type="text" value={selectedRowData?.rate || ""} onChange={(e) => setSelectedRowData({ ...selectedRowData, rate: e.target.value })} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                          <input type="text" value={selectedRowData?.rate || ""} onChange={(e) => setSelectedRowData({ ...selectedRowData, rate: e.target.value })} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:border-blue-500" />
                         </div>
                         <div className="space-y-1.5">
                           <label className="text-sm font-medium text-slate-700">QTY</label>
-                          <input type="text" value={selectedRowData?.qty || ""} onChange={(e) => setSelectedRowData({ ...selectedRowData, qty: e.target.value })} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                          <input type="text" value={selectedRowData?.qty || ""} onChange={(e) => setSelectedRowData({ ...selectedRowData, qty: e.target.value })} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:border-blue-500" />
                         </div>
                         <div className="space-y-1.5">
                           <label className="text-sm font-medium text-slate-700">Amount</label>
@@ -1828,11 +1828,11 @@ useEffect(() => {
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <input type="checkbox" checked={selectedRowData?.tax} onChange={(event) => handleServiceWitch(event.target.checked)} className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+                        <input type="checkbox" checked={selectedRowData?.tax} onChange={(event) => handleServiceWitch(event.target.checked)} className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:border-blue-500" />
                         <label className="text-sm text-slate-700">Tax</label>
                       </div>
                       <div className="flex items-center gap-3 pt-2">
-                        <button type="button" onClick={handleSaveChanges} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700">Save</button>
+                        <button type="button" onClick={handleSaveChanges} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700">Save</button>
                         <button type="button" onClick={handleEditDrawerClose} className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">Cancel</button>
                       </div>
                     </div>
@@ -1851,21 +1851,21 @@ useEffect(() => {
               placeholder="Payment terms"
               value={paymentterms}
               onChange={handlePaymentTerms}
-              className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:border-blue-500"
             />
             <input
               type="text"
               placeholder="Payment due date"
               value={paymentduedate}
               onChange={handlePaymentDueDate}
-              className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:border-blue-500"
             />
             <input
               type="text"
               placeholder="Payment amount"
               value={paymentamount}
               onChange={handlePaymentAmount}
-              className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:border-blue-500"
             />
           </div>
         );
@@ -1914,14 +1914,14 @@ useEffect(() => {
                         onClick={() => handleStepClick(index)}
                         className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${
                           isActive
-                            ? 'bg-indigo-50 text-indigo-700 ring-1 ring-indigo-200'
+                            ? 'bg-blue-50 text-blue-700 ring-1 ring-blue-200'
                             : isCompleted
                             ? 'text-green-600'
                             : 'text-slate-400 hover:text-slate-600'
                         } ${isError ? 'text-red-600 bg-red-50 ring-1 ring-red-200' : ''}`}
                       >
                         <span className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${
-                          isActive ? 'bg-indigo-600 text-white' : isCompleted ? 'bg-green-500 text-white' : isError ? 'bg-red-500 text-white' : 'bg-slate-200 text-slate-500'
+                          isActive ? 'bg-blue-600 text-white' : isCompleted ? 'bg-green-500 text-white' : isError ? 'bg-red-500 text-white' : 'bg-slate-200 text-slate-500'
                         }`}>
                           {isCompleted ? '✓' : index + 1}
                         </span>
@@ -1935,7 +1935,7 @@ useEffect(() => {
             <div className="flex flex-col gap-2">
               <button
                 onClick={activeStep === steps.length - 1 ? handleReset : handleNext}
-                className="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-700 w-48"
+                className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 w-48"
               >
                 {activeStep === steps.length - 1 ? "Save Template" : "Next"}
               </button>
@@ -1956,7 +1956,7 @@ useEffect(() => {
           <div className="flex items-center justify-between">
             <button
               onClick={handleCreateTemplateClick}
-              className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-700"
+              className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700"
             >
               <AiOutlinePlusCircle className="h-4 w-4" /> Create Template
             </button>
@@ -1964,7 +1964,7 @@ useEffect(() => {
 
           {loading ? (
             <div className="flex items-center justify-center py-20">
-              <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
+              <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
             </div>
           ) : (
             <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
@@ -1987,7 +1987,7 @@ useEffect(() => {
                           <td className="px-5 py-3">
                             <button
                               onClick={() => handleEdit(row._id)}
-                              className="text-sm font-medium text-indigo-600 hover:text-indigo-800 hover:underline transition-colors"
+                              className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline transition-colors"
                             >
                               {row.templatename}
                             </button>
@@ -2035,7 +2035,7 @@ useEffect(() => {
                     <select
                       value={rowsPerPage}
                       onChange={(e) => handleChangeRowsPerPage({ target: { value: e.target.value } })}
-                      className="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-600 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-600 shadow-sm focus:outline-none focus:ring-2 focus:border-blue-500"
                     >
                       {[5, 10, 25, 50].map((opt) => (
                         <option key={opt} value={opt}>{opt} / page</option>

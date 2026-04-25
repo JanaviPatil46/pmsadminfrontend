@@ -900,7 +900,7 @@ function FolderList({ tempName, fetchAllFolders, folderData, templateId }) {
                 type="button"
                 disabled={isDisabled}
                 onClick={() => { if (!isDisabled) { handleEdit(selectedItem); handleMenuClose(); } }}
-                className="flex w-full items-center px-4 py-2 text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 disabled:text-slate-300 disabled:cursor-not-allowed transition-colors"
+                className="flex w-full items-center px-4 py-2 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-500 disabled:text-slate-300 disabled:cursor-not-allowed transition-colors"
               >Edit</button>
               <button
                 type="button"

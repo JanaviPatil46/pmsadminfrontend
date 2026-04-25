@@ -1225,7 +1225,7 @@ const InvoiceComponent = ({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-slate-700">Issue invoice</label>
-                <select value={invoice.issueInvoice || ''} onChange={(e) => handleIssueChange(invoice.id, e.target.value)} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <select value={invoice.issueInvoice || ''} onChange={(e) => handleIssueChange(invoice.id, e.target.value)} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                   {invoiceissueoptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                 </select>
               </div>
@@ -1233,11 +1233,11 @@ const InvoiceComponent = ({
                 <>
                   <div className="space-y-1.5">
                     <label className="text-sm font-medium text-slate-700">Date</label>
-                    <input type="date" value={invoice.specificDate ? (typeof invoice.specificDate === 'string' ? invoice.specificDate : invoice.specificDate.format?.('YYYY-MM-DD') || '') : ''} onChange={(e) => handleDateChange(invoice.id, e.target.value)} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                    <input type="date" value={invoice.specificDate ? (typeof invoice.specificDate === 'string' ? invoice.specificDate : invoice.specificDate.format?.('YYYY-MM-DD') || '') : ''} onChange={(e) => handleDateChange(invoice.id, e.target.value)} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-sm font-medium text-slate-700">Time</label>
-                    <select value={invoice.selectedTime || ''} onChange={(e) => handleTimeChange(invoice.id, e.target.value)} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <select value={invoice.selectedTime || ''} onChange={(e) => handleTimeChange(invoice.id, e.target.value)} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                       <option value="">Select Time</option>
                       {timeOptions.map(t => <option key={t} value={t}>{t}</option>)}
                     </select>
@@ -1250,7 +1250,7 @@ const InvoiceComponent = ({
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-slate-700">Description</label>
               <div className="relative">
-                <input type="text" value={invoice.description} onChange={(e) => handleDescriptionChange(invoice.id, e)} placeholder="Description" className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 pr-20 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                <input type="text" value={invoice.description} onChange={(e) => handleDescriptionChange(invoice.id, e)} placeholder="Description" className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 pr-20 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">{invoice.charCount}/{invoice.charLimit}</span>
               </div>
             </div>
@@ -1299,16 +1299,16 @@ const InvoiceComponent = ({
                             <input type="text" name="description" value={row.description} onChange={(e) => handleInputChange(invoice.id, rowIndex, e)} placeholder="Description" className="w-full border-0 bg-transparent text-sm focus:outline-none focus:ring-0" />
                           </td>
                           <td className="px-4 py-2">
-                            <input type="text" name="rate" value={row.rate} onChange={(e) => handleInputChange(invoice.id, rowIndex, e)} className={`w-20 rounded border bg-transparent px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 ${getInvoiceRowError(invoice.id, rowIndex, 'rate') ? 'border-red-400' : 'border-slate-200'}`} />
+                            <input type="text" name="rate" value={row.rate} onChange={(e) => handleInputChange(invoice.id, rowIndex, e)} className={`w-20 rounded border bg-transparent px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 ${getInvoiceRowError(invoice.id, rowIndex, 'rate') ? 'border-red-400' : 'border-slate-200'}`} />
                             {getInvoiceRowError(invoice.id, rowIndex, 'rate') && <p className="text-xs text-red-500 mt-0.5">{getInvoiceRowError(invoice.id, rowIndex, 'rate')}</p>}
                           </td>
                           <td className="px-4 py-2">
-                            <input type="text" name="quantity" value={row.quantity} onChange={(e) => handleInputChange(invoice.id, rowIndex, e)} className={`w-16 rounded border bg-transparent px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 ${getInvoiceRowError(invoice.id, rowIndex, 'quantity') ? 'border-red-400' : 'border-slate-200'}`} />
+                            <input type="text" name="quantity" value={row.quantity} onChange={(e) => handleInputChange(invoice.id, rowIndex, e)} className={`w-16 rounded border bg-transparent px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 ${getInvoiceRowError(invoice.id, rowIndex, 'quantity') ? 'border-red-400' : 'border-slate-200'}`} />
                             {getInvoiceRowError(invoice.id, rowIndex, 'quantity') && <p className="text-xs text-red-500 mt-0.5">{getInvoiceRowError(invoice.id, rowIndex, 'quantity')}</p>}
                           </td>
                           <td className="px-4 py-2 text-sm text-slate-700">${row.amount}</td>
                           <td className="px-4 py-2">
-                            <input type="checkbox" name="tax" checked={row.tax} onChange={(e) => handleInputChange(invoice.id, rowIndex, e)} className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+                            <input type="checkbox" name="tax" checked={row.tax} onChange={(e) => handleInputChange(invoice.id, rowIndex, e)} className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
                           </td>
                           <td className="px-4 py-2">
                             <button type="button" onClick={() => deleteRow(invoice.id, rowIndex)} className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-red-500">
@@ -1324,10 +1324,10 @@ const InvoiceComponent = ({
 
               {/* Add Row Buttons */}
               <div className="flex items-center gap-4 mt-2">
-                <button type="button" onClick={() => addRow(invoice.id)} className="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-700">
+                <button type="button" onClick={() => addRow(invoice.id)} className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700">
                   <AiOutlinePlusCircle className="h-4 w-4" /> Line item
                 </button>
-                <button type="button" onClick={() => addRow(invoice.id, true)} className="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-700">
+                <button type="button" onClick={() => addRow(invoice.id, true)} className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700">
                   <CiDiscount1 className="h-4 w-4" /> Discount
                 </button>
               </div>
@@ -1349,7 +1349,7 @@ const InvoiceComponent = ({
                       <td className="px-4 py-3 text-sm font-medium text-slate-700">${invoice.subtotal}</td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1">
-                          <input type="text" value={invoice.taxRate} onChange={(e) => handleTaxRateChange(invoice.id, e.target.value)} className="w-16 rounded border border-slate-200 bg-transparent px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500" />
+                          <input type="text" value={invoice.taxRate} onChange={(e) => handleTaxRateChange(invoice.id, e.target.value)} className="w-16 rounded border border-slate-200 bg-transparent px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" />
                           <span className="text-sm text-slate-500">%</span>
                         </div>
                       </td>
@@ -1375,7 +1375,7 @@ const InvoiceComponent = ({
 
       {/* Add Invoice Button */}
       <div className="flex items-center gap-3 mt-2">
-        <button type="button" onClick={addInvoice} className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-200 bg-white px-4 py-2 text-sm font-medium text-indigo-600 shadow-sm transition-colors hover:bg-indigo-50">
+        <button type="button" onClick={addInvoice} className="inline-flex items-center gap-1.5 rounded-lg border border-blue-200 bg-white px-4 py-2 text-sm font-medium text-blue-600 shadow-sm transition-colors hover:bg-blue-50">
           Add invoice
         </button>
       </div>

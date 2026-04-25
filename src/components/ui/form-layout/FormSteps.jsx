@@ -42,7 +42,7 @@ const FormSteps = ({ steps = [], currentStep = 0, onStepClick, className }) => {
                     "flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold transition-all duration-200",
                     isCompleted && "bg-primary text-primary-foreground",
                     isCurrent && "border-2 border-primary bg-primary/10 text-primary",
-                    !isCompleted && !isCurrent && "border-2 border-border bg-white text-muted-foreground"
+                    !isCompleted && !isCurrent && "border-2 border-border bg-background text-muted-foreground"
                   )}
                 >
                   {isCompleted ? (

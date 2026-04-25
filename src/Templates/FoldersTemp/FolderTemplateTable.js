@@ -35,7 +35,7 @@ function FolderTemplateTbel({
         <button
           type="button"
           onClick={handleCreateTemplate}
-          className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 active:scale-[0.98]"
+          className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/40 active:scale-[0.98]"
         >
           <Plus className="h-4 w-4" />
           Create Template
@@ -67,7 +67,7 @@ function FolderTemplateTbel({
                       <button
                         type="button"
                         onClick={() => handleEdit(template._id)}
-                        className="text-sm font-medium text-indigo-600 hover:text-indigo-800 hover:underline transition-colors"
+                        className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline transition-colors"
                       >
                         {template.templatename}
                       </button>

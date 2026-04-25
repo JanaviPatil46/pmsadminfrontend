@@ -379,7 +379,7 @@ const Tags = () => {
       {/* Table */}
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
+          <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
         </div>
       ) : (
         <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
@@ -463,7 +463,7 @@ const Tags = () => {
                 <select
                   value={rowsPerPage}
                   onChange={(e) => handleChangeRowsPerPage({ target: { value: e.target.value } })}
-                  className="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-600 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-600 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   {[5, 10, 25, 50].map((opt) => (
                     <option key={opt} value={opt}>{opt} / page</option>
@@ -499,7 +499,7 @@ const Tags = () => {
         <SheetContent className="sm:max-w-md overflow-y-auto">
           <SheetHeader>
             <SheetTitle className="flex items-center gap-2">
-              <Tag className="h-5 w-5 text-indigo-500" /> Create Tag
+              <Tag className="h-5 w-5 text-blue-500" /> Create Tag
             </SheetTitle>
             <SheetDescription>Add a new tag with a name and color.</SheetDescription>
           </SheetHeader>
@@ -572,7 +572,7 @@ const Tags = () => {
         <SheetContent className="sm:max-w-md overflow-y-auto">
           <SheetHeader>
             <SheetTitle className="flex items-center gap-2">
-              <Pencil className="h-5 w-5 text-indigo-500" /> Edit Tag
+              <Pencil className="h-5 w-5 text-blue-500" /> Edit Tag
             </SheetTitle>
             <SheetDescription>Update the tag name and color.</SheetDescription>
           </SheetHeader>

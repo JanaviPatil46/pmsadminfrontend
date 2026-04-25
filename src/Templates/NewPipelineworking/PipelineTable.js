@@ -100,7 +100,7 @@ const PipelineTable = () => {
         <h1 className="text-xl font-semibold text-slate-900">Pipeline Templates</h1>
         <button
           onClick={handelCreateNew}
-          className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 hover:shadow-md active:scale-[0.98]"
+          className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-blue-700 hover:shadow-md active:scale-[0.98]"
         >
           <Plus className="h-4 w-4" />
           Create New Pipeline
@@ -121,11 +121,11 @@ const PipelineTable = () => {
             <tbody className="divide-y divide-slate-100">
               {pipelineData?.length > 0 ? (
                 pipelineData.map((pipeline, idx) => (
-                  <tr key={pipeline._id} className={`transition-colors hover:bg-indigo-50/40 ${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'}`}>
+                  <tr key={pipeline._id} className={`transition-colors hover:bg-blue-50/40 ${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'}`}>
                     <td className="px-5 py-3.5">
                       <Link
                         to={`/firmtemp/pipelineform?edit=${pipeline._id}`}
-                        className="text-sm font-medium text-indigo-600 hover:text-indigo-800 hover:underline transition-colors"
+                        className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline transition-colors"
                       >
                         {pipeline.pipelineName}
                       </Link>
@@ -146,7 +146,7 @@ const PipelineTable = () => {
                         {anchorEl === pipeline._id && (
                           <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-slate-200 bg-white py-1 shadow-lg animate-in fade-in slide-in-from-top-1">
                             <button onClick={handleEdit} className="flex w-full items-center px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">Edit</button>
-                            <button onClick={handleDelete} className="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">Delete</button>
+                            <button onClick={handleDelete} className="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors focus:ring-blue-500">Delete</button>
                           </div>
                         )}
                       </div>

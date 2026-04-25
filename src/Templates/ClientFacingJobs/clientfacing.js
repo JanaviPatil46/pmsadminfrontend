@@ -300,7 +300,7 @@ const validateForm = () => {
         {/* Display Current Status */}
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
+            <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
           </div>
         ) : (
           <div className="space-y-3">

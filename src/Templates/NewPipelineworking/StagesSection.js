@@ -776,7 +776,7 @@ console.log("Preparing automation for saving:", automationData);
                 <p className="text-sm font-semibold text-slate-700 mb-2">{automationSelect}</p>
                 <p className="text-xs text-slate-500 mb-1">Select template</p>
                 <select
-                  className="w-full h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  className="w-full h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                   value={automation.selectedtemp?.value || ""}
                   onChange={(e) => { const opt = taskTemplateOptions.find(o => o.value === e.target.value); handletemp(opt || null, automationSelect, automationIndex); }}
                 >
@@ -788,7 +788,7 @@ console.log("Preparing automation for saving:", automationData);
                     <span className="text-xs text-slate-500">Only for:</span>{selectedTagElements}
                   </div>
                 )}
-                <button type="button" onClick={() => handleAddConditions(automationIndex)} className="mt-2 text-xs text-indigo-600 hover:underline">
+                <button type="button" onClick={() => handleAddConditions(automationIndex)} className="mt-2 text-xs text-blue-600 hover:underline">
                   {selectedTags.length > 0 ? "Edit Conditions" : "Add Conditions"}
                 </button>
             </div>
@@ -802,7 +802,7 @@ console.log("Preparing automation for saving:", automationData);
                 <p className="text-sm font-semibold text-slate-700 mb-2">{automationSelect}</p>
                 <p className="text-xs text-slate-500 mb-1">Select template</p>
                 <select
-                  className="w-full h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  className="w-full h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                   value={automation.selectedtemp?.value || ""}
                   onChange={(e) => { const opt = emailTemplateOptions.find(o => o.value === e.target.value); handletemp(opt || null, automationSelect, automationIndex); }}
                 >
@@ -814,7 +814,7 @@ console.log("Preparing automation for saving:", automationData);
                     <span className="text-xs text-slate-500">Only for:</span>{selectedTagElements}
                   </div>
                 )}
-                <button type="button" onClick={() => handleAddConditions(automationIndex)} className="mt-2 text-xs text-indigo-600 hover:underline">
+                <button type="button" onClick={() => handleAddConditions(automationIndex)} className="mt-2 text-xs text-blue-600 hover:underline">
                   {selectedTags.length > 0 ? "Edit Conditions" : "Add Conditions"}
                 </button>
             </div>
@@ -828,7 +828,7 @@ console.log("Preparing automation for saving:", automationData);
                 <p className="text-sm font-semibold text-slate-700 mb-2">{automationSelect}</p>
                 <p className="text-xs text-slate-500 mb-1">Select template</p>
                 <select
-                  className="w-full h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  className="w-full h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                   value={automation.selectedtemp?.value || ""}
                   onChange={(e) => { const opt = chatTemplateOptions.find(o => o.value === e.target.value); handletemp(opt || null, automationSelect, automationIndex); }}
                 >
@@ -840,7 +840,7 @@ console.log("Preparing automation for saving:", automationData);
                     <span className="text-xs text-slate-500">Only for:</span>{selectedTagElements}
                   </div>
                 )}
-                <button type="button" onClick={() => handleAddConditions(automationIndex)} className="mt-2 text-xs text-indigo-600 hover:underline">
+                <button type="button" onClick={() => handleAddConditions(automationIndex)} className="mt-2 text-xs text-blue-600 hover:underline">
                   {selectedTags.length > 0 ? "Edit Conditions" : "Add Conditions"}
                 </button>
             </div>
@@ -854,7 +854,7 @@ console.log("Preparing automation for saving:", automationData);
                 <p className="text-sm font-semibold text-slate-700 mb-2">{automationSelect}</p>
                 <p className="text-xs text-slate-500 mb-1">Select template</p>
                 <select
-                  className="w-full h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  className="w-full h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                   value={automation.selectedtemp?.value || ""}
                   onChange={(e) => { const opt = invoiceTemplateOptions.find(o => o.value === e.target.value); handletemp(opt || null, automationSelect, automationIndex); }}
                 >
@@ -866,7 +866,7 @@ console.log("Preparing automation for saving:", automationData);
                     <span className="text-xs text-slate-500">Only for:</span>{selectedTagElements}
                   </div>
                 )}
-                <button type="button" onClick={() => handleAddConditions(automationIndex)} className="mt-2 text-xs text-indigo-600 hover:underline">
+                <button type="button" onClick={() => handleAddConditions(automationIndex)} className="mt-2 text-xs text-blue-600 hover:underline">
                   {selectedTags.length > 0 ? "Edit Conditions" : "Add Conditions"}
                 </button>
             </div>
@@ -880,7 +880,7 @@ console.log("Preparing automation for saving:", automationData);
                 <p className="text-sm font-semibold text-slate-700 mb-2">{automationSelect}</p>
                 <p className="text-xs text-slate-500 mb-1">Select template</p>
                 <select
-                  className="w-full h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  className="w-full h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                   value={automation.selectedtemp?.value || ""}
                   onChange={(e) => { const opt = proposalElsOptions.find(o => o.value === e.target.value); handletemp(opt || null, automationSelect, automationIndex); }}
                 >
@@ -892,7 +892,7 @@ console.log("Preparing automation for saving:", automationData);
                     <span className="text-xs text-slate-500">Only for:</span>{selectedTagElements}
                   </div>
                 )}
-                <button type="button" onClick={() => handleAddConditions(automationIndex)} className="mt-2 text-xs text-indigo-600 hover:underline">
+                <button type="button" onClick={() => handleAddConditions(automationIndex)} className="mt-2 text-xs text-blue-600 hover:underline">
                   {selectedTags.length > 0 ? "Edit Conditions" : "Add Conditions"}
                 </button>
             </div>
@@ -906,7 +906,7 @@ console.log("Preparing automation for saving:", automationData);
                 <p className="text-sm font-semibold text-slate-700 mb-2">{automationSelect}</p>
                 <p className="text-xs text-slate-500 mb-1">Select template</p>
                 <select
-                  className="w-full h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  className="w-full h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                   value={automation.selectedtemp?.value || ""}
                   onChange={(e) => { const opt = optionfolder.find(o => o.value === e.target.value); handletemp(opt || null, automationSelect, automationIndex); }}
                 >
@@ -918,7 +918,7 @@ console.log("Preparing automation for saving:", automationData);
                     <span className="text-xs text-slate-500">Only for:</span>{selectedTagElements}
                   </div>
                 )}
-                <button type="button" onClick={() => handleAddConditions(automationIndex)} className="mt-2 text-xs text-indigo-600 hover:underline">
+                <button type="button" onClick={() => handleAddConditions(automationIndex)} className="mt-2 text-xs text-blue-600 hover:underline">
                   {selectedTags.length > 0 ? "Edit Conditions" : "Add Conditions"}
                 </button>
             </div>
@@ -932,7 +932,7 @@ console.log("Preparing automation for saving:", automationData);
                 <p className="text-sm font-semibold text-slate-700 mb-2">{automationSelect}</p>
                 <p className="text-xs text-slate-500 mb-1">Select template</p>
                 <select
-                  className="w-full h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  className="w-full h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                   value={automation.selectedtemp?.value || ""}
                   onChange={(e) => { const opt = organizerOptions.find(o => o.value === e.target.value); handletemp(opt || null, automationSelect, automationIndex); }}
                 >
@@ -944,7 +944,7 @@ console.log("Preparing automation for saving:", automationData);
                     <span className="text-xs text-slate-500">Only for:</span>{selectedTagElements}
                   </div>
                 )}
-                <button type="button" onClick={() => handleAddConditions(automationIndex)} className="mt-2 text-xs text-indigo-600 hover:underline">
+                <button type="button" onClick={() => handleAddConditions(automationIndex)} className="mt-2 text-xs text-blue-600 hover:underline">
                   {selectedTags.length > 0 ? "Edit Conditions" : "Add Conditions"}
                 </button>
             </div>
@@ -1087,7 +1087,7 @@ case "Update client-facing job status":
         <div>
           <label className="block text-xs font-medium text-slate-600 mb-1">Visibility for client</label>
           <select
-            className="w-full h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+            className="w-full h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
             value={automation.status?.value !== undefined ? String(automation.status.value) : ""}
             onChange={(e) => { const opt = statusOptions.find(o => String(o.value) === e.target.value); updateAutomationState(automationIndex, { status: opt || null }); }}
           >
@@ -1100,7 +1100,7 @@ case "Update client-facing job status":
             <div>
               <label className="block text-xs font-medium text-slate-600 mb-1">Select status</label>
               <select
-                className="w-full h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                 value={automation.selectedClientStatus?.value || ""}
                 onChange={(e) => { const opt = optionstatus.find(o => o.value === e.target.value); handleClientStatusSelection(null, opt || null, automationIndex); }}
               >
@@ -1114,7 +1114,7 @@ case "Update client-facing job status":
               <label className="block text-xs font-medium text-slate-600 mb-1">Status description for client</label>
               <textarea
                 rows={3}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 resize-none"
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 resize-none"
                 value={automation.clientDescription || clientDescription}
                 onChange={(e) => updateAutomationState(automationIndex, { clientDescription: e.target.value })}
                 placeholder="Status description for client"
@@ -1128,7 +1128,7 @@ case "Update client-facing job status":
             <span className="text-xs text-slate-500">Only for:</span>{selectedTagElements}
           </div>
         )}
-        <button type="button" onClick={() => handleAddConditions(automationIndex)} className="text-xs text-indigo-600 hover:underline">
+        <button type="button" onClick={() => handleAddConditions(automationIndex)} className="text-xs text-blue-600 hover:underline">
           {selectedTags.length > 0 ? "Edit Conditions" : "Add Conditions"}
         </button>
       </div>
@@ -1162,7 +1162,7 @@ case "Update client-facing job status":
                   <span className="text-xs text-slate-500">Only for:</span>{selectedTagElements}
                 </div>
               )}
-              <button type="button" onClick={() => handleAddConditions(automationIndex)} className="text-xs text-indigo-600 hover:underline">
+              <button type="button" onClick={() => handleAddConditions(automationIndex)} className="text-xs text-blue-600 hover:underline">
                 {selectedTags.length > 0 ? "Edit Conditions" : "Add Conditions"}
               </button>
             </div>
@@ -1196,7 +1196,7 @@ case "Update client-facing job status":
                   <span className="text-xs text-slate-500">Only for:</span>{selectedTagElements}
                 </div>
               )}
-              <button type="button" onClick={() => handleAddConditions(automationIndex)} className="text-xs text-indigo-600 hover:underline">
+              <button type="button" onClick={() => handleAddConditions(automationIndex)} className="text-xs text-blue-600 hover:underline">
                 {selectedTags.length > 0 ? "Edit Conditions" : "Add Conditions"}
               </button>
             </div>
@@ -1223,7 +1223,7 @@ case "Update client-facing job status":
         <button
           type="button"
           onClick={() => handleAddStage(stages.length)}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition-colors"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 transition-colors"
         >
           <Plus className="h-4 w-4" />
           Add Stage
@@ -1242,7 +1242,7 @@ case "Update client-facing job status":
                     <div className="flex-1 relative">
                       <input
                         type="text"
-                        className="w-full h-8 rounded-lg border border-slate-200 bg-white px-2 pr-7 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                        className="w-full h-8 rounded-lg border border-slate-200 bg-white px-2 pr-7 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                         placeholder="Stage Name"
                         value={stage.name}
                         onChange={(e) => handleStageNameChange(e, index)}
@@ -1338,7 +1338,7 @@ case "Update client-facing job status":
                                 {/* Automation Header */}
                                 <div className="flex items-center justify-between mb-1.5">
                                   <div className="flex items-center gap-1.5">
-                                    <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-indigo-600 text-white text-[10px] font-bold">
+                                    <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-white text-[10px] font-bold">
                                       {automation.index}
                                     </span>
                                     <span className="text-xs font-semibold text-slate-700">{automation.type}</span>
@@ -1366,7 +1366,7 @@ case "Update client-facing job status":
                                       <span className="text-[10px] font-medium text-slate-700">{clientStatusDetails.label}</span>
                                     </span>
                                     {automation.status === true && (
-                                      <span className="rounded-full border border-indigo-300 px-1.5 text-[10px] text-indigo-600">Visible</span>
+                                      <span className="rounded-full border border-blue-300 px-1.5 text-[10px] text-blue-600">Visible</span>
                                     )}
                                   </div>
                                 )}
@@ -1433,7 +1433,7 @@ case "Update client-facing job status":
                       <button
                         type="button"
                         onClick={() => handleEditAutomations(index)}
-                        className="mt-2 w-full inline-flex items-center justify-center gap-1.5 rounded-lg border border-indigo-500 px-3 py-1.5 text-xs font-semibold text-indigo-600 hover:bg-indigo-600 hover:text-white transition-colors"
+                        className="mt-2 w-full inline-flex items-center justify-center gap-1.5 rounded-lg border border-blue-500 px-3 py-1.5 text-xs font-semibold text-blue-600 hover:bg-blue-600 hover:text-white transition-colors"
                       >
                         <Pencil className="h-3.5 w-3.5" />
                         Edit Automations ({stage.automations.length})
@@ -1442,7 +1442,7 @@ case "Update client-facing job status":
                       <button
                         type="button"
                         onClick={(event) => handleAutomationMenuOpen(event, index)}
-                        className="mt-2 w-full inline-flex items-center justify-center gap-1.5 rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:border-indigo-400 hover:text-indigo-600 transition-colors"
+                        className="mt-2 w-full inline-flex items-center justify-center gap-1.5 rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:border-blue-400 hover:text-blue-600 transition-colors"
                       >
                         <Plus className="h-3.5 w-3.5" />
                         Add Automation
@@ -1455,7 +1455,7 @@ case "Update client-facing job status":
                 <button
                   type="button"
                   onClick={() => handleAddStage(index + 1)}
-                  className="flex-shrink-0 self-center p-1 rounded-full text-indigo-500 hover:text-indigo-700 hover:bg-indigo-50 transition-colors"
+                  className="flex-shrink-0 self-center p-1 rounded-full text-blue-500 hover:text-blue-700 hover:bg-blue-50 transition-colors"
                 >
                   <Plus className="h-6 w-6" />
                 </button>
@@ -1472,7 +1472,7 @@ case "Update client-facing job status":
             <div className="fixed inset-0 z-40" onClick={handleAutomationMenuClose} />
             <div className="fixed z-50 w-52 rounded-xl border border-slate-200 bg-white py-1 shadow-xl overflow-y-auto max-h-56" style={{ top: anchorEl.getBoundingClientRect().bottom + 4, left: anchorEl.getBoundingClientRect().left }}>
               {AUTOMATION_TYPES.map(type => (
-                <button key={type} type="button" onClick={() => handleAddAutomation(stageSelected, type)} className="flex w-full items-center px-4 py-2 text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors text-left">{type}</button>
+                <button key={type} type="button" onClick={() => handleAddAutomation(stageSelected, type)} className="flex w-full items-center px-4 py-2 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-700 transition-colors text-left">{type}</button>
               ))}
             </div>
           </>
@@ -1525,7 +1525,7 @@ case "Update client-facing job status":
                 <button
                   type="button"
                   onClick={handleDrawerMenuOpen}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:border-indigo-400 hover:text-indigo-600 transition-colors"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:border-blue-400 hover:text-blue-600 transition-colors"
                 >
                   <Plus className="h-4 w-4" />
                   Add Another Automation
@@ -1535,7 +1535,7 @@ case "Update client-facing job status":
                 type="button"
                 onClick={handleSaveAllAutomations}
                 disabled={drawerAutomations.length === 0 || stageSelected === null}
-                className="w-full rounded-lg bg-indigo-600 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 disabled:bg-slate-200 disabled:text-slate-400 transition-colors"
+                className="w-full rounded-lg bg-blue-600 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 transition-colors"
               >
                 {stageSelected === null
                   ? 'No Stage Selected'
@@ -1554,7 +1554,7 @@ case "Update client-facing job status":
                   <div className="fixed inset-0 z-40" onClick={handleDrawerMenuClose} />
                   <div className="fixed z-50 w-52 rounded-xl border border-slate-200 bg-white py-1 shadow-xl overflow-y-auto max-h-56" style={{ top: rect.bottom + 4, left: rect.left }}>
                     {AUTOMATION_TYPES.map(type => (
-                      <button key={type} type="button" onClick={() => handleDrawerMenuItemSelect(type)} className="flex w-full items-center px-4 py-2 text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors text-left">{type}</button>
+                      <button key={type} type="button" onClick={() => handleDrawerMenuItemSelect(type)} className="flex w-full items-center px-4 py-2 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-700 transition-colors text-left">{type}</button>
                     ))}
                   </div>
                 </>
@@ -1569,7 +1569,7 @@ case "Update client-facing job status":
           <div className="fixed inset-0 bg-transparent" onClick={handleGoBack} />
           <div className="relative z-[60] flex flex-col bg-white shadow-2xl w-full max-w-[550px] h-full">
             <div className="flex items-center gap-3 px-5 py-4 border-b border-slate-200">
-              <button type="button" onClick={handleGoBack} className="p-1.5 rounded-lg text-indigo-600 hover:bg-indigo-50 transition-colors">
+              <button type="button" onClick={handleGoBack} className="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors">
                 <ChevronLeft className="h-5 w-5" />
               </button>
               <h2 className="text-base font-semibold text-slate-800">Add conditions</h2>
@@ -1580,7 +1580,7 @@ case "Update client-facing job status":
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                 <input
                   type="text"
-                  className="w-full h-9 rounded-lg border border-slate-200 bg-white pl-9 pr-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  className="w-full h-9 rounded-lg border border-slate-200 bg-white pl-9 pr-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                   placeholder="Search tags..."
                   value={searchTerm}
                   onChange={handleSearchChange}
@@ -1591,7 +1591,7 @@ case "Update client-facing job status":
                   <div key={tag._id} className="flex items-center gap-3 border-b border-slate-100 pb-2">
                     <input
                       type="checkbox"
-                      className="h-4 w-4 rounded border-slate-300 text-indigo-600"
+                      className="h-4 w-4 rounded border-slate-300 text-blue-600"
                       checked={tempSelectedTags.some(s => s._id === tag._id)}
                       onChange={() => handleCheckboxChange(tag)}
                     />
@@ -1605,7 +1605,7 @@ case "Update client-facing job status":
                 type="button"
                 disabled={tempSelectedTags.length === 0}
                 onClick={handleAddTags}
-                className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:bg-slate-200 disabled:text-slate-400 transition-colors"
+                className="rounded-lg bg-blue-600 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 transition-colors"
               >
                 {currentAutomationIndex !== null && drawerAutomations[currentAutomationIndex]?.selectedTags?.length > 0 ? "Update" : "Add"}
               </button>

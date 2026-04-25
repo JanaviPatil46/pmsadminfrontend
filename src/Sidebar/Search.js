@@ -152,7 +152,7 @@ const SearchComponent = () => {
     <>
       <div ref={containerRef} className="relative w-72">
         {/* Search input */}
-        <div className={`flex items-center gap-2 rounded-xl border bg-white px-3 py-2 shadow-sm transition-all duration-200 ${isFocused ? "border-indigo-400 ring-2 ring-indigo-500/15 shadow-md" : "border-slate-200 hover:border-slate-300"}`}>
+        <div className={`flex items-center gap-2 rounded-xl border bg-background px-3 py-2 shadow-sm transition-all duration-200 ${isFocused ? "border-primary ring-2 ring-primary/15 shadow-md" : "border-input hover:border-ring"}`}>
           {loading
             ? <Loader2 className="h-4 w-4 text-slate-400 shrink-0 animate-spin" />
             : <Search className="h-4 w-4 text-slate-400 shrink-0" />
@@ -178,7 +178,7 @@ const SearchComponent = () => {
 
         {/* Dropdown results */}
         {showDropdown && (
-          <div className="absolute left-0 right-0 top-full z-50 mt-1.5 rounded-xl border border-slate-200 bg-white shadow-xl ring-1 ring-black/5 overflow-hidden">
+          <div className="absolute left-0 right-0 top-full z-50 mt-1.5 rounded-xl border border-border bg-popover shadow-xl ring-1 ring-black/5 overflow-hidden">
             {/* Filter tabs */}
             <div className="flex items-center gap-1 border-b border-slate-100 px-3 py-2">
               {FILTER_TYPES.map((type) => {
@@ -190,13 +190,13 @@ const SearchComponent = () => {
                     onClick={() => setFilterType(type)}
                     className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium transition-all ${
                       filterType === type
-                        ? "bg-indigo-600 text-white shadow-sm"
-                        : "text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                     }`}
                   >
                     {type}
                     {count > 0 && (
-                      <span className={`rounded-full px-1.5 py-0 text-[10px] font-semibold ${filterType === type ? "bg-white/25 text-white" : "bg-slate-200 text-slate-600"}`}>
+                      <span className={`rounded-full px-1.5 py-0 text-[10px] font-semibold ${filterType === type ? "bg-primary-foreground/25 text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
                         {count}
                       </span>
                     )}
@@ -227,9 +227,9 @@ const SearchComponent = () => {
                             handleClick(option.id);
                           }
                         }}
-                        className="flex w-full items-center gap-3 px-3 py-2.5 text-left transition-colors hover:bg-slate-50"
+                        className="flex w-full items-center gap-3 px-3 py-2.5 text-left transition-colors hover:bg-accent"
                       >
-                        <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-white text-xs font-semibold ${option.type === "Accounts" ? "bg-indigo-500" : "bg-emerald-500"}`}>
+                        <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-white text-xs font-semibold ${option.type === "Accounts" ? "bg-primary" : "bg-emerald-500"}`}>
                           {option.type === "Accounts"
                             ? <Building2 className="h-4 w-4" />
                             : <User className="h-4 w-4" />
@@ -239,7 +239,7 @@ const SearchComponent = () => {
                           <p className="truncate text-sm font-semibold text-slate-800">{option.label}</p>
                           <p className="truncate text-xs text-slate-500">{option.subLabel}</p>
                         </div>
-                        <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ${option.type === "Accounts" ? "bg-indigo-50 text-indigo-600" : "bg-emerald-50 text-emerald-600"}`}>
+                        <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ${option.type === "Accounts" ? "bg-primary/10 text-primary" : "bg-emerald-50 text-emerald-600"}`}>
                           {option.type === "Accounts" ? "Account" : "Contact"}
                         </span>
                       </button>
@@ -259,7 +259,7 @@ const SearchComponent = () => {
             className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm transition-opacity"
             onClick={handleCloseDrawer}
           />
-          <div className="fixed right-0 top-0 z-50 flex h-full w-full max-w-lg flex-col bg-white shadow-2xl transition-transform duration-300">
+          <div className="fixed right-0 top-0 z-50 flex h-full w-full max-w-lg flex-col bg-background shadow-2xl transition-transform duration-300">
             <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
               <h2 className="text-base font-semibold text-slate-900">Edit Contact</h2>
               <button

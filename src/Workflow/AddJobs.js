@@ -1881,7 +1881,7 @@ const [isProcessing, setIsProcessing] = useState(false);
 
       {isDrawerOpen && (
         <div className="fixed inset-0 z-50 flex">
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsDrawerOpen(false)} />
+          <div className="fixed inset-0 bg-foreground/50 backdrop-blur-sm" onClick={() => setIsDrawerOpen(false)} />
           <div className="ml-auto relative z-50 w-full max-w-[520px] bg-background h-full flex flex-col shadow-2xl">
             <DrawerContent selectedAccounts={combinedaccountValues} />
           </div>

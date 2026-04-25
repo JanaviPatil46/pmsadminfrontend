@@ -766,15 +766,15 @@ const ServicesInvoicesStep = ({
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-semibold text-indigo-600">Services & Invoices</h2>
+      <h2 className="text-2xl font-semibold text-blue-600">Services & Invoices</h2>
 
       <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-6" onBlur={handleOptionBlur}>
         <p className="text-sm font-semibold text-slate-700 mb-3">Select Option *</p>
         <div className="space-y-3">
           <label className={`flex items-start gap-3 rounded-xl border p-4 cursor-pointer transition-all ${
-            formData.services.option === 'invoice' ? 'border-indigo-400 bg-indigo-50/50 border-2' : stepErrors.option ? 'border-red-300 bg-red-50/30' : 'border-slate-200 bg-white'
+            formData.services.option === 'invoice' ? 'border-blue-400 bg-blue-50/50 border-2' : stepErrors.option ? 'border-red-300 bg-red-50/30' : 'border-slate-200 bg-white'
           }`}>
-            <input type="radio" name="serviceOption" value="invoice" checked={formData.services.option === 'invoice'} onChange={(e) => handleServiceTypeChange(e.target.value)} className="mt-1 h-4 w-4 text-indigo-600 border-slate-300 focus:ring-indigo-500" />
+            <input type="radio" name="serviceOption" value="invoice" checked={formData.services.option === 'invoice'} onChange={(e) => handleServiceTypeChange(e.target.value)} className="mt-1 h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500" />
             <div>
               <span className="text-sm font-semibold text-slate-800">Add Invoice</span>
               <p className="text-xs text-slate-500 mt-0.5">Create one-time or recurring invoice, or ask for deposit to sign</p>
@@ -782,9 +782,9 @@ const ServicesInvoicesStep = ({
           </label>
 
           <label className={`flex items-start gap-3 rounded-xl border p-4 cursor-pointer transition-all ${
-            formData.services.option === 'services' ? 'border-indigo-400 bg-indigo-50/50 border-2' : stepErrors.option ? 'border-red-300 bg-red-50/30' : 'border-slate-200 bg-white'
+            formData.services.option === 'services' ? 'border-blue-400 bg-blue-50/50 border-2' : stepErrors.option ? 'border-red-300 bg-red-50/30' : 'border-slate-200 bg-white'
           }`}>
-            <input type="radio" name="serviceOption" value="services" checked={formData.services.option === 'services'} onChange={(e) => handleServiceTypeChange(e.target.value)} className="mt-1 h-4 w-4 text-indigo-600 border-slate-300 focus:ring-indigo-500" />
+            <input type="radio" name="serviceOption" value="services" checked={formData.services.option === 'services'} onChange={(e) => handleServiceTypeChange(e.target.value)} className="mt-1 h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500" />
             <div>
               <span className="text-sm font-semibold text-slate-800">Itemized Services</span>
               <p className="text-xs text-slate-500 mt-0.5">No invoice or deposit request will be created</p>
