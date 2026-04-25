@@ -5,10 +5,12 @@ import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import ComposeEmailDrawer from "./ComposeDrawer";
 import { Avatar as ShadAvatar, AvatarFallback } from "../../components/ui/avatar";
-import { Separator } from "../../components/ui/separator";
 import { Button as ShadButton } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
-import { Search, Reply, Trash2, X, Pencil, Paperclip, Send as SendIcon } from "lucide-react";
+import {
+  Search, Reply, X, Pencil, Paperclip, Send as SendIcon,
+  ChevronDown, ChevronUp, Mail,
+} from "lucide-react";
 
 const AVATAR_COLORS = ["#00ACC1","#7C3AED","#16A34A","#DC2626","#D97706","#2563EB","#DB2777"];
 const getAvatarColor = (str = "") => {
@@ -28,13 +30,17 @@ const getRelativeTime = (dateStr) => {
   return `${diffDays}D`;
 };
 
+
 const EmailViewer = ({ type }) => {
   const { data } = useParams();
   const navigate = useNavigate();
 
   const [threads, setThreads] = useState([]);
   const [selectedThreadId, setSelectedThreadId] = useState(null);
+  const [threadTab, setThreadTab] = useState(0); // 0 = All, 1 = Unread
   const [replyText, setReplyText] = useState("");
+  const [replyingToMessageId, setReplyingToMessageId] = useState(null);
+  const [expandedMessageId, setExpandedMessageId] = useState(null);
   const [previewFile, setPreviewFile] = useState(null);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [contactMap, setContactMap] = useState({});
@@ -278,232 +284,296 @@ const formatThreadTitle = (thread) => {
 
   const selectedThread = threads.find((t) => t._id === selectedThreadId);
 
+  const visibleThreads = threads.filter((t) => {
+    if (threadTab === 1) return !t.latest?.read;
+    return true;
+  });
+
   return (
-    <>
-      <div className="flex h-full overflow-hidden bg-card">
+    <div className="flex h-full overflow-hidden bg-background">
 
-        {/* ── LEFT: Thread list panel ── */}
-        <div className="w-[320px] shrink-0 flex flex-col border-r border-border h-full overflow-hidden">
+      {/* ══════════════════════════════════
+          PANEL 1 — Thread List
+      ══════════════════════════════════ */}
+      <div className="w-[300px] shrink-0 flex flex-col border-r border-border/40 h-full overflow-hidden bg-background">
 
-          {/* Search + Compose header */}
-          <div className="px-3 pt-3 pb-2.5 border-b border-border shrink-0 space-y-2">
-            <div className="relative">
-              <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
-              <Input
-                placeholder="Search"
-                className="pl-8 h-8 text-xs rounded-lg border-border bg-muted"
-              />
-            </div>
+        {/* Header */}
+        <div className="px-4 pt-4 pb-0 shrink-0">
+          <div className="flex items-center justify-between mb-3">
+            <h1 className="text-[15px] font-semibold text-foreground tracking-tight capitalize">{type}</h1>
             <ShadButton
+              variant="ghost"
               size="sm"
-              className="w-full h-8 text-xs rounded-lg gap-1.5 bg-primary hover:bg-primary/90 text-primary-foreground"
+              className="h-7 w-7 p-0 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted"
               onClick={() => setOpenDrawer(true)}
+              title="Compose"
             >
-              <Pencil size={11} />
-              Compose
+              <Pencil className="h-3.5 w-3.5" />
             </ShadButton>
           </div>
 
-          {/* Thread list */}
-          <div className="flex-1 overflow-y-auto">
-            {threads.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 gap-2">
-                <span className="text-3xl opacity-20">✉</span>
-                <p className="text-xs text-muted-foreground">No emails found</p>
-              </div>
-            ) : (
-              threads.map((thread) => {
-                const latest = thread.latest;
-                const isSelected = selectedThreadId === thread._id;
-                const isUnread = !latest?.read;
-                const senderRaw = type === "sent"
-                  ? (Array.isArray(latest?.to) ? latest.to[0] : latest?.to)
-                  : latest?.from;
-                const avatarBg = getAvatarColor(senderRaw || "");
-                const initials = getInitialsFromStr(senderRaw || "");
+          {/* Search */}
+          <div className="relative mb-3">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+            <Input
+              placeholder="Search…"
+              className="pl-8 h-8 text-[12px] rounded-md border-0 bg-muted/50 focus-visible:bg-muted focus-visible:ring-1 placeholder:text-muted-foreground/50"
+            />
+          </div>
 
-                return (
-                  <div
-                    key={thread._id}
-                    onClick={() => { setSelectedThreadId(thread._id); markThreadAsRead(thread._id); }}
-                    className={`flex items-start gap-2.5 px-3.5 py-3 cursor-pointer border-b border-border transition-colors ${
-                      isSelected
-                        ? "border-l-2 border-l-primary bg-primary/5"
-                        : "border-l-2 border-l-transparent hover:bg-muted/50"
-                    }`}
-                  >
-                    {/* Avatar */}
-                    <ShadAvatar className="h-8 w-8 shrink-0 mt-0.5">
-                      <AvatarFallback style={{ backgroundColor: avatarBg }} className="text-white text-[10px] font-bold">
-                        {initials}
-                      </AvatarFallback>
-                    </ShadAvatar>
-
-                    {/* Content */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-0.5">
-                        <span className={`text-[12px] truncate max-w-[140px] ${
-                          isUnread ? "font-bold text-foreground" : "font-medium text-foreground/80"
-                        }`}>
-                          {formatThreadTitle(thread)}
-                        </span>
-                        <span className="text-[10px] text-muted-foreground shrink-0 ml-1">
-                          {getRelativeTime(latest?.createdAt || latest?.date)}
-                        </span>
-                      </div>
-                      <div className={`text-[11.5px] truncate mb-0.5 ${
-                        isUnread ? "font-semibold text-foreground" : "text-muted-foreground"
-                      }`}>
-                        {latest?.subject || "(No Subject)"}
-                      </div>
-                      <div className="text-[11px] text-muted-foreground truncate">
-                        {getPreview(latest?.body || "", 55)}
-                      </div>
-                    </div>
-
-                    {/* Unread dot */}
-                    {isUnread && (
-                      <div className="w-2 h-2 rounded-full bg-primary shrink-0 mt-1.5" />
-                    )}
-                  </div>
-                );
-              })
-            )}
+          {/* Tabs */}
+          <div className="flex border-b border-border/40 -mx-4 px-4">
+            {["All", "Unread"].map((label, i) => (
+              <button
+                key={label}
+                onClick={() => setThreadTab(i)}
+                className={`px-3 py-2 text-[12px] font-medium border-b-2 -mb-px transition-colors duration-150 ${
+                  threadTab === i
+                    ? "border-primary text-foreground"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {label}
+                {i === 1 && unreadCount > 0 && (
+                  <span className="ml-1.5 inline-flex items-center justify-center min-w-[16px] h-4 rounded-full bg-primary/15 text-primary text-[10px] font-bold px-1">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* ── RIGHT: Email viewer panel ── */}
-        <div className="flex-1 flex flex-col h-full overflow-hidden bg-card">
-          {selectedThread ? (
-            <>
-              {/* Subject + action bar */}
-              <div className="flex items-start justify-between px-5 py-4 border-b border-border shrink-0">
-                <h2 className="text-base font-bold text-foreground leading-snug flex-1 mr-4 truncate">
-                  {selectedThread.latest?.subject || "(No Subject)"}
-                </h2>
-                <div className="flex items-center gap-0.5 shrink-0">
-                  <ShadButton variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted">
-                    <Reply size={15} />
-                  </ShadButton>
-                  <ShadButton variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10">
-                    <Trash2 size={15} />
-                  </ShadButton>
-                  <ShadButton variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted" onClick={() => setSelectedThreadId(null)}>
-                    <X size={15} />
-                  </ShadButton>
-                </div>
-              </div>
-
-              {/* Messages — scrollable */}
-              <div className="flex-1 overflow-y-auto px-5 pb-4">
-                {selectedThread.messages.map((email, idx) => (
-                  <div key={email.messageId || idx}>
-                    {/* From / To header */}
-                    <div className="flex items-start gap-3 py-4">
-                      <ShadAvatar className="h-9 w-9 shrink-0">
-                        <AvatarFallback style={{ backgroundColor: getAvatarColor(email.from || "") }} className="text-white text-[10px] font-bold">
-                          {getInitialsFromStr(email.from || "")}
-                        </AvatarFallback>
-                      </ShadAvatar>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <span className="text-sm font-semibold text-foreground">{getName(email.from)}</span>
-                            <span className="text-xs text-muted-foreground ml-2">
-                              to {Array.isArray(email.to) ? email.to.join(", ") : email.to}
-                            </span>
-                          </div>
-                          <span className="text-[11px] text-muted-foreground shrink-0 ml-2">
-                            {new Date(email.createdAt).toLocaleString()}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <Separator className="opacity-50" />
-
-                    {/* Email body */}
-                    <div
-                      className="py-4 text-sm text-foreground leading-relaxed"
-                      dangerouslySetInnerHTML={{ __html: email.body }}
-                    />
-
-                    {/* Attachments */}
-                    {email.attachments?.length > 0 && (
-                      <div className="mb-3">
-                        <p className="flex items-center gap-1 text-xs font-semibold text-muted-foreground mb-2">
-                          <Paperclip size={12} /> Attachments
-                        </p>
-                        <div className="flex flex-wrap gap-2">
-                          {email.attachments.map((att, i) => (
-                            <button
-                              key={i}
-                              type="button"
-                              onClick={() => openAttachment(att)}
-                              className="border border-border rounded-lg px-3 py-1.5 text-xs text-foreground bg-muted hover:bg-muted/70 transition-colors"
-                            >
-                              {att.filename}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {idx < selectedThread.messages.length - 1 && (
-                      <Separator className="my-2 opacity-30" />
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              {/* Reply box */}
-              {type === "inbox" && (
-                <div className="border-t border-border px-5 py-3 shrink-0">
-                  <textarea
-                    placeholder="Type your response…"
-                    value={replyText}
-                    onChange={(e) => setReplyText(e.target.value)}
-                    className="w-full min-h-[72px] rounded-xl border border-border bg-muted px-3 py-2.5 text-sm text-foreground resize-none outline-none focus:ring-2 focus:ring-ring focus:border-transparent placeholder:text-muted-foreground transition-colors"
-                  />
-                  <div className="flex justify-end mt-2">
-                    <ShadButton
-                      size="sm"
-                      className="h-8 px-4 text-xs rounded-lg gap-1.5 bg-primary hover:bg-primary/90 text-primary-foreground"
-                      onClick={sendReply}
-                    >
-                      <SendIcon size={12} />
-                      Send Reply
-                    </ShadButton>
-                  </div>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="flex-1 flex flex-col items-center justify-center gap-3">
-              <span className="text-5xl opacity-20">✉</span>
-              <p className="text-sm text-muted-foreground">Select an email to read</p>
+        {/* Thread rows */}
+        <div className="flex-1 overflow-y-auto">
+          {visibleThreads.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 gap-2">
+              <Mail className="h-8 w-8 text-muted-foreground/20" />
+              <p className="text-[12px] text-muted-foreground">No emails found</p>
             </div>
+          ) : (
+            visibleThreads.map((thread) => {
+              const latest = thread.latest;
+              const isSelected = selectedThreadId === thread._id;
+              const isUnread = !latest?.read;
+
+              return (
+                <div
+                  key={thread._id}
+                  onClick={() => { setSelectedThreadId(thread._id); setExpandedMessageId(null); setReplyingToMessageId(null); markThreadAsRead(thread._id); }}
+                  className={`group flex items-start gap-2.5 px-4 py-2.5 cursor-pointer transition-colors duration-150 ${
+                    isSelected ? "bg-muted" : "hover:bg-muted/40"
+                  }`}
+                >
+                  {/* Unread dot */}
+                  <div className="shrink-0 mt-[7px]">
+                    <div className={`h-1.5 w-1.5 rounded-full transition-colors ${
+                      isUnread ? "bg-primary" : "bg-transparent"
+                    }`} />
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-baseline justify-between gap-2">
+                      <span className={`text-[12.5px] truncate ${
+                        isUnread ? "font-semibold text-foreground" : "font-medium text-foreground/70"
+                      }`}>
+                        {formatThreadTitle(thread)}
+                      </span>
+                      <span className="text-[10px] text-muted-foreground/60 shrink-0 tabular-nums">
+                        {getRelativeTime(latest?.createdAt || latest?.date)}
+                      </span>
+                    </div>
+                    <div className={`text-[12px] truncate ${
+                      isUnread ? "font-semibold text-foreground" : "font-normal text-muted-foreground"
+                    }`}>
+                      {latest?.subject || "(No Subject)"}
+                    </div>
+                    <div className="text-[11px] text-muted-foreground/55 truncate">
+                      {getPreview(latest?.body || "", 60)}
+                    </div>
+                  </div>
+                </div>
+              );
+            })
           )}
         </div>
       </div>
 
-      {/* Attachment preview modal */}
+      {/* ══════════════════════════════════
+          PANEL 2 — Email Content
+      ══════════════════════════════════ */}
+      <div className="flex flex-col flex-1 h-full overflow-hidden bg-background">
+        {selectedThread ? (
+          <>
+            {/* Header: subject left, actions right */}
+            <div className="flex items-center justify-between px-6 py-3 border-b border-border/40 shrink-0 gap-4">
+              <div className="flex-1 min-w-0">
+                <h2 className="text-[15px] font-semibold text-foreground leading-tight truncate">
+                  {selectedThread.latest?.subject || "(No Subject)"}
+                </h2>
+                <p className="text-[11px] text-muted-foreground mt-0.5 leading-none">
+                  {selectedThread.messages.length} message{selectedThread.messages.length !== 1 ? "s" : ""}
+                  {" · "}
+                  {getName(selectedThread.latest?.from)}
+                </p>
+              </div>
+              <div className="flex items-center gap-1 shrink-0">
+                <ShadButton variant="ghost" size="sm" className="h-7 w-7 p-0 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted" onClick={() => setSelectedThreadId(null)}>
+                  <X className="h-3.5 w-3.5" />
+                </ShadButton>
+              </div>
+            </div>
+
+            {/* Scrollable messages */}
+            <div className="flex-1 overflow-y-auto">
+              <div className="px-6 py-4">
+                {selectedThread.messages.map((email, idx) => {
+                  const isExpanded = expandedMessageId === (email.messageId || idx);
+                  const emailAvatarBg = getAvatarColor(email.from || "");
+                  const emailInitials = getInitialsFromStr(email.from || "");
+
+                  return (
+                    <div
+                      key={email.messageId || idx}
+                      className={`${idx < selectedThread.messages.length - 1 ? "border-b border-border/40" : ""}`}
+                    >
+                      {/* Collapsed row */}
+                      <div
+                        onClick={() => setExpandedMessageId(isExpanded ? null : (email.messageId || idx))}
+                        className={`flex items-start gap-3 py-3 cursor-pointer transition-colors duration-100 rounded-md ${
+                          isExpanded ? "" : "hover:bg-muted/40"
+                        }`}
+                      >
+                        <ShadAvatar className="h-8 w-8 shrink-0">
+                          <AvatarFallback style={{ backgroundColor: emailAvatarBg }} className="text-white text-[10px] font-bold">
+                            {emailInitials}
+                          </AvatarFallback>
+                        </ShadAvatar>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-baseline justify-between">
+                            <div className="min-w-0 flex items-baseline gap-2">
+                              <span className="text-[13px] font-semibold text-foreground">{getName(email.from)}</span>
+                              <span className="text-[11px] text-muted-foreground truncate">
+                                to {Array.isArray(email.to) ? email.to.join(", ") : email.to}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-1.5 shrink-0 ml-3">
+                              <span className="text-[11px] text-muted-foreground tabular-nums">
+                                {new Date(email.createdAt).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}
+                              </span>
+                              {isExpanded
+                                ? <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" />
+                                : <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                              }
+                            </div>
+                          </div>
+                          {!isExpanded && (
+                            <p className="text-[12px] text-muted-foreground truncate mt-0.5">
+                              {getPreview(email.body || "", 120)}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Expanded body */}
+                      {isExpanded && (
+                        <div className="ml-11 pb-4">
+                          <div
+                            className="text-[13px] leading-6 text-foreground break-words [&_p]:mb-3 [&_a]:text-primary [&_a]:underline"
+                            dangerouslySetInnerHTML={{ __html: email.body }}
+                          />
+
+                          {/* Attachments */}
+                          {email.attachments?.length > 0 && (
+                            <div className="mt-4 pt-3 border-t border-border/40">
+                              <p className="flex items-center gap-1 text-[10.5px] font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+                                <Paperclip className="h-2.5 w-2.5" />
+                                {email.attachments.length} Attachment{email.attachments.length > 1 ? "s" : ""}
+                              </p>
+                              <div className="flex flex-wrap gap-1.5">
+                                {email.attachments.map((att, i) => (
+                                  <button
+                                    key={i}
+                                    type="button"
+                                    onClick={() => openAttachment(att)}
+                                    className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border border-border/60 bg-muted/30 hover:bg-muted hover:border-border transition-colors text-left"
+                                  >
+                                    <Paperclip className="h-3 w-3 text-muted-foreground shrink-0" />
+                                    <span className="text-[11px] font-medium text-foreground truncate max-w-[160px]">{att.filename}</span>
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Per-email reply */}
+                          {replyingToMessageId === (email.messageId || idx) ? (
+                            <div className="mt-3 rounded-lg border border-border bg-muted/20 overflow-hidden">
+                              <textarea
+                                autoFocus
+                                placeholder={`Reply to ${getName(email.from)}…`}
+                                value={replyText}
+                                onChange={(e) => setReplyText(e.target.value)}
+                                rows={3}
+                                className="w-full bg-transparent px-4 pt-3 pb-1 text-[13px] text-foreground resize-none outline-none placeholder:text-muted-foreground/50"
+                              />
+                              <div className="flex items-center justify-between px-3 py-2 border-t border-border/40">
+                                <ShadButton variant="ghost" size="sm" className="h-7 text-[11.5px] rounded-md text-muted-foreground hover:text-foreground" onClick={() => { setReplyingToMessageId(null); setReplyText(""); }}>
+                                  Cancel
+                                </ShadButton>
+                                <ShadButton size="sm" className="h-7 px-4 text-[12px] rounded-md gap-1.5 font-medium" onClick={() => { sendReply(); setReplyingToMessageId(null); }}>
+                                  <SendIcon className="h-3.5 w-3.5" /> Send
+                                </ShadButton>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="mt-3">
+                              <ShadButton variant="outline" size="sm" className="h-7 px-3 text-[12px] rounded-md gap-1.5" onClick={() => { setReplyingToMessageId(email.messageId || idx); setReplyText(""); }}>
+                                <Reply className="h-3.5 w-3.5" /> Reply
+                              </ShadButton>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+          </>
+        ) : (
+          <div className="flex-1 flex flex-col items-center justify-center gap-2">
+            <Mail className="h-8 w-8 text-muted-foreground/20" />
+            <p className="text-[13px] font-medium text-foreground/60">Select a thread to read</p>
+          </div>
+        )}
+      </div>
+
+      {/* ── Attachment preview modal ── */}
       {previewFile && (
         <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60"
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/65 backdrop-blur-sm"
           onClick={() => setPreviewFile(null)}
         >
           <div
-            className="w-[85%] h-[90%] bg-card rounded-xl overflow-hidden flex flex-col shadow-2xl"
+            className="w-[85%] h-[90%] bg-card rounded-2xl overflow-hidden flex flex-col shadow-2xl border border-border"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-4 py-2.5 border-b border-border shrink-0">
-              <span className="text-sm font-semibold text-foreground">{previewFile.filename}</span>
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border shrink-0">
+              <span className="text-[13px] font-semibold text-foreground">{previewFile.filename}</span>
               <ShadButton variant="ghost" size="sm" className="h-7 w-7 p-0 rounded-lg" onClick={() => setPreviewFile(null)}>
-                <X size={15} />
+                <X className="h-4 w-4" />
               </ShadButton>
             </div>
-            <iframe src={previewFile.url} className="flex-1 border-none" title="Preview" />
+            <div className="flex-1 overflow-hidden">
+              {previewFile.mimeType?.startsWith("image/") && (
+                <img src={previewFile.url} alt={previewFile.filename} className="w-full h-full object-contain" />
+              )}
+              {!previewFile.mimeType?.startsWith("image/") && (
+                <iframe src={previewFile.url} className="w-full h-full border-none" title="Preview" />
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -513,7 +583,7 @@ const formatThreadTitle = (thread) => {
         open={openDrawer}
         onClose={() => setOpenDrawer(false)}
       />
-    </>
+    </div>
   );
 };
 

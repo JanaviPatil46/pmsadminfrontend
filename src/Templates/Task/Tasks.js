@@ -1,24 +1,18 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import React, { useState, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { useNavigate } from "react-router-dom";
 import Editor from "../Texteditor/Editor";
 import Priority from "../Priority/Priority";
 import Status from "../Status/Status";
 import { toast } from "react-toastify";
-
 import axios from "axios";
 import debounce from "lodash.debounce";
 import MultiSelectDropdown from "../MultiSelectDropdown";
 import TagsMultiSelectDropDown from "../TagsMultiSelectDropDown";
-import { FormPage, FormSection, FormField, FormRow, FormGrid } from "../../components/ui/form-layout";
+import { FormPage, FormSection, FormField, FormRow, FormGrid, FormSwitchRow, FormSubtaskItem, FormSubtaskAdd } from "../../components/ui/form-layout";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
-import { Label } from "../../components/ui/label";
-import { Switch } from "../../components/ui/switch";
-import { Checkbox } from "../../components/ui/checkbox";
-import { Trash2, Plus, GripVertical, FileText, Calendar, ListChecks, MoreVertical, Pencil, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import { FileText, Calendar, ListChecks, MoreVertical, Pencil, Loader2, ChevronLeft, ChevronRight, Plus, Trash2 } from "lucide-react";
 
 const Tasks = () => {
   const TASK_API = process.env.REACT_APP_TASK_TEMP_URL;
@@ -529,8 +523,7 @@ const handleUserChange = (newSelectedUsers) => {
       return debouncedCheck.cancel;
     }, [templatename]);
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <div>
+    <div>
         {!showForm ? (
           <div className="mt-4 space-y-4">
             <div className="flex items-center justify-between">
@@ -703,116 +696,125 @@ const handleUserChange = (newSelectedUsers) => {
               </>
             }
           >
-            <FormGrid>
-              {/* ===== LEFT COLUMN: Task Details ===== */}
+            <FormGrid sidebarWidth="sm">
+              {/* ===== LEFT COLUMN (70%): Main form ===== */}
               <FormGrid.Main>
-                <FormSection title="General">
+
+                {/* ── General: name + status in a row, assignee + priority in a row ── */}
+                <FormSection
+                  title="General"
+                  icon={<FileText className="h-4 w-4" />}
+                >
                   <FormRow cols={2}>
-                    <FormField label="Template Name" error={templateNameError}>
+                    <FormField label="Template Name" required error={templateNameError}>
                       <Input
                         name="TemplateName"
-                        placeholder="Template Name"
+                        placeholder="Enter template name"
                         value={templatename}
                         onChange={(e) => settemplatename(e.target.value)}
-                        error={!!templateNameError}
                       />
                     </FormField>
-                    <div>
+                    <FormField label="Status">
                       <Status onStatusChange={handleStatusChange} selectedStatus={status} />
-                    </div>
+                    </FormField>
                   </FormRow>
 
                   <FormRow cols={2}>
-                    <FormField label="Task Assignee">
+                    <FormField label="Assignees">
                       <MultiSelectDropdown
                         value={selectedUser}
                         onChange={handleUserChange}
-                        placeholder="Assignees"
+                        placeholder="Select assignees"
                       />
                     </FormField>
-                    <div>
+                    <FormField label="Priority">
                       <Priority onPriorityChange={handlePriorityChange} selectedPriority={priority} />
-                    </div>
+                    </FormField>
                   </FormRow>
                 </FormSection>
 
+                {/* ── Description ── */}
                 <FormSection title="Description">
                   <Editor onChange={handleEditorChange} content={description} />
                 </FormSection>
 
+                {/* ── Tags ── */}
                 <FormSection title="Tags">
                   <TagsMultiSelectDropDown
                     value={selectedTags}
                     onChange={handleTagChange}
-                    placeholder="Tags"
+                    placeholder="Select or search tags"
                   />
                 </FormSection>
 
-                <FormSection title="Start and Due Date">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-sm font-medium">Absolute Date</Label>
-                    <Switch
-                      checked={absoluteDate}
-                      onCheckedChange={handleAbsolutesDates}
-                    />
-                  </div>
+                {/* ── Start & Due Date ── */}
+                <FormSection
+                  title="Dates"
+                  icon={<Calendar className="h-4 w-4" />}
+                >
+                  <FormSwitchRow
+                    label="Use absolute dates"
+                    description="Set fixed calendar dates instead of relative offsets"
+                    checked={absoluteDate}
+                    onCheckedChange={handleAbsolutesDates}
+                  />
 
-                  {absoluteDate && (
-                    <div className="space-y-4 mt-4">
+                  {absoluteDate ? (
+                    <FormRow cols={2}>
                       <FormField label="Start Date">
-                        <DatePicker
-                          format="MM/DD/YYYY"
-                          sx={{ width: '100%' }}
-                          value={startDate}
-                          onChange={handleStartDateChange}
+                        <input
+                          type="date"
+                          value={startDate ? startDate.format?.("YYYY-MM-DD") ?? startDate : ""}
+                          onChange={(e) => setStartDate(e.target.value)}
+                          className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm focus:outline-none focus:ring-1 focus:ring-ring transition-shadow"
                         />
                       </FormField>
                       <FormField label="Due Date">
-                        <DatePicker
-                          format="MM/DD/YYYY"
-                          sx={{ width: '100%' }}
-                          value={dueDate}
-                          onChange={handleDueDateChange}
+                        <input
+                          type="date"
+                          value={dueDate ? dueDate.format?.("YYYY-MM-DD") ?? dueDate : ""}
+                          onChange={(e) => setDueDate(e.target.value)}
+                          className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm focus:outline-none focus:ring-1 focus:ring-ring transition-shadow"
                         />
                       </FormField>
-                    </div>
-                  )}
-
-                  {!absoluteDate && (
-                    <div className="space-y-4 mt-4">
-                      <div className="flex items-center gap-3">
-                        <Label className="w-20 shrink-0 text-sm">Start In</Label>
+                    </FormRow>
+                  ) : (
+                    <div className="space-y-3">
+                      <div className="grid grid-cols-[80px_1fr_140px] items-center gap-3">
+                        <span className="text-sm font-medium text-foreground">Start in</span>
                         <Input
                           value={startsin}
                           onChange={(e) => setstartsin(e.target.value)}
                           placeholder="0"
-                          className="flex-1"
+                          type="number"
+                          min="0"
                         />
                         <select
-                          className="flex h-10 rounded-lg border border-input bg-card px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
                           value={startsInDuration || ""}
                           onChange={(e) => setStartsInDuration(e.target.value)}
                         >
-                          <option value="">Select</option>
+                          <option value="">Unit</option>
                           {dayOptions.map((opt) => (
                             <option key={opt.value} value={opt.value}>{opt.label}</option>
                           ))}
                         </select>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <Label className="w-20 shrink-0 text-sm">Due In</Label>
+                      <div className="grid grid-cols-[80px_1fr_140px] items-center gap-3">
+                        <span className="text-sm font-medium text-foreground">Due in</span>
                         <Input
                           value={duein}
                           onChange={(e) => setduein(e.target.value)}
                           placeholder="0"
-                          className="flex-1"
+                          type="number"
+                          min="0"
                         />
                         <select
-                          className="flex h-10 rounded-lg border border-input bg-card px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
                           value={dueinduration || ""}
                           onChange={(e) => setdueinduration(e.target.value)}
                         >
-                          <option value="">Select</option>
+                          <option value="">Unit</option>
                           {dayOptions.map((opt) => (
                             <option key={opt.value} value={opt.value}>{opt.label}</option>
                           ))}
@@ -821,70 +823,57 @@ const handleUserChange = (newSelectedUsers) => {
                     </div>
                   )}
                 </FormSection>
+
               </FormGrid.Main>
 
-              {/* ===== RIGHT COLUMN: Subtasks ===== */}
+              {/* ===== RIGHT COLUMN (30%): Controls panel ===== */}
               <FormGrid.Sidebar>
-                <FormSection title="Subtasks">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-sm font-medium">Enable Subtasks</Label>
-                    <Switch
-                      checked={SubtaskSwitch}
-                      onCheckedChange={handleSubtaskSwitch}
-                    />
-                  </div>
+                <FormSection
+                  title="Subtasks"
+                  icon={<ListChecks className="h-4 w-4" />}
+                  description="Add checklist items to this task template"
+                >
+                  <FormSwitchRow
+                    label="Enable subtasks"
+                    description="Show a subtask checklist on every task created from this template"
+                    checked={SubtaskSwitch}
+                    onCheckedChange={handleSubtaskSwitch}
+                  />
 
                   {SubtaskSwitch && (
                     <DragDropContext onDragEnd={handleDragEnd}>
                       <Droppable droppableId="subtaskList">
                         {(provided) => (
-                          <div className="space-y-2 mt-3" {...provided.droppableProps} ref={provided.innerRef}>
+                          <div
+                            className="space-y-2 mt-1"
+                            {...provided.droppableProps}
+                            ref={provided.innerRef}
+                          >
                             {subtasks.map((subtask, index) => (
-                              <Draggable key={subtask.id} draggableId={subtask.id} index={index}>
+                              <Draggable
+                                key={subtask.id}
+                                draggableId={subtask.id}
+                                index={index}
+                              >
                                 {(provided) => (
                                   <div
                                     ref={provided.innerRef}
                                     {...provided.draggableProps}
-                                    className="flex items-center gap-2 rounded-lg border border-border bg-card p-2 shadow-sm"
                                   >
-                                    <Checkbox
+                                    <FormSubtaskItem
+                                      text={subtask.text}
                                       checked={checkedSubtasks.includes(subtask.id)}
+                                      onTextChange={(val) => handleInputChange(subtask.id, val)}
                                       onCheckedChange={() => handleCheckboxChange(subtask.id)}
+                                      onDelete={() => handleDeleteSubtask(subtask.id)}
+                                      dragHandleProps={provided.dragHandleProps}
                                     />
-                                    <Input
-                                      placeholder="Things to do"
-                                      value={subtask.text}
-                                      onChange={(e) => handleInputChange(subtask.id, e.target.value)}
-                                      className="flex-1 border-0 shadow-none focus-visible:ring-0"
-                                    />
-                                    <button
-                                      type="button"
-                                      onClick={() => handleDeleteSubtask(subtask.id)}
-                                      className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-                                    >
-                                      <Trash2 className="h-4 w-4" />
-                                    </button>
-                                    <div
-                                      {...provided.dragHandleProps}
-                                      className="cursor-grab rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent"
-                                    >
-                                      <GripVertical className="h-4 w-4" />
-                                    </div>
                                   </div>
                                 )}
                               </Draggable>
                             ))}
                             {provided.placeholder}
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={handleAddSubtask}
-                              className="mt-2 w-full text-primary"
-                            >
-                              <Plus className="h-4 w-4" />
-                              Add Subtask
-                            </Button>
+                            <FormSubtaskAdd onClick={handleAddSubtask} />
                           </div>
                         )}
                       </Droppable>
@@ -896,7 +885,7 @@ const handleUserChange = (newSelectedUsers) => {
           </FormPage>
         )}
       </div>
-    </LocalizationProvider>
   );
 };
+
 export default Tasks;

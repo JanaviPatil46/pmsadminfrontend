@@ -1,248 +1,125 @@
-// import React, { useState ,useEffect} from "react";
-// import { Box,Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, List,  IconButton } from "@mui/material";
-// import CloseIcon from "@mui/icons-material/Close";
-
-// const ClientSelectionDialog = ({ open, onClose }) => {
-//      const [accountdata, setaccountdata] = useState([]);
-//      const fetchAccountDatas = async (data) => {
-//         console.log("data", data);
-//         try {
-//           const response = await fetch(
-//             `http://127.0.0.1/accounts/accountsdata?test=${data}`
-//           );
-//           const datas = await response.json();
-//           console.log("accounts", datas);
-//           setaccountdata(datas.accounts);
-//         } catch (error) {
-//           console.error("Error fetching data:", error);
-//         }
-
-//       };
-//     useEffect(() => {
-
-//         fetchAccountDatas("data");
-//       }, []);
-
-//       const accountoptions = accountdata.map((account) => ({
-//         value: account._id,
-//         label: account.accountName,
-//       }));
-
-//   return (
-//    <Box>
-//      <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-//       <DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-//         Select client
-//         <IconButton onClick={onClose}>
-//           <CloseIcon />
-//         </IconButton>
-//       </DialogTitle>
-
-//       <DialogContent dividers>
-//         <TextField
-//           fullWidth
-//           variant="outlined"
-//           placeholder="Start typing user name, ID or email"
-//         //   value={searchTerm}
-//         //   onChange={(e) => setSearchTerm(e.target.value)}
-//           sx={{ mb: 2 }}
-//         />
-
-//         <List>
-//           {/* {filteredClients.map((client) => (
-//             <ListItem button key={client.id}>
-//               <ListItemAvatar>
-//                 <Avatar sx={{ bgcolor: client.color, color: "#fff", fontWeight: "bold" }}>
-//                   {client.id}
-//                 </Avatar>
-//               </ListItemAvatar>
-//               <ListItemText primary={client.name} />
-//             </ListItem>
-//           ))} */}
-//         </List>
-//       </DialogContent>
-
-//       <DialogActions>
-//         <Button variant="outlined" onClick={onClose}>
-//           Cancel
-//         </Button>
-//       </DialogActions>
-//     </Dialog>
-//    </Box>
-//   )
-// }
-
-// export default ClientSelectionDialog
-
 import React, { useState, useEffect } from "react";
-import {
-  Box,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
-  List,
-  ListItem,
-  ListItemText,
-  IconButton,
-  
-} from "@mui/material";
-
-import CloseIcon from "@mui/icons-material/Close";
+import { X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const ClientSelectionDialog = ({ open, onClose,handleDrawerClose}) => {
-     const navigate = useNavigate();
-  const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
+const ClientSelectionDialog = ({ open, onClose, handleDrawerClose }) => {
+  const navigate = useNavigate();
   const [accountData, setAccountData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const [selectedAccount, setSelectedAccount] = useState(null);
-
-  // // Fetch accounts
-  // const fetchAccountData = async () => {
-  //   try {
-  //     // const response = await fetch(
-  //     //  `${ACCOUNT_API}/accounts/account/accountdetailslist/true`
-  //     // );
-  //     // const data = await response.json();
-  //     // console.log("client list", data);
-  //     // setAccountData(data.accountlist);
-  //      const url = "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true"
-  //         const response = await fetch(url);
-  //         const data = await response.json();
-  //     setAccountData(data.accounts);
-  //   } catch (error) {
-  //     console.error("Error fetching data:", error);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   fetchAccountData();
-  // }, []);
-
-  // // Map account data into options
-  // const accountOptions = accountData.map((account) => ({
-  //   value: account._id,
-  //   label: account.accountName,
-  // }));
   useEffect(() => {
-  fetchAccountData();
-}, []);
+    if (open) fetchAccountData();
+  }, [open]);
 
-const fetchAccountData = async () => {
-  try {
-    const storedUserRole = localStorage.getItem("userRole");
-    const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
-    const loginuserid = storedData?.teammember?.userid;
-    const viewAllAccounts = storedData?.teammember?.viewallAccounts;
+  const fetchAccountData = async () => {
+    try {
+      const storedUserRole = localStorage.getItem("userRole");
+      const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
+      const loginuserid = storedData?.teammember?.userid;
+      const viewAllAccounts = storedData?.teammember?.viewallAccounts;
 
-    let url = "";
-
-    // === ROLE-BASED URL LOGIC ===
-    if (storedUserRole === "Admin") {
-      url =
-        "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true";
-    } else {
-      // Team Member
-      url =
-        viewAllAccounts === true
+      let url = "";
+      if (storedUserRole === "Admin") {
+        url = "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true";
+      } else {
+        url = viewAllAccounts === true
           ? "https://www.snptaxes.com/api/accounts/accountlist/names-by-status?active=true"
           : `https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=true`;
+      }
+
+      const response = await fetch(url);
+      const data = await response.json();
+      const accounts = Array.isArray(data.accountlist)
+        ? data.accountlist
+        : Array.isArray(data.teamAccounts)
+        ? data.teamAccounts
+        : [];
+      setAccountData(accounts);
+    } catch (error) {
+      console.error("Error fetching data:", error);
     }
+  };
 
-    console.log("Fetching accounts from:", url);
+  const accountOptions = accountData.map((account) => ({
+    value: account._id,
+    label: account.accountName,
+  }));
 
-    const response = await fetch(url);
-    const data = await response.json();
-
-    // Handle both response formats (Admin & TeamMember)
-    const accounts = Array.isArray(data.accountlist)
-      ? data.accountlist
-      : Array.isArray(data.teamAccounts)
-      ? data.teamAccounts
-      : [];
-
-    console.log("Account list:", accounts);
-
-    setAccountData(accounts);
-  } catch (error) {
-    console.error("Error fetching data:", error);
-  }
-};
-
-// Convert to dropdown options
-const accountOptions = accountData.map((account) => ({
-  value: account._id,
-  label: account.accountName,
-}));
-
-  // Filter accounts based on search input
   const filteredAccounts = accountOptions.filter((account) =>
     account.label.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Handle account selection
   const handleSelectAccount = (account) => {
-    console.log("selected account", account)
-    setSelectedAccount(account);
     onClose();
-    navigate(`/clients/accounts/accountsdash/organizers/${account.value}/accountorganizer`)
-    handleDrawerClose()
-    // setDrawerOpen(true); // Open the right drawer
+    navigate(`/clients/accounts/accountsdash/organizers/${account.value}/accountorganizer`);
+    handleDrawerClose();
   };
-  
-  return (
-    <Box>
-      <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-        <DialogTitle
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          Select client
-          <IconButton onClick={onClose}>
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
 
-        <DialogContent dividers>
-          <TextField
-            fullWidth
-            variant="outlined"
-            placeholder="Start typing user name, ID, or email"
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        onClick={onClose}
+      />
+
+      {/* Dialog Panel */}
+      <div className="relative z-10 bg-card border border-border rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+          <h2 className="text-base font-semibold text-foreground">Select Client</h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="px-5 pt-4 pb-2">
+          <input
+            type="text"
+            placeholder="Start typing name, ID, or email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            sx={{ mb: 2 }}
+            className="w-full border border-input rounded-lg px-3 py-2 text-sm bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow shadow-sm mb-3"
           />
 
-          <List sx={{ height: "200px", overflowY: "auto" }}>
-            {filteredAccounts.map((account) => (
-              <ListItem
-                key={account.value}
-                onClick={() => handleSelectAccount(account)}
-              >
-                <ListItemText
-                  primary={account.label}
-                  sx={{ cursor: "pointer" }}
-                />
-              </ListItem>
-            ))}
-          </List>
-        </DialogContent>
+          <ul className="h-52 overflow-y-auto divide-y divide-border rounded-lg border border-border">
+            {filteredAccounts.length > 0 ? (
+              filteredAccounts.map((account) => (
+                <li
+                  key={account.value}
+                  onClick={() => handleSelectAccount(account)}
+                  className="px-4 py-2.5 text-sm text-foreground cursor-pointer hover:bg-muted transition-colors"
+                >
+                  {account.label}
+                </li>
+              ))
+            ) : (
+              <li className="px-4 py-6 text-sm text-muted-foreground text-center">
+                No accounts found
+              </li>
+            )}
+          </ul>
+        </div>
 
-        <DialogActions>
-          <Button variant="outlined" onClick={onClose}>
+        {/* Footer */}
+        <div className="flex justify-end px-5 py-4 border-t border-border">
+          <button
+            type="button"
+            onClick={onClose}
+            className="inline-flex items-center justify-center rounded-lg px-5 py-2 text-sm font-medium border border-border text-foreground hover:bg-muted transition-colors"
+          >
             Cancel
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-    </Box>
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 

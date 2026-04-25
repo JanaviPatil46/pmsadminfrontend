@@ -37,7 +37,7 @@ const FormPage = ({
   return (
     <div className={cn("min-h-screen bg-background", className)} {...props}>
       {/* Sticky header */}
-      <div className="sticky top-0 z-10 border-b border-border bg-white/80 backdrop-blur-sm">
+      <div className="sticky top-0 z-10 border-b border-border bg-background/80 backdrop-blur-sm">
         <div className={cn("mx-auto px-4 py-3 sm:px-6 sm:py-4", mw)}>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3 min-w-0">

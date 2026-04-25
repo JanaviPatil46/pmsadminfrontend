@@ -29,8 +29,6 @@ const AccountTask = ({ handleNewDrawerClose, handleDrawerClose }) => {
   const [errorTooltip, setErrorTooltip] = useState("");
   const handleAccountChange = (selectedOptions) => {
     setSelectedaccount(selectedOptions);
-    console.log("aacounts", selectedOptions);
-
     fetchJobList(selectedOptions.value); // Fetch jobs based on selected account ID
   };
 
@@ -89,9 +87,6 @@ const fetchAccountData = async () => {
     const loginuserid = storedData?.teammember?.userid;
     const viewAllAccounts = storedData?.teammember?.viewallAccounts;
 
-    console.log("UserRole:", userRole);
-    console.log("TeamMember userId:", loginuserid);
-    console.log("viewAllAccounts:", viewAllAccounts);
 
     // === Choose API URL based on userRole & viewAllAccounts ===
     let url = "";
@@ -106,8 +101,6 @@ const fetchAccountData = async () => {
           : `https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=${true}`;
     }
 
-    console.log("Final Account Fetch URL:", url);
-
     const response = await fetch(url);
     const data = await response.json();
 
@@ -120,9 +113,6 @@ const fetchAccountData = async () => {
 
     // === Read accountId from cookie ===
     const accountIdFromCookie = Cookies.get("accountId");
-    console.log("All Accounts:", accounts.map(a => a.value));
-    console.log("AccountId from cookie:", accountIdFromCookie);
-
     if (accountIdFromCookie) {
       const matchedAccount = accounts.find(
         (a) => a.value === accountIdFromCookie
@@ -130,9 +120,6 @@ const fetchAccountData = async () => {
 
       if (matchedAccount) {
         setSelectedaccount(matchedAccount);
-        console.log("Matched Cookie Account:", matchedAccount);
-
-        // Fetch job list for this account
         fetchJobList(matchedAccount.value);
       }
     }
@@ -145,7 +132,6 @@ const fetchAccountData = async () => {
 // STEP 1: Load userRole
 useEffect(() => {
   const storedUserRole = localStorage.getItem("userRole") || "";
-  console.log("Loaded userRole:", storedUserRole);
   setUserRole(storedUserRole);
 }, []);
 
@@ -167,7 +153,6 @@ const accountoptions = accountdata;
 
   const handleJobChange = async (selectedOptions) => {
     setSelectedJob(selectedOptions);
-    console.log(selectedOptions.value);
   };
 
   const fetchJobList = async (accountId) => {
@@ -182,7 +167,6 @@ const accountoptions = accountdata;
     )
       .then((response) => response.json())
       .then((result) => {
-        console.log(result);
         setJoblist(result.jobList);
       })
       .catch((error) => console.error(error));
@@ -314,7 +298,6 @@ const accountoptions = accountdata;
   };
   const handleStatusChange = (status) => {
     setStatus(status);
-    console.log(status);
   };
   // const [description, setDescription] = useState('');
   const handleEditorChange = (content) => {
@@ -345,10 +328,8 @@ const accountoptions = accountdata;
   const [selectedUser, setSelectedUser] = useState([]);
   const handleUserChange = (newSelectedUsers) => {
     setSelectedUser(newSelectedUsers);
-    console.log(newSelectedUsers);
     const selectedValues = newSelectedUsers.map((option) => option.value);
     setCombinedValues(selectedValues);
-    console.log(selectedValues);
   };
   //Tag FetchData ================
   const [tags, setTags] = useState([]);
@@ -380,10 +361,8 @@ const accountoptions = accountdata;
 
   const handleTagChange = (newSelectedTags) => {
     setTagsNew(newSelectedTags);
-    console.log(newSelectedTags);
     const selectedValues = newSelectedTags.map((option) => option.value);
     setCombinedTagsValues(selectedValues);
-    console.log(selectedValues);
   };
 
   const [tempvalues, setTempValues] = useState();
@@ -529,7 +508,6 @@ const [errors, setErrors] = useState({ account: false, template: false });
       text,
       checked: checkedSubtasks.includes(id),
     }));
-    console.log(subtaskData);
     const raw = JSON.stringify({
       accounts: selectedaccount?.value,
       job: selectedJob?.value,
@@ -558,7 +536,6 @@ const [errors, setErrors] = useState({ account: false, template: false });
     fetch(url, requestOptions)
       .then((response) => response.json())
       .then((result) => {
-        console.log(result);
         toast.success("Task Created successfully");
         handleClose();
         handleDrawerClose();
@@ -588,7 +565,7 @@ const [errors, setErrors] = useState({ account: false, template: false });
               handleAccountChange(match || null);
               setErrors((prev) => ({ ...prev, account: !match }));
             }}
-            className={`flex h-10 w-full rounded-lg border bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow ${errors.account ? "border-destructive" : "border-input"}`}
+            className={`flex h-10 w-full rounded-lg border bg-background text-foreground px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow ${errors.account ? "border-destructive" : "border-input"}`}
           >
             <option value="">Select Account</option>
             {accountoptions.map((opt) => (
@@ -608,7 +585,7 @@ const [errors, setErrors] = useState({ account: false, template: false });
               const match = jobsoptions.find((j) => j.value === e.target.value);
               handleJobChange(match || null);
             }}
-            className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex h-10 w-full rounded-lg border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <option value="">Select Job</option>
             {jobsoptions.map((opt) => (
@@ -627,7 +604,7 @@ const [errors, setErrors] = useState({ account: false, template: false });
               handletemp(e, match || null);
               setErrors((prev) => ({ ...prev, template: !match }));
             }}
-            className={`flex h-10 w-full rounded-lg border bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow ${errors.template ? "border-destructive" : "border-input"}`}
+            className={`flex h-10 w-full rounded-lg border bg-background text-foreground px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow ${errors.template ? "border-destructive" : "border-input"}`}
           >
             <option value="">Select Template</option>
             {taskTemplateOptions.map((opt) => (
@@ -679,7 +656,7 @@ const [errors, setErrors] = useState({ account: false, template: false });
               type="date"
               value={StartsDateNew ? dayjs(StartsDateNew).format("YYYY-MM-DD") : ""}
               onChange={(e) => handleStartDateChange(e.target.value ? dayjs(e.target.value) : null)}
-              className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow"
+              className="flex h-10 w-full rounded-lg border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow"
             />
           </div>
           <div>
@@ -688,7 +665,7 @@ const [errors, setErrors] = useState({ account: false, template: false });
               type="date"
               value={DueDateNew ? dayjs(DueDateNew).format("YYYY-MM-DD") : ""}
               onChange={(e) => handleDueDateChange(e.target.value ? dayjs(e.target.value) : null)}
-              className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow"
+              className="flex h-10 w-full rounded-lg border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow"
             />
           </div>
         </div>

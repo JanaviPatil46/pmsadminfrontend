@@ -67,7 +67,6 @@ const MyAccount = () => {
     }
   }, [loginuserid]);
 
-  console.log("loginuseriid", loginuserid);
   // const fetchData = async () => {
   //   try {
   //     const url = `${LOGIN_API}/common/user/${loginuserid}`;
@@ -92,13 +91,11 @@ const MyAccount = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [emailsync, setEmailSync] = useState("");
   useEffect(() => {
-    console.log("Email sync updated:", emailsync);
     // updateEmailSync(emailsync)
   }, [emailsync]);
   const fetchData = async () => {
     try {
       const url = `${LOGIN_API}/common/user/${loginuserid}`;
-      console.log("jjj", url);
       const response = await fetch(url);
       const data = await response.json();
 
@@ -106,7 +103,6 @@ const MyAccount = () => {
       setSignedTime(formatTimePeriod(validTime));
 
       setuserdata(data);
-      console.log("dta", data);
       setCurrentImage(data.profilePicture);
       setEmailSync(data.emailSyncEmail);
       if (data.role === "TeamMember") {
@@ -136,7 +132,6 @@ const MyAccount = () => {
         throw new Error("Failed to update email sync");
       }
 
-      console.log("Email sync updated on server");
     } catch (error) {
       console.error("Error updating email sync:", error);
     }
@@ -149,7 +144,6 @@ const MyAccount = () => {
         "profilepicture/"
       );
       setPreview(`${LOGIN_API}/${transformedUrl}`);
-      console.log("ghfhgf", `${LOGIN_API}/${transformedUrl}`);
     }
   }, [currentImage]);
   const handleImageChange = (e) => {
@@ -206,13 +200,11 @@ const MyAccount = () => {
   const fetchAdminData = async (email) => {
     try {
       const url = `${LOGIN_API}/admin/adminsignup/adminbyemail/${email}`;
-      console.log("url", url);
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error("Failed to fetch email templates");
       }
       const data = await response.json();
-      console.log("admin", data);
       setadmindata(data.admin[0]);
       setFirstName(data.admin[0].firstName);
       setMiddleName(data.admin[0].middleName);
@@ -220,7 +212,6 @@ const MyAccount = () => {
       setPhoneNumber(data.admin[0].phoneNumber);
       setEmail(data.admin[0].email);
       setUserName(data.admin[0].firmName);
-      console.log(profilePicture);
     } catch (error) {
       console.error("Error fetching email templates:", error);
     }
@@ -228,13 +219,11 @@ const MyAccount = () => {
   const fetchTeamMemberData = async (email) => {
     try {
       const url = `${LOGIN_API}/admin/teammember/teammemberbyemail/${email}`;
-      console.log("url", url);
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error("Failed to fetch email templates");
       }
       const data = await response.json();
-      console.log("admin", data);
       setadmindata(data.admin[0]);
       setFirstName(data.admin[0].firstName);
       setMiddleName(data.admin[0].middleName);
@@ -242,7 +231,6 @@ const MyAccount = () => {
       setPhoneNumber(data.admin[0].phoneNumber);
       setEmail(data.admin[0].email);
       setUserName(data.admin[0].firmName);
-      console.log(profilePicture);
     } catch (error) {
       console.error("Error fetching email templates:", error);
     }
@@ -264,13 +252,9 @@ const MyAccount = () => {
     };
 
     const url = `${LOGIN_API}/admin/adminsignup/${admindata._id}`;
-    console.log(url);
-    console.log(admindata._id);
-
     try {
       const response = await fetch(url, requestOptions);
-      const result = await response.text();
-      console.log(result);
+      await response.text();
       toast.success("Data updated successfully!");
       updateProfilePicture();
       await fetchAdminData();
@@ -855,7 +839,6 @@ const MyAccount = () => {
       ],
       active: true,
     });
-    console.log(raw);
     const requestOptions = {
       method: "PATCH",
       headers: myHeaders,
@@ -863,13 +846,10 @@ const MyAccount = () => {
       redirect: "follow",
     };
 
-    console.log(notificationdata);
-
     const url = `${LOGIN_API}/admin/notification/${notificationdata._id}`;
     fetch(url, requestOptions)
       .then((response) => response.json())
       .then((result) => {
-        console.log(result);
         if (result && result.message === "Notification updated successfully") {
           toast.success("Notification settings updated successfully");
           // setTimeout(() => {
@@ -975,7 +955,6 @@ const MyAccount = () => {
       console.error("Error fetching notification data:", error);
     }
   };
-  console.log(notificationdata);
 
   const [selectedLanguage, setSelectedLanguage] = useState(null);
 
@@ -1003,7 +982,6 @@ const MyAccount = () => {
     fetch(url, requestOptions)
       .then((response) => response.json())
       .then((result) => {
-        console.log(result.user);
         setUserUpdate(result.user);
 
         toast("User Verified successfully.");
@@ -1017,7 +995,6 @@ const MyAccount = () => {
         console.error(error);
       });
   };
-  console.log(userUpdate);
   const updatePassword = () => {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
@@ -1199,7 +1176,6 @@ const MyAccount = () => {
       await axios.patch(`${LOGIN_API}/common/user/${userId}`, {
         emailSyncEmail: emailSyncValue,
       });
-      console.log("✅ User updated with emailSync field.");
     } catch (error) {
       console.error("❌ Failed to update user with emailSync field:", error);
     }
@@ -1207,7 +1183,6 @@ const MyAccount = () => {
 
   const handleTokenLogin = async () => {
     const targetEmail = emailsync;
-    console.log("target", targetEmail);
     if (!targetEmail) {
       alert("⚠️ Please enter your email or login with Google first.");
       return;
@@ -1217,7 +1192,6 @@ const MyAccount = () => {
       const res = await axios.get(
         `${EMAIL_SYNC}/emailsync/user/login-with-token/${targetEmail}`
       );
-      console.log("payload", res.data);
       setEmail(targetEmail);
       // setProfile(res.data.profile);
       setEmailList(res.data.emails || []);
@@ -1244,11 +1218,8 @@ const MyAccount = () => {
       );
 
       if (res.data.exists) {
-        console.log("User exists, using token login.");
-        // setEmail(emailsync);
         await handleTokenLogin();
       } else {
-        console.log("User not found, redirecting to Google login.");
         setEmail(emailsync);
         await handleGoogleLogin();
       }
@@ -1268,7 +1239,6 @@ const MyAccount = () => {
     if (selectedFile) {
       // Check directly if selectedFile is set
       formdata.append("ProfilePicture", selectedFile);
-      console.log(selectedFile); // Debugging: Log the selected file
 
       const requestOptions = {
         method: "PATCH",
@@ -1278,10 +1248,8 @@ const MyAccount = () => {
 
       fetch(`${LOGIN_API}/admin/adminsignup/${admindata._id}`, requestOptions)
         .then((response) => response.json())
-        .then((result) => console.log(result))
         .catch((error) => console.error(error));
     } else {
-      console.error("No file selected"); // This will execute if no file is selected
     }
   };
 
@@ -1342,7 +1310,6 @@ const MyAccount = () => {
     try {
       const response = await axios.get(`${LOGIN_API}/lastimage`);
       if (response.status === 200) {
-        console.log("Last uploaded image:", response.data.imageUrl);
         setCroppedImage(response.data.imageUrl); // Set the image URL in state
       }
     } catch (error) {
@@ -1386,7 +1353,6 @@ const MyAccount = () => {
           }
         );
 
-        console.log("Image uploaded successfully:", result.data);
       } catch (error) {
         console.error("Error uploading image:", error);
       }

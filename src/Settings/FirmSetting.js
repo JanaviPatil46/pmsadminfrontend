@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useMemo, useContext } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { LoginContext } from "../Sidebar/Context/Context";
 import { Facebook, Linkedin, Twitter, Instagram, PlusCircle, Upload } from "lucide-react";
-import Switch from "react-switch";
+import { Switch } from "../components/ui/switch";
 import { toast } from "react-toastify";
 import axios from "axios";
 import dayjs from "dayjs";
@@ -27,17 +27,9 @@ const FirmSetting = () => {
   // Helper: reusable switch component for settings
   const SettingsSwitch = ({ checked, onChange, disabled }) => (
     <Switch
-      onChange={onChange}
-      checked={checked}
-      onColor="#4f46e5"
-      onHandleColor="#FFF"
-      handleDiameter={10}
-      uncheckedIcon={false}
-      checkedIcon={false}
-      height={20}
-      width={32}
+      checked={checked || false}
+      onCheckedChange={onChange}
       disabled={disabled}
-      className="react-switch"
     />
   );
 
@@ -79,22 +71,17 @@ const FirmSetting = () => {
     { value: "Dansk", label: "Dansk" },
   ];
   const [selectedLanguage, setSelectedLanguage] = useState(languages[0]);
-  const language = selectedLanguage;
-  console.log(language);
   const handleLanguageChange = (selectedLanguage) => {
     setSelectedLanguage(selectedLanguage);
   };
 
   const { logindata } = useContext(LoginContext);
   const [adminUserData, setAdminUserData] = useState();
-  console.log(logindata);
   useEffect(() => {
     getFirmSettingsByAdminUserId();
     setAdminUserData(logindata.user.id);
   }, []);
-  console.log(adminUserData);
   const [firmSettingId, setFirmSettingsId] = useState();
-  console.log(firmSettingId);
   const [AssigneesNew, setAssigneesNew] = useState([]);
   const getFirmSettingsByAdminUserId = () => {
     const requestOptions = {
@@ -105,7 +92,6 @@ const FirmSetting = () => {
     fetch(`${LOGIN_API}/adminfirm/firmsetting/Firmsettingbyuserid/${logindata.user.id}`, requestOptions)
       .then((response) => response.json())
       .then((result) => {
-        console.log(result);
         if (result.length > 0) {
           setFirmSettingsId(result[0]._id);
           setDefaultreplytoemails(result[0].defaultreplytoemails);
@@ -156,7 +142,6 @@ const FirmSetting = () => {
 
           const selectedValues = accountAccessMembers.map((option) => option.value);
           setCombinedValues(selectedValues);
-          console.log(selectedValues);
         }
       })
       .catch((error) => console.error("Error fetching firm settings:", error));
@@ -177,14 +162,12 @@ const FirmSetting = () => {
       state: selectedState.label,
       firmPhoneNumber: firmPhoneNumber,
       defaultreplytoemails: defaultreplytoemails,
-      // firmURL: firmURL,
       firmwebsite: firmwebsite,
       firmEmail: firmEmail,
       streetAddress: address,
       city: City,
       postalCode: zipCode,
     });
-    console.log(raw);
     const requestOptions = {
       method: "PATCH",
       headers: myHeaders,
@@ -200,15 +183,11 @@ const FirmSetting = () => {
         return response.json();
       })
       .then((result) => {
-        console.log(result);
-
-        // Show success toast
         toast.success("Firm settings updated successfully!");
         getFirmSettingsByAdminUserId();
       })
       .catch((error) => {
         console.error(error);
-        // Show error toast
         toast.error("Error updating firm settings!");
       });
   };
@@ -227,7 +206,6 @@ const FirmSetting = () => {
       aboutusDescription: discription,
       showfirmownerphototologin: showfirmownerphototologin,
     });
-    console.log(raw);
     const requestOptions = {
       method: "PATCH",
       headers: myHeaders,
@@ -242,14 +220,11 @@ const FirmSetting = () => {
         }
         return response.json();
       })
-      .then((result) => {
-        console.log(result);
-        // Show success toast
+      .then(( ) => {
         toast.success("Firm settings updated successfully!");
       })
       .catch((error) => {
         console.error(error);
-        // Show error toast
         toast.error("Error updating firm settings!");
       });
   };
@@ -262,7 +237,6 @@ const FirmSetting = () => {
     const raw = JSON.stringify({
       domainname: domainname,
     });
-    console.log(raw);
     const requestOptions = {
       method: "PATCH",
       headers: myHeaders,
@@ -277,14 +251,11 @@ const FirmSetting = () => {
         }
         return response.json();
       })
-      .then((result) => {
-        console.log(result);
-        // Show success toast
+      .then(() => {
         toast.success("Firm settings updated successfully!");
       })
       .catch((error) => {
         console.error(error);
-        // Show error toast
         toast.error("Error updating firm settings!");
       });
   };
@@ -303,7 +274,6 @@ const FirmSetting = () => {
       require2FAforallteam: require2FAforallteam,
       emailaddressfor2FA: defaultreplytoemails,
     });
-    console.log(raw);
     const requestOptions = {
       method: "PATCH",
       headers: myHeaders,
@@ -318,14 +288,11 @@ const FirmSetting = () => {
         }
         return response.json();
       })
-      .then((result) => {
-        console.log(result);
-        // Show success toast
+      .then(() => {
         toast.success("Firm settings updated successfully!");
       })
       .catch((error) => {
         console.error(error);
-        // Show error toast
         toast.error("Error updating firm settings!");
       });
   };
@@ -343,7 +310,6 @@ const FirmSetting = () => {
     const raw = JSON.stringify({
       allowclienttocreatenewchat: allowclienttocreatenewchat,
     });
-    console.log(raw);
     const requestOptions = {
       method: "PATCH",
       headers: myHeaders,
@@ -358,14 +324,11 @@ const FirmSetting = () => {
         }
         return response.json();
       })
-      .then((result) => {
-        console.log(result);
-        // Show success toast
+      .then(() => {
         toast.success("Firm settings updated successfully!");
       })
       .catch((error) => {
         console.error(error);
-        // Show error toast
         toast.error("Error updating firm settings!");
       });
   };
@@ -386,7 +349,6 @@ const FirmSetting = () => {
       xlink: xlink,
       instagramlink: instagramlink,
     });
-    console.log(raw);
     const requestOptions = {
       method: "PATCH",
       headers: myHeaders,
@@ -401,14 +363,11 @@ const FirmSetting = () => {
         }
         return response.json();
       })
-      .then((result) => {
-        console.log(result);
-        // Show success toast
+      .then(() => {
         toast.success("Firm settings updated successfully!");
       })
       .catch((error) => {
         console.error(error);
-        // Show error toast
         toast.error("Error updating firm settings!");
       });
   };
@@ -421,7 +380,6 @@ const FirmSetting = () => {
     const raw = JSON.stringify({
       defaultlanguage: defaultlanguage,
     });
-    console.log(raw);
     const requestOptions = {
       method: "PATCH",
       headers: myHeaders,
@@ -436,14 +394,11 @@ const FirmSetting = () => {
         }
         return response.json();
       })
-      .then((result) => {
-        console.log(result);
-        // Show success toast
+      .then(() => {
         toast.success("Firm settings updated successfully!");
       })
       .catch((error) => {
         console.error(error);
-        // Show error toast
         toast.error("Error updating firm settings!");
       });
   };
@@ -466,7 +421,6 @@ const FirmSetting = () => {
       contactnameformat: selectedFormat,
       applytoallcontacts: applytoallcontacts,
     });
-    console.log(raw);
     const requestOptions = {
       method: "PATCH",
       headers: myHeaders,
@@ -481,14 +435,11 @@ const FirmSetting = () => {
         }
         return response.json();
       })
-      .then((result) => {
-        console.log(result);
-        // Show success toast
+      .then(() => {
         toast.success("Firm settings updated successfully!");
       })
       .catch((error) => {
         console.error(error);
-        // Show error toast
         toast.error("Error updating firm settings!");
       });
   };
@@ -518,7 +469,6 @@ const FirmSetting = () => {
       showKBAverification: showKBAverification,
       showQESAdESverification: showQESAdESverification,
     });
-    console.log(raw);
     const requestOptions = {
       method: "PATCH",
       headers: myHeaders,
@@ -533,14 +483,11 @@ const FirmSetting = () => {
         }
         return response.json();
       })
-      .then((result) => {
-        console.log(result);
-        // Show success toast
+      .then(() => {
         toast.success("Firm settings updated successfully!");
       })
       .catch((error) => {
         console.error(error);
-        // Show error toast
         toast.error("Error updating firm settings!");
       });
   };
@@ -570,7 +517,6 @@ const FirmSetting = () => {
       allowsupportteamownerlikepermissiondate: allowsupportteamownerlikepermissiondate,
     });
 
-    console.log(raw);
     const requestOptions = {
       method: "PATCH",
       headers: myHeaders,
@@ -580,19 +526,14 @@ const FirmSetting = () => {
 
     fetch(`${LOGIN_API}/adminfirm/firmsetting/${firmSettingId}`, requestOptions)
       .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
+        if (!response.ok) throw new Error("Network response was not ok");
         return response.json();
       })
-      .then((result) => {
-        console.log(result);
-        // Show success toast
+      .then(() => {
         toast.success("Firm settings updated successfully!");
       })
       .catch((error) => {
         console.error(error);
-        // Show error toast
         toast.error("Error updating firm settings!");
       });
   };
@@ -639,8 +580,6 @@ const FirmSetting = () => {
       showmesscontextinternalnotification: showmesscontextinternalnotification,
       showmesscontextclientfacingnotification: showmesscontextclientfacingnotification,
     });
-
-    console.log(raw);
     const requestOptions = {
       method: "PATCH",
       headers: myHeaders,
@@ -655,14 +594,11 @@ const FirmSetting = () => {
         }
         return response.json();
       })
-      .then((result) => {
-        console.log(result);
-        // Show success toast
+      .then(() => {
         toast.success("Firm settings updated successfully!");
       })
       .catch((error) => {
         console.error(error);
-        // Show error toast
         toast.error("Error updating firm settings!");
       });
   };
@@ -678,8 +614,6 @@ const FirmSetting = () => {
     const raw = JSON.stringify({
       emailfirmmembercansend: emailfirmmembercansend,
     });
-
-    console.log(raw);
     const requestOptions = {
       method: "PATCH",
       headers: myHeaders,
@@ -694,14 +628,11 @@ const FirmSetting = () => {
         }
         return response.json();
       })
-      .then((result) => {
-        console.log(result);
-        // Show success toast
+      .then(() => {
         toast.success("Firm settings updated successfully!");
       })
       .catch((error) => {
         console.error(error);
-        // Show error toast
         toast.error("Error updating firm settings!");
       });
   };
@@ -727,8 +658,6 @@ const FirmSetting = () => {
       showdoneuploadingbutton: showdoneuploadingbutton,
       showdoneuploadingcheckbox: showdoneuploadingcheckbox,
     });
-
-    console.log(raw);
     const requestOptions = {
       method: "PATCH",
       headers: myHeaders,
@@ -743,14 +672,11 @@ const FirmSetting = () => {
         }
         return response.json();
       })
-      .then((result) => {
-        console.log(result);
-        // Show success toast
+      .then(() => {
         toast.success("Firm settings updated successfully!");
       })
       .catch((error) => {
         console.error(error);
-        // Show error toast
         toast.error("Error updating firm settings!");
       });
   };
@@ -766,14 +692,12 @@ const FirmSetting = () => {
       .then((response) => response.json())
       .then((result) => {
         setUserData(result);
-        console.log("Fetched Team Member Data:", result);
       })
       .catch((error) => {
         console.error("Error fetching team member data:", error);
       });
   };
 
-  // console.log(combinedValues)
   useEffect(() => {
     Fetchteammember();
   }, []);
@@ -791,9 +715,7 @@ const FirmSetting = () => {
     setSelectedUser(selectedOptions);
     const selectedValues = selectedOptions.map((option) => option.value);
     setCombinedValues(selectedValues);
-    console.log(selectedValues);
   };
-  console.log(combinedValues);
 
   //PATCH for teammember
   const teammember = () => {
@@ -803,8 +725,6 @@ const FirmSetting = () => {
     const raw = JSON.stringify({
       giveaccountaccessteammembers: combinedValues,
     });
-
-    console.log(raw);
     const requestOptions = {
       method: "PATCH",
       headers: myHeaders,
@@ -819,14 +739,11 @@ const FirmSetting = () => {
         }
         return response.json();
       })
-      .then((result) => {
-        console.log(result);
-        // Show success toast
+      .then(() => {
         toast.success("Firm settings updated successfully!");
       })
       .catch((error) => {
         console.error(error);
-        // Show error toast
         toast.error("Error updating firm settings!");
       });
   };
@@ -854,7 +771,6 @@ const FirmSetting = () => {
     const fetchAllStates = async () => {
       try {
         const response = await axios.get("https://countriesnow.space/api/v0.1/countries/states");
-        console.log(response.data); // Log the response to see its structure
         const allStates = response.data.data.flatMap((country) => country.states);
         setStates(allStates);
 
@@ -874,27 +790,27 @@ const FirmSetting = () => {
 
   // Reusable card wrapper
   const SettingsCard = ({ title, children }) => (
-    <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-      <div className="border-b border-slate-100 px-5 py-3.5">
-        <h3 className="text-sm font-semibold text-slate-900">{title}</h3>
+    <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+      <div className="border-b border-border px-5 py-3.5">
+        <h3 className="text-sm font-semibold text-foreground">{title}</h3>
       </div>
       <div className="p-5 space-y-4">{children}</div>
     </div>
   );
 
   const SaveBtn = ({ onClick }) => (
-    <button onClick={onClick} className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition-colors">
+    <button onClick={onClick} className="inline-flex items-center justify-center rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors">
       Save
     </button>
   );
 
   const InputField = ({ label, value, onChange, placeholder, type = "text", endAdornment, icon: Icon, iconColor }) => (
     <div>
-      {label && <label className="block text-sm font-medium text-slate-700 mb-1.5">{label}</label>}
+      {label && <label className="block text-sm font-medium text-foreground mb-1.5">{label}</label>}
       <div className="relative">
         {Icon && (
           <div className="absolute left-3 top-1/2 -translate-y-1/2">
-            <Icon className="h-4 w-4" style={{ color: iconColor || '#6b7280' }} />
+            <Icon className="h-4 w-4" style={{ color: iconColor || 'currentColor' }} />
           </div>
         )}
         <input
@@ -902,10 +818,10 @@ const FirmSetting = () => {
           value={value || ""}
           onChange={onChange}
           placeholder={placeholder}
-          className={`flex h-10 w-full rounded-lg border border-slate-200 bg-white ${Icon ? 'pl-10' : 'px-3'} ${endAdornment ? 'pr-12' : 'px-3'} py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow`}
+          className={`flex h-10 w-full rounded-lg border border-input bg-background text-foreground ${Icon ? 'pl-10' : 'px-3'} ${endAdornment ? 'pr-12' : 'px-3'} py-2 text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow`}
         />
         {endAdornment && (
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">{endAdornment}</span>
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">{endAdornment}</span>
         )}
       </div>
     </div>
@@ -914,20 +830,20 @@ const FirmSetting = () => {
   const SwitchRow = ({ checked, onChange, label, disabled }) => (
     <div className="flex items-center gap-3 py-1.5">
       <SettingsSwitch checked={checked || false} onChange={onChange} disabled={disabled} />
-      <span className="text-sm text-slate-700">{label}</span>
+      <span className="text-sm text-foreground">{label}</span>
     </div>
   );
 
   const CheckboxRow = ({ checked, onChange, label }) => (
     <label className="flex items-center gap-2.5 cursor-pointer py-1">
-      <input type="checkbox" checked={checked || false} onChange={(e) => onChange(e.target.checked)} className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 transition" />
-      <span className="text-sm text-slate-700">{label}</span>
+      <input type="checkbox" checked={checked || false} onChange={(e) => onChange(e.target.checked)} className="h-4 w-4 rounded border-border text-primary focus:ring-ring transition" />
+      <span className="text-sm text-foreground">{label}</span>
     </label>
   );
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-slate-900 mb-8">Firm Settings</h1>
+      <h1 className="text-2xl font-semibold text-foreground mb-8">Firm Settings</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left Column */}
@@ -942,14 +858,14 @@ const FirmSetting = () => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <InputField label="City" value={City} onChange={(e) => setCity(e.target.value)} placeholder="City" />
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">State</label>
+                <label className="block text-sm font-medium text-foreground mb-1.5">State</label>
                 <select
                   value={selectedState?.label || ""}
                   onChange={(e) => {
                     const match = states.find((s) => s.name === e.target.value);
                     setSelectedState(match ? { label: match.name } : null);
                   }}
-                  className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+                  className="flex h-10 w-full rounded-lg border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow"
                 >
                   <option value="">Select State</option>
                   {states.map((s) => (
@@ -964,8 +880,8 @@ const FirmSetting = () => {
               <InputField label="Firm Website" value={firmwebsite} onChange={(e) => setFirmWebsite(e.target.value)} placeholder="Firm Website" />
             </div>
             <InputField label="Default reply-to address for system emails" value={defaultreplytoemails} onChange={(e) => setDefaultreplytoemails(e.target.value)} placeholder="Default reply-to address for system emails" />
-            <div className="flex items-start gap-3 rounded-lg bg-slate-50 p-3">
-              <span className="text-xs text-slate-600 flex-1">Receive copies (BCC) of system emails sent to clients. These emails include requests and reminders to fill out forms, upload documents, and complete other pending actions.</span>
+            <div className="flex items-start gap-3 rounded-lg bg-muted/50 p-3">
+              <span className="text-xs text-muted-foreground flex-1">Receive copies (BCC) of system emails sent to clients. These emails include requests and reminders to fill out forms, upload documents, and complete other pending actions.</span>
               <SettingsSwitch checked={false} onChange={() => {}} />
             </div>
             <SaveBtn onClick={Contactdetails} />
@@ -974,12 +890,12 @@ const FirmSetting = () => {
           {/* About Us */}
           <SettingsCard title="About us">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Description</label>
+              <label className="block text-sm font-medium text-foreground mb-1.5">Description</label>
               <textarea
                 value={discription || ""}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={3}
-                className="flex w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow resize-none"
+                className="flex w-full rounded-lg border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow resize-none"
               />
             </div>
             <CheckboxRow checked={showfirmownerphototologin} onChange={handleAboutusCheckbox} label="Show firm owner photo on the login page" />
@@ -988,18 +904,18 @@ const FirmSetting = () => {
 
           {/* Firm Portal URL */}
           <SettingsCard title="Firm portal URL">
-            <p className="text-sm text-slate-600">Your firm's TaxDome portal URL:</p>
-            <p className="text-sm font-medium text-indigo-600">https://anuja.taxdome.com/</p>
-            <p className="text-xs text-slate-500">To modify this address, please contact support.</p>
+            <p className="text-sm text-muted-foreground">Your firm's TaxDome portal URL:</p>
+            <p className="text-sm font-medium text-primary">https://anuja.taxdome.com/</p>
+            <p className="text-xs text-muted-foreground">To modify this address, please contact support.</p>
           </SettingsCard>
 
           {/* Custom Domain */}
           <SettingsCard title="Custom domain">
-            <p className="text-sm text-slate-600">
-              You can white-label your TaxDome portal with your own domain name (for example, anuja.com instead of anuja.taxdome.com). Before adding your domain name, please see <span className="text-indigo-600 cursor-pointer hover:underline">how to configure DNS</span>.
+            <p className="text-sm text-muted-foreground">
+              You can white-label your TaxDome portal with your own domain name (for example, anuja.com instead of anuja.taxdome.com). Before adding your domain name, please see <span className="text-primary cursor-pointer hover:underline">how to configure DNS</span>.
             </p>
             <InputField label="Domain name" value={domainname} onChange={(e) => setDomainName(e.target.value)} placeholder="Domain name" />
-            <button onClick={CustomDomain} className="rounded-lg border border-indigo-200 bg-white px-4 py-2 text-sm font-medium text-indigo-600 shadow-sm hover:bg-indigo-50 transition-colors">
+            <button onClick={CustomDomain} className="inline-flex items-center justify-center rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium text-primary shadow-sm hover:bg-muted transition-colors">
               Link Custom Domain
             </button>
           </SettingsCard>
@@ -1008,13 +924,13 @@ const FirmSetting = () => {
           <SettingsCard title="Two-factor authentication (2FA)">
             <InputField label="Email address to receive manual 2FA disable requests" value={defaultreplytoemails} onChange={(e) => setDefaultreplytoemails(e.target.value)} placeholder="Email address" />
             <CheckboxRow checked={require2FAforallteam} onChange={handlefor2FA} label="Require 2FA for all team members" />
-            <p className="text-xs text-slate-500 ml-6">2FA will be turned on for team members at next login.</p>
+            <p className="text-xs text-muted-foreground ml-6">2FA will be turned on for team members at next login.</p>
             <SaveBtn onClick={TwoFactorAuthentication} />
           </SettingsCard>
 
           {/* Chats */}
           <SettingsCard title="Chats">
-            <p className="text-sm text-slate-600">Chats are a secure way to communicate and exchange documents with your clients. You can allow clients to start new chats, or have them only respond to messages sent by your firm.</p>
+            <p className="text-sm text-muted-foreground">Chats are a secure way to communicate and exchange documents with your clients. You can allow clients to start new chats, or have them only respond to messages sent by your firm.</p>
             <SwitchRow checked={allowclienttocreatenewchat} onChange={handlechat} label="Allow clients to create new chat threads" />
             <SaveBtn onClick={chat} />
           </SettingsCard>
@@ -1036,29 +952,29 @@ const FirmSetting = () => {
             <div
               onDrop={handleDrop}
               onDragOver={handleDragOver}
-              className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-slate-50/50 p-8 gap-3 transition-colors hover:border-indigo-400 hover:bg-indigo-50/30"
+              className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-muted/30 p-8 gap-3 transition-colors hover:border-primary/50 hover:bg-primary/5"
             >
-              <Upload className="h-8 w-8 text-slate-400" />
-              <p className="text-sm text-slate-500">Drag & Drop file here</p>
-              <button onClick={handleButtonClick} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition-colors">
+              <Upload className="h-8 w-8 text-muted-foreground" />
+              <p className="text-sm text-muted-foreground">Drag & Drop file here</p>
+              <button onClick={handleButtonClick} className="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors">
                 Browse Files
               </button>
               <input id="fileInput" type="file" className="hidden" onChange={handleFileChange} />
-              {selectedFile && <p className="mt-2 text-xs text-slate-600 break-all">Selected file: {selectedFile.name}</p>}
+              {selectedFile && <p className="mt-2 text-xs text-muted-foreground break-all">Selected file: {selectedFile.name}</p>}
             </div>
           </SettingsCard>
 
           {/* International Settings */}
           <SettingsCard title="International settings">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Default language</label>
+              <label className="block text-sm font-medium text-foreground mb-1.5">Default language</label>
               <select
                 value={selectedLanguage?.value || ""}
                 onChange={(e) => {
                   const lang = languages.find(l => l.value === e.target.value);
                   handleLanguageChange(lang);
                 }}
-                className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+                className="flex h-10 w-full rounded-lg border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow"
               >
                 {languages.map((lang) => (
                   <option key={lang.value} value={lang.value}>{lang.label}</option>
@@ -1072,11 +988,11 @@ const FirmSetting = () => {
           {/* Contact Name Formatting */}
           <SettingsCard title="Contact name formatting">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">The next generated contact name will have the following format</label>
+              <label className="block text-sm font-medium text-foreground mb-1.5">The next generated contact name will have the following format</label>
               <select
                 value={selectedFormat || ""}
                 onChange={(e) => setSelectedFormat(e.target.value)}
-                className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+                className="flex h-10 w-full rounded-lg border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow"
               >
                 {contactNameOptions.map((opt) => (
                   <option key={opt} value={opt}>{opt}</option>
@@ -1090,11 +1006,11 @@ const FirmSetting = () => {
           {/* Signatures */}
           <SettingsCard title="Signatures">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Default date format for e-signature</label>
+              <label className="block text-sm font-medium text-foreground mb-1.5">Default date format for e-signature</label>
               <select
                 value={selectedSignatures || ""}
                 onChange={(e) => setSelectedSignatures(e.target.value)}
-                className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+                className="flex h-10 w-full rounded-lg border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow"
               >
                 {SignaturesOptions.map((opt) => (
                   <option key={opt} value={opt}>{opt}</option>
@@ -1109,7 +1025,7 @@ const FirmSetting = () => {
           {/* Default Account Access */}
           <SettingsCard title="Default account access">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Team Members</label>
+              <label className="block text-sm font-medium text-foreground mb-1.5">Team Members</label>
               <select
                 multiple
                 value={combinedValues}
@@ -1119,7 +1035,7 @@ const FirmSetting = () => {
                   const selectedOpts = options.filter(o => selected.includes(o.value));
                   setSelectedUser(selectedOpts);
                 }}
-                className="flex min-h-[80px] w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+                className="flex min-h-[80px] w-full rounded-lg border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow"
               >
                 {options.map((opt) => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -1128,7 +1044,7 @@ const FirmSetting = () => {
               {selectedUser.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 mt-2">
                   {selectedUser.map((u) => (
-                    <span key={u.value} className="inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-700">{u.label}</span>
+                    <span key={u.value} className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">{u.label}</span>
                   ))}
                 </div>
               )}
@@ -1142,24 +1058,24 @@ const FirmSetting = () => {
               <SwitchRow checked={allowsupportteamsetuplanding} onChange={handleallowsupportteamsetuplanding} label="Allow the support team to set up landing" />
               {allowsupportteamsetuplanding && (
                 <div className="ml-11">
-                  <label className="block text-sm font-medium text-slate-700 mb-1.5">Until</label>
+                  <label className="block text-sm font-medium text-foreground mb-1.5">Until</label>
                   <input
                     type="date"
                     value={allowsupportteamsetuplandingdate ? dayjs(allowsupportteamsetuplandingdate).format("YYYY-MM-DD") : ""}
                     onChange={(e) => setAllowsupportteamsetuplandingdate(e.target.value ? dayjs(e.target.value) : null)}
-                    className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+                    className="flex h-10 w-full rounded-lg border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow"
                   />
                 </div>
               )}
               <SwitchRow checked={allowsupportteamownerlikepermission} onChange={handleallowsupportteamownerlikepermission} label="Allow the support team to log in with owner-like permissions" />
               {allowsupportteamownerlikepermission && (
                 <div className="ml-11">
-                  <label className="block text-sm font-medium text-slate-700 mb-1.5">Until</label>
+                  <label className="block text-sm font-medium text-foreground mb-1.5">Until</label>
                   <input
                     type="date"
                     value={allowsupportteamownerlikepermissiondate ? dayjs(allowsupportteamownerlikepermissiondate).format("YYYY-MM-DD") : ""}
                     onChange={(e) => setAllowsupportteamownerlikepermissiondate(e.target.value ? dayjs(e.target.value) : null)}
-                    className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+                    className="flex h-10 w-full rounded-lg border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow"
                   />
                 </div>
               )}
@@ -1171,7 +1087,7 @@ const FirmSetting = () => {
           <SettingsCard title="Default folder template">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1.5">Folder Templates</label>
-              <select multiple className="flex min-h-[80px] w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow">
+              <select multiple className="flex min-h-[80px] w-full rounded-lg border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow">
                 {/* Add folder template options here */}
               </select>
             </div>
@@ -1203,8 +1119,8 @@ const FirmSetting = () => {
 
           {/* Client Portal Announcement */}
           <SettingsCard title="Client portal announcement">
-            <p className="text-sm text-slate-600">Announcement is visible in the client portal and mobile app upon login.</p>
-            <button onClick={() => setNewChat(true)} className="flex items-center gap-2 text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors">
+            <p className="text-sm text-muted-foreground">Announcement is visible in the client portal and mobile app upon login.</p>
+            <button onClick={() => setNewChat(true)} className="flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors">
               <PlusCircle className="h-4 w-4" />
               Create announcement
             </button>

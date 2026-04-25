@@ -1,17 +1,11 @@
 import React, { useState, useEffect, useContext } from "react";
-import { AiOutlinePlusCircle } from "react-icons/ai";
-import { CiDiscount1 } from "react-icons/ci";
-import { BsThreeDotsVertical } from "react-icons/bs";
-import { RiCloseLine } from "react-icons/ri";
-import { MdOutlinePreview } from "react-icons/md";
-import { IoArrowBack } from "react-icons/io5";
+import { Plus, Tag, MoreVertical, X, Eye, ArrowLeft, Loader2 } from "lucide-react";
 import { toast } from "react-toastify";
 import CreatableSelect from "react-select/creatable";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import Cookies from "js-cookie";
 import { LoginContext } from "../Sidebar/Context/Context";
-import { RxCross2 } from "react-icons/rx";
 const InvoiceDrawer = ({
   isDrawerOpen,
   setDrawerOpen,
@@ -876,14 +870,14 @@ const [lineItemsError, setLineItemsError]= useState("")
     const qty = selectedRowData?.qty || 0;
     setTotalamount(`$${(rate * qty).toFixed(2)}`);
   }, [selectedRowData?.rate, selectedRowData?.qty]);
-  const inputCls = "w-full border border-gray-300 rounded px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-blue-400";
-  const labelCls = "block text-sm font-medium text-gray-700 mb-1";
-  const btnPrimary = "rounded-full px-5 py-1.5 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] transition-colors";
-  const btnOutline = "rounded-full px-5 py-1.5 text-sm font-medium border border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white hover:border-transparent transition-colors";
+  const inputCls = "w-full border border-input rounded-lg px-3 py-2 text-sm bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow shadow-sm";
+  const labelCls = "block text-sm font-medium text-foreground mb-1.5";
+  const btnPrimary = "inline-flex items-center justify-center rounded-lg px-5 py-2 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 transition-colors shadow-sm";
+  const btnOutline = "inline-flex items-center justify-center rounded-lg px-5 py-2 text-sm font-medium border border-border text-foreground hover:bg-muted transition-colors";
   const switchEl = (checked, onChange) => (
     <label className="relative inline-flex items-center cursor-pointer">
       <input type="checkbox" checked={checked} onChange={onChange} className="sr-only peer" />
-      <div className="w-10 h-5 bg-gray-200 rounded-full peer peer-checked:bg-blue-600 transition-colors after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5" />
+      <div className="w-10 h-5 bg-muted rounded-full peer peer-checked:bg-primary transition-colors after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-background after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5" />
     </label>
   );
 
@@ -894,18 +888,18 @@ const [lineItemsError, setLineItemsError]= useState("")
       {/* Main Invoice Drawer */}
       <div className="fixed inset-0 z-40 overflow-hidden">
         <div className="absolute inset-0 bg-black/30" onClick={() => setDrawerOpen(false)} />
-        <div className="absolute right-0 top-0 h-full bg-white shadow-2xl overflow-y-auto w-full md:w-[60%]">
+        <div className="absolute right-0 top-0 h-full bg-card shadow-2xl overflow-y-auto w-full md:w-[60%]">
 
           {/* Header */}
-          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 sticky top-0 bg-white z-10">
-            <h2 className="text-lg font-bold text-gray-800">Create Invoice</h2>
-            <div className="flex items-center gap-4">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-border sticky top-0 bg-card z-10">
+            <h2 className="text-base font-semibold text-foreground">Create Invoice</h2>
+            <div className="flex items-center gap-2">
               <button type="button" onClick={handleOpenpreviewDrawer}
-                className="flex items-center gap-1.5 text-blue-600 text-sm hover:text-blue-800">
-                <MdOutlinePreview size={18} /> Preview
+                className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <Eye className="h-4 w-4" /> Preview
               </button>
-              <button type="button" onClick={handleDrawerClose} className="text-gray-400 hover:text-gray-700">
-                <RxCross2 size={18} />
+              <button type="button" onClick={handleDrawerClose} className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
+                <X className="h-4 w-4" />
               </button>
             </div>
           </div>
@@ -917,7 +911,7 @@ const [lineItemsError, setLineItemsError]= useState("")
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className={labelCls}>Account name, ID or email</label>
-                <input readOnly value={selectedAccount?.label || ""} placeholder="Select Account" className={inputCls + " bg-gray-50 cursor-default"} />
+                <input readOnly value={selectedAccount?.label || ""} placeholder="Select Account" className={inputCls + " bg-muted cursor-default"} />
               </div>
               <div>
                 <label className={labelCls}>Invoice Template</label>
@@ -935,8 +929,8 @@ const [lineItemsError, setLineItemsError]= useState("")
               <div>
                 <label className={labelCls}>Invoice Number</label>
                 <input readOnly value={isLoadingInvoiceNumber ? "Loading..." : invoicenumber}
-                  placeholder="Invoice Number" className={inputCls + " bg-gray-50 cursor-default"} />
-                <p className="text-xs text-gray-400 mt-1">Auto-generated invoice number</p>
+                  placeholder="Invoice Number" className={inputCls + " bg-muted cursor-default"} />
+                <p className="text-xs text-muted-foreground mt-1">Auto-generated invoice number</p>
               </div>
               <div>
                 <label className={labelCls}>Payment Method</label>
@@ -972,7 +966,7 @@ const [lineItemsError, setLineItemsError]= useState("")
             <div className="relative">
               <label className={labelCls}>Description</label>
               <textarea value={description} onChange={handleChange} placeholder="Description" rows={3} className={inputCls} />
-              <p className="text-xs text-gray-400 text-right mt-1">{charCount}/{charLimit}</p>
+              <p className="text-xs text-muted-foreground text-right mt-1">{charCount}/{charLimit}</p>
               <div className="relative mt-1">
                 <button type="button" onClick={toggleDropdown} className={btnPrimary + " !rounded-full px-4 py-1.5 text-xs"}>
                   Add Shortcode
@@ -980,11 +974,11 @@ const [lineItemsError, setLineItemsError]= useState("")
                 {showDropdown && (
                   <>
                     <div className="fixed inset-0 z-30" onClick={handleCloseDropdown} />
-                    <div className="absolute left-0 z-40 bg-white border border-gray-200 rounded-lg shadow-lg w-[300px] h-[300px] overflow-y-auto">
+                    <div className="absolute left-0 z-40 bg-popover border border-border rounded-lg shadow-lg w-[300px] h-[300px] overflow-y-auto">
                       <ul>
                         {filteredShortcuts.map((shortcut, index) => (
                           <li key={index} onClick={() => handleAddShortcut(shortcut.value)}
-                            className="px-4 py-2 text-sm cursor-pointer hover:bg-gray-50"
+                            className="px-4 py-2 text-sm text-popover-foreground cursor-pointer hover:bg-muted"
                             style={{ fontWeight: shortcut.isBold ? "bold" : "normal" }}>
                             {shortcut.title}
                           </li>
@@ -998,49 +992,49 @@ const [lineItemsError, setLineItemsError]= useState("")
 
             {/* Additional toggles */}
             <div>
-              <h3 className="text-sm font-semibold text-gray-800 mb-3">Additional</h3>
+              <h3 className="text-sm font-semibold text-foreground mb-3">Additional</h3>
               <div className="space-y-3">
                 <label className="flex items-center gap-3 cursor-pointer">
                   {switchEl(payInvoice, handlePayInvoiceChange)}
-                  <span className="text-sm text-gray-700">Pay invoice using client credits</span>
+                  <span className="text-sm text-foreground">Pay invoice using client credits</span>
                 </label>
                 <label className="flex items-center gap-3 cursor-pointer">
                   {switchEl(emailInvoice, handleEmailInvoiceChange)}
-                  <span className="text-sm text-gray-700">Email invoice to client</span>
+                  <span className="text-sm text-foreground">Email invoice to client</span>
                 </label>
                 <label className="flex items-center gap-3 cursor-pointer">
                   {switchEl(reminders, handleRemindersChange)}
-                  <span className="text-sm text-gray-700">Reminders</span>
+                  <span className="text-sm text-foreground">Reminders</span>
                 </label>
                 <label className="flex items-center gap-3 cursor-pointer">
                   {switchEl(scheduledInvoice, handleScheduledInvoiceChange)}
-                  <span className="text-sm text-gray-700">Scheduled invoice</span>
+                  <span className="text-sm text-foreground">Scheduled invoice</span>
                 </label>
               </div>
             </div>
 
             {/* Line Items */}
             <div className="invoice-section-three">
-              <h3 className="text-base font-bold text-gray-800 mb-1">Line Items</h3>
-              <p className="text-xs text-gray-500 mb-3">Client-facing itemized list of products and services</p>
+              <h3 className="text-base font-semibold text-foreground mb-1">Line Items</h3>
+              <p className="text-xs text-muted-foreground mb-3">Client-facing itemized list of products and services</p>
               <div className="overflow-x-auto">
-                <table className="w-full text-sm bg-white">
-                  <thead className="bg-gray-50">
+                <table className="w-full text-sm">
+                  <thead className="bg-muted/40">
                     <tr>
-                      <th className="text-left px-3 py-2 font-medium sticky left-0 bg-gray-50">Product or Service</th>
-                      <th className="text-left px-3 py-2 font-medium">Description</th>
-                      <th className="text-left px-3 py-2 font-medium">Rate</th>
-                      <th className="text-left px-3 py-2 font-medium">Qty</th>
-                      <th className="text-left px-3 py-2 font-medium">Amount</th>
-                      <th className="text-left px-3 py-2 font-medium">Tax</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground sticky left-0 bg-muted/40">Product or Service</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Description</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Rate</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Qty</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Amount</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Tax</th>
                       <th className="px-3 py-2"></th>
                       <th className="px-3 py-2"></th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody className="divide-y divide-border">
                     {rows.map((row, index) => (
-                      <tr key={index}>
-                        <td className="px-2 py-1 sticky left-0 bg-white">
+                      <tr key={index} className="hover:bg-muted/30 transition-colors">
+                        <td className="px-2 py-1 sticky left-0 bg-card">
                           <CreatableSelect
                             placeholder={row.isDiscount ? "Reason for discount" : "Product or Service"}
                             options={serviceoptions}
@@ -1057,37 +1051,37 @@ const [lineItemsError, setLineItemsError]= useState("")
                           />
                         </td>
                         <td className="px-2 py-1">
-                          <input type="text" name="description" value={row.description} onChange={(e) => handleInputChange(index, e)} className="border-none outline-none text-sm w-full" placeholder="Description" />
+                          <input type="text" name="description" value={row.description} onChange={(e) => handleInputChange(index, e)} className="border-none outline-none text-sm w-full bg-transparent text-foreground placeholder:text-muted-foreground" placeholder="Description" />
                         </td>
                         <td className="px-2 py-1">
-                          <input type="text" name="rate" value={row.rate} onChange={(e) => handleInputChange(index, e)} className="border-none outline-none text-sm w-20" />
+                          <input type="text" name="rate" value={row.rate} onChange={(e) => handleInputChange(index, e)} className="border-none outline-none text-sm w-20 bg-transparent text-foreground" />
                         </td>
                         <td className="px-2 py-1">
-                          <input type="text" name="qty" value={row.qty} onChange={(e) => handleInputChange(index, e)} className="border-none outline-none text-sm w-12" />
+                          <input type="text" name="qty" value={row.qty} onChange={(e) => handleInputChange(index, e)} className="border-none outline-none text-sm w-12 bg-transparent text-foreground" />
                         </td>
                         <td className={`px-2 py-1 text-sm ${row.isDiscount ? "text-red-500 discount-amount" : ""}`}>{row.amount}</td>
                         <td className="px-2 py-1">
                           <input type="checkbox" name="tax" checked={row.tax} onChange={(e) => handleInputChange(index, e)} className="h-4 w-4" />
                         </td>
                         <td className="px-2 py-1 relative">
-                          <button type="button" onClick={(e) => handleMenuOpen(e, index)} className="p-1 text-gray-500 hover:text-gray-700">
-                            <BsThreeDotsVertical />
+                          <button type="button" onClick={(e) => handleMenuOpen(e, index)} className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
+                            <MoreVertical className="h-3.5 w-3.5" />
                           </button>
                           {Boolean(anchorElNew) && selectedRow === index && (
                             <>
                               <div className="fixed inset-0 z-30" onClick={handleMenuClose} />
-                              <div className="absolute right-0 z-40 bg-white border border-gray-200 rounded-lg shadow-lg py-1 min-w-[160px]">
-                                <button type="button" className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50" onClick={() => handleEditService(row, index)}>Edit</button>
-                                <button type="button" className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50" onClick={handleDeleteService}>Delete</button>
-                                <button type="button" className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50" onClick={() => handleSaveAsNewService(row)}>Save as new service</button>
-                                <button type="button" className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50" onClick={handleDuplicate}>Duplicate</button>
+                              <div className="absolute right-0 z-40 bg-popover border border-border rounded-lg shadow-lg py-1 min-w-[160px]">
+                                <button type="button" className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors" onClick={() => handleEditService(row, index)}>Edit</button>
+                                <button type="button" className="w-full text-left px-3 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors" onClick={handleDeleteService}>Delete</button>
+                                <button type="button" className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors" onClick={() => handleSaveAsNewService(row)}>Save as new service</button>
+                                <button type="button" className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors" onClick={handleDuplicate}>Duplicate</button>
                               </div>
                             </>
                           )}
                         </td>
                         <td className="px-2 py-1">
-                          <button type="button" onClick={() => deleteRow(index)} className="p-1 text-gray-400 hover:text-red-500">
-                            <RiCloseLine />
+                          <button type="button" onClick={() => deleteRow(index)} className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors">
+                            <X className="h-3.5 w-3.5" />
                           </button>
                         </td>
                       </tr>
@@ -1097,33 +1091,33 @@ const [lineItemsError, setLineItemsError]= useState("")
               </div>
 
               <div className="flex items-center gap-5 mt-3">
-                <button type="button" onClick={() => addRow()} className="flex items-center gap-1 text-blue-600 text-sm hover:text-blue-800">
-                  <AiOutlinePlusCircle /> Line item
+                <button type="button" onClick={() => addRow()} className="flex items-center gap-1.5 text-primary text-sm hover:text-primary/80 transition-colors">
+                  <Plus className="h-4 w-4" /> Line item
                 </button>
-                <button type="button" onClick={() => addRow(true)} className="flex items-center gap-1 text-blue-600 text-sm hover:text-blue-800">
-                  <CiDiscount1 /> Discount
+                <button type="button" onClick={() => addRow(true)} className="flex items-center gap-1.5 text-primary text-sm hover:text-primary/80 transition-colors">
+                  <Tag className="h-4 w-4" /> Discount
                 </button>
               </div>
 
               {/* Summary */}
               <div className="mt-5">
-                <h3 className="text-base font-bold text-gray-800 mb-2">Summary</h3>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm bg-white border border-gray-100 rounded-lg">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="text-left px-3 py-2 font-medium">SUBTOTAL</th>
-                        <th className="text-left px-3 py-2 font-medium">TAX RATE</th>
-                        <th className="text-left px-3 py-2 font-medium">TAX TOTAL</th>
-                        <th className="text-left px-3 py-2 font-medium">TOTAL</th>
+                <h3 className="text-base font-semibold text-foreground mb-2">Summary</h3>
+                <div className="overflow-x-auto rounded-lg border border-border">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted/40">
+                      <tr className="border-b border-border">
+                        <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">SUBTOTAL</th>
+                        <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">TAX RATE</th>
+                        <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">TAX TOTAL</th>
+                        <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">TOTAL</th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr>
-                        <td className="px-3 py-2"><div className="flex items-center">$<input type="number" value={subtotal} onChange={handleSubtotalChange} className="border-none outline-none text-sm w-20 ml-1" /></div></td>
-                        <td className="px-3 py-2"><div className="flex items-center"><input type="number" value={taxRate} onChange={handleTaxRateChange} className="border-none outline-none text-sm w-16" />%</div></td>
-                        <td className="px-3 py-2">${taxTotal.toFixed(2)}</td>
-                        <td className="px-3 py-2 font-semibold">${totalAmount}</td>
+                        <td className="px-3 py-2 text-foreground"><div className="flex items-center">$<input type="number" value={subtotal} onChange={handleSubtotalChange} className="border-none outline-none text-sm w-20 ml-1 bg-transparent text-foreground" /></div></td>
+                        <td className="px-3 py-2 text-foreground"><div className="flex items-center"><input type="number" value={taxRate} onChange={handleTaxRateChange} className="border-none outline-none text-sm w-16 bg-transparent text-foreground" />%</div></td>
+                        <td className="px-3 py-2 text-foreground">${taxTotal.toFixed(2)}</td>
+                        <td className="px-3 py-2 font-semibold text-foreground">${totalAmount}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -1144,40 +1138,40 @@ const [lineItemsError, setLineItemsError]= useState("")
       {previewDrawerOpen && (
         <div className="fixed inset-0 z-50 overflow-hidden">
           <div className="absolute inset-0 bg-black/30" onClick={handleClosepreviewDrawer} />
-          <div className="absolute right-0 top-0 h-full bg-[#f8fafc] shadow-2xl overflow-y-auto w-full md:w-[800px]">
+          <div className="absolute right-0 top-0 h-full bg-card shadow-2xl overflow-y-auto w-full md:w-[800px]">
             <div className="p-8">
               <div className="flex items-center justify-between mb-4">
-                <span className="text-base font-semibold text-gray-700">Preview</span>
-                <button type="button" onClick={handleClosepreviewDrawer} className="text-blue-600 hover:text-blue-800">
-                  <RxCross2 size={18} />
+                <span className="text-base font-semibold text-foreground">Preview</span>
+                <button type="button" onClick={handleClosepreviewDrawer} className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
+                  <X className="h-4 w-4" />
                 </button>
               </div>
-              <hr className="border-gray-200 mb-6" />
+              <hr className="border-border mb-6" />
 
-              <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+              <div className="bg-background border border-border rounded-xl shadow-sm p-6 mb-6">
                 <h2 className="text-xl font-bold text-[#ff6700] mb-4">Invoice</h2>
-                <div className="flex justify-between text-sm text-gray-600 mb-1">
+                <div className="flex justify-between text-sm text-muted-foreground mb-1">
                   <span>{selectedAccount?.label || "[ACCOUNT NAME]"}</span>
-                  <span>Invoice number: <span className="text-gray-400">{invoicenumber || "[INVOICE_NUMBER]"}</span></span>
+                  <span>Invoice number: <span className="text-muted-foreground">{invoicenumber || "[INVOICE_NUMBER]"}</span></span>
                 </div>
-                <div className="flex justify-between text-sm text-gray-600 mb-1">
+                <div className="flex justify-between text-sm text-muted-foreground mb-1">
                   <span>{firstContactEmail || "[CONTACT EMAIL]"}</span>
                   <span>Date: {startDate ? startDate.format("YYYY-MM-DD") : ""}</span>
                 </div>
-                <p className="text-sm text-gray-600 mb-5">Description: {description}</p>
+                <p className="text-sm text-muted-foreground mb-5">Description: {description}</p>
 
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm mb-4">
-                    <thead className="bg-[#fff8f5]">
+                    <thead className="bg-muted/40">
                       <tr>
-                        <th className="text-left px-3 py-2 font-semibold">Product/Service</th>
-                        <th className="text-left px-3 py-2 font-semibold">Description</th>
-                        <th className="text-right px-3 py-2 font-semibold">Rate ($)</th>
-                        <th className="text-right px-3 py-2 font-semibold">Qty</th>
-                        <th className="text-right px-3 py-2 font-semibold">Amount</th>
+                        <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Product/Service</th>
+                        <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Description</th>
+                        <th className="text-right px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Rate ($)</th>
+                        <th className="text-right px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Qty</th>
+                        <th className="text-right px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Amount</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
+                    <tbody className="divide-y divide-border">
                       {rows.map((row, index) => (
                         <tr key={index}>
                           <td className="px-3 py-2">{row.productName}</td>
@@ -1211,10 +1205,10 @@ const [lineItemsError, setLineItemsError]= useState("")
       {isNewDrawerOpen && (
         <div className="fixed inset-0 z-50 overflow-hidden">
           <div className="absolute inset-0 bg-black/30" onClick={handleNewDrawerClose} />
-          <div className="absolute right-0 top-0 h-full bg-white shadow-2xl overflow-y-auto w-full md:w-[650px]">
-            <div className="flex justify-between items-center p-4 border-b border-gray-200">
-              <h2 className="text-base font-semibold">Create Service</h2>
-              <RxCross2 onClick={handleNewDrawerClose} className="cursor-pointer text-gray-500" />
+          <div className="absolute right-0 top-0 h-full bg-card shadow-2xl overflow-y-auto w-full md:w-[650px]">
+            <div className="flex justify-between items-center p-4 border-b border-border">
+              <h2 className="text-base font-semibold text-foreground">Create Service</h2>
+              <button type="button" onClick={handleNewDrawerClose} className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"><X className="h-4 w-4" /></button>
             </div>
             <form className="p-4 space-y-4">
               <div>
@@ -1276,13 +1270,13 @@ const [lineItemsError, setLineItemsError]= useState("")
       {isCategoryFormOpen && (
         <div className="fixed inset-0 z-[60] overflow-hidden">
           <div className="absolute inset-0 bg-black/30" onClick={handleCategoryFormClose} />
-          <div className="absolute right-0 top-0 h-full bg-white shadow-2xl overflow-y-auto w-full md:w-[650px]">
+          <div className="absolute right-0 top-0 h-full bg-card shadow-2xl overflow-y-auto w-full md:w-[650px]">
             <div className="flex items-center p-5">
-              <button type="button" onClick={handleCategoryFormClose} className="text-gray-500 hover:text-gray-700">
-                <IoArrowBack size={20} />
+              <button type="button" onClick={handleCategoryFormClose} className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
+                <ArrowLeft className="h-4 w-4" />
               </button>
             </div>
-            <hr className="border-gray-200" />
+            <hr className="border-border" />
             <div className="p-6 space-y-4">
               <div>
                 <label className={labelCls}>Category Name</label>
@@ -1302,10 +1296,10 @@ const [lineItemsError, setLineItemsError]= useState("")
       {isEditDrawerOpen && (
         <div className="fixed inset-0 z-50 overflow-hidden">
           <div className="absolute inset-0 bg-black/30" onClick={handleEditDrawerClose} />
-          <div className="absolute right-0 top-0 h-full bg-white shadow-2xl overflow-y-auto w-full md:w-[650px]">
-            <div className="flex justify-between items-center p-4 border-b border-gray-200">
-              <h2 className="text-base font-semibold">Edit Item</h2>
-              <RxCross2 onClick={handleEditDrawerClose} className="cursor-pointer text-gray-500" />
+          <div className="absolute right-0 top-0 h-full bg-card shadow-2xl overflow-y-auto w-full md:w-[650px]">
+            <div className="flex justify-between items-center p-4 border-b border-border">
+              <h2 className="text-base font-semibold text-foreground">Edit Item</h2>
+              <button type="button" onClick={handleEditDrawerClose} className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"><X className="h-4 w-4" /></button>
             </div>
             <div className="p-4 space-y-3">
               <div>
@@ -1331,12 +1325,12 @@ const [lineItemsError, setLineItemsError]= useState("")
                 </div>
                 <div className="flex-1">
                   <p className="text-sm mb-1">Amount</p>
-                  <input className={inputCls + " bg-gray-100 cursor-not-allowed"} disabled value={totalamount} />
+                  <input className={inputCls + " bg-muted cursor-not-allowed"} disabled value={totalamount} />
                 </div>
               </div>
               <label className="flex items-center gap-3 cursor-pointer">
                 {switchEl(selectedRowData?.tax || false, (e) => handleServiceWitch(e.target.checked))}
-                <span className="text-sm text-gray-700">Tax</span>
+                <span className="text-sm text-foreground">Tax</span>
               </label>
               <div className="flex gap-3 mt-4">
                 <button type="button" className={btnPrimary} onClick={handleSaveChanges}>Save</button>

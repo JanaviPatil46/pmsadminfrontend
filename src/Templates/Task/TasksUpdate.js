@@ -5,17 +5,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import Editor from '../Texteditor/Editor';
 import Priority from '../Priority/Priority';
 import Status from '../Status/Status';
-import dayjs from 'dayjs';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import MultiSelectDropdown from "../MultiSelectDropdown";
 import TagsMultiSelectDropDown from "../TagsMultiSelectDropDown";
-import { FormPage, FormSection, FormField, FormRow, FormGrid } from "../../components/ui/form-layout";
+import { FormPage, FormSection, FormField, FormRow, FormGrid, FormSwitchRow, FormSubtaskItem, FormSubtaskAdd } from "../../components/ui/form-layout";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
-import { Label } from "../../components/ui/label";
-import { Switch } from "../../components/ui/switch";
-import { Checkbox } from "../../components/ui/checkbox";
-import { Trash2, Plus, GripVertical, FileText, Calendar, ListChecks } from "lucide-react";
+import { FileText, Calendar, ListChecks } from "lucide-react";
 const Tasks = () => {
     const TASK_API = process.env.REACT_APP_TASK_TEMP_URL;
     const USER_API = process.env.REACT_APP_USER_URL;
@@ -23,7 +19,6 @@ const Tasks = () => {
 
     const navigate = useNavigate();
     const { _id } = useParams();
-    console.log(_id)
     const [tempNameNew, setTempNameNew] = useState("");
     const [tagsNew, setTagsNew] = useState([]);
     const [AssigneesNew, setAssigneesNew] = useState([]);
@@ -132,12 +127,6 @@ const Tasks = () => {
    
     
     // Optional: Use useEffect to log after state updates
-    useEffect(() => {
-        console.log("Updated checkedSubtasks:", checkedSubtasks);
-        console.log("Updated subtasks:", subtasks);
-    }, [checkedSubtasks, subtasks]);
-    
-    
     // const handleCheckboxChange = (subtaskId) => {
     //     const isChecked = checkedSubtasks.includes(subtaskId);
     //     const newCheckedSubtasks = isChecked
@@ -212,7 +201,6 @@ const Tasks = () => {
     };
     const handleStatusChange = (status) => {
         setStatus(status);
-        console.log(status)
     };
     // const [description, setDescription] = useState('');
     const handleEditorChange = (content) => {
@@ -249,10 +237,8 @@ const Tasks = () => {
     // };
     const handleUserChange = (newSelectedUsers) => {
         setSelectedUser(newSelectedUsers);
-        console.log(newSelectedUsers)
         const selectedValues = newSelectedUsers.map((option) => option.value);
         setCombinedValues(selectedValues);
-        console.log(selectedValues)
       };
     //Tag FetchData ================
     const [tags, setTags] = useState([]);
@@ -335,10 +321,8 @@ const Tasks = () => {
 
     const handleTagChange = (newSelectedTags) => {
         setTagsNew(newSelectedTags);
-        console.log(newSelectedTags)
         const selectedValues = newSelectedTags.map((option) => option.value);
         setCombinedTagsValues(selectedValues);
-        console.log(selectedValues)
       };
     const [tempvalues, setTempValues] = useState();
     useEffect(() => {
@@ -355,8 +339,6 @@ const Tasks = () => {
                 throw new Error("Failed to fetch data");
             }
             const data = await response.json();
-            console.log("tasktemp", data)
-            
             if (data.taskTemplate && Array.isArray(data.taskTemplate.taskassignees)) {
                 // Flatten the array in case of unnecessary nesting
                 const flatAssignees = data.taskTemplate.taskassignees.flat();
@@ -371,8 +353,6 @@ const Tasks = () => {
             
                     const selectedValues = assigneesData.map(option => option.value);
                     setCombinedValues(selectedValues);
-                } else {
-                    console.log("taskassignees contains an unexpected structure.");
                 }
             }
             
@@ -400,9 +380,6 @@ const Tasks = () => {
                 setTagsNew(tagsData); // Assuming you have a setTags function to update your state
                 const selectedTagsValues = tagsData.map((option) => option.value);
                 setCombinedTagsValues(selectedTagsValues);
-                console.log("Tags Data:", selectedTagsValues);
-            } else {
-                console.log("tasktags is not defined or not an array.");
             }
 
             setTempValues(data.taskTemplate);
@@ -418,7 +395,6 @@ const Tasks = () => {
             //     console.log("subtasks is not defined or not an array.");
             // }
             setSubtasks(data.taskTemplate.subtasks)
-            console.log("subtask list",data.taskTemplate.subtasks)
         } catch (error) {
             console.error("Error fetching data:", error);
         }
@@ -430,7 +406,6 @@ const Tasks = () => {
     }, [tempvalues]);
     const tempallvalue = () => {
         if (tempvalues) {
-            console.log(tempvalues);
             setTempNameNew(tempvalues.templatename || '');
             setStatus(tempvalues.status || '');
             setTaskDescription(tempvalues.description || '');
@@ -438,7 +413,6 @@ const Tasks = () => {
             // setStartsInNew(tempvalues.startsin || '');
             setStartsInNew(String(tempvalues.startsin ?? ''));
 
-            console.log("staert in upadte value",tempvalues.startsin)
             // setDueInNew(tempvalues.duein || '');
             setDueInNew(String(tempvalues.duein ?? ''));
 
@@ -455,7 +429,6 @@ const Tasks = () => {
     };
 
     const updatetasktemp = () => {
-        console.log(_id)
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
 
@@ -466,7 +439,6 @@ const Tasks = () => {
             checked: checked !== undefined ? checked : false // Ensure checked is either true or false
         }));
 
-        console.log(subtaskData);
         const raw = JSON.stringify({
             templatename: tempNameNew,
             status: status,
@@ -485,7 +457,6 @@ const Tasks = () => {
             subtasks: subtaskData,
             issubtaskschecked: SubtaskSwitch
         });
-        console.log(raw)
         const requestOptions = {
             method: "PATCH",
             headers: myHeaders,
@@ -493,7 +464,6 @@ const Tasks = () => {
             redirect: "follow",
         };
         const url = `${TASK_API}/workflow/tasks/tasktemplate/${_id}`;
-        console.log(url)
         fetch(url, requestOptions)
             .then((response) => {
                 if (!response.ok) {
@@ -501,8 +471,7 @@ const Tasks = () => {
                 }
                 return response.text();
             })
-            .then((result) => {
-                console.log(result)
+            .then(() => {
                 toast.success("Task Template updated successfully");
                 navigate("/firmtemp/templates/tasks")
 
@@ -513,7 +482,6 @@ const Tasks = () => {
                 toast.error("Failed to create Job Template");
             });
     };
-    console.log(subtasks)
     const updatesavetasktemp = () => {
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
@@ -525,13 +493,11 @@ const Tasks = () => {
             checked: checked !== undefined ? checked : false // Ensure checked is either true or false
         }));
 
-        console.log(subtaskData);
         const raw = JSON.stringify({
             templatename: tempNameNew,
             status: status,
             tasktags: combinedTagsValues,
             taskassignees: combinedValues,
-
             priority: priority,
             description: taskDiscription,
             absolutedates: absoluteDate,
@@ -603,67 +569,71 @@ const Tasks = () => {
                     </>
                 }
             >
-                <FormGrid>
-                    {/* ===== LEFT COLUMN: Task Details ===== */}
+                <FormGrid sidebarWidth="sm">
+                    {/* ===== LEFT COLUMN (70%): Main form ===== */}
                     <FormGrid.Main>
+
+                        {/* ── General ── */}
                         <FormSection title="General" icon={<FileText className="h-4 w-4" />}>
                             <FormRow cols={2}>
-                                <FormField label="Template Name">
+                                <FormField label="Template Name" required>
                                     <Input
                                         name="TemplateName"
-                                        placeholder="Template Name"
+                                        placeholder="Enter template name"
                                         value={tempNameNew}
                                         onChange={(e) => setTempNameNew(e.target.value)}
                                     />
                                 </FormField>
-                                <div>
+                                <FormField label="Status">
                                     <Status onStatusChange={handleStatusChange} selectedStatus={status} />
-                                </div>
+                                </FormField>
                             </FormRow>
 
                             <FormRow cols={2}>
-                                <FormField label="Task Assignee">
+                                <FormField label="Assignees">
                                     <MultiSelectDropdown
                                         value={selectedUser}
                                         onChange={handleUserChange}
-                                        placeholder="Assignees"
+                                        placeholder="Select assignees"
                                     />
                                 </FormField>
-                                <div>
+                                <FormField label="Priority">
                                     <Priority onPriorityChange={handlePriorityChange} selectedPriority={priority} />
-                                </div>
+                                </FormField>
                             </FormRow>
                         </FormSection>
 
+                        {/* ── Description ── */}
                         <FormSection title="Description">
                             <Editor initialContent={taskDiscription} onChange={handleEditorChange} />
                         </FormSection>
 
+                        {/* ── Tags ── */}
                         <FormSection title="Tags">
                             <TagsMultiSelectDropDown
                                 value={tagsNew}
                                 onChange={handleTagChange}
-                                placeholder="Tags"
+                                placeholder="Select or search tags"
                             />
                         </FormSection>
 
-                        <FormSection title="Start and Due Date" icon={<Calendar className="h-4 w-4" />}>
-                            <div className="flex items-center justify-between">
-                                <Label className="text-sm font-medium">Absolute Date</Label>
-                                <Switch
-                                    checked={absoluteDate}
-                                    onCheckedChange={handleAbsolutesDates}
-                                />
-                            </div>
+                        {/* ── Dates ── */}
+                        <FormSection title="Dates" icon={<Calendar className="h-4 w-4" />}>
+                            <FormSwitchRow
+                                label="Use absolute dates"
+                                description="Set fixed calendar dates instead of relative offsets"
+                                checked={absoluteDate}
+                                onCheckedChange={handleAbsolutesDates}
+                            />
 
-                            {absoluteDate && (
-                                <div className="space-y-4 mt-4">
+                            {absoluteDate ? (
+                                <FormRow cols={2}>
                                     <FormField label="Start Date">
                                         <input
                                             type="date"
                                             value={StartsDateNew}
                                             onChange={handleStartDateChange}
-                                            className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                                            className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm focus:outline-none focus:ring-1 focus:ring-ring transition-shadow"
                                         />
                                     </FormField>
                                     <FormField label="Due Date">
@@ -671,45 +641,47 @@ const Tasks = () => {
                                             type="date"
                                             value={DueDateNew}
                                             onChange={handleDueDateChange}
-                                            className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                                            className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm focus:outline-none focus:ring-1 focus:ring-ring transition-shadow"
                                         />
                                     </FormField>
-                                </div>
-                            )}
-
-                            {!absoluteDate && (
-                                <div className="space-y-4 mt-4">
-                                    <div className="flex items-center gap-3">
-                                        <Label className="w-20 shrink-0 text-sm">Start In</Label>
+                                </FormRow>
+                            ) : (
+                                <div className="space-y-3">
+                                    <div className="grid grid-cols-[80px_1fr_140px] items-center gap-3">
+                                        <span className="text-sm font-medium text-foreground">Start in</span>
                                         <Input
                                             value={StartsInNew}
                                             onChange={(e) => setStartsInNew(e.target.value)}
-                                            className="flex-1"
+                                            placeholder="0"
+                                            type="number"
+                                            min="0"
                                         />
                                         <select
-                                            className="flex h-10 rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                            className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
                                             value={StartsInDurationNew || ""}
                                             onChange={(e) => setStartsInDurationNew(e.target.value)}
                                         >
-                                            <option value="">Select</option>
+                                            <option value="">Unit</option>
                                             {dayOptions.map((opt) => (
                                                 <option key={opt.value} value={opt.value}>{opt.label}</option>
                                             ))}
                                         </select>
                                     </div>
-                                    <div className="flex items-center gap-3">
-                                        <Label className="w-20 shrink-0 text-sm">Due In</Label>
+                                    <div className="grid grid-cols-[80px_1fr_140px] items-center gap-3">
+                                        <span className="text-sm font-medium text-foreground">Due in</span>
                                         <Input
                                             value={DueInNew}
                                             onChange={(e) => setDueInNew(e.target.value)}
-                                            className="flex-1"
+                                            placeholder="0"
+                                            type="number"
+                                            min="0"
                                         />
                                         <select
-                                            className="flex h-10 rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                            className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
                                             value={DueInDurationNew || ""}
                                             onChange={(e) => setDueInDurationNew(e.target.value)}
                                         >
-                                            <option value="">Select</option>
+                                            <option value="">Unit</option>
                                             {dayOptions.map((opt) => (
                                                 <option key={opt.value} value={opt.value}>{opt.label}</option>
                                             ))}
@@ -718,70 +690,57 @@ const Tasks = () => {
                                 </div>
                             )}
                         </FormSection>
+
                     </FormGrid.Main>
 
-                    {/* ===== RIGHT COLUMN: Subtasks ===== */}
+                    {/* ===== RIGHT COLUMN (30%): Controls panel ===== */}
                     <FormGrid.Sidebar>
-                        <FormSection title="Subtasks" icon={<ListChecks className="h-4 w-4" />}>
-                            <div className="flex items-center justify-between">
-                                <Label className="text-sm font-medium">Enable Subtasks</Label>
-                                <Switch
-                                    checked={SubtaskSwitch}
-                                    onCheckedChange={handleSubtaskSwitch}
-                                />
-                            </div>
+                        <FormSection
+                            title="Subtasks"
+                            icon={<ListChecks className="h-4 w-4" />}
+                            description="Add checklist items to this task template"
+                        >
+                            <FormSwitchRow
+                                label="Enable subtasks"
+                                description="Show a subtask checklist on every task created from this template"
+                                checked={SubtaskSwitch}
+                                onCheckedChange={handleSubtaskSwitch}
+                            />
 
                             {SubtaskSwitch && (
                                 <DragDropContext onDragEnd={handleDragEnd}>
                                     <Droppable droppableId="subtaskList">
                                         {(provided) => (
-                                            <div className="space-y-2 mt-3" {...provided.droppableProps} ref={provided.innerRef}>
+                                            <div
+                                                className="space-y-2 mt-1"
+                                                {...provided.droppableProps}
+                                                ref={provided.innerRef}
+                                            >
                                                 {subtasks.map((subtask, index) => (
-                                                    <Draggable key={subtask.id} draggableId={subtask.id} index={index}>
+                                                    <Draggable
+                                                        key={subtask.id}
+                                                        draggableId={subtask.id}
+                                                        index={index}
+                                                    >
                                                         {(provided) => (
                                                             <div
                                                                 ref={provided.innerRef}
                                                                 {...provided.draggableProps}
-                                                                className="flex items-center gap-2 rounded-lg border border-border bg-white p-2 shadow-sm"
                                                             >
-                                                                <Checkbox
+                                                                <FormSubtaskItem
+                                                                    text={subtask.text}
                                                                     checked={subtask.checked}
+                                                                    onTextChange={(val) => handleInputChange(subtask.id, val)}
                                                                     onCheckedChange={() => handleCheckboxChange(subtask.id)}
+                                                                    onDelete={() => handleDeleteSubtask(subtask.id)}
+                                                                    dragHandleProps={provided.dragHandleProps}
                                                                 />
-                                                                <Input
-                                                                    placeholder="Things to do"
-                                                                    value={subtask.text}
-                                                                    onChange={(e) => handleInputChange(subtask.id, e.target.value)}
-                                                                    className="flex-1 border-0 shadow-none focus-visible:ring-0"
-                                                                />
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() => handleDeleteSubtask(subtask.id)}
-                                                                    className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-                                                                >
-                                                                    <Trash2 className="h-4 w-4" />
-                                                                </button>
-                                                                <div
-                                                                    {...provided.dragHandleProps}
-                                                                    className="cursor-grab rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent"
-                                                                >
-                                                                    <GripVertical className="h-4 w-4" />
-                                                                </div>
                                                             </div>
                                                         )}
                                                     </Draggable>
                                                 ))}
                                                 {provided.placeholder}
-                                                <Button
-                                                    type="button"
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={handleAddSubtask}
-                                                    className="mt-2 w-full text-primary"
-                                                >
-                                                    <Plus className="h-4 w-4" />
-                                                    Add Subtask
-                                                </Button>
+                                                <FormSubtaskAdd onClick={handleAddSubtask} />
                                             </div>
                                         )}
                                     </Droppable>

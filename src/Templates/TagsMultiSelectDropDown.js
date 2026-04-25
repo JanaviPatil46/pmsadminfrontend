@@ -1,31 +1,26 @@
 import React, { useState, useEffect, useRef } from "react";
-import { FaCaretUp, FaCaretDown, FaTimes } from "react-icons/fa";
+import { X, ChevronDown, ChevronUp } from "lucide-react";
 
 const TagsMultiSelectDropDown = ({
   value = [],
   onChange,
   options: propOptions,
   placeholder = "Select tags",
-  // width = "100%"
 }) => {
   const containerRef = useRef(null);
-  const [anchorEl, setAnchorEl] = useState(null);
+  const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [menuWidth, setMenuWidth] = useState(null);
   const [internalOptions, setInternalOptions] = useState([]);
 
   const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
-
-  // Determine if using internal or external options
   const options = propOptions || internalOptions;
 
   useEffect(() => {
-    // Only fetch data if no options prop provided
     if (!propOptions) {
       const fetchData = async () => {
         try {
-          const url = `${TAGS_API}/tags/`;
-          const response = await fetch(url);
+          const response = await fetch(`${TAGS_API}/tags/`);
           const data = await response.json();
           setInternalOptions(
             data.tags.map((tag) => ({
@@ -35,108 +30,131 @@ const TagsMultiSelectDropDown = ({
             }))
           );
         } catch (error) {
-          console.error("Error fetching data:", error);
+          console.error("Error fetching tags:", error);
         }
       };
       fetchData();
     }
   }, [TAGS_API, propOptions]);
 
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-    if (containerRef.current) {
+  const handleToggle = () => {
+    if (!open && containerRef.current) {
       setMenuWidth(containerRef.current.offsetWidth);
     }
+    setOpen((prev) => !prev);
+    setSearchQuery("");
   };
 
   const handleClose = () => {
-    setAnchorEl(null);
+    setOpen(false);
+    setSearchQuery("");
   };
 
   const handleSelect = (selectedValue) => {
-    const newValue = value.some((item) => item.value === selectedValue)
+    const isSelected = value.some((item) => item.value === selectedValue);
+    const newValue = isSelected
       ? value.filter((item) => item.value !== selectedValue)
-      : [...value, options.find((option) => option.value === selectedValue)];
-
-    if (onChange) {
-      onChange(newValue);
-    }
+      : [...value, options.find((opt) => opt.value === selectedValue)];
+    onChange?.(newValue);
   };
 
-  const handleSearchChange = (event) => {
-    setSearchQuery(event.target.value);
+  const clearSelection = (e) => {
+    e.stopPropagation();
+    onChange?.([]);
   };
 
-  const clearSelection = () => {
-    if (onChange) {
-      onChange([]);
-    }
-  };
-
-  //   const filteredOptions = options.filter((option) =>
-  //     option.label.toLowerCase().includes(searchQuery.toLowerCase())
-  //   );
   const filteredOptions = options
-    .filter((option) =>
-      option.label.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-    .filter(
-      (option) => !value.some((selected) => selected.value === option.value)
-    );
+    .filter((opt) => opt.label.toLowerCase().includes(searchQuery.toLowerCase()))
+    .filter((opt) => !value.some((sel) => sel.value === opt.value));
+
   return (
-    <div className="relative">
+    <div className="relative" ref={containerRef}>
+      {/* Trigger */}
       <div
-        ref={containerRef}
-        className="flex items-center justify-between border border-gray-300 px-1.5 py-1 cursor-pointer bg-white mt-2 min-h-[30px]"
-        onClick={handleClick}
+        onClick={handleToggle}
+        className="flex min-h-[38px] w-full cursor-pointer items-center gap-2 rounded-lg border border-input bg-background px-3 py-1.5 text-sm transition-all duration-150 hover:border-ring focus-within:border-ring focus-within:ring-1 focus-within:ring-ring"
       >
-        <div className="flex flex-wrap gap-1 flex-1">
+        <div className="flex flex-1 flex-wrap gap-1.5">
           {value.length > 0 ? (
             value.map((item) => {
-              const selectedOption = options.find(o => o.value === item.value);
+              const opt = options.find((o) => o.value === item.value);
               return (
-                <span key={item.value}
-                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold text-white shadow-sm"
-                  style={{ backgroundColor: selectedOption?.colour }}>
+                <span
+                  key={item.value}
+                  className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium text-white shadow-sm transition-opacity hover:opacity-90"
+                  style={{ backgroundColor: opt?.colour || "#6b7280" }}
+                >
                   {item.label}
-                  <button type="button" onClick={(e) => { e.stopPropagation(); handleSelect(item.value); }} className="opacity-70 hover:opacity-100"><FaTimes size={8}/></button>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); handleSelect(item.value); }}
+                    className="rounded-full opacity-70 hover:opacity-100 focus:outline-none"
+                    aria-label={`Remove ${item.label}`}
+                  >
+                    <X className="h-2.5 w-2.5" />
+                  </button>
                 </span>
               );
             })
           ) : (
-            <span className="text-xs text-gray-400">{placeholder}</span>
+            <span className="text-sm text-muted-foreground">{placeholder}</span>
           )}
         </div>
-        <div className="flex items-center">
+        <div className="flex shrink-0 items-center gap-1 text-muted-foreground">
           {value.length > 0 && (
-            <button type="button" onClick={(e) => { e.stopPropagation(); clearSelection(); }} className="text-gray-400 hover:text-gray-600 p-0.5"><FaTimes size={10}/></button>
+            <button
+              type="button"
+              onClick={clearSelection}
+              className="rounded p-0.5 transition-colors hover:text-foreground focus:outline-none"
+              aria-label="Clear all tags"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
           )}
-          <button type="button" className="text-gray-400 p-0.5">{anchorEl ? <FaCaretUp size={12}/> : <FaCaretDown size={12}/>}</button>
+          {open ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
         </div>
       </div>
 
-      {Boolean(anchorEl) && (
+      {/* Dropdown */}
+      {open && (
         <>
           <div className="fixed inset-0 z-30" onClick={handleClose} />
-          <div className="absolute top-full left-0 z-40 bg-white border border-gray-200 rounded shadow-lg overflow-y-auto"
-            style={{ width: menuWidth || "auto", maxHeight: 250 }}>
-            <div className="p-1">
-              <input type="text" autoFocus placeholder="Search..."
-                className="w-full border border-gray-200 rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400"
-                value={searchQuery} onChange={handleSearchChange} autoComplete="off" />
+          <div
+            className="absolute left-0 top-full z-40 mt-1 overflow-hidden rounded-lg border border-border bg-card shadow-lg"
+            style={{ width: menuWidth || "100%", maxHeight: 260 }}
+          >
+            {/* Search */}
+            <div className="border-b border-border px-2 py-1.5">
+              <input
+                type="text"
+                autoFocus
+                placeholder="Search tags..."
+                className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                autoComplete="off"
+              />
             </div>
-            {filteredOptions.length > 0 ? (
-              filteredOptions.map((option) => (
-                <div key={option.value}
-                  className="mx-2.5 my-1 px-2 py-1 rounded-lg text-[10px] text-white cursor-pointer whitespace-nowrap w-fit"
-                  style={{ backgroundColor: option.colour }}
-                  onClick={() => handleSelect(option.value)}>
-                  {option.label}
+            {/* Options */}
+            <div className="overflow-y-auto" style={{ maxHeight: 210 }}>
+              {filteredOptions.length > 0 ? (
+                <div className="flex flex-wrap gap-1.5 p-2">
+                  {filteredOptions.map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => handleSelect(opt.value)}
+                      className="inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium text-white shadow-sm transition-opacity hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-ring"
+                      style={{ backgroundColor: opt.colour || "#6b7280" }}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
                 </div>
-              ))
-            ) : (
-              <p className="px-3 py-2 text-xs text-gray-400">No results found</p>
-            )}
+              ) : (
+                <p className="px-3 py-4 text-center text-xs text-muted-foreground">No tags found</p>
+              )}
+            </div>
           </div>
         </>
       )}

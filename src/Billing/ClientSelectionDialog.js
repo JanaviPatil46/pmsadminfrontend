@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { RxCross2 } from "react-icons/rx";
+import { X } from "lucide-react";
 import InvoiceDrawer from "./InvoiceDrawer";
 import Cookies from "js-cookie";
 
@@ -83,16 +83,16 @@ const ClientSelectionDialog = ({ open, onClose, handleDrawerClose }) => {
         />
 
         {/* Dialog Panel */}
-        <div className="relative z-10 bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
+        <div className="relative z-10 bg-card border border-border rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
           {/* Header */}
-          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-            <h2 className="text-base font-semibold text-gray-800">Select Client</h2>
+          <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+            <h2 className="text-base font-semibold text-foreground">Select Client</h2>
             <button
               type="button"
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-700 transition-colors"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
             >
-              <RxCross2 size={18} />
+              <X className="h-4 w-4" />
             </button>
           </div>
 
@@ -103,22 +103,22 @@ const ClientSelectionDialog = ({ open, onClose, handleDrawerClose }) => {
               placeholder="Start typing name, ID, or email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 mb-3"
+              className="w-full border border-input rounded-lg px-3 py-2 text-sm bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow shadow-sm mb-3"
             />
 
-            <ul className="h-52 overflow-y-auto divide-y divide-gray-100 rounded-lg border border-gray-100">
+            <ul className="h-52 overflow-y-auto divide-y divide-border rounded-lg border border-border">
               {filteredAccounts.length > 0 ? (
                 filteredAccounts.map((account) => (
                   <li
                     key={account.value}
                     onClick={() => handleSelectAccount(account)}
-                    className="px-4 py-2.5 text-sm text-gray-700 cursor-pointer hover:bg-blue-50 hover:text-blue-700 transition-colors"
+                    className="px-4 py-2.5 text-sm text-foreground cursor-pointer hover:bg-muted transition-colors"
                   >
                     {account.label}
                   </li>
                 ))
               ) : (
-                <li className="px-4 py-6 text-sm text-gray-400 text-center">
+                <li className="px-4 py-6 text-sm text-muted-foreground text-center">
                   No accounts found
                 </li>
               )}
@@ -126,11 +126,11 @@ const ClientSelectionDialog = ({ open, onClose, handleDrawerClose }) => {
           </div>
 
           {/* Footer */}
-          <div className="flex justify-end px-5 py-4 border-t border-gray-100">
+          <div className="flex justify-end px-5 py-4 border-t border-border">
             <button
               type="button"
               onClick={onClose}
-              className="rounded-full px-5 py-1.5 text-sm font-medium border border-gray-300 text-gray-600 hover:bg-gray-100 transition-colors"
+              className="inline-flex items-center justify-center rounded-lg px-5 py-2 text-sm font-medium border border-border text-foreground hover:bg-muted transition-colors"
             >
               Cancel
             </button>

@@ -20,6 +20,7 @@ import {
   FormSwitchRow,
   FormSubtaskItem,
   FormSubtaskAdd,
+  FormDivider,
 } from "../components/ui/form-layout";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
@@ -475,43 +476,49 @@ const accountoptions = accountdata.map((account) => ({
       open={open}
       onClose={onClose}
       title={isEditMode ? "Edit Task" : "New Task"}
-      description={isEditMode ? "Update task details" : "Create a new task"}
+      description={isEditMode ? "Update task details" : "Fill in the fields below to create a task"}
       width="lg"
     >
-      {/* ── Source Section ── */}
-      <FormSection title="Source">
-        <FormField label="Account" required error={errors.account ? "Account is required" : ""}>
-          <FormSelect
-            value={selectedaccount?.value || ""}
-            onChange={(e) => {
-              const newValue = accountoptions.find((o) => o.value === e.target.value) || null;
-              handleAccountChange(newValue);
-              setErrors((prev) => ({ ...prev, account: !newValue }));
-            }}
-            error={errors.account}
-          >
-            <option value="">Select Account</option>
-            {accountoptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </FormSelect>
-        </FormField>
+      {/* ── Unified panel: all form groups in one flat container ── */}
+      <FormSection flat>
 
-        <FormField label="Job">
-          <FormSelect
-            disabled={!selectedaccount}
-            value={selectedJob?.value || ""}
-            onChange={(e) => {
-              const newValue = jobsoptions.find((o) => o.value === e.target.value) || null;
-              handleJobChange(newValue);
-            }}
-          >
-            <option value="">Select Job</option>
-            {jobsoptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </FormSelect>
-        </FormField>
+        {/* SOURCE */}
+        <FormDivider label="Source" />
+
+        <FormRow cols={2}>
+          <FormField label="Account" required error={errors.account ? "Account is required" : ""}>
+            <FormSelect
+              value={selectedaccount?.value || ""}
+              onChange={(e) => {
+                const newValue = accountoptions.find((o) => o.value === e.target.value) || null;
+                handleAccountChange(newValue);
+                setErrors((prev) => ({ ...prev, account: !newValue }));
+              }}
+              error={errors.account}
+            >
+              <option value="">Select account</option>
+              {accountoptions.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </FormSelect>
+          </FormField>
+
+          <FormField label="Job">
+            <FormSelect
+              disabled={!selectedaccount}
+              value={selectedJob?.value || ""}
+              onChange={(e) => {
+                const newValue = jobsoptions.find((o) => o.value === e.target.value) || null;
+                handleJobChange(newValue);
+              }}
+            >
+              <option value="">Select job</option>
+              {jobsoptions.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </FormSelect>
+          </FormField>
+        </FormRow>
 
         <FormField label="Template" required error={errors.template ? "Template is required" : ""}>
           <FormSelect
@@ -523,69 +530,58 @@ const accountoptions = accountdata.map((account) => ({
             }}
             error={errors.template}
           >
-            <option value="">Select Template</option>
+            <option value="">Select template</option>
             {taskTemplateOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
             ))}
           </FormSelect>
         </FormField>
-      </FormSection>
 
-      {/* ── Assignment & Status ── */}
-      <FormSection title="Assignment">
-        <FormRow cols={2}>
-          <FormField label="Task Assignee">
-            <MultiSelectDropdown
-              value={selectedUser}
-              onChange={handleUserChange}
-              placeholder="Assignees"
-            />
-          </FormField>
-          <FormField label="Status">
-            <Status
-              onStatusChange={handleStatusChange}
-              selectedStatus={status}
-            />
-          </FormField>
-        </FormRow>
+        {/* ASSIGNMENT */}
+        <FormDivider label="Assignment" />
 
         <FormRow cols={2}>
           <FormField label="Task Name">
             <Input
-              name="TemplateName"
-              placeholder="Task Name"
+              name="TaskName"
+              placeholder="Enter task name"
               onChange={(e) => setTempNameNew(e.target.value)}
               value={tempNameNew}
             />
           </FormField>
-          <FormField label="Priority">
-            <Priority
-              onPriorityChange={handlePriorityChange}
-              selectedPriority={priority}
+          <FormField label="Assignees">
+            <MultiSelectDropdown
+              value={selectedUser}
+              onChange={handleUserChange}
+              placeholder="Select assignees"
             />
           </FormField>
         </FormRow>
-      </FormSection>
 
-      {/* ── Description ── */}
-      <FormSection title="Description">
-        <Editor
-          initialContent={taskDiscription}
-          onChange={handleEditorChange}
-        />
-      </FormSection>
+        <FormRow cols={2}>
+          <FormField label="Status">
+            <Status onStatusChange={handleStatusChange} selectedStatus={status} />
+          </FormField>
+          <FormField label="Priority">
+            <Priority onPriorityChange={handlePriorityChange} selectedPriority={priority} />
+          </FormField>
+        </FormRow>
 
-      {/* ── Tags ── */}
-      <FormSection title="Tags">
-        <TagsMultiSelectDropDown
-          value={tagsNew}
-          onChange={handleTagChange}
-          placeholder="Tags"
-        />
-      </FormSection>
+        {/* DETAILS */}
+        <FormDivider label="Details" />
 
-      {/* ── Dates ── */}
-      <FormSection title="Dates">
+        <FormField label="Description">
+          <Editor initialContent={taskDiscription} onChange={handleEditorChange} />
+        </FormField>
+
+        <FormField label="Tags">
+          <TagsMultiSelectDropDown
+            value={tagsNew}
+            onChange={handleTagChange}
+            placeholder="Select or search tags"
+          />
+        </FormField>
+
         <FormRow cols={2}>
           <FormField label="Start Date">
             <FormDatePicker
@@ -600,13 +596,13 @@ const accountoptions = accountdata.map((account) => ({
             />
           </FormField>
         </FormRow>
-      </FormSection>
 
-      {/* ── Subtasks ── */}
-      <FormSection title="Subtasks">
+        {/* SUBTASKS */}
+        <FormDivider label="Subtasks" />
+
         <FormSwitchRow
           label="Enable Subtasks"
-          description="Break this task into smaller steps"
+          description="Break this task into smaller checklist steps"
           checked={SubtaskSwitch}
           onCheckedChange={handleSubtaskSwitch}
         />
@@ -615,14 +611,15 @@ const accountoptions = accountdata.map((account) => ({
           <DragDropContext onDragEnd={handleDragEnd}>
             <Droppable droppableId="subtaskList">
               {(provided) => (
-                <div className="space-y-2" {...provided.droppableProps} ref={provided.innerRef}>
+                <div
+                  className="space-y-2"
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                >
                   {subtasks.map((subtask, index) => (
                     <Draggable key={subtask.id} draggableId={subtask.id} index={index}>
                       {(provided) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                        >
+                        <div ref={provided.innerRef} {...provided.draggableProps}>
                           <FormSubtaskItem
                             text={subtask.text}
                             checked={subtask.checked}
@@ -642,9 +639,10 @@ const accountoptions = accountdata.map((account) => ({
             </Droppable>
           </DragDropContext>
         )}
+
       </FormSection>
 
-      {/* ── Footer Actions ── */}
+      {/* ── Footer ── */}
       <FormDrawerFooter>
         <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
           Cancel

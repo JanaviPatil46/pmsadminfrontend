@@ -2,12 +2,11 @@ import React, { useState, useEffect, useMemo } from "react";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 
-import { AiOutlinePlusCircle, AiOutlineDelete } from "react-icons/ai";
+import { Plus, Trash2, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import "./contact.css";
 import TagsMultiSelectDropDown from "../Templates/TagsMultiSelectDropDown";
 import { toast } from "react-toastify";
-import { RxCross2 } from "react-icons/rx";
 import countryList from "react-select-country-list";
 const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   const navigate = useNavigate();
@@ -235,17 +234,20 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
     const selectedValues = newSelectedTags.map((option) => option.value);
     setCombinedValues(selectedValues);
   };
-  const inputCls = "w-full border border-border rounded px-3 py-1.5 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-primary/40";
-  const labelCls = "block text-sm font-medium text-foreground mb-1";
-  const btnPrimary = "rounded-full px-5 py-1.5 text-sm font-medium text-white bg-primary hover:bg-primary/90 transition-colors";
-  const btnOutline = "rounded-full px-5 py-1.5 text-sm font-medium border border-border text-primary hover:bg-primary hover:text-white hover:border-transparent transition-colors";
+  const inputCls = "w-full border border-input rounded-lg px-3 py-2 text-sm bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow shadow-sm";
+  const labelCls = "block text-sm font-medium text-foreground mb-1.5";
+  const btnPrimary = "inline-flex items-center justify-center rounded-lg px-5 py-2 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 transition-colors shadow-sm";
+  const btnOutline = "inline-flex items-center justify-center rounded-lg px-5 py-2 text-sm font-medium border border-border text-foreground hover:bg-muted transition-colors";
+  const errorCls = "text-destructive text-xs mt-1";
 
   return (
     <div>
       {/* Header */}
       <div className="flex justify-between items-center px-4 py-3 border-b border-border">
         <h2 className="text-lg font-semibold text-foreground">New Contact</h2>
-        <RxCross2 onClick={handleNewDrawerClose} className="cursor-pointer text-muted-foreground hover:text-foreground" size={18} />
+        <button type="button" onClick={handleNewDrawerClose} className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
+          <X className="h-4 w-4" />
+        </button>
       </div>
 
       <form className="contact-form px-5 py-4 h-[90vh] overflow-y-auto space-y-4">
@@ -253,15 +255,15 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
         {/* Name Row */}
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1">
-            <label className={labelCls}>First Name <span className="text-red-500">*</span></label>
+            <label className={labelCls}>First Name <span className="text-destructive">*</span></label>
             <input
               name="firstName"
               value={firstName}
               placeholder="First Name"
-              className={`${inputCls} ${firstNameError ? "border-red-500" : ""}`}
+              className={`${inputCls} ${firstNameError ? "border-destructive" : ""}`}
               onChange={(e) => { setFirstName(e.target.value); if (e.target.value.trim()) setFirstNameError(""); }}
             />
-            {!!firstNameError && <p className="text-red-500 text-xs mt-1">{firstNameError}</p>}
+            {!!firstNameError && <p className={errorCls}>{firstNameError}</p>}
           </div>
           <div className="flex-1">
             <label className={labelCls}>Middle Name</label>
@@ -269,15 +271,15 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
               onChange={(e) => setMiddleName(e.target.value)} />
           </div>
           <div className="flex-1">
-            <label className={labelCls}>Last Name <span className="text-red-500">*</span></label>
+            <label className={labelCls}>Last Name <span className="text-destructive">*</span></label>
             <input
               name="lastName"
               value={lastName}
               placeholder="Last Name"
-              className={`${inputCls} ${lastNameError ? "border-red-500" : ""}`}
+              className={`${inputCls} ${lastNameError ? "border-destructive" : ""}`}
               onChange={(e) => { setLastName(e.target.value); if (e.target.value.trim()) setLastNameError(""); }}
             />
-            {!!lastNameError && <p className="text-red-500 text-xs mt-1">{lastNameError}</p>}
+            {!!lastNameError && <p className={errorCls}>{lastNameError}</p>}
           </div>
         </div>
 
@@ -297,12 +299,12 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
 
         {/* Email */}
         <div>
-          <label className={labelCls}>Email <span className="text-red-500">*</span></label>
+          <label className={labelCls}>Email <span className="text-destructive">*</span></label>
           <input
             name="email"
             value={email}
             placeholder="Email"
-            className={`${inputCls} ${emailError ? "border-red-500" : ""}`}
+            className={`${inputCls} ${emailError ? "border-destructive" : ""}`}
             onChange={(e) => {
               const value = e.target.value;
               setEmail(value);
@@ -311,7 +313,7 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
               else setEmaileError("");
             }}
           />
-          {!!emailError && <p className="text-red-500 text-xs mt-1">{emailError}</p>}
+          {!!emailError && <p className={errorCls}>{emailError}</p>}
         </div>
 
         {/* Tags */}
@@ -324,7 +326,7 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
         <div>
           <label className={labelCls}>Note</label>
           <textarea name="note" value={note} placeholder="Note" rows={3}
-            className={inputCls} onChange={(e) => setNote(e.target.value)} />
+            className={`${inputCls} resize-none`} onChange={(e) => setNote(e.target.value)} />
         </div>
 
         {/* SSN */}
@@ -336,11 +338,11 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
             placeholder="123-45-6789"
             maxLength={11}
             inputMode="numeric"
-            className={`${inputCls} ${ssnError ? "border-red-500" : ""}`}
+            className={`${inputCls} ${ssnError ? "border-destructive" : ""}`}
             onChange={handleSSNChange}
           />
           {ssnError
-            ? <p className="text-red-500 text-xs mt-1">{ssnError}</p>
+            ? <p className={errorCls}>{ssnError}</p>
             : <p className="text-muted-foreground text-xs mt-1">Format: 123-45-6789</p>}
         </div>
 
@@ -362,14 +364,16 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                     buttonStyle={{ borderTopLeftRadius: "8px", borderBottomLeftRadius: "8px" }}
                   />
                 </div>
-                <AiOutlineDelete onClick={() => handleDeletePhoneNumber(phone.id)}
-                  className="cursor-pointer text-red-500 hover:text-red-700 flex-shrink-0" size={18} />
+                <button type="button" onClick={() => handleDeletePhoneNumber(phone.id)}
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-destructive hover:bg-destructive/10 flex-shrink-0 transition-colors">
+                  <Trash2 className="h-4 w-4" />
+                </button>
               </div>
             ))}
           </div>
           <button type="button" onClick={handleAddPhoneNumber}
-            className="flex items-center gap-2 text-primary text-sm font-medium mt-3 hover:text-primary/80">
-            <AiOutlinePlusCircle size={18} /> Add phone number
+            className="flex items-center gap-1.5 text-primary text-sm font-medium mt-3 hover:text-primary/80 transition-colors">
+            <Plus className="h-4 w-4" /> Add phone number
           </button>
         </div>
 

@@ -80,9 +80,13 @@ const FormSection = ({
 
       {/* Section Content */}
       {(!collapsible || isOpen) && (
-        <div className={cn("p-4 sm:p-6", !title && !description && "pt-4 sm:pt-6")}>
+        flat ? (
           <div className="space-y-4 sm:space-y-5">{children}</div>
-        </div>
+        ) : (
+          <div className={cn("p-4 sm:p-6", !title && !description && "pt-4 sm:pt-6")}>
+            <div className="space-y-4 sm:space-y-5">{children}</div>
+          </div>
+        )
       )}
     </div>
   )
