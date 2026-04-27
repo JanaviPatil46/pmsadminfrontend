@@ -1,2976 +1,563 @@
-
-
-// import React, { useEffect, useState } from "react";
-// import axios from "axios";
-// import {
-//   Box,
-//   Table,
-//   TableBody,
-//   TableCell,
-//   TableContainer,
-//   TableHead,
-//   TableRow,
-//   Paper,
-//   Typography,
-//   Chip,
-//   Stack,
-//   Link,
-//   Button,
-//   Checkbox,
-//   TablePagination,
-//   TableSortLabel,
-//   ButtonGroup,
-//   Menu,
-//   MenuItem,
-//   Drawer,
-//   IconButton,
-//   Divider,
-//   Tooltip,Select,InputLabel,FormControl,TextField,Dialog,DialogActions,DialogTitle,DialogContent,List,ListItem,ListItemText,DialogContentText
-// } from "@mui/material";
-// import DeleteIcon from "@mui/icons-material/Delete";
-
-// import useMediaQuery from "@mui/material/useMediaQuery";
-// import SendAccountEmail from "../../src/Pages/BulkActions/SendAccountEmail";
-// import AddJobs from "../../src/Pages/BulkActions/AddJobs";
-// import AddBulkOrganizer from "../../src/Pages/BulkActions/AddBulkOrganizer";
-// import ManageTags from "../../src/Pages/BulkActions/ManageTags";
-// import ManageTeams from "../../src/Pages/BulkActions/ManageTeams";
-// import { useTheme } from "@mui/material/styles";
-// import { RxCross2 } from "react-icons/rx";
-// import ListIcon from "@mui/icons-material/List";
-// import EmailIcon from "@mui/icons-material/Email";
-// import TagIcon from "@mui/icons-material/Tag";
-// import PersonIcon from "@mui/icons-material/Person";
-// import MoreVertIcon from "@mui/icons-material/MoreVert";
-// import { useNavigate } from "react-router-dom";
-// import AccountContactDrawer from "./AccountContactDrawer";
-// import { toast } from "react-toastify";
-// import Cookies from 'js-cookie';
-// import TagsMultiSelectDropDown from "./TagsMultiSelectDropDown.js"
-// import TeamMemberMultiSelectDropDown from "./TeamMemberMultiSelectDropDown.js"
-// function descendingComparator(a, b, orderBy) {
-//   if (b[orderBy] < a[orderBy]) return -1;
-//   if (b[orderBy] > a[orderBy]) return 1;
-//   return 0;
-// }
-
-// function getComparator(order, orderBy) {
-//   return order === "desc"
-//     ? (a, b) => descendingComparator(a, b, orderBy)
-//     : (a, b) => -descendingComparator(a, b, orderBy);
-// }
-
-// const AccountTable = () => {
-//   const [accountList, setAccountList] = useState([]);
-//   const [openDrawer, setOpenDrawer] = useState(false);
-//   const [selected, setSelected] = useState([]);
-//   const [page, setPage] = useState(0);
-//   const [rowsPerPage, setRowsPerPage] = useState(25);
-
-//   const [order, setOrder] = useState(null);
-// const [orderBy, setOrderBy] = useState(null);
-
-//   const [filterStatus, setFilterStatus] = useState("active"); // active | archived
-//   const [anchorE2, setAnchorE2] = useState(null);
-//    const [anchorEl, setAnchorEl] = useState(null);
-//      const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-//   const [accountsToDelete, setAccountsToDelete] = useState([]);
-//   const [filters, setFilters] = useState({
-//     accountName: "",
-//     type: "",
-//     teamMember: [],  // Changed from string to array
-//     tags: [],
-//     email: "",
-//   });
-//     const [showFilters, setShowFilters] = useState({
-//       accountName: false,
-//       type: false,
-//       teamMember: false,
-//       tags: false,
-//       email: false,
-//     });
-//      const handleFilterButtonClick = (event) => {
-//     setAnchorEl(event.currentTarget);
-//   };
-//   const clearFilter = (filterField) => {
-//   setFilters(prev => ({
-//     ...prev,
-//     [filterField]: filterField === 'accountName' || filterField === 'type' ||  filterField === "email" ? '' : []
-//   }));
-//   setShowFilters(prev => ({
-//     ...prev,
-//     [filterField]: false,
-//   }));
-// };
-//   const toggleFilter = (filterType) => {
-//     setShowFilters((prev) => ({
-//       ...prev,
-//       [filterType]: !prev[filterType],
-//     }));
-//   };
-//   const navigate = useNavigate();
-
-//   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-//   const [userRole, setUserRole] = useState("");
-//   const [viewAllAccounts, setViewAllAccounts] = useState(false);
-//   const [loading, setLoading] = useState(false);
-  
-
-//   const handleDrawerOpen = () => {
-//     setIsDrawerOpen(true);
-//   };
-//   const theme = useTheme();
-
-//   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
-//   const [isSendEmailOpen, setIsSendEmailOpen] = useState(false);
-//   const [isCreateJobOpen, setIsCreateJobOpen] = useState(false);
-//   const [isCreateOrganizerOpen, setIsCreateOrganizerOpen] = useState(false);
-//   const [isManageTagsOpen, setIsManageTagsOpen] = useState(false);
-//   const [isManageTeamOpen, setIsManageTeamOpen] = useState(false);
-
-//   // Get user role from localStorage on component mount
-//   useEffect(() => {
-//     const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
-//     if (storedData) {
-//       setUserRole(storedData.teammember?.userrole || "");
-//       setViewAllAccounts(storedData.teammember?.viewallAccounts || false);
-//       // const disableAll = storedData?.teammember?.manageAccounts === false;
-//     }
-//   }, []);
-// const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
-// const disableAll = storedData?.teammember?.manageAccounts === false;
-
-//   const handleFormClose = () => {
-//     setIsDrawerOpen(false);
-//     setIsSendEmailOpen(false);
-//     setIsCreateOrganizerOpen(false);
-//     setIsCreateJobOpen(false);
-//     setIsManageTagsOpen(false);
-//     setIsManageTeamOpen(false);
-//   };
-//   const handleAssignOrganizer = () => {
-//     setIsCreateOrganizerOpen(!isCreateOrganizerOpen);
-//     handleDrawerOpen();
-//     console.log("Assign Organizer action triggered.");
-//   };
-
-//   const handleAddJob = () => {
-//     setIsCreateJobOpen(!isCreateJobOpen);
-//     handleDrawerOpen();
-//     console.log("Add Job action triggered.");
-//   };
-
-//   const handleManageTeam = () => {
-//     setIsManageTeamOpen(!isManageTeamOpen);
-//     handleDrawerOpen();
-//     console.log("Manage Team action triggered.");
-//   };
-
-//   const handleSendEmail = () => {
-//     setIsSendEmailOpen(!isSendEmailOpen);
-//     handleDrawerOpen();
-//     console.log("Send Email action triggered.");
-//   };
-
-//   const handleManageTags = () => {
-//     setIsManageTagsOpen(!isManageTagsOpen);
-//     handleDrawerOpen();
-//     console.log("Manage Tags action triggered.");
-//   };
-//  useEffect(() => {
-//     const storedUserRole = localStorage.getItem("userRole");
-//     console.log("Fetched userRole from localStorage:", storedUserRole);
-//     setUserRole(storedUserRole);
-//   }, []);
-//   const fetchAccountsList = async () => {
-//     setLoading(true);
-//     try {
-//       const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
-//       console.log("Received stored teamMemberData:", storedData);
-
-//       const loginuserid = storedData?.teammember?.userid;
-//       // const userRole = storedData?.teammember?.userrole || "Admin";
-//       console.log("User role is:", userRole);
-
-//       let url;
-
-//       if (userRole === "Admin") {
-//         url = `https://www.snptaxes.com/api/accounts/list?active=${filterStatus === "active"}`;
-//       } else if (userRole === "TeamMember") {
-//         const viewAll = storedData?.teammember?.viewallAccounts || false;
-//         setViewAllAccounts(viewAll);
-
-//         if (viewAll) {
-//           url = `https://www.snptaxes.com/api/accounts/list?active=${filterStatus === "active"}`;
-//         } else {
-//           url = `https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=${filterStatus === "active"}`;
-//         }
-//       }
-
-//       console.log("Fetching from URL:", url);
-//       const response = await axios.get(url);
-//       setAccountList(response.data.accountlist || []);
-//       console.log("Fetched accounts:", response.data.accountlist);
-//     } catch (err) {
-//       console.error("Error loading accounts:", err);
-//       setAccountList([]);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   useEffect(() => {
-//     fetchAccountsList();
-//   }, [filterStatus,userRole]);
-
-//   const handleArchiveAccount = async () => {
-//     try {
-//       await axios.patch(`https://www.snptaxes.com/api/accounts/update-active`, {
-//         ids: selected,
-//         active: false,
-//       });
-
-//       console.log("Accounts archived:", selected);
-
-//       setSelected([]);
-//       fetchAccountsList();
-//       handleClose();
-//       toast.success("Account Archived successfully");
-//     } catch (error) {
-//       console.error("Failed to archive account", error);
-//     }
-//   };
-
-//   const handleActivateAccount = async () => {
-//     try {
-//       await axios.patch(`https://www.snptaxes.com/api/accounts/update-active`, {
-//         ids: selected,
-//         active: true,
-//       });
-
-//       console.log("Accounts activated:", selected);
-
-//       setSelected([]);
-//       fetchAccountsList();
-//       handleClose();
-//       toast.success("Account Activated successfully");
-//     } catch (error) {
-//       console.error("Failed to activate account", error);
-//     }
-//   };
-
-//   // New handler for drawer close that also refreshes the table
-//   const handleDrawerClose = () => {
-//     setOpenDrawer(false);
-//     fetchAccountsList(); // refresh data when drawer closes
-//   };
-//   const handleRequestSort = (property) => {
-//     const isAsc = orderBy === property && order === "asc";
-//     setOrder(isAsc ? "desc" : "asc");
-//     setOrderBy(property);
-//   };
-
-//   const handleSelectAllClick = (event) => {
-//     if (event.target.checked) {
-//       const allSelectedIds = accountList.map((n) => n._id);
-//       setSelected(allSelectedIds);
-
-//       // Console log all selected accounts
-//       console.log(
-//         "Selected all accounts:",
-//         accountList.map(({ _id, accountName }) => ({
-//           value: _id,
-//           label: accountName,
-//         }))
-//       );
-//       return;
-//     }
-
-//     setSelected([]);
-//     console.log("Deselected all accounts");
-//   };
-//   // import Cookies from "js-cookie";
-
-// const handleClick = (account) => {
-//   const selectedIndex = selected.indexOf(account._id);
-//   let newSelected = [];
-
-//   if (selectedIndex === -1) {
-//     newSelected = newSelected.concat(selected, account._id);
-//   } else if (selectedIndex === 0) {
-//     newSelected = newSelected.concat(selected.slice(1));
-//   } else if (selectedIndex === selected.length - 1) {
-//     newSelected = newSelected.concat(selected.slice(0, -1));
-//   } else if (selectedIndex > 0) {
-//     newSelected = newSelected.concat(
-//       selected.slice(0, selectedIndex),
-//       selected.slice(selectedIndex + 1)
-//     );
-//   }
-
-//   setSelected(newSelected);
-
-//   // Get selected account details
-//   const selectedAccounts = newSelected
-//     .map((id) => {
-//       const acc = accountList.find((a) => a._id === id);
-//       return acc ? { id: acc._id, name: acc.accountName } : null;
-//     })
-//     .filter(Boolean);
-
-//   console.log("Selected accounts:", selectedAccounts);
-
-//   // ✅ Store in cookies
-//   if (selectedAccounts.length > 0) {
-//     Cookies.set("selectedAccounts", JSON.stringify(selectedAccounts), {
-//       path: "/",
-//     });
-
-//     // Also store the most recently selected one
-//     const latest = selectedAccounts[selectedAccounts.length - 1];
-//     Cookies.set("accountId", latest.id, { path: "/" });
-//     Cookies.set("accountName", latest.name, { path: "/" });
-
-//     console.log(
-//       "✅ Stored cookies:",
-//       selectedAccounts.length,
-//       "accounts (latest:)",
-//       latest
-//     );
-//   } else {
-//     // Remove cookies when nothing is selected
-//     Cookies.remove("selectedAccounts", { path: "/" });
-//     Cookies.remove("accountId", { path: "/" });
-//     Cookies.remove("accountName", { path: "/" });
-//     console.log("❌ Removed all account cookies");
-//   }
-// };
-
-//   const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
-//     const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
-//     const [tags, setTags] = useState([]);
-  
-//     useEffect(() => {
-//       fetchTagData();
-//     }, []);
-  
-//     const fetchTagData = async () => {
-//       try {
-//         const response = await fetch(`${TAGS_API}/tags/`);
-//         const data = await response.json();
-//         setTags(data.tags);
-//         console.log(data.tags);
-//       } catch (error) {
-//         console.error("Error fetching tags:", error);
-//       }
-//     };
-  
-//     const uniqueTags = Array.from(
-//       new Map(
-//         tags.map((tag) => [`${tag.tagName}_${tag.tagColour}`, tag])
-//       ).values()
-//     );
-//     const applyFilters = () => {
-//   let filtered = [...accountList];
-
-//   // ✅ Filter by Account Name (case insensitive)
-//   if (filters.accountName.trim() !== "") {
-//     filtered = filtered.filter(acc =>
-//       acc.accountName.toLowerCase().includes(filters.accountName.toLowerCase())
-//     );
-//   }
-
-//   // ✅ Filter by Email (inside contacts.contact.email)
-// if (filters.email.trim() !== "") {
-//   const search = filters.email.toLowerCase();
-
-//   filtered = filtered.filter(acc =>
-//     acc.contacts?.some(c =>
-//       c.contact?.email?.toLowerCase().includes(search)
-//     )
-//   );
-// }
-
-
-//   // ✅ Filter by Type
-//   if (filters.type !== "") {
-//     filtered = filtered.filter(acc => acc.clientType === filters.type);
-//   }
-
-// // ✅ Filter by Team Member
-//   if (filters.teamMember.length > 0) {
-//     const selectedIds = filters.teamMember.map(t => t.value);
-//     filtered = filtered.filter((acc) =>
-//       acc.teamMember?.some((tm) => selectedIds.includes(tm._id))
-//     );
-//   }
-
-//   // ✅ Filter by Tags (multi-select)
-// if (filters.tags.length > 0) {
-//   const selectedIds = filters.tags.map(t => t.value);
-//   filtered = filtered.filter(acc =>
-//     acc.tags?.some(tag => selectedIds.includes(tag._id))
-//   );
-// }
-
-
-
-
-//   return filtered;
-// };
-// const filteredList = applyFilters();
-// // const sortedList = filteredList.slice().sort(getComparator(order, orderBy));
-// const sortedList =
-//   orderBy && order
-//     ? filteredList.slice().sort(getComparator(order, orderBy))
-//     : filteredList; // keep API order
-
-// const paginatedList = sortedList.slice(
-//   page * rowsPerPage,
-//   page * rowsPerPage + rowsPerPage
-// );
-
- 
-
-//   const isSelected = (id) => selected.indexOf(id) !== -1;
-//   const handleMoreActionsClick = (event) => {
-//     setAnchorE2(event.currentTarget);
-//   };
-//   const handleClose = () => {
-//     setAnchorEl(null);
-//     setAnchorE2(null);
-//   };
-
-
-// const handleFilterChange = (event) => {
-//   const { name, value } = event.target;
-  
-//   setFilters(prev => {
-//     // For multi-select fields, ensure we maintain an array
-//     if (name === "teamMember") {
-//       return {
-//         ...prev,
-//         [name]: Array.isArray(value) ? value : [value].filter(Boolean)
-//       };
-//     }
-//     // For single-select fields
-//     return {
-//       ...prev,
-//       [name]: value
-//     };
-//   });
-  
-//   setPage(0);
-// };
-
-//   const renderLimitedChips = (items, getLabel, getColor) => {
-//     if (!items || items.length === 0) return "—";
-
-//     const first = items[0];
-//     const remainingCount = items.length - 1;
-
-//     return (
-//       <Stack
-//         direction="row"
-//         spacing={1}
-//         flexWrap="wrap"
-//         sx={{ cursor: "pointer" }}
-//       >
-//         {/* ✅ FIRST CHIP */}
-//         <Tooltip title={getLabel(first)} placement="top-end">
-//           <Chip
-//             label={getLabel(first)}
-//             size="small"
-//             sx={getColor ? getColor(first) : {}}
-//           />
-//         </Tooltip>
-
-//         {/* ✅ SHOW +N MORE if more than 1 */}
-//         {remainingCount > 0 && (
-//           <Tooltip
-//             title={items.map((i) => getLabel(i)).join(", ")}
-//             placement="top-end"
-//           >
-//             <Chip
-//               label={`+${remainingCount} more`}
-//               size="small"
-//               variant="outlined"
-//             />
-//           </Tooltip>
-//         )}
-//       </Stack>
-//     );
-//   };
-
-//   // Check if TeamMember has no permission to view accounts
-//   if (userRole === "TeamMember" && !viewAllAccounts && accountList.length === 0) {
-//     return (
-//       <Box sx={{ p: 2 }}>
-//         <Typography
-//           sx={{
-//             textAlign: "center",
-//             fontSize: "18px",
-//             fontWeight: "bold",
-//             color: "red",
-//             marginTop: "20px",
-//           }}
-//         >
-//           You do not have permission to view accounts.
-//         </Typography>
-//       </Box>
-//     );
-//   }
-
-//   const handleDeleteAccount = async () => {
-//     try {
-//       await axios.delete(`https://www.snptaxes.com/api/accounts/accounts/deleteMultipleAccounts`, {
-//         data: { accountIds: selected }
-//       });
-
-//       console.log("Accounts deleted:", selected);
-
-//       setSelected([]);
-//       fetchAccountsList();
-//       handleClose();
-//       setIsDeleteDialogOpen(false);
-//       toast.success("Account(s) deleted successfully");
-//     } catch (error) {
-//       console.error("Failed to delete account", error);
-//       toast.error("Failed to delete account(s)");
-//     }
-//   };
-
-//   const handleDeleteClick = () => {
-//     // Get account names for confirmation dialog
-//     const accountsToDeleteNames = selected.map(id => {
-//       const account = accountList.find(acc => acc._id === id);
-//       return account ? account.accountName : id;
-//     });
-    
-//     setAccountsToDelete(accountsToDeleteNames);
-//     setIsDeleteDialogOpen(true);
-//     handleClose(); // Close the menu
-//   };
-
-//   const handleCloseDeleteDialog = () => {
-//     setIsDeleteDialogOpen(false);
-//     setAccountsToDelete([]);
-//   };
-
-//   return (
-//     <Box sx={{ p: 2 }}>
-//       <Stack
-//         direction="row"
-//         alignItems="center"
-//         justifyContent="space-between"
-//         sx={{ mb: 2 }}
-//       >
-//         <ButtonGroup>
-//           <Button
-//             variant={filterStatus === "active" ? "contained" : "outlined"}
-//             onClick={() => setFilterStatus("active")}
-//           >
-//             Active
-//           </Button>
-//           <Button
-//             variant={filterStatus === "archived" ? "contained" : "outlined"}
-//             onClick={() => setFilterStatus("archived")}
-//           >
-//             Archived
-//           </Button>
-//         </ButtonGroup>
-
-//         <Button
-//           variant="contained"
-//           color="primary"
-//           onClick={() => setOpenDrawer(true)}
-//         >
-//           Add Account
-//         </Button>
-//       </Stack>
-// <Box
-//                 sx={{
-//                   width: "50px",
-//                   padding: "4px 8px",
-//                   cursor: "pointer",
-//                   color: "#3f51b5",
-//                   mb:5
-//                 }}
-//                 onClick={handleFilterButtonClick}
-//               >
-                
-//                 Filters
-                
-//               </Box>
-//               <Menu
-//                         anchorEl={anchorEl}
-//                         open={Boolean(anchorEl)}
-//                         onClose={handleClose}
-//                       >
-//                         <MenuItem
-//                           onClick={() => {
-//                             toggleFilter("accountName");
-//                             handleClose();
-//                           }}
-//                         >
-//                           Account Name
-//                         </MenuItem>
-//                         <MenuItem
-//   onClick={() => {
-//     toggleFilter("email");
-//     handleClose();
-//   }}
-// >
-//   Email
-// </MenuItem>
-
-//                         <MenuItem
-//                           onClick={() => {
-//                             toggleFilter("type");
-//                             handleClose();
-//                           }}
-//                         >
-//                           Type
-//                         </MenuItem>
-//                         <MenuItem
-//                           onClick={() => {
-//                             toggleFilter("teamMember");
-//                             handleClose();
-//                           }}
-//                         >
-//                           Team Member
-//                         </MenuItem>
-//                         <MenuItem
-//                           onClick={() => {
-//                             toggleFilter("tags");
-//                             handleClose();
-//                           }}
-//                         >
-//                           Tags
-//                         </MenuItem>
-//                       </Menu>
-
-//                         {/* Account Name Filter */}
-//               {showFilters.accountName && (
-//                 <div
-//                   style={{
-//                     display: "flex",
-//                     alignItems: "center",
-//                     // marginBottom: "10px",
-//                   }}
-//                 >
-//                   <TextField
-//                     name="accountName"
-//                     value={filters.accountName}
-//                     onChange={handleFilterChange}
-//                     placeholder="Filter by Account Name"
-//                     variant="outlined"
-//                     size="small"
-//                     style={{ marginRight: "10px" }}
-//                   />
-//                   <DeleteIcon
-//                     onClick={() => clearFilter("accountName")}
-//                     style={{ cursor: "pointer", color: "red" }}
-//                   />
-//                 </div>
-//               )}
-// {showFilters.email && (
-//   <div
-//     style={{
-//       display: "flex",
-//       alignItems: "center",
-//       // marginBottom: "10px",
-//     }}
-//   >
-//     <TextField
-//       name="email"
-//       value={filters.email}
-//       onChange={handleFilterChange}
-//       placeholder="Filter by Email"
-//       variant="outlined"
-//       size="small"
-//       style={{ marginRight: "10px" }}
-//     />
-//     <DeleteIcon
-//       onClick={() => clearFilter("email")}
-//       style={{ cursor: "pointer", color: "red" }}
-//     />
-//   </div>
-// )}
-
-//               {/* Type Filter */}
-//               {showFilters.type && (
-//                 <div
-//                   style={{
-//                     display: "flex",
-//                     alignItems: "center",
-//                     // marginBottom: "10px",
-//                   }}
-//                 >
-//                   <FormControl
-//                     variant="outlined"
-//                     size="small"
-//                     style={{ marginRight: "10px", width: "150px" }}
-//                   >
-//                     <InputLabel>Type</InputLabel>
-//                     <Select
-//                       name="type"
-//                       value={filters.type}
-//                       onChange={handleFilterChange}
-//                       label="Type"
-//                     >
-//                       <MenuItem value="">All</MenuItem>
-//                       <MenuItem value="Individual">Individual</MenuItem>
-//                       <MenuItem value="Company">Company</MenuItem>
-//                     </Select>
-//                   </FormControl>
-//                   <DeleteIcon
-//                     onClick={() => clearFilter("type")}
-//                     style={{ cursor: "pointer", color: "red" }}
-//                   />
-//                 </div>
-//               )}
-//               {/* Team Member Filter */}
-// {showFilters.teamMember && (
-//   <div style={{ display: "flex", alignItems: "center" }}>
-//     <Box sx={{ mr: 3 }}>
-//       <TeamMemberMultiSelectDropDown
-//         value={filters.teamMember}               // array of IDs → ["689c4d64...", "6880af58..."]
-//         onChange={(newValue) => {
-//           setFilters(prev => ({
-//             ...prev,
-//             teamMember: newValue                // dropdown returns array of IDs
-//           }));
-//           setPage(0);
-//         }}
-//         width="250px"
-//         LOGIN_API={LOGIN_API}
-//       />
-//     </Box>
-
-//     <DeleteIcon
-//       onClick={() => clearFilter("teamMember")}
-//       style={{ cursor: "pointer", color: "red", marginLeft: 5 }}
-//     />
-//   </div>
-// )}
-
-
-// {/* Tag Filter */}
-// {showFilters.tags && (
-//   <div style={{ display: "flex", alignItems: "center", width: "250px" }}>
-//     <Box mr={3}>
-//       <TagsMultiSelectDropDown
-//         value={filters.tags}   // it will be array of tag IDs like ["65a2..", "65b3.."]
-//         onChange={(newValue) => {
-//           setFilters(prev => ({
-//             ...prev,
-//             tags: newValue     // already array of IDs
-//           }));
-//           setPage(0);
-//         }}
-//         // Send dropdown list as ID + label + colour
-//         options={uniqueTags.map(tag => ({
-//           value: tag._id,
-//           label: tag.tagName,
-//           colour: tag.tagColour
-//         }))}
-//         width="250px"
-//         placeholder="Select Tags..."
-//       />
-//     </Box>
-
-//     <DeleteIcon
-//       onClick={() => clearFilter("tags")}
-//       style={{ cursor: "pointer", color: "red" }}
-//     />
-//   </div>
-// )}
-
-
-//       {/* {selected.length > 0 && (
-//         <Box data-test="clients-bulk-actions-panel" sx={{ mb: 2 }}>
-//           <div
-//             style={{
-//               display: "flex",
-//               alignItems: "center",
-//               gap: "12px",
-//               padding: "10px",
-//               backgroundColor: "#f5f5f5",
-//               borderRadius: "4px",
-//             }}
-//           >
-//             <Button
-//               variant="text"
-//               startIcon={<ListIcon />}
-//               onClick={handleAssignOrganizer}
-//               // disabled={storedData?.teammember?.manageOrganizers === false}
-//             >
-//               Send Organizer
-//             </Button>
-//             <Button
-//               variant="text"
-//               startIcon={<ListIcon />}
-//               onClick={handleAddJob}
-//               // disabled={storedData?.teammember?.managePipelines === false}
-//             >
-//               Add Job
-//             </Button>
-//             <Button
-//               variant="text"
-//               startIcon={<PersonIcon />}
-//               onClick={handleManageTeam}
-//               // disabled={storedData?.teammember?.assignTeamMates === false}
-//             >
-//               Manage Team
-//             </Button>
-//             <Button
-//               variant="text"
-//               startIcon={<EmailIcon />}
-//               // disabled={selected.length === 0}
-//               onClick={handleSendEmail}
-//             >
-//               Send Email
-//             </Button>
-//             <Button
-//               variant="text"
-//               startIcon={<TagIcon />}
-//               onClick={handleManageTags}
-//             >
-//               Manage Tags
-//             </Button>
-//             <Button
-//               variant="text"
-//               startIcon={<MoreVertIcon />}
-//               onClick={handleMoreActionsClick}
-//             >
-//               More Actions
-//             </Button>
-
-//             <Menu
-//               anchorEl={anchorE2}
-//               open={Boolean(anchorE2)}
-//               onClose={handleClose}
-//             >
-//               {filterStatus === "active" ? (
-//                 <MenuItem onClick={handleArchiveAccount}>
-//                   Archive Account
-//                 </MenuItem>
-//               ) : (
-//                 <MenuItem onClick={handleActivateAccount}>
-//                   Activate Account
-//                 </MenuItem>
-//               )}
-//              {filterStatus === "archived" && (
-//     <MenuItem onClick={handleDeleteClick} sx={{ color: 'error.main' }}>
-//       Delete Account
-//     </MenuItem>
-//   )}
-//               <MenuItem>Edit login notify emailSync</MenuItem>
-//             </Menu>
-//           </div>
-//         </Box>
-//       )} */}
-
-// {selected.length > 0 && (
-//   <Box data-test="clients-bulk-actions-panel" sx={{ mb: 2 }}>
-//     <div
-//       style={{
-//         display: "flex",
-//         alignItems: "center",
-//         gap: "12px",
-//         padding: "10px",
-//         backgroundColor: "#f5f5f5",
-//         borderRadius: "4px",
-//       }}
-//     >
-//       {/* Send Organizer */}
-//       <Tooltip
-//         title={
-//           storedData?.teammember?.manageOrganizers === false
-//             ? "You don't have permission to send organizers"
-//             : ""
-//         }
-//         disableHoverListener={
-//           storedData?.teammember?.manageOrganizers !== false
-//         }
-//       >
-//         <span>
-//           <Button
-//             variant="text"
-//             startIcon={<ListIcon />}
-//             onClick={handleAssignOrganizer}
-//             disabled={storedData?.teammember?.manageOrganizers === false}
-//           >
-//             Send Organizer
-//           </Button>
-//         </span>
-//       </Tooltip>
-
-//       {/* Add Job */}
-//       <Tooltip
-//         title={
-//           storedData?.teammember?.managePipelines === false
-//             ? "You don't have permission to add jobs"
-//             : ""
-//         }
-//         disableHoverListener={
-//           storedData?.teammember?.managePipelines !== false
-//         }
-//       >
-//         <span>
-//           <Button
-//             variant="text"
-//             startIcon={<ListIcon />}
-//             onClick={handleAddJob}
-//             disabled={storedData?.teammember?.managePipelines === false}
-//           >
-//             Add Job
-//           </Button>
-//         </span>
-//       </Tooltip>
-
-//       {/* Manage Team */}
-//       <Tooltip
-//         title={
-//           storedData?.teammember?.assignTeamMates === false
-//             ? "You don't have permission to manage team"
-//             : ""
-//         }
-//         disableHoverListener={
-//           storedData?.teammember?.assignTeamMates !== false
-//         }
-//       >
-//         <span>
-//           <Button
-//             variant="text"
-//             startIcon={<PersonIcon />}
-//             onClick={handleManageTeam}
-//             disabled={storedData?.teammember?.assignTeamMates === false}
-//           >
-//             Manage Team
-//           </Button>
-//         </span>
-//       </Tooltip>
-
-//       {/* Send Email — no permission restriction? */}
-//       <Tooltip title="">
-//         <span>
-//           <Button
-//             variant="text"
-//             startIcon={<EmailIcon />}
-//             onClick={handleSendEmail}
-//           >
-//             Send Email
-//           </Button>
-//         </span>
-//       </Tooltip>
-
-//       {/* Manage Tags */}
-//     <Tooltip
-//   title={
-//     storedData?.teammember?.manageTags === false
-//       ? "You don't have permission to manage tags"
-//       : ""
-//   }
-//   disableHoverListener={storedData?.teammember?.manageTags !== false}
-// >
-//   <span>
-//     <Button
-//       variant="text"
-//       startIcon={<TagIcon />}
-//       onClick={handleManageTags}
-//       disabled={storedData?.teammember?.manageTags === false}
-//     >
-//       Manage Tags
-//     </Button>
-//   </span>
-// </Tooltip>
-
-
-//       {/* More Actions */}
-//       {/* <Tooltip title="">
-//         <span>
-//           <Button
-//             variant="text"
-//             startIcon={<MoreVertIcon />}
-//             onClick={handleMoreActionsClick}
-//           >
-//             More Actions
-//           </Button>
-//         </span>
-//       </Tooltip> */}
-
-//       {/* Menu Options */}
-//       {/* <Menu anchorEl={anchorE2} open={Boolean(anchorE2)} onClose={handleClose}>
-//         {filterStatus === "active" ? (
-//           <MenuItem onClick={handleArchiveAccount}>Archive Account</MenuItem>
-//         ) : (
-//           <MenuItem onClick={handleActivateAccount}>Activate Account</MenuItem>
-//         )}
-
-//         {filterStatus === "archived" && (
-//           <MenuItem onClick={handleDeleteClick} sx={{ color: "error.main" }}>
-//             Delete Account
-//           </MenuItem>
-//         )}
-
-//         <MenuItem>Edit login notify emailSync</MenuItem>
-//       </Menu> */}
-//       {/* More Actions */}
-// <Tooltip
-//   // title={
-//   //   storedData?.teammember?.manageAccounts === false
-//   //     ? "You don't have permission to access these actions"
-//   //     : ""
-//   // }
-//   // disableHoverListener={storedData?.teammember?.manageAccounts !== false}
-// >
-//   <span>
-//     <Button
-//       variant="text"
-//       startIcon={<MoreVertIcon />}
-//       // onClick={
-//       //   storedData?.teammember?.manageAccounts === false
-//       //     ? undefined
-//       //     : handleMoreActionsClick
-//       // }
-//       // disabled={storedData?.teammember?.manageAccounts === false}
-//       onClick={handleMoreActionsClick}
-//     >
-//       More Actions
-//     </Button>
-//   </span>
-// </Tooltip>
-
-
-// {/* Menu Options */}
-// <Menu anchorEl={anchorE2} open={Boolean(anchorE2)} onClose={handleClose}>
-//   {filterStatus === "active" ? (
-//     <Tooltip
-//       title={
-//         storedData?.teammember?.manageAccounts === false
-//           ? "You don't have permission to archive accounts"
-//           : ""
-//       }
-//       disableHoverListener={storedData?.teammember?.manageAccounts !== false}
-//     >
-//       <span>
-//         <MenuItem
-//           onClick={handleArchiveAccount}
-//           disabled={storedData?.teammember?.manageAccounts === false}
-//         >
-//           Archive Account
-//         </MenuItem>
-//       </span>
-//     </Tooltip>
-//   ) : (
-//     <Tooltip
-//       title={
-//         storedData?.teammember?.manageAccounts === false
-//           ? "You don't have permission to activate accounts"
-//           : ""
-//       }
-//       disableHoverListener={storedData?.teammember?.manageAccounts !== false}
-//     >
-//       <span>
-//         <MenuItem
-//           onClick={handleActivateAccount}
-//           disabled={storedData?.teammember?.manageAccounts === false}
-//         >
-//           Activate Account
-//         </MenuItem>
-//       </span>
-//     </Tooltip>
-//   )}
-
-//   {filterStatus === "archived" && (
-//     <Tooltip
-//       title={
-//         storedData?.teammember?.manageAccounts === false
-//           ? "You don't have permission to delete accounts"
-//           : ""
-//       }
-//       disableHoverListener={storedData?.teammember?.manageAccounts !== false}
-//     >
-//       <span>
-//         <MenuItem
-//           onClick={handleDeleteClick}
-//           disabled={storedData?.teammember?.manageAccounts === false}
-//           sx={{ color: "error.main" }}
-//         >
-//           Delete Account
-//         </MenuItem>
-//       </span>
-//     </Tooltip>
-//   )}
-
-//   <MenuItem >Edit login notify emailSync</MenuItem>
-// </Menu>
-
-//     </div>
-//   </Box>
-// )}
-
-
-//       {loading ? (
-//         <Typography sx={{ textAlign: "center", p: 3 }}>
-//           Loading accounts...
-//         </Typography>
-//       ) : (
-//         <TableContainer component={Paper}>
-//           <Table>
-//             <TableHead>
-//               <TableRow>
-//                 <TableCell padding="checkbox">
-//                   <Checkbox
-//                     color="primary"
-//                     indeterminate={
-//                       selected.length > 0 && selected.length < accountList.length
-//                     }
-//                     checked={
-//                       accountList.length > 0 &&
-//                       selected.length === accountList.length
-//                     }
-//                     onChange={handleSelectAllClick}
-//                   />
-//                 </TableCell>
-//                 <TableCell
-//                   sortDirection={orderBy === "accountName" ? order : false}
-//                   width={"500px"}
-//                 >
-//                   <TableSortLabel
-//                     active={orderBy === "accountName"}
-//                     direction={orderBy === "accountName" ? order : "asc"}
-//                     onClick={() => handleRequestSort("accountName")}
-//                   >
-//                     Account Name
-//                   </TableSortLabel>
-//                 </TableCell>
-//                 <TableCell
-//                   sortDirection={orderBy === "clientType" ? order : false}
-//                 >
-//                   <TableSortLabel
-//                     active={orderBy === "clientType"}
-//                     direction={orderBy === "clientType" ? order : "asc"}
-//                     onClick={() => handleRequestSort("clientType")}
-//                   >
-//                     Client Type
-//                   </TableSortLabel>
-//                 </TableCell>
-//                 <TableCell
-//                   sortDirection={orderBy === "companyName" ? order : false}
-//                 >
-//                   <TableSortLabel
-//                     active={orderBy === "companyName"}
-//                     direction={orderBy === "companyName" ? order : "asc"}
-//                     onClick={() => handleRequestSort("companyName")}
-//                   >
-//                     Company Name
-//                   </TableSortLabel>
-//                 </TableCell>
-//                 <TableCell>Tags</TableCell>
-//                 <TableCell>Team Members</TableCell>
-//                 <TableCell>Contact Emails</TableCell>
-//               </TableRow>
-//             </TableHead>
-
-//             <TableBody>
-//               {paginatedList.length > 0 ? (
-//                 paginatedList.map((account) => (
-//                   <TableRow key={account._id} selected={isSelected(account._id)}>
-//                     <TableCell padding="checkbox">
-//                       <Checkbox
-//                         color="primary"
-//                         checked={isSelected(account._id)}
-//                         onChange={() => handleClick(account)}
-//                       />
-//                     </TableCell>
-//                     <TableCell>
-//                       <Link
-//                         component="button"
-//                         underline="hover"
-//                         color="primary"
-
-//                         onClick={() =>
-//                           navigate(`/clients/accounts/accountsdash/overview/${account._id}`)
-//                         }
-//                       >
-//                         {account.accountName}
-//                       </Link>
-//                     </TableCell>
-//                     <TableCell>{account.clientType}</TableCell>
-//                     <TableCell>{account.companyName || "—"}</TableCell>
-
-//                     <TableCell>
-//                       {renderLimitedChips(
-//                         account.tags,
-//                         (t) => t.tagName,
-//                         (t) => ({
-//                           backgroundColor: t.tagColour,
-//                           color: "#fff",
-//                           fontWeight: 600,
-//                         })
-//                       )}
-//                     </TableCell>
-
-//                     <TableCell>
-//                       {renderLimitedChips(
-//                         account.teamMember,
-//                         (tm) => tm.username,
-//                         () => ({
-//                           border: "1px solid",
-//                           borderColor: "primary.main",
-//                           color: "primary.main",
-//                         })
-//                       )}
-//                     </TableCell>
-
-//                     <TableCell>
-//                       {renderLimitedChips(
-//                         account.contacts?.map((c) => c.contact),
-//                         (c) => c.email
-//                       )}
-//                     </TableCell>
-//                   </TableRow>
-//                 ))
-//               ) : (
-//                 <TableRow>
-//                   <TableCell colSpan={7} align="center">
-//                     No accounts found
-//                   </TableCell>
-//                 </TableRow>
-//               )}
-//             </TableBody>
-//           </Table>
-//           <TablePagination
-//             component="div"
-//             count={accountList.length}
-//             page={page}
-//             onPageChange={(e, newPage) => setPage(newPage)}
-//             rowsPerPage={rowsPerPage}
-//              rowsPerPageOptions={[5, 10, 25,30, 50, 100,]} 
-//             onRowsPerPageChange={(e) => {
-//               setRowsPerPage(parseInt(e.target.value));
-//               setPage(0);
-//             }}
-//           />
-//         </TableContainer>
-//       )}
-      
-//       <AccountContactDrawer open={openDrawer} onClose={handleDrawerClose} fetchAccountsList={fetchAccountsList}/>
-// <Dialog
-//         open={isDeleteDialogOpen}
-//         onClose={handleCloseDeleteDialog}
-//         aria-labelledby="delete-dialog-title"
-//         aria-describedby="delete-dialog-description"
-//       >
-//         <DialogTitle id="delete-dialog-title">
-//           Confirm Delete
-//         </DialogTitle>
-//         <DialogContent>
-//           <DialogContentText id="delete-dialog-description">
-//             Are you sure you want to delete the following account(s)? This action cannot be undone.
-//           </DialogContentText>
-//           <Box sx={{ mt: 2 }}>
-//             <Typography variant="subtitle2" gutterBottom>
-//               Accounts to be deleted:
-//             </Typography>
-//             <List dense>
-//               {accountsToDelete.map((accountName, index) => (
-//                 <ListItem key={index}>
-//                   <ListItemText primary={accountName} />
-//                 </ListItem>
-//               ))}
-//             </List>
-//           </Box>
-//         </DialogContent>
-//         <DialogActions>
-//           <Button onClick={handleCloseDeleteDialog} color="primary">
-//             Cancel
-//           </Button>
-//           <Button 
-//             onClick={handleDeleteAccount} 
-//             color="error" 
-//             variant="contained"
-//             autoFocus
-//           >
-//             Delete
-//           </Button>
-//         </DialogActions>
-//       </Dialog>
-//       <Drawer
-//         anchor="right"
-//         open={isDrawerOpen}
-//         onClose={handleDrawerClose}
-//         PaperProps={{
-//           id: "tag-drawer",
-//           sx: {
-//             borderRadius: isSmallScreen ? "0" : "10px 0 0 10px",
-//             width: isSmallScreen ? "100%" : 700,
-//             maxWidth: "100%",
-//             [theme.breakpoints.down("sm")]: {
-//               width: "100%",
-//             },
-//           },
-//         }}
-//       >
-//         <Box
-//           sx={{ borderRadius: isSmallScreen ? "0" : "15px" }}
-//           role="presentation"
-//         >
-//           {isSendEmailOpen && (
-//             <Box p={2}>
-//               <Box
-//                 display="flex"
-//                 alignItems="center"
-//                 justifyContent="space-between"
-//               >
-//                 <Typography variant="h6">New Email</Typography>
-//                 <IconButton onClick={handleFormClose} sx={{ color: "blue" }}>
-//                   <RxCross2 fontSize="large" />
-//                 </IconButton>
-//               </Box>
-
-//               <Divider sx={{ my: 2 }} />
-
-//               <SendAccountEmail
-//                 selectedAccounts={selected}
-//                 onClose={handleFormClose}
-//               />
-//             </Box>
-//           )}
-
-//           {isCreateJobOpen && (
-//             <Box p={2} className="right-drawers">
-//               <Box
-//                 display="flex"
-//                 alignItems="center"
-//                 justifyContent="space-between"
-//               >
-//                 <Typography variant="h6">Create job</Typography>
-//                 <IconButton onClick={handleFormClose} sx={{ color: "blue" }}>
-//                   <RxCross2 fontSize="large" />
-//                 </IconButton>
-//               </Box>
-
-//               <AddJobs selectedAccounts={selected} onClose={handleFormClose} />
-//             </Box>
-//           )}
-
-//           {isCreateOrganizerOpen && (
-//             <Box p={2}>
-//               <Box
-//                 display="flex"
-//                 alignItems="center"
-//                 justifyContent="space-between"
-//               >
-//                 <Typography variant="h6">Create Organizer</Typography>
-//                 <IconButton onClick={handleFormClose} sx={{ color: "blue" }}>
-//                   <RxCross2 fontSize="large" />
-//                 </IconButton>
-//               </Box>
-
-//               <AddBulkOrganizer
-//                 selectedAccounts={selected}
-//                 onClose={handleFormClose}
-//               />
-//             </Box>
-//           )}
-
-//           {isManageTagsOpen && (
-//             <Box p={2}>
-//               <Box
-//                 display="flex"
-//                 alignItems="center"
-//                 justifyContent="space-between"
-//               >
-//                 <Typography variant="h6">Assign Tags for </Typography>
-
-//                 <Typography variant="body1" sx={{ marginRight: 2 }}>
-//                   {selected
-//                     .map((id) => {
-//                       const account = accountList.find(
-//                         (account) => account._id === id
-//                       );
-//                       return account ? account.accountName : id; // Fallback to ID if name is not found
-//                     })
-//                     .join(", ")}{" "}
-//                   {/* Joining account names with commas */}
-//                 </Typography>
-
-//                 <IconButton onClick={handleFormClose} sx={{ color: "blue" }}>
-//                   <RxCross2 fontSize="large" />
-//                 </IconButton>
-//               </Box>
-
-//               <Divider sx={{ my: 2 }} />
-
-//               <ManageTags
-//                 selectedAccounts={selected}
-//                 onClose={handleFormClose}
-//                 fetchData={fetchAccountsList}
-//               />
-//             </Box>
-//           )}
-
-//           {isManageTeamOpen && (
-//             <Box p={2}>
-//               <Box
-//                 display="flex"
-//                 alignItems="center"
-//                 justifyContent="space-between"
-//               >
-//                 <Typography variant="h6">Assign Team for</Typography>
-
-//                 <Typography variant="body1" sx={{ marginRight: 2 }}>
-//                   {selected
-//                     .map((id) => {
-//                       const account = accountList.find(
-//                         (account) => account._id === id
-//                       );
-//                       return account ? account.accountName : id; // Fallback to ID if name is not found
-//                     })
-//                     .join(", ")}{" "}
-//                   {/* Joining account names with commas */}
-//                 </Typography>
-//                 <IconButton onClick={handleFormClose} sx={{ color: "blue" }}>
-//                   <RxCross2 fontSize="large" />
-//                 </IconButton>
-//               </Box>
-
-//               <Divider sx={{ my: 2 }} />
-
-//               <ManageTeams
-//                 selectedAccounts={selected}
-//                 onClose={handleFormClose}
-//                 fetchaccountList={fetchAccountsList}
-//               />
-//             </Box>
-//           )}
-//         </Box>
-//       </Drawer>
-//     </Box>
-//   );
-// };
-
-// export default AccountTable;
-
-
-import React, { useEffect, useState } from "react";
+/* ─── AccountTable — @tanstack/react-table + shadcn DataTable ─── */
+import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
-import {
-  Box,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Typography,
-  Chip,
-  Stack,
-  // Link,
-  Button,
-  Checkbox,
-  TablePagination,
-  TableSortLabel,
-  ButtonGroup,
-  Menu,
-  MenuItem,
-  Drawer,
-  IconButton,
-  Divider,
-  Tooltip,
-  Select,
-  InputLabel,
-  FormControl,
-  TextField,
-  Dialog,
-  DialogActions,
-  DialogTitle,
-  DialogContent,
-  List,
-  ListItem,
-  ListItemText,
-  DialogContentText,
-  Tab
-} from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
-import CloseIcon from "@mui/icons-material/Close";
-import PersonIcon from "@mui/icons-material/Person";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import EmailIcon from "@mui/icons-material/Email";
-import { Link } from "react-router-dom";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import SendAccountEmail from "../../src/Pages/BulkActions/SendAccountEmail";
-import AddJobs from "../../src/Pages/BulkActions/AddJobs";
-import AddBulkOrganizer from "../../src/Pages/BulkActions/AddBulkOrganizer";
-import ManageTags from "../../src/Pages/BulkActions/ManageTags";
-import ManageTeams from "../../src/Pages/BulkActions/ManageTeams";
-import { useTheme } from "@mui/material/styles";
-import { RxCross2 } from "react-icons/rx";
-import ListIcon from "@mui/icons-material/List";
-import TagIcon from "@mui/icons-material/Tag";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { useNavigate } from "react-router-dom";
-import AccountContactDrawer from "./AccountContactDrawer";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import Cookies from 'js-cookie';
-import TagsMultiSelectDropDown from "./TagsMultiSelectDropDown.js"
-import TeamMemberMultiSelectDropDown from "./TeamMemberMultiSelectDropDown.js"
+import Cookies from "js-cookie";
+import {
+  Mail, Briefcase, Users, Tag, Archive,
+  RotateCcw, Trash2, X,
+} from "lucide-react";
+import { DataTable } from "../components/data-table/data-table";
+import { DataTableToolbar } from "../components/data-table/toolbar";
+import TagsMultiSelectDropDown from "./TagsMultiSelectDropDown.js";
+import TeamMemberMultiSelectDropDown from "./TeamMemberMultiSelectDropDown.js";
+import AccountContactDrawer from "./AccountContactDrawer";
+import SendAccountEmail from "../Pages/BulkActions/SendAccountEmail";
+import AddJobs from "../Pages/BulkActions/AddJobs";
+import AddBulkOrganizer from "../Pages/BulkActions/AddBulkOrganizer";
+import ManageTags from "../Pages/BulkActions/ManageTags";
+import ManageTeams from "../Pages/BulkActions/ManageTeams";
+import { cn } from "../lib/utils";
 
-function descendingComparator(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) return -1;
-  if (b[orderBy] > a[orderBy]) return 1;
-  return 0;
+const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
+const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
+
+function TagPills({ tags }) {
+  if (!tags?.length) return <span className="text-muted-foreground text-xs">—</span>;
+  return (
+    <div className="flex items-center gap-1 flex-wrap">
+      {tags.slice(0, 2).map((t) => (
+        <span
+          key={t._id}
+          className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium truncate max-w-[110px]"
+          style={{ backgroundColor: t.tagColour, color: "#fff" }}
+        >
+          {t.tagName}
+        </span>
+      ))}
+      {tags.length > 2 && (
+        <span
+          title={tags.slice(2).map((t) => t.tagName).join(", ")}
+          className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[11px] font-medium bg-muted text-muted-foreground border border-border cursor-default"
+        >
+          +{tags.length - 2}
+        </span>
+      )}
+    </div>
+  );
 }
 
-function getComparator(order, orderBy) {
-  return order === "desc"
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
+function MemberPills({ members }) {
+  if (!members?.length) return <span className="text-muted-foreground text-xs">—</span>;
+  const first = members[0];
+  return (
+    <div className="flex items-center gap-1">
+      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-primary/10 text-primary border border-primary/20 truncate max-w-[110px]">
+        {first.username}
+      </span>
+      {members.length > 1 && (
+        <span
+          title={members.slice(1).map((m) => m.username).join(", ")}
+          className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[11px] font-medium bg-muted text-muted-foreground border border-border"
+        >
+          +{members.length - 1}
+        </span>
+      )}
+    </div>
+  );
+}
+
+function BulkActionBtn({ label, icon: Icon, onClick, disabled, variant = "default" }) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={cn(
+        "inline-flex items-center gap-1.5 h-7 px-2.5 text-xs font-medium rounded-md border transition-colors disabled:opacity-40 disabled:cursor-not-allowed",
+        variant === "destructive"
+          ? "border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20"
+          : "border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground"
+      )}
+    >
+      <Icon className="h-3.5 w-3.5" />
+      {label}
+    </button>
+  );
 }
 
 const AccountTable = () => {
-  const [accountList, setAccountList] = useState([]);
-  const [openDrawer, setOpenDrawer] = useState(false);
-  const [selected, setSelected] = useState([]);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(25);
-  const [order, setOrder] = useState(null);
-  const [orderBy, setOrderBy] = useState(null);
-  const [filterStatus, setFilterStatus] = useState("active");
-  const [anchorE2, setAnchorE2] = useState(null);
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [accountsToDelete, setAccountsToDelete] = useState([]);
-  const [confirmText, setConfirmText] = useState("");
-
-  // New state for the edit settings drawer
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [settings, setSettings] = useState({
-    login: "Do nothing",
-    notify: "Do nothing",
-    emailSync: "Do nothing"
-  });
-
-  const [filters, setFilters] = useState({
-    accountName: "",
-    type: "",
-    teamMember: [],
-    tags: [],
-    email: "",
-  });
-  
-  const [showFilters, setShowFilters] = useState({
-    accountName: false,
-    type: false,
-    teamMember: false,
-    tags: false,
-    email: false,
-  });
-  
   const navigate = useNavigate();
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
+  const perms = storedData?.teammember;
+
+  const [accountList, setAccountList] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [userRole, setUserRole] = useState("");
   const [viewAllAccounts, setViewAllAccounts] = useState(false);
-  const [loading, setLoading] = useState(false);
-  
-  const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const [filterStatus, setFilterStatus] = useState("active");
+  const [globalFilter, setGlobalFilter] = useState("");
+  const [selectedIds, setSelectedIds] = useState([]);
+
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isSendEmailOpen, setIsSendEmailOpen] = useState(false);
   const [isCreateJobOpen, setIsCreateJobOpen] = useState(false);
   const [isCreateOrganizerOpen, setIsCreateOrganizerOpen] = useState(false);
   const [isManageTagsOpen, setIsManageTagsOpen] = useState(false);
   const [isManageTeamOpen, setIsManageTeamOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [confirmText, setConfirmText] = useState("");
 
-  // Get user role from localStorage on component mount
+  const [filters, setFilters] = useState({ accountName: "", type: "", teamMember: [], tags: [], email: "" });
+  const [activeFilters, setActiveFilters] = useState([]);
+  const [tags, setTags] = useState([]);
+
+  const [settings, setSettings] = useState({ login: "Do nothing", notify: "Do nothing", emailSync: "Do nothing" });
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   useEffect(() => {
-    const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
-    if (storedData) {
-      setUserRole(storedData.teammember?.userrole || "");
-      setViewAllAccounts(storedData.teammember?.viewallAccounts || false);
-    }
+    const role = localStorage.getItem("userRole");
+    setUserRole(role);
+    const sd = JSON.parse(localStorage.getItem("teamMemberData"));
+    if (sd) setViewAllAccounts(sd.teammember?.viewallAccounts || false);
   }, []);
-  
-  const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
-  const disableAll = storedData?.teammember?.manageAccounts === false;
 
-  // Handler for opening the edit settings drawer
-  const handleEditSettingsClick = () => {
-    setIsSidebarOpen(true);
-    handleClose(); // Close the menu
-  };
-
-  // Handler for closing the edit settings drawer
-  const handleCloseSidebar = () => {
-    setIsSidebarOpen(false);
-  };
-
-  // Handler for changing settings in the drawer
-  const handleSettingChange = (setting, value) => {
-    setSettings(prev => ({
-      ...prev,
-      [setting]: value
-    }));
-  };
-
-  // Handler for saving the settings (API call)
-  // const handleupdatecontacts = async () => {
-  //   try {
-  //     // Prepare data for API call
-  //     const updates = [];
-  //     selected.forEach(accountId => {
-  //       const account = accountList.find(acc => acc._id === accountId);
-  //       if (account && account.contacts) {
-  //         account.contacts.forEach(contact => {
-  //           const contactId = contact.contact?._id || contact.contact;
-  //           if (contactId) {
-  //             const updateData = {
-  //               accountId,
-  //               contactId,
-  //               canLogin: settings.login === "Assign to all" ? true : settings.login === "Remove from all" ? false : undefined,
-  //               canNotify: settings.notify === "Assign to all" ? true : settings.notify === "Remove from all" ? false : undefined,
-  //               canEmailSync: settings.emailSync === "Assign to all" ? true : settings.emailSync === "Remove from all" ? false : undefined
-  //             };
-              
-  //             // Remove undefined values
-  //             Object.keys(updateData).forEach(key => {
-  //               if (updateData[key] === undefined) {
-  //                 delete updateData[key];
-  //               }
-  //             });
-              
-  //             updates.push(updateData);
-  //           }
-  //         });
-  //       }
-  //     });
-
-  //     // Make API calls for each contact
-  //     const promises = updates.map(update => 
-  //       axios.patch(
-  //         `https://www.snptaxes.com/api/accounts/${update.accountId}/contact/${update.contactId}`,
-  //         update
-  //       )
-  //     );
-
-  //     await Promise.all(promises);
-      
-  //     toast.success("Contact permissions updated successfully");
-  //     handleCloseSidebar();
-  //     fetchAccountsList(); // Refresh the account list
-  //   } catch (error) {
-  //     console.error("Failed to update contact permissions", error);
-  //     toast.error("Failed to update contact permissions");
-  //   }
-  // };
-const handleupdatecontacts = async () => {
-  try {
-    const updates = [];
-
-    // Prepare update payloads
-    selected.forEach(accountId => {
-      const account = accountList.find(acc => acc._id === accountId);
-
-      if (account?.contacts?.length) {
-        account.contacts.forEach(contact => {
-          const contactId = contact.contact?._id || contact.contact;
-          if (!contactId) return;
-
-          const updateData = {
-            accountId,
-            contactId,
-            canLogin:
-              settings.login === "Assign to all"
-                ? true
-                : settings.login === "Remove from all"
-                ? false
-                : undefined,
-            canNotify:
-              settings.notify === "Assign to all"
-                ? true
-                : settings.notify === "Remove from all"
-                ? false
-                : undefined,
-            canEmailSync:
-              settings.emailSync === "Assign to all"
-                ? true
-                : settings.emailSync === "Remove from all"
-                ? false
-                : undefined
-          };
-
-          // Remove undefined fields
-          Object.keys(updateData).forEach(key => {
-            if (updateData[key] === undefined) {
-              delete updateData[key];
-            }
-          });
-
-          updates.push(updateData);
-        });
-      }
-    });
-
-    // Sequential API calls (prevents network errors)
-    for (const update of updates) {
-      await axios.patch(
-        `https://www.snptaxes.com/api/accounts/${update.accountId}/contact/${update.contactId}`,
-        update,
-        {
-          headers: {
-            "Content-Type": "application/json"
-          }
-        }
-      );
-    }
-
-    toast.success("Contact permissions updated successfully");
-    handleCloseSidebar();
-    fetchAccountsList();
-  } catch (error) {
-    console.error("Failed to update contact permissions", error);
-    toast.error("Failed to update contact permissions");
-  }
-};
-
-  const handleFilterButtonClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  
-  const clearFilter = (filterField) => {
-    setFilters(prev => ({
-      ...prev,
-      [filterField]: filterField === 'accountName' || filterField === 'type' || filterField === "email" ? '' : []
-    }));
-    setShowFilters(prev => ({
-      ...prev,
-      [filterField]: false,
-    }));
-  };
-  
-  const toggleFilter = (filterType) => {
-    setShowFilters((prev) => ({
-      ...prev,
-      [filterType]: !prev[filterType],
-    }));
-  };
-  
-  const handleDrawerOpen = () => {
-    setIsDrawerOpen(true);
-  };
-
-  const handleFormClose = () => {
-    setIsDrawerOpen(false);
-    setIsSendEmailOpen(false);
-    setIsCreateOrganizerOpen(false);
-    setIsCreateJobOpen(false);
-    setIsManageTagsOpen(false);
-    setIsManageTeamOpen(false);
-  };
-  
-  const handleAssignOrganizer = () => {
-    setIsCreateOrganizerOpen(!isCreateOrganizerOpen);
-    handleDrawerOpen();
-  };
-
-  const handleAddJob = () => {
-    setIsCreateJobOpen(!isCreateJobOpen);
-    handleDrawerOpen();
-  };
-
-  const handleManageTeam = () => {
-    setIsManageTeamOpen(!isManageTeamOpen);
-    handleDrawerOpen();
-  };
-
-  const handleSendEmail = () => {
-    setIsSendEmailOpen(!isSendEmailOpen);
-    handleDrawerOpen();
-  };
-
-  const handleManageTags = () => {
-    setIsManageTagsOpen(!isManageTagsOpen);
-    handleDrawerOpen();
-  };
-  
-  useEffect(() => {
-    const storedUserRole = localStorage.getItem("userRole");
-    console.log("Fetched userRole from localStorage:", storedUserRole);
-    setUserRole(storedUserRole);
-  }, []);
-  
   const fetchAccountsList = async () => {
     setLoading(true);
     try {
-      const storedData = JSON.parse(localStorage.getItem("teamMemberData"));
-      console.log("Received stored teamMemberData:", storedData);
-
-      const loginuserid = storedData?.teammember?.userid;
+      const sd = JSON.parse(localStorage.getItem("teamMemberData"));
+      const loginuserid = sd?.teammember?.userid;
       let url;
-
       if (userRole === "Admin") {
         url = `https://www.snptaxes.com/api/accounts/list?active=${filterStatus === "active"}`;
       } else if (userRole === "TeamMember") {
-        const viewAll = storedData?.teammember?.viewallAccounts || false;
+        const viewAll = sd?.teammember?.viewallAccounts || false;
         setViewAllAccounts(viewAll);
-
-        if (viewAll) {
-          url = `https://www.snptaxes.com/api/accounts/list?active=${filterStatus === "active"}`;
-        } else {
-          url = `https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=${filterStatus === "active"}`;
-        }
+        url = viewAll
+          ? `https://www.snptaxes.com/api/accounts/list?active=${filterStatus === "active"}`
+          : `https://www.snptaxes.com/api/accounts/byTeam?userId=${loginuserid}&active=${filterStatus === "active"}`;
       }
-
-      console.log("Fetching from URL:", url);
-      const response = await axios.get(url);
-      setAccountList(response.data.accountlist || []);
-      console.log("Fetched accounts:", response.data.accountlist);
+      if (!url) return;
+      const res = await axios.get(url);
+      setAccountList(res.data.accountlist || []);
     } catch (err) {
-      console.error("Error loading accounts:", err);
+      console.error(err);
       setAccountList([]);
     } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => { fetchAccountsList(); }, [filterStatus, userRole]);
+
   useEffect(() => {
-    fetchAccountsList();
-  }, [filterStatus, userRole]);
+    (async () => {
+      try {
+        const res = await fetch(`${TAGS_API}/tags/`);
+        const d = await res.json();
+        setTags(d.tags || []);
+      } catch (e) { console.error(e); }
+    })();
+  }, []);
 
-  const handleArchiveAccount = async () => {
-    try {
-      await axios.patch(`https://www.snptaxes.com/api/accounts/update-active`, {
-        ids: selected,
-        active: false,
-      });
+  const uniqueTags = useMemo(() =>
+    Array.from(new Map(tags.map((t) => [`${t.tagName}_${t.tagColour}`, t])).values()),
+    [tags]
+  );
 
-      console.log("Accounts archived:", selected);
-
-      setSelected([]);
-      fetchAccountsList();
-      handleClose();
-      toast.success("Account Archived successfully");
-    } catch (error) {
-      console.error("Failed to archive account", error);
+  const filteredData = useMemo(() => {
+    let d = [...accountList];
+    if (filters.accountName) d = d.filter((a) => a.accountName?.toLowerCase().includes(filters.accountName.toLowerCase()));
+    if (filters.email) d = d.filter((a) => a.contacts?.some((c) => c.contact?.email?.toLowerCase().includes(filters.email.toLowerCase())));
+    if (filters.type) d = d.filter((a) => a.clientType === filters.type);
+    if (filters.teamMember.length) {
+      const ids = filters.teamMember.map((t) => t.value);
+      d = d.filter((a) => a.teamMember?.some((tm) => ids.includes(tm._id)));
     }
-  };
-
-  const handleActivateAccount = async () => {
-    try {
-      await axios.patch(`https://www.snptaxes.com/api/accounts/update-active`, {
-        ids: selected,
-        active: true,
-      });
-
-      console.log("Accounts activated:", selected);
-
-      setSelected([]);
-      fetchAccountsList();
-      handleClose();
-      toast.success("Account Activated successfully");
-    } catch (error) {
-      console.error("Failed to activate account", error);
+    if (filters.tags.length) {
+      const ids = filters.tags.map((t) => t.value);
+      d = d.filter((a) => a.tags?.some((t) => ids.includes(t._id)));
     }
-  };
+    return d;
+  }, [accountList, filters]);
 
-  // New handler for drawer close that also refreshes the table
-  const handleDrawerClose = () => {
-    setOpenDrawer(false);
-    fetchAccountsList(); // refresh data when drawer closes
-  };
-  
-  const handleRequestSort = (property) => {
-    const isAsc = orderBy === property && order === "asc";
-    setOrder(isAsc ? "desc" : "asc");
-    setOrderBy(property);
-  };
-
-  // const handleSelectAllClick = (event) => {
-  //   if (event.target.checked) {
-  //     const allSelectedIds = accountList.map((n) => n._id);
-  //     setSelected(allSelectedIds);
-
-  //     console.log(
-  //       "Selected all accounts:",
-  //       accountList.map(({ _id, accountName }) => ({
-  //         value: _id,
-  //         label: accountName,
-  //       }))
-  //     );
-  //     return;
-  //   }
-
-  //   setSelected([]);
-  //   console.log("Deselected all accounts");
-  // };
-// Select ALL accounts (ignores filters & pagination)
-
-
-const handleSelectAllClick = (event) => {
-  if (event.target.checked) {
-    const newSelected = Array.from(
-      new Set([...selected, ...pageIds])
-    );
-    setSelected(newSelected);
-  } else {
-    const newSelected = selected.filter(
-      id => !pageIds.includes(id)
-    );
-    setSelected(newSelected);
-  }
-};
-
-const handleSelectAllAccounts = () => {
-  setSelected(accountList.map(a => a._id));
-};
-
-// Select ALL FILTERED accounts (all pages)
-const handleSelectAllFiltered = () => {
-  setSelected(sortedList.map(a => a._id));
-};
-
-// Clear selection
-const handleClearSelection = () => {
-  setSelected([]);
-  Cookies.remove("selectedAccounts", { path: "/" });
-  Cookies.remove("accountId", { path: "/" });
-  Cookies.remove("accountName", { path: "/" });
-};
-
-  const handleClick = (account) => {
-    const selectedIndex = selected.indexOf(account._id);
-    let newSelected = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, account._id);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
-    }
-
-    setSelected(newSelected);
-
-    // Get selected account details
-    const selectedAccounts = newSelected
-      .map((id) => {
-        const acc = accountList.find((a) => a._id === id);
-        return acc ? { id: acc._id, name: acc.accountName } : null;
-      })
-      .filter(Boolean);
-
-    console.log("Selected accounts:", selectedAccounts);
-
-    // ✅ Store in cookies
-    if (selectedAccounts.length > 0) {
-      Cookies.set("selectedAccounts", JSON.stringify(selectedAccounts), {
-        path: "/",
-      });
-
-      // Also store the most recently selected one
-      const latest = selectedAccounts[selectedAccounts.length - 1];
-      Cookies.set("accountId", latest.id, { path: "/" });
-      Cookies.set("accountName", latest.name, { path: "/" });
-
-      console.log(
-        "✅ Stored cookies:",
-        selectedAccounts.length,
-        "accounts (latest:)",
-        latest
-      );
+  const syncCookies = (ids) => {
+    const accs = ids.map((id) => {
+      const a = accountList.find((x) => x._id === id);
+      return a ? { id: a._id, name: a.accountName } : null;
+    }).filter(Boolean);
+    if (accs.length) {
+      Cookies.set("selectedAccounts", JSON.stringify(accs), { path: "/" });
+      Cookies.set("accountId", accs[accs.length - 1].id, { path: "/" });
+      Cookies.set("accountName", accs[accs.length - 1].name, { path: "/" });
     } else {
-      // Remove cookies when nothing is selected
       Cookies.remove("selectedAccounts", { path: "/" });
       Cookies.remove("accountId", { path: "/" });
       Cookies.remove("accountName", { path: "/" });
-      console.log("❌ Removed all account cookies");
     }
   };
 
-  const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
-  const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
-  const [tags, setTags] = useState([]);
+  const handleRowSelectionChange = (rowSel) => {
+    const ids = Object.keys(rowSel).filter((k) => rowSel[k]);
+    setSelectedIds(ids);
+    syncCookies(ids);
+  };
 
-  useEffect(() => {
-    fetchTagData();
-  }, []);
-
-  const fetchTagData = async () => {
+  const handleArchive = async () => {
     try {
-      const response = await fetch(`${TAGS_API}/tags/`);
-      const data = await response.json();
-      setTags(data.tags);
-      console.log(data.tags);
-    } catch (error) {
-      console.error("Error fetching tags:", error);
-    }
+      await axios.patch("https://www.snptaxes.com/api/accounts/update-active", { ids: selectedIds, active: false });
+      toast.success("Accounts archived");
+      setSelectedIds([]);
+      fetchAccountsList();
+    } catch { toast.error("Failed to archive"); }
   };
 
-  const uniqueTags = Array.from(
-    new Map(
-      tags.map((tag) => [`${tag.tagName}_${tag.tagColour}`, tag])
-    ).values()
+  const handleActivate = async () => {
+    try {
+      await axios.patch("https://www.snptaxes.com/api/accounts/update-active", { ids: selectedIds, active: true });
+      toast.success("Accounts activated");
+      setSelectedIds([]);
+      fetchAccountsList();
+    } catch { toast.error("Failed to activate"); }
+  };
+
+  const handleDelete = async () => {
+    if (confirmText !== "DELETE") return;
+    try {
+      await axios.delete("https://www.snptaxes.com/api/accounts/accounts/deleteMultipleAccounts", { data: { accountIds: selectedIds } });
+      toast.success("Accounts deleted");
+      setSelectedIds([]);
+      setIsDeleteDialogOpen(false);
+      setConfirmText("");
+      fetchAccountsList();
+    } catch { toast.error("Failed to delete"); }
+  };
+
+  const openBulkDrawer = (setter) => { setter(true); setIsDrawerOpen(true); };
+  const handleFormClose = () => {
+    setIsDrawerOpen(false);
+    setIsSendEmailOpen(false);
+    setIsCreateJobOpen(false);
+    setIsCreateOrganizerOpen(false);
+    setIsManageTagsOpen(false);
+    setIsManageTeamOpen(false);
+  };
+
+  const columns = useMemo(() => [
+    {
+      accessorKey: "accountCode",
+      header: "Code",
+      size: 80,
+      cell: ({ getValue }) => {
+        const v = getValue();
+        return v
+          ? <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300">{v}</span>
+          : <span className="text-muted-foreground text-xs">—</span>;
+      },
+    },
+    {
+      accessorKey: "accountName",
+      header: "Account Name",
+      size: 220,
+      cell: ({ row, getValue }) => (
+        <Link
+          to={`/clients/accounts/accountsdash/overview/${row.original._id}`}
+          className="text-sm font-medium text-primary hover:text-primary/80 no-underline transition-colors truncate block max-w-[200px]"
+        >
+          {getValue() || "—"}
+        </Link>
+      ),
+    },
+    {
+      accessorKey: "clientType",
+      header: "Type",
+      size: 110,
+      cell: ({ getValue }) => {
+        const v = getValue();
+        if (!v) return <span className="text-muted-foreground text-xs">—</span>;
+        const color = v === "Individual" ? "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-300"
+          : v === "Company" ? "bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950 dark:text-violet-300"
+          : "bg-muted text-muted-foreground border-border";
+        return <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium border ${color}`}>{v}</span>;
+      },
+    },
+    {
+      accessorKey: "companyName",
+      header: "Company",
+      size: 160,
+      cell: ({ getValue }) => (
+        <span className="text-sm text-foreground/80 truncate block max-w-[150px]">
+          {getValue() || <span className="text-muted-foreground">—</span>}
+        </span>
+      ),
+    },
+    {
+      accessorKey: "tags",
+      header: "Tags",
+      size: 180,
+      enableSorting: false,
+      cell: ({ getValue }) => <TagPills tags={getValue()} />,
+    },
+    {
+      accessorKey: "teamMember",
+      header: "Team",
+      size: 160,
+      enableSorting: false,
+      cell: ({ getValue }) => <MemberPills members={getValue()} />,
+    },
+    {
+      id: "contactEmails",
+      header: "Contact Emails",
+      size: 200,
+      enableSorting: false,
+      cell: ({ row }) => {
+        const emails = row.original.contacts
+          ?.map((c) => c.contact?.email)
+          .filter(Boolean) || [];
+        if (!emails.length) return <span className="text-muted-foreground text-xs">—</span>;
+        return (
+          <div className="flex items-center gap-1">
+            <span className="text-xs text-foreground/80 truncate max-w-[160px]">{emails[0]}</span>
+            {emails.length > 1 && (
+              <span className="text-[11px] text-muted-foreground" title={emails.slice(1).join(", ")}>+{emails.length - 1}</span>
+            )}
+          </div>
+        );
+      },
+    },
+  ], []);
+
+  const addFilter = (key) => {
+    if (!activeFilters.includes(key)) setActiveFilters((p) => [...p, key]);
+  };
+  const removeFilter = (key) => {
+    setActiveFilters((p) => p.filter((f) => f !== key));
+    setFilters((p) => ({ ...p, [key]: key === "teamMember" || key === "tags" ? [] : "" }));
+  };
+
+  const filterContent = (
+    <div className="flex flex-col gap-1">
+      {[
+        { key: "accountName", label: "Account Name" },
+        { key: "email", label: "Email" },
+        { key: "type", label: "Client Type" },
+        { key: "teamMember", label: "Team Member" },
+        { key: "tags", label: "Tags" },
+      ].map(({ key, label }) => (
+        <button
+          key={key}
+          onClick={() => addFilter(key)}
+          disabled={activeFilters.includes(key)}
+          className="text-left px-2 py-1.5 text-sm rounded-md hover:bg-muted text-foreground transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          {label}
+        </button>
+      ))}
+    </div>
   );
-  
-  const applyFilters = () => {
-    let filtered = [...accountList];
 
-    // ✅ Filter by Account Name (case insensitive)
-    if (filters.accountName.trim() !== "") {
-      filtered = filtered.filter(acc =>
-        acc.accountName.toLowerCase().includes(filters.accountName.toLowerCase())
-      );
-    }
-
-    // ✅ Filter by Email (inside contacts.contact.email)
-    if (filters.email.trim() !== "") {
-      const search = filters.email.toLowerCase();
-
-      filtered = filtered.filter(acc =>
-        acc.contacts?.some(c =>
-          c.contact?.email?.toLowerCase().includes(search)
-        )
-      );
-    }
-
-    // ✅ Filter by Type
-    if (filters.type !== "") {
-      filtered = filtered.filter(acc => acc.clientType === filters.type);
-    }
-
-    // ✅ Filter by Team Member
-    if (filters.teamMember.length > 0) {
-      const selectedIds = filters.teamMember.map(t => t.value);
-      filtered = filtered.filter((acc) =>
-        acc.teamMember?.some((tm) => selectedIds.includes(tm._id))
-      );
-    }
-
-    // ✅ Filter by Tags (multi-select)
-    if (filters.tags.length > 0) {
-      const selectedIds = filters.tags.map(t => t.value);
-      filtered = filtered.filter(acc =>
-        acc.tags?.some(tag => selectedIds.includes(tag._id))
-      );
-    }
-
-    return filtered;
-  };
-  const isAnyFilterApplied =
-  filters.accountName.trim() !== "" ||
-  filters.email.trim() !== "" ||
-  filters.type !== "" ||
-  filters.teamMember.length > 0 ||
-  filters.tags.length > 0;
-
-  
-  const filteredList = applyFilters();
-  const sortedList =
-    orderBy && order
-      ? filteredList.slice().sort(getComparator(order, orderBy))
-      : filteredList;
-  
-  const paginatedList = sortedList.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
-  );
-// ================== SELECTION HELPERS ==================
-
-// IDs on current page
-const pageIds = paginatedList.map(a => a._id);
-
-// Header checkbox state (CURRENT PAGE)
-const isPageAllSelected =
-  pageIds.length > 0 && pageIds.every(id => selected.includes(id));
-
-const isPageIndeterminate =
-  pageIds.some(id => selected.includes(id)) && !isPageAllSelected;
-
-  const isSelected = (id) => selected.indexOf(id) !== -1;
-  
-  const handleMoreActionsClick = (event) => {
-    setAnchorE2(event.currentTarget);
-  };
-  
-  const handleClose = () => {
-    setAnchorEl(null);
-    setAnchorE2(null);
-  };
-
-  const handleFilterChange = (event) => {
-    const { name, value } = event.target;
-    
-    setFilters(prev => {
-      // For multi-select fields, ensure we maintain an array
-      if (name === "teamMember") {
-        return {
-          ...prev,
-          [name]: Array.isArray(value) ? value : [value].filter(Boolean)
-        };
+  const bulkActions = (
+    <>
+      <BulkActionBtn label="Send Email" icon={Mail} onClick={() => openBulkDrawer(setIsSendEmailOpen)} />
+      <BulkActionBtn label="Add Job" icon={Briefcase} onClick={() => openBulkDrawer(setIsCreateJobOpen)} disabled={perms?.managePipelines === false} />
+      <BulkActionBtn label="Organizer" icon={Briefcase} onClick={() => openBulkDrawer(setIsCreateOrganizerOpen)} disabled={perms?.manageOrganizers === false} />
+      <BulkActionBtn label="Team" icon={Users} onClick={() => openBulkDrawer(setIsManageTeamOpen)} disabled={perms?.assignTeamMates === false} />
+      <BulkActionBtn label="Tags" icon={Tag} onClick={() => openBulkDrawer(setIsManageTagsOpen)} disabled={perms?.manageTags === false} />
+      <div className="h-4 w-px bg-border/60 mx-1" />
+      {filterStatus === "active"
+        ? <BulkActionBtn label="Archive" icon={Archive} onClick={handleArchive} disabled={perms?.manageAccounts === false} />
+        : <BulkActionBtn label="Activate" icon={RotateCcw} onClick={handleActivate} disabled={perms?.manageAccounts === false} />
       }
-      // For single-select fields
-      return {
-        ...prev,
-        [name]: value
-      };
-    });
-    
-    setPage(0);
-  };
+      {filterStatus === "archived" && (
+        <BulkActionBtn label="Delete" icon={Trash2} variant="destructive" onClick={() => setIsDeleteDialogOpen(true)} disabled={perms?.manageAccounts === false} />
+      )}
+    </>
+  );
 
-  const renderLimitedChips = (items, getLabel, getColor) => {
-    if (!items || items.length === 0) return <span className="text-slate-400 text-xs">—</span>;
-
-    const first = items[0];
-    const remainingCount = items.length - 1;
-    const colorStyle = getColor ? getColor(first) : {};
-    const inlineStyle = {};
-    if (colorStyle.backgroundColor) inlineStyle.backgroundColor = colorStyle.backgroundColor;
-    if (colorStyle.color) inlineStyle.color = colorStyle.color;
-    if (colorStyle.borderColor) {
-      inlineStyle.border = `1px solid`;
-      inlineStyle.borderColor = typeof colorStyle.borderColor === 'string' ? colorStyle.borderColor : '#6366f1';
-      inlineStyle.color = typeof colorStyle.color === 'string' ? colorStyle.color : '#6366f1';
-    }
-
-    return (
-      <div className="flex items-center gap-1.5 flex-wrap">
-        <Tooltip title={getLabel(first)} placement="top-end">
-          <span
-            className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium truncate max-w-[140px] cursor-default"
-            style={Object.keys(inlineStyle).length > 0 ? inlineStyle : { backgroundColor: '#f1f5f9', color: '#475569' }}
-          >
-            {getLabel(first)}
-          </span>
-        </Tooltip>
-
-        {remainingCount > 0 && (
-          <Tooltip
-            title={items.map((i) => getLabel(i)).join(", ")}
-            placement="top-end"
-          >
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-500 border border-slate-200 cursor-default">
-              +{remainingCount}
-            </span>
-          </Tooltip>
-        )}
-      </div>
-    );
-  };
-
-  // Check if TeamMember has no permission to view accounts
-  if (userRole === "TeamMember" && !viewAllAccounts && accountList.length === 0) {
+  if (userRole === "TeamMember" && !viewAllAccounts && accountList.length === 0 && !loading) {
     return (
       <div className="flex items-center justify-center min-h-[200px] p-8">
-        <p className="text-red-500 font-semibold text-base">
-          You do not have permission to view accounts.
-        </p>
+        <p className="text-destructive font-medium text-sm">You do not have permission to view accounts.</p>
       </div>
     );
   }
-
-  const handleDeleteAccount = async () => {
-    try {
-      await axios.delete(`https://www.snptaxes.com/api/accounts/accounts/deleteMultipleAccounts`, {
-        data: { accountIds: selected }
-      });
-
-      console.log("Accounts deleted:", selected);
-
-      setSelected([]);
-      fetchAccountsList();
-      handleClose();
-      setIsDeleteDialogOpen(false);
-      toast.success("Account(s) deleted successfully");
-    } catch (error) {
-      console.error("Failed to delete account", error);
-      toast.error("Failed to delete account(s)");
-    }
-  };
-
-  const handleDeleteClick = () => {
-    // Get account names for confirmation dialog
-    const accountsToDeleteNames = selected.map(id => {
-      const account = accountList.find(acc => acc._id === id);
-      return account ? account.accountName : id;
-    });
-    
-    setAccountsToDelete(accountsToDeleteNames);
-    setIsDeleteDialogOpen(true);
-    handleClose(); // Close the menu
-  };
-
-  const handleCloseDeleteDialog = () => {
-    setIsDeleteDialogOpen(false);
-    setAccountsToDelete([]);
-  };
-const handleConfirmDelete = async () => {
-  if (confirmText === "DELETE") {
-    await handleDeleteAccount(); // your existing delete logic
-    setConfirmText("");
-    handleCloseDeleteDialog();
-  }
-};
 
   return (
     <div className="p-4 md:p-6 space-y-4">
-      {/* Header toolbar */}
+      {/* Status toggle */}
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <div className="inline-flex rounded-lg border border-slate-200 bg-slate-50 p-0.5">
-          <button
-            className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all duration-150 ${
-              filterStatus === "active"
-                ? "bg-white text-slate-900 shadow-sm"
-                : "text-slate-500 hover:text-slate-700"
-            }`}
-            onClick={() => setFilterStatus("active")}
-          >
-            Active
-          </button>
-          <button
-            className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all duration-150 ${
-              filterStatus === "archived"
-                ? "bg-white text-slate-900 shadow-sm"
-                : "text-slate-500 hover:text-slate-700"
-            }`}
-            onClick={() => setFilterStatus("archived")}
-          >
-            Archived
-          </button>
+        <div className="inline-flex rounded-lg border border-border bg-muted/40 p-0.5 gap-0.5">
+          {["active", "archived"].map((s) => (
+            <button
+              key={s}
+              onClick={() => setFilterStatus(s)}
+              className={cn(
+                "px-3.5 py-1.5 text-sm font-medium rounded-md transition-all capitalize",
+                filterStatus === s
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {s}
+            </button>
+          ))}
         </div>
-
         <button
-          className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm"
           onClick={() => setOpenDrawer(true)}
+          className="inline-flex items-center gap-1.5 h-8 px-3 text-sm font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
         >
-          <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+          <span className="text-lg leading-none">+</span>
           Add Account
         </button>
       </div>
 
-      {/* Filters bar */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <button
-          className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
-          onClick={handleFilterButtonClick}
-        >
-          <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
-          Filters
-        </button>
-
-        <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
-          <MenuItem onClick={() => { toggleFilter("accountName"); handleClose(); }}>Account Name</MenuItem>
-          <MenuItem onClick={() => { toggleFilter("email"); handleClose(); }}>Email</MenuItem>
-          <MenuItem onClick={() => { toggleFilter("type"); handleClose(); }}>Type</MenuItem>
-          <MenuItem onClick={() => { toggleFilter("teamMember"); handleClose(); }}>Team Member</MenuItem>
-          <MenuItem onClick={() => { toggleFilter("tags"); handleClose(); }}>Tags</MenuItem>
-        </Menu>
-
+      {/* Toolbar */}
+      <DataTableToolbar
+        globalFilter={globalFilter}
+        onGlobalFilterChange={setGlobalFilter}
+        filterContent={filterContent}
+        selectedCount={selectedIds.length}
+        bulkActions={bulkActions}
+      >
         {/* Active filter chips */}
-        {showFilters.accountName && (
-          <div className="inline-flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-2 py-1">
-            <TextField name="accountName" value={filters.accountName} onChange={handleFilterChange} placeholder="Account Name" variant="outlined" size="small" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px', fontSize: '13px' }, width: '160px' }} />
-            <button onClick={() => clearFilter("accountName")} className="text-slate-400 hover:text-red-500 transition-colors"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
-          </div>
-        )}
-        {showFilters.email && (
-          <div className="inline-flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-2 py-1">
-            <TextField name="email" value={filters.email} onChange={handleFilterChange} placeholder="Email" variant="outlined" size="small" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px', fontSize: '13px' }, width: '160px' }} />
-            <button onClick={() => clearFilter("email")} className="text-slate-400 hover:text-red-500 transition-colors"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
-          </div>
-        )}
-        {showFilters.type && (
-          <div className="inline-flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-2 py-1">
-            <FormControl variant="outlined" size="small" sx={{ width: '140px' }}>
-              <InputLabel>Type</InputLabel>
-              <Select name="type" value={filters.type} onChange={handleFilterChange} label="Type" sx={{ borderRadius: '8px', fontSize: '13px' }}>
-                <MenuItem value="">All</MenuItem>
-                <MenuItem value="Individual">Individual</MenuItem>
-                <MenuItem value="Company">Company</MenuItem>
-                <MenuItem value="Other">Other</MenuItem>
-              </Select>
-            </FormControl>
-            <button onClick={() => clearFilter("type")} className="text-slate-400 hover:text-red-500 transition-colors"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
-          </div>
-        )}
-        {showFilters.teamMember && (
-          <div className="inline-flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-2 py-1">
-            <TeamMemberMultiSelectDropDown
-              value={filters.teamMember}
-              onChange={(newValue) => { setFilters(prev => ({ ...prev, teamMember: newValue })); setPage(0); }}
-              width="220px"
-              LOGIN_API={LOGIN_API}
-            />
-            <button onClick={() => clearFilter("teamMember")} className="text-slate-400 hover:text-red-500 transition-colors"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
-          </div>
-        )}
-        {showFilters.tags && (
-          <div className="inline-flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-2 py-1">
-            <TagsMultiSelectDropDown
-              value={filters.tags}
-              onChange={(newValue) => { setFilters(prev => ({ ...prev, tags: newValue })); setPage(0); }}
-              options={uniqueTags.map(tag => ({ value: tag._id, label: tag.tagName, colour: tag.tagColour }))}
-              width="220px"
-              placeholder="Select Tags..."
-            />
-            <button onClick={() => clearFilter("tags")} className="text-slate-400 hover:text-red-500 transition-colors"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
-          </div>
-        )}
-      </div>
-
-      {/* Selection bar */}
-      {selected.length > 0 && (
-        <div className="flex items-center gap-2 flex-wrap">
-          {isAnyFilterApplied ? (
-            <button className="px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition-colors" onClick={handleSelectAllFiltered}>
-              Select Filtered
-            </button>
-          ) : (
-            <button className="px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition-colors" onClick={handleSelectAllAccounts}>
-              Select All
-            </button>
-          )}
-          <button className="px-3 py-1.5 text-xs font-medium text-slate-500 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors" onClick={handleClearSelection}>
-            Clear ({selected.length})
-          </button>
-        </div>
-      )}
-
-      {/* Bulk actions bar */}
-      {selected.length > 0 && (
-        <div data-test="clients-bulk-actions-panel" className="flex items-center gap-1 p-2 bg-slate-50 border border-slate-200 rounded-xl flex-wrap">
-          <Tooltip title={storedData?.teammember?.manageOrganizers === false ? "You don't have permission to send organizers" : ""} disableHoverListener={storedData?.teammember?.manageOrganizers !== false}>
-            <span>
-              <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all disabled:opacity-40 disabled:cursor-not-allowed" onClick={handleAssignOrganizer} disabled={storedData?.teammember?.manageOrganizers === false}>
-                <ListIcon sx={{ fontSize: 16 }} /> Send Organizer
-              </button>
-            </span>
-          </Tooltip>
-          <Tooltip title={storedData?.teammember?.managePipelines === false ? "You don't have permission to add jobs" : ""} disableHoverListener={storedData?.teammember?.managePipelines !== false}>
-            <span>
-              <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all disabled:opacity-40 disabled:cursor-not-allowed" onClick={handleAddJob} disabled={storedData?.teammember?.managePipelines === false}>
-                <ListIcon sx={{ fontSize: 16 }} /> Add Job
-              </button>
-            </span>
-          </Tooltip>
-          <Tooltip title={storedData?.teammember?.assignTeamMates === false ? "You don't have permission to manage team" : ""} disableHoverListener={storedData?.teammember?.assignTeamMates !== false}>
-            <span>
-              <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all disabled:opacity-40 disabled:cursor-not-allowed" onClick={handleManageTeam} disabled={storedData?.teammember?.assignTeamMates === false}>
-                <PersonIcon sx={{ fontSize: 16 }} /> Manage Team
-              </button>
-            </span>
-          </Tooltip>
-          <Tooltip title="">
-            <span>
-              <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all" onClick={handleSendEmail}>
-                <EmailIcon sx={{ fontSize: 16 }} /> Send Email
-              </button>
-            </span>
-          </Tooltip>
-          <Tooltip title={storedData?.teammember?.manageTags === false ? "You don't have permission to manage tags" : ""} disableHoverListener={storedData?.teammember?.manageTags !== false}>
-            <span>
-              <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all disabled:opacity-40 disabled:cursor-not-allowed" onClick={handleManageTags} disabled={storedData?.teammember?.manageTags === false}>
-                <TagIcon sx={{ fontSize: 16 }} /> Manage Tags
-              </button>
-            </span>
-          </Tooltip>
-          <Tooltip title="">
-            <span>
-              <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all" onClick={handleMoreActionsClick}>
-                <MoreVertIcon sx={{ fontSize: 16 }} /> More
-              </button>
-            </span>
-          </Tooltip>
-
-          <Menu anchorEl={anchorE2} open={Boolean(anchorE2)} onClose={handleClose}>
-            {filterStatus === "active" ? (
-              <Tooltip title={storedData?.teammember?.manageAccounts === false ? "You don't have permission to archive accounts" : ""} disableHoverListener={storedData?.teammember?.manageAccounts !== false}>
-                <span><MenuItem onClick={handleArchiveAccount} disabled={storedData?.teammember?.manageAccounts === false}>Archive Account</MenuItem></span>
-              </Tooltip>
-            ) : (
-              <Tooltip title={storedData?.teammember?.manageAccounts === false ? "You don't have permission to activate accounts" : ""} disableHoverListener={storedData?.teammember?.manageAccounts !== false}>
-                <span><MenuItem onClick={handleActivateAccount} disabled={storedData?.teammember?.manageAccounts === false}>Activate Account</MenuItem></span>
-              </Tooltip>
+        {activeFilters.length > 0 && (
+          <div className="flex items-center gap-2 flex-wrap pt-1">
+            {activeFilters.includes("accountName") && (
+              <div className="inline-flex items-center gap-1.5 h-8 border border-border rounded-lg pl-2.5 pr-1.5 bg-background">
+                <input
+                  value={filters.accountName}
+                  onChange={(e) => setFilters((p) => ({ ...p, accountName: e.target.value }))}
+                  placeholder="Account name…"
+                  className="text-sm bg-transparent outline-none text-foreground placeholder:text-muted-foreground w-36"
+                />
+                <button onClick={() => removeFilter("accountName")} className="text-muted-foreground hover:text-foreground"><X className="h-3.5 w-3.5" /></button>
+              </div>
             )}
-            {filterStatus === "archived" && (
-              <Tooltip title={storedData?.teammember?.manageAccounts === false ? "You don't have permission to delete accounts" : ""} disableHoverListener={storedData?.teammember?.manageAccounts !== false}>
-                <span><MenuItem onClick={handleDeleteClick} disabled={storedData?.teammember?.manageAccounts === false} sx={{ color: "error.main" }}>Delete Account</MenuItem></span>
-              </Tooltip>
+            {activeFilters.includes("email") && (
+              <div className="inline-flex items-center gap-1.5 h-8 border border-border rounded-lg pl-2.5 pr-1.5 bg-background">
+                <input
+                  value={filters.email}
+                  onChange={(e) => setFilters((p) => ({ ...p, email: e.target.value }))}
+                  placeholder="Email…"
+                  className="text-sm bg-transparent outline-none text-foreground placeholder:text-muted-foreground w-36"
+                />
+                <button onClick={() => removeFilter("email")} className="text-muted-foreground hover:text-foreground"><X className="h-3.5 w-3.5" /></button>
+              </div>
             )}
-          </Menu>
-        </div>
-      )}
-
-      {/* Table */}
-      {loading ? (
-        <div className="flex items-center justify-center py-12">
-          <div className="flex items-center gap-3 text-slate-500">
-            <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
-            <span className="text-sm font-medium">Loading accounts...</span>
+            {activeFilters.includes("type") && (
+              <div className="inline-flex items-center gap-1.5 h-8 border border-border rounded-lg pl-2.5 pr-1.5 bg-background">
+                <select
+                  value={filters.type}
+                  onChange={(e) => setFilters((p) => ({ ...p, type: e.target.value }))}
+                  className="text-sm bg-transparent outline-none text-foreground"
+                >
+                  <option value="">All types</option>
+                  <option value="Individual">Individual</option>
+                  <option value="Company">Company</option>
+                  <option value="Other">Other</option>
+                </select>
+                <button onClick={() => removeFilter("type")} className="text-muted-foreground hover:text-foreground"><X className="h-3.5 w-3.5" /></button>
+              </div>
+            )}
+            {activeFilters.includes("teamMember") && (
+              <div className="inline-flex items-center gap-1.5 h-8 border border-border rounded-lg pl-1 pr-1.5 bg-background">
+                <TeamMemberMultiSelectDropDown
+                  value={filters.teamMember}
+                  onChange={(v) => setFilters((p) => ({ ...p, teamMember: v }))}
+                  width="200px"
+                  LOGIN_API={LOGIN_API}
+                />
+                <button onClick={() => removeFilter("teamMember")} className="text-muted-foreground hover:text-foreground"><X className="h-3.5 w-3.5" /></button>
+              </div>
+            )}
+            {activeFilters.includes("tags") && (
+              <div className="inline-flex items-center gap-1.5 h-8 border border-border rounded-lg pl-1 pr-1.5 bg-background">
+                <TagsMultiSelectDropDown
+                  value={filters.tags}
+                  onChange={(v) => setFilters((p) => ({ ...p, tags: v }))}
+                  options={uniqueTags.map((t) => ({ value: t._id, label: t.tagName, colour: t.tagColour }))}
+                  width="200px"
+                  placeholder="Tags…"
+                />
+                <button onClick={() => removeFilter("tags")} className="text-muted-foreground hover:text-foreground"><X className="h-3.5 w-3.5" /></button>
+              </div>
+            )}
           </div>
-        </div>
-      ) : (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-slate-100 bg-slate-50/60">
-                  <th className="w-12 px-4 py-3">
-                    <Checkbox
-                      color="primary"
-                      size="small"
-                      indeterminate={isPageIndeterminate}
-                      checked={isPageAllSelected}
-                      onChange={handleSelectAllClick}
-                      sx={{ padding: '2px' }}
-                    />
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Code</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider min-w-[200px] cursor-pointer select-none" onClick={() => handleRequestSort("accountName")}>
-                    <span className="inline-flex items-center gap-1">
-                      Account Name
-                      {orderBy === "accountName" && (
-                        <svg className={`w-3.5 h-3.5 transition-transform ${order === "desc" ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" /></svg>
-                      )}
-                    </span>
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer select-none" onClick={() => handleRequestSort("clientType")}>
-                    <span className="inline-flex items-center gap-1">
-                      Client Type
-                      {orderBy === "clientType" && (
-                        <svg className={`w-3.5 h-3.5 transition-transform ${order === "desc" ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" /></svg>
-                      )}
-                    </span>
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer select-none" onClick={() => handleRequestSort("companyName")}>
-                    <span className="inline-flex items-center gap-1">
-                      Company Name
-                      {orderBy === "companyName" && (
-                        <svg className={`w-3.5 h-3.5 transition-transform ${order === "desc" ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" /></svg>
-                      )}
-                    </span>
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Tags</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Team Members</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Contact Emails</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {paginatedList.length > 0 ? (
-                  paginatedList.map((account) => (
-                    <tr
-                      key={account._id}
-                      className={`transition-colors duration-100 hover:bg-slate-50/80 ${isSelected(account._id) ? "bg-indigo-50/40" : ""}`}
-                    >
-                      <td className="w-12 px-4 py-3">
-                        <Checkbox
-                          color="primary"
-                          size="small"
-                          checked={isSelected(account._id)}
-                          onClick={(e) => e.stopPropagation()}
-                          onChange={() => handleClick(account)}
-                          sx={{ padding: '2px' }}
-                        />
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
-                          {account.importId}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <Link
-                          to={`/clients/accounts/accountsdash/overview/${account._id}`}
-                          className="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors no-underline"
-                        >
-                          {account.accountName}
-                        </Link>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-slate-600">{account.clientType}</td>
-                      <td className="px-4 py-3 text-sm text-slate-600">{account.companyName || <span className="text-slate-300">—</span>}</td>
-                      <td className="px-4 py-3">
-                        {renderLimitedChips(
-                          account.tags,
-                          (t) => t.tagName,
-                          (t) => ({ backgroundColor: t.tagColour, color: "#fff", fontWeight: 600 })
-                        )}
-                      </td>
-                      <td className="px-4 py-3">
-                        {renderLimitedChips(
-                          account.teamMember,
-                          (tm) => tm.username,
-                          () => ({ borderColor: "primary.main", color: "primary.main" })
-                        )}
-                      </td>
-                      <td className="px-4 py-3">
-                        {renderLimitedChips(
-                          account.contacts?.map((c) => c.contact)?.filter((c) => c?.email?.trim()),
-                          (c) => c.email
-                        )}
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={8} className="px-4 py-12 text-center text-sm text-slate-400">
-                      No accounts found
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+        )}
+      </DataTableToolbar>
 
-          {/* Pagination */}
-          <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100 bg-slate-50/40">
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-500">Rows per page:</span>
-              <select
-                value={rowsPerPage}
-                onChange={(e) => { setRowsPerPage(parseInt(e.target.value)); setPage(0); }}
-                className="text-xs border border-slate-200 rounded-md px-2 py-1 bg-white text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-              >
-                {[5, 10, 25, 30, 50, 100, 500].map(opt => (
-                  <option key={opt} value={opt}>{opt}</option>
-                ))}
-              </select>
-            </div>
-            <div className="flex items-center gap-1">
-              <span className="text-xs text-slate-500 mr-2">
-                {sortedList.length === 0 ? "0 of 0" : `${page * rowsPerPage + 1}–${Math.min((page + 1) * rowsPerPage, sortedList.length)} of ${sortedList.length}`}
-              </span>
-              <button
-                onClick={() => setPage(0)}
-                disabled={page === 0}
-                className="p-1 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" /></svg>
-              </button>
-              <button
-                onClick={() => setPage(Math.max(0, page - 1))}
-                disabled={page === 0}
-                className="p-1 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7 7" /></svg>
-              </button>
-              <button
-                onClick={() => setPage(Math.min(Math.ceil(sortedList.length / rowsPerPage) - 1, page + 1))}
-                disabled={page >= Math.ceil(sortedList.length / rowsPerPage) - 1}
-                className="p-1 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-              </button>
-              <button
-                onClick={() => setPage(Math.ceil(sortedList.length / rowsPerPage) - 1)}
-                disabled={page >= Math.ceil(sortedList.length / rowsPerPage) - 1}
-                className="p-1 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" /></svg>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      
-      <AccountContactDrawer open={openDrawer} onClose={handleDrawerClose} fetchAccountsList={fetchAccountsList}/>
-      
-      <Dialog
-        open={isDeleteDialogOpen}
-        onClose={handleCloseDeleteDialog}
-        aria-labelledby="delete-dialog-title"
-        aria-describedby="delete-dialog-description"
-      >
-        <DialogTitle id="delete-dialog-title">
-          Confirm Delete
-        </DialogTitle>
-        {/* Content */}
-    <DialogContent>
-      <DialogContentText id="delete-dialog-description">
-        Are you sure you want to delete{" "}
-        <strong>{accountsToDelete.length}</strong>{" "}
-        {accountsToDelete.length === 1 ? "account" : "accounts"}?
-        This action cannot be undone.
-      </DialogContentText>
-
-      <Box sx={{ mt: 2 }}>
-        <Typography variant="subtitle2" gutterBottom>
-          Accounts to be deleted:
-        </Typography>
-        <List dense>
-          {accountsToDelete.map((accountName, index) => (
-            <ListItem key={index}>
-              <ListItemText primary={accountName} />
-            </ListItem>
-          ))}
-        </List>
-      </Box>
-
-      <DialogContentText sx={{ mt: 2 }}>
-        If you want to proceed, please type{" "}
-        <strong>DELETE</strong> below.
-      </DialogContentText>
-
-      <TextField
-        fullWidth
-        margin="normal"
-        size="small"
-        variant="outlined"
-        value={confirmText}
-        onChange={(e) => setConfirmText(e.target.value)}
-        placeholder="Please enter the word DELETE"
+      {/* Data table */}
+      <DataTable
+        columns={columns}
+        data={filteredData}
+        loading={loading}
+        globalFilter={globalFilter}
+        onGlobalFilterChange={setGlobalFilter}
+        onRowSelectionChange={handleRowSelectionChange}
+        getRowId={(row) => row._id}
+        emptyMessage="No accounts found"
+        emptyDescription={filterStatus === "archived" ? "No archived accounts" : "Create your first account to get started"}
+        pageSize={25}
       />
-    </DialogContent>
-        {/* <DialogContent>
-          <DialogContentText id="delete-dialog-description">
-            Are you sure you want to delete the following account(s)? This action cannot be undone.
-          </DialogContentText>
-          <Box sx={{ mt: 2 }}>
-            <Typography variant="subtitle2" gutterBottom>
-              Accounts to be deleted:
-            </Typography>
-            <List dense>
-              {accountsToDelete.map((accountName, index) => (
-                <ListItem key={index}>
-                  <ListItemText primary={accountName} />
-                </ListItem>
-              ))}
-            </List>
-          </Box>
-        </DialogContent> */}
-        <DialogActions>
-          {/* <Button onClick={handleCloseDeleteDialog} color="primary">
-            Cancel
-          </Button>
-          <Button 
-            onClick={handleDeleteAccount} 
-            color="error" 
-            variant="contained"
-            autoFocus
-          >
-            Delete
-          </Button> */}
-           <Button
-        onClick={handleConfirmDelete}
-        color="error"
-        variant="contained"
-        disabled={confirmText !== "DELETE"}
-      >
-        Delete
-      </Button>
-      <Button
-        onClick={handleCloseDeleteDialog}
-        variant="outlined"
-      >
-        Cancel
-      </Button>
-        </DialogActions>
-      </Dialog>
-      
-      {/* NEW: Edit Settings Drawer */}
-      <Drawer
-        anchor="right"
-        open={isSidebarOpen}
-        onClose={handleCloseSidebar}
-        PaperProps={{
-          id: "edit-settings-drawer",
-          sx: {
-            borderRadius: isSmallScreen ? "0" : "10px 0 0 10px",
-            width: isSmallScreen ? "100%" : 700,
-            maxWidth: "100%",
-            [theme.breakpoints.down("sm")]: {
-              width: "100%",
-            },
-          },
-        }}
-      >
-        <div style={{ padding: 16, position: "relative" }}>
-          <DialogTitle>
-            Bulk-edit login, notify, email sync
-            <Typography variant="subtitle1">
-              For a selected  {selected.length} accounts
-            </Typography>
-            <IconButton
-              onClick={handleCloseSidebar}
-              style={{ position: "absolute", right: 8, top: 8 }}
-            >
-              <CloseIcon />
-            </IconButton>
-          </DialogTitle>
 
-          <DialogContent dividers>
-            <Typography variant="body2" color="textSecondary" gutterBottom>
-              Bulk edit updates all email addresses linked to the selected
-              accounts. You can adjust settings per contact within each
-              account's Info section.
-            </Typography>
-            <Typography variant="body2" color="textSecondary">
-              Your clients will be able to access their portal through their
-              email address and receive notifications. Additionally, you can
-              automatically see all email history if you enable email sync.
-            </Typography>
+      {/* Create/Edit Account Drawer */}
+      <AccountContactDrawer
+        open={openDrawer}
+        onClose={() => { setOpenDrawer(false); fetchAccountsList(); }}
+        fetchAccountsList={fetchAccountsList}
+      />
 
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Settings</TableCell>
-                    <TableCell>Action</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {[
-                    {
-                      label: "Login",
-                      setting: "login",
-                      icon: <PersonIcon />,
-                    },
-                    {
-                      label: "Notify",
-                      setting: "notify",
-                      icon: <NotificationsIcon />,
-                    },
-                    {
-                      label: "Email sync",
-                      setting: "emailSync",
-                      icon: <EmailIcon />,
-                    },
-                  ].map((setting, index) => (
-                    <TableRow key={index}>
-                      <TableCell>
-                        <div
-                          style={{ display: "flex", alignItems: "center" }}
-                        >
-                          {setting.icon}
-                          <Typography
-                            variant="body2"
-                            style={{ marginLeft: 8 }}
-                          >
-                            {setting.label}
-                          </Typography>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Select
-                          value={settings[setting.setting]}
-                          onChange={(e) =>
-                            handleSettingChange(
-                              setting.setting,
-                              e.target.value
-                            )
-                          }
-                          displayEmpty
-                          inputProps={{ "aria-label": "Without label" }}
-                          sx={{ width: "150px" }}
-                        >
-                          <MenuItem value="Assign to all">
-                            Assign to all
-                          </MenuItem>
-                          <MenuItem value="Remove from all">
-                            Remove from all
-                          </MenuItem>
-                          <MenuItem value="Do nothing">Do nothing</MenuItem>
-                        </Select>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </DialogContent>
-
-          <DialogActions>
-            <Button
-              variant="contained"
-              onClick={handleupdatecontacts}
-              sx={{
-                backgroundColor: "var(--color-save-btn)",
-                "&:hover": {
-                  backgroundColor: "var(--color-save-hover-btn)",
-                },
-                width: "80px",
-                borderRadius: "15px",
-              }}
-            >
-              Save
-            </Button>
-            <Button
-              variant="outlined"
-              onClick={handleCloseSidebar}
-              sx={{
-                borderColor: "var(--color-border-cancel-btn)",
-                color: "var(--color-save-btn)",
-                "&:hover": {
-                  backgroundColor: "var(--color-save-hover-btn)",
-                  color: "#fff",
-                  border: "none",
-                },
-                width: "80px",
-                borderRadius: "15px",
-              }}
-            >
-              Cancel
-            </Button>
-          </DialogActions>
+      {/* Bulk action drawer */}
+      {isDrawerOpen && (
+        <div className="fixed inset-0 z-50 overflow-hidden">
+          <div className="absolute inset-0 bg-foreground/20 backdrop-blur-sm" onClick={handleFormClose} />
+          <div className="absolute right-0 top-0 h-full w-full sm:w-[650px] bg-background shadow-xl flex flex-col">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
+              <h2 className="text-base font-semibold text-foreground">
+                {isSendEmailOpen && "Send Email"}
+                {isCreateJobOpen && "Add Job"}
+                {isCreateOrganizerOpen && "Send Organizer"}
+                {isManageTagsOpen && "Manage Tags"}
+                {isManageTeamOpen && "Manage Team"}
+              </h2>
+              <button onClick={handleFormClose} className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-4">
+              {isSendEmailOpen && <SendAccountEmail selectedAccounts={selectedIds} onClose={handleFormClose} />}
+              {isCreateJobOpen && <AddJobs selectedAccounts={selectedIds} onClose={handleFormClose} />}
+              {isCreateOrganizerOpen && <AddBulkOrganizer selectedAccounts={selectedIds} onClose={handleFormClose} />}
+              {isManageTagsOpen && <ManageTags selectedAccounts={selectedIds} onClose={handleFormClose} fetchData={fetchAccountsList} />}
+              {isManageTeamOpen && <ManageTeams selectedAccounts={selectedIds} onClose={handleFormClose} fetchaccountList={fetchAccountsList} />}
+            </div>
+          </div>
         </div>
-      </Drawer>
+      )}
 
-      <Drawer
-        anchor="right"
-        open={isDrawerOpen}
-        onClose={handleDrawerClose}
-        PaperProps={{
-          id: "tag-drawer",
-          sx: {
-            borderRadius: isSmallScreen ? "0" : "10px 0 0 10px",
-            width: isSmallScreen ? "100%" : 700,
-            maxWidth: "100%",
-            [theme.breakpoints.down("sm")]: {
-              width: "100%",
-            },
-          },
-        }}
-      >
-        <Box
-          sx={{ borderRadius: isSmallScreen ? "0" : "15px" }}
-          role="presentation"
-        >
-          {isSendEmailOpen && (
-            <Box p={2}>
-              <Box
-                display="flex"
-                alignItems="center"
-                justifyContent="space-between"
-              >
-                <Typography variant="h6">New Email</Typography>
-                <IconButton onClick={handleFormClose} sx={{ color: "blue" }}>
-                  <RxCross2 fontSize="large" />
-                </IconButton>
-              </Box>
-
-              <Divider sx={{ my: 2 }} />
-
-              <SendAccountEmail
-                selectedAccounts={selected}
-                onClose={handleFormClose}
-              />
-            </Box>
-          )}
-
-          {isCreateJobOpen && (
-            <Box p={2} className="right-drawers">
-              <Box
-                display="flex"
-                alignItems="center"
-                justifyContent="space-between"
-              >
-                <Typography variant="h6">Create job</Typography>
-                <IconButton onClick={handleFormClose} sx={{ color: "blue" }}>
-                  <RxCross2 fontSize="large" />
-                </IconButton>
-              </Box>
-
-              <AddJobs selectedAccounts={selected} onClose={handleFormClose} />
-            </Box>
-          )}
-
-          {isCreateOrganizerOpen && (
-            <Box p={2}>
-              <Box
-                display="flex"
-                alignItems="center"
-                justifyContent="space-between"
-              >
-                <Typography variant="h6">Create Organizer</Typography>
-                <IconButton onClick={handleFormClose} sx={{ color: "blue" }}>
-                  <RxCross2 fontSize="large" />
-                </IconButton>
-              </Box>
-
-              <AddBulkOrganizer
-                selectedAccounts={selected}
-                onClose={handleFormClose}
-              />
-            </Box>
-          )}
-
-          {isManageTagsOpen && (
-            <Box p={2}>
-              <Box
-                display="flex"
-                alignItems="center"
-                justifyContent="space-between"
-              >
-                <Typography variant="h6">Assign Tags for </Typography>
-
-                <Typography variant="body1" sx={{ marginRight: 2 }}>
-                  {selected
-                    .map((id) => {
-                      const account = accountList.find(
-                        (account) => account._id === id
-                      );
-                      return account ? account.accountName : id;
-                    })
-                    .join(", ")}{" "}
-                </Typography>
-
-                <IconButton onClick={handleFormClose} sx={{ color: "blue" }}>
-                  <RxCross2 fontSize="large" />
-                </IconButton>
-              </Box>
-
-              <Divider sx={{ my: 2 }} />
-
-              <ManageTags
-                selectedAccounts={selected}
-                onClose={handleFormClose}
-                fetchData={fetchAccountsList}
-              />
-            </Box>
-          )}
-
-          {isManageTeamOpen && (
-            <Box p={2}>
-              <Box
-                display="flex"
-                alignItems="center"
-                justifyContent="space-between"
-              >
-                <Typography variant="h6">Assign Team for</Typography>
-
-                <Typography variant="body1" sx={{ marginRight: 2 }}>
-                  {selected
-                    .map((id) => {
-                      const account = accountList.find(
-                        (account) => account._id === id
-                      );
-                      return account ? account.accountName : id;
-                    })
-                    .join(", ")}{" "}
-                </Typography>
-                <IconButton onClick={handleFormClose} sx={{ color: "blue" }}>
-                  <RxCross2 fontSize="large" />
-                </IconButton>
-              </Box>
-
-              <Divider sx={{ my: 2 }} />
-
-              <ManageTeams
-                selectedAccounts={selected}
-                onClose={handleFormClose}
-                fetchaccountList={fetchAccountsList}
-              />
-            </Box>
-          )}
-        </Box>
-      </Drawer>
+      {/* Delete confirmation dialog */}
+      {isDeleteDialogOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-foreground/40" onClick={() => setIsDeleteDialogOpen(false)} />
+          <div className="relative bg-background rounded-xl shadow-lg w-full max-w-sm mx-4 p-6 space-y-4">
+            <h3 className="text-base font-semibold text-foreground">Delete Accounts?</h3>
+            <p className="text-sm text-muted-foreground">
+              This will permanently delete <strong>{selectedIds.length}</strong> account{selectedIds.length > 1 ? "s" : ""}. Type <strong>DELETE</strong> to confirm.
+            </p>
+            <input
+              value={confirmText}
+              onChange={(e) => setConfirmText(e.target.value)}
+              placeholder="Type DELETE"
+              className="w-full h-9 px-3 text-sm rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+            <div className="flex justify-end gap-3">
+              <button onClick={() => { setIsDeleteDialogOpen(false); setConfirmText(""); }} className="h-9 px-4 text-sm font-medium border border-border rounded-lg text-foreground hover:bg-muted transition-colors">Cancel</button>
+              <button onClick={handleDelete} disabled={confirmText !== "DELETE"} className="h-9 px-4 text-sm font-medium bg-destructive text-destructive-foreground rounded-lg hover:bg-destructive/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">Delete</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
