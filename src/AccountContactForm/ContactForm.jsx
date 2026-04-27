@@ -17,29 +17,20 @@ import {
   setContactTags,
   setContactCountry,
 } from "../redux/accountContactSlice";
-import {
-  Box,
-  Button,
-  TextField,
-  Typography,
-  Grid,
-  IconButton,
-  Divider,
-  FormControlLabel,
-  Checkbox,
-  FormGroup,
-  Chip,
-  Autocomplete,
-  FormLabel,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-} from "@mui/material";
 import countryList from "react-select-country-list";
-import { AddCircle, RemoveCircle } from "@mui/icons-material";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
+import { Plus, Minus, UserPlus, Trash2, X } from "lucide-react";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import TagsMultiSelectDropDown from "../Templates/TagsMultiSelectDropDown";
+import {
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetFooter,
+} from "../components/ui/sheet";
 import ContactSelectionDialog from "./ContactSelectionDialog";
 import SelectedContactsDisplay from "./SelectedContactsDisplay";
 
@@ -52,30 +43,38 @@ const PersonalizationDialog = ({
   onMessageChange,
   onConfirm,
 }) => {
+  if (!open) return null;
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: '12px' } }}>
-      <div className="px-5 py-4 border-b border-slate-200">
-        <h2 className="text-lg font-semibold text-slate-900">Add portal access</h2>
-      </div>
-      <DialogContent>
-        <p className="text-sm font-semibold text-slate-700 mb-2">This message will be sent to:</p>
-        <div className="max-h-[150px] overflow-y-auto border border-slate-100 rounded-lg p-3 mb-3 bg-slate-50">
-          {contactEmails.map((email, index) => (
-            <p key={index} className="text-sm text-slate-600 mb-0.5">• {email}</p>
-          ))}
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div className="w-full max-w-md rounded-xl border border-border bg-background shadow-xl">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border/40">
+          <SheetTitle className="text-base font-semibold">Add portal access</SheetTitle>
+          <button onClick={onClose} className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted transition-colors">
+            <X className="h-4 w-4" />
+          </button>
         </div>
-        <TextField
-          autoFocus margin="dense" type="text" fullWidth multiline rows={3} variant="outlined"
-          value={message} onChange={onMessageChange}
-          placeholder="Enter a message that will be sent to all contacts"
-          sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
-        />
-      </DialogContent>
-      <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-slate-200">
-        <button onClick={onClose} className="px-4 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Cancel</button>
-        <button onClick={onConfirm} className="px-4 py-1.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm">Send</button>
+        <div className="px-5 py-4 space-y-3">
+          <p className="text-sm font-medium text-foreground">This message will be sent to:</p>
+          <div className="max-h-36 overflow-y-auto rounded-md border border-border bg-muted/30 p-3 space-y-0.5">
+            {contactEmails.map((email, i) => (
+              <p key={i} className="text-sm text-muted-foreground">• {email}</p>
+            ))}
+          </div>
+          <div className="space-y-1.5">
+            <Label>Personal Message</Label>
+            <textarea
+              autoFocus rows={3} value={message} onChange={onMessageChange}
+              placeholder="Enter a message that will be sent to all contacts"
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring resize-none"
+            />
+          </div>
+        </div>
+        <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-border/40">
+          <Button variant="ghost" size="sm" onClick={onClose}>Cancel</Button>
+          <Button size="sm" onClick={onConfirm}>Send</Button>
+        </div>
       </div>
-    </Dialog>
+    </div>
   );
 };
 
@@ -316,20 +315,23 @@ const handleCancelPersonalization = () => {
   
   const options = useMemo(() => countryList().getData(), []);
 
+  const selectCls = "h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-ring";
+
   return (
-    <div className="space-y-5">
-      {/* Header & existing contacts selector */}
-      <div>
-        <h3 className="text-sm font-semibold text-slate-900 mb-3">Contact Form</h3>
-        <button
-          type="button"
-          onClick={() => setDialogOpen(true)}
-          className="inline-flex items-center gap-1.5 px-4 py-1.5 text-sm font-medium text-indigo-600 bg-white border border-indigo-200 rounded-lg hover:bg-indigo-50 transition-colors"
-        >
-          <AddCircle fontSize="small" />
-          Select Existing Contacts
-        </button>
-      </div>
+    <div className="flex flex-col h-full">
+      {/* Section header */}
+      <SheetHeader className="px-0 pb-4 border-b border-border/40 space-y-0.5">
+        <div className="flex items-center justify-between">
+          <SheetTitle className="text-sm font-semibold">Contacts</SheetTitle>
+          <Button variant="outline" size="sm" type="button" onClick={() => setDialogOpen(true)} className="gap-1.5">
+            <UserPlus className="h-3.5 w-3.5" />
+            Link Existing
+          </Button>
+        </div>
+        <SheetDescription className="text-xs">Add new contacts or link existing ones to this account.</SheetDescription>
+      </SheetHeader>
+
+      <div className="flex-1 overflow-y-auto pt-4 space-y-5">
 
       <ContactSelectionDialog
         open={dialogOpen}
@@ -343,161 +345,180 @@ const handleCancelPersonalization = () => {
         isEditing={isEditing}
       />
 
-      {/* Add new contacts */}
-      <h3 className="text-sm font-semibold text-slate-900">Add New Contacts</h3>
-      {showContactForm && (
-        <div className="space-y-4">
-          {contacts.map((contact, contactIndex) => (
-            <div key={contactIndex} className="border border-slate-200 rounded-xl p-4 bg-slate-50/50 space-y-3">
+      {/* New contact forms */}
+      <div className="space-y-3">
+        <SheetHeader className="px-0 py-0 space-y-0.5">
+          <SheetTitle className="text-sm font-semibold">New Contacts</SheetTitle>
+          <SheetDescription className="text-xs">Fill in details for any new contacts to create.</SheetDescription>
+        </SheetHeader>
+        {showContactForm && contacts.map((contact, contactIndex) => (
+          <div key={contactIndex} className="rounded-lg border border-border bg-muted/10 p-4 space-y-3">
+            <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-slate-700">Contact #{contactIndex + 1}</span>
+                <SheetTitle className="text-sm font-semibold">Contact #{contactIndex + 1}</SheetTitle>
                 {newFormContacts.includes(contactIndex) && (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-indigo-50 text-indigo-700 border border-indigo-200">New</span>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-primary/10 text-primary border border-primary/20">New</span>
                 )}
               </div>
-
-              {/* Name fields */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <TextField fullWidth size="small" label="First Name" name="firstName" value={contact.firstName || ""}
-                  onChange={(e) => handleChange(contactIndex, e)} error={!!contactErrors[contactIndex]?.firstName}
-                  helperText={contactErrors[contactIndex]?.firstName} required
-                  sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
-                />
-                <TextField fullWidth size="small" label="Middle Name" name="middleName" value={contact.middleName || ""}
-                  onChange={(e) => handleChange(contactIndex, e)}
-                  sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
-                />
-                <TextField fullWidth size="small" label="Last Name" name="lastName" value={contact.lastName || ""}
-                  onChange={(e) => handleChange(contactIndex, e)} error={!!contactErrors[contactIndex]?.lastName}
-                  helperText={contactErrors[contactIndex]?.lastName} required
-                  sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
-                />
-              </div>
-
-              <TextField fullWidth size="small" label="Contact Name" value={contact.contactName || ""} disabled
-                sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
-              />
-              <TextField fullWidth size="small" label="Company Name" name="companyName" value={contact.companyName || ""}
-                onChange={(e) => handleChange(contactIndex, e)}
-                sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
-              />
-              <TextField fullWidth size="small" label="Note" name="note" multiline value={contact.note || ""}
-                onChange={(e) => handleChange(contactIndex, e)}
-                sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
-              />
-              <TextField fullWidth size="small" label="SSN" name="ssn" value={contact.ssn || ""}
-                onChange={(e) => handleSSNChange(contactIndex, e)}
-                inputProps={{ maxLength: 11, inputMode: "numeric", pattern: "[0-9]*" }}
-                helperText={contact.ssnError ? contact.ssnError : "Format: 123-45-6789"}
-                error={!!contact.ssnError}
-                sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
-              />
-              <TextField fullWidth size="small" label="Email" name="email" value={contact.email || ""}
-                onChange={(e) => handleChange(contactIndex, e)} error={!!contactErrors[contactIndex]?.email}
-                helperText={contactErrors[contactIndex]?.email} required
-                sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
-              />
-
-              {/* Permissions */}
-              <div className="flex items-center gap-4 mt-1">
-                <FormControlLabel control={<Checkbox size="small" checked={contact.login || false} disabled onChange={(e) => dispatch(updateContactField({ index: contactIndex, field: "login", value: e.target.checked }))} sx={{ padding: '2px' }} />} label={<span className="text-xs text-slate-600">Login</span>} />
-                <FormControlLabel control={<Checkbox size="small" checked={contact.notify || false} disabled onChange={(e) => dispatch(updateContactField({ index: contactIndex, field: "notify", value: e.target.checked }))} sx={{ padding: '2px' }} />} label={<span className="text-xs text-slate-600">Notify</span>} />
-                <FormControlLabel control={<Checkbox size="small" checked={contact.emailSync || false} disabled onChange={(e) => dispatch(updateContactField({ index: contactIndex, field: "emailSync", value: e.target.checked }))} sx={{ padding: '2px' }} />} label={<span className="text-xs text-slate-600">Email Sync</span>} />
-              </div>
-
-              {/* Tags */}
-              <Autocomplete
-                multiple options={tags} getOptionLabel={(option) => option.label}
-                value={contact.tags || []}
-                onChange={(e, newValue) => dispatch(setContactTags({ index: contactIndex, tags: newValue }))}
-                filterSelectedOptions
-                renderTags={(selected, getTagProps) =>
-                  selected.map((option, index) => (
-                    <span {...getTagProps({ index })} key={option.value} className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium text-white mr-1 mb-1" style={{ backgroundColor: option.colour }}>
-                      {option.label}
-                    </span>
-                  ))
-                }
-                renderOption={(props, option) => (
-                  <li {...props}>
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium text-white" style={{ backgroundColor: option.colour }}>{option.label}</span>
-                  </li>
-                )}
-                renderInput={(params) => (
-                  <TextField {...params} label="Select Tags" size="small" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }} />
-                )}
-              />
-
-              {/* Phone Numbers */}
-              <div>
-                <p className="text-xs font-semibold text-slate-700 mb-2">Phone Numbers</p>
-                {contact.phoneNumbers && contact.phoneNumbers.map((phone, phoneIndex) => (
-                  <div key={phoneIndex} className="flex items-center gap-2 mb-2">
-                    <div className="flex-1">
-                      <PhoneInput country={"us"} value={phone}
-                        onChange={(value) => dispatch(updatePhoneNumber({ contactIndex, phoneIndex, value }))}
-                        inputStyle={{ width: "100%", borderRadius: "8px" }}
-                      />
-                    </div>
-                    <button type="button" onClick={() => dispatch(removePhoneNumber({ contactIndex, phoneIndex }))}
-                      disabled={contact.phoneNumbers.length === 1}
-                      className="p-1.5 rounded-md text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-30">
-                      <RemoveCircle fontSize="small" />
-                    </button>
-                    {phoneIndex === contact.phoneNumbers.length - 1 && (
-                      <button type="button" onClick={() => dispatch(addPhoneNumber(contactIndex))}
-                        className="p-1.5 rounded-md text-indigo-500 hover:text-indigo-700 hover:bg-indigo-50 transition-colors">
-                        <AddCircle fontSize="small" />
-                      </button>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              {/* Address */}
-              <div className="space-y-3">
-                <p className="text-xs font-semibold text-slate-700">Address</p>
-                <Autocomplete options={options} getOptionLabel={(option) => option.label}
-                  value={contact.country || null} size="small"
-                  onChange={(e, newValue) => dispatch(setContactCountry({ index: contactIndex, country: newValue }))}
-                  renderInput={(params) => (<TextField {...params} label="Select Country" size="small" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }} />)}
-                />
-                <TextField fullWidth size="small" label="Street Address" name="streetAdd" value={contact.streetAdd || ""} onChange={(e) => handleChange(contactIndex, e)} sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }} />
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <TextField fullWidth size="small" label="City" name="city" value={contact.city || ""} onChange={(e) => handleChange(contactIndex, e)} sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }} />
-                  <TextField fullWidth size="small" label="State" name="state" value={contact.state || ""} onChange={(e) => handleChange(contactIndex, e)} sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }} />
-                  <TextField fullWidth size="small" label="Zip Code" name="zipCode" value={contact.zipCode || ""} onChange={(e) => handleChange(contactIndex, e)} sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }} />
-                </div>
-              </div>
-
               <button type="button" onClick={() => handleRemoveContact(contactIndex)}
-                className="inline-flex items-center gap-1 text-sm font-medium text-red-500 hover:text-red-700 transition-colors mt-2">
-                <RemoveCircle fontSize="small" /> Remove Contact
+                className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors">
+                <Trash2 className="h-3.5 w-3.5" />
               </button>
             </div>
-          ))}
-        </div>
-      )}
 
-      <button type="button" onClick={handleAddContact}
-        className="inline-flex items-center gap-1.5 px-4 py-1.5 text-sm font-medium text-indigo-600 bg-white border border-indigo-200 rounded-lg hover:bg-indigo-50 transition-colors">
-        <AddCircle fontSize="small" /> Add Another Contact
-      </button>
+            {/* Name */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="space-y-1">
+                <Label>First Name <span className="text-destructive">*</span></Label>
+                <Input name="firstName" value={contact.firstName || ""}
+                  placeholder="First Name"
+                  className={contactErrors[contactIndex]?.firstName ? "border-destructive" : ""}
+                  onChange={(e) => handleChange(contactIndex, e)} />
+                {contactErrors[contactIndex]?.firstName && <p className="text-xs text-destructive">{contactErrors[contactIndex].firstName}</p>}
+              </div>
+              <div className="space-y-1">
+                <Label>Middle Name</Label>
+                <Input name="middleName" value={contact.middleName || ""} placeholder="Middle Name" onChange={(e) => handleChange(contactIndex, e)} />
+              </div>
+              <div className="space-y-1">
+                <Label>Last Name <span className="text-destructive">*</span></Label>
+                <Input name="lastName" value={contact.lastName || ""}
+                  placeholder="Last Name"
+                  className={contactErrors[contactIndex]?.lastName ? "border-destructive" : ""}
+                  onChange={(e) => handleChange(contactIndex, e)} />
+                {contactErrors[contactIndex]?.lastName && <p className="text-xs text-destructive">{contactErrors[contactIndex].lastName}</p>}
+              </div>
+            </div>
 
-      <hr className="border-slate-200" />
+            <div className="space-y-1">
+              <Label>Contact Name</Label>
+              <Input value={contact.contactName || ""} disabled className="bg-muted/40 text-muted-foreground" />
+            </div>
+            <div className="space-y-1">
+              <Label>Company Name</Label>
+              <Input name="companyName" value={contact.companyName || ""} placeholder="Company Name" onChange={(e) => handleChange(contactIndex, e)} />
+            </div>
+            <div className="space-y-1">
+              <Label>Note</Label>
+              <textarea name="note" value={contact.note || ""} placeholder="Note" rows={2}
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring resize-none"
+                onChange={(e) => handleChange(contactIndex, e)} />
+            </div>
+            <div className="space-y-1">
+              <Label>SSN</Label>
+              <Input name="ssn" value={contact.ssn || ""} placeholder="123-45-6789" maxLength={11} inputMode="numeric"
+                className={contact.ssnError ? "border-destructive" : ""}
+                onChange={(e) => handleSSNChange(contactIndex, e)} />
+              {contact.ssnError
+                ? <p className="text-xs text-destructive">{contact.ssnError}</p>
+                : <p className="text-xs text-muted-foreground">Format: 123-45-6789</p>}
+            </div>
+            <div className="space-y-1">
+              <Label>Email <span className="text-destructive">*</span></Label>
+              <Input name="email" value={contact.email || ""} placeholder="Email" type="email"
+                className={contactErrors[contactIndex]?.email ? "border-destructive" : ""}
+                onChange={(e) => handleChange(contactIndex, e)} />
+              {contactErrors[contactIndex]?.email && <p className="text-xs text-destructive">{contactErrors[contactIndex].email}</p>}
+            </div>
 
-      {/* Actions */}
-      <div className="flex items-center justify-between pt-2">
-        <button type="button" onClick={onBack}
-          className="px-5 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
-          <svg className="w-4 h-4 mr-1.5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-          Back
-        </button>
-        <button type="button" onClick={handleSubmitWithPersonalization} disabled={isSubmitting}
-          className="px-5 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
-          {isSubmitting ? "Submitting..." : "Submit"}
-        </button>
+            {/* Permissions */}
+            <div className="flex items-center gap-5">
+              {[{field:"login",label:"Login"},{field:"notify",label:"Notify"},{field:"emailSync",label:"Email Sync"}].map(({field,label}) => (
+                <label key={field} className="flex items-center gap-1.5 cursor-not-allowed opacity-60">
+                  <input type="checkbox" checked={contact[field] || false} disabled
+                    onChange={(e) => dispatch(updateContactField({ index: contactIndex, field, value: e.target.checked }))}
+                    className="h-3.5 w-3.5 rounded accent-primary" />
+                  <span className="text-xs text-foreground">{label}</span>
+                </label>
+              ))}
+            </div>
+
+            {/* Tags */}
+            <div className="space-y-1">
+              <Label>Tags</Label>
+              <TagsMultiSelectDropDown
+                options={tags}
+                value={contact.tags || []}
+                onChange={(newValue) => dispatch(setContactTags({ index: contactIndex, tags: newValue }))}
+                placeholder="Select tags"
+              />
+            </div>
+
+            {/* Phone Numbers */}
+            <div className="space-y-2">
+              <SheetHeader className="px-0 py-0 space-y-0">
+                <SheetTitle className="text-xs font-semibold">Phone Numbers</SheetTitle>
+              </SheetHeader>
+              {contact.phoneNumbers && contact.phoneNumbers.map((phone, phoneIndex) => (
+                <div key={phoneIndex} className="flex items-center gap-2">
+                  <div className="flex-1">
+                    <PhoneInput country="us" value={phone}
+                      onChange={(value) => dispatch(updatePhoneNumber({ contactIndex, phoneIndex, value }))}
+                      inputStyle={{ width: "100%", height: "36px", fontSize: "14px" }}
+                      buttonStyle={{ borderTopLeftRadius: "6px", borderBottomLeftRadius: "6px" }}
+                    />
+                  </div>
+                  <button type="button" onClick={() => dispatch(removePhoneNumber({ contactIndex, phoneIndex }))}
+                    disabled={contact.phoneNumbers.length === 1}
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-30">
+                    <Minus className="h-3.5 w-3.5" />
+                  </button>
+                  {phoneIndex === contact.phoneNumbers.length - 1 && (
+                    <button type="button" onClick={() => dispatch(addPhoneNumber(contactIndex))}
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">
+                      <Plus className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Address */}
+            <div className="space-y-2">
+              <SheetHeader className="px-0 py-0 space-y-0">
+                <SheetTitle className="text-xs font-semibold">Address</SheetTitle>
+              </SheetHeader>
+              <div className="space-y-1">
+                <Label>Country</Label>
+                <select
+                  value={contact.country?.value || ""}
+                  onChange={(e) => dispatch(setContactCountry({ index: contactIndex, country: options.find(o => o.value === e.target.value) || null }))}
+                  className={selectCls}>
+                  <option value="">Select Country</option>
+                  {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                </select>
+              </div>
+              <div className="space-y-1">
+                <Label>Street Address</Label>
+                <Input name="streetAdd" value={contact.streetAdd || ""} placeholder="Street address" onChange={(e) => handleChange(contactIndex, e)} />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="space-y-1"><Label>City</Label><Input name="city" value={contact.city || ""} placeholder="City" onChange={(e) => handleChange(contactIndex, e)} /></div>
+                <div className="space-y-1"><Label>State</Label><Input name="state" value={contact.state || ""} placeholder="State" onChange={(e) => handleChange(contactIndex, e)} /></div>
+                <div className="space-y-1"><Label>ZIP Code</Label><Input name="zipCode" value={contact.zipCode || ""} placeholder="ZIP Code" onChange={(e) => handleChange(contactIndex, e)} /></div>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
+
+        <Button variant="outline" size="sm" type="button" onClick={handleAddContact} className="gap-1.5">
+          <Plus className="h-3.5 w-3.5" /> Add Contact
+        </Button>
+      </div>
+
+      {/* Footer actions */}
+      <SheetFooter className="border-t border-border/40 pt-3 pb-1">
+        <div className="flex items-center justify-between w-full">
+          <Button variant="ghost" size="sm" type="button" onClick={onBack} className="gap-1.5">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+            Back
+          </Button>
+          <Button size="sm" type="button" onClick={handleSubmitWithPersonalization} disabled={isSubmitting}>
+            {isSubmitting ? "Submitting…" : "Submit"}
+          </Button>
+        </div>
+      </SheetFooter>
 
       <PersonalizationDialog
         open={personalizationDialogOpen}

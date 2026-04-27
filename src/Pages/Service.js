@@ -1,14 +1,17 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { X, Plus, MoreVertical, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { X, Plus, ArrowLeft, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useNavigate } from "react-router-dom";
+import { Button } from '../components/ui/button';
+import { Badge } from '../components/ui/badge';
+import { DataTable } from '../components/data-table/data-table';
+import { DataTableToolbar } from '../components/data-table/toolbar';
 
 const Service = () => {
 
     const SERVICE_API = process.env.REACT_APP_SERVICES_URL;
     const CATEGORY_API = process.env.REACT_APP_CATEGORY_URL;
     const navigate = useNavigate();
-    const menuRef = useRef(null);
     const [isNewDrawerOpen, setIsNewDrawerOpen] = useState(false);
     const [servicename, setservicename] = useState("");
     const [discription, setdiscription] = useState("");
@@ -193,73 +196,22 @@ const Service = () => {
           setLoading(false); // Stop loader
         }
       };
-      // Pagination state
-const [page, setPage] = useState(0);
-const [rowsPerPage, setRowsPerPage] = useState(30);
-
-// Handle page change
-const handleChangePage = (event, newPage) => {
-  setPage(newPage);
-};
-
-// Handle rows per page change
-const handleChangeRowsPerPage = (event) => {
-  setRowsPerPage(parseInt(event.target.value, 10));
-  setPage(0); // Reset to first page
-};
-      // Get paginated data
-const paginatedServices = ServiceTemplates.slice(
-  page * rowsPerPage,
-  page * rowsPerPage + rowsPerPage
-);
-      const [tempIdget, setTempIdGet] = useState("");
-      const [openMenuId, setOpenMenuId] = useState(null);
-        const toggleMenu = (event, _id) => {
-    setOpenMenuId(openMenuId === _id ? null : _id);
-    setTempIdGet(_id);
-  };
-    const handleMenuClose = () => {
-    setOpenMenuId(null);
-    setTempIdGet(null);
-  };
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
-        handleMenuClose();
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-      const handleEdit = (_id) => {
-
+            const handleEdit = (_id) => {
         navigate("/servicesUpdate/" + _id);
       };
-     
-    const handleDelete = (_id) => {
-        // Show a confirmation prompt
+
+      const handleDelete = (_id) => {
         const isConfirmed = window.confirm("Are you sure you want to delete this service?");
-        
-        // Proceed with deletion if confirmed
         if (isConfirmed) {
-          const requestOptions = {
-            method: "DELETE",
-            redirect: "follow",
-          };
-          const url = `${SERVICE_API}/workflow/services/servicetemplate/`;
-          fetch(url + _id, requestOptions)
+          const requestOptions = { method: "DELETE", redirect: "follow" };
+          fetch(`${SERVICE_API}/workflow/services/servicetemplate/` + _id, requestOptions)
             .then((response) => {
-              if (!response.ok) {
-                throw new Error("Failed to delete item");
-              }
+              if (!response.ok) throw new Error("Failed to delete item");
               return response.json();
             })
-            .then((result) => {
-              console.log(result);
+            .then(() => {
               toast.success("Item deleted successfully");
-              handleMenuClose()
-              fetchServicesData(); // Refresh data
+              fetchServicesData();
             })
             .catch((error) => {
               console.error(error);
@@ -267,111 +219,97 @@ const paginatedServices = ServiceTemplates.slice(
             });
         }
       };
-      
-    
-    const totalPages = Math.ceil(ServiceTemplates.length / rowsPerPage);
+
+      const [globalFilter, setGlobalFilter] = useState("");
+
+      const serviceColumns = useMemo(() => [
+        {
+          accessorKey: "serviceName",
+          header: "Name",
+          cell: ({ getValue, row }) => (
+            <button
+              onClick={() => handleEdit(row.original._id)}
+              className="text-sm font-medium text-primary hover:text-primary/80 hover:underline transition-colors text-left"
+            >
+              {getValue()}
+            </button>
+          ),
+        },
+        {
+          accessorKey: "description",
+          header: "Description",
+          cell: ({ getValue }) => (
+            <span className="text-sm text-muted-foreground max-w-[200px] truncate block">{getValue()}</span>
+          ),
+        },
+        {
+          accessorKey: "rate",
+          header: "Rate",
+          cell: ({ getValue }) => (
+            <span className="text-sm font-medium text-foreground">{getValue()}</span>
+          ),
+        },
+        {
+          accessorKey: "ratetype",
+          header: "Rate Type",
+          cell: ({ getValue }) => {
+            const val = getValue();
+            return val ? <Badge variant="secondary">{val}</Badge> : null;
+          },
+        },
+        {
+          accessorKey: "category",
+          header: "Category",
+          cell: ({ getValue }) => (
+            <span className="text-sm text-muted-foreground">{getValue()?.categoryName || ""}</span>
+          ),
+        },
+        {
+          id: "actions",
+          header: "Actions",
+          size: 80,
+          enableSorting: false,
+          cell: ({ row }) => (
+            <div className="flex items-center gap-0.5">
+              <button
+                onClick={() => handleEdit(row.original._id)}
+                className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-foreground hover:bg-muted"
+                title="Edit"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </button>
+              <button
+                onClick={() => handleDelete(row.original._id)}
+                className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-destructive hover:bg-destructive/10"
+                title="Delete"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          ),
+        },
+      ], []);
 
     return (
-        <div className="space-y-6">
-            {/* Header */}
+        <div className="space-y-3">
             <div className="flex items-center justify-between">
-                <h1 className="text-xl font-semibold text-slate-900">Services</h1>
-                <button
-                    onClick={() => setIsNewDrawerOpen(true)}
-                    className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 hover:shadow-md active:scale-[0.98]"
-                >
-                    <Plus className="h-4 w-4" />
-                    Create Service
-                </button>
+                <Button size="sm" onClick={() => setIsNewDrawerOpen(true)}>
+                    <Plus className="h-3.5 w-3.5 mr-1.5" /> Create Service
+                </Button>
             </div>
-
-            {/* Table */}
-            <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-                {loading ? (
-                    <div className="flex items-center justify-center py-20 gap-3">
-                        <div className="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
-                        <span className="text-sm text-slate-500">Loading services...</span>
-                    </div>
-                ) : (
-                    <>
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left">
-                                <thead>
-                                    <tr className="border-b border-slate-100 bg-slate-50/80">
-                                        <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Name</th>
-                                        <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Description</th>
-                                        <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Rate</th>
-                                        <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Rate Type</th>
-                                        <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Category</th>
-                                        <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500 text-right w-20"></th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100">
-                                    {paginatedServices.map((row, idx) => (
-                                        <tr key={row._id} className={`transition-colors hover:bg-indigo-50/40 ${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'}`}>
-                                            <td className="px-5 py-3.5">
-                                                <button onClick={() => handleEdit(row._id)} className="text-sm font-medium text-indigo-600 hover:text-indigo-800 hover:underline transition-colors">
-                                                    {row.serviceName}
-                                                </button>
-                                            </td>
-                                            <td className="px-5 py-3.5 text-sm text-slate-600 max-w-[200px] truncate">{row.description}</td>
-                                            <td className="px-5 py-3.5 text-sm text-slate-700 font-medium">{row.rate}</td>
-                                            <td className="px-5 py-3.5">
-                                                <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700">{row.ratetype}</span>
-                                            </td>
-                                            <td className="px-5 py-3.5 text-sm text-slate-600">{row.category?.categoryName || ""}</td>
-                                            <td className="px-5 py-3.5 text-right">
-                                                <div className="relative inline-block" ref={openMenuId === row._id ? menuRef : null}>
-                                                    <button
-                                                        onClick={(e) => toggleMenu(e, row._id)}
-                                                        className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
-                                                    >
-                                                        <MoreVertical className="h-4 w-4" />
-                                                    </button>
-                                                    {openMenuId === row._id && (
-                                                        <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-slate-200 bg-white py-1 shadow-lg animate-in fade-in slide-in-from-top-1">
-                                                            <button onClick={() => { handleEdit(row._id); handleMenuClose(); }} className="flex w-full items-center px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">Edit</button>
-                                                            <button onClick={() => { handleDelete(row._id); handleMenuClose(); }} className="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">Delete</button>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {ServiceTemplates.length === 0 && (
-                                        <tr>
-                                            <td colSpan={6} className="px-5 py-12 text-center text-sm text-slate-400">No services found.</td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-
-                        {/* Pagination */}
-                        <div className="flex items-center justify-between border-t border-slate-100 px-5 py-3">
-                            <div className="flex items-center gap-2 text-sm text-slate-500">
-                                <span>Rows per page:</span>
-                                <select
-                                    value={rowsPerPage}
-                                    onChange={handleChangeRowsPerPage}
-                                    className="rounded-md border border-slate-200 bg-white px-2 py-1 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                                >
-                                    {[30, 40, 50, 60, 100].map(n => <option key={n} value={n}>{n}</option>)}
-                                </select>
-                                <span className="ml-2">{page * rowsPerPage + 1}–{Math.min((page + 1) * rowsPerPage, ServiceTemplates.length)} of {ServiceTemplates.length}</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                                <button onClick={(e) => handleChangePage(e, page - 1)} disabled={page === 0} className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed">
-                                    <ChevronLeft className="h-4 w-4" />
-                                </button>
-                                <button onClick={(e) => handleChangePage(e, page + 1)} disabled={page >= totalPages - 1} className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed">
-                                    <ChevronRight className="h-4 w-4" />
-                                </button>
-                            </div>
-                        </div>
-                    </>
-                )}
-            </div>
+            <DataTableToolbar globalFilter={globalFilter} onGlobalFilterChange={setGlobalFilter} />
+            <DataTable
+                columns={serviceColumns}
+                data={ServiceTemplates}
+                loading={loading}
+                globalFilter={globalFilter}
+                onGlobalFilterChange={setGlobalFilter}
+                enableRowSelection={false}
+                getRowId={(row) => row._id}
+                emptyMessage="No services found"
+                emptyDescription="Create your first service to get started"
+                pageSize={30}
+            />
 
             {/* Create Service Drawer */}
             {isNewDrawerOpen && (

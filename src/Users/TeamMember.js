@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { LoginContext } from "../Sidebar/Context/Context";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { Button } from "../components/ui/button";
 
 const TeamMember = () => {
   const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
@@ -615,14 +616,14 @@ const TeamMember = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         {/* Tabs */}
-        <div className="inline-flex items-center rounded-lg bg-slate-100 p-1">
+        <div className="inline-flex items-center rounded-lg bg-muted p-1">
           <NavLink
             to="/firmtemp/teammember/activemember"
             className={({ isActive }) =>
               `rounded-md px-4 py-2 text-sm font-medium transition-all ${
                 isActive
-                  ? "bg-white text-indigo-600 shadow-sm font-semibold"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "bg-background text-primary shadow-sm font-semibold"
+                  : "text-muted-foreground hover:text-foreground"
               }`
             }
           >
@@ -633,8 +634,8 @@ const TeamMember = () => {
             className={({ isActive }) =>
               `rounded-md px-4 py-2 text-sm font-medium transition-all ${
                 isActive
-                  ? "bg-white text-indigo-600 shadow-sm font-semibold"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "bg-background text-primary shadow-sm font-semibold"
+                  : "text-muted-foreground hover:text-foreground"
               }`
             }
           >
@@ -642,13 +643,10 @@ const TeamMember = () => {
           </NavLink>
         </div>
 
-        <button
-          onClick={() => setIsNewDrawerOpen(true)}
-          className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 hover:shadow-md active:scale-[0.98]"
-        >
-          <UserPlus className="h-4 w-4" />
-          Team Member
-        </button>
+        <Button size="sm" onClick={() => setIsNewDrawerOpen(true)}>
+          <UserPlus className="h-4 w-4 mr-1.5" />
+          Add Team Member
+        </Button>
       </div>
 
       {/* Outlet */}

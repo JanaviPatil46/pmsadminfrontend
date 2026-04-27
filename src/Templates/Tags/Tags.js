@@ -5,9 +5,10 @@ import { LoginContext } from "../../Sidebar/Context/Context";
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
-import { Badge } from '../../components/ui/badge';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from '../../components/ui/sheet';
-import { MoreVertical, Pencil, Trash2, Loader2, ChevronLeft, ChevronRight, Plus, Search, Settings, X, Tag, AlertCircle } from 'lucide-react';
+import { Pencil, Trash2, Loader2, Plus, X, Tag, AlertCircle } from 'lucide-react';
+import { DataTable } from '../../components/data-table/data-table';
+import { DataTableToolbar } from '../../components/data-table/toolbar';
 const Tags = () => {
 
  const { logindata } = useContext(LoginContext);
@@ -20,9 +21,7 @@ const Tags = () => {
   const [inputValue, setInputValue] = useState("");
   const [selectedOption, setSelectedOption] = useState(null);
   const [options, setOptions] = useState([]);
-  const [tagidget, setTagidGet] = useState("");
   const [getId, setGetId] = useState("");
-  const [openMenuId, setOpenMenuId] = useState(null);
   const [tagid, settagidData] = useState();
 
   // const colors = ["#EE4B2B", "#FFAC1C", "#32CD32", "#008000", "#0000FF", "#BF40BF", "#F72798"];
@@ -102,7 +101,6 @@ const Tags = () => {
 
   const handleEdit = async (_id) => {
     setGetId(_id);
-    setOpenMenuId(false);
     const response = await fetch(`${TAGS_API}/tags/` + _id);
     if (!response.ok) {
       throw new Error('Failed to fetch tag data');
@@ -156,61 +154,25 @@ const Tags = () => {
   }
     return isValid;
   }
-  console.log(tagidget);
   const handleDelete = (_id) => {
-    console.log("hgh",_id)
-    // Show a confirmation prompt
     const isConfirmed = window.confirm("Are you sure you want to delete this tag?");
-
-    // Proceed with deletion if confirmed
     if (isConfirmed) {
       setGetId(_id);
-      setOpenMenuId(false);
-      const requestOptions = {
-        method: "DELETE",
-        redirect: "follow"
-      };
-      fetch(`${TAGS_API}/tags/` + _id, requestOptions)
+      fetch(`${TAGS_API}/tags/` + _id, { method: "DELETE", redirect: "follow" })
         .then((response) => {
-          if (!response.ok) {
-            throw new Error('Failed to delete tagdata');
-          }
+          if (!response.ok) throw new Error('Failed to delete tagdata');
           return response.json();
         })
-        .then((result) => {
-          console.log(result);
-          toast.success('Tagdata deleted successfully');
-          handleMenuClose()
+        .then(() => {
+          toast.success('Tag deleted successfully');
           fetchData();
-          setOpenMenuId(false);
         })
         .catch((error) => {
           console.error(error);
-          toast.error('Failed to delete tagdata');
+          toast.error('Failed to delete tag');
         });
     }
   };
-  const [tempIdget, setTempIdGet] = useState("");
-   const toggleMenu = (event, _id) => {
-    setAnchorEl(event.currentTarget);
-    setOpenMenuId(_id);
-    setTempIdGet(_id);
-  };
-    const handleMenuClose = () => {
-    setAnchorEl(null);
-    setOpenMenuId(null);
-    setTempIdGet(null);
-  };
-  const [anchorEl, setAnchorEl] = useState(null);
-    const open = Boolean(anchorEl);
-  
-    const handleClick = (event) => {
-      setAnchorEl(event.currentTarget);
-    };
-  
-    const handleClose = () => {
-      setAnchorEl(null);
-    };
     
   // useEffect(() => {
   //   const handleClickOutside = (event) => {
@@ -318,7 +280,6 @@ const Tags = () => {
         toast.success('Tag Updated successfully');
         fetchData();
         handleClear();
-        setOpenMenuId(false);
         handleUpdateDrawerClose();
       })
       .catch((error) => {
@@ -331,168 +292,92 @@ const Tags = () => {
   };
 
 
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(30); // Default rows per page
+  const [globalFilter, setGlobalFilter] = useState("");
 
-  const handleChangePage = (event, newPage) => setPage(newPage);
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-  const [searchTerm, setSearchTerm] = useState(""); // New state for search
+  const tagColumns = useMemo(() => [
+    {
+      accessorKey: "tagName",
+      header: "Tag",
+      cell: ({ getValue, row }) => (
+        <span
+          className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-semibold text-white shadow-sm"
+          style={{ backgroundColor: row.original.tagColour }}
+        >
+          {getValue()}
+        </span>
+      ),
+    },
+    {
+      accessorKey: "count",
+      header: "Accounts",
+      cell: ({ getValue }) => <span className="text-sm text-muted-foreground">{getValue()}</span>,
+    },
+    {
+      accessorKey: "archivedAccounts",
+      header: "Archived",
+      cell: ({ getValue }) => <span className="text-sm text-muted-foreground">{getValue()}</span>,
+    },
+    {
+      accessorKey: "pendingTasks",
+      header: "Pending Tasks",
+      cell: ({ getValue }) => <span className="text-sm text-muted-foreground">{getValue()}</span>,
+    },
+    {
+      accessorKey: "completedTasks",
+      header: "Completed Tasks",
+      cell: ({ getValue }) => <span className="text-sm text-muted-foreground">{getValue()}</span>,
+    },
+    {
+      accessorKey: "pipelines",
+      header: "Pipelines",
+      cell: ({ getValue }) => <span className="text-sm text-muted-foreground">{getValue()}</span>,
+    },
+    {
+      id: "actions",
+      header: "Actions",
+      size: 80,
+      enableSorting: false,
+      cell: ({ row }) => (
+        <div className="flex items-center gap-0.5">
+          <button
+            onClick={() => { handleEdit(row.original._id); handleUpdateDrawerOpen(); }}
+            className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-foreground hover:bg-muted"
+            title="Edit"
+          >
+            <Pencil className="h-3.5 w-3.5" />
+          </button>
+          <button
+            onClick={() => handleDelete(row.original._id)}
+            className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-destructive hover:bg-destructive/10"
+            title="Delete"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      ),
+    },
+  ], []);
 
-  // Handle search input change
-  const handleSearchChange = (event) => {
-    setSearchTerm(event.target.value);
-    setPage(0); // Reset pagination on search
-  };
-   // Filter tags based on search term
-   const filteredTags = tags.filter((tag) =>
-    tag.tagName.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  // Slice data for pagination after filtering
-  const paginatedTags = filteredTags.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
- // Slice data for pagination
-//  const paginatedTags = tags.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
   return (
-    <div className="space-y-4">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <h2 className="text-lg font-semibold text-slate-800">Tags</h2>
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <div className="relative flex-1 sm:flex-initial">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <Input
-              placeholder="Search tags..."
-              value={searchTerm}
-              onChange={handleSearchChange}
-              className="pl-9 w-full sm:w-64"
-            />
-          </div>
-          <Button onClick={handleDrawerOpen}>
-            <Plus className="mr-2 h-4 w-4" /> Add Tag
-          </Button>
-        </div>
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <Button size="sm" onClick={handleDrawerOpen}>
+          <Plus className="h-3.5 w-3.5 mr-1.5" /> Add Tag
+        </Button>
       </div>
-
-      {/* Table */}
-      {loading ? (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
-        </div>
-      ) : (
-        <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="border-b border-slate-100 bg-slate-50/60">
-                  <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Tag</th>
-                  <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Accounts</th>
-                  <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 hidden md:table-cell">Archived</th>
-                  <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 hidden lg:table-cell">Pending Tasks</th>
-                  <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 hidden lg:table-cell">Completed Tasks</th>
-                  <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 hidden xl:table-cell">Pipelines</th>
-                  <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 w-20 text-right">
-                    <Settings className="h-4 w-4 ml-auto text-slate-400" />
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {paginatedTags.length === 0 ? (
-                  <tr>
-                    <td colSpan={7} className="px-5 py-10 text-center text-sm text-slate-400">No tags found.</td>
-                  </tr>
-                ) : (
-                  paginatedTags.map((row) => (
-                    <tr key={row._id} className="group transition-colors hover:bg-slate-50/70">
-                      <td className="px-5 py-3">
-                        <span
-                          className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-semibold text-white shadow-sm"
-                          style={{ backgroundColor: row.tagColour }}
-                        >
-                          {row.tagName}
-                        </span>
-                      </td>
-                      <td className="px-5 py-3 text-sm text-slate-600">{row.count}</td>
-                      <td className="px-5 py-3 text-sm text-slate-600 hidden md:table-cell">{row.archivedAccounts}</td>
-                      <td className="px-5 py-3 text-sm text-slate-600 hidden lg:table-cell">{row.pendingTasks}</td>
-                      <td className="px-5 py-3 text-sm text-slate-600 hidden lg:table-cell">{row.completedTasks}</td>
-                      <td className="px-5 py-3 text-sm text-slate-600 hidden xl:table-cell">{row.pipelines}</td>
-                      <td className="px-5 py-3 text-right">
-                        <div className="relative inline-block">
-                          <button
-                            onClick={(event) => toggleMenu(event, row._id)}
-                            className="inline-flex items-center justify-center rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
-                          >
-                            <MoreVertical className="h-4 w-4" />
-                          </button>
-                          {openMenuId === row._id && (
-                            <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-slate-200 bg-white py-1 shadow-lg animate-in fade-in-0 zoom-in-95">
-                              <button
-                                onClick={() => { handleEdit(tempIdget); handleUpdateDrawerOpen(); handleMenuClose(); }}
-                                className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
-                              >
-                                <Pencil className="h-3.5 w-3.5" /> Edit
-                              </button>
-                              <button
-                                onClick={() => { handleDelete(tempIdget); }}
-                                className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
-                              >
-                                <Trash2 className="h-3.5 w-3.5" /> Delete
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Pagination */}
-          {filteredTags.length > 0 && (
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-100 bg-slate-50/40 px-5 py-3">
-              <p className="text-xs text-slate-500">
-                Showing <span className="font-semibold text-slate-700">{page * rowsPerPage + 1}</span>–<span className="font-semibold text-slate-700">{Math.min((page + 1) * rowsPerPage, filteredTags.length)}</span> of{" "}
-                <span className="font-semibold text-slate-700">{filteredTags.length}</span>
-              </p>
-              <div className="flex items-center gap-2">
-                <select
-                  value={rowsPerPage}
-                  onChange={(e) => handleChangeRowsPerPage({ target: { value: e.target.value } })}
-                  className="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-600 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  {[5, 10, 25, 50].map((opt) => (
-                    <option key={opt} value={opt}>{opt} / page</option>
-                  ))}
-                </select>
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => handleChangePage(null, page - 1)}
-                    disabled={page === 0}
-                    className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 text-slate-500 shadow-sm transition-colors hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </button>
-                  <span className="min-w-[3rem] text-center text-xs font-medium text-slate-600">
-                    {page + 1} / {Math.max(1, Math.ceil(filteredTags.length / rowsPerPage))}
-                  </span>
-                  <button
-                    onClick={() => handleChangePage(null, page + 1)}
-                    disabled={(page + 1) * rowsPerPage >= filteredTags.length}
-                    className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 text-slate-500 shadow-sm transition-colors hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
+      <DataTableToolbar globalFilter={globalFilter} onGlobalFilterChange={setGlobalFilter} />
+      <DataTable
+        columns={tagColumns}
+        data={tags}
+        loading={loading}
+        globalFilter={globalFilter}
+        onGlobalFilterChange={setGlobalFilter}
+        enableRowSelection={false}
+        getRowId={(row) => row._id}
+        emptyMessage="No tags found"
+        emptyDescription="Create your first tag to get started"
+        pageSize={30}
+      />
 
       {/* ===== CREATE TAG SHEET ===== */}
       <Sheet open={isDrawerOpen} onOpenChange={(open) => { if (!open) handleDrawerClose(); }}>

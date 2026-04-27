@@ -1,13 +1,22 @@
 
 
-import React, { useState, useEffect, useMemo,useContext } from "react";
+import React, { useState, useEffect, useMemo, useContext } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setAccountData } from "../redux/accountContactSlice";
-import { Autocomplete, FormLabel, Box, Button, TextField, Typography, FormControl, Radio, FormControlLabel, RadioGroup } from "@mui/material";
 import countryList from "react-select-country-list";
 import MultiSelectDropdown from "../Templates/MultiSelectDropdown";
 import TagsMultiSelectDropDown from "../Templates/TagsMultiSelectDropDown";
 import { LoginContext } from "../Sidebar/Context/Context";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { Button } from "../components/ui/button";
+import { ChevronRight } from "lucide-react";
+import {
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetFooter,
+} from "../components/ui/sheet";
 export default function AccountForm({ onContinue, isEditing = false  }) {
   const dispatch = useDispatch();
   const { accountData } = useSelector((state) => state.accountContact);
@@ -220,96 +229,159 @@ useEffect(() => {
 
   const options = useMemo(() => countryList().getData(), []);
 console.log("country options", options);
-  return (
-    <div className="space-y-6">
-      {/* Client Type section */}
-      <div>
-        <h3 className="text-sm font-semibold text-slate-900 mb-2">Client Type</h3>
-        <FormControl component="fieldset" fullWidth>
-          <RadioGroup
-            row
-            name="clientType"
-            value={accountData.clientType || ""}
-            onChange={handleChange}
-          >
-            <FormControlLabel value="Individual" control={<Radio size="small" />} label={<span className="text-sm text-slate-700">Individual</span>} />
-            <FormControlLabel value="Company" control={<Radio size="small" />} label={<span className="text-sm text-slate-700">Company</span>} />
-          </RadioGroup>
-        </FormControl>
-      </div>
+  const selectCls = "h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring";
 
-      {/* Account Info section */}
-      <div className="space-y-3">
-        <h3 className="text-sm font-semibold text-slate-900">Account Info</h3>
-        <TextField
-          size="small" fullWidth label="Account Name" name="accountName"
-          value={accountData.accountName || ""} onChange={handleChange}
-          error={!!errors.accountName} helperText={errors.accountName} required
-          sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
-        />
+  return (
+    <div className="flex flex-col h-full">
+      {/* Scrollable content */}
+      <div className="flex-1 overflow-y-auto space-y-6 pb-2">
+
+        {/* Client Type */}
+        <div className="space-y-3">
+          <SheetHeader className="px-0 py-0 space-y-0.5">
+            <SheetTitle className="text-sm font-semibold">Client Type</SheetTitle>
+            <SheetDescription className="text-xs">Select whether this is an individual or company account.</SheetDescription>
+          </SheetHeader>
+          <div className="flex items-center gap-6">
+            {["Individual", "Company"].map((type) => (
+              <label key={type} className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio" name="clientType" value={type}
+                  checked={(accountData.clientType || "") === type}
+                  onChange={handleChange}
+                  className="h-4 w-4 accent-primary"
+                />
+                <span className="text-sm text-foreground">{type}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Account Info */}
+        <div className="space-y-3">
+          <SheetHeader className="px-0 py-0 space-y-0.5">
+            <SheetTitle className="text-sm font-semibold">Account Info</SheetTitle>
+            <SheetDescription className="text-xs">Enter the primary account details.</SheetDescription>
+          </SheetHeader>
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <Label>Account Name <span className="text-destructive">*</span></Label>
+              <Input
+                name="accountName"
+                value={accountData.accountName || ""}
+                placeholder="Account Name"
+                className={errors.accountName ? "border-destructive" : ""}
+                onChange={handleChange}
+              />
+              {errors.accountName && <p className="text-xs text-destructive">{errors.accountName}</p>}
+            </div>
+            {accountData.clientType === "Company" && (
+              <div className="space-y-1.5">
+                <Label>Company Name <span className="text-destructive">*</span></Label>
+                <Input
+                  name="companyName"
+                  value={accountData.companyName || ""}
+                  placeholder="Company Name"
+                  className={errors.companyName ? "border-destructive" : ""}
+                  onChange={handleChange}
+                />
+                {errors.companyName && <p className="text-xs text-destructive">{errors.companyName}</p>}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Team, Tags & Folder */}
+        <div className="space-y-3">
+          <SheetHeader className="px-0 py-0 space-y-0.5">
+            <SheetTitle className="text-sm font-semibold">Assignment</SheetTitle>
+            <SheetDescription className="text-xs">Assign team members, tags and a folder template.</SheetDescription>
+          </SheetHeader>
+          <div className="space-y-3">
+            <MultiSelectDropdown
+              value={accountData.teamMembers || []}
+              onChange={(newValue) => dispatch(setAccountData({ teamMembers: newValue }))}
+              options={teamMembers}
+              placeholder="Select Team Members"
+              width="100%"
+            />
+            <TagsMultiSelectDropDown
+              value={accountData.tags || []}
+              onChange={(newValue) => dispatch(setAccountData({ tags: newValue }))}
+              options={tags}
+              placeholder="Select tags"
+            />
+            <div className="space-y-1.5">
+              <Label>Folder Template <span className="text-destructive">*</span></Label>
+              <select
+                value={accountData.folderTemp?.value || ""}
+                onChange={(e) => {
+                  const opt = folderTemp.find(f => f.value === e.target.value) || null;
+                  handleAutocompleteChange("folderTemp", opt);
+                }}
+                className={selectCls}
+              >
+                <option value="">Select Folder Template</option>
+                {folderTemp.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Address (Company only) */}
         {accountData.clientType === "Company" && (
-          <TextField
-            fullWidth size="small" label="Company Name" name="companyName"
-            value={accountData.companyName || ""} onChange={handleChange}
-            error={!!errors.companyName} helperText={errors.companyName} required
-            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
-          />
+          <div className="space-y-3">
+            <SheetHeader className="px-0 py-0 space-y-0.5">
+              <SheetTitle className="text-sm font-semibold">Address</SheetTitle>
+              <SheetDescription className="text-xs">Company billing or mailing address.</SheetDescription>
+            </SheetHeader>
+            <div className="space-y-3">
+              <div className="space-y-1.5">
+                <Label>Country</Label>
+                <select
+                  value={options.find(o => o.label === accountData?.country?.label)?.value || ""}
+                  onChange={(e) => {
+                    const found = options.find(o => o.value === e.target.value) || null;
+                    dispatch(setAccountData({ country: found }));
+                  }}
+                  className={selectCls}
+                >
+                  <option value="">Select Country</option>
+                  {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Street Address</Label>
+                <Input name="streetAddress" value={accountData.streetAddress || ""} placeholder="Street address" onChange={handleChange} />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="space-y-1.5">
+                  <Label>City</Label>
+                  <Input name="city" value={accountData.city || ""} placeholder="City" onChange={handleChange} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>State</Label>
+                  <Input name="state" value={accountData.state || ""} placeholder="State" onChange={handleChange} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>ZIP Code</Label>
+                  <Input name="postalCode" value={accountData.postalCode || ""} placeholder="ZIP Code" onChange={handleChange} />
+                </div>
+              </div>
+            </div>
+          </div>
         )}
       </div>
 
-      {/* Team & Tags */}
-      <div className="space-y-3">
-        <MultiSelectDropdown
-          value={accountData.teamMembers || []}
-          onChange={(newValue) => dispatch(setAccountData({ teamMembers: newValue }))}
-          options={teamMembers}
-          placeholder="Select Team Members"
-          width="100%"
-        />
-        <TagsMultiSelectDropDown
-          value={accountData.tags || []}
-          onChange={(newValue) => dispatch(setAccountData({ tags: newValue }))}
-          options={tags}
-          placeholder="Select tags"
-        />
-        <Autocomplete
-          options={folderTemp}
-          getOptionLabel={(option) => option?.label || ""}
-          value={accountData.folderTemp || null}
-          onChange={(e, newValue) => handleAutocompleteChange('folderTemp', newValue)}
-          renderInput={(params) => (
-            <TextField {...params} label="Select Folder Template" size="small" required sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }} />
-          )}
-        />
-      </div>
-
-      {/* Address section (Company only) */}
-      {accountData.clientType === "Company" && (
-        <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-slate-900">Address</h3>
-          <Autocomplete
-            fullWidth options={options} getOptionLabel={(option) => option.label}
-            value={options.find(opt => opt.label === accountData?.country?.label) || null}
-            onChange={(event, newValue) => dispatch(setAccountData({ country: newValue }))}
-            isOptionEqualToValue={(option, value) => option.label === value?.label}
-            renderInput={(params) => (<TextField {...params} label="Select Country" size="small" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }} />)}
-          />
-          <TextField fullWidth size="small" label="Street Address" name="streetAddress" value={accountData.streetAddress || ""} onChange={handleChange} sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }} />
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <TextField fullWidth size="small" label="City" name="city" value={accountData.city || ""} onChange={handleChange} sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }} />
-            <TextField fullWidth size="small" label="State" name="state" value={accountData.state || ""} onChange={handleChange} sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }} />
-            <TextField fullWidth size="small" label="Zip Code" name="postalCode" value={accountData.postalCode || ""} onChange={handleChange} sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }} />
-          </div>
+      {/* Footer */}
+      <SheetFooter className="border-t border-border/40 pt-3 pb-1">
+        <div className="flex justify-end w-full">
+          <Button size="sm" onClick={onContinue} className="gap-1.5">
+            Continue
+            <ChevronRight className="h-3.5 w-3.5" />
+          </Button>
         </div>
-      )}
-
-      <button
-        className="inline-flex items-center px-5 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm"
-        onClick={onContinue}
-      >
-        Continue
-        <svg className="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-      </button>
+      </SheetFooter>
     </div>
   );
 }

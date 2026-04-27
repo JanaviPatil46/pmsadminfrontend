@@ -166,13 +166,17 @@ export function DataTable({
                       key={header.id}
                       style={isCompact ? { width: colSize, minWidth: colSize } : undefined}
                       className={cn(
-                        "px-3 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground select-none whitespace-nowrap",
+                        "px-3 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground select-none whitespace-nowrap",
+                        header.column.columnDef.meta?.align === "right" ? "text-right" : "text-left",
                         canSort && "group cursor-pointer hover:text-foreground transition-colors"
                       )}
                       onClick={canSort ? header.column.getToggleSortingHandler() : undefined}
                     >
                       {header.isPlaceholder ? null : (
-                        <div className="flex items-center">
+                        <div className={cn(
+                          "flex items-center",
+                          header.column.columnDef.meta?.align === "right" && "justify-end"
+                        )}>
                           {flexRender(header.column.columnDef.header, header.getContext())}
                           {canSort && <SortIcon column={header.column} />}
                         </div>
@@ -209,7 +213,8 @@ export function DataTable({
                         style={isCompact ? { width: colSize, minWidth: colSize } : undefined}
                         className={cn(
                           "px-3 py-2.5 align-middle",
-                          isCompact && "whitespace-nowrap"
+                          isCompact && "whitespace-nowrap",
+                          cell.column.columnDef.meta?.align === "right" && "text-right"
                         )}
                       >
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}

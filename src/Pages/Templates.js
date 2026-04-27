@@ -16,31 +16,41 @@ const NAV_LINKS = [
 
 const Templates = () => {
   return (
-    <div className="min-h-screen bg-slate-50/40">
-      {/* Page header */}
-      <div className="border-b border-slate-100 bg-white px-6 pt-6 pb-0 shadow-sm">
-        <div className="flex items-center gap-3 mb-5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 shadow-sm">
-            <LayoutTemplate className="h-5 w-5 text-white" />
+    <div className="min-h-screen bg-background">
+      {/* ── Sticky header ── */}
+      <header className="sticky top-0 z-20 bg-background border-b border-border/40">
+
+        {/* ── Top bar: title + (future actions slot) ── */}
+        <div className="flex items-center gap-3 px-6 h-14 border-b border-border/40">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary shadow-sm shrink-0">
+            <LayoutTemplate className="h-4 w-4 text-primary-foreground" />
           </div>
-          <div>
-            <h1 className="text-xl font-semibold text-slate-900">Firm Templates</h1>
-            <p className="text-xs text-slate-500">Manage and configure your firm's template library</p>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-base font-semibold text-foreground leading-none">Firm Templates</h1>
+            <p className="text-xs text-muted-foreground mt-0.5 leading-none">
+              Manage and configure your firm's template library
+            </p>
           </div>
         </div>
 
-        {/* Animated nav tabs */}
-        <nav className="flex items-center gap-0.5 overflow-x-auto -mb-px [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {/* ── Tab bar ── */}
+        <nav
+          className="flex items-end gap-0 px-6 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          aria-label="Template sections"
+        >
           {NAV_LINKS.map(({ to, label }) => (
             <NavLink
               key={to}
               to={to}
               className={({ isActive }) =>
                 [
-                  "relative whitespace-nowrap px-3 py-2.5 text-sm font-medium transition-colors duration-150 rounded-t-lg select-none outline-none focus:outline-none",
+                  "relative shrink-0 whitespace-nowrap px-3 py-2.5 text-sm font-medium",
+                  "transition-colors duration-150 select-none outline-none",
+                  "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 rounded-t-sm",
+                  "border-b-2",
                   isActive
-                    ? "text-indigo-600 bg-indigo-50/60 border-b-2 border-indigo-600"
-                    : "text-slate-500 hover:text-slate-800 hover:bg-slate-50 border-b-2 border-transparent",
+                    ? "text-foreground border-primary"
+                    : "text-muted-foreground border-transparent hover:text-foreground hover:border-border",
                 ].join(" ")
               }
             >
@@ -48,12 +58,12 @@ const Templates = () => {
             </NavLink>
           ))}
         </nav>
-      </div>
+      </header>
 
-      {/* Page content */}
-      <div className="p-6">
+      {/* ── Page content ── */}
+      <main className="p-6">
         <Outlet />
-      </div>
+      </main>
     </div>
   );
 };

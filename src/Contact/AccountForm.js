@@ -1,56 +1,23 @@
-import {
-  ListItem,
-  Box,
-  Grid,
-  Menu,
-  IconButton,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Divider,
-  Typography,
-  FormControl,
-  RadioGroup,
-  Radio,
-  Button,
-  Select,
-  Chip,
-  MenuItem,
-  TextField,
-  useMediaQuery,
-  Autocomplete,
-  Switch,
-  FormControlLabel,
-  Alert,
-  Modal,
-  OutlinedInput,
-} from "@mui/material";
-import { useContext } from "react";
-import { RxCross2 } from "react-icons/rx";
-import { useTheme } from "@mui/material/styles";
-import ArrowForwardIosRoundedIcon from "@mui/icons-material/ArrowForwardIosRounded";
-import React, { useState, useEffect } from "react";
-import HelpOutlineRoundedIcon from "@mui/icons-material/HelpOutlineRounded";
-import MoreVertRoundedIcon from "@mui/icons-material/MoreVertRounded";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import axios from "axios";
 import "react-phone-input-2/lib/style.css";
-import { InputLabel } from "@mui/material";
 import PhoneInput from "react-phone-input-2";
-import "./contact.css";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { AiOutlinePlusCircle, AiOutlineDelete } from "react-icons/ai";
-import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import TagsMultiSelectDropDown from "../Templates/TagsMultiSelectDropDown";
 import MultiSelectDropdown from "../Templates/MultiSelectDropdown";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { LoginContext } from "../Sidebar/Context/Context";
 import debounce from "lodash.debounce";
-import { createFilterOptions } from "@mui/material/Autocomplete";
+import { CheckCircle2, ChevronRight, ChevronDown, MoreVertical, Plus, Trash2, UserPlus } from "lucide-react";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import {
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetFooter,
+} from "../components/ui/sheet";
 const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
 
@@ -69,9 +36,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   const ITEM_HEIGHT = 48;
   const ITEM_PADDING_TOP = 8;
 
-  const theme = useTheme();
   const navigate = useNavigate();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const [selectedOption, setSelectedOption] = useState("Account Info");
   const [accountType, setAccountType] = useState("Individual");
   const [accountName, setaccountName] = useState("");
@@ -265,34 +230,6 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
       alignItems: "center",
       textAlign: "center",
       // padding: "2px",
-      fontSize: "10px",
-      cursor: "pointer",
-    },
-  }));
-
-  const tagsoptions = tags.map((tag) => ({
-    value: tag._id,
-    label: tag.tagName,
-    colour: tag.tagColour,
-
-    customStyle: {
-      backgroundColor: tag.tagColour,
-      color: "#fff",
-      borderRadius: "8px",
-      alignItems: "center",
-      textAlign: "center",
-      marginBottom: "5px",
-      padding: "2px,8px",
-      fontSize: "10px",
-      width: `${calculateWidth(tag.tagName)}px`,
-      margin: "7px",
-    },
-    customTagStyle: {
-      backgroundColor: tag.tagColour,
-      color: "#fff",
-      alignItems: "center",
-      textAlign: "center",
-      padding: "2px,8px",
       fontSize: "10px",
       cursor: "pointer",
     },
@@ -1277,11 +1214,6 @@ const newUser = (
     console.log("Filtered Contacts news:", filtered);
   };
 
-  const filterOptions = createFilterOptions({
-    matchFrom: "any",
-    stringify: (option) =>
-      `${option.name} ${option.email} ${option.phoneNumbers.join(" ")}`,
-  });
   console.log(allContactData);
   console.log(filteredContacts);
   const handleClickOpen = () => {
@@ -1488,2000 +1420,532 @@ const handleLoginToggle = (checked, contact) => {
     debouncedCheck(accountName);
     return debouncedCheck.cancel;
   }, [accountName]);
+  const selectCls = "h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-ring";
+
+  const isContactStep = activeStep === "Contact Info";
+  const stepTitle = isContactStep ? "Contact Info" : "Account Info";
+  const stepDescription = isContactStep
+    ? "Add or link contacts for this account."
+    : "Fill in the account details below.";
+
   return (
-    <Box>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          p: 2,
-          borderBottom: "1px solid grey",
-        }}
-      >
-        <Typography variant="h6">New Account</Typography>
-        <RxCross2
-          style={{ cursor: "pointer" }}
-          onClick={handleNewDrawerClose}
-        />
-      </Box>
-      <Box className="account-form" sx={{ height: "90vh", overflowY: "auto" }}>
-        <Box>
-          <FormControl
-            sx={{ width: "100%", display: "flex", alignItems: "center" }}
-          >
-            <RadioGroup
-              row
-              aria-labelledby="main-radio-buttons-group-label"
-              name="main-radio-buttons-group"
-              value={selectedOption}
-              onChange={handleOptionChange}
-            >
-              <Box className="account-contact-info">
-                {activeStep === "Contact Info" ? (
-                  <>
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          mr: 2,
-                          gap: 2,
-                          cursor: "pointer",
-                        }}
-                        onClick={() => {
-                          handleOptionChange(null, "Account Info");
-                        }}
-                      >
-                        <CheckCircleRoundedIcon style={{ color: "green" }} />
-                        <Typography>Account Info</Typography>
-                      </Box>
+    <div className="flex flex-col h-full">
+      {/* Step header using Sheet primitives */}
+      <SheetHeader className="px-0 pb-4 border-b border-border/40 space-y-3">
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => !isContactStep ? null : handleOptionChange(null, "Account Info")}
+            className={[
+              "flex items-center gap-1.5",
+              isContactStep
+                ? "text-primary cursor-pointer hover:text-primary/80 transition-colors"
+                : "cursor-default",
+            ].join(" ")}>
+            <span className={[
+              "inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold",
+              isContactStep ? "bg-primary text-primary-foreground" : "bg-primary text-primary-foreground ring-2 ring-primary/20",
+            ].join(" ")}>
+              {isContactStep ? <CheckCircle2 className="h-3 w-3" /> : "1"}
+            </span>
+            <span className={"text-sm font-medium" + (isContactStep ? " text-primary" : " text-foreground font-semibold")}>Account Info</span>
+          </button>
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          <span className="flex items-center gap-1.5">
+            <span className={[
+              "inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold",
+              isContactStep ? "bg-primary text-primary-foreground ring-2 ring-primary/20" : "border border-border text-muted-foreground",
+            ].join(" ")}>2</span>
+            <span className={"text-sm font-medium" + (isContactStep ? " text-foreground font-semibold" : " text-muted-foreground")}>
+              Contact Info
+            </span>
+          </span>
+        </div>
+        <SheetTitle className="text-base font-semibold">{stepTitle}</SheetTitle>
+        <SheetDescription className="text-xs text-muted-foreground">{stepDescription}</SheetDescription>
+      </SheetHeader>
 
-                      <ArrowForwardIosRoundedIcon />
-                      <FormControlLabel
-                        value="Contact Info"
-                        control={<Radio checked />}
-                        label="Contact Info"
-                        sx={{ ml: 2 }}
-                      />
-                    </Box>
-                  </>
-                ) : (
-                  <>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                      <Box>
-                        <FormControlLabel
-                          value="Account Info"
-                          control={
-                            <Radio
-                              checked={selectedOption === "Account Info"}
-                            />
-                          }
-                          label="Account Info"
-                        />
-                      </Box>
-                      <Box>
-                        <ArrowForwardIosRoundedIcon
-                          style={{ fontSize: "15px" }}
-                        />
-                      </Box>
-                      <Box ml={1}>
-                        <FormControlLabel
-                          value="Contact Info"
-                          control={
-                            <Radio
-                              checked={selectedOption === "Contact Info"}
-                            />
-                          }
-                          label="Contact Info"
-                        />
-                      </Box>
-                    </Box>
-                  </>
-                )}
-              </Box>
-            </RadioGroup>
-          </FormControl>
-        </Box>
+      <div className="flex-1 overflow-y-auto pt-4">
 
-        <Box sx={{ p: 2 }}>
-          {selectedOption === "Account Info" && (
-            <Box>
-              <Typography sx={{ fontWeight: "bold", fontSize: "20px" }}>
-                Client Type
-              </Typography>
-              {/* <Box>
-                Client Type
-              </Box> */}
-              <FormControl>
-                <RadioGroup
-                  row
-                  aria-labelledby="account-type-radio-buttons-group-label"
-                  name="account-type-radio-buttons-group"
-                  value={accountType}
-                  onChange={handleAccountTypeChange}
-                >
-                  <FormControlLabel
-                    value="Individual"
-                    control={<Radio />}
-                    label="Individual"
-                  />
-                  <FormControlLabel
-                    value="Company"
-                    control={<Radio />}
-                    label="Company"
-                  />
-                </RadioGroup>
-              </FormControl>
-              {accountType === "Individual" && (
-                <Box>
-                  <Box>
-                    <Box
-                      className="account-Type-options"
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        mb: 1,
-                      }}
-                    >
-                      {/* <Box>
-                        <h3>Account Info</h3>
-                      </Box> */}
-                      <Typography sx={{ fontWeight: "bold", fontSize: "20px" }}>
-                        Account Info
-                      </Typography>
-                      {/* <Box className='HelpOutlineRoundedIcon'></Box> */}
-
-                      <Box className="MoreVertRoundedIcon">
-                        <HelpOutlineRoundedIcon />
-                        <MoreVertRoundedIcon />
-                      </Box>
-                    </Box>
-
-                    <Box>
-                      <InputLabel
-                        sx={{
-                          color: "black",
-                          display: "flex",
-                          alignItems: "center",
-                        }}
-                      >
-                        Account Name
-                        <Typography sx={{ color: "red", ml: 0.5 }}>
-                          *
-                        </Typography>
-                      </InputLabel>
-
-                      <TextField
-                        size="small"
-                        fullWidth
-                        placeholder="Account Name"
-                        value={accountName}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          setaccountName(value);
-
-                          // Clear the error message when input is not empty
-                          if (value.trim() !== "") {
-                            setAccountNameError("");
-                          }
-                        }}
-                        // onChange={(e) => setaccountName(e.target.value)}
-                        // margin="normal"
-                        sx={{ mt: 1.5, backgroundColor: "#fff" }}
-                        error={!!accountNameError}
-                      />
-                      {!!accountNameError && (
-                        <Alert
-                          sx={{
-                            width: "96%",
-                            p: "0", // Adjust padding to control the size
-                            pl: "4%",
-                            height: "23px",
-                            borderRadius: "10px",
-                            borderTopLeftRadius: "0",
-                            borderTopRightRadius: "0",
-                            fontSize: "15px",
-                            display: "flex",
-                            alignItems: "center", // Center content vertically
-                            "& .MuiAlert-icon": {
-                              fontSize: "16px", // Adjust the size of the icon
-                              mr: "8px", // Add margin to the right of the icon
-                            },
-                          }}
-                          variant="filled"
-                          severity="error"
-                        >
-                          {accountNameError}
-                        </Alert>
-                      )}
-                    </Box>
-
-                    <Box mt={2} mr={2}>
-                      {/* <InputLabel sx={{ color: "black", mt: 2 }}>
-                        Tags
-                      </InputLabel>
-
-                      <Autocomplete
-                        multiple
-                        size="small"
-                      
-                        options={tagsOptions}
-                        getOptionLabel={(option) => option.label}
-                        value={tagsOptions.filter((option) =>
-                          selectedTags.includes(option.value)
-                        )}
-                        onChange={handleTagChange}
-                        // renderTags={(selected, getTagProps) =>
-                        //   selected.map((option, index) => (
-                        //     <Chip
-                        //       key={option.value}
-                        //       label={option.label}
-                        //       style={option.customTagStyle}
-                        //       {...getTagProps({ index })}
-                        //     />
-                        //   ))
-                        // }
-                        renderTags={(selected, getTagProps) =>
-                          selected.map((option, index) => (
-                            <Chip
-                              key={option.value}
-                              label={option.label}
-                              sx={{
-                                backgroundColor: option.colour,
-                                color: "#fff",
-                                fontWeight: 500,
-                                fontSize: "15px",
-                                borderRadius: "16px",
-                                padding: "4px 10px",
-                                height: "28px",
-                                margin: "2px",
-                                cursor:'pointer',
-                                boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-                                "& .MuiChip-label": {
-                                  padding: "0 8px",
-                                },
-                                "& .MuiChip-deleteIcon": {
-                                  color: "#fff",
-                                  opacity: 0.7,
-                                  transition: "opacity 0.2s",
-                                  "&:hover": {
-                                    opacity: 1,
-                                  },
-                                },
-                              }}
-                              {...getTagProps({ index })}
-                            />
-                          ))
-                        }
-                        
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            variant="outlined"
-                            placeholder="Tags"
-                            sx={{ width: "100%", marginTop: "8px" }}
-                          />
-                        )}
-                        renderOption={(props, option) => (
-                          <Box
-                            component="li"
-                            {...props}
-                            style={option.customStyle}
-                          >
-                            {option.label}
-                          </Box>
-                        )}
-                      /> */}
-                      <InputLabel sx={{ color: "black", mb: 1 }}>
-                        Tags
-                      </InputLabel>
-
-                      <TagsMultiSelectDropDown
-                        value={selectedTags}
-                        onChange={handleTagChange}
-                        placeholder="Tags"
-                      />
-                    </Box>
-
-                    <Box mt={2} mr={2.5}>
-                      <InputLabel sx={{ color: "black" }}>
-                        Team Member
-                      </InputLabel>
-                      {/* <Autocomplete
-                        multiple
-                        sx={{ mt: 2 }}
-                        options={options}
-                        size="small"
-                        getOptionLabel={(option) => option.label}
-                        value={selectedUser}
-                        onChange={handleUserChange}
-                        renderTags={(selected, getTagProps) =>
-                          selected.map((option, index) => (
-                            <Chip
-                              key={option.value}
-                              label={option.label}
-                              sx={{
-                              
-                                color: "#000",
-                                fontWeight: 500,
-                                fontSize: "15px",
-                                borderRadius: "16px",
-                                padding: "4px 10px",
-                                height: "28px",
-                                margin: "2px",
-                                cursor:'pointer',
-                                boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-                                "& .MuiChip-label": {
-                                  padding: "0 8px",
-                                },
-                                "& .MuiChip-deleteIcon": {
-                                  color: "#fff",
-                                  opacity: 0.7,
-                                  transition: "opacity 0.2s",
-                                  "&:hover": {
-                                    opacity: 1,
-                                  },
-                                },
-                              }}
-                              {...getTagProps({ index })}
-                            />
-                          ))
-                        }
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            variant="outlined"
-                            placeholder="Assignees"
-                          />
-                        )}
-                        isOptionEqualToValue={(option, value) =>
-                          option.value === value.value
-                        }
-                      /> */}
-                      <MultiSelectDropdown
-                        value={selectedUser}
-                        onChange={handleUserChange}
-                        placeholder="Assignees"
-                      />
-                    </Box>
-                    <Box mt={2}>
-                      {/* <Typography>Folder Template</Typography> */}
-                      <InputLabel
-                        sx={{
-                          color: "black",
-                          display: "flex",
-                          alignItems: "center",
-                        }}
-                      >
-                        Folder Template
-                        <Typography sx={{ color: "red", ml: 0.5 }}>
-                          *
-                        </Typography>
-                      </InputLabel>
-                      <Autocomplete
-                        options={optionfolder}
-                        getOptionLabel={(option) => option.label}
-                        value={selectedTemplate}
-                        onChange={(event, newValue) =>
-                          handleSelectTemplate(newValue)
-                        }
-                        isOptionEqualToValue={(option, value) =>
-                          option.value === value.value
-                        }
-                        renderOption={(props, option) => (
-                          <Box
-                            component="li"
-                            {...props}
-                            sx={{ cursor: "pointer", margin: "5px 10px" }} // Add cursor pointer style
-                          >
-                            {option.label}
-                          </Box>
-                        )}
-                        renderInput={(params) => (
-                          <>
-                            <TextField
-                              {...params}
-                              sx={{ backgroundColor: "#fff" }}
-                              placeholder="select folder template"
-                              variant="outlined"
-                              size="small"
-                              error={!!foldertemplateError}
-                            />
-                            {!!foldertemplateError && (
-                              <Alert
-                                sx={{
-                                  width: "96%",
-                                  p: "0", // Adjust padding to control the size
-                                  pl: "4%",
-                                  height: "23px",
-                                  borderRadius: "10px",
-                                  borderTopLeftRadius: "0",
-                                  borderTopRightRadius: "0",
-                                  fontSize: "15px",
-                                  display: "flex",
-                                  alignItems: "center", // Center content vertically
-                                  "& .MuiAlert-icon": {
-                                    fontSize: "16px", // Adjust the size of the icon
-                                    mr: "8px", // Add margin to the right of the icon
-                                  },
-                                }}
-                                variant="filled"
-                                severity="error"
-                              >
-                                {foldertemplateError}
-                              </Alert>
-                            )}
-                          </>
-                        )}
-                        sx={{ width: "100%", marginTop: "8px" }}
-                        clearOnEscape // Enable clearable functionality
-                      />
-                    </Box>
-                  </Box>
-                </Box>
-              )}
+        {selectedOption === "Account Info" && (
+          <div className="space-y-5 pb-4">
+            {/* Client Type */}
+            <div className="space-y-2">
+              <SheetHeader className="px-0 py-0 space-y-0.5">
+                <SheetTitle className="text-sm font-semibold">Client Type</SheetTitle>
+                <SheetDescription className="text-xs">Select whether this is an individual or company account.</SheetDescription>
+              </SheetHeader>
+              <div className="flex items-center gap-5">
+                {["Individual", "Company"].map((type) => (
+                  <label key={type} className="flex items-center gap-2 cursor-pointer">
+                    <input type="radio" name="accountType" value={type}
+                      checked={accountType === type} onChange={handleAccountTypeChange}
+                      className="h-4 w-4 accent-primary" />
+                    <span className="text-sm text-foreground">{type}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            {/* Account Info fields — shared for Individual & Company */}
+            <div className="space-y-3">
+              <SheetHeader className="px-0 py-0 space-y-0.5">
+                <SheetTitle className="text-sm font-semibold">Account Info</SheetTitle>
+                <SheetDescription className="text-xs">Enter the primary account details.</SheetDescription>
+              </SheetHeader>
+              <div className="space-y-1.5">
+                <Label>Account Name <span className="text-destructive">*</span></Label>
+                <Input
+                  placeholder="Account Name"
+                  value={accountName}
+                  className={accountNameError ? "border-destructive" : ""}
+                  onChange={(e) => { setaccountName(e.target.value); if (e.target.value.trim()) setAccountNameError(""); }}
+                />
+                {accountNameError && <p className="text-xs text-destructive">{accountNameError}</p>}
+              </div>
               {accountType === "Company" && (
-                <Box>
-                  <form>
-                    <Box mt={2}>
-                      <Box>
-                        <InputLabel
-                          sx={{
-                            color: "black",
-                            display: "flex",
-                            alignItems: "center",
-                          }}
-                        >
-                          Account Name
-                          <Typography sx={{ color: "red", ml: 0.5 }}>
-                            *
-                          </Typography>
-                        </InputLabel>
-
-                        <TextField
-                          value={accountName}
-                          // onChange={(e) => setaccountName(e.target.value)}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            setaccountName(value);
-
-                            // Clear the error message when input is not empty
-                            if (value.trim() !== "") {
-                              setAccountNameError("");
-                            }
-                          }}
-                          placeholder="Account Name"
-                          fullWidth
-                          size="small"
-                          error={!!accountNameError}
-                          // helperText={pipelineNameError}
-                          sx={{ mt: 1.5, backgroundColor: "#fff" }}
-                        />
-                        {!!accountNameError && (
-                          <Alert
-                            sx={{
-                              width: "96%",
-                              p: "0", // Adjust padding to control the size
-                              pl: "4%",
-                              height: "23px",
-                              borderRadius: "10px",
-                              borderTopLeftRadius: "0",
-                              borderTopRightRadius: "0",
-                              fontSize: "15px",
-                              display: "flex",
-                              alignItems: "center", // Center content vertically
-                              "& .MuiAlert-icon": {
-                                fontSize: "16px", // Adjust the size of the icon
-                                mr: "8px", // Add margin to the right of the icon
-                              },
-                            }}
-                            variant="filled"
-                            severity="error"
-                          >
-                            {accountNameError}
-                          </Alert>
-                        )}
-                      </Box>
-
-                      <Box mt={2}>
-                        {/* <InputLabel sx={{ color: "black" }}>
-                          Company Name
-                        </InputLabel> */}
-                        <InputLabel
-                          sx={{
-                            color: "black",
-                            display: "flex",
-                            alignItems: "center",
-                          }}
-                        >
-                          Company Name
-                          <Typography sx={{ color: "red", ml: 0.5 }}>
-                            *
-                          </Typography>
-                        </InputLabel>
-                        <TextField
-                          fullWidth
-                          size="small"
-                          //  margin="normal"
-                          error={!!companyNameError}
-                          // helperText={pipelineNameError}
-                          sx={{ mt: 1.5, backgroundColor: "#fff" }}
-                          value={companyname}
-                          // onChange={(e) => setcompanyname(e.target.value)}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            setcompanyname(value);
-
-                            // Clear the error message when input is not empty
-                            if (value.trim() !== "") {
-                              setCompanyNameError("");
-                            }
-                          }}
-                          placeholder="Company Name"
-                        />
-                        {!!companyNameError && (
-                          <Alert
-                            sx={{
-                              width: "96%",
-                              p: "0", // Adjust padding to control the size
-                              pl: "4%",
-                              height: "23px",
-                              borderRadius: "10px",
-                              borderTopLeftRadius: "0",
-                              borderTopRightRadius: "0",
-                              fontSize: "15px",
-                              display: "flex",
-                              alignItems: "center", // Center content vertically
-                              "& .MuiAlert-icon": {
-                                fontSize: "16px", // Adjust the size of the icon
-                                mr: "8px", // Add margin to the right of the icon
-                              },
-                            }}
-                            variant="filled"
-                            severity="error"
-                          >
-                            {companyNameError}
-                          </Alert>
-                        )}
-                      </Box>
-
-                      <Box mt={2} mr={2}>
-                        <InputLabel sx={{ color: "black", mb: 1 }}>
-                          Tags
-                        </InputLabel>
-
-                        <TagsMultiSelectDropDown
-                          value={selectedTags}
-                          onChange={handleTagChange}
-                          placeholder="Tags"
-                        />
-                      </Box>
-
-                      <Box mt={2} mr={2.5}>
-                        <InputLabel sx={{ color: "black" }}>
-                          Team Member
-                        </InputLabel>
-
-                        <MultiSelectDropdown
-                          value={selectedUser}
-                          onChange={handleUserChange}
-                          placeholder="Assignees"
-                        />
-                      </Box>
-                    </Box>
-                    <Box mt={2}>
-                      <InputLabel
-                        sx={{
-                          color: "black",
-                          display: "flex",
-                          alignItems: "center",
-                        }}
-                      >
-                        Folder Template
-                        <Typography sx={{ color: "red", ml: 0.5 }}>
-                          *
-                        </Typography>
-                      </InputLabel>
-                      <Autocomplete
-                        options={optionfolder}
-                        getOptionLabel={(option) => option.label}
-                        value={selectedTemplate}
-                        onChange={(event, newValue) =>
-                          handleSelectTemplate(newValue)
-                        }
-                        isOptionEqualToValue={(option, value) =>
-                          option.value === value.value
-                        }
-                        renderOption={(props, option) => (
-                          <Box
-                            component="li"
-                            {...props}
-                            sx={{ cursor: "pointer", margin: "5px 10px" }} // Add cursor pointer style
-                          >
-                            {option.label}
-                          </Box>
-                        )}
-                        renderInput={(params) => (
-                          <>
-                            <TextField
-                              {...params}
-                              sx={{ backgroundColor: "#fff" }}
-                              placeholder="select folder template"
-                              variant="outlined"
-                              size="small"
-                              error={!!foldertemplateError}
-                            />
-                            {!!foldertemplateError && (
-                              <Alert
-                                sx={{
-                                  width: "96%",
-                                  p: "0", // Adjust padding to control the size
-                                  pl: "4%",
-                                  height: "23px",
-                                  borderRadius: "10px",
-                                  borderTopLeftRadius: "0",
-                                  borderTopRightRadius: "0",
-                                  fontSize: "15px",
-                                  display: "flex",
-                                  alignItems: "center", // Center content vertically
-                                  "& .MuiAlert-icon": {
-                                    fontSize: "16px", // Adjust the size of the icon
-                                    mr: "8px", // Add margin to the right of the icon
-                                  },
-                                }}
-                                variant="filled"
-                                severity="error"
-                              >
-                                {foldertemplateError}
-                              </Alert>
-                            )}
-                          </>
-                        )}
-                        sx={{ width: "100%", marginTop: "8px" }}
-                        clearOnEscape // Enable clearable functionality
-                      />
-                    </Box>
-                    <Box mt={2}>
-                      {/* <Typography variant="h6" gutterBottom mt={3}>
-                        Address
-                      </Typography> */}
-                      <Typography sx={{ fontWeight: "bold", fontSize: "20px" }}>
-                        {" "}
-                        Address
-                      </Typography>
-                      <Box mt={2}>
-                        <InputLabel sx={{ color: "black" }}>Country</InputLabel>
-                        <Autocomplete
-                          size="small"
-                          options={countries}
-                          getOptionLabel={(option) => option.name}
-                          // value={cCountry}
-                          // onChange={(event, newValue) => SetCCountry(newValue)}
-                          value={selectedCountry}
-                          onChange={(event, newValue) =>
-                            setSelectedCountry(newValue)
-                          }
-                          renderOption={(props, option) => (
-                            <ListItem
-                              {...props}
-                              sx={{
-                                display: "flex",
-                                justifyContent: "space-between",
-                                padding: "8px",
-                                borderBottom: "1px solid #ddd",
-                                cursor: "pointer",
-                              }}
-                            >
-                              <Typography sx={{ fontWeight: 500 }}>
-                                {option.name}
-                              </Typography>
-                              <Typography
-                                sx={{ fontSize: "0.9rem", color: "gray" }}
-                              >
-                                {option.code}
-                              </Typography>
-                            </ListItem>
-                          )}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder="Country"
-                              variant="outlined"
-                              sx={{ marginTop: "8px", width: "100%" }}
-                            />
-                          )}
-                        />
-                        {/* <Select
-                          size='small'
-                          value={cCountry}
-                          onChange={(e) => SetCCountry(e.target.value)}
-                          sx={{
-                            marginTop: '8px',
-                            width: '100%',
-
-                          }}
-                        >
-                          {countries.map((country) => (
-                            <MenuItem key={country.code} value={country.code}>
-                              {country.name}
-                            </MenuItem>
-                          ))}
-                        </Select> */}
-                      </Box>
-                      <Box>
-                        <InputLabel sx={{ color: "black", mt: 2 }}>
-                          Street address
-                        </InputLabel>
-                        <TextField
-                          placeholder="Street address"
-                          value={cStreetAddress}
-                          onChange={(e) => SetCStreetAddress(e.target.value)}
-                          size="small"
-                          fullWidth
-                          margin="normal"
-                        />
-                      </Box>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          flexDirection: isSmallScreen ? "column" : "row",
-                          gap: isSmallScreen ? 2 : 5,
-                          mt: 2,
-                        }}
-                      >
-                        <Box>
-                          <InputLabel sx={{ color: "black" }}>City</InputLabel>
-
-                          <TextField
-                            fullWidth
-                            margin="normal"
-                            name="city"
-                            value={cCity}
-                            onChange={(e) => setCcity(e.target.value)}
-                            placeholder="City"
-                            size="small"
-                          />
-                        </Box>
-                        <Box>
-                          <InputLabel sx={{ color: "black" }}>
-                            State/Province
-                          </InputLabel>
-
-                          <TextField
-                            margin="normal"
-                            name="state"
-                            fullWidth
-                            value={cStateProvince}
-                            onChange={(e) => SetCStateProvince(e.target.value)}
-                            placeholder="State/Province"
-                            size="small"
-                          />
-                        </Box>
-                        <Box>
-                          <InputLabel sx={{ color: "black" }}>
-                            ZIP/Postal Code
-                          </InputLabel>
-
-                          <TextField
-                            margin="normal"
-                            fullWidth
-                            name="postalCode"
-                            value={cZipPostalCode}
-                            onChange={(e) => SetCZipPostalCode(e.target.value)}
-                            placeholder="ZIP/Postal Code"
-                            size="small"
-                          />
-                        </Box>
-                      </Box>
-                    </Box>
-                  </form>
-                </Box>
-              )}
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                // sx={{ borderRadius: "10px", mt: 3 }}
-                onClick={() => {
-                  handleOptionChange(null, "Contact Info");
-                }}
-                sx={{
-                  backgroundColor: "var(--color-save-btn)", // Normal background
-
-                  "&:hover": {
-                    backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                  },
-                  borderRadius: "15px",
-                  mt: 3,
-                }}
-              >
-                Continue
-              </Button>
-            </Box>
-          )}
-        </Box>
-
-        <Box>
-          {selectedOption === "Contact Info" && (
-            <Box className="create_new_contactform-container">
-              <Box className="create_new_contactform-container">
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    p: 2,
-                  }}
-                >
-                  {/* <h3 style={{ marginLeft: "20px" }}>Contacts</h3> */}
-                  <Typography sx={{ fontWeight: "bold", fontSize: "20px" }}>
-                    Contacts
-                  </Typography>
-
-                  <Box
-                    onClick={handleClickOpen}
-                    sx={{
-                      color: "#1976d3",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      gap: "5px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <AddCircleOutlineIcon />
-                    <Typography>Link existing contact</Typography>
-                  </Box>
-                </Box>
-
-                <Box>
-                  {contactData.length > 0 ? (
-                    contactData.map((contact) => (
-                      <Box key={contact._id} sx={{ padding: 2 }}>
-                        {/* Header Section - Always Visible */}
-                        <Grid
-                          container
-                          alignItems="center"
-                          justifyContent="space-between"
-                        >
-                          <Grid item xs="auto">
-                            <Button
-                              variant="text"
-                              sx={{
-                                padding: 0,
-                                minWidth: "auto",
-                                marginRight: 1,
-                              }}
-                              onClick={() => handleExpandClick(contact._id)}
-                            >
-                              <ExpandMoreIcon />
-                            </Button>
-                          </Grid>
-                          <Grid item xs>
-                            <Typography variant="h6" textAlign="left">
-                              {contact.firstName} {contact.middleName}{" "}
-                              {contact.lastName}
-                            </Typography>
-                          </Grid>
-                          <Grid item xs="auto">
-                            <IconButton
-                              aria-label="more options"
-                              size="small"
-                              onClick={(e) =>
-                                handleMenuClick(e, contact._id, contactName)
-                              }
-                            >
-                              <MoreVertIcon />
-                            </IconButton>
-                          </Grid>
-                        </Grid>
-
-                        {/* Dropdown Menu */}
-                        <Menu
-                          anchorEl={anchorEl}
-                          open={menuOpen} // Use derived state here
-                          onClose={handleMenuClose}
-                        >
-                          <MenuItem onClick={handleEditDescription}>
-                            Edit Existing Contact
-                          </MenuItem>
-                          <MenuItem onClick={handleUnlink}>Unlink</MenuItem>
-                        </Menu>
-
-                        {/* Show Company Name, Email, and Toggles Always */}
-                        <Box sx={{ marginY: 2, marginLeft: 4 }}>
-                          {/* Company Name */}
-                          <Typography
-                            variant="subtitle2"
-                            color="textSecondary"
-                            gutterBottom
-                            textAlign="left"
-                          >
-                            Company Name
-                          </Typography>
-                          <Typography variant="body2" textAlign="left">
-                            {contact.companyName}
-                          </Typography>
-
-                          {/* Email */}
-                          <Typography
-                            variant="body2"
-                            color="textSecondary"
-                            textAlign="left"
-                            sx={{ marginTop: 1 }}
-                          >
-                            {contact.email}
-                          </Typography>
-
-                          {/* Toggle Switches */}
-                          <Box sx={{ display: "flex", gap: 2, marginTop: 2 }}>
-                            {/* <FormControlLabel
-                              control={
-                                <Switch checked={contact.login} readOnly />
-                              }
-                              label="Login"
-                            /> */}
-                            <FormControlLabel
-  control={
-    <Switch
-      checked={contact.login}
-      onChange={(e) => handleLoginToggle(e.target.checked, contact)}
-    />
-  }
-  label="Login"
-/>
-
-                            <FormControlLabel
-                              control={
-                                <Switch checked={contact.notify} disabled />
-                              }
-                              label="Notify"
-                            />
-                            <FormControlLabel
-                              control={
-                                <Switch checked={contact.emailSync} readOnly />
-                              }
-                              label="Email Sync"
-                            />
-                          </Box>
-                        </Box>
-
-                        {/* Conditionally Render Details on Expand */}
-                        {expandedContact === contact._id && (
-                          <Box sx={{ marginY: 2, marginLeft: 4 }}>
-                            {/* Additional Details */}
-                            {/* Note Section */}
-                            <Box sx={{ marginTop: 2 }}>
-                              <Typography
-                                variant="subtitle2"
-                                color="textSecondary"
-                                gutterBottom
-                                textAlign="left"
-                              >
-                                Note
-                              </Typography>
-                              <Typography variant="body2" textAlign="left">
-                                {contact.note}
-                              </Typography>
-                            </Box>
-
-                            {/* SSN Section */}
-                            <Box sx={{ marginTop: 2 }}>
-                              <Typography
-                                variant="subtitle2"
-                                color="textSecondary"
-                                gutterBottom
-                                textAlign="left"
-                              >
-                                SSN
-                              </Typography>
-                              <Typography variant="body2" textAlign="left">
-                                {contact.ssn}
-                              </Typography>
-                            </Box>
-
-                            {/* Address Section */}
-                            <Box>
-                              <Typography variant="h6" textAlign="left">
-                                Address
-                              </Typography>
-                              <Box sx={{ marginY: 1 }}>
-                                <Typography
-                                  variant="subtitle2"
-                                  color="textSecondary"
-                                  gutterBottom
-                                  textAlign="left"
-                                >
-                                  Country
-                                </Typography>
-                                <Typography variant="body2" textAlign="left">
-                                  {contact.country.name}
-                                </Typography>
-                              </Box>
-                              <Box>
-                                <Typography
-                                  variant="subtitle2"
-                                  color="textSecondary"
-                                  gutterBottom
-                                  textAlign="left"
-                                >
-                                  Street Address
-                                </Typography>
-                                <Typography variant="body2" textAlign="left">
-                                  {contact.streetAddress || "N/A"}
-                                </Typography>
-                              </Box>
-                              <Grid container spacing={0}>
-                                <Grid item xs={4}>
-                                  <Typography
-                                    variant="subtitle2"
-                                    color="textSecondary"
-                                    gutterBottom
-                                    textAlign="left"
-                                  >
-                                    City
-                                  </Typography>
-                                  <Typography variant="body2" textAlign="left">
-                                    {contact.city || "N/A"}
-                                  </Typography>
-                                </Grid>
-                                <Grid item xs={4}>
-                                  <Typography
-                                    variant="subtitle2"
-                                    color="textSecondary"
-                                    gutterBottom
-                                    textAlign="left"
-                                  >
-                                    State / Province
-                                  </Typography>
-                                  <Typography variant="body2" textAlign="left">
-                                    {contact.state || "N/A"}
-                                  </Typography>
-                                </Grid>
-                                <Grid item xs={4}>
-                                  <Typography
-                                    variant="subtitle2"
-                                    color="textSecondary"
-                                    gutterBottom
-                                    textAlign="left"
-                                  >
-                                    ZIP / Postal Code
-                                  </Typography>
-                                  <Typography variant="body2" textAlign="left">
-                                    {contact.postalCode || "N/A"}
-                                  </Typography>
-                                </Grid>
-                              </Grid>
-                            </Box>
-
-                            {/* Linked Accounts Section */}
-                            {contact.tags && (
-                              <Box>
-                                <Typography variant="h6" textAlign="left">
-                                  Linked Accounts
-                                </Typography>
-                                <Box>
-                                  <Typography
-                                    variant="subtitle2"
-                                    color="textSecondary"
-                                    gutterBottom
-                                    textAlign="left"
-                                  >
-                                    Linked accounts
-                                  </Typography>
-                                  {contact.tags.map((tag, index) => (
-                                    <Box
-                                      key={index}
-                                      sx={{
-                                        display: "inline-block",
-                                        backgroundColor:
-                                          tag.tagColour || "#f0f0f0",
-                                        borderRadius: "20px",
-                                        padding: "4px 12px",
-                                        margin: "4px",
-                                      }}
-                                    >
-                                      <Typography
-                                        variant="body2"
-                                        component="span"
-                                        textAlign="left"
-                                      >
-                                        {accountData.accountName}
-                                      </Typography>
-                                    </Box>
-                                  ))}
-                                </Box>
-                              </Box>
-                            )}
-                          </Box>
-                        )}
-                      </Box>
-                    ))
-                  ) : (
-                    <Box sx={{ textAlign: "center", py: 4 }}>
-                      <Typography variant="h6">No linked contacts</Typography>
-                      <Typography variant="body2" color="textSecondary">
-                        Link an existing contact or add a new one to finish
-                        creating the account.
-                      </Typography>
-                    </Box>
-                  )}
-                </Box>
-
-                {/* MUI Dialog */}
-                <Dialog open={open} onClose={handleDialogClose}>
-                  <DialogTitle>Search for a Contact</DialogTitle>
-                  <Divider />
-                  <DialogContent>
-                    <DialogContentText>
-                      Search for an existing contact by entering their name,
-                      phone number, or email. If the contact is not in your CRM,
-                      click "Cancel" and create one on the previous page.
-                    </DialogContentText>
-
-                    <Box mt={5}>
-                      <InputLabel sx={{ color: "black" }}>
-                        Serch for contact
-                      </InputLabel>
-                      <Autocomplete
-                        multiple
-                        options={filteredContacts}
-                        getOptionLabel={(option) => option.name}
-                        filterOptions={filterOptions}
-                        // onInputChange={(event, newValue) => setSearchQuery(newValue)}
-                        onChange={(event, newValue) => {
-                          const ids = newValue.map((contact) => contact.id);
-                          setSelectedContacts(ids);
-                          console.log("getSelectedIds", getSelectedIds());
-                        }}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            variant="outlined"
-                            placeholder="Search contacts..."
-                            onFocus={(e) => e.stopPropagation()}
-                          />
-                        )}
-                        renderOption={(props, option) => (
-                          <li {...props} key={option.id}>
-                            {option.name}
-                          </li>
-                        )}
-                        fullWidth
-                        disableClearable
-                        value={filteredContacts.filter((contact) =>
-                          selectedContacts.includes(contact.id)
-                        )}
-                      />
-                    </Box>
-                  </DialogContent>
-                  <DialogActions>
-                    <Button
-                      variant="contained"
-                      onClick={handleLinkAccounts}
-                      sx={{
-                        backgroundColor: "var(--color-save-btn)", // Normal background
-
-                        "&:hover": {
-                          backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                        },
-                        borderRadius: "15px",
-                        width: "80px",
-                      }}
-                    >
-                      Add
-                    </Button>
-                    <Button
-                      onClick={handleDialogClose}
-                      variant="outlined"
-                      color="primary"
-                      sx={{
-                        borderColor: "var(--color-border-cancel-btn)", // Normal background
-                        color: "var(--color-save-btn)",
-                        "&:hover": {
-                          backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                          color: "#fff",
-                          border: "none",
-                        },
-                        width: "80px",
-                        borderRadius: "15px",
-                      }}
-                    >
-                      Cancel
-                    </Button>
-                  </DialogActions>
-                </Dialog>
-              </Box>
-
-              {contacts.map((contact, index) => (
-                <Box
-                  style={{
-                    border: "1px solid #e2e8f0",
-                    margin: "15px",
-                    borderRadius: "8px",
-                    height: "55vh",
-                    overflowY: "auto",
-                    padding: "15px",
-                  }}
-                  className="create_new_contactform"
-                >
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    {" "}
-                    <Typography variant="h6" gutterBottom sx={{ ml: 1 }}>
-                      Contact {index + 1}
-                    </Typography>
-                    <AiOutlineDelete
-                      onClick={() => handleDeleteContact(index)}
-                      style={{
-                        // position: "absolute",
-                        top: "10px",
-                        right: "10px",
-                        cursor: "pointer",
-                        color: "red",
-                      }}
-                    />
-                  </Box>
-
-                  <Box>
-                    <form>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          flexDirection: isSmallScreen ? "column" : "row",
-                          gap: isSmallScreen ? 2 : 5,
-                          padding: "1px 5px 0 5px",
-                        }}
-                      >
-                        <Box>
-                          {/* <InputLabel sx={{ color: "black" }}>
-                            First Name
-                          </InputLabel> */}
-                          <InputLabel
-                            sx={{
-                              color: "black",
-                              display: "flex",
-                              alignItems: "center",
-                            }}
-                          >
-                            First Name
-                            <Typography sx={{ color: "red", ml: 0.5 }}>
-                              *
-                            </Typography>
-                          </InputLabel>
-                          <TextField
-                            fullWidth
-                            name="firstName"
-                            placeholder="First Name"
-                            size="small"
-                            onChange={(e) => handleContactInputChange(index, e)}
-                            error={!!firstNameError}
-                            // helperText={pipelineNameError}
-                            sx={{ mt: 1.5, backgroundColor: "#fff" }}
-                          />
-                          {!!firstNameError && (
-                            <Alert
-                              sx={{
-                                width: "96%",
-                                p: "0", // Adjust padding to control the size
-                                pl: "4%",
-                                height: "23px",
-                                borderRadius: "10px",
-                                borderTopLeftRadius: "0",
-                                borderTopRightRadius: "0",
-                                fontSize: "11px",
-                                display: "flex",
-                                alignItems: "center", // Center content vertically
-                                "& .MuiAlert-icon": {
-                                  fontSize: "16px", // Adjust the size of the icon
-                                  mr: "8px", // Add margin to the right of the icon
-                                },
-                              }}
-                              variant="filled"
-                              severity="error"
-                            >
-                              {firstNameError}
-                            </Alert>
-                          )}
-                        </Box>
-                        <Box>
-                          <InputLabel sx={{ color: "black" }}>
-                            Middle Name
-                          </InputLabel>
-                          <TextField
-                            margin="normal"
-                            fullWidth
-                            name="middleName"
-                            placeholder="Middle Name"
-                            size="small"
-                            onChange={(e) => handleContactInputChange(index, e)}
-                          />
-                        </Box>
-                        <Box>
-                          {/* <InputLabel sx={{ color: "black" }}>
-                            Last Name
-                          </InputLabel> */}
-                          <InputLabel
-                            sx={{
-                              color: "black",
-                              display: "flex",
-                              alignItems: "center",
-                            }}
-                          >
-                            Last Name
-                            <Typography sx={{ color: "red", ml: 0.5 }}>
-                              *
-                            </Typography>
-                          </InputLabel>
-                          <TextField
-                            fullWidth
-                            name="lastName"
-                            placeholder="Last name"
-                            size="small"
-                            onChange={(e) => handleContactInputChange(index, e)}
-                            error={!!lastNameError}
-                            // helperText={pipelineNameError}
-                            sx={{ mt: 1.5, backgroundColor: "#fff" }}
-                          />
-
-                          {!!lastNameError && (
-                            <Alert
-                              sx={{
-                                width: "96%",
-                                p: "0", // Adjust padding to control the size
-                                pl: "4%",
-                                height: "23px",
-                                borderRadius: "10px",
-                                borderTopLeftRadius: "0",
-                                borderTopRightRadius: "0",
-                                fontSize: "11px",
-                                display: "flex",
-                                alignItems: "center", // Center content vertically
-                                "& .MuiAlert-icon": {
-                                  fontSize: "16px", // Adjust the size of the icon
-                                  mr: "8px", // Add margin to the right of the icon
-                                },
-                              }}
-                              variant="filled"
-                              severity="error"
-                            >
-                              {lastNameError}
-                            </Alert>
-                          )}
-                        </Box>
-                      </Box>
-                      <Box>
-                        <InputLabel sx={{ color: "black" }}>
-                          Contact Name
-                        </InputLabel>
-                        <TextField
-                          name="contactName"
-                          fullWidth
-                          placeholder="Contact Name"
-                          margin="normal"
-                          size="small"
-                          value={contact.contactName}
-                          onChange={(e) => handleContactInputChange(index, e)}
-                        />
-                      </Box>
-                      <Box>
-                        <InputLabel sx={{ color: "black" }}>
-                          Company Name
-                        </InputLabel>
-                        <TextField
-                          fullWidth
-                          name="companyName"
-                          margin="normal"
-                          placeholder="Company Name"
-                          size="small"
-                          onChange={(e) => handleContactInputChange(index, e)}
-                        />
-                      </Box>
-                      <Box>
-                        <InputLabel sx={{ color: "black" }}>Note</InputLabel>
-                        <TextField
-                          fullWidth
-                          multiline
-                          name="note"
-                          margin="normal"
-                          placeholder="Note"
-                          size="small"
-                          onChange={(e) => handleContactInputChange(index, e)}
-                        />
-                      </Box>
-                      <Box>
-                        <InputLabel sx={{ color: "black" }}>SSN</InputLabel>
-                        <TextField
-                          fullWidth
-                          name="ssn"
-                          margin="normal"
-                          placeholder="SSN"
-                          size="small"
-                          onChange={(e) => handleContactInputChange(index, e)}
-                        />
-                      </Box>
-                      <Box>
-                        {/* <InputLabel sx={{ color: "black" }}>Email</InputLabel> */}
-                        <InputLabel
-                          sx={{
-                            color: "black",
-                            display: "flex",
-                            alignItems: "center",
-                          }}
-                        >
-                          Email
-                          <Typography sx={{ color: "red", ml: 0.5 }}>
-                            *
-                          </Typography>
-                        </InputLabel>
-                        <TextField
-                          fullWidth
-                          name="email"
-                          placeholder="Email"
-                          size="small"
-                          onChange={(e) => handleContactInputChange(index, e)}
-                          error={!!emailError}
-                          // helperText={pipelineNameError}
-                          sx={{ mt: 1.5, backgroundColor: "#fff" }}
-                        />
-                        {!!emailError && (
-                          <Alert
-                            sx={{
-                              width: "96%",
-                              p: "0", // Adjust padding to control the size
-                              pl: "4%",
-                              height: "23px",
-                              borderRadius: "10px",
-                              borderTopLeftRadius: "0",
-                              borderTopRightRadius: "0",
-                              fontSize: "15px",
-                              display: "flex",
-                              alignItems: "center", // Center content vertically
-                              "& .MuiAlert-icon": {
-                                fontSize: "16px", // Adjust the size of the icon
-                                mr: "8px", // Add margin to the right of the icon
-                              },
-                            }}
-                            variant="filled"
-                            severity="error"
-                          >
-                            {emailError}
-                          </Alert>
-                        )}
-                      </Box>
-                      {/* Switches for Login, Notify, and Email Sync */}
-                      <Box sx={{ mt: 1 }}>
-                        <FormControlLabel
-                          control={
-                            <Switch
-                              checked={contact.login === "true"}
-                              onChange={(e) =>
-                                handleContactSwitchChange(
-                                  index,
-                                  "login",
-                                  e.target.checked
-                                )
-                              }
-                              color="primary"
-                            />
-                          }
-                          label={
-                            <Typography>
-                              Login
-                              {/* <Typography component="span" sx={{ color: "red" }}>*</Typography> */}
-                            </Typography>
-                          }
-                        />
-                        <FormControlLabel
-                          control={
-                            <Switch
-                              checked={contact.notify === "true"}
-                              onChange={(e) =>
-                                handleContactSwitchChange(
-                                  index,
-                                  "notify",
-                                  e.target.checked
-                                )
-                              }
-                              color="primary"
-                            />
-                          }
-                          label={
-                            <Typography>
-                              Notify
-                              {/* <Typography component="span" sx={{ color: "red" }}>*</Typography> */}
-                            </Typography>
-                          }
-                        />
-                        <FormControlLabel
-                          control={
-                            <Switch
-                              checked={contact.emailSync === "true"}
-                              onChange={(e) =>
-                                handleContactSwitchChange(
-                                  index,
-                                  "emailSync",
-                                  e.target.checked
-                                )
-                              }
-                              color="primary"
-                            />
-                          }
-                          label={
-                            <Typography>
-                              Email Sync
-                              {/* <Typography component="span" sx={{ color: "red" }}>*</Typography> */}
-                            </Typography>
-                          }
-                        />
-                      </Box>
-
-                      <Box key={contact.id}>
-                        <InputLabel sx={{ color: "black" }}>Tags</InputLabel>
-
-                        <Autocomplete
-                          multiple
-                          options={tagsoptions}
-                          getOptionLabel={(option) => option.label}
-                          value={tagsoptions.filter((option) =>
-                            (contact.tags || []).includes(option.value)
-                          )}
-                          // value={contact.selectedTags || []} // Ensure it's an array
-                          onChange={(event, newValue) =>
-                            handleContactTagChange(index, event, newValue)
-                          }
-                          renderTags={(tagValue, getTagProps) =>
-                            tagValue.map((option, index) => (
-                              <Chip
-                                key={option.value}
-                                label={option.label}
-                                style={option.customTagStyle}
-                                {...getTagProps({ index })}
-                              />
-                            ))
-                          }
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              variant="outlined"
-                              size="small"
-                              placeholder="Select tags"
-                              sx={{ width: "100%", marginTop: "8px" }}
-                            />
-                          )}
-                          renderOption={(props, option) => (
-                            <Box
-                              component="li"
-                              {...props}
-                              style={option.customStyle}
-                            >
-                              {option.label}
-                            </Box>
-                          )}
-                        />
-                      </Box>
-                      <Typography
-                        variant="h6"
-                        gutterBottom
-                        sx={{ ml: 1, fontWeight: "bold", mt: 3 }}
-                      >
-                        Phone Numbers
-                      </Typography>
-                      {contact.phoneNumbers.map((phone, phoneIndex) => (
-                        <Box
-                          key={phone.id}
-                          sx={{
-                            display: "flex",
-                            flexDirection: "row",
-                            alignItems: "center",
-                            gap: 2,
-                            ml: 1,
-                            mb: 2,
-                          }}
-                        >
-                          {phone.isPrimary && (
-                            <Chip
-                              label="Primary phone"
-                              color="primary"
-                              size="small"
-                              sx={{ position: "absolute", mt: -3 }}
-                            />
-                          )}
-                          {/* <PhoneInput
-                            country={"us"}
-                            value={phone.phone}
-                            // onChange={(phoneValue) =>
-                            //   handleContactPhoneNumberChange(
-                            //     index,
-                            //     phoneIndex,
-                            //     phoneValue
-                            //   )
-                            // }
-                            onChange={(value, country) =>
-    handleContactPhoneNumberChange(value, country, phone.id)
-  }
-                            inputStyle={{
-                              width: "100%",
-                            }}
-                            buttonStyle={{
-                              borderTopLeftRadius: "8px",
-                              borderBottomLeftRadius: "8px",
-                            }}
-                            containerStyle={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "8px",
-                            }}
-                          /> */}
-                          <PhoneInput
-                            country={phone.country || "us"}
-                            value={phone.phone}
-                            onChange={(value, country) =>
-                              handleContactPhoneNumberChange(
-                                index,
-                                phoneIndex,
-                                value,
-                                country
-                              )
-                            }
-                            inputStyle={{ width: "100%" }}
-                            buttonStyle={{
-                              borderTopLeftRadius: "8px",
-                              borderBottomLeftRadius: "8px",
-                            }}
-                            containerStyle={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "8px",
-                            }}
-                          />
-
-                          <AiOutlineDelete
-                            onClick={() =>
-                              handleDeletePhoneNumber(index, phoneIndex)
-                            }
-                            style={{ cursor: "pointer", color: "red" }}
-                          />
-                        </Box>
-                      ))}
-
-                      <Box
-                        sx={{
-                          display: "flex",
-                          gap: 2,
-                          alignItems: isSmallScreen ? "center" : "flex-start",
-                          ml: 1,
-                          cursor: "pointer",
-                          color: "blue",
-                          fontWeight: 600,
-                        }}
-                        onClick={() => handleContactAddPhoneNumber(index)}
-                      >
-                        <AiOutlinePlusCircle style={{ marginTop: "20px" }} />
-                        <p>Add phone number</p>
-                      </Box>
-
-                      <Typography
-                        variant="h6"
-                        gutterBottom
-                        sx={{ ml: 1, fontWeight: "bold", mt: 3 }}
-                      >
-                        Address
-                      </Typography>
-
-                      <Box key={contact.id}>
-                        {/* Country Selection */}
-                        <Box>
-                          <InputLabel sx={{ color: "black" }}>
-                            Country
-                          </InputLabel>
-
-                          <Autocomplete
-                            size="small"
-                            options={countries}
-                            getOptionLabel={(option) => option.name}
-                            value={contact.country} // Update to reflect the contact's current country
-                            onChange={(event, newValue) => {
-                              // Update the contact's country in the contacts state
-                              const updatedContact = {
-                                ...contact,
-                                country: newValue, // Assuming newValue is an object { name, code }
-                              };
-                              setContacts((prevContacts) => {
-                                const updatedContacts = [...prevContacts];
-                                updatedContacts[index] = updatedContact; // Update the specific contact
-                                return updatedContacts;
-                              });
-                            }}
-                            renderOption={(props, option) => (
-                              <ListItem
-                                {...props}
-                                sx={{
-                                  display: "flex",
-                                  justifyContent: "space-between",
-                                  padding: "8px",
-                                  borderBottom: "1px solid #ddd",
-                                  cursor: "pointer",
-                                }}
-                              >
-                                <Typography sx={{ fontWeight: 500 }}>
-                                  {option.name}
-                                </Typography>
-                                <Typography
-                                  sx={{ fontSize: "0.9rem", color: "gray" }}
-                                >
-                                  {option.code}
-                                </Typography>
-                              </ListItem>
-                            )}
-                            renderInput={(params) => (
-                              <TextField
-                                {...params}
-                                placeholder="Country"
-                                variant="outlined"
-                                sx={{ marginTop: "8px", width: "100%" }}
-                              />
-                            )}
-                          />
-                        </Box>
-                      </Box>
-                      <Box>
-                        <InputLabel sx={{ color: "black", mt: 2 }}>
-                          Street address
-                        </InputLabel>
-                        <TextField
-                          fullWidth
-                          name="streetAddress"
-                          margin="normal"
-                          placeholder="Street address"
-                          size="small"
-                          onChange={(e) =>
-                            handleContactAddressChange(
-                              index,
-                              "streetAddress",
-                              e.target.value
-                            )
-                          }
-                        />
-                      </Box>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          flexDirection: isSmallScreen ? "column" : "row",
-                          gap: isSmallScreen ? 2 : 5,
-                          mt: 2,
-                        }}
-                      >
-                        <Box>
-                          <InputLabel sx={{ color: "black" }}>City</InputLabel>
-                          <TextField
-                            fullWidth
-                            margin="normal"
-                            name="city"
-                            placeholder="City"
-                            size="small"
-                            onChange={(e) =>
-                              handleContactAddressChange(
-                                index,
-                                "city",
-                                e.target.value
-                              )
-                            }
-                          />
-                        </Box>
-                        <Box>
-                          <InputLabel sx={{ color: "black" }}>
-                            State/Province
-                          </InputLabel>
-                          <TextField
-                            margin="normal"
-                            name="state"
-                            fullWidth
-                            placeholder="State/Province"
-                            size="small"
-                            onChange={(e) =>
-                              handleContactAddressChange(
-                                index,
-                                "state",
-                                e.target.value
-                              )
-                            }
-                          />
-                        </Box>
-                        <Box>
-                          <InputLabel sx={{ color: "black" }}>
-                            ZIP/Postal Code
-                          </InputLabel>
-                          <TextField
-                            margin="normal"
-                            fullWidth
-                            name="postalCode"
-                            placeholder="ZIP/Postal Code"
-                            size="small"
-                            onChange={(e) =>
-                              handleContactAddressChange(
-                                index,
-                                "postalCode",
-                                e.target.value
-                              )
-                            }
-                          />
-                        </Box>
-                      </Box>
-                    </form>
-                  </Box>
-                </Box>
-              ))}
-
-              <Box
-                sx={{
-                  display: "flex",
-                  gap: 2,
-                  alignItems: "center",
-                  ml: 1,
-                  cursor: "pointer",
-                  color: "#1976d3",
-                  fontWeight: 600,
-                  marginLeft: "20px",
-                }}
-              >
-                <AiOutlinePlusCircle />
-                <p onClick={addNewContact}>Add New Contact</p>
-              </Box>
-
-              <Box
-                sx={{
-                  display: "flex",
-                  gap: 4,
-                  padding: "1px 5px 0 5px",
-                }}
-              >
-                <Button
-                  variant="contained"
-                  color="primary"
-                  // sx={{
-                  //   mt: 2,
-                  //   ml: 3,
-                  //   borderRadius: "10px",
-                  // }}
-                  onClick={() => {
-                    handleOptionChange(null, "Account Info");
-                  }}
-                  sx={{
-                    backgroundColor: "var(--color-save-btn)", // Normal background
-
-                    "&:hover": {
-                      backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                    },
-                    borderRadius: "15px",
-                    width: "80px",
-                    mt: 2,
-                    ml: 3,
-                  }}
-                >
-                  Back
-                </Button>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                  // sx={{
-                  //   mt: 2,
-
-                  //   borderRadius: "10px",
-                  // }}
-                  // onClick={handlesubmitContact}
-                  onClick={handleopendialog}
-                  sx={{
-                    backgroundColor: "var(--color-save-btn)", // Normal background
-
-                    "&:hover": {
-                      backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                    },
-                    borderRadius: "15px",
-                    mt: 2,
-                  }}
-                >
-                  Create
-                </Button>
-                <Button
-                  type="button"
-                  variant="outlined"
-                  color="primary"
-                  onClick={handleOpen}
-                  // onClick={onClose}
-                  // sx={{
-                  //   mt: 2,
-
-                  //   borderRadius: "10px",
-                  // }}
-                  sx={{
-                    borderColor: "var(--color-border-cancel-btn)", // Normal background
-                    color: "var(--color-save-btn)",
-                    "&:hover": {
-                      backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-                      color: "#fff",
-                      border: "none",
-                    },
-                    width: "80px",
-                    borderRadius: "15px",
-                    mt: 2,
-                  }}
-                >
-                  Cancel
-                </Button>
-              </Box>
-              <Modal open={comfirmationOpen} onClose={handleClose}>
-                <Box
-                  sx={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    width: 300,
-                    bgcolor: "background.paper",
-                    p: 4,
-                    boxShadow: 24,
-                    borderRadius: 2,
-                  }}
-                >
-                  <Typography variant="h6" component="h2" mb={2}>
-                    Confirm Deletion
-                  </Typography>
-                  <Typography variant="body1" mb={4}>
-                    Are you sure you want to delete this data?
-                  </Typography>
-                  <Box display="flex" gap={3} ml={15}>
-                    <Button variant="text" onClick={handleClose}>
-                      Cancel
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="error"
-                      onClick={handleDeleteData}
-                    >
-                      Delete
-                    </Button>
-                  </Box>
-                </Box>
-              </Modal>
-              {/* Material-UI Dialog for Modal */}
-              <Dialog open={isModalVisible} onClose={handleCloseModal}>
-                <DialogTitle>Add portal access</DialogTitle>
-                <DialogContent>
-                  <p>You are adding portal access for the following users:</p>
-                  <div>{contacts.email}</div>
-                  <TextField
-                    label="Personal message"
-                    variant="outlined"
-                    fullWidth
-                    value={personalMessage}
-                    onChange={handleMessageChange}
-                    // onChange={(e) => handleContactInputChange(index, e)}
-                    sx={{ mt: 2 }}
+                <div className="space-y-1.5">
+                  <Label>Company Name <span className="text-destructive">*</span></Label>
+                  <Input
+                    placeholder="Company Name"
+                    value={companyname}
+                    className={companyNameError ? "border-destructive" : ""}
+                    onChange={(e) => { setcompanyname(e.target.value); if (e.target.value.trim()) setCompanyNameError(""); }}
                   />
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={handleCloseModal} color="primary">
-                    Skip
-                  </Button>
-                  <Button onClick={handlesubmitContact} color="primary">
-                    Send
-                  </Button>
-                </DialogActions>
-              </Dialog>
-            </Box>
+                  {companyNameError && <p className="text-xs text-destructive">{companyNameError}</p>}
+                </div>
+              )}
+            </div>
+
+            {/* Tags */}
+            <div className="space-y-1.5">
+              <Label>Tags</Label>
+              <TagsMultiSelectDropDown value={selectedTags} onChange={handleTagChange} placeholder="Tags" />
+            </div>
+
+            {/* Team Member */}
+            <div className="space-y-1.5">
+              <Label>Team Member</Label>
+              <MultiSelectDropdown value={selectedUser} onChange={handleUserChange} placeholder="Assignees" />
+            </div>
+
+            {/* Folder Template */}
+            <div className="space-y-1.5">
+              <Label>Folder Template <span className="text-destructive">*</span></Label>
+              <select
+                value={selectedTemplate?.value || ""}
+                onChange={(e) => handleSelectTemplate(optionfolder.find(f => f.value === e.target.value) || null)}
+                className={`${selectCls} ${foldertemplateError ? "border-destructive" : ""}`}
+              >
+                <option value="">Select folder template</option>
+                {optionfolder.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
+              </select>
+              {foldertemplateError && <p className="text-xs text-destructive">{foldertemplateError}</p>}
+            </div>
+
+            {/* Address (Company only) */}
+            {accountType === "Company" && (
+              <div className="space-y-3">
+                <SheetHeader className="px-0 py-0 space-y-0.5">
+                  <SheetTitle className="text-sm font-semibold">Address</SheetTitle>
+                  <SheetDescription className="text-xs">Company billing or mailing address.</SheetDescription>
+                </SheetHeader>
+                <div className="space-y-1.5">
+                  <Label>Country</Label>
+                  <select
+                    value={selectedCountry?.code || ""}
+                    onChange={(e) => setSelectedCountry(countries.find(c => c.code === e.target.value) || null)}
+                    className={selectCls}
+                  >
+                    <option value="">Select Country</option>
+                    {countries.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
+                  </select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Street Address</Label>
+                  <Input placeholder="Street address" value={cStreetAddress} onChange={(e) => SetCStreetAddress(e.target.value)} />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="space-y-1.5">
+                    <Label>City</Label>
+                    <Input placeholder="City" value={cCity} onChange={(e) => setCcity(e.target.value)} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>State/Province</Label>
+                    <Input placeholder="State/Province" value={cStateProvince} onChange={(e) => SetCStateProvince(e.target.value)} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>ZIP/Postal Code</Label>
+                    <Input placeholder="ZIP/Postal Code" value={cZipPostalCode} onChange={(e) => SetCZipPostalCode(e.target.value)} />
+                  </div>
+                </div>
+              </div>
+            )}
+
+          </div>
+        )}
+
+        {selectedOption === "Contact Info" && (
+          <div className="space-y-5 pb-4">
+            {/* Header + link existing */}
+            <div className="flex items-center justify-between">
+              <SheetTitle className="text-sm font-semibold">Contacts</SheetTitle>
+              <button type="button" onClick={handleClickOpen}
+                className="flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors">
+                <UserPlus className="h-3.5 w-3.5" />
+                Link existing contact
+              </button>
+            </div>
+
+            {/* Linked contacts list */}
+            {contactData.length > 0 ? (
+              <div className="space-y-2">
+                {contactData.map((contact) => (
+                  <div key={contact._id} className="rounded-lg border border-border/60 bg-muted/20 p-3">
+                    <div className="flex items-center justify-between">
+                      <button type="button" onClick={() => handleExpandClick(contact._id)}
+                        className="flex items-center gap-1.5 text-sm font-medium text-foreground">
+                        {expandedContact === contact._id
+                          ? <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                          : <ChevronRight className="h-4 w-4 text-muted-foreground" />}
+                        {contact.firstName} {contact.middleName} {contact.lastName}
+                      </button>
+                      <div className="relative">
+                        <button type="button"
+                          onClick={(e) => handleMenuClick(e, contact._id, contactName)}
+                          className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted transition-colors">
+                          <MoreVertical className="h-4 w-4" />
+                        </button>
+                        {menuOpen && anchorEl && (
+                          <div className="absolute right-0 top-8 z-50 min-w-[140px] rounded-md border border-border bg-popover shadow-md py-1">
+                            <button type="button" onClick={handleEditDescription}
+                              className="w-full px-3 py-1.5 text-left text-sm hover:bg-muted transition-colors">Edit Contact</button>
+                            <button type="button" onClick={handleUnlink}
+                              className="w-full px-3 py-1.5 text-left text-sm text-destructive hover:bg-destructive/10 transition-colors">Unlink</button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="mt-2 pl-5 space-y-1">
+                      {contact.companyName && <p className="text-xs text-muted-foreground">{contact.companyName}</p>}
+                      <p className="text-xs text-muted-foreground">{contact.email}</p>
+                      <div className="flex items-center gap-4 pt-1">
+                        {[{field: "login", label: "Login", onChange: (checked) => handleLoginToggle(checked, contact)},
+                          {field: "notify", label: "Notify", disabled: true},
+                          {field: "emailSync", label: "Email Sync"}].map(({field, label, onChange, disabled}) => (
+                          <label key={field} className="flex items-center gap-1.5 cursor-pointer">
+                            <input type="checkbox" checked={!!contact[field]}
+                              disabled={disabled}
+                              onChange={onChange ? (e) => onChange(e.target.checked) : undefined}
+                              className="h-3.5 w-3.5 rounded accent-primary" />
+                            <span className="text-xs text-foreground">{label}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    {expandedContact === contact._id && (
+                      <div className="mt-3 pl-5 space-y-2 border-t border-border/40 pt-3">
+                        {contact.note && (
+                          <div><p className="text-xs font-medium text-muted-foreground">Note</p><p className="text-xs text-foreground">{contact.note}</p></div>
+                        )}
+                        {contact.ssn && (
+                          <div><p className="text-xs font-medium text-muted-foreground">SSN</p><p className="text-xs text-foreground">{contact.ssn}</p></div>
+                        )}
+                        <div>
+                          <p className="text-xs font-medium text-muted-foreground mb-1">Address</p>
+                          <p className="text-xs text-foreground">{contact.country?.name}</p>
+                          <p className="text-xs text-foreground">{contact.streetAddress || "N/A"}</p>
+                          <p className="text-xs text-foreground">{[contact.city, contact.state, contact.postalCode].filter(Boolean).join(", ") || "N/A"}</p>
+                        </div>
+                        {contact.tags?.length > 0 && (
+                          <div>
+                            <p className="text-xs font-medium text-muted-foreground mb-1">Tags</p>
+                            <div className="flex flex-wrap gap-1">
+                              {contact.tags.map((tag, i) => (
+                                <span key={i} className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium text-white"
+                                  style={{ backgroundColor: tag.tagColour || "#6b7280" }}>{accountData?.accountName}</span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-lg border border-dashed border-border py-8 text-center">
+                <p className="text-sm font-medium text-foreground">No linked contacts</p>
+                <p className="text-xs text-muted-foreground mt-1">Link an existing contact or add a new one below.</p>
+              </div>
+            )}
+
+            {/* New contact forms */}
+            {contacts.map((contact, index) => (
+              <div key={index} className="rounded-lg border border-border bg-muted/10 p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <SheetTitle className="text-sm font-semibold">Contact {index + 1}</SheetTitle>
+                  <button type="button" onClick={() => handleDeleteContact(index)}
+                    className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors">
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+
+                {/* Name row */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="space-y-1">
+                    <Label>First Name <span className="text-destructive">*</span></Label>
+                    <Input name="firstName" placeholder="First Name"
+                      className={firstNameError ? "border-destructive" : ""}
+                      onChange={(e) => handleContactInputChange(index, e)} />
+                    {firstNameError && <p className="text-xs text-destructive">{firstNameError}</p>}
+                  </div>
+                  <div className="space-y-1">
+                    <Label>Middle Name</Label>
+                    <Input name="middleName" placeholder="Middle Name"
+                      onChange={(e) => handleContactInputChange(index, e)} />
+                  </div>
+                  <div className="space-y-1">
+                    <Label>Last Name <span className="text-destructive">*</span></Label>
+                    <Input name="lastName" placeholder="Last Name"
+                      className={lastNameError ? "border-destructive" : ""}
+                      onChange={(e) => handleContactInputChange(index, e)} />
+                    {lastNameError && <p className="text-xs text-destructive">{lastNameError}</p>}
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <Label>Contact Name</Label>
+                  <Input name="contactName" placeholder="Contact Name"
+                    value={contact.contactName} onChange={(e) => handleContactInputChange(index, e)} />
+                </div>
+                <div className="space-y-1">
+                  <Label>Company Name</Label>
+                  <Input name="companyName" placeholder="Company Name"
+                    onChange={(e) => handleContactInputChange(index, e)} />
+                </div>
+                <div className="space-y-1">
+                  <Label>Note</Label>
+                  <textarea name="note" placeholder="Note" rows={2}
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring resize-none"
+                    onChange={(e) => handleContactInputChange(index, e)} />
+                </div>
+                <div className="space-y-1">
+                  <Label>SSN</Label>
+                  <Input name="ssn" placeholder="SSN"
+                    onChange={(e) => handleContactInputChange(index, e)} />
+                </div>
+                <div className="space-y-1">
+                  <Label>Email <span className="text-destructive">*</span></Label>
+                  <Input name="email" placeholder="Email" type="email"
+                    className={emailError ? "border-destructive" : ""}
+                    onChange={(e) => handleContactInputChange(index, e)} />
+                  {emailError && <p className="text-xs text-destructive">{emailError}</p>}
+                </div>
+
+                {/* Toggles */}
+                <div className="flex items-center gap-5">
+                  {[{field:"login",label:"Login"},{field:"notify",label:"Notify"},{field:"emailSync",label:"Email Sync"}].map(({field,label}) => (
+                    <label key={field} className="flex items-center gap-1.5 cursor-pointer">
+                      <input type="checkbox" checked={contact[field] === "true"}
+                        onChange={(e) => handleContactSwitchChange(index, field, e.target.checked)}
+                        className="h-3.5 w-3.5 rounded accent-primary" />
+                      <span className="text-xs text-foreground">{label}</span>
+                    </label>
+                  ))}
+                </div>
+
+                {/* Tags */}
+                <div className="space-y-1">
+                  <Label>Tags</Label>
+                  <TagsMultiSelectDropDown
+                    value={tagsOptions.filter(o => (contact.tags || []).includes(o.value))}
+                    onChange={(newVal) => handleContactTagChange(index, null, newVal)}
+                    placeholder="Select tags"
+                  />
+                </div>
+
+                {/* Phone Numbers */}
+                <div className="space-y-2">
+                  <SheetHeader className="px-0 py-0 space-y-0">
+                    <SheetTitle className="text-xs font-semibold">Phone Numbers</SheetTitle>
+                  </SheetHeader>
+                  {contact.phoneNumbers.map((phone, phoneIndex) => (
+                    <div key={phone.id} className="flex items-center gap-2">
+                      {phone.isPrimary && (
+                        <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-full font-medium">Primary</span>
+                      )}
+                      <div className="flex-1">
+                        <PhoneInput country={phone.country || "us"} value={phone.phone}
+                          onChange={(value, country) => handleContactPhoneNumberChange(index, phoneIndex, value, country)}
+                          inputStyle={{ width: "100%", height: "36px", fontSize: "14px" }}
+                          buttonStyle={{ borderTopLeftRadius: "6px", borderBottomLeftRadius: "6px" }} />
+                      </div>
+                      <button type="button" onClick={() => handleDeletePhoneNumber(index, phoneIndex)}
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors">
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                  <button type="button" onClick={() => handleContactAddPhoneNumber(index)}
+                    className="flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors">
+                    <Plus className="h-3.5 w-3.5" />
+                    Add phone number
+                  </button>
+                </div>
+
+                {/* Address */}
+                <div className="space-y-2">
+                  <SheetHeader className="px-0 py-0 space-y-0">
+                    <SheetTitle className="text-xs font-semibold">Address</SheetTitle>
+                  </SheetHeader>
+                  <div className="space-y-1">
+                    <Label>Country</Label>
+                    <select
+                      value={contact.country?.code || ""}
+                      onChange={(e) => {
+                        const found = countries.find(c => c.code === e.target.value) || null;
+                        setContacts(prev => { const u = [...prev]; u[index] = {...u[index], country: found}; return u; });
+                      }}
+                      className={selectCls}>
+                      <option value="">Select Country</option>
+                      {countries.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
+                    </select>
+                  </div>
+                  <div className="space-y-1">
+                    <Label>Street Address</Label>
+                    <Input name="streetAddress" placeholder="Street address"
+                      onChange={(e) => handleContactAddressChange(index, "streetAddress", e.target.value)} />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                      <Label>City</Label>
+                      <Input placeholder="City"
+                        onChange={(e) => handleContactAddressChange(index, "city", e.target.value)} />
+                    </div>
+                    <div className="space-y-1">
+                      <Label>State/Province</Label>
+                      <Input placeholder="State/Province"
+                        onChange={(e) => handleContactAddressChange(index, "state", e.target.value)} />
+                    </div>
+                    <div className="space-y-1">
+                      <Label>ZIP/Postal Code</Label>
+                      <Input placeholder="ZIP/Postal Code"
+                        onChange={(e) => handleContactAddressChange(index, "postalCode", e.target.value)} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {/* Add new contact */}
+            <button type="button" onClick={addNewContact}
+              className="flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors">
+              <Plus className="h-4 w-4" />
+              Add New Contact
+            </button>
+
+
+            {/* Confirm deletion modal */}
+            {comfirmationOpen && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                <div className="w-80 rounded-xl border border-border bg-background p-6 shadow-xl">
+                  <SheetTitle className="text-base font-semibold mb-2">Confirm Deletion</SheetTitle>
+                  <p className="text-sm text-muted-foreground mb-6">Are you sure you want to delete this data?</p>
+                  <div className="flex items-center justify-end gap-2">
+                    <Button variant="ghost" size="sm" onClick={handleClose}>Cancel</Button>
+                    <Button variant="destructive" size="sm" onClick={handleDeleteData}>Delete</Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Portal access modal */}
+            {isModalVisible && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                <div className="w-96 rounded-xl border border-border bg-background p-6 shadow-xl">
+                  <SheetTitle className="text-base font-semibold mb-2">Add portal access</SheetTitle>
+                  <p className="text-sm text-muted-foreground mb-1">You are adding portal access for the following users:</p>
+                  <p className="text-sm text-foreground mb-4">{contacts.email}</p>
+                  <div className="space-y-1.5 mb-4">
+                    <Label>Personal message</Label>
+                    <textarea rows={3} value={personalMessage} onChange={handleMessageChange}
+                      className="w-full border border-input rounded-md px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-ring resize-none" />
+                  </div>
+                  <div className="flex items-center justify-end gap-2">
+                    <Button variant="ghost" size="sm" onClick={handleCloseModal}>Skip</Button>
+                    <Button size="sm" onClick={handlesubmitContact}>Send</Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Link contact dialog */}
+            {open && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                <div className="w-[480px] rounded-xl border border-border bg-background p-6 shadow-xl">
+                  <SheetTitle className="text-base font-semibold mb-1">Search for a Contact</SheetTitle>
+                  <p className="text-xs text-muted-foreground mb-4">Search by name, phone, or email. If the contact doesn't exist, cancel and create one first.</p>
+                  <div className="space-y-1.5 mb-4">
+                    <Label>Search</Label>
+                    <Input
+                      placeholder="Search contacts..."
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                  </div>
+                  {filteredContacts.length > 0 && (
+                    <div className="max-h-48 overflow-y-auto rounded-md border border-border mb-4">
+                      {filteredContacts.map((c) => (
+                        <label key={c.id} className="flex items-center gap-2 px-3 py-2 hover:bg-muted cursor-pointer">
+                          <input type="checkbox"
+                            checked={selectedContacts.includes(c.id)}
+                            onChange={(e) => setSelectedContacts(prev =>
+                              e.target.checked ? [...prev, c.id] : prev.filter(id => id !== c.id)
+                            )}
+                            className="h-3.5 w-3.5 rounded accent-primary" />
+                          <span className="text-sm text-foreground">{c.name}</span>
+                          <span className="text-xs text-muted-foreground ml-auto">{c.email}</span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                  <div className="flex items-center justify-end gap-2">
+                    <Button variant="ghost" size="sm" onClick={handleDialogClose}>Cancel</Button>
+                    <Button size="sm" onClick={handleLinkAccounts}>Add</Button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Sticky footer — actions change per step */}
+      <SheetFooter className="border-t border-border/40 pt-3 pb-1">
+        <div className="flex items-center justify-between w-full">
+          {selectedOption === "Account Info" ? (
+            <>
+              <span />
+              <Button size="sm" onClick={() => handleOptionChange(null, "Contact Info")} className="gap-1.5">
+                Continue <ChevronRight className="h-3.5 w-3.5" />
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="ghost" size="sm" onClick={() => handleOptionChange(null, "Account Info")}>
+                Back
+              </Button>
+              <div className="flex items-center gap-2">
+                <Button variant="ghost" size="sm" onClick={handleOpen}>Cancel</Button>
+                <Button size="sm" onClick={handleopendialog}>Create</Button>
+              </div>
+            </>
           )}
-        </Box>
-      </Box>
-    </Box>
+        </div>
+      </SheetFooter>
+    </div>
   );
 };
 

@@ -1,789 +1,20 @@
-
-// import React, { useState, useEffect,useMemo } from "react";
-// import PhoneInput from "react-phone-input-2";
-// import "react-phone-input-2/lib/style.css";
-
-// import { AiOutlinePlusCircle, AiOutlineDelete } from "react-icons/ai";
-// import {
-//   Button,
-//   Box,
-//   Typography,
-//   useMediaQuery,
-//   Chip,
-//   MenuItem,
-//   Select,
-//   ListItem,
-//   TextField,
-//   InputLabel,
-//   Autocomplete,
-//   Alert,
-//   FormControl,
-//   OutlinedInput,
-// } from "@mui/material";
-// import { useTheme } from "@mui/material/styles";
-// import axios from "axios";
-// import { useNavigate } from "react-router-dom";
-// // import "./contact.css";
-// import TagsMultiSelectDropDown from "../Templates/TagsMultiSelectDropDown"
-// import { toast } from "react-toastify";
-// import { RxCross2 } from "react-icons/rx";
-// import countryList from "react-select-country-list";
-// const ContactForm = ({ open,onClose,contact }) => {
-//   const CONTACT_API = process.env.REACT_APP_CONTACTS_URL;
-
-
-//   const navigate = useNavigate();
-//   const theme = useTheme();
-//   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
-
-//   const [phoneNumbers, setPhoneNumbers] = useState([]);
-//   const [countries, setCountries] = useState([]);
-//   const [selectedCountry, setSelectedCountry] = useState(null);
-
-//   // Individual state hooks for form fields
-//   const [firstName, setFirstName] = useState("");
-//   const [middleName, setMiddleName] = useState("");
-//   const [lastName, setLastName] = useState("");
-//   const [contactName, setContactName] = useState("");
-//   const [companyName, setCompanyName] = useState("");
-//   const [note, setNote] = useState("");
-//   const [ssn, setSsn] = useState("");
-//   const [email, setEmail] = useState("");
-
-//   const [streetAddress, setStreetAddress] = useState("");
-//   const [city, setCity] = useState("");
-//   const [state, setState] = useState("");
-//   const [postalCode, setPostalCode] = useState("");
-//   const [combinedValues, setCombinedValues] = useState();
-
-//   console.log(selectedCountry);
-  
-//   const options = useMemo(() => countryList().getData(), []);
- 
-
-//    const handlePhoneNumberChange = (phoneValue, countryData, id) => {
-//   setPhoneNumbers(prevPhoneNumbers =>
-//     prevPhoneNumbers.map(item =>
-//       item.id === id
-//         ? {
-//             ...item,
-//             phone: phoneValue,
-//             countryCode: countryData.dialCode, // Store country dial code
-//             country: countryData.countryCode.toLowerCase() // Store country code (e.g., 'us')
-//           }
-//         : item
-//     )
-//   );
-// };
-//   // Update contactName when firstName, middleName, or lastName changes
-//   useEffect(() => {
-//     setContactName(`${firstName} ${middleName} ${lastName}`.trim());
-//   }, [firstName, middleName, lastName]);
-
-  
-//   const handleAddPhoneNumber = () => {
-//   setPhoneNumbers(prevPhoneNumbers => [
-//     ...prevPhoneNumbers,
-//     { 
-//       id: Date.now(), 
-//       phone: "", 
-//       country: "us", // Default country
-//       isPrimary: false 
-//     },
-//   ]);
-// };
-
-//   const handleDeletePhoneNumber = (id) => {
-//     setPhoneNumbers((prevPhoneNumbers) =>
-//       prevPhoneNumbers.filter((item) => item.id !== id)
-//     );
-//   };
-
-//   const [firstNameError, setFirstNameError] = useState("");
-//   const [lastNameError, setLastNameError] = useState("");
-//   const [emailError, setEmaileError] = useState("");
-//   const validateForm = () => {
-//     let isValid = true;
-//     if (!firstName) {
-//       setFirstNameError("First name is required");
-
-//       isValid = false;
-//     } else {
-//       setFirstNameError("");
-//     }
-
-//     if (!lastName) {
-//       setLastNameError("Last name is required.");
-//       isValid = false;
-//     } else {
-//       setLastNameError("");
-//     }
-    
-//     // Email
-//   if (!email?.trim()) {
-//     setEmaileError("Email is required.");
-//     isValid = false;
-//   } else if (
-//     !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)
-//   ) {
-//     setEmaileError("Please enter a valid email address.");
-//     isValid = false;
-//   } else {
-//     setEmaileError("");
-//   }
-//     return isValid;
-//   };
-// //   const sendingData = async (e) => {
-// //     e.preventDefault();
-
-// //     // Validate form before proceeding
-// //     if (!validateForm()) {
-// //       return; // Stop execution if validation fails
-// //     }
-
-// //     handleNewDrawerClose();
-// //     handleDrawerClose();
- 
-// //   const formattedPhoneNumbers = phoneNumbers.map(phone => phone.phone);
-
-
-// // console.log("formattedPhoneNumbers",formattedPhoneNumbers)
-// //     const raw = JSON.stringify([
-// //       {
-// //         firstName: firstName,
-// //         middleName: middleName,
-// //         lastName: lastName,
-// //         contactName: contactName,
-// //         companyName: companyName,
-// //         note: note,
-// //         ssn: ssn,
-// //         email: email,
-// //         // login: false,
-// //         // notify: false,
-// //         // emailSync: false,
-// //         tags: combinedValues,
-
-// //         country: selectedCountry,
-// //         streetAddress: streetAddress,
-// //         city: city,
-// //         state: state,
-// //         postalCode: postalCode,
-// //         phoneNumbers: formattedPhoneNumbers,
-// //       },
-// //     ]);
-// //     console.log(raw);
-// //     const requestOptions = {
-// //       method: "POST",
-
-// //       headers: {
-// //         "Content-Type": "application/json",
-// //       },
-// //       body: raw,
-// //       redirect: "follow",
-// //     };
-// //     const url = "https://www.snptaxes.com/api/contacts";
-// //     fetch(url, requestOptions)
-// //       .then((response) => {
-// //         if (!response.ok) {
-// //           throw new Error("Network response was not ok");
-// //         }
-// //         return response.json();
-// //       })
-// //       .then((result) => {
-// //         // Handle success
-// //         toast.success("Contact created successfully!");
-// //         //console.log('Contact ID:', result);  // Log the contactId
-// //         navigate("/clients/contacts");
-// //         // Additional logic after successful creation if needed
-// //       })
-// //       .catch((error) => {
-// //         // Handle errors
-// //         console.error(error);
-// //         toast.error("Failed to create contact");
-// //       });
-// //   };
-// const sendingData = async (e) => {
-//   e.preventDefault();
-
-//   if (!validateForm()) return;
-
-  
-
-//   const formattedPhoneNumbers = phoneNumbers.map((item) => item.phone);
-
-//   const countryPayload = selectedCountry
-//     ? { name: selectedCountry.label, code: selectedCountry.value }
-//     : null;
-
-//   const payload = JSON.stringify({
-//     firstName,
-//     middleName,
-//     lastName,
-//     contactName,
-//     companyName,
-//     note,
-//     ssn,
-//     email,
-//     tags: combinedValues,
-//     country: countryPayload,
-//     streetAddress,
-//     city,
-//     state,
-//     postalCode,
-//     phoneNumbers: formattedPhoneNumbers,
-//   });
-
-//   const requestOptions = {
-//     method: "POST",
-//     headers: { "Content-Type": "application/json" },
-//     body: payload
-//   };
-
-//   fetch("https://www.snptaxes.com/api/contacts", requestOptions)
-//     .then((res) => {
-//       if (!res.ok) throw new Error("Request failed");
-//       return res.json();
-//     })
-//     .then(() => {
-//       toast.success("Contact created successfully!");
-//       navigate("/clients/contacts");
-//     })
-//     .catch(() => {
-//       toast.error("Failed to create contact");
-//     });
-// };
-
-//   const handleClose = () => {
-//    onClose()
-//   };
-
-//   const [selectedTags, setSelectedTags] = useState([]);
-
-//   //Tag FetchData ================
-//   const handleTagChange = (newSelectedTags) => {
-//     setSelectedTags(newSelectedTags);
-//     console.log(newSelectedTags)
-//     const selectedValues = newSelectedTags.map((option) => option.value);
-//     setCombinedValues(selectedValues);
-//     console.log(selectedValues)
-//   };
-//   return (
-//     <Box>
-//       <Box
-//         sx={{
-//           display: "flex",
-//           justifyContent: "space-between",
-//           alignItems: "center",
-//           p: 2,
-//           borderBottom: "1px solid grey",
-//         }}
-//       >
-//         <Typography sx={{ fontWeight: "550", fontSize: "20px" }}>
-//           New Contact 
-//         </Typography>
-//         <RxCross2
-//           onClick={onClose}
-//           style={{ cursor: "pointer" }}
-//         />
-//       </Box>
-//       <form
-//         style={{
-       
-//           paddingRight: "3%",
-//           paddingLeft: "3%",
-//           height: "90vh",
-//           overflowY: "auto",
-//         }}
-//         className="contact-form"
-//       >
-   
-//         <Box
-//           sx={{
-//             display: "flex",
-//             flexDirection: isSmallScreen ? "column" : "row",
-//             gap: isSmallScreen ? 2 : 5,
-//             padding: "1px 5px 0 2px",
-//             mt: 1,
-//           }}
-//         >
-//           <Box>
-          
-//             <InputLabel
-//               sx={{
-//                 color: "black",
-//                 display: "flex",
-//                 alignItems: "center",
-//               }}
-//             >
-//               First Name
-//               <Typography sx={{ color: "red", ml: 0.5 }}>*</Typography>
-//             </InputLabel>
-//             <TextField
-//               // margin="normal"
-//               fullWidth
-//               name="firstName"
-//               value={firstName}
-//               sx={{ mt: 1.5, backgroundColor: "#fff" }}
-//               // onChange={(e) => setFirstName(e.target.value)}
-//               onChange={(e) => {
-//                 const value = e.target.value;
-//                 setFirstName(value);
-
-//                 // Clear the error message when input is not empty
-//                 if (value.trim() !== "") {
-//                   setFirstNameError("");
-//                 }
-//               }}
-//               placeholder="First Name"
-//               size="small"
-//               error={!!firstNameError}
-//             />
-           
-//           </Box>
-//           <Box>
-         
-//             <InputLabel
-//               sx={{
-//                 color: "black",
-//                 display: "flex",
-//                 alignItems: "center",
-//               }}
-//             >
-//               Middle Name
-//             </InputLabel>
-//             <TextField
-           
-//               sx={{ mt: 1.5, backgroundColor: "#fff" }}
-//               fullWidth
-//               name="middleName"
-//               value={middleName}
-//               onChange={(e) => setMiddleName(e.target.value)}
-//               placeholder="Middle Name"
-//               size="small"
-//             />
-//           </Box>
-//           <Box>
-          
-//             <InputLabel
-//               sx={{
-//                 color: "black",
-//                 display: "flex",
-//                 alignItems: "center",
-//               }}
-//             >
-//               Last Name
-//               <Typography sx={{ color: "red", ml: 0.5 }}>*</Typography>
-//             </InputLabel>
-            
-
-//             <TextField
-//               fullWidth
-//               name="lastName"
-//               value={lastName}
-            
-//               placeholder="Last name"
-//               size="small"
-//               sx={{ mt: 1.5, backgroundColor: "#fff" }}
-             
-//               onChange={(e) => {
-//                 const value = e.target.value;
-//                 setLastName(value);
-
-//                 // Clear the error message when input is not empty
-//                 if (value.trim() !== "") {
-//                   setLastNameError("");
-//                 }
-//               }}
-//               error={!!firstNameError}
-//             />
-//             {!!lastNameError && (
-//               <Alert
-//                 sx={{
-//                   width: "96%",
-//                   p: "0", // Adjust padding to control the size
-//                   pl: "4%",
-//                   height: "23px",
-//                   borderRadius: "10px",
-//                   borderTopLeftRadius: "0",
-//                   borderTopRightRadius: "0",
-//                   fontSize: "11px",
-//                   display: "flex",
-//                   alignItems: "center", // Center content vertically
-//                   "& .MuiAlert-icon": {
-//                     fontSize: "16px", // Adjust the size of the icon
-//                     mr: "8px", // Add margin to the right of the icon
-//                   },
-//                 }}
-//                 variant="filled"
-//                 severity="error"
-//               >
-//                 {lastNameError}
-//               </Alert>
-//             )}
-//           </Box>
-//         </Box>
-//         <Box mt={1}>
-//           <InputLabel sx={{ color: "black" }}>Contact Name</InputLabel>
-
-//           <TextField
-//             name="contactName"
-//             value={contactName}
-//             onChange={(e) => setContactName(e.target.value)}
-//             fullWidth
-//             placeholder="Contact Name"
-//             margin="normal"
-//             size="small"
-//           />
-//         </Box>
-//         <Box mt={1}>
-//           <InputLabel sx={{ color: "black" }}>Company Name</InputLabel>
-
-//           <TextField
-//             fullWidth
-//             name="companyName"
-//             value={companyName}
-//             onChange={(e) => setCompanyName(e.target.value)}
-//             margin="normal"
-//             placeholder="Company Name"
-//             size="small"
-//           />
-//         </Box>
-//         <Box mt={1}>
-          
-//           <InputLabel
-//             sx={{
-//               color: "black",
-//               display: "flex",
-//               alignItems: "center",
-//             }}
-//           >
-//             Email
-//             <Typography sx={{ color: "red", ml: 0.5 }}>*</Typography>
-//           </InputLabel>
-//           <TextField
-//             fullWidth
-//             name="email"
-//             value={email}
-//             // onChange={(e) => setEmail(e.target.value)}
-//             // margin="normal"
-//             placeholder="Email"
-//             size="small"
-//             sx={{ mt: 1.5, backgroundColor: "#fff" }}
-           
-//             onChange={(e) => {
-//   const value = e.target.value;
-//   setEmail(value);
-
-//   if (!value.trim()) {
-//     setEmaileError("Email is required.");
-//   } else if (!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(value)) {
-//     setEmaileError("Please enter a valid email address.");
-//   } else {
-//     setEmaileError(""); // Clear error when valid
-//   }
-// }}
-
-//             error={!!emailError}
-//           />
-//           {!!emailError && (
-//             <Alert
-//               sx={{
-//                 width: "96%",
-//                 p: "0", // Adjust padding to control the size
-//                 pl: "4%",
-//                 height: "23px",
-//                 borderRadius: "10px",
-//                 borderTopLeftRadius: "0",
-//                 borderTopRightRadius: "0",
-//                 fontSize: "11px",
-//                 display: "flex",
-//                 alignItems: "center", // Center content vertically
-//                 "& .MuiAlert-icon": {
-//                   fontSize: "16px", // Adjust the size of the icon
-//                   mr: "8px", // Add margin to the right of the icon
-//                 },
-//               }}
-//               variant="filled"
-//               severity="error"
-//             >
-//               {emailError}
-//             </Alert>
-//           )}
-//         </Box>
-//         <Box mt={1} mr={2}>
-         
-//           <InputLabel sx={{ color: "black", mb: 1 }}>Tags</InputLabel>
-         
-//           <TagsMultiSelectDropDown 
-//   value={selectedTags}
-//   onChange={handleTagChange}
-//   placeholder="Tags"
-// />
-
-//         </Box>
-//         <Box mt={1}>
-//           <InputLabel sx={{ color: "black" }}>Note</InputLabel>
-
-//           <TextField
-//             fullWidth
-//             name="note"
-//             value={note}
-//             multiline
-//             onChange={(e) => setNote(e.target.value)}
-//             margin="normal"
-//             placeholder="Note"
-//             size="small"
-//           />
-//         </Box>
-//         <Box mt={1}>
-//           <InputLabel sx={{ color: "black" }}>SSN</InputLabel>
-
-//           <TextField
-//             fullWidth
-//             name="ssn"
-//             value={ssn}
-//             onChange={(e) => setSsn(e.target.value)}
-//             margin="normal"
-//             placeholder="SSN"
-//             size="small"
-//           />
-//         </Box>
-
-//         <Typography
-//           variant="h6"
-//           gutterBottom
-//           sx={{ ml: 1, fontWeight: "bold", mt: 3 }}
-//         >
-//           Phone Numbers
-//         </Typography>
-//         {phoneNumbers.map((phone) => (
-//           <Box
-//             key={phone.id}
-//             sx={{
-//               display: "flex",
-//               flexDirection: "row",
-//               alignItems: "center",
-//               gap: 2,
-//               ml: 1,
-//               mb: 2,
-//             }}
-//           >
-//             {phone.isPrimary && (
-//               <Chip
-//                 label="Primary phone"
-//                 color="primary"
-//                 size="small"
-//                 sx={{ position: "absolute", mt: -3 }}
-//               />
-//             )}
-            
-// <PhoneInput
-// country={"us"}
-//   value={phone.phone}
-//   // onChange={(phoneValue) => handlePhoneNumberChange(phone.id, phoneValue)}
-//      onChange={(value, country) => handlePhoneNumberChange(value, country, phone.id)}
-//   inputStyle={{
-//     width: "100%",
-//   }}
-//   buttonStyle={{
-//     borderTopLeftRadius: "8px",
-//     borderBottomLeftRadius: "8px",
-//   }}
-//   containerStyle={{
-//     display: "flex",
-//     alignItems: "center",
-//     gap: "8px",
-//   }}
-// />
-//             <AiOutlineDelete
-//               onClick={() => handleDeletePhoneNumber(phone.id)}
-//               style={{ cursor: "pointer", color: "red" }}
-//             />
-//           </Box>
-//         ))}
-//         <Box
-//           sx={{
-//             display: "flex",
-//             gap: 2,
-//             alignItems: isSmallScreen ? "center" : "flex-start",
-//             ml: 1,
-//             cursor: "pointer",
-//             color: "blue",
-//             fontWeight: 600,
-//           }}
-//           onClick={handleAddPhoneNumber}
-//         >
-//           <AiOutlinePlusCircle style={{ marginTop: "20px" }} />
-//           <p>Add phone number</p>
-//         </Box>
-//         <Typography
-//           variant="h6"
-//           gutterBottom
-//           sx={{ ml: 1, fontWeight: "bold", mt: 3 }}
-//         >
-//           Address
-//         </Typography>
-//         <Box>
-//           <InputLabel sx={{ color: "black" }}>Country</InputLabel>
-
-         
-//           <Autocomplete
-//       options={options}
-//       size="small"
-//       getOptionLabel={(option) => option.label} // show country name
-//       value={selectedCountry}
-//       onChange={(event, newValue) => setSelectedCountry(newValue)}
-//       renderInput={(params) => (
-//         <TextField {...params} placeholder="Select Country" variant="outlined" />
-//       )}
-      
-//     />
-//         </Box>
-//         <Box>
-//           <InputLabel sx={{ color: "black", mt: 2 }}>Street address</InputLabel>
-//           <TextField
-//             fullWidth
-//             name="streetAddress"
-//             value={streetAddress}
-//             onChange={(e) => setStreetAddress(e.target.value)}
-//             margin="normal"
-//             placeholder="Street address"
-//             size="small"
-//           />
-//         </Box>
-//         <Box
-//           sx={{
-//             display: "flex",
-//             flexDirection: isSmallScreen ? "column" : "row",
-//             gap: isSmallScreen ? 2 : 5,
-//             mt: 2,
-//           }}
-//         >
-//           <Box>
-//             <InputLabel sx={{ color: "black" }}>City</InputLabel>
-//             <TextField
-//               fullWidth
-//               margin="normal"
-//               name="city"
-//               value={city}
-//               onChange={(e) => setCity(e.target.value)}
-//               placeholder="City"
-//               size="small"
-//             />
-//           </Box>
-//           <Box>
-//             <InputLabel sx={{ color: "black" }}>State/Province</InputLabel>
-
-//             <TextField
-//               margin="normal"
-//               name="state"
-//               fullWidth
-//               value={state}
-//               onChange={(e) => setState(e.target.value)}
-//               placeholder="State/Province"
-//               size="small"
-//             />
-//           </Box>
-//           <Box>
-//             <InputLabel sx={{ color: "black" }}>ZIP/Postal Code</InputLabel>
-
-//             <TextField
-//               margin="normal"
-//               fullWidth
-//               name="postalCode"
-//               value={postalCode}
-//               onChange={(e) => setPostalCode(e.target.value)}
-//               placeholder="ZIP/Postal Code"
-//               size="small"
-//             />
-//           </Box>
-//         </Box>
-//         <Box
-//           sx={{
-//             display: "flex",
-//             gap: 4,
-//             padding: "1px 5px 15px 5px",
-//           }}
-//         >
-//           <Button
-//             type="submit"
-//             variant="contained"
-//             color="primary"
-//             onClick={sendingData}
-  
-//             sx={{
-//               backgroundColor: "var(--color-save-btn)", // Normal background
-
-//               "&:hover": {
-//                 backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-//               },
-//               borderRadius: "15px",
-//               mt: 2,
-//               width: isSmallScreen ? "100%" : "auto",
-//             }}
-//           >
-//             Update
-//           </Button>
-//           <Button
-//             type="button"
-//             variant="outlined"
-//             color="primary"
-//             onClick={handleClose}
-           
-//             sx={{
-//               borderColor: "var(--color-border-cancel-btn)", // Normal background
-//               color: "var(--color-save-btn)",
-//               "&:hover": {
-//                 backgroundColor: "var(--color-save-hover-btn)", // Hover background color
-//                 color: "#fff",
-//                 border: "none",
-//               },
-//               width: isSmallScreen ? "100%" : "auto",
-//               borderRadius: "15px",
-//               mt: 2,
-//             }}
-//           >
-//             Cancel
-//           </Button>
-//         </Box>
-//       </form>
-//     </Box>
-//   );
-// };
-
-// export default ContactForm;
-
-
- import {
-  Drawer,
-  Box,
-  Typography,
-  TextField,
-  InputLabel,
-  Button,
-  Chip,
-  Alert,
-  Autocomplete,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
-import { RxCross2 } from "react-icons/rx";
-import { AiOutlineDelete, AiOutlinePlusCircle } from "react-icons/ai";
-import PhoneInput from "react-phone-input-2";
-import "react-phone-input-2/lib/style.css";
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-// import "react-phone-number-input/style.css";
-import TagsMultiSelectDropDown from "./TagsMultiSelectDropDown";
+import { Trash2, Plus, Loader2 } from "lucide-react";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
 import countryList from "react-select-country-list";
+import TagsMultiSelectDropDown from "./TagsMultiSelectDropDown";
+import { SideSheet } from "../components/ui/side-sheet";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { Textarea } from "../components/ui/textarea";
+import { Button } from "../components/ui/button";
 
 const ContactForm = ({ open, onClose, contact, onSave }) => {
   const CONTACT_API = process.env.REACT_APP_CONTACTS_URL;
-
   const navigate = useNavigate();
-  const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [phoneNumbers, setPhoneNumbers] = useState([]);
   const [selectedCountry, setSelectedCountry] = useState(null);
@@ -1036,72 +267,56 @@ const ContactForm = ({ open, onClose, contact, onSave }) => {
     setCombinedValues(selectedValues);
   };
 
-  return (
-    <Drawer
-      anchor="right"
-      open={open}
-      onClose={handleClose}
-      PaperProps={{ sx: { width: { xs: '100%', sm: 600 }, maxWidth: '100vw', borderRadius: { sm: '12px 0 0 12px' } } }}
-    >
-      {/* Header */}
-      <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200">
-        <h2 className="text-lg font-semibold text-slate-900">
-          {contact ? 'Edit Contact' : 'New Contact'}
-        </h2>
-        <button onClick={handleClose} className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors">
-          <RxCross2 size={18} />
-        </button>
-      </div>
+  const fieldCls = "h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring";
+  const countriesList = useMemo(() => countryList().getData(), []);
 
-      {/* Form */}
-      <form onSubmit={sendingData} className="p-5 overflow-y-auto flex-1 space-y-4">
+  return (
+    <SideSheet
+      open={open}
+      onOpenChange={(v) => !v && handleClose()}
+      title={contact ? 'Edit Contact' : 'New Contact'}
+      size="lg"
+      hideDefaultFooter
+    >
+      <form onSubmit={sendingData} className="space-y-4">
         {/* Name row */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">First Name <span className="text-red-500">*</span></label>
-            <TextField fullWidth size="small" name="firstName" value={firstName} placeholder="First Name" error={!!firstNameError}
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+          <div className="space-y-1.5">
+            <Label>First Name <span className="text-destructive">*</span></Label>
+            <Input value={firstName} placeholder="First Name"
+              className={!!firstNameError ? "border-destructive" : ""}
               onChange={(e) => { setFirstName(e.target.value); if (e.target.value.trim()) setFirstNameError(""); }}
             />
-            {!!firstNameError && <p className="text-xs text-red-500 mt-0.5">{firstNameError}</p>}
+            {!!firstNameError && <p className="text-xs text-destructive">{firstNameError}</p>}
           </div>
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Middle Name</label>
-            <TextField fullWidth size="small" name="middleName" value={middleName} placeholder="Middle Name"
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
-              onChange={(e) => setMiddleName(e.target.value)}
-            />
+          <div className="space-y-1.5">
+            <Label>Middle Name</Label>
+            <Input value={middleName} placeholder="Middle Name" onChange={(e) => setMiddleName(e.target.value)} />
           </div>
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Last Name <span className="text-red-500">*</span></label>
-            <TextField fullWidth size="small" name="lastName" value={lastName} placeholder="Last Name" error={!!lastNameError}
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+          <div className="space-y-1.5">
+            <Label>Last Name <span className="text-destructive">*</span></Label>
+            <Input value={lastName} placeholder="Last Name"
+              className={!!lastNameError ? "border-destructive" : ""}
               onChange={(e) => { setLastName(e.target.value); if (e.target.value.trim()) setLastNameError(""); }}
             />
-            {!!lastNameError && <p className="text-xs text-red-500 mt-0.5">{lastNameError}</p>}
+            {!!lastNameError && <p className="text-xs text-destructive">{lastNameError}</p>}
           </div>
         </div>
 
-        <div>
-          <label className="block text-xs font-semibold text-slate-700 mb-1">Contact Name</label>
-          <TextField fullWidth size="small" name="contactName" value={contactName} placeholder="Contact Name"
-            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
-            onChange={(e) => setContactName(e.target.value)}
-          />
+        <div className="space-y-1.5">
+          <Label>Contact Name</Label>
+          <Input value={contactName} placeholder="Contact Name" onChange={(e) => setContactName(e.target.value)} />
         </div>
 
-        <div>
-          <label className="block text-xs font-semibold text-slate-700 mb-1">Company Name</label>
-          <TextField fullWidth size="small" name="companyName" value={companyName} placeholder="Company Name"
-            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
-            onChange={(e) => setCompanyName(e.target.value)}
-          />
+        <div className="space-y-1.5">
+          <Label>Company Name</Label>
+          <Input value={companyName} placeholder="Company Name" onChange={(e) => setCompanyName(e.target.value)} />
         </div>
 
-        <div>
-          <label className="block text-xs font-semibold text-slate-700 mb-1">Email <span className="text-red-500">*</span></label>
-          <TextField fullWidth size="small" name="email" value={email} placeholder="Email" error={!!emailError}
-            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+        <div className="space-y-1.5">
+          <Label>Email <span className="text-destructive">*</span></Label>
+          <Input value={email} placeholder="Email" type="email"
+            className={!!emailError ? "border-destructive" : ""}
             onChange={(e) => {
               const value = e.target.value;
               setEmail(value);
@@ -1110,118 +325,103 @@ const ContactForm = ({ open, onClose, contact, onSave }) => {
               else setEmailError("");
             }}
           />
-          {!!emailError && <p className="text-xs text-red-500 mt-0.5">{emailError}</p>}
+          {!!emailError && <p className="text-xs text-destructive">{emailError}</p>}
         </div>
 
-        <div>
-          <label className="block text-xs font-semibold text-slate-700 mb-1">Tags</label>
+        <div className="space-y-1.5">
+          <Label>Tags</Label>
           <TagsMultiSelectDropDown value={selectedTags} onChange={handleTagChange} placeholder="Tags" />
         </div>
 
-        <div>
-          <label className="block text-xs font-semibold text-slate-700 mb-1">Note</label>
-          <TextField fullWidth size="small" name="note" value={note} multiline rows={3} placeholder="Note"
-            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
-            onChange={(e) => setNote(e.target.value)}
-          />
+        <div className="space-y-1.5">
+          <Label>Note</Label>
+          <Textarea value={note} placeholder="Note" rows={3} onChange={(e) => setNote(e.target.value)} />
         </div>
 
-        <div>
-          <label className="block text-xs font-semibold text-slate-700 mb-1">SSN</label>
-          <TextField fullWidth size="small" name="ssn" value={ssn} placeholder="SSN"
-            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
-            onChange={(e) => setSsn(e.target.value)}
-          />
+        <div className="space-y-1.5">
+          <Label>SS</Label>
+          <Input value={ssn} placeholder="SSN" onChange={(e) => setSsn(e.target.value)} />
         </div>
 
         {/* Phone Numbers */}
-        <div>
-          <h3 className="text-sm font-semibold text-slate-900 mb-2">Phone Numbers</h3>
+        <div className="space-y-2">
+          <p className="text-sm font-semibold text-foreground">Phone Numbers</p>
           <div className="space-y-2">
             {phoneNumbers.map((phone) => (
               <div key={phone.id} className="flex items-center gap-2 relative">
                 {phone.isPrimary && (
-                  <span className="absolute -top-2 left-0 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-indigo-50 text-indigo-700 border border-indigo-200">Primary</span>
+                  <span className="absolute -top-2 left-0 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-primary/10 text-primary">Primary</span>
                 )}
                 <div className="flex-1">
                   <PhoneInput
-                    country={"us"}
+                    country="us"
                     value={phone.phone}
                     onChange={(value, country) => handlePhoneNumberChange(value, country, phone.id)}
-                    inputStyle={{ width: "100%", borderRadius: "8px" }}
-                    buttonStyle={{ borderTopLeftRadius: "8px", borderBottomLeftRadius: "8px" }}
-                    containerStyle={{ display: "flex", alignItems: "center", gap: "8px" }}
+                    inputStyle={{ width: "100%", borderRadius: "6px", height: "36px", fontSize: "14px" }}
+                    buttonStyle={{ borderTopLeftRadius: "6px", borderBottomLeftRadius: "6px" }}
                   />
                 </div>
-                <button type="button" onClick={() => handleDeletePhoneNumber(phone.id)} className="p-1.5 rounded-md text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors">
-                  <AiOutlineDelete size={16} />
+                <button type="button" onClick={() => handleDeletePhoneNumber(phone.id)}
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors">
+                  <Trash2 className="h-4 w-4" />
                 </button>
               </div>
             ))}
           </div>
-          <button type="button" onClick={handleAddPhoneNumber} className="inline-flex items-center gap-1.5 mt-2 text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors">
-            <AiOutlinePlusCircle size={16} />
+          <Button type="button" variant="ghost" size="sm" onClick={handleAddPhoneNumber} className="h-8 gap-1.5 text-xs">
+            <Plus className="h-3.5 w-3.5" />
             Add phone number
-          </button>
+          </Button>
         </div>
 
         {/* Address */}
-        <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-slate-900">Address</h3>
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Country</label>
-            <Autocomplete options={options} size="small" getOptionLabel={(option) => option.label}
-              value={selectedCountry} onChange={(event, newValue) => setSelectedCountry(newValue)}
-              renderInput={(params) => (<TextField {...params} placeholder="Select Country" variant="outlined" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }} />)}
-            />
+        <div className="space-y-3 pt-1">
+          <p className="text-sm font-semibold text-foreground">Address</p>
+          <div className="space-y-1.5">
+            <Label>Country</Label>
+            <select
+              value={selectedCountry?.value || ""}
+              onChange={(e) => {
+                const opt = countriesList.find(c => c.value === e.target.value) || null;
+                setSelectedCountry(opt);
+              }}
+              className="h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            >
+              <option value="">Select Country</option>
+              {countriesList.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+            </select>
           </div>
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Street Address</label>
-            <TextField fullWidth size="small" name="streetAddress" value={streetAddress} placeholder="Street address"
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
-              onChange={(e) => setStreetAddress(e.target.value)}
-            />
+          <div className="space-y-1.5">
+            <Label>Street Address</Label>
+            <Input value={streetAddress} placeholder="Street address" onChange={(e) => setStreetAddress(e.target.value)} />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">City</label>
-              <TextField fullWidth size="small" name="city" value={city} placeholder="City"
-                sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
-                onChange={(e) => setCity(e.target.value)}
-              />
+            <div className="space-y-1.5">
+              <Label>City</Label>
+              <Input value={city} placeholder="City" onChange={(e) => setCity(e.target.value)} />
             </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">State/Province</label>
-              <TextField fullWidth size="small" name="state" value={state} placeholder="State/Province"
-                sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
-                onChange={(e) => setState(e.target.value)}
-              />
+            <div className="space-y-1.5">
+              <Label>State/Province</Label>
+              <Input value={state} placeholder="State/Province" onChange={(e) => setState(e.target.value)} />
             </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">ZIP/Postal Code</label>
-              <TextField fullWidth size="small" name="postalCode" value={postalCode} placeholder="ZIP/Postal Code"
-                sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
-                onChange={(e) => setPostalCode(e.target.value)}
-              />
+            <div className="space-y-1.5">
+              <Label>ZIP/Postal Code</Label>
+              <Input value={postalCode} placeholder="ZIP/Postal Code" onChange={(e) => setPostalCode(e.target.value)} />
             </div>
           </div>
         </div>
 
-        {/* Actions */}
-        <div className="flex items-center gap-3 pt-4 pb-4">
-          <button type="submit" disabled={isSubmitting}
-            className="px-5 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isSubmitting ? 'Saving...' : (contact ? 'Update' : 'Create')}
-          </button>
-          <button type="button" onClick={handleClose} disabled={isSubmitting}
-            className="px-5 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-50"
-          >
+        {/* Sticky footer actions */}
+        <div className="flex items-center justify-end gap-2 pt-4 pb-2 border-t border-border/40 sticky bottom-0 bg-background">
+          <Button type="button" variant="ghost" size="sm" onClick={handleClose} disabled={isSubmitting}>
             Cancel
-          </button>
+          </Button>
+          <Button type="submit" size="sm" disabled={isSubmitting}>
+            {isSubmitting ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Saving…</> : (contact ? 'Update' : 'Create')}
+          </Button>
         </div>
       </form>
-    </Drawer>
+    </SideSheet>
   );
 };
 

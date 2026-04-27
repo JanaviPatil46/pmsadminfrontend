@@ -1,13 +1,20 @@
 import React, { useState, useEffect, useMemo } from "react";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-
-import { Plus, Trash2, X } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import "./contact.css";
 import TagsMultiSelectDropDown from "../Templates/TagsMultiSelectDropDown";
 import { toast } from "react-toastify";
 import countryList from "react-select-country-list";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { Button } from "../components/ui/button";
+import {
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetFooter,
+} from "../components/ui/sheet";
 const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   const navigate = useNavigate();
 
@@ -234,77 +241,66 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
     const selectedValues = newSelectedTags.map((option) => option.value);
     setCombinedValues(selectedValues);
   };
-  const inputCls = "w-full border border-input rounded-lg px-3 py-2 text-sm bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow shadow-sm";
-  const labelCls = "block text-sm font-medium text-foreground mb-1.5";
-  const btnPrimary = "inline-flex items-center justify-center rounded-lg px-5 py-2 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 transition-colors shadow-sm";
-  const btnOutline = "inline-flex items-center justify-center rounded-lg px-5 py-2 text-sm font-medium border border-border text-foreground hover:bg-muted transition-colors";
-  const errorCls = "text-destructive text-xs mt-1";
+  const selectCls = "h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-ring";
 
   return (
-    <div>
-      {/* Header */}
-      <div className="flex justify-between items-center px-4 py-3 border-b border-border">
-        <h2 className="text-lg font-semibold text-foreground">New Contact</h2>
-        <button type="button" onClick={handleNewDrawerClose} className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
-          <X className="h-4 w-4" />
-        </button>
-      </div>
+    <div className="flex flex-col h-full">
+      <SheetHeader className="px-0 pb-4 border-b border-border/40">
+        <SheetTitle className="text-base font-semibold">Contact Details</SheetTitle>
+        <SheetDescription className="text-xs text-muted-foreground">
+          Fill in the contact information below. Fields marked <span className="text-destructive">*</span> are required.
+        </SheetDescription>
+      </SheetHeader>
 
-      <form className="contact-form px-5 py-4 h-[90vh] overflow-y-auto space-y-4">
+      <form className="flex-1 overflow-y-auto space-y-4 pt-4">
 
         {/* Name Row */}
         <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1">
-            <label className={labelCls}>First Name <span className="text-destructive">*</span></label>
-            <input
-              name="firstName"
-              value={firstName}
-              placeholder="First Name"
-              className={`${inputCls} ${firstNameError ? "border-destructive" : ""}`}
+          <div className="flex-1 space-y-1.5">
+            <Label>First Name <span className="text-destructive">*</span></Label>
+            <Input
+              name="firstName" value={firstName} placeholder="First Name"
+              className={firstNameError ? "border-destructive" : ""}
               onChange={(e) => { setFirstName(e.target.value); if (e.target.value.trim()) setFirstNameError(""); }}
             />
-            {!!firstNameError && <p className={errorCls}>{firstNameError}</p>}
+            {!!firstNameError && <p className="text-xs text-destructive">{firstNameError}</p>}
           </div>
-          <div className="flex-1">
-            <label className={labelCls}>Middle Name</label>
-            <input name="middleName" value={middleName} placeholder="Middle Name" className={inputCls}
+          <div className="flex-1 space-y-1.5">
+            <Label>Middle Name</Label>
+            <Input name="middleName" value={middleName} placeholder="Middle Name"
               onChange={(e) => setMiddleName(e.target.value)} />
           </div>
-          <div className="flex-1">
-            <label className={labelCls}>Last Name <span className="text-destructive">*</span></label>
-            <input
-              name="lastName"
-              value={lastName}
-              placeholder="Last Name"
-              className={`${inputCls} ${lastNameError ? "border-destructive" : ""}`}
+          <div className="flex-1 space-y-1.5">
+            <Label>Last Name <span className="text-destructive">*</span></Label>
+            <Input
+              name="lastName" value={lastName} placeholder="Last Name"
+              className={lastNameError ? "border-destructive" : ""}
               onChange={(e) => { setLastName(e.target.value); if (e.target.value.trim()) setLastNameError(""); }}
             />
-            {!!lastNameError && <p className={errorCls}>{lastNameError}</p>}
+            {!!lastNameError && <p className="text-xs text-destructive">{lastNameError}</p>}
           </div>
         </div>
 
         {/* Contact Name */}
-        <div>
-          <label className={labelCls}>Contact Name</label>
-          <input name="contactName" value={contactName} placeholder="Contact Name" className={inputCls}
+        <div className="space-y-1.5">
+          <Label>Contact Name</Label>
+          <Input name="contactName" value={contactName} placeholder="Contact Name"
             onChange={(e) => setContactName(e.target.value)} />
         </div>
 
         {/* Company Name */}
-        <div>
-          <label className={labelCls}>Company Name</label>
-          <input name="companyName" value={companyName} placeholder="Company Name" className={inputCls}
+        <div className="space-y-1.5">
+          <Label>Company Name</Label>
+          <Input name="companyName" value={companyName} placeholder="Company Name"
             onChange={(e) => setCompanyName(e.target.value)} />
         </div>
 
         {/* Email */}
-        <div>
-          <label className={labelCls}>Email <span className="text-destructive">*</span></label>
-          <input
-            name="email"
-            value={email}
-            placeholder="Email"
-            className={`${inputCls} ${emailError ? "border-destructive" : ""}`}
+        <div className="space-y-1.5">
+          <Label>Email <span className="text-destructive">*</span></Label>
+          <Input
+            name="email" value={email} placeholder="Email" type="email"
+            className={emailError ? "border-destructive" : ""}
             onChange={(e) => {
               const value = e.target.value;
               setEmail(value);
@@ -313,42 +309,42 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
               else setEmaileError("");
             }}
           />
-          {!!emailError && <p className={errorCls}>{emailError}</p>}
+          {!!emailError && <p className="text-xs text-destructive">{emailError}</p>}
         </div>
 
         {/* Tags */}
-        <div>
-          <label className={labelCls}>Tags</label>
+        <div className="space-y-1.5">
+          <Label>Tags</Label>
           <TagsMultiSelectDropDown value={selectedTags} onChange={handleTagChange} placeholder="Tags" />
         </div>
 
         {/* Note */}
-        <div>
-          <label className={labelCls}>Note</label>
+        <div className="space-y-1.5">
+          <Label>Note</Label>
           <textarea name="note" value={note} placeholder="Note" rows={3}
-            className={`${inputCls} resize-none`} onChange={(e) => setNote(e.target.value)} />
+            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring resize-none"
+            onChange={(e) => setNote(e.target.value)} />
         </div>
 
         {/* SSN */}
-        <div>
-          <label className={labelCls}>SSN</label>
-          <input
-            name="ssn"
-            value={ssn}
-            placeholder="123-45-6789"
-            maxLength={11}
-            inputMode="numeric"
-            className={`${inputCls} ${ssnError ? "border-destructive" : ""}`}
+        <div className="space-y-1.5">
+          <Label>SSN</Label>
+          <Input
+            name="ssn" value={ssn} placeholder="123-45-6789"
+            maxLength={11} inputMode="numeric"
+            className={ssnError ? "border-destructive" : ""}
             onChange={handleSSNChange}
           />
           {ssnError
-            ? <p className={errorCls}>{ssnError}</p>
-            : <p className="text-muted-foreground text-xs mt-1">Format: 123-45-6789</p>}
+            ? <p className="text-xs text-destructive">{ssnError}</p>
+            : <p className="text-xs text-muted-foreground">Format: 123-45-6789</p>}
         </div>
 
         {/* Phone Numbers */}
-        <div>
-          <h3 className="text-sm font-semibold text-foreground mb-2">Phone Numbers</h3>
+        <div className="space-y-2">
+          <SheetHeader className="px-0 py-0 space-y-0">
+            <SheetTitle className="text-sm font-semibold">Phone Numbers</SheetTitle>
+          </SheetHeader>
           <div className="space-y-3">
             {phoneNumbers.map((phone) => (
               <div key={phone.id} className="flex items-center gap-3">
@@ -357,75 +353,70 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                 )}
                 <div className="flex-1">
                   <PhoneInput
-                    country={"us"}
-                    value={phone.phone}
+                    country="us" value={phone.phone}
                     onChange={(value, country) => handlePhoneNumberChange(value, country, phone.id)}
-                    inputStyle={{ width: "100%" }}
-                    buttonStyle={{ borderTopLeftRadius: "8px", borderBottomLeftRadius: "8px" }}
+                    inputStyle={{ width: "100%", height: "36px", fontSize: "14px" }}
+                    buttonStyle={{ borderTopLeftRadius: "6px", borderBottomLeftRadius: "6px" }}
                   />
                 </div>
                 <button type="button" onClick={() => handleDeletePhoneNumber(phone.id)}
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-destructive hover:bg-destructive/10 flex-shrink-0 transition-colors">
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 flex-shrink-0 transition-colors">
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>
             ))}
           </div>
           <button type="button" onClick={handleAddPhoneNumber}
-            className="flex items-center gap-1.5 text-primary text-sm font-medium mt-3 hover:text-primary/80 transition-colors">
+            className="flex items-center gap-1.5 text-primary text-sm font-medium mt-2 hover:text-primary/80 transition-colors">
             <Plus className="h-4 w-4" /> Add phone number
           </button>
         </div>
 
         {/* Address */}
-        <div>
-          <h3 className="text-sm font-semibold text-foreground mb-3">Address</h3>
-          <div className="space-y-3">
-            <div>
-              <label className={labelCls}>Country</label>
-              <select
-                value={selectedCountry?.value || ""}
-                onChange={(e) => {
-                  const found = options.find(o => o.value === e.target.value);
-                  setSelectedCountry(found || null);
-                }}
-                className={inputCls}
-              >
-                <option value="">Select Country</option>
-                {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </select>
+        <div className="space-y-3">
+          <SheetHeader className="px-0 py-0 space-y-0">
+            <SheetTitle className="text-sm font-semibold">Address</SheetTitle>
+          </SheetHeader>
+          <div className="space-y-1.5">
+            <Label>Country</Label>
+            <select
+              value={selectedCountry?.value || ""}
+              onChange={(e) => { const found = options.find(o => o.value === e.target.value); setSelectedCountry(found || null); }}
+              className={selectCls}
+            >
+              <option value="">Select Country</option>
+              {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
+          <div className="space-y-1.5">
+            <Label>Street Address</Label>
+            <Input name="streetAddress" value={streetAddress} placeholder="Street address"
+              onChange={(e) => setStreetAddress(e.target.value)} />
+          </div>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1 space-y-1.5">
+              <Label>City</Label>
+              <Input name="city" value={city} placeholder="City" onChange={(e) => setCity(e.target.value)} />
             </div>
-            <div>
-              <label className={labelCls}>Street Address</label>
-              <input name="streetAddress" value={streetAddress} placeholder="Street address" className={inputCls}
-                onChange={(e) => setStreetAddress(e.target.value)} />
+            <div className="flex-1 space-y-1.5">
+              <Label>State / Province</Label>
+              <Input name="state" value={state} placeholder="State/Province" onChange={(e) => setState(e.target.value)} />
             </div>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="flex-1">
-                <label className={labelCls}>City</label>
-                <input name="city" value={city} placeholder="City" className={inputCls}
-                  onChange={(e) => setCity(e.target.value)} />
-              </div>
-              <div className="flex-1">
-                <label className={labelCls}>State / Province</label>
-                <input name="state" value={state} placeholder="State/Province" className={inputCls}
-                  onChange={(e) => setState(e.target.value)} />
-              </div>
-              <div className="flex-1">
-                <label className={labelCls}>ZIP / Postal Code</label>
-                <input name="postalCode" value={postalCode} placeholder="ZIP/Postal Code" className={inputCls}
-                  onChange={(e) => setPostalCode(e.target.value)} />
-              </div>
+            <div className="flex-1 space-y-1.5">
+              <Label>ZIP / Postal Code</Label>
+              <Input name="postalCode" value={postalCode} placeholder="ZIP/Postal Code" onChange={(e) => setPostalCode(e.target.value)} />
             </div>
           </div>
         </div>
 
-        {/* Actions */}
-        <div className="flex gap-4 pt-2 pb-6">
-          <button type="submit" className={btnPrimary} onClick={sendingData}>Create</button>
-          <button type="button" className={btnOutline} onClick={handleClose}>Cancel</button>
-        </div>
       </form>
+
+      <SheetFooter className="border-t border-border/40 pt-3 pb-1">
+        <div className="flex items-center justify-end gap-2 w-full">
+          <Button type="button" variant="ghost" size="sm" onClick={handleClose}>Cancel</Button>
+          <Button type="submit" size="sm" onClick={sendingData}>Create</Button>
+        </div>
+      </SheetFooter>
     </div>
   );
 };

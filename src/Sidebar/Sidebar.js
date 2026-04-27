@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Drawer } from "@mui/material";
+import { SideSheet } from "../components/ui/side-sheet";
 import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import "./Sidebar.css";
@@ -968,9 +968,9 @@ axios.request(config)
         <SheetContent side="left" className="p-0 w-[216px] flex flex-col bg-background border-r border-border/40 [&>button]:hidden">
           <SheetHeader className="new-drawer-header">
             <SheetTitle className="new-drawer-title">
-              <span className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/10">
-                <Plus className="h-3.5 w-3.5 text-primary" />
-              </span>
+              {/* <span className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/10">
+                // {/* <Plus className="h-3.5 w-3.5 text-primary" /> */}
+              {/* </span> */} 
               <span className="text-sm font-semibold text-foreground">Create New</span>
             </SheetTitle>
             <button onClick={handleDrawerClose} className="new-drawer-close">
@@ -1010,28 +1010,32 @@ axios.request(config)
         </SheetContent>
       </Sheet>
 
-      {/* ─── Right Drawer ────────────────────────────────── */}
-      <Drawer
-        anchor="right"
+      {/* ─── Right Sheet ────────────────────────────────── */}
+      <SideSheet
         open={isRightDrawerOpen}
-        onClose={handleNewDrawerClose}
-        PaperProps={{ sx: { width: { xs: '100vw', sm: 650 }, borderRadius: { sm: '16px 0 0 16px' } } }}
+        onOpenChange={(v) => !v && handleNewDrawerClose()}
+        title={
+          rightDrawerContent === "Contact" ? "New Contact" :
+          rightDrawerContent === "Task" ? "New Task" :
+          rightDrawerContent === "Chat" ? "New Chat" :
+          rightDrawerContent === "Jobs" ? "Add Job" : ""
+        }
+        size="lg"
+        hideDefaultFooter
       >
-        <div style={{ width: "100%" }}>
-          {rightDrawerContent === "Contact" && (
-            <ContactForm handleNewDrawerClose={handleNewDrawerClose} handleDrawerClose={handleDrawerClose} />
-          )}
-          {rightDrawerContent === "Task" && (
-            <TaskForm handleNewDrawerClose={handleNewDrawerClose} handleDrawerClose={handleDrawerClose} />
-          )}
-          {rightDrawerContent === "Chat" && (
-            <ChatForm handleNewDrawerClose={handleNewDrawerClose} handleDrawerClose={handleDrawerClose} />
-          )}
-          {rightDrawerContent === "Jobs" && (
-            <JobDrawer handleNewDrawerClose={handleNewDrawerClose} handleDrawerClose={handleDrawerClose} />
-          )}
-        </div>
-      </Drawer>
+        {rightDrawerContent === "Contact" && (
+          <ContactForm handleNewDrawerClose={handleNewDrawerClose} handleDrawerClose={handleDrawerClose} />
+        )}
+        {rightDrawerContent === "Task" && (
+          <TaskForm handleNewDrawerClose={handleNewDrawerClose} handleDrawerClose={handleDrawerClose} />
+        )}
+        {rightDrawerContent === "Chat" && (
+          <ChatForm handleNewDrawerClose={handleNewDrawerClose} handleDrawerClose={handleDrawerClose} />
+        )}
+        {rightDrawerContent === "Jobs" && (
+          <JobDrawer handleNewDrawerClose={handleNewDrawerClose} handleDrawerClose={handleDrawerClose} />
+        )}
+      </SideSheet>
 
       <ClientSelectionDialog
         open={isDialogOpen}

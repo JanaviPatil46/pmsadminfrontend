@@ -1,11 +1,17 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useSelector } from "react-redux";
-import { Box, Stepper, Step, StepLabel } from "@mui/material";
+import {
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetFooter,
+} from "../components/ui/sheet";
 import AccountForm from "./AccountForm";
 import ContactForm from "./ContactForm";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { LoginContext } from "../Sidebar/Context/Context";
+import { Check } from "lucide-react";
 
 const steps = ["Account Information", "Contact Information"];
 
@@ -580,43 +586,54 @@ export default function AccountContactForm({
     }
   };
 
-  return (
-    <div className="max-w-[800px] mx-auto mt-2">
-      {/* Modern step indicator */}
-      <div className="flex items-center gap-2 mb-6">
-        {steps.map((label, index) => (
-          <React.Fragment key={label}>
-            <div className="flex items-center gap-2">
-              <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold transition-all duration-200 ${
-                index < activeStep
-                  ? "bg-indigo-600 text-white"
-                  : index === activeStep
-                    ? "bg-indigo-600 text-white ring-4 ring-indigo-100"
-                    : "bg-slate-100 text-slate-400"
-              }`}>
-                {index < activeStep ? (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
-                ) : (
-                  index + 1
-                )}
-              </div>
-              <span className={`text-sm font-medium ${
-                index <= activeStep ? "text-slate-900" : "text-slate-400"
-              }`}>
-                {label}
-              </span>
-            </div>
-            {index < steps.length - 1 && (
-              <div className={`flex-1 h-0.5 rounded-full mx-2 ${
-                index < activeStep ? "bg-indigo-600" : "bg-slate-200"
-              }`} />
-            )}
-          </React.Fragment>
-        ))}
-      </div>
+  const stepDescription = activeStep === 0
+    ? "Fill in the account details to continue"
+    : "Add or link contacts for this account";
 
-      {/* Form content */}
-      <div className="border border-slate-200 rounded-xl bg-white p-5">
+  return (
+    <div className="flex flex-col h-full">
+      {/* Step header */}
+      <SheetHeader className="px-0 pb-4 border-b border-border/40 space-y-3">
+        {/* Step breadcrumb */}
+        <div className="flex items-center gap-2">
+          {steps.map((label, index) => (
+            <React.Fragment key={label}>
+              <div className="flex items-center gap-2">
+                <div className={[
+                  "flex items-center justify-center w-7 h-7 rounded-full text-xs font-semibold transition-all duration-200",
+                  index < activeStep
+                    ? "bg-primary text-primary-foreground"
+                    : index === activeStep
+                      ? "bg-primary text-primary-foreground ring-4 ring-primary/20"
+                      : "bg-muted text-muted-foreground",
+                ].join(" ")}>
+                  {index < activeStep
+                    ? <Check className="w-3.5 h-3.5" strokeWidth={2.5} />
+                    : index + 1}
+                </div>
+                <SheetTitle className={[
+                  "text-sm font-medium leading-none",
+                  index <= activeStep ? "text-foreground" : "text-muted-foreground",
+                ].join(" ")}>
+                  {label}
+                </SheetTitle>
+              </div>
+              {index < steps.length - 1 && (
+                <div className={[
+                  "flex-1 h-px mx-1",
+                  index < activeStep ? "bg-primary" : "bg-border",
+                ].join(" ")} />
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+        <SheetDescription className="text-xs text-muted-foreground">
+          {stepDescription}
+        </SheetDescription>
+      </SheetHeader>
+
+      {/* Scrollable step content */}
+      <div className="flex-1 overflow-y-auto pt-5">
         {activeStep === 0 && (
           <AccountForm
             onContinue={() => setActiveStep(1)}

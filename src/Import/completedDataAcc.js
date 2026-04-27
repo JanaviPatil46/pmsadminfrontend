@@ -1,11 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { Search, Upload, Trash2, FileArchive, Loader2, AlertCircle, FolderOpen, ChevronLeft, ChevronRight } from "lucide-react";
+import { Upload, Trash2, FileArchive, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-
-const ROWS_OPTIONS = [10, 25, 50];
+import { DataTable } from "../components/data-table/data-table";
+import { DataTableToolbar } from "../components/data-table/toolbar";
 
 const AccountTable = () => {
   const [accounts, setAccounts] = useState([]);
@@ -17,10 +16,6 @@ const AccountTable = () => {
   const [selectedZip, setSelectedZip] = useState(null);
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [folderName, setFolderName] = useState("");
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-
   const fileInputRef = useRef(null);
 
   useEffect(() => { fetchAccounts(); }, []);
@@ -37,11 +32,7 @@ const AccountTable = () => {
     }
   };
 
-  const filteredAccounts = accounts.filter((a) =>
-    a.accountName?.toLowerCase().includes(search.toLowerCase())
-  );
-  const totalPages = Math.ceil(filteredAccounts.length / rowsPerPage);
-  const paginatedAccounts = filteredAccounts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  const [globalFilter, setGlobalFilter] = useState("");
 
   const handleSelectZip = (account) => {
     setSelectedAccount(account);
@@ -105,20 +96,77 @@ const AccountTable = () => {
     }
   };
 
-  if (loading) return (
-    <div className="rounded-xl border border-border bg-card">
-      {[...Array(5)].map((_, i) => (
-        <div key={i} className="flex items-center justify-between px-5 py-4 border-b border-border last:border-0">
-          <div className="h-4 w-48 rounded bg-muted animate-pulse" />
-          <div className="flex gap-2">
-            <div className="h-8 w-24 rounded-lg bg-muted animate-pulse" />
-            <div className="h-8 w-20 rounded-lg bg-muted animate-pulse" />
-            <div className="h-8 w-32 rounded-lg bg-muted animate-pulse" />
+  const columns = useMemo(() => [
+    {
+      accessorKey: "accountName",
+      header: "Account Name",
+      cell: ({ getValue, row }) => {
+        const account = row.original;
+        const isThisSelected = selectedAccount?._id === account._id && selectedZip;
+        return (
+          <div className="flex items-center gap-2.5">
+            <span className="text-sm font-medium text-foreground">{getValue()}</span>
+            {isThisSelected && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
+                <FileArchive className="h-3 w-3" />
+                {selectedZip.name}
+              </span>
+            )}
           </div>
-        </div>
-      ))}
-    </div>
-  );
+        );
+      },
+    },
+    {
+      id: "actions",
+      header: "Actions",
+      size: 260,
+      enableSorting: false,
+      meta: { align: "right" },
+      cell: ({ row }) => {
+        const account = row.original;
+        const isThisSelected = selectedAccount?._id === account._id && selectedZip;
+        const isDeleting = isDeletingId === account._id;
+        return (
+          <div className="flex items-center justify-end gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleSelectZip(account)}
+              className="h-7 gap-1.5 text-xs"
+            >
+              <FileArchive className="h-3.5 w-3.5" />
+              Select ZIP
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => handleUpload(account)}
+              disabled={!isThisSelected || isUploading}
+              className="h-7 gap-1.5 text-xs"
+            >
+              {isUploading && isThisSelected ? (
+                <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Uploading…</>
+              ) : (
+                <><Upload className="h-3.5 w-3.5" /> Upload</>
+              )}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleDeleteDocuments(account)}
+              disabled={isDeleting}
+              className="h-7 gap-1.5 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive border-destructive/30 hover:border-destructive/50"
+            >
+              {isDeleting ? (
+                <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Deleting…</>
+              ) : (
+                <><Trash2 className="h-3.5 w-3.5" /> Delete Docs</>
+              )}
+            </Button>
+          </div>
+        );
+      },
+    },
+  ], [selectedAccount, selectedZip, isUploading, isDeletingId]);
 
   if (error) return (
     <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-destructive/20 bg-destructive/5 py-16">
@@ -129,143 +177,20 @@ const AccountTable = () => {
   );
 
   return (
-    <div className="space-y-4">
-      {/* Search bar */}
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-        <Input
-          placeholder="Search accounts..."
-          value={search}
-          onChange={(e) => { setSearch(e.target.value); setPage(0); }}
-          className="pl-9"
-        />
-      </div>
-
-      {/* Table */}
-      <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="border-b border-border bg-muted/40">
-                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Account Name</th>
-                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {paginatedAccounts.length === 0 ? (
-                <tr>
-                  <td colSpan={2} className="py-16 text-center">
-                    <div className="flex flex-col items-center gap-2">
-                      <FolderOpen className="h-8 w-8 text-muted-foreground/40" />
-                      <p className="text-sm font-medium text-muted-foreground">No accounts found</p>
-                      {search && <p className="text-xs text-muted-foreground">Try adjusting your search</p>}
-                    </div>
-                  </td>
-                </tr>
-              ) : (
-                paginatedAccounts.map((account) => {
-                  const isThisSelected = selectedAccount?._id === account._id && selectedZip;
-                  const isDeleting = isDeletingId === account._id;
-                  return (
-                    <tr key={account._id} className="group transition-colors hover:bg-muted/30">
-                      <td className="px-5 py-3">
-                        <div className="flex items-center gap-2.5">
-                          <span className="text-sm font-medium text-foreground">{account.accountName}</span>
-                          {isThisSelected && (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
-                              <FileArchive className="h-3 w-3" />
-                              {selectedZip.name}
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-5 py-3 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleSelectZip(account)}
-                            className="h-8 gap-1.5 text-xs"
-                          >
-                            <FileArchive className="h-3.5 w-3.5" />
-                            Select ZIP
-                          </Button>
-                          <Button
-                            size="sm"
-                            onClick={() => handleUpload(account)}
-                            disabled={!isThisSelected || isUploading}
-                            className="h-8 gap-1.5 text-xs"
-                          >
-                            {isUploading && isThisSelected ? (
-                              <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Uploading…</>
-                            ) : (
-                              <><Upload className="h-3.5 w-3.5" /> Upload</>
-                            )}
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleDeleteDocuments(account)}
-                            disabled={isDeleting}
-                            className="h-8 gap-1.5 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive border-destructive/30 hover:border-destructive/50"
-                          >
-                            {isDeleting ? (
-                              <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Deleting…</>
-                            ) : (
-                              <><Trash2 className="h-3.5 w-3.5" /> Delete Docs</>
-                            )}
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Pagination */}
-        {filteredAccounts.length > 0 && (
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-border bg-muted/20 px-5 py-3">
-            <p className="text-xs text-muted-foreground">
-              Showing <span className="font-medium text-foreground">{page * rowsPerPage + 1}–{Math.min((page + 1) * rowsPerPage, filteredAccounts.length)}</span> of <span className="font-medium text-foreground">{filteredAccounts.length}</span> accounts
-            </p>
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs text-muted-foreground">Rows</span>
-                <select
-                  value={rowsPerPage}
-                  onChange={(e) => { setRowsPerPage(Number(e.target.value)); setPage(0); }}
-                  className="h-7 rounded-md border border-border bg-background px-2 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
-                >
-                  {ROWS_OPTIONS.map((n) => <option key={n} value={n}>{n}</option>)}
-                </select>
-              </div>
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => setPage((p) => Math.max(0, p - 1))}
-                  disabled={page === 0}
-                  className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
-                >
-                  <ChevronLeft className="h-3.5 w-3.5" />
-                </button>
-                <span className="min-w-[4rem] text-center text-xs text-muted-foreground">
-                  {page + 1} / {totalPages || 1}
-                </span>
-                <button
-                  onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
-                  disabled={page >= totalPages - 1}
-                  className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
-                >
-                  <ChevronRight className="h-3.5 w-3.5" />
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
+    <div className="space-y-3">
+      <DataTableToolbar globalFilter={globalFilter} onGlobalFilterChange={setGlobalFilter} />
+      <DataTable
+        columns={columns}
+        data={accounts}
+        loading={loading}
+        globalFilter={globalFilter}
+        onGlobalFilterChange={setGlobalFilter}
+        enableRowSelection={false}
+        getRowId={(row) => row._id}
+        emptyMessage="No accounts found"
+        emptyDescription="No completed upload accounts available"
+        pageSize={10}
+      />
       <input ref={fileInputRef} type="file" hidden accept=".zip" onChange={handleZipChange} />
     </div>
   );

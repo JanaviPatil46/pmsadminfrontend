@@ -8,8 +8,9 @@ import axios from "axios";
 import { LoginContext } from "../Sidebar/Context/Context";
 import MultiSelectDropdown from "../Templates/MultiSelectDropdown";
 import AccountMultiSelectDropdown from "../Templates/AccountMultiSelectDropdown";
-import { RxCross2 } from "react-icons/rx";
 import { format, formatDistanceToNow } from "date-fns";
+import { SideSheet } from "../components/ui/side-sheet";
+import { Button } from "../components/ui/button";
 const JobDrawer = ({
   handleNewDrawerClose,
   handleDrawerClose,
@@ -2054,22 +2055,16 @@ console.log("Sending chat to account...", raw);
 
   const inputCls = "w-full border border-border rounded px-3 py-1.5 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-primary/40";
   const labelCls = "block text-sm font-medium text-foreground mb-1";
-  const btnPrimary = "rounded-full px-5 py-1.5 text-sm font-medium text-white bg-primary hover:bg-primary/90 transition-colors";
-  const btnOutline = "rounded-full px-5 py-1.5 text-sm font-medium border border-border text-primary hover:bg-primary hover:text-white hover:border-transparent transition-colors";
 
   return (
-    <div>
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-        <h2 className="text-base font-semibold text-foreground">Add Job</h2>
-        <button type="button" onClick={handleClose} className="text-muted-foreground hover:text-foreground">
-          <RxCross2 size={18} />
-        </button>
-      </div>
-
-      {/* Scrollable body */}
-      <div className="px-4 py-3 overflow-y-auto" style={{ height: "83vh" }}>
-        <div className="space-y-4">
+    <SideSheet
+      open
+      onOpenChange={(v) => !v && handleClose()}
+      title="Add Job"
+      size="lg"
+      hideDefaultFooter
+    >
+      <div className="space-y-4">
 
           {/* Accounts */}
           <div>
@@ -2302,25 +2297,26 @@ console.log("Sending chat to account...", raw);
             )}
           </div>
 
-        </div>
       </div>
 
-      {/* Footer actions */}
-      <div className="flex items-center gap-4 px-4 py-3 border-t border-border">
-        <button type="button" className={btnPrimary} onClick={createjob}>Add</button>
-        <button type="button" className={btnOutline} onClick={handleClose}>Cancel</button>
+      {/* Sticky footer inside SideSheet scrollable area */}
+      <div className="flex items-center justify-end gap-2 pt-4 mt-2 border-t border-border/40 sticky bottom-0 bg-background">
+        <Button variant="ghost" size="sm" onClick={handleClose}>Cancel</Button>
+        <Button size="sm" onClick={createjob}>Add Job</Button>
       </div>
 
-      {/* Automations slide-over */}
-      {drawerOpen && (
-        <div className="fixed inset-0 z-50 overflow-hidden">
-          <div className="absolute inset-0 bg-black/30" onClick={() => setDrawerOpen(false)} />
-          <div className="absolute right-0 top-0 h-full bg-white shadow-2xl overflow-y-auto w-full md:w-[550px]">
-            <DrawerContent selectedAccounts={combinedaccountValues} />
-          </div>
-        </div>
-      )}
-    </div>
+      {/* Automations nested Sheet */}
+      <SideSheet
+        open={drawerOpen}
+        onOpenChange={(v) => !v && setDrawerOpen(false)}
+        title="Stage Automations"
+        description="Review automations that will run when this job is created"
+        size="lg"
+        hideDefaultFooter
+      >
+        <DrawerContent selectedAccounts={combinedaccountValues} />
+      </SideSheet>
+    </SideSheet>
   );
 };
 
