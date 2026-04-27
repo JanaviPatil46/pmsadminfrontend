@@ -1,13 +1,9 @@
 import React, { useState, useEffect, useMemo } from "react";
-
-import { AiOutlinePlusCircle } from "react-icons/ai";
-import { CiDiscount1 } from "react-icons/ci";
-import { BsThreeDotsVertical } from "react-icons/bs";
-import { RiCloseLine } from "react-icons/ri";
-import "./invoices.css";
-import { MoreHorizontal, X, ChevronLeft, FileText, Plus, Percent } from "lucide-react";
+import { MoreHorizontal, X, ChevronLeft, FileText, Plus, Percent, Pencil, Trash2 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Switch } from "../components/ui/switch";
+import { DataTable } from "../components/data-table/data-table";
+import { DataTableToolbar } from "../components/data-table/toolbar";
 import { toast } from "react-toastify";
 import { RxCross2 } from "react-icons/rx";
 import CreatableSelect from "react-select/creatable";
@@ -1327,76 +1323,162 @@ const fetchInvoiceData = async () => {
   const handleOpenpreviewDrawer = () => setpreviewDrawerOpen(true);
   const handleClosepreviewDrawer = () => setpreviewDrawerOpen(false);
 
+  const STATUS_CLASSES = {
+    Paid: "bg-emerald-500/15 text-emerald-700 border-emerald-500/20",
+    Overdue: "bg-destructive/10 text-destructive border-destructive/20",
+    Pending: "bg-amber-500/15 text-amber-700 border-amber-500/20",
+  };
+
+  const invoiceColumns = useMemo(() => [
+    {
+      accessorKey: "account",
+      header: "Client",
+      size: 160,
+      cell: ({ getValue }) => {
+        const acc = getValue();
+        return (
+          <button
+            className="text-sm font-medium text-primary hover:text-primary/80 transition-colors text-left truncate max-w-[150px] block"
+            onClick={() => handleAccountDash(null, acc?._id)}
+          >
+            {acc?.accountName || "—"}
+          </button>
+        );
+      },
+    },
+    {
+      accessorKey: "invoicenumber",
+      header: "Invoice #",
+      size: 120,
+      cell: ({ getValue, row }) => (
+        <button
+          className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+          onClick={() => handleEdit(row.original._id)}
+        >
+          {getValue() || "—"}
+        </button>
+      ),
+    },
+    {
+      accessorKey: "invoiceStatus",
+      header: "Status",
+      size: 100,
+      cell: ({ getValue }) => {
+        const status = getValue();
+        const cls = STATUS_CLASSES[status] || "bg-muted text-muted-foreground border-border";
+        return (
+          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border ${cls}`}>
+            {status || "—"}
+          </span>
+        );
+      },
+    },
+    {
+      accessorKey: "createdAt",
+      header: "Posted",
+      size: 100,
+      cell: ({ getValue }) => (
+        <span className="text-xs text-muted-foreground">
+          {getValue() ? new Intl.DateTimeFormat("en-US", { month: "2-digit", day: "2-digit", year: "numeric" }).format(new Date(getValue())) : "—"}
+        </span>
+      ),
+    },
+    {
+      accessorKey: "summary",
+      id: "total",
+      header: "Total",
+      size: 90,
+      cell: ({ getValue }) => (
+        <span className="text-sm font-medium">${getValue()?.total ?? "—"}</span>
+      ),
+    },
+    {
+      accessorKey: "paidAmount",
+      header: "Amount Paid",
+      size: 110,
+      cell: ({ getValue }) => <span className="text-xs text-muted-foreground">${getValue() ?? "—"}</span>,
+    },
+    {
+      id: "balanceDue",
+      header: "Balance Due",
+      size: 110,
+      enableSorting: false,
+      cell: ({ row }) => {
+        const total = row.original.summary?.total ?? 0;
+        const paid = row.original.paidAmount ?? 0;
+        return <span className="text-xs text-muted-foreground">${(total - paid).toFixed ? (total - paid).toFixed(2) : total - paid}</span>;
+      },
+    },
+    {
+      accessorKey: "lastPaid",
+      header: "Last Paid",
+      size: 100,
+      cell: ({ getValue }) => <span className="text-xs text-muted-foreground">{getValue() || "—"}</span>,
+    },
+    {
+      accessorKey: "description",
+      header: "Description",
+      size: 180,
+      cell: ({ getValue }) => (
+        <span className="text-xs text-muted-foreground truncate block max-w-[170px]">{getValue() || "—"}</span>
+      ),
+    },
+    {
+      id: "actions",
+      header: "Actions",
+      size: 80,
+      enableSorting: false,
+      cell: ({ row }) => (
+        <div className="flex items-center gap-0.5">
+          <button
+            onClick={() => handleEdit(row.original._id)}
+            className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-foreground hover:bg-muted"
+            title="Edit"
+          >
+            <Pencil className="h-3.5 w-3.5" />
+          </button>
+          <button
+            onClick={() => handleDelete(row.original._id)}
+            className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-destructive hover:bg-destructive/10"
+            title="Delete"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      ),
+    },
+  ], []);
+
+  const [globalFilter, setGlobalFilter] = useState("");
+
   return (
     <div className="space-y-5">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">Invoices</h1>
-        <Button
-          type="button"
-          onClick={handleOpen}
-          className="rounded-full px-5
-          bg-primary text-white hover:bg-primary/90"
-        >
-          Create Invoice
+        <h1 className="text-xl font-semibold text-foreground">Invoices</h1>
+        <Button size="sm" onClick={handleOpen}>
+          <Plus className="h-3.5 w-3.5 mr-1.5" /> Create Invoice
         </Button>
       </div>
 
-      {/* Invoices Table */}
-      <div className="bg-background rounded-xl border shadow-sm overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b bg-muted/40">
-              {["Client", "Invoice #", "Status", "Posted", "Total", "Amount Paid", "Balance Due", "Last Paid", "Description", "Settings"].map((h) => (
-                <th key={h} className="text-xs font-semibold text-left px-4 py-3 text-muted-foreground uppercase tracking-wide">{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {billingInvoice.length === 0 ? (
-              <tr><td colSpan={10} className="text-center py-12 text-sm text-muted-foreground">No invoices found.</td></tr>
-            ) : billingInvoice.map((row) => (
-              <tr key={row._id} className="border-b hover:bg-muted/30 transition-colors">
-                <td className="px-4 py-3">
-                  <span className="text-sm text-primary cursor-pointer hover:underline font-medium" onClick={() => handleAccountDash(row._id, row.account._id)}>
-                    {row.account.accountName}
-                  </span>
-                </td>
-                <td className="px-4 py-3">
-                  <span className="text-sm text-primary cursor-pointer hover:underline font-medium" onClick={() => handleEdit(row._id)}>
-                    {row.invoicenumber}
-                  </span>
-                </td>
-                <td className="px-4 py-3">
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
-                    row.invoiceStatus === "Paid" ? "bg-success/10 text-success border-success/20" :
-                    row.invoiceStatus === "Overdue" ? "bg-destructive/10 text-destructive border-destructive/20" :
-                    "bg-warning/10 text-warning border-warning/20"
-                  }`}>{row.invoiceStatus}</span>
-                </td>
-                <td className="px-4 py-3 text-sm text-muted-foreground">
-                  {new Intl.DateTimeFormat("en-US", { day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(row.createdAt))}
-                </td>
-                <td className="px-4 py-3 text-sm font-medium">${row.summary.total}</td>
-                <td className="px-4 py-3 text-sm">${row.paidAmount}</td>
-                <td className="px-4 py-3 text-sm">${row.summary.total - row.paidAmount}</td>
-                <td className="px-4 py-3 text-sm text-muted-foreground">{row.lastPaid || "—"}</td>
-                <td className="px-4 py-3 text-sm text-muted-foreground max-w-[200px] truncate">{row.description}</td>
-                <td className="px-4 py-3 relative">
-                  <button onClick={() => toggleMenu(row._id)} className="p-1.5 rounded-md hover:bg-muted transition-colors text-muted-foreground">
-                    <MoreHorizontal className="h-4 w-4" />
-                  </button>
-                  {openMenuId === row._id && (
-                    <div className="absolute right-6 top-8 z-50 min-w-[120px] bg-background border rounded-lg shadow-lg py-1">
-                      <button className="w-full text-left px-4 py-2 text-sm font-medium hover:bg-muted transition-colors" onClick={() => handleEdit(row._id)}>Edit</button>
-                      <button className="w-full text-left px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors" onClick={() => handleDelete(row._id)}>Delete</button>
-                    </div>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {/* Invoices DataTable */}
+      <div className="space-y-3">
+        <DataTableToolbar
+          globalFilter={globalFilter}
+          onGlobalFilterChange={setGlobalFilter}
+        />
+        <DataTable
+          columns={invoiceColumns}
+          data={billingInvoice}
+          loading={false}
+          globalFilter={globalFilter}
+          onGlobalFilterChange={setGlobalFilter}
+          enableRowSelection={false}
+          getRowId={(row) => row._id}
+          emptyMessage="No invoices found"
+          emptyDescription="Create your first invoice to get started"
+          pageSize={25}
+        />
       </div>
 
       {/* Create Invoice Drawer */}
