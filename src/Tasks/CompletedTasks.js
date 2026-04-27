@@ -1,33 +1,25 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { toast } from "react-toastify";
-import { MoreVertical } from "lucide-react";
-import { Checkbox } from "../components/ui/checkbox";
+import { MoreVertical, Trash2 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../components/ui/tooltip";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "../components/ui/dropdown-menu";
+import { DataTable } from "../components/data-table/data-table";
+import { DataTableToolbar } from "../components/data-table/toolbar";
 import NewTaskDrawer from "./NewTaskDrawer";
 const CompletedTasks = () => {
   const ACCOUNT_TASKS_API = process.env.REACT_APP_TASKS_API;
-    const [taskData, setTasksData] = useState([]);
+  const [taskData, setTasksData] = useState([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
-    const onclose =()=>{
-      setDrawerOpen(false)
-      fetchCompletedTasks()
-     }
-    const [isEditMode, setIsEditMode] = useState(false);
-    const [selectedTaskData, setSelectedTaskData] = useState(null);
-   const [selectedTask, setSelectedTask] = useState("");
-    const [selected, setSelected] = useState([]);
-    const handleSelect = (id) => {
-      const currentIndex = selected.indexOf(id);
-      const newSelected =
-        currentIndex === -1
-          ? [...selected, id]
-          : selected.filter((item) => item !== id);
-      setSelected(newSelected);
-      // Log all selected row IDs
-      // console.log("Selected IDs:", newSelected); // Log all selected IDs
-    };
+  const onclose = () => {
+    setDrawerOpen(false);
+    fetchCompletedTasks();
+  };
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [selectedTaskData, setSelectedTaskData] = useState(null);
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [globalFilter, setGlobalFilter] = useState("");
+  const [openMenuId, setOpenMenuId] = useState(null);
   
     const fetchCompletedTasks =()=>{
     const requestOptions = {
@@ -58,49 +50,35 @@ const CompletedTasks = () => {
     fetchCompletedTasks();
   }, []);
 
-  const [openMenuId, setOpenMenuId] = useState(null);
-
-    const handleMenuClick = (id) => {
-      setOpenMenuId(openMenuId === id ? null : id);
-    };
-    const handleClose = () => {
-      setOpenMenuId(null);
-    };
-  
-    const handleDelete = () => {
-      handleClose();
-      handleDeleteTask(selectedTask);
-      console.log("Deleted:", selectedTask);
-    };
-    const handleDeleteTask = async () => {
-      const isConfirmed = window.confirm(
-        "Are you sure you want to delete the selected tasks? This action cannot be undone."
-      );
-      if (isConfirmed) {
-        try {
-          // Make delete requests for each selected job
-          await Promise.all(
-            selected.map((id) =>
-              fetch(`${ACCOUNT_TASKS_API}/accountstasks/taskdelete/` + id, {
-                method: "DELETE",
-                redirect: "follow",
-              })
-            )
-          );
-  
-          // Optionally, you can remove the deleted jobs from the UI (if needed)
-          // If you're using jobData in state, for example:
-          // setJobData((prevJobs) => prevJobs.filter((job) => !selected.includes(job.id)));
-  
-          toast.success("task deleted successfully!");
-          setSelected([]); // Clear the selected jobs
-          fetchCompletedTasks(); // Refresh the data after deletion
-        } catch (error) {
-          console.error("Delete API Error:", error);
-          toast.error("Failed to delete selected jobs");
-        }
+  const handleMenuClick = (id) => {
+    setOpenMenuId(openMenuId === id ? null : id);
+  };
+  const handleClose = () => {
+    setOpenMenuId(null);
+  };
+  const handleDeleteTask = async () => {
+    const isConfirmed = window.confirm(
+      "Are you sure you want to delete the selected tasks? This action cannot be undone."
+    );
+    if (isConfirmed) {
+      try {
+        await Promise.all(
+          selectedIds.map((id) =>
+            fetch(`${ACCOUNT_TASKS_API}/accountstasks/taskdelete/` + id, {
+              method: "DELETE",
+              redirect: "follow",
+            })
+          )
+        );
+        toast.success("Tasks deleted successfully!");
+        setSelectedIds([]);
+        fetchCompletedTasks();
+      } catch (error) {
+        console.error("Delete API Error:", error);
+        toast.error("Failed to delete selected tasks");
       }
-    };
+    }
+  };
 
   const statusOptions = [
     { value: "No status", label: "No status", color: "#C4AEAD" },
@@ -135,74 +113,122 @@ const CompletedTasks = () => {
     { value: "Low", label: "Low", color: "#56c288" },
   ];
 
-  const columns = [
-    { key: "Name", label: "Name", sticky: true },
-    { key: "AccountName", label: "Account" },
-    { key: "Assignees", label: "Assignee" },
-    { key: "Status", label: "Status" },
-    { key: "Priority", label: "Priority" },
-    { key: "SubtaskCount", label: "Subtasks" },
-    { key: "startDate", label: "Start Date" },
-    { key: "dueDate", label: "Due Date" },
-    { key: "JobName", label: "Job Name" },
-    { key: "PipelineName", label: "Pipeline" },
-    { key: "StageNames", label: "Stage" },
-    { key: "TaskTags", label: "Tags" },
-    { key: "description", label: "Description" },
-  ];
-
-  const renderCell = (row, col) => {
-    switch (col.key) {
-      case "Name":
+  const tableColumns = useMemo(() => [
+    {
+      accessorKey: "Name",
+      header: "Name",
+      size: 180,
+      cell: ({ row, getValue }) => (
+        <button
+          className="text-sm font-medium text-primary hover:text-primary/80 transition-colors text-left truncate max-w-[165px] block"
+          onClick={(e) => { e.stopPropagation(); handleClick(row.original.id); }}
+        >
+          {getValue() || "\u2014"}
+        </button>
+      ),
+    },
+    {
+      accessorKey: "AccountName",
+      header: "Account",
+      size: 140,
+      cell: ({ getValue }) => <span className="text-xs text-foreground/80">{getValue() || <span className="text-muted-foreground">\u2014</span>}</span>,
+    },
+    {
+      accessorKey: "Assignees",
+      header: "Assignee",
+      size: 120,
+      cell: ({ getValue }) => <span className="text-xs text-foreground/80">{getValue() || <span className="text-muted-foreground">\u2014</span>}</span>,
+    },
+    {
+      accessorKey: "Status",
+      header: "Status",
+      size: 130,
+      cell: ({ getValue }) => {
+        const val = getValue();
+        if (!val) return null;
+        const color = statusOptions.find((s) => s.value === val)?.color || "#ccc";
         return (
-          <button
-            className="text-sm font-medium text-primary hover:underline transition-colors text-left"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleClick(row.id);
-            }}
-          >
-            {row.Name}
-          </button>
-        );
-      case "Status":
-        if (!row.Status) return null;
-        return (
-          <span
-            className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold text-white"
-            style={{ backgroundColor: statusOptions.find((s) => s.value === row.Status)?.color || "#ccc" }}
-          >
-            {row.Status}
+          <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold text-white" style={{ backgroundColor: color }}>
+            {val}
           </span>
         );
-      case "Priority":
-        if (!row.Priority) return null;
+      },
+    },
+    {
+      accessorKey: "Priority",
+      header: "Priority",
+      size: 100,
+      cell: ({ getValue }) => {
+        const val = getValue();
+        if (!val) return null;
+        const color = priorityOptions.find((p) => p.value === val)?.color || "#ccc";
         return (
-          <span
-            className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold text-white"
-            style={{ backgroundColor: priorityOptions.find((p) => p.value === row.Priority)?.color || "#ccc" }}
-          >
-            {row.Priority}
+          <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold text-white" style={{ backgroundColor: color }}>
+            {val}
           </span>
         );
-      case "TaskTags":
-        if (!row.TaskTags || row.TaskTags.length === 0) return <span className="text-xs text-muted-foreground">No Tags</span>;
+      },
+    },
+    {
+      accessorKey: "SubtaskCount",
+      header: "Subtasks",
+      size: 80,
+      cell: ({ getValue }) => <span className="text-xs text-muted-foreground">{getValue() ?? "\u2014"}</span>,
+    },
+    {
+      accessorKey: "startDate",
+      header: "Start Date",
+      size: 105,
+      cell: ({ getValue }) => <span className="text-xs text-muted-foreground">{getValue() || "\u2014"}</span>,
+    },
+    {
+      accessorKey: "dueDate",
+      header: "Due Date",
+      size: 105,
+      cell: ({ getValue }) => <span className="text-xs text-muted-foreground">{getValue() || "\u2014"}</span>,
+    },
+    {
+      accessorKey: "JobName",
+      header: "Job Name",
+      size: 130,
+      cell: ({ getValue }) => <span className="text-xs text-foreground/80">{getValue() || <span className="text-muted-foreground">\u2014</span>}</span>,
+    },
+    {
+      accessorKey: "PipelineName",
+      header: "Pipeline",
+      size: 120,
+      cell: ({ getValue }) => <span className="text-xs text-foreground/80">{getValue() || <span className="text-muted-foreground">\u2014</span>}</span>,
+    },
+    {
+      accessorKey: "StageNames",
+      header: "Stage",
+      size: 110,
+      cell: ({ getValue }) => <span className="text-xs text-foreground/80">{getValue() || <span className="text-muted-foreground">\u2014</span>}</span>,
+    },
+    {
+      accessorKey: "TaskTags",
+      header: "Tags",
+      size: 140,
+      enableSorting: false,
+      cell: ({ getValue }) => {
+        const tags = getValue();
+        if (!tags || tags.length === 0) return <span className="text-xs text-muted-foreground">\u2014</span>;
         return (
           <TooltipProvider>
             <div className="flex items-center gap-1 flex-wrap">
-              <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold text-white" style={{ backgroundColor: row.TaskTags[0].tagColour }}>
-                {row.TaskTags[0].tagName}
+              <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold text-white" style={{ backgroundColor: tags[0].tagColour }}>
+                {tags[0].tagName}
               </span>
-              {row.TaskTags.length > 1 && (
+              {tags.length > 1 && (
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground cursor-pointer">
-                      +{row.TaskTags.length - 1}
+                      +{tags.length - 1}
                     </span>
                   </TooltipTrigger>
                   <TooltipContent side="top" className="space-y-1">
-                    {row.TaskTags.slice(1).map((tag) => (
-                      <span key={tag.id} className="block rounded-full px-2 py-0.5 text-[10px] font-semibold text-white" style={{ backgroundColor: tag.tagColour }}>
+                    {tags.slice(1).map((tag) => (
+                      <span key={tag._id || tag.id} className="block rounded-full px-2 py-0.5 text-[10px] font-semibold text-white" style={{ backgroundColor: tag.tagColour }}>
                         {tag.tagName}
                       </span>
                     ))}
@@ -212,10 +238,50 @@ const CompletedTasks = () => {
             </div>
           </TooltipProvider>
         );
-      default:
-        return <span className="text-xs text-foreground">{row[col.key] || ""}</span>;
-    }
-  };
+      },
+    },
+    {
+      accessorKey: "description",
+      header: "Description",
+      size: 180,
+      cell: ({ getValue }) => (
+        <span className="text-xs text-muted-foreground truncate block max-w-[170px]">{getValue() || "\u2014"}</span>
+      ),
+    },
+    {
+      id: "actions",
+      header: "",
+      size: 50,
+      enableSorting: false,
+      cell: ({ row }) => (
+        <DropdownMenu
+          open={openMenuId === row.original.id}
+          onOpenChange={(open) => setOpenMenuId(open ? row.original.id : null)}
+        >
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost" size="icon"
+              className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <MoreVertical className="h-3.5 w-3.5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleClick(row.original.id); }}>
+              Edit
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={(e) => { e.stopPropagation(); handleClose(); setSelectedIds([row.original.id]); handleDeleteTask(); }}
+              className="text-destructive focus:text-destructive"
+            >
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
+    },
+  ], [openMenuId, statusOptions, priorityOptions]);
 
   const handleClick = async (id) => {
     try {
@@ -238,78 +304,39 @@ const CompletedTasks = () => {
     }
   };
 
+  const bulkActions = selectedIds.length > 0 ? (
+    <button
+      onClick={handleDeleteTask}
+      className="inline-flex items-center gap-1.5 h-7 px-2.5 text-xs font-medium rounded-md border border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors"
+    >
+      <Trash2 className="h-3.5 w-3.5" /> Delete
+    </button>
+  ) : null;
+
   return (
-    <div className="space-y-4">
-      <div className="rounded-xl border bg-card shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="border-b bg-muted/40">
-                <th className="sticky left-0 z-10 bg-muted/40 w-10 px-3 py-3">
-                  <Checkbox
-                    checked={taskData.length > 0 && selected.length === taskData.length}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
-                        setSelected(taskData.map((item) => item.id));
-                      } else {
-                        setSelected([]);
-                      }
-                    }}
-                  />
-                </th>
-                {columns.map((col) => (
-                  <th key={col.key} className={`px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-nowrap ${col.sticky ? "sticky left-10 z-10 bg-muted/40" : ""}`}>
-                    {col.label}
-                  </th>
-                ))}
-                <th className="sticky right-0 z-10 bg-muted/40 w-14 px-3 py-3" />
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {taskData.length === 0 ? (
-                <tr>
-                  <td colSpan={columns.length + 2} className="px-4 py-12 text-center text-sm text-muted-foreground">
-                    No completed tasks found.
-                  </td>
-                </tr>
-              ) : (
-                taskData.map((row) => {
-                  const isSelected = selected.includes(row.id);
-                  return (
-                    <tr
-                      key={row.id}
-                      onClick={() => handleSelect(row.id)}
-                      className={`cursor-pointer transition-colors hover:bg-muted/30 ${isSelected ? "bg-primary/5" : ""}`}
-                    >
-                      <td className="sticky left-0 z-[5] bg-card px-3 py-2.5">
-                        <Checkbox checked={isSelected} onCheckedChange={() => handleSelect(row.id)} />
-                      </td>
-                      {columns.map((col) => (
-                        <td key={col.key} className={`px-4 py-2.5 whitespace-nowrap ${col.sticky ? "sticky left-10 z-[5] bg-card" : ""}`}>
-                          {renderCell(row, col)}
-                        </td>
-                      ))}
-                      <td className="sticky right-0 z-[5] bg-card px-2 py-2.5">
-                        <DropdownMenu open={openMenuId === row.id} onOpenChange={(open) => setOpenMenuId(open ? row.id : null)}>
-                          <DropdownMenuTrigger>
-                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); handleMenuClick(row.id); }}>
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent>
-                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleClick(row.id); }}>Edit</DropdownMenuItem>
-                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleClose(); handleDeleteTask(selectedTask); }} className="text-destructive">Delete</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+    <div className="space-y-3">
+      <DataTableToolbar
+        globalFilter={globalFilter}
+        onGlobalFilterChange={setGlobalFilter}
+        selectedCount={selectedIds.length}
+        bulkActions={bulkActions}
+      />
+
+      <DataTable
+        columns={tableColumns}
+        data={taskData}
+        loading={false}
+        globalFilter={globalFilter}
+        onGlobalFilterChange={setGlobalFilter}
+        enableRowSelection
+        onRowSelectionChange={(sel) =>
+          setSelectedIds(Object.keys(sel).filter((k) => sel[k]))
+        }
+        getRowId={(row) => row.id}
+        emptyMessage="No completed tasks found"
+        emptyDescription="Tasks marked as complete will appear here"
+        pageSize={25}
+      />
 
       <NewTaskDrawer
         open={drawerOpen}

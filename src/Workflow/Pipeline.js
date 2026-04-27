@@ -1,5 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
-import "./pipeline.css";
+import React, { useEffect, useState, useContext, useMemo, useCallback } from "react";
 import { useDrag, DndProvider, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import axios from "axios";
@@ -22,6 +21,273 @@ import dayjs from "dayjs";
 import MultiSelectDropdown from "../Templates/MultiSelectDropdown";
 import { LoginContext } from "../Sidebar/Context/Context";
 import EditJobDrawer from "./updateJobCard";
+import { DataTable } from "../components/data-table/data-table";
+import { DataTableToolbar } from "../components/data-table/toolbar";
+import { LayoutGrid, List } from "lucide-react";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "../components/ui/dropdown-menu";
+
+function BoardListView({ jobs, stages, sharedAccountOptions, sharedTagOptions, sharedUserOptions, sharedClientFacingOptions, fetchJobData, optionpipeline }) {
+  const [globalFilter, setGlobalFilter] = React.useState("");
+  const [stageFilter, setStageFilter] = React.useState("all");
+  const [listOpenMenuId, setListOpenMenuId] = React.useState(null);
+
+  const JOBS_API_LIST = process.env.REACT_APP_ADD_JOBS_URL;
+
+  const filteredJobs = React.useMemo(() => {
+    let data = jobs;
+    if (stageFilter !== "all") {
+      data = data.filter((job) => {
+        if (!job.Stages) return false;
+        const stagesArr = Array.isArray(job.Stages) ? job.Stages : [job.Stages];
+        return stagesArr.some((s) => s._id === stageFilter);
+      });
+    }
+    return data;
+  }, [jobs, stageFilter]);
+
+  const handleDeleteJob = async (jobId) => {
+    if (!window.confirm("Delete this job? This action cannot be undone.")) return;
+    try {
+      const res = await fetch(`${JOBS_API_LIST}/workflow/jobs/job/${jobId}`, { method: "DELETE" });
+      if (!res.ok) throw new Error();
+      toast.success("Job deleted");
+      fetchJobData();
+    } catch {
+      toast.error("Failed to delete job");
+    }
+  };
+
+  const PRIORITY_MAP = {
+    urgent: "bg-zinc-900 text-white",
+    high:   "bg-red-500/15 text-red-600",
+    medium: "bg-amber-500/15 text-amber-700",
+    low:    "bg-emerald-500/15 text-emerald-700",
+  };
+
+  const columns = React.useMemo(() => [
+    {
+      accessorKey: "Name",
+      header: "Job Name",
+      size: 200,
+      cell: ({ getValue }) => (
+        <span className="text-sm font-medium text-foreground truncate block max-w-[190px]">{getValue() || "—"}</span>
+      ),
+    },
+    {
+      accessorKey: "Account",
+      header: "Account",
+      size: 150,
+      cell: ({ getValue }) => {
+        const val = getValue();
+        const text = Array.isArray(val) ? val.join(", ") : (val || "");
+        return <span className="text-xs text-foreground/80 truncate block max-w-[140px]">{text || <span className="text-muted-foreground">—</span>}</span>;
+      },
+    },
+    {
+      accessorKey: "Stages",
+      header: "Stage",
+      size: 130,
+      cell: ({ getValue }) => {
+        const val = getValue();
+        const stagesArr = Array.isArray(val) ? val : (val ? [val] : []);
+        const name = stagesArr[0]?.name || "—";
+        return <span className="text-xs text-foreground/80">{name}</span>;
+      },
+    },
+    {
+      accessorKey: "jobAssigneeText",
+      header: "Assignee",
+      size: 130,
+      cell: ({ getValue, row }) => {
+        const val = getValue() || (Array.isArray(row.original.JobAssignee) ? row.original.JobAssignee.join(", ") : "");
+        return <span className="text-xs text-foreground/80 truncate block max-w-[120px]">{val || <span className="text-muted-foreground">—</span>}</span>;
+      },
+    },
+    {
+      accessorKey: "Priority",
+      header: "Priority",
+      size: 100,
+      cell: ({ getValue }) => {
+        const val = getValue();
+        if (!val) return <span className="text-muted-foreground text-xs">—</span>;
+        const cls = PRIORITY_MAP[(val || "").toLowerCase()] || "bg-muted text-muted-foreground";
+        return (
+          <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold leading-none ${cls}`}>{val}</span>
+        );
+      },
+    },
+    {
+      accessorKey: "StartDate",
+      header: "Start",
+      size: 110,
+      cell: ({ getValue }) => <span className="text-xs text-muted-foreground">{getValue() || "—"}</span>,
+    },
+    {
+      accessorKey: "DueDate",
+      header: "Due",
+      size: 110,
+      cell: ({ getValue }) => <span className="text-xs text-muted-foreground">{getValue() || "—"}</span>,
+    },
+    {
+      accessorKey: "updatedAt",
+      header: "Updated",
+      size: 120,
+      cell: ({ getValue }) => <span className="text-xs text-muted-foreground">{getValue() || "—"}</span>,
+    },
+    {
+      id: "actions",
+      header: "Actions",
+      size: 80,
+      enableSorting: false,
+      cell: ({ row }) => (
+        <div className="flex items-center gap-0.5">
+          <button
+            onClick={(e) => { e.stopPropagation(); handleDeleteJob(row.original.id); }}
+            className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-destructive hover:bg-destructive/10"
+            title="Delete"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      ),
+    },
+  ], []);
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-2">
+        <DataTableToolbar
+          globalFilter={globalFilter}
+          onGlobalFilterChange={setGlobalFilter}
+        />
+        {stages.length > 0 && (
+          <select
+            value={stageFilter}
+            onChange={(e) => setStageFilter(e.target.value)}
+            className="h-9 rounded-lg border border-input bg-background px-3 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-ring shrink-0"
+          >
+            <option value="all">All stages</option>
+            {stages.map((s) => (
+              <option key={s._id} value={s._id}>{s.name}</option>
+            ))}
+          </select>
+        )}
+      </div>
+      <DataTable
+        columns={columns}
+        data={filteredJobs}
+        loading={false}
+        globalFilter={globalFilter}
+        onGlobalFilterChange={setGlobalFilter}
+        enableRowSelection={false}
+        getRowId={(row) => row.id}
+        emptyMessage="No jobs found"
+        emptyDescription="Add a job to get started"
+        pageSize={25}
+      />
+    </div>
+  );
+}
+
+function PipelineListView({ pipelineData, openMenuId, handleBoardsList, togglePipelineMenu, closePipelineMenu, handleDeletePipeline }) {
+  const [globalFilter, setGlobalFilter] = React.useState("");
+
+  const columns = React.useMemo(() => [
+    {
+      accessorKey: "pipelineName",
+      header: "Pipeline Name",
+      size: 220,
+      cell: ({ row, getValue }) => (
+        <button
+          className="text-sm font-medium text-primary hover:text-primary/80 transition-colors text-left"
+          onClick={() => handleBoardsList(row.original)}
+        >
+          {getValue() || "—"}
+        </button>
+      ),
+    },
+    {
+      id: "jobs",
+      header: "Jobs",
+      size: 80,
+      enableSorting: false,
+      cell: () => <span className="text-xs text-muted-foreground">—</span>,
+    },
+    {
+      id: "schedule",
+      header: "Schedule",
+      size: 100,
+      enableSorting: false,
+      cell: () => <span className="text-xs text-muted-foreground">—</span>,
+    },
+    {
+      id: "startDate",
+      header: "Start Date",
+      size: 110,
+      enableSorting: false,
+      cell: () => <span className="text-xs text-muted-foreground">—</span>,
+    },
+    {
+      id: "endDate",
+      header: "End Date",
+      size: 110,
+      enableSorting: false,
+      cell: () => <span className="text-xs text-muted-foreground">—</span>,
+    },
+    {
+      id: "actions",
+      header: "Actions",
+      size: 80,
+      enableSorting: false,
+      cell: ({ row }) => {
+        const pipeline = row.original;
+        return (
+          <div className="flex items-center gap-0.5">
+            <button
+              onClick={(e) => { e.stopPropagation(); handleBoardsList(pipeline); }}
+              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-foreground hover:bg-muted"
+              title="Edit"
+            >
+              <Pencil className="h-3.5 w-3.5" />
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); handleDeletePipeline(); }}
+              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-destructive hover:bg-destructive/10"
+              title="Delete"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        );
+      },
+    },
+  ], [handleBoardsList, handleDeletePipeline]);
+
+  return (
+    <>
+      <div className="mb-5 flex items-center justify-between">
+        <h1 className="text-xl font-semibold text-foreground">Pipelines</h1>
+      </div>
+      <DataTableToolbar
+        globalFilter={globalFilter}
+        onGlobalFilterChange={setGlobalFilter}
+      />
+      <DataTable
+        columns={columns}
+        data={pipelineData}
+        loading={false}
+        globalFilter={globalFilter}
+        onGlobalFilterChange={setGlobalFilter}
+        enableRowSelection={false}
+        getRowId={(row) => row._id}
+        emptyMessage="No pipelines found"
+        emptyDescription="Create a pipeline to get started"
+        pageSize={25}
+      />
+    </>
+  );
+}
+
 const Pipeline = ({ charLimit = 4000 }) => {
   const { logindata } = useContext(LoginContext);
   const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
@@ -216,6 +482,37 @@ const Pipeline = ({ charLimit = 4000 }) => {
   //   }
   // };
   const [filterStatus, setFilterStatus] = useState("active");
+  const [viewMode, setViewMode] = useState("board");
+
+  // ── Shared options fetched once in parent and passed to JobCard ──
+  const ACCOUNT_API_PARENT = process.env.REACT_APP_ACCOUNTS_URL;
+  const TAGS_API_PARENT = process.env.REACT_APP_TAGS_TEMP_URL;
+  const CLIENT_FACING_API_PARENT = process.env.REACT_APP_CLIENT_FACING_URL;
+  const [sharedAccountOptions, setSharedAccountOptions] = useState([]);
+  const [sharedTagOptions, setSharedTagOptions] = useState([]);
+  const [sharedUserOptions, setSharedUserOptions] = useState([]);
+  const [sharedClientFacingOptions, setSharedClientFacingOptions] = useState([]);
+
+  useEffect(() => {
+    const fetchSharedData = async () => {
+      try {
+        const [accRes, tagRes, userRes, cfRes] = await Promise.all([
+          fetch(`${ACCOUNT_API_PARENT}/accounts/accountdetails`).then(r => r.json()),
+          fetch(`${TAGS_API_PARENT}/tags/`).then(r => r.json()),
+          fetch(`${LOGIN_API}/common/users/roles?roles=TeamMember,Admin`).then(r => r.json()),
+          fetch(`${CLIENT_FACING_API_PARENT}/workflow/clientfacingjobstatus/`).then(r => r.json()),
+        ]);
+        setSharedAccountOptions((accRes.accounts || []).map(a => ({ value: a._id, label: a.accountName })));
+        setSharedTagOptions((tagRes.tags || []).map(t => ({ value: t._id, label: t.tagName, colour: t.tagColour })));
+        setSharedUserOptions((userRes || []).map(u => ({ value: u._id, label: u.username })));
+        setSharedClientFacingOptions((cfRes.clientFacingJobStatues || []).map(s => ({ value: s._id, label: s.clientfacingName, clientfacingColour: s.clientfacingColour })));
+      } catch (e) {
+        console.error("Error fetching shared options:", e);
+      }
+    };
+    fetchSharedData();
+  }, []);
+
 const fetchJobData = async () => {
   setLoading(true);
   const loaderDelay = new Promise((resolve) => setTimeout(resolve, 1000));
@@ -1526,750 +1823,241 @@ const fetchJobData = async () => {
       </div>
     );
   };
-  const JobCard = ({ job }) => {
-    // console.log("nbfhjsg",job)
+  const PRIORITY_CLASSES_CARD = {
+    urgent: "bg-zinc-900 text-white",
+    high:   "bg-red-500/15 text-red-600",
+    medium: "bg-amber-500/15 text-amber-700",
+    low:    "bg-emerald-500/15 text-emerald-700",
+  };
+
+  const JobCard = ({ job, accountOptions, tagOptions, userOptions, clientFacingOptions }) => {
     const [{ isDragging }, drag] = useDrag({
       type: "JOB_CARD",
       item: { id: job.id },
-      collect: (monitor) => ({
-        isDragging: !!monitor.isDragging(),
-      }),
+      collect: (monitor) => ({ isDragging: !!monitor.isDragging() }),
     });
-    const [lastUpdatedTime, setLastUpdatedTime] = useState(
-      new Date(job.createdAt)
+
+    const [isHovered, setIsHovered] = useState(false);
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const [editJobId, setEditJobId] = useState(null);
+
+    const JOBS_API_CARD = process.env.REACT_APP_ADD_JOBS_URL;
+
+    const lastUpdatedRef = React.useRef(
+      job.updatedAt ? new Date(job.updatedAt) : new Date(job.createdAt)
     );
 
     useEffect(() => {
-      if (job.updatedAt) {
-        setLastUpdatedTime(new Date(job.updatedAt));
-      }
+      if (job.updatedAt) lastUpdatedRef.current = new Date(job.updatedAt);
     }, [job.updatedAt]);
 
     useEffect(() => {
-      const intervalId = setInterval(() => {
-        setLastUpdatedTime((prevTime) => new Date(prevTime));
-      }, 1000);
-
-      return () => clearInterval(intervalId);
+      const id = setInterval(() => {}, 60000);
+      return () => clearInterval(id);
     }, []);
-
-    const updateLastUpdatedTime = () => {
-      setLastUpdatedTime(new Date());
-      console.log(new Date());
-    };
 
     const timeAgo = () => {
-      const currentTime = new Date();
-      const jobTime = lastUpdatedTime;
-
-      const minutesDiff = differenceInMinutes(currentTime, jobTime);
-      const hoursDiff = differenceInHours(currentTime, jobTime);
-      const daysDiff = differenceInDays(currentTime, jobTime);
-
-      if (minutesDiff < 1) {
-        return "just now";
-      } else if (minutesDiff < 60) {
-        return `${minutesDiff} minute${minutesDiff === 1 ? "" : "s"} ago`;
-      } else if (hoursDiff < 24) {
-        return `${hoursDiff} hour${hoursDiff === 1 ? "" : "s"} ago`;
-      } else {
-        return `${daysDiff} day${daysDiff === 1 ? "" : "s"} ago`;
-      }
+      if (!job.updatedAt) return "";
+      if (typeof job.updatedAt === "string" && job.updatedAt.includes("ago")) return job.updatedAt;
+      return formatDistanceToNow(new Date(job.updatedAt), { addSuffix: true });
     };
 
-    const stripHtmlTags = (html) => {
-      const doc = new DOMParser().parseFromString(html, "text/html");
-      return doc.body.textContent || "";
+    const stripHtml = (html) => {
+      try { return new DOMParser().parseFromString(html, "text/html").body.textContent || ""; }
+      catch { return html || ""; }
     };
 
-    const truncateDescription = (description, maxLength = 30) => {
-      if (description.length > maxLength) {
-        return description.slice(0, maxLength) + "...";
-      }
-      return description;
-    };
-
-    const getPriorityClass = (priority) => {
-      switch ((priority || "").toLowerCase()) {
-        case "urgent": return "bg-zinc-900 text-white";
-        case "high":   return "bg-red-500 text-white";
-        case "medium": return "bg-amber-400 text-white";
-        case "low":    return "bg-emerald-500 text-white";
-        default:       return "bg-muted text-muted-foreground";
-      }
-    };
-
-    const truncateName = (name) => {
-      const maxLength = 15;
-      if (name.length > maxLength) {
-        return name.substring(0, maxLength) + "...";
-      }
-      return name;
-    };
-
-    const formatDate = (dateString) => {
-      if (!dateString) return "";
-      const date = new Date(dateString);
-      const options = { month: "short", day: "2-digit", year: "numeric" };
-      return date.toLocaleDateString("en-US", options);
-    };
-
-    const startDateFormatted = formatDate(job.StartDate);
-    const dueDateFormatted = formatDate(job.DueDate);
-
-    const [isHovered, setIsHovered] = useState(false);
-    const [open, setOpen] = useState(false);
-
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
-    const handleDelete = (_id) => {
-      const requestOptions = {
-        method: "DELETE",
-        redirect: "follow",
-      };
-
-      fetch(`${JOBS_API}/workflow/jobs/job/` + _id, requestOptions)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Failed to delete item");
-          }
-          return response.json();
-        })
-        .then((result) => {
-          // console.log(result);
-          toast.success("Job deleted successfully");
-          fetchJobData();
-        })
-        .catch((error) => {
-          console.error(error);
-          toast.error("Failed to delete item");
-        });
-    };
-
-    // edit
-
-    // account
-    const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
-    const [accountData, setAccountData] = useState([]);
-
-    useEffect(() => {
-      fetchAccountData();
-    }, []);
-
-    const fetchAccountData = async () => {
+    const handleDelete = async (_id) => {
       try {
-        const response = await fetch(`${ACCOUNT_API}/accounts/accountdetails`);
-        const data = await response.json();
-        setAccountData(data.accounts);
-      } catch (error) {
-        console.error("Error fetching data:", error);
+        const res = await fetch(`${JOBS_API_CARD}/workflow/jobs/job/${_id}`, { method: "DELETE" });
+        if (!res.ok) throw new Error();
+        toast.success("Job deleted successfully");
+        fetchJobData();
+      } catch {
+        toast.error("Failed to delete job");
+      } finally {
+        setConfirmOpen(false);
       }
     };
 
-    // Create account options
-    const accountOptions = accountData.map((account) => ({
-      value: account._id,
-      label: account.accountName,
-    }));
-
-    // pipeline
-    const PIPELINE_API = process.env.REACT_APP_PIPELINE_TEMP_URL;
-    const [pipelineData, setPipelineData] = useState([]);
-    const [selectedPipeline, setSelectedPipeline] = useState(null);
-    const [piplineid, setPipelineId] = useState();
-    const [pipelineIdData, setPipelineIdData] = useState();
-    const [stages, setstages] = useState();
-
-   
-
-    const fetchPipelineDataid = async (piplineid) => {
-      try {
-        const response = await fetch(
-          `${PIPELINE_API}/workflow/pipeline/pipeline/${piplineid}`
-        );
-        const data = await response.json();
-
-        setPipelineIdData(data.pipeline);
-        console.log("pipeline data for stage", data.pipeline);
-
-        if (data.pipeline && data.pipeline.stages) {
-          const stagesdata = data.pipeline.stages.map((stage) => ({
-            value: stage._id,
-            label: stage.name,
-          }));
-          setstages(stagesdata);
-          // setSelectedstage(stagesdata[0]);
-          console.log(stagesdata);
-        }
-      } catch (error) {
-        // console.error("Error fetching data:", error);
-      }
-    };
-    useEffect(() => {
-      fetchPipelineData();
-    }, []);
-
-    const fetchPipelineData = async () => {
-      try {
-        const url = `${PIPELINE_API}/workflow/pipeline/pipelines`;
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error("Failed to fetch pipeline data");
-        }
-        const data = await response.json();
-        console.log(data);
-        setPipelineData(data.pipeline || []);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    const optionpipeline = pipelineData.map((pipeline) => ({
-      value: pipeline._id,
-      label: pipeline.pipelineName,
-    }));
-
-    // const handlePipelineChange = (selectedOptions) => {
-    //   setSelectedPipeline(selectedOptions);
-    //   console.log("pipeline", selectedOptions);
-    //   fetchPipelineDataid(selectedOptions.value);
-    // };
-
-    // const [selectedStage, setSelectedStage] = useState(null);
-    const [stagesoptions, setStagesOptions] = useState([]);
-    const [selectedstage, setSelectedstage] = useState("");
-    const handleStageChange = (selectedOptions) => {
-      setSelectedstage(selectedOptions);
-    };
-
-    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-    const [selectedJobData, setSelectedJoData] = useState(null);
-    const [priority, setPriority] = useState("");
-    const [description, setDescription] = useState("");
-    const handlePriorityChange = (priority) => {
-      setPriority(priority);
-    };
-    const handleEditorChange = (content) => {
-      setDescription(content);
-    };
-
-    //Tag FetchData ================
-    const [tags, setTags] = useState([]);
-    const [combinedTagsValues, setCombinedTagsValues] = useState([]);
-    useEffect(() => {
-      fetchTagData();
-    }, []);
-
-    const fetchTagData = async () => {
-      try {
-        const response = await fetch(`${TAGS_API}/tags/`);
-        const data = await response.json();
-        setTags(data.tags);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    const tagoptions = tags.map((tag) => ({
-      value: tag._id,
-      label: tag.tagName,
-      colour: tag.tagColour,
-
-      customTagStyle: {
-        backgroundColor: tag.tagColour,
-        color: "#fff",
-        borderRadius: "8px",
-        alignItems: "center",
-        textAlign: "center",
-        marginBottom: "5px",
-        padding: "2px,8px",
-
-        fontSize: "10px",
-        // width: `${calculateWidth(tag.tagName)}px`,
-        margin: "7px",
-      },
-    }));
-
-    const [selectedTags, setSelectedTags] = useState([]);
-    const [dataAccountjob, setDataAccountjob] = useState();
-
-    const handleTagChange = (event) => {
-      const { value } = event.target; // Get selected tag objects
-      setSelectedTags(value); // Keep full tag objects in state
-
-      // Extract selected tag values
-      const selectedTagsValues = value.map((val) => {
-        const option = tagoptions.find((opt) => opt.value === val);
-        return option?.value;
-      });
-
-      setCombinedTagsValues(selectedTagsValues); // Send only tag IDs to backend
-    };
-
-    useEffect(() => {
-      fetchUserData();
-    }, []);
-    const [userData, setUserData] = useState([]);
-    const [selectedUser, setSelectedUser] = useState();
-    const [combinedValues, setCombinedValues] = useState();
-    const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
-    const fetchUserData = async () => {
-      try {
-        const url = `${LOGIN_API}/common/users/roles?roles=TeamMember,Admin`;
-        const response = await fetch(url);
-        const data = await response.json();
-        setUserData(data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    const useroptions = userData.map((user) => ({
-      value: user._id,
-      label: user.username,
-    }));
-
-    const handleUserChange = (newSelectedUsers) => {
-      setSelectedUser(newSelectedUsers);
-      console.log(newSelectedUsers);
-      const selectedValues = newSelectedUsers.map((option) => option.value);
-      setCombinedValues(selectedValues);
-      console.log(selectedValues);
-    };
-    const [startDate, setStartDate] = useState(null);
-    const [dueDate, setDueDate] = useState(null);
-    const handleStartDateChange = (date) => {
-      setStartDate(date);
-    };
-    const handleDueDateChange = (date) => {
-      setDueDate(date);
-    };
-    const [accountId, setAccountId] = useState();
-    const USER_API = process.env.REACT_APP_USER_URL;
-    const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
-    const CLIENT_FACING_API = process.env.REACT_APP_CLIENT_FACING_URL;
-    const JOBS_API = process.env.REACT_APP_ADD_JOBS_URL;
-    const [jobid, setjobid] = useState();
-    const [inputText, setInputText] = useState("");
-    const [charCount, setCharCount] = useState(0);
-    const [selectedjob, setSelectedjob] = useState(null);
-    const [clientFacingJobs, setClientFacingJobs] = useState([]);
-    const [clientDescription, setClientDescription] = useState("");
-    const [clientFacingStatus, setClientFacingStatus] = useState(false);
-    const [selectedJobShortcut, setSelectedJobShortcut] = useState("");
-    const fetchClientFacingJobsData = async () => {
-      try {
-        const response = await fetch(
-          `${CLIENT_FACING_API}/workflow/clientfacingjobstatus/`
-        );
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const data = await response.json();
-        setClientFacingJobs(data.clientFacingJobStatues); // Ensure data is set correctly
-        console.log(data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    const optionstatus = clientFacingJobs.map((status) => ({
-      value: status._id,
-      label: status.clientfacingName,
-      clientfacingColour: status.clientfacingColour,
-    }));
-
-    // useEffect to fetch jobs when the component mounts
-    useEffect(() => {
-      fetchClientFacingJobsData();
-    }, []);
-
-    const handleJobChange = async (event, newValue) => {
-      setSelectedjob(newValue);
-
-      if (newValue && newValue.value) {
-        const clientjobId = newValue.value;
-        try {
-          const response = await fetch(
-            `${CLIENT_FACING_API}/workflow/clientfacingjobstatus/${clientjobId}`
-          );
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          const data = await response.json();
-
-          console.log(data);
-          setClientDescription(
-            data.clientfacingjobstatuses.clientfacingdescription
-          );
-          console.log(data.clientfacingjobstatuses.clientfacingdescription);
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        }
-      }
-    };
-    const handlechatsubject = (e) => {
-      const { value } = e.target;
-      setInputText(value);
-    };
-    const handleChange = (event) => {
-      const value = event.target.value;
-      if (value.length <= charLimit) {
-        setClientDescription(value);
-        setCharCount(value.length);
-      }
-    };
-    const handleClientFacing = (checked) => {
-      setClientFacingStatus(checked);
-    };
-    const [selectedAccount, setSelectedAccount] = useState(null);
-    // const handleEditJobCard = async (jobid) => {
-    //   console.log(jobid);
-    //   setjobid(jobid);
-    //   try {
-    //     const url = `${JOBS_API}/workflow/jobs/job/joblist/listbyid/${jobid}`;
-    //     const response = await fetch(url);
-    //     if (!response.ok) {
-    //       throw new Error("Failed to fetch data");
-    //     }
-    //     const data = await response.json();
-    //     console.log("jobasdata",data)
-    //     setSelectedJoData(data.jobList);
-
-    //     if (data.jobList.Account && data.jobList.Account.length > 0) {
-    //       const { _id, accountName } = data.jobList.Account[0];
-    //       console.log("Account ID:", _id);
-    //       console.log("Account Name:", accountName);
-    //       setSelectedAccount(accountName);
-    //     }
-    //     if (data.jobList && data.jobList.Pipeline) {
-    //       const pipelineData = {
-    //         value: data.jobList.Pipeline._id,
-    //         label: data.jobList.Pipeline.Name,
-    //       };
-    //       setSelectedPipeline(pipelineData);
-    //       console.log(pipelineData);
-    //       setPipelineId(data.jobList.Pipeline._id);
-    //       console.log(data.jobList.Pipeline._id);
-    //       fetchPipelineDataid(data.jobList.Pipeline._id);
-    //     }
-    //     setDueDate(dayjs(data.jobList.DueDate) || null);
-    //     // (dayjs(tempvalues.startdate) || null)
-    //     setStartDate(dayjs(data.jobList.StartDate) || null);
-    //     if (
-    //       data.jobList &&
-    //       data.jobList.Stage &&
-    //       data.jobList.Stage.length > 0
-    //     ) {
-    //       const stageData = {
-    //         value: data.jobList.Stage[0]._id, // Access first element of array
-    //         label: data.jobList.Stage[0].name,
-    //       };
-    //       setSelectedstage(stageData);
-    //       console.log("stages", stageData);
-    //     }
-
-    //     setPriority(data.jobList.Priority);
-    //     setDescription(data.jobList.Description);
-    //     setClientFacingStatus(data.jobList.ShowinClientPortal);
-    //     setInputText(data.jobList.jobClientName);
-    //     setClientDescription(data.jobList.ClientFacingDecription);
-    //     if (
-    //       data.jobList.ClientFacingStatus &&
-    //       data.jobList.ClientFacingStatus
-    //     ) {
-    //       const clientStatusData = {
-    //         value: data.jobList.ClientFacingStatus._id,
-    //         label: data.jobList.ClientFacingStatus.clientfacingName,
-    //         clientfacingColour:
-    //           data.jobList.ClientFacingStatus.clientfacingColour,
-    //       };
-
-    //       setSelectedjob(clientStatusData);
-    //     }
-
-    //     if (data.jobList && data.jobList.Account) {
-    //       setDataAccountjob(data.jobList.Account[0].accountName);
-    //     }
-
-    //     if (data.jobList && data.jobList.Account) {
-    //       console.log(data.jobList.Account[0]._id);
-    //       setAccountId(data.jobList.Account[0]._id);
-    //       console.log(data.jobList.Account[0].tags);
-    //       const tagsData = data.jobList.Account[0].tags
-    //         .flatMap((tagArray) => tagArray)
-    //         .map((tag) => ({
-    //           value: tag._id,
-    //           label: tag.tagName,
-    //           colour: tag.tagColour,
-    //         }));
-    //       setSelectedTags(tagsData);
-    //       const selectedValues = tagsData.map((option) => option.value);
-    //       setCombinedTagsValues(selectedValues);
-    //     }
-
-    //     if (data.jobList && data.jobList.JobAssignee) {
-    //       const assigneesData = data.jobList.JobAssignee.map((assignee) => ({
-    //         value: assignee._id,
-    //         label: assignee.username,
-    //       }));
-
-    //       setSelectedUser(assigneesData);
-    //       const selectedValues = assigneesData.map((option) => option.value);
-    //       setCombinedValues(selectedValues);
-    //     }
-
-    //     setIsDrawerOpen(true);
-    //   } catch (error) {
-    //     console.error("Error fetching data:", error);
-    //   }
-    // };
-    const [editJobId, setEditJobId] = useState(null);
     const handleEditJobCard = (jobId) => {
       setEditJobId(jobId);
       setIsDrawerOpen(true);
     };
-    const handleSaveClick = () => {
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
 
-      const raw = JSON.stringify({
-        pipeline: selectedPipeline.value,
-        stageid: selectedstage.value,
-        jobassignees: combinedValues,
-        priority: priority,
-        description: description,
-        startdate: startDate,
-        enddate: dueDate,
-      });
+    const accountText = Array.isArray(job.Account) ? job.Account.join(", ") : (job.Account || "");
+    const assigneeText = Array.isArray(job.JobAssignee)
+      ? job.JobAssignee.join(", ")
+      : (job.jobAssigneeText || "");
+    const descriptionText = (() => {
+      const plain = stripHtml(job.Description || "");
+      return plain.length > 80 ? plain.slice(0, 80) + "…" : plain;
+    })();
+    const priorityCls = PRIORITY_CLASSES_CARD[(job.Priority || "").toLowerCase()] || "bg-muted text-muted-foreground";
+    const startFmt = job.StartDate ? (
+      typeof job.StartDate === "string" && job.StartDate.match(/[a-zA-Z]/)
+        ? job.StartDate
+        : (() => { try { return format(new Date(job.StartDate), "MMM d, yyyy"); } catch { return job.StartDate; } })()
+    ) : null;
+    const dueFmt = job.DueDate ? (
+      typeof job.DueDate === "string" && job.DueDate.match(/[a-zA-Z]/)
+        ? job.DueDate
+        : (() => { try { return format(new Date(job.DueDate), "MMM d, yyyy"); } catch { return job.DueDate; } })()
+    ) : null;
 
-      console.log(raw);
-      // /job
-      const requestOptions = {
-        method: "PATCH",
-        headers: myHeaders,
-        body: raw,
-        redirect: "follow",
-      };
-      console.log(jobid);
-      fetch(`${JOBS_API}/workflow/jobs/job/` + jobid, requestOptions)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          return response.json();
-        })
-        .then((result) => {
-          // Handle success
-          toast.success("Job  updated successfully");
-          handleSaveTags();
-          // setIsDrawerOpen(false);
-          fetchJobData();
-        })
-        .catch((error) => {
-          // Handle errors
-          console.error(error);
-          toast.error("Failed to update Job ");
-        });
-    };
-    const handleSaveExitClick = () => {
-      updatejobdata();
-    };
-    // console.log(accountId);
-    const handleSaveTags = () => {
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      const raw = JSON.stringify({
-        tags: combinedTagsValues,
-      });
-      console.log(raw);
-      const requestOptions = {
-        method: "PATCH",
-        headers: myHeaders,
-        body: raw,
-        redirect: "follow",
-      };
-      const url = `${ACCOUNT_API}/accounts/accountdetails/${accountId}`;
-      fetch(url, requestOptions)
-        .then((response) => response.json())
-        .then((result) => {
-          console.log(result);
-          console.log("acc", result.updatedAccount); // Log the result
-        })
-        .catch((error) => {
-          console.error(error); // Log the error
-          toast.error("An error occurred while submitting the form"); // Display error toast
-        });
-    };
-    const handleFormClose = () => {
-      setIsDrawerOpen(false);
-    };
-    const updatejobdata = () => {
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-
-      const raw = JSON.stringify({
-        pipeline: selectedPipeline.value,
-        stageid: selectedstage.value,
-        jobassignees: combinedValues,
-
-        priority: priority,
-        description: description,
-        startdate: startDate,
-        enddate: dueDate,
-        showinclientportal: clientFacingStatus,
-        jobnameforclient: inputText,
-        clientfacingstatus: selectedjob?.value,
-        clientfacingDescription: clientDescription,
-      });
-
-      console.log(raw);
-      // /job
-      const requestOptions = {
-        method: "PATCH",
-        headers: myHeaders,
-        body: raw,
-        redirect: "follow",
-      };
-      console.log(jobid);
-      fetch(`${JOBS_API}/workflow/jobs/job/` + jobid, requestOptions)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          return response.json();
-        })
-        .then((result) => {
-          // Handle success
-          console.log("hgdvhvf", result);
-          toast.success("Job Template updated successfully");
-          handleSaveTags();
-          setIsDrawerOpen(false);
-
-          fetchJobData();
-        })
-        .catch((error) => {
-          // Handle errors
-          console.error(error);
-          toast.error("Failed to update Job Template");
-        });
-    };
     return (
       <div
-        className={`bg-card rounded-xl border border-border p-4 transition-all duration-150 hover:shadow-md hover:border-border/80 ${isDragging ? "opacity-50 shadow-xl scale-95" : ""}`}
         ref={drag}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        onDrop={updateLastUpdatedTime}
+        className={[
+          "group relative rounded-lg border bg-card p-3 text-left transition-all duration-150",
+          "hover:shadow-sm hover:border-border/80 cursor-grab active:cursor-grabbing select-none",
+          isDragging ? "opacity-40 shadow-xl scale-[0.97]" : "opacity-100",
+        ].join(" ")}
       >
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-sm font-semibold text-foreground">{job.Account.join(", ")}</span>
-          {isHovered ? (
-            <button onClick={handleOpen} className="inline-flex h-6 w-6 items-center justify-center rounded-md text-destructive transition-colors hover:bg-destructive/10">
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+        {/* Header */}
+        <div className="flex items-start justify-between gap-2 mb-2">
+          <span className="text-[11px] font-medium text-muted-foreground leading-tight truncate flex-1">{accountText}</span>
+          <div className="flex items-center gap-1 shrink-0">
+            {job.Priority && (
+              <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold leading-none ${priorityCls}`}>
+                {job.Priority}
+              </span>
+            )}
+            <button
+              onClick={(e) => { e.stopPropagation(); setConfirmOpen(true); }}
+              className={`inline-flex h-5 w-5 items-center justify-center rounded text-muted-foreground transition-all hover:text-destructive hover:bg-destructive/10 ${isHovered ? "opacity-100" : "opacity-0"}`}
+            >
+              <Trash2 className="h-3 w-3" />
             </button>
-          ) : (
-            <span className="inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-primary/10 px-1.5 text-[10px] font-semibold text-primary">1</span>
-          )}
+          </div>
         </div>
 
-        <p className="font-bold mb-2 cursor-pointer break-words" onClick={() => handleEditJobCard(job.id)}>{job.Name}</p>
-        <p className="text-sm text-muted-foreground mb-2 break-words leading-relaxed">{job.JobAssignee.join(", ")}</p>
-        <p className="text-sm text-muted-foreground mb-2">{truncateDescription(stripHtmlTags(job.Description))}</p>
+        {/* Job name */}
+        <button
+          onClick={() => handleEditJobCard(job.id)}
+          className="block w-full text-left text-sm font-semibold text-foreground hover:text-primary transition-colors break-words leading-snug mb-1.5"
+        >
+          {job.Name}
+        </button>
 
-        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${getPriorityClass(job.Priority)}`}>{job.Priority}</span>
+        {/* Assignee */}
+        {assigneeText && (
+          <p className="text-[11px] text-muted-foreground truncate mb-1.5">{assigneeText}</p>
+        )}
 
-        <div className="mt-3 space-y-0.5">
-          <p className="text-sm text-muted-foreground"><strong>Starts:</strong> {startDateFormatted}</p>
-          <p className="text-sm text-muted-foreground"><strong>Due:</strong> {dueDateFormatted}</p>
-        </div>
+        {/* Description */}
+        {descriptionText && (
+          <p className="text-[11px] text-muted-foreground/80 leading-relaxed line-clamp-2 mb-2">{descriptionText}</p>
+        )}
 
-        <span className="text-xs text-muted-foreground mt-2 block">{timeAgo()}</span>
+        {/* Dates */}
+        {(startFmt || dueFmt) && (
+          <div className="flex items-center gap-3 mt-2 pt-2 border-t border-border/50">
+            {startFmt && <span className="text-[10px] text-muted-foreground"><span className="font-medium">Start</span> {startFmt}</span>}
+            {dueFmt && <span className="text-[10px] text-muted-foreground"><span className="font-medium">Due</span> {dueFmt}</span>}
+          </div>
+        )}
 
-        {open && (
+        {/* Time ago */}
+        <p className="text-[10px] text-muted-foreground/50 mt-1.5">{timeAgo()}</p>
+
+        {/* Delete confirm */}
+        {confirmOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center">
-            <div className="fixed inset-0 bg-foreground/40" onClick={handleClose} />
-            <div className="relative z-50 w-[300px] bg-background rounded-xl p-6 shadow-2xl">
-              <h3 className="text-lg font-semibold mb-2">Confirm Deletion</h3>
-              <p className="text-sm text-muted-foreground mb-4">Are you sure you want to delete this job?</p>
-              <div className="flex justify-end gap-3">
-                <Button variant="ghost" onClick={handleClose}>Cancel</Button>
-                <Button variant="destructive" onClick={() => handleDelete(job.id)}>Delete</Button>
+            <div className="fixed inset-0 bg-foreground/40 backdrop-blur-sm" onClick={() => setConfirmOpen(false)} />
+            <div className="relative z-50 w-72 rounded-xl border border-border bg-card p-5 shadow-2xl">
+              <h3 className="text-sm font-semibold text-foreground mb-1">Delete Job</h3>
+              <p className="text-xs text-muted-foreground mb-4">This action cannot be undone.</p>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" size="sm" onClick={() => setConfirmOpen(false)}>Cancel</Button>
+                <Button variant="destructive" size="sm" onClick={() => handleDelete(job.id)}>Delete</Button>
               </div>
             </div>
           </div>
         )}
+
         <EditJobDrawer
           open={isDrawerOpen}
-          onClose={() => setIsDrawerOpen(false)}
+          onClose={() => { setIsDrawerOpen(false); fetchJobData(); }}
           jobId={editJobId}
           fetchJobData={fetchJobData}
           accountOptions={accountOptions}
           pipelineOptions={optionpipeline}
-          tagOptions={tagoptions}
-          userOptions={useroptions}
-          clientFacingOptions={optionstatus}
+          tagOptions={tagOptions}
+          userOptions={userOptions}
+          clientFacingOptions={clientFacingOptions}
         />
-
-        </div>
+      </div>
     );
   };
 
   const Stage = ({ stage, selectedPipeline, handleDrop }) => {
-    console.log("pipeline stage list", stage);
     const [{ isOver }, drop] = useDrop({
       accept: "JOB_CARD",
-      drop: (item, monitor) => {
-        // handleDrop(item.id, stage.name);
-        handleDrop(item.id, stage._id, stage.name);
-        console.log(stage.automations);
-        // updateJobStage(stage, item);
-      },
-      collect: (monitor) => ({
-        isOver: !!monitor.isOver(),
-      }),
+      drop: (item) => { handleDrop(item.id, stage._id, stage.name); },
+      collect: (monitor) => ({ isOver: !!monitor.isOver() }),
     });
-    console.log("jobs for stage", jobs);
-    // const stageJobs = jobs.filter(
-    //   (job) =>
 
-    //     job.Pipeline  &&
-    //     // job.Stages.includes(stage.name)
-    //      job.Stages.some((s) => s.name === stage.name)
-    // );
-    // Filter jobs by stage ID
     const stageJobs = jobs.filter((job) => {
-  if (!job.Pipeline || !job.Stages) return false;
+      if (!job.Pipeline || !job.Stages) return false;
+      if (Array.isArray(job.Stages)) return job.Stages.some((s) => s._id === stage._id);
+      return job.Stages._id === stage._id;
+    });
 
-  if (Array.isArray(job.Stages)) {
-    return job.Stages.some((s) => s._id === stage._id);
-  }
-
-  return job.Stages._id === stage._id;
-});
-
-    // const stageJobs = jobs.filter(
-    //   (job) => job.Pipeline && job.Stages.some((s) => s._id === stage._id)
-    // );
-    // console.log("jobs for stage", stageJobs);
     const [displayCount, setDisplayCount] = useState(50);
     const displayedJobs = stageJobs.slice(0, displayCount);
-    const truncatedStageName =
-      stage.name.length > 30 ? `${stage.name.slice(0, 20)}...` : stage.name;
+
     return (
-      <div ref={drop} style={{maxHeight:'calc(100vh - 160px)',overflowY:'auto'}} className={`min-w-[260px] max-w-[280px] rounded-xl border transition-colors duration-150 p-3 flex flex-col gap-2 ${isOver ? "border-primary/50 bg-primary/5" : "border-border bg-muted/20"}`}>
-        <div className="flex items-center gap-2 px-1 mb-1">
-          <p className="text-sm font-semibold text-foreground break-words flex-1">{stage.name}</p>
-          {stageJobs.length > 0 && (
-            <span className="inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-muted px-1.5 text-[10px] font-semibold text-muted-foreground">{stageJobs.length}</span>
+      <div
+        ref={drop}
+        className={[
+          "min-w-[260px] max-w-[272px] flex flex-col rounded-xl border transition-colors duration-150",
+          isOver ? "border-primary/40 bg-primary/5" : "border-border bg-muted/20",
+        ].join(" ")}
+        style={{ maxHeight: "calc(100vh - 168px)" }}
+      >
+        {/* Column header */}
+        <div className="flex items-center gap-2 px-3 py-2.5 border-b border-border/60 shrink-0">
+          <span className="h-2 w-2 rounded-full bg-primary/60 shrink-0" />
+          <p className="text-xs font-semibold text-foreground uppercase tracking-wide flex-1 truncate">{stage.name}</p>
+          <span className="inline-flex h-4.5 min-w-[1.25rem] items-center justify-center rounded-full bg-muted px-1.5 text-[10px] font-semibold text-muted-foreground leading-none">
+            {stageJobs.length}
+          </span>
+        </div>
+
+        {/* Cards */}
+        <div className="flex flex-col gap-1.5 p-2 overflow-y-auto flex-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {displayedJobs.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-8 gap-1.5">
+              <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
+                <span className="text-muted-foreground text-base">·</span>
+              </div>
+              <p className="text-[11px] text-muted-foreground">No jobs</p>
+            </div>
+          ) : (
+            displayedJobs.map((job) => (
+              <JobCard
+                key={job.id}
+                job={job}
+                accountOptions={sharedAccountOptions}
+                tagOptions={sharedTagOptions}
+                userOptions={sharedUserOptions}
+                clientFacingOptions={sharedClientFacingOptions}
+              />
+            ))
+          )}
+          {stageJobs.length > displayCount && (
+            <button
+              onClick={() => setDisplayCount(displayCount + 50)}
+              className="mt-1 w-full rounded-md py-1.5 text-[11px] text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            >
+              Load {stageJobs.length - displayCount} more
+            </button>
           )}
         </div>
-        {displayedJobs.map((job) => (
-          <JobCard key={job.id} job={job} />
-        ))}
-        {stageJobs.length > displayCount && (
-          <Button variant="outline" onClick={() => setDisplayCount(displayCount + 50)} className="mt-4 self-center">
-            Load More
-          </Button>
-        )}
       </div>
     );
   };
@@ -2622,45 +2410,77 @@ const fetchJobData = async () => {
           </div>
         ) : selectedPipeline ? (
           <>
-            <div className="mb-5 space-y-3">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                <select
-                  value={selectedPipelineOption?.value || ""}
-                  onChange={(e) => {
-                    const option = optionpipeline.find((o) => o.value === e.target.value);
-                    handleSelectChange(e, option);
-                  }}
-                  className="flex-1 h-9 rounded-lg border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                >
-                  <option value="" disabled>Select pipeline…</option>
-                  {optionpipeline.map((opt) => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+            {/* ── Board toolbar ── */}
+            <div className="mb-4 flex flex-col sm:flex-row items-start sm:items-center gap-2">
+              <select
+                value={selectedPipelineOption?.value || ""}
+                onChange={(e) => {
+                  const option = optionpipeline.find((o) => o.value === e.target.value);
+                  handleSelectChange(e, option);
+                }}
+                className="h-9 rounded-lg border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring min-w-[180px]"
+              >
+                <option value="" disabled>Select pipeline…</option>
+                {optionpipeline.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+
+              <div className="flex items-center gap-2 ml-auto">
+                {/* Active/inactive filter */}
+                <div className="inline-flex items-center rounded-lg border border-border bg-muted/40 p-0.5">
+                  {["active", "inactive"].map((s) => (
+                    <button
+                      key={s}
+                      onClick={() => setFilterStatus(s)}
+                      className={[
+                        "rounded-md px-3 py-1.5 text-xs font-medium capitalize transition-all duration-150",
+                        filterStatus === s
+                          ? "bg-background text-foreground shadow-sm"
+                          : "text-muted-foreground hover:text-foreground",
+                      ].join(" ")}
+                    >
+                      {s}
+                    </button>
                   ))}
-                </select>
-                <div className="flex items-center gap-2">
-                  <div className="inline-flex items-center gap-1 rounded-lg border border-border bg-muted/40 p-0.5">
-                    {["active", "inactive"].map((s) => (
-                      <button
-                        key={s}
-                        onClick={() => setFilterStatus(s)}
-                        className={[
-                          "rounded-md px-3 py-1.5 text-xs font-medium capitalize transition-all duration-150",
-                          filterStatus === s
-                            ? "bg-background text-foreground shadow-sm"
-                            : "text-muted-foreground hover:text-foreground",
-                        ].join(" ")}
-                      >
-                        {s}
-                      </button>
-                    ))}
-                  </div>
-                  <Button variant="outline" size="sm" onClick={handleBackToPipelineList}>← Back</Button>
-                  <Button size="sm" onClick={handleDrawerOpen}>+ Add Job</Button>
                 </div>
+
+                {/* Board / List toggle */}
+                <div className="inline-flex items-center rounded-lg border border-border bg-muted/40 p-0.5">
+                  <button
+                    onClick={() => setViewMode("board")}
+                    title="Board view"
+                    className={[
+                      "inline-flex items-center justify-center h-7 w-7 rounded-md transition-all",
+                      viewMode === "board"
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground",
+                    ].join(" ")}
+                  >
+                    <LayoutGrid className="h-3.5 w-3.5" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode("list")}
+                    title="List view"
+                    className={[
+                      "inline-flex items-center justify-center h-7 w-7 rounded-md transition-all",
+                      viewMode === "list"
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground",
+                    ].join(" ")}
+                  >
+                    <List className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+
+                <Button variant="outline" size="sm" onClick={handleBackToPipelineList}>← Back</Button>
+                <Button size="sm" onClick={handleDrawerOpen}>+ Add Job</Button>
               </div>
             </div>
-            <div>
-              <div className="flex gap-4 overflow-x-auto pb-4 items-start">
+
+            {/* ── Board view ── */}
+            {viewMode === "board" ? (
+              <div className="flex gap-3 overflow-x-auto pb-4 items-start">
                 {stages.map((stage, index) => (
                   <Stage
                     key={stage._id || index}
@@ -2669,7 +2489,6 @@ const fetchJobData = async () => {
                     handleDrop={handleDrop}
                   />
                 ))}
-
                 <AutomationDrawer
                   open={automationdrawerOpen}
                   automations={automationData}
@@ -2681,7 +2500,21 @@ const fetchJobData = async () => {
                   accountId={accountId}
                 />
               </div>
-            </div>
+            ) : (
+              <BoardListView
+                jobs={jobs}
+                stages={stages}
+                onEdit={(jobId) => {
+                  setViewMode("board");
+                }}
+                sharedAccountOptions={sharedAccountOptions}
+                sharedTagOptions={sharedTagOptions}
+                sharedUserOptions={sharedUserOptions}
+                sharedClientFacingOptions={sharedClientFacingOptions}
+                fetchJobData={fetchJobData}
+                optionpipeline={optionpipeline}
+              />
+            )}
 
             {isDrawerOpen && (
               <div className="fixed inset-0 z-50 flex">
@@ -2709,81 +2542,14 @@ const fetchJobData = async () => {
             )}
           </>
         ) : (
-          <>
-            <div className="mb-5 flex items-center justify-between">
-              <h1 className="text-xl font-semibold text-foreground">Pipelines</h1>
-            </div>
-            <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="border-b border-border bg-muted/40">
-                    <th className="text-xs font-semibold tracking-wider uppercase px-5 py-3 text-muted-foreground">Pipeline Name</th>
-                    <th className="text-xs font-semibold tracking-wider uppercase px-5 py-3 text-muted-foreground">Jobs</th>
-                    <th className="text-xs font-semibold tracking-wider uppercase px-5 py-3 text-muted-foreground">Schedule</th>
-                    <th className="text-xs font-semibold tracking-wider uppercase px-5 py-3 text-muted-foreground">Start Date</th>
-                    <th className="text-xs font-semibold tracking-wider uppercase px-5 py-3 text-muted-foreground">End Date</th>
-                    <th className="text-xs font-semibold tracking-wider uppercase px-5 py-3 text-muted-foreground">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {pipelineData.length === 0 ? (
-                    <tr>
-                      <td colSpan={6} className="py-16 text-center">
-                        <div className="flex flex-col items-center gap-2">
-                          <svg className="h-8 w-8 text-muted-foreground/40" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7" /></svg>
-                          <p className="text-sm font-medium text-muted-foreground">No pipelines found</p>
-                          <p className="text-xs text-muted-foreground">Create a pipeline to get started</p>
-                        </div>
-                      </td>
-                    </tr>
-                  ) : (
-                    pipelineData.map((pipeline, index) => (
-                      <tr key={index} className="transition-colors hover:bg-muted/30">
-                        <td className="px-5 py-3">
-                          <button
-                            onClick={() => handleBoardsList(pipeline)}
-                            className="text-sm font-medium text-primary hover:underline text-left"
-                          >
-                            {pipeline.pipelineName}
-                          </button>
-                        </td>
-                        <td className="px-5 py-3 text-sm text-muted-foreground">—</td>
-                        <td className="px-5 py-3 text-sm text-muted-foreground">—</td>
-                        <td className="px-5 py-3 text-sm text-muted-foreground">—</td>
-                        <td className="px-5 py-3 text-sm text-muted-foreground">—</td>
-                        <td className="px-5 py-3">
-                          <div className="relative inline-block">
-                            <button
-                              onClick={(e) => togglePipelineMenu(e, pipeline)}
-                              className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                            >
-                              <MoreVertical className="h-4 w-4" />
-                            </button>
-                            {openMenuId === pipeline._id && (
-                              <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-border bg-card py-1 shadow-lg animate-in fade-in-0 zoom-in-95">
-                                <button
-                                  onClick={() => { handleBoardsList(pipeline); closePipelineMenu(); }}
-                                  className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors"
-                                >
-                                  <Pencil className="h-3.5 w-3.5" /> Edit
-                                </button>
-                                <button
-                                  onClick={handleDeletePipeline}
-                                  className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors"
-                                >
-                                  <Trash2 className="h-3.5 w-3.5" /> Delete
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </>
+          <PipelineListView
+            pipelineData={pipelineData}
+            openMenuId={openMenuId}
+            handleBoardsList={handleBoardsList}
+            togglePipelineMenu={togglePipelineMenu}
+            closePipelineMenu={closePipelineMenu}
+            handleDeletePipeline={handleDeletePipeline}
+          />
         )}
       </div>
     </DndProvider>

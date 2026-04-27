@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { MoreVertical, Trash2 } from "lucide-react";
-import { Checkbox } from "../components/ui/checkbox";
+import { MoreVertical, Trash2, CheckCircle2 } from "lucide-react";
 import { Button } from "../components/ui/button";
-import { Badge } from "../components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../components/ui/tooltip";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "../components/ui/dropdown-menu";
+import { DataTable } from "../components/data-table/data-table";
+import { DataTableToolbar } from "../components/data-table/toolbar";
 import NewTaskDrawer from "./NewTaskDrawer";
 import Status from "../Templates/Status/Status";
 const PendingTasks = () => {
@@ -18,18 +18,13 @@ const PendingTasks = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedTaskData, setSelectedTaskData] = useState(null);
   const ACCOUNT_TASKS_API = process.env.REACT_APP_TASKS_API;
-    const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
+  const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
   const [taskData, setTasksData] = useState([]);
   const [selectedTask, setSelectedTask] = useState("");
-  const [selected, setSelected] = useState([]);
-  const handleSelect = (id) => {
-    const currentIndex = selected.indexOf(id);
-    const newSelected =
-      currentIndex === -1
-        ? [...selected, id]
-        : selected.filter((item) => item !== id);
-    setSelected(newSelected);
-  };
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [globalFilter, setGlobalFilter] = useState("");
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const [status, setStatus] = useState("No status");
 
   // const fetchTasksData = () => {
   //   const requestOptions = {
@@ -102,8 +97,6 @@ const fetchTasksData = async () => {
   useEffect(() => {
     fetchTasksData();
   }, []);
-  const [openMenuId, setOpenMenuId] = useState(null);
-
   const handleMenuClick = (id) => {
     setOpenMenuId(openMenuId === id ? null : id);
   };
@@ -111,77 +104,50 @@ const fetchTasksData = async () => {
     setOpenMenuId(null);
   };
 
-  const handleDelete = () => {
-    handleClose();
-    handleDeleteTask(selectedTask);
-    console.log("Deleted:", selectedTask);
-  };
   const handleDeleteTask = async () => {
     const isConfirmed = window.confirm(
       "Are you sure you want to delete the selected tasks? This action cannot be undone."
     );
     if (isConfirmed) {
       try {
-        // Make delete requests for each selected job
         await Promise.all(
-          selected.map((id) =>
+          selectedIds.map((id) =>
             fetch(`${ACCOUNT_TASKS_API}/accountstasks/taskdelete/` + id, {
               method: "DELETE",
               redirect: "follow",
             })
           )
         );
-
-        toast.success("task deleted successfully!");
-        setSelected([]); // Clear the selected jobs
-        fetchTasksData(); // Refresh the data after deletion
+        toast.success("Tasks deleted successfully!");
+        setSelectedIds([]);
+        fetchTasksData();
       } catch (error) {
         console.error("Delete API Error:", error);
-        toast.error("Failed to delete selected jobs");
+        toast.error("Failed to delete selected tasks");
       }
     }
   };
   const handleStatusChange = async (newStatus) => {
     const tasksToUpdate = taskData.filter(
-      (task) =>
-        selected.includes(task.id || task.id) && task.Status !== newStatus
+      (task) => selectedIds.includes(task.id) && task.Status !== newStatus
     );
-    console.log("newStatus", newStatus);
     if (tasksToUpdate.length === 0) {
       toast.info(`All selected tasks are already ${newStatus}.`);
       return;
     }
-
-    const confirm = window.confirm(
-      `Update ${tasksToUpdate.length} task(s) status to ${newStatus}?`
-    );
+    const confirm = window.confirm(`Update ${tasksToUpdate.length} task(s) status to ${newStatus}?`);
     if (!confirm) return;
-
     try {
-      const taskIds = tasksToUpdate.map((task) => task.id);
-
-      const response = await fetch(
-        `${ACCOUNT_TASKS_API}/accountstasks/tasks/updatestatus`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            taskIds: taskIds,
-            status: newStatus,
-          }),
-        }
-      );
-
+      const response = await fetch(`${ACCOUNT_TASKS_API}/accountstasks/tasks/updatestatus`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ taskIds: tasksToUpdate.map((t) => t.id), status: newStatus }),
+      });
       const result = await response.json();
-      console.log("API response:", result);
-
       if (!response.ok) throw new Error(result.message || "Update failed");
-
       toast.success(`Tasks status updated to ${newStatus}!`);
-      setSelected([]);
-      fetchTasksData(); // Refresh updated task list
+      setSelectedIds([]);
+      fetchTasksData();
     } catch (err) {
       console.error("Status Update Error:", err);
       toast.error("Failed to update tasks status.");
@@ -189,45 +155,25 @@ const fetchTasksData = async () => {
   };
   const handleMarkComplete = async () => {
     const tasksToComplete = taskData.filter(
-      (task) =>
-        selected.includes(task.id || task.id) && task.Status !== "Completed"
+      (task) => selectedIds.includes(task.id) && task.Status !== "Completed"
     );
-
     if (tasksToComplete.length === 0) {
       toast.info("All selected tasks are already complete.");
       return;
     }
-
-    const confirm = window.confirm(
-      `Mark ${tasksToComplete.length} task(s) as Completed?`
-    );
+    const confirm = window.confirm(`Mark ${tasksToComplete.length} task(s) as Completed?`);
     if (!confirm) return;
-
     try {
-      const taskIds = tasksToComplete.map((task) => task.id);
-      console.log("taskIds", taskIds);
-      const response = await fetch(
-        `${ACCOUNT_TASKS_API}/accountstasks/tasks/updatestatus`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            taskIds: taskIds,
-            status: "Completed",
-          }),
-        }
-      );
-
+      const response = await fetch(`${ACCOUNT_TASKS_API}/accountstasks/tasks/updatestatus`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ taskIds: tasksToComplete.map((t) => t.id), status: "Completed" }),
+      });
       const result = await response.json();
-      console.log("API response:", result);
-
       if (!response.ok) throw new Error(result.message || "Update failed");
-
       toast.success("Tasks marked as completed!");
-      setSelected([]);
-      fetchTasksData(); // Refresh updated task list
+      setSelectedIds([]);
+      fetchTasksData();
     } catch (err) {
       console.error("Mark Complete Error:", err);
       toast.error("Failed to mark tasks as completed.");
@@ -268,21 +214,13 @@ const fetchTasksData = async () => {
   ];
 
   const handleClick = async (id) => {
-    console.log(id);
     try {
       const response = await fetch(
         `${ACCOUNT_TASKS_API}/accountstasks/task/listbyid/${id}`,
-        {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-        }
+        { method: "GET", headers: { "Content-Type": "application/json" } }
       );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch task data");
-      }
-
-      const taskToEdit = await response.json(); // Assuming response is JSON
+      if (!response.ok) throw new Error("Failed to fetch task data");
+      const taskToEdit = await response.json();
       setSelectedTaskData(taskToEdit);
       handleClose();
       setIsEditMode(true);
@@ -291,73 +229,123 @@ const fetchTasksData = async () => {
       console.error("Error fetching task:", error);
     }
   };
-  const [status, setStatus] = useState("No status");
 
-  const columns = [
-    { key: "Name", label: "Name", sticky: true },
-    { key: "AccountName", label: "Account" },
-    { key: "Assignees", label: "Assignee" },
-    { key: "Status", label: "Status" },
-    { key: "Priority", label: "Priority" },
-    { key: "SubtaskCount", label: "Subtasks" },
-    { key: "startDate", label: "Start Date" },
-    { key: "dueDate", label: "Due Date" },
-    { key: "JobName", label: "Job Name" },
-    { key: "PipelineName", label: "Pipeline" },
-    { key: "StageNames", label: "Stage" },
-    { key: "TaskTags", label: "Tags" },
-    { key: "description", label: "Description" },
-  ];
-
-  const renderCell = (row, col) => {
-    switch (col.key) {
-      case "Name":
+  const tableColumns = useMemo(() => [
+    {
+      accessorKey: "Name",
+      header: "Name",
+      size: 180,
+      cell: ({ row, getValue }) => (
+        <button
+          className="text-sm font-medium text-primary hover:text-primary/80 transition-colors text-left truncate max-w-[165px] block"
+          onClick={(e) => { e.stopPropagation(); handleClick(row.original.id); }}
+        >
+          {getValue() || "—"}
+        </button>
+      ),
+    },
+    {
+      accessorKey: "AccountName",
+      header: "Account",
+      size: 140,
+      cell: ({ getValue }) => <span className="text-xs text-foreground/80">{getValue() || <span className="text-muted-foreground">—</span>}</span>,
+    },
+    {
+      accessorKey: "Assignees",
+      header: "Assignee",
+      size: 120,
+      cell: ({ getValue }) => <span className="text-xs text-foreground/80">{getValue() || <span className="text-muted-foreground">—</span>}</span>,
+    },
+    {
+      accessorKey: "Status",
+      header: "Status",
+      size: 130,
+      cell: ({ getValue }) => {
+        const val = getValue();
+        if (!val) return null;
+        const color = statusOptions.find((s) => s.value === val)?.color || "#ccc";
         return (
-          <button
-            className="text-sm font-medium text-primary hover:underline transition-colors text-left"
-            onClick={(e) => { e.stopPropagation(); handleClick(row.id); }}
-          >
-            {row.Name}
-          </button>
-        );
-      case "Status":
-        if (!row.Status) return null;
-        return (
-          <span
-            className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold text-white"
-            style={{ backgroundColor: statusOptions.find((s) => s.value === row.Status)?.color || "#ccc" }}
-          >
-            {row.Status}
+          <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold text-white" style={{ backgroundColor: color }}>
+            {val}
           </span>
         );
-      case "Priority":
-        if (!row.Priority) return null;
+      },
+    },
+    {
+      accessorKey: "Priority",
+      header: "Priority",
+      size: 100,
+      cell: ({ getValue }) => {
+        const val = getValue();
+        if (!val) return null;
+        const color = priorityOptions.find((p) => p.value === val)?.color || "#ccc";
         return (
-          <span
-            className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold text-white"
-            style={{ backgroundColor: priorityOptions.find((p) => p.value === row.Priority)?.color || "#ccc" }}
-          >
-            {row.Priority}
+          <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold text-white" style={{ backgroundColor: color }}>
+            {val}
           </span>
         );
-      case "TaskTags":
-        if (!row.TaskTags || row.TaskTags.length === 0) return <span className="text-xs text-muted-foreground">No Tags</span>;
+      },
+    },
+    {
+      accessorKey: "SubtaskCount",
+      header: "Subtasks",
+      size: 80,
+      cell: ({ getValue }) => <span className="text-xs text-muted-foreground">{getValue() ?? "—"}</span>,
+    },
+    {
+      accessorKey: "startDate",
+      header: "Start Date",
+      size: 105,
+      cell: ({ getValue }) => <span className="text-xs text-muted-foreground">{getValue() || "—"}</span>,
+    },
+    {
+      accessorKey: "dueDate",
+      header: "Due Date",
+      size: 105,
+      cell: ({ getValue }) => <span className="text-xs text-muted-foreground">{getValue() || "—"}</span>,
+    },
+    {
+      accessorKey: "JobName",
+      header: "Job Name",
+      size: 130,
+      cell: ({ getValue }) => <span className="text-xs text-foreground/80">{getValue() || <span className="text-muted-foreground">—</span>}</span>,
+    },
+    {
+      accessorKey: "PipelineName",
+      header: "Pipeline",
+      size: 120,
+      cell: ({ getValue }) => <span className="text-xs text-foreground/80">{getValue() || <span className="text-muted-foreground">—</span>}</span>,
+    },
+    {
+      accessorKey: "StageNames",
+      header: "Stage",
+      size: 110,
+      cell: ({ getValue }) => <span className="text-xs text-foreground/80">{getValue() || <span className="text-muted-foreground">—</span>}</span>,
+    },
+    {
+      accessorKey: "TaskTags",
+      header: "Tags",
+      size: 140,
+      enableSorting: false,
+      cell: ({ getValue }) => {
+        const tags = getValue();
+        if (!tags || tags.length === 0) return <span className="text-xs text-muted-foreground">—</span>;
         return (
           <TooltipProvider>
             <div className="flex items-center gap-1 flex-wrap">
-              <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold text-white" style={{ backgroundColor: row.TaskTags[0].tagColour }}>
-                {row.TaskTags[0].tagName}
+              <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold text-white" style={{ backgroundColor: tags[0].tagColour }}>
+                {tags[0].tagName}
               </span>
-              {row.TaskTags.length > 1 && (
+              {tags.length > 1 && (
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground cursor-pointer">
-                      +{row.TaskTags.length - 1}
+                      +{tags.length - 1}
                     </span>
                   </TooltipTrigger>
                   <TooltipContent side="top" className="space-y-1">
-                    {row.TaskTags.slice(1).map((tag) => (
-                      <span key={tag.id} className="block rounded-full px-2 py-0.5 text-[10px] font-semibold text-white" style={{ backgroundColor: tag.tagColour }}>
+                    {tags.slice(1).map((tag) => (
+                      <span key={tag._id || tag.id} className="block rounded-full px-2 py-0.5 text-[10px] font-semibold text-white" style={{ backgroundColor: tag.tagColour }}>
                         {tag.tagName}
                       </span>
                     ))}
@@ -367,93 +355,93 @@ const fetchTasksData = async () => {
             </div>
           </TooltipProvider>
         );
-      default:
-        return <span className="text-xs text-foreground">{row[col.key] || ""}</span>;
-    }
-  };
+      },
+    },
+    {
+      accessorKey: "description",
+      header: "Description",
+      size: 180,
+      cell: ({ getValue }) => (
+        <span className="text-xs text-muted-foreground truncate block max-w-[170px]">{getValue() || "—"}</span>
+      ),
+    },
+    {
+      id: "actions",
+      header: "",
+      size: 50,
+      enableSorting: false,
+      cell: ({ row }) => (
+        <DropdownMenu
+          open={openMenuId === row.original.id}
+          onOpenChange={(open) => setOpenMenuId(open ? row.original.id : null)}
+        >
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost" size="icon"
+              className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <MoreVertical className="h-3.5 w-3.5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleClick(row.original.id); }}>
+              Edit
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={(e) => { e.stopPropagation(); handleClose(); setSelectedIds([row.original.id]); handleDeleteTask(); }}
+              className="text-destructive focus:text-destructive"
+            >
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
+    },
+  ], [openMenuId, statusOptions, priorityOptions]);
+
+  const bulkActions = selectedIds.length > 0 ? (
+    <>
+      <Status onStatusChange={handleStatusChange} selectedStatus={status} />
+      <button
+        onClick={handleMarkComplete}
+        className="inline-flex items-center gap-1.5 h-7 px-2.5 text-xs font-medium rounded-md border border-border bg-background text-foreground hover:bg-muted transition-colors"
+      >
+        <CheckCircle2 className="h-3.5 w-3.5" /> Mark Complete
+      </button>
+      <button
+        onClick={handleDeleteTask}
+        className="inline-flex items-center gap-1.5 h-7 px-2.5 text-xs font-medium rounded-md border border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors"
+      >
+        <Trash2 className="h-3.5 w-3.5" /> Delete
+      </button>
+    </>
+  ) : null;
 
   return (
-    <div className="space-y-4">
-      {selected.length > 0 && (
-        <div className="flex items-center gap-3 rounded-lg border bg-muted/50 px-4 py-2">
-          <span className="text-sm font-medium text-muted-foreground">{selected.length} selected</span>
-          <Status onStatusChange={handleStatusChange} selectedStatus={status} />
-          <Button variant="ghost" size="icon" onClick={handleDeleteTask} className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10">
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
-      )}
+    <div className="space-y-3">
+      <DataTableToolbar
+        globalFilter={globalFilter}
+        onGlobalFilterChange={setGlobalFilter}
+        selectedCount={selectedIds.length}
+        bulkActions={bulkActions}
+      />
 
-      <div className="rounded-xl border bg-card shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="border-b bg-muted/40">
-                <th className="sticky left-0 z-10 bg-muted/40 w-10 px-3 py-3">
-                  <Checkbox
-                    checked={taskData.length > 0 && selected.length === taskData.length}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
-                        setSelected(taskData.map((item) => item.id));
-                      } else {
-                        setSelected([]);
-                      }
-                    }}
-                  />
-                </th>
-                {columns.map((col) => (
-                  <th key={col.key} className={`px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-nowrap ${col.sticky ? "sticky left-10 z-10 bg-muted/40" : ""}`}>
-                    {col.label}
-                  </th>
-                ))}
-                <th className="sticky right-0 z-10 bg-muted/40 w-14 px-3 py-3" />
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {taskData.length === 0 ? (
-                <tr>
-                  <td colSpan={columns.length + 2} className="px-4 py-12 text-center text-sm text-muted-foreground">
-                    No pending tasks found.
-                  </td>
-                </tr>
-              ) : (
-                taskData.map((row) => {
-                  const isSelected = selected.includes(row.id);
-                  return (
-                    <tr
-                      key={row.id}
-                      onClick={() => handleSelect(row.id)}
-                      className={`cursor-pointer transition-colors hover:bg-muted/30 ${isSelected ? "bg-primary/5" : ""}`}
-                    >
-                      <td className="sticky left-0 z-[5] bg-card px-3 py-2.5">
-                        <Checkbox checked={isSelected} onCheckedChange={() => handleSelect(row.id)} />
-                      </td>
-                      {columns.map((col) => (
-                        <td key={col.key} className={`px-4 py-2.5 whitespace-nowrap ${col.sticky ? "sticky left-10 z-[5] bg-card" : ""}`}>
-                          {renderCell(row, col)}
-                        </td>
-                      ))}
-                      <td className="sticky right-0 z-[5] bg-card px-2 py-2.5">
-                        <DropdownMenu open={openMenuId === row.id} onOpenChange={(open) => setOpenMenuId(open ? row.id : null)}>
-                          <DropdownMenuTrigger>
-                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); handleMenuClick(row.id); }}>
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent>
-                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleClick(row.id); }}>Edit</DropdownMenuItem>
-                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleClose(); handleDeleteTask(selectedTask); }} className="text-destructive">Delete</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <DataTable
+        columns={tableColumns}
+        data={taskData}
+        loading={false}
+        globalFilter={globalFilter}
+        onGlobalFilterChange={setGlobalFilter}
+        enableRowSelection
+        onRowSelectionChange={(sel) =>
+          setSelectedIds(Object.keys(sel).filter((k) => sel[k]))
+        }
+        getRowId={(row) => row.id}
+        emptyMessage="No pending tasks found"
+        emptyDescription="All tasks have been completed or none assigned yet"
+        pageSize={25}
+      />
 
       <NewTaskDrawer
         open={drawerOpen}

@@ -7,12 +7,12 @@ import { toast } from "react-toastify";
 import { X, MoreVertical, Trash2, Archive, Loader2 } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
-import { Checkbox } from "../../components/ui/checkbox";
 import { Switch } from "../../components/ui/switch";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "../../components/ui/dropdown-menu";
+import { DataTable } from "../../components/data-table/data-table";
+import { DataTableToolbar } from "../../components/data-table/toolbar";
 import Priority from "../../Templates/Priority/Priority";
 import Editor from "../../Templates/Texteditor/Editor";
-import UpdateJob from "../UpdateJob";
 import { GoDotFill } from "react-icons/go";
 import TagsMultiSelectDropDown from "../../Templates/TagsMultiSelectDropDown";
 import MultiSelectDropdown from "../../Templates/MultiSelectDropdown";
@@ -817,7 +817,7 @@ const [jobName,setJobName]=useState("")
       try {
         // Make delete requests for each selected job
         await Promise.all(
-          selected.map((id) =>
+          selectedIds.map((id) =>
             fetch(`${JOBS_API}/workflow/jobs/job/` + id, {
               method: "DELETE",
               redirect: "follow",
@@ -826,7 +826,7 @@ const [jobName,setJobName]=useState("")
         );
 
         toast.success("Job deleted successfully!");
-        setSelected([]); // Clear the selected jobs
+        setSelectedIds([]); // Clear the selected jobs
         fetchData(true); // Refresh the data after deletion
       } catch (error) {
         console.error("Delete API Error:", error);
@@ -1001,6 +1001,8 @@ jobname:jobName,
       });
   };
 
+  const [globalFilter, setGlobalFilter] = useState("");
+  const [selectedIds, setSelectedIds] = useState([]);
   const [clientFacingStatus, setClientFacingStatus] = useState(false);
   const [selectedJobShortcut, setSelectedJobShortcut] = useState("");
   const [anchorElClientJob, setAnchorElClientJob] = useState(null);
@@ -1158,13 +1160,11 @@ jobname:jobName,
   //
   // Define additional action handlers
   const handleArchive = () => {
-    console.log("Additional Action 1 triggered");
-
-    selected.forEach((jobId) => {
+    selectedIds.forEach((jobId) => {
       handleArchiveJob(jobId);
     });
     toast.success("Jobs archived successfully");
-
+    setSelectedIds([]);
     navigate("/jobs/archivedjob");
   };
 
@@ -1196,85 +1196,163 @@ jobname:jobName,
         toast.error("An error occurred while submitting the form"); // Display error toast
       });
   };
-const getPriorityStyle = (priority) => {
-  const baseStyle = {
-    display: "inline-block",
-    borderRadius: "50px",
-    padding: "2px 10px",
-    fontSize: "12px",
-    fontWeight: 500,
-    textTransform: "capitalize",
-    color: "white",
-    width: "fit-content",
+  const PRIORITY_CLASSES = {
+    urgent: "bg-zinc-950 text-white",
+    high:   "bg-red-400 text-white",
+    medium: "bg-amber-400 text-white",
+    low:    "bg-emerald-400 text-white",
   };
 
-  switch (priority?.toLowerCase()) {
-    case "urgent":
-      return { ...baseStyle, backgroundColor: "#0E0402" };
-    case "high":
-      return { ...baseStyle, backgroundColor: "#fe676e" };
-    case "medium":
-      return { ...baseStyle, backgroundColor: "#FFC300", };
-    case "low":
-      return { ...baseStyle, backgroundColor: "#56c288" };
-    default:
-      return { ...baseStyle, backgroundColor: "#6c757d" }; // default gray
-  }
-};
-
- 
-  const columns = [
-    { key: "Name", label: "Name", sticky: true },
-    { key: "JobAssignee", label: "Job Assignee" },
-    { key: "Pipeline", label: "Pipeline" },
-    { key: "Stage", label: "Stage" },
-    { key: "Account", label: "Account" },
-    { key: "ClientFacing", label: "Client-Facing Status" },
-    { key: "Priority", label: "Priority" },
-    { key: "StartDate", label: "Start Date" },
-    { key: "DueDate", label: "Due Date" },
-    { key: "updatedAt", label: "Time in Stage" },
-  ];
-
-  const getPriorityClasses = (priority) => {
-    switch (priority?.toLowerCase()) {
-      case "urgent": return "bg-black text-white";
-      case "high": return "bg-red-400 text-white";
-      case "medium": return "bg-yellow-400 text-white";
-      case "low": return "bg-green-400 text-white";
-      default: return "bg-gray-400 text-white";
-    }
-  };
-
-  const renderCell = (row, col) => {
-    switch (col.key) {
-      case "Name":
+  const tableColumns = useMemo(() => [
+    {
+      accessorKey: "Name",
+      header: "Job Name",
+      size: 200,
+      cell: ({ row, getValue }) => (
+        <button
+          className="text-sm font-medium text-primary hover:text-primary/80 transition-colors text-left truncate max-w-[180px] block"
+          onClick={(e) => { e.stopPropagation(); handleClick(row.original.id); }}
+        >
+          {getValue() || "—"}
+        </button>
+      ),
+    },
+    {
+      accessorKey: "JobAssignee",
+      header: "Assignee",
+      size: 140,
+      cell: ({ getValue }) => (
+        <span className="text-xs text-foreground/80 truncate block max-w-[130px]">{getValue() || <span className="text-muted-foreground">—</span>}</span>
+      ),
+    },
+    {
+      accessorKey: "Pipeline",
+      header: "Pipeline",
+      size: 130,
+      cell: ({ getValue }) => (
+        <span className="text-xs text-foreground/80">{getValue() || <span className="text-muted-foreground">—</span>}</span>
+      ),
+    },
+    {
+      id: "Stage",
+      header: "Stage",
+      size: 120,
+      enableSorting: false,
+      accessorFn: (row) => row.Stages?.name || "",
+      cell: ({ getValue }) => (
+        <span className="text-xs text-foreground/80">{getValue() || <span className="text-muted-foreground">—</span>}</span>
+      ),
+    },
+    {
+      accessorKey: "Account",
+      header: "Account",
+      size: 150,
+      cell: ({ getValue }) => (
+        <span className="text-xs text-foreground/80 truncate block max-w-[140px]">{getValue() || <span className="text-muted-foreground">—</span>}</span>
+      ),
+    },
+    {
+      id: "ClientFacing",
+      header: "Client Status",
+      size: 155,
+      enableSorting: false,
+      cell: ({ row }) => {
+        const r = row.original;
+        if (!r.visibilityForClient) return <span className="text-xs text-muted-foreground">—</span>;
+        const { statusName, statusColor } = r.clientfacingstatus || {};
+        if (!statusName) return <span className="text-xs text-muted-foreground">—</span>;
         return (
-          <button className="text-sm font-medium text-primary hover:underline" onClick={(e) => { e.stopPropagation(); handleClick(row.id); }}>
-            {row.Name}
-          </button>
-        );
-      case "Stage":
-        return <span className="text-sm text-muted-foreground">{row.Stages?.name || "-"}</span>;
-      case "ClientFacing":
-        return row.visibilityForClient ? (
-          row.clientfacingstatus?.statusName ? (
-            <span className="flex items-center gap-1.5 text-sm">
-              <GoDotFill style={{ color: row.clientfacingstatus.statusColor, fontSize: "16px" }} />
-              {row.clientfacingstatus.statusName}
-            </span>
-          ) : null
-        ) : <span className="text-sm text-muted-foreground">-</span>;
-      case "Priority":
-        return row.Priority ? (
-          <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${getPriorityClasses(row.Priority)}`}>
-            {row.Priority}
+          <span className="inline-flex items-center gap-1.5 text-xs">
+            <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: statusColor }} />
+            {statusName}
           </span>
-        ) : null;
-      default:
-        return <span className="text-sm text-muted-foreground">{row[col.key] || "-"}</span>;
-    }
-  };
+        );
+      },
+    },
+    {
+      accessorKey: "Priority",
+      header: "Priority",
+      size: 100,
+      cell: ({ getValue }) => {
+        const val = getValue();
+        if (!val) return <span className="text-xs text-muted-foreground">—</span>;
+        const cls = PRIORITY_CLASSES[val.toLowerCase()] || "bg-muted text-muted-foreground";
+        return (
+          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold capitalize ${cls}`}>
+            {val}
+          </span>
+        );
+      },
+    },
+    {
+      accessorKey: "StartDate",
+      header: "Start Date",
+      size: 110,
+      cell: ({ getValue }) => <span className="text-xs text-muted-foreground">{getValue() || "—"}</span>,
+    },
+    {
+      accessorKey: "DueDate",
+      header: "Due Date",
+      size: 110,
+      cell: ({ getValue }) => <span className="text-xs text-muted-foreground">{getValue() || "—"}</span>,
+    },
+    {
+      accessorKey: "updatedAt",
+      header: "Time in Stage",
+      size: 130,
+      cell: ({ getValue }) => <span className="text-xs text-muted-foreground">{getValue() || "—"}</span>,
+    },
+    {
+      id: "actions",
+      header: "",
+      size: 50,
+      enableSorting: false,
+      cell: ({ row }) => (
+        <DropdownMenu
+          open={openMenuId === row.original.id}
+          onOpenChange={(open) => setOpenMenuId(open ? row.original.id : null)}
+        >
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost" size="icon"
+              className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <MoreVertical className="h-3.5 w-3.5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleSubmit(row.original.id); }}>
+              Archive
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={(e) => { e.stopPropagation(); handleClose(); handleDeleteJob(); }}
+              className="text-destructive focus:text-destructive"
+            >
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
+    },
+  ], [openMenuId]);
+
+  const bulkActions = selectedIds.length > 0 ? (
+    <>
+      <button
+        onClick={handleArchive}
+        className="inline-flex items-center gap-1.5 h-7 px-2.5 text-xs font-medium rounded-md border border-border bg-background text-foreground hover:bg-muted transition-colors"
+      >
+        <Archive className="h-3.5 w-3.5" /> Archive
+      </button>
+      <button
+        onClick={handleDeleteJob}
+        className="inline-flex items-center gap-1.5 h-7 px-2.5 text-xs font-medium rounded-md border border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors"
+      >
+        <Trash2 className="h-3.5 w-3.5" /> Delete
+      </button>
+    </>
+  ) : null;
 
   return (
     <>
@@ -1419,108 +1497,39 @@ const getPriorityStyle = (priority) => {
         </div>
       )}
 
-      {/* ===== ACTION BAR ===== */}
-      {selected.length > 0 && (
-        <div className="flex items-center gap-3 rounded-lg border bg-muted/50 px-4 py-2 mb-3">
-          <span className="text-sm font-medium text-muted-foreground">{selected.length} selected</span>
-          <button onClick={handleArchive} className="flex items-center gap-1.5 text-sm font-semibold text-foreground hover:text-primary transition-colors">
-            <Archive className="h-4 w-4" /> Archive
-          </button>
-          <Button variant="ghost" size="icon" onClick={handleDeleteJob} className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10">
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
-      )}
+      {/* ===== TOOLBAR + TABLE ===== */}
+      <div className="space-y-3">
+        <FilterDropdown onFilterChange={handleFilterChange} />
 
-      {/* ===== LOADING / TABLE ===== */}
-      {loading ? (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      ) : (
-        <div className="space-y-3">
-          <FilterDropdown onFilterChange={handleFilterChange} />
-          <div className="rounded-xl border bg-card shadow-sm overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="border-b bg-muted/40">
-                    <th className="sticky left-0 z-10 bg-muted/40 w-10 px-3 py-3">
-                      <Checkbox
-                        checked={filteredData.length > 0 && selected.length === filteredData.length}
-                        onCheckedChange={(checked) => {
-                          if (checked) { setSelected(filteredData.map((item) => item.id)); } else { setSelected([]); }
-                        }}
-                      />
-                    </th>
-                    {columns.map((col) => (
-                      <th key={col.key} className={`px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-nowrap ${col.sticky ? "sticky left-10 z-10 bg-muted/40" : ""}`}>
-                        {col.label}
-                      </th>
-                    ))}
-                    <th className="sticky right-0 z-10 bg-muted/40 w-14 px-3 py-3" />
-                  </tr>
-                </thead>
-                <tbody className="divide-y">
-                  {paginatedChats.length === 0 ? (
-                    <tr>
-                      <td colSpan={columns.length + 2} className="px-4 py-12 text-center text-sm text-muted-foreground">
-                        No active jobs found.
-                      </td>
-                    </tr>
-                  ) : (
-                    paginatedChats.map((row) => {
-                      const isSelected = selected.includes(row.id);
-                      return (
-                        <tr key={row.id} onClick={() => handleSelect(row.id)} className={`cursor-pointer transition-colors hover:bg-muted/30 ${isSelected ? "bg-primary/5" : ""}`}>
-                          <td className="sticky left-0 z-[5] bg-card px-3 py-2.5">
-                            <Checkbox checked={isSelected} onCheckedChange={() => handleSelect(row.id)} />
-                          </td>
-                          {columns.map((col) => (
-                            <td key={col.key} className={`px-4 py-2.5 whitespace-nowrap ${col.sticky ? "sticky left-10 z-[5] bg-card" : ""}`}>
-                              {renderCell(row, col)}
-                            </td>
-                          ))}
-                          <td className="sticky right-0 z-[5] bg-card px-2 py-2.5">
-                            <DropdownMenu open={openMenuId === row.id} onOpenChange={(open) => setOpenMenuId(open ? row.id : null)}>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); handleMenuClick(row.id); }}>
-                                  <MoreVertical className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleSubmit(row.id); }}>Archive</DropdownMenuItem>
-                                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleClose(); handleDeleteJob(); }} className="text-destructive">Delete</DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
+        <DataTableToolbar
+          globalFilter={globalFilter}
+          onGlobalFilterChange={setGlobalFilter}
+          selectedCount={selectedIds.length}
+          bulkActions={bulkActions}
+        />
 
-          {/* Pagination */}
-          <div className="flex items-center justify-between px-2 py-2">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span>Rows per page:</span>
-              <select value={rowsPerPage} onChange={handleChangeRowsPerPage} className="rounded border border-input bg-white px-2 py-1 text-sm">
-                {[25, 30, 40, 50, 60, 100].map((opt) => (
-                  <option key={opt} value={opt}>{opt}</option>
-                ))}
-              </select>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span>{page * rowsPerPage + 1}–{Math.min((page + 1) * rowsPerPage, filteredData.length)} of {filteredData.length}</span>
-              <Button variant="outline" size="sm" disabled={page === 0} onClick={() => setPage(page - 1)}>Prev</Button>
-              <Button variant="outline" size="sm" disabled={(page + 1) * rowsPerPage >= filteredData.length} onClick={() => setPage(page + 1)}>Next</Button>
-            </div>
+        {loading ? (
+          <div className="flex items-center justify-center py-24">
+            <Loader2 className="h-7 w-7 animate-spin text-primary" />
           </div>
-        </div>
-      )}
+        ) : (
+          <DataTable
+            columns={tableColumns}
+            data={filteredData}
+            loading={false}
+            globalFilter={globalFilter}
+            onGlobalFilterChange={setGlobalFilter}
+            enableRowSelection
+            onRowSelectionChange={(sel) =>
+              setSelectedIds(Object.keys(sel).filter((k) => sel[k]))
+            }
+            getRowId={(row) => row.id}
+            emptyMessage="No active jobs found"
+            emptyDescription="Create a job to get started"
+            pageSize={25}
+          />
+        )}
+      </div>
     </>
   );
 };
