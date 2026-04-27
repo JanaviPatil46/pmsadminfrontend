@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { useNavigate } from "react-router-dom";
 import Editor from "../Texteditor/Editor";
@@ -12,7 +12,9 @@ import TagsMultiSelectDropDown from "../TagsMultiSelectDropDown";
 import { FormPage, FormSection, FormField, FormRow, FormGrid, FormSwitchRow, FormSubtaskItem, FormSubtaskAdd } from "../../components/ui/form-layout";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
-import { FileText, Calendar, ListChecks, MoreVertical, Pencil, Loader2, ChevronLeft, ChevronRight, Plus, Trash2 } from "lucide-react";
+import { FileText, Calendar, ListChecks, Pencil, Loader2, Plus, Trash2 } from "lucide-react";
+import { DataTable } from "../../components/data-table/data-table";
+import { DataTableToolbar } from "../../components/data-table/toolbar";
 
 const Tasks = () => {
   const TASK_API = process.env.REACT_APP_TASK_TEMP_URL;
@@ -414,9 +416,8 @@ const handleUserChange = (newSelectedUsers) => {
         })
         .then((result) => {
           toast.success("Item deleted successfully");
-          handleMenuClose();
           fetchTaskData();
-          // setshowOrganizerTemplateForm(false);
+          // setshowOrganizerTemplateForm(false):
         })
         .catch((error) => {
           console.error(error);
@@ -424,25 +425,46 @@ const handleUserChange = (newSelectedUsers) => {
         });
     }
   };
-  const [tempIdget, setTempIdGet] = useState("");
-  const [openMenuId, setOpenMenuId] = useState(null);
-    const [anchorEl, setAnchorEl] = useState(null);
-  // const toggleMenu = (_id) => {
-  //   setOpenMenuId(openMenuId === _id ? null : _id);
-  //   setTempIdGet(_id);
-  // };
+  const [globalFilter, setGlobalFilter] = useState("");
 
-
-    const toggleMenu = (event, _id) => {
-    setAnchorEl(event.currentTarget);
-    setOpenMenuId(_id);
-    setTempIdGet(_id);
-  };
-    const handleMenuClose = () => {
-    setAnchorEl(null);
-    setOpenMenuId(null);
-    setTempIdGet(null);
-  };
+  const taskColumns = useMemo(() => [
+    {
+      accessorKey: "templatename",
+      header: "Name",
+      cell: ({ getValue, row }) => (
+        <button
+          onClick={() => handleEdit(row.original._id)}
+          className="text-sm font-medium text-primary hover:text-primary/80 hover:underline transition-colors text-left"
+        >
+          {getValue()}
+        </button>
+      ),
+    },
+    {
+      id: "actions",
+      header: "Actions",
+      size: 80,
+      enableSorting: false,
+      cell: ({ row }) => (
+        <div className="flex items-center gap-0.5">
+          <button
+            onClick={() => handleEdit(row.original._id)}
+            className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-foreground hover:bg-muted"
+            title="Edit"
+          >
+            <Pencil className="h-3.5 w-3.5" />
+          </button>
+          <button
+            onClick={() => handleDelete(row.original._id)}
+            className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-destructive hover:bg-destructive/10"
+            title="Delete"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      ),
+    },
+  ], []);
   const [templateNameError, setTemplateNameError] = useState("");
 
   const validateForm = () => {
@@ -479,22 +501,6 @@ const handleUserChange = (newSelectedUsers) => {
     }
   }, [templatename, priority, description, status, absoluteDate]);
 
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(30);
-
-  const handleChangePage = (_, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-  // Compute paginated tasks
-  const paginatedTasks = TaskTemplates.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
-  );
 
   // Debounced function to check template name existence
   const checkTemplateName = async (name) => {
@@ -525,164 +531,26 @@ const handleUserChange = (newSelectedUsers) => {
   return (
     <div>
         {!showForm ? (
-          <div className="mt-4 space-y-4">
+          <div className="mt-4 space-y-3">
             <div className="flex items-center justify-between">
-              <Button onClick={handleCreateTask}>
-                {/* <ListChecks className="mr-2 h-4 w-4" />  */}
-                 <Plus className="h-4 w-4" />
-                Create New Task
+              <Button size="sm" onClick={handleCreateTask}>
+                <Plus className="h-3.5 w-3.5 mr-1.5" /> Create New Task
               </Button>
             </div>
 
-            {loading ? (
-              <div className="flex items-center justify-center py-20">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              </div>
-            ) : (
-              <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
-
-                {/* ── Mobile card list (< sm) ── */}
-                <div className="sm:hidden">
-                  {paginatedTasks.length === 0 ? (
-                    <p className="px-4 py-10 text-center text-sm text-muted-foreground">No task templates found.</p>
-                  ) : (
-                    <ul className="divide-y divide-border">
-                      {paginatedTasks.map((row) => (
-                        <li key={row._id} className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-muted/50 transition-colors">
-                          <button
-                            onClick={() => handleEdit(row._id)}
-                            className="flex-1 text-left text-sm font-medium text-primary hover:underline truncate"
-                          >
-                            {row.templatename}
-                          </button>
-                          <div className="relative shrink-0">
-                            <button
-                              onClick={(event) => toggleMenu(event, row._id)}
-                              className="inline-flex items-center justify-center rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                            >
-                              <MoreVertical className="h-4 w-4" />
-                            </button>
-                            {openMenuId === row._id && (
-                              <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-border bg-card py-1 shadow-lg">
-                                <button
-                                  onClick={() => { handleEdit(tempIdget); handleMenuClose(); }}
-                                  className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors"
-                                >
-                                  <Pencil className="h-3.5 w-3.5" /> Edit
-                                </button>
-                                <button
-                                  onClick={() => { handleDelete(tempIdget); }}
-                                  className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors"
-                                >
-                                  <Trash2 className="h-3.5 w-3.5" /> Delete
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-
-                {/* ── Desktop / tablet table (sm+) ── */}
-                <div className="hidden sm:block overflow-x-auto">
-                  <table className="min-w-full text-left">
-                    <thead>
-                      <tr className="border-b border-border bg-muted/40">
-                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Name</th>
-                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-20 text-right">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border">
-                      {paginatedTasks.length === 0 ? (
-                        <tr>
-                          <td colSpan={2} className="px-4 py-10 text-center text-sm text-muted-foreground">No task templates found.</td>
-                        </tr>
-                      ) : (
-                        paginatedTasks.map((row) => (
-                          <tr key={row._id} className="group transition-colors hover:bg-muted/50">
-                            <td className="px-4 py-3">
-                              <button
-                                onClick={() => handleEdit(row._id)}
-                                className="text-sm font-medium text-primary hover:text-primary/80 hover:underline transition-colors truncate max-w-xs md:max-w-md lg:max-w-none block"
-                              >
-                                {row.templatename}
-                              </button>
-                            </td>
-                            <td className="px-4 py-3 text-right">
-                              <div className="relative inline-block">
-                                <button
-                                  onClick={(event) => toggleMenu(event, row._id)}
-                                  className="inline-flex items-center justify-center rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                                >
-                                  <MoreVertical className="h-4 w-4" />
-                                </button>
-                                {openMenuId === row._id && (
-                                  <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-border bg-card py-1 shadow-lg animate-in fade-in-0 zoom-in-95">
-                                    <button
-                                      onClick={() => { handleEdit(tempIdget); handleMenuClose(); }}
-                                      className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors"
-                                    >
-                                      <Pencil className="h-3.5 w-3.5" /> Edit
-                                    </button>
-                                    <button
-                                      onClick={() => { handleDelete(tempIdget); }}
-                                      className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors"
-                                    >
-                                      <Trash2 className="h-3.5 w-3.5" /> Delete
-                                    </button>
-                                  </div>
-                                )}
-                              </div>
-                            </td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-
-                {TaskTemplates.length > 0 && (
-                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-border bg-muted/30 px-4 py-3">
-                    <p className="text-xs text-muted-foreground">
-                      Showing <span className="font-semibold text-foreground">{page * rowsPerPage + 1}</span>–<span className="font-semibold text-foreground">{Math.min((page + 1) * rowsPerPage, TaskTemplates.length)}</span> of{" "}
-                      <span className="font-semibold text-foreground">{TaskTemplates.length}</span>
-                    </p>
-                    <div className="flex items-center gap-2">
-                      <select
-                        value={rowsPerPage}
-                        onChange={(e) => handleChangeRowsPerPage({ target: { value: e.target.value } })}
-                        className="rounded-lg border border-border bg-card px-2 py-1.5 text-xs text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                      >
-                        {[30, 40, 50, 60, 100].map((opt) => (
-                          <option key={opt} value={opt}>{opt} / page</option>
-                        ))}
-                      </select>
-                      <div className="flex items-center gap-1">
-                        <button
-                          onClick={() => handleChangePage(null, page - 1)}
-                          disabled={page === 0}
-                          className="inline-flex items-center justify-center rounded-lg border border-border bg-card p-1.5 text-muted-foreground shadow-sm transition-colors hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed"
-                        >
-                          <ChevronLeft className="h-4 w-4" />
-                        </button>
-                        <span className="min-w-[3rem] text-center text-xs font-medium text-muted-foreground">
-                          {page + 1} / {Math.max(1, Math.ceil(TaskTemplates.length / rowsPerPage))}
-                        </span>
-                        <button
-                          onClick={() => handleChangePage(null, page + 1)}
-                          disabled={(page + 1) * rowsPerPage >= TaskTemplates.length}
-                          className="inline-flex items-center justify-center rounded-lg border border-border bg-card p-1.5 text-muted-foreground shadow-sm transition-colors hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed"
-                        >
-                          <ChevronRight className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
+            <DataTableToolbar globalFilter={globalFilter} onGlobalFilterChange={setGlobalFilter} />
+            <DataTable
+              columns={taskColumns}
+              data={TaskTemplates}
+              loading={loading}
+              globalFilter={globalFilter}
+              onGlobalFilterChange={setGlobalFilter}
+              enableRowSelection={false}
+              getRowId={(row) => row._id}
+              emptyMessage="No task templates found"
+              emptyDescription="Create your first task template to get started"
+              pageSize={30}
+            />
           </div>
         ) : (
           <FormPage

@@ -11,7 +11,9 @@ import { Button } from "../../components/ui/button";
 import { Label } from "../../components/ui/label";
 import { Plus } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "../../components/ui/radio-group";
-import { Upload, Trash2, FileText, Mail, Paperclip, User, MoreVertical, Pencil, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Upload, Trash2, FileText, Pencil, Loader2 } from "lucide-react";
+import { DataTable } from "../../components/data-table/data-table";
+import { DataTableToolbar } from "../../components/data-table/toolbar";
 const EmailTemp = () => {
   const EMAIL_API = process.env.REACT_APP_EMAIL_TEMP_URL;
   const USER_API = process.env.REACT_APP_USER_URL;
@@ -420,8 +422,6 @@ const EmailTemp = () => {
         })
         .then((result) => {
           toast.success("Data deleted successfully");
-          
-          handleMenuClose();
           fetchEmailTemplates();
         })
         .catch((error) => {
@@ -430,19 +430,46 @@ const EmailTemp = () => {
     }
   };
 
-  const [tempIdget, setTempIdGet] = useState("");
-  const [openMenuId, setOpenMenuId] = useState(null);
-  
-  const toggleMenu = (event, _id) => {
-    setAnchorEl(event.currentTarget);
-    setOpenMenuId(_id);
-    setTempIdGet(_id);
-  };
-    const handleMenuClose = () => {
-    setAnchorEl(null);
-    setOpenMenuId(null);
-    setTempIdGet(null);
-  };
+  const [globalFilter, setGlobalFilter] = useState("");
+
+  const emailColumns = useMemo(() => [
+    {
+      accessorKey: "templatename",
+      header: "Name",
+      cell: ({ getValue, row }) => (
+        <button
+          onClick={() => handleEdit(row.original._id)}
+          className="text-sm font-medium text-primary hover:text-primary/80 hover:underline transition-colors text-left"
+        >
+          {getValue()}
+        </button>
+      ),
+    },
+    {
+      id: "actions",
+      header: "Actions",
+      size: 80,
+      enableSorting: false,
+      cell: ({ row }) => (
+        <div className="flex items-center gap-0.5">
+          <button
+            onClick={() => handleEdit(row.original._id)}
+            className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-foreground hover:bg-muted"
+            title="Edit"
+          >
+            <Pencil className="h-3.5 w-3.5" />
+          </button>
+          <button
+            onClick={() => handleDelete(row.original._id)}
+            className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-destructive hover:bg-destructive/10"
+            title="Delete"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      ),
+    },
+  ], []);
   const handleTempCancle = () => {
     if (isFormDirty) {
       const confirmClose = window.confirm(
@@ -532,22 +559,6 @@ const EmailTemp = () => {
     setFiles((prevFiles) => [...prevFiles, ...acceptedFiles]);
   };
 
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(30);
-
-  const handleChangePage = (_, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-  // Compute paginated tasks
-  const paginatedTasks = emailTemplates.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
-  );
 
   // Debounced function to check template name existence
   const checkTemplateName = async (name) => {
@@ -578,118 +589,25 @@ const EmailTemp = () => {
   return (
     <div>
       {!showForm ? (
-        <div className="mt-4 space-y-4">
+        <div className="mt-4 space-y-3">
           <div className="flex items-center justify-between">
-            <Button onClick={handleCreateTemplate}>
-              {/* <Mail className="mr-2 h-4 w-4" />  */}
-              <Plus className="h-4 w-4" />
-              Create New Email
+            <Button size="sm" onClick={handleCreateTemplate}>
+              <Plus className="h-3.5 w-3.5 mr-1.5" /> Create New Email
             </Button>
           </div>
-
-          {loading ? (
-            <div className="flex items-center justify-center py-20">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-          ) : (
-            <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left">
-                  <thead>
-                    <tr className="border-b border-border bg-muted/40">
-                      <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Name</th>
-                      <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-24 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border">
-                    {paginatedTasks.length === 0 ? (
-                      <tr>
-                        <td colSpan={2} className="px-5 py-10 text-center text-sm text-muted-foreground">No email templates found.</td>
-                      </tr>
-                    ) : (
-                      paginatedTasks.map((row) => (
-                        <tr key={row._id} className="group transition-colors hover:bg-muted/50">
-                          <td className="px-5 py-3">
-                            <button
-                              onClick={() => handleEdit(row._id)}
-                              className="text-sm font-medium text-primary hover:text-primary/80 hover:underline transition-colors"
-                            >
-                              {row.templatename}
-                            </button>
-                          </td>
-                          <td className="px-5 py-3 text-right">
-                            <div className="relative inline-block">
-                              <button
-                                onClick={(event) => toggleMenu(event, row._id)}
-                                className="inline-flex items-center justify-center rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                              >
-                                <MoreVertical className="h-4 w-4" />
-                              </button>
-                              {openMenuId === row._id && (
-                                <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-border bg-card py-1 shadow-lg animate-in fade-in-0 zoom-in-95">
-                                  <button
-                                    onClick={() => { handleEdit(tempIdget); handleMenuClose(); }}
-                                    className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors"
-                                  >
-                                    <Pencil className="h-3.5 w-3.5" /> Edit
-                                  </button>
-                                  <button
-                                    onClick={() => { handleDelete(tempIdget); }}
-                                    className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors"
-                                  >
-                                    <Trash2 className="h-3.5 w-3.5" /> Delete
-                                  </button>
-                                </div>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
-
-              {emailTemplates.length > 0 && (
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-border bg-muted/30 px-5 py-3">
-                  <p className="text-xs text-muted-foreground">
-                    Showing <span className="font-semibold text-foreground">{page * rowsPerPage + 1}</span>–<span className="font-semibold text-foreground">{Math.min((page + 1) * rowsPerPage, emailTemplates.length)}</span> of{" "}
-                    <span className="font-semibold text-foreground">{emailTemplates.length}</span>
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <select
-                      value={rowsPerPage}
-                      onChange={(e) => handleChangeRowsPerPage({ target: { value: e.target.value } })}
-                      className="rounded-lg border border-border bg-card px-2 py-1.5 text-xs text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                    >
-                      {[30, 40, 50, 60, 100].map((opt) => (
-                        <option key={opt} value={opt}>{opt} / page</option>
-                      ))}
-                    </select>
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => handleChangePage(null, page - 1)}
-                        disabled={page === 0}
-                        className="inline-flex items-center justify-center rounded-lg border border-border bg-card p-1.5 text-muted-foreground shadow-sm transition-colors hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed"
-                      >
-                        <ChevronLeft className="h-4 w-4" />
-                      </button>
-                      <span className="min-w-[3rem] text-center text-xs font-medium text-muted-foreground">
-                        {page + 1} / {Math.max(1, Math.ceil(emailTemplates.length / rowsPerPage))}
-                      </span>
-                      <button
-                        onClick={() => handleChangePage(null, page + 1)}
-                        disabled={(page + 1) * rowsPerPage >= emailTemplates.length}
-                        className="inline-flex items-center justify-center rounded-lg border border-border bg-card p-1.5 text-muted-foreground shadow-sm transition-colors hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed"
-                      >
-                        <ChevronRight className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
+          <DataTableToolbar globalFilter={globalFilter} onGlobalFilterChange={setGlobalFilter} />
+          <DataTable
+            columns={emailColumns}
+            data={emailTemplates}
+            loading={loading}
+            globalFilter={globalFilter}
+            onGlobalFilterChange={setGlobalFilter}
+            enableRowSelection={false}
+            getRowId={(row) => row._id}
+            emptyMessage="No email templates found"
+            emptyDescription="Create your first email template to get started"
+            pageSize={30}
+          />
         </div>
       ) : (
         <FormPage

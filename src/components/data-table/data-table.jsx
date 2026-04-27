@@ -153,16 +153,18 @@ export function DataTable({
 
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full text-sm border-collapse">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id} className="border-b border-border/40 bg-muted/30">
                 {headerGroup.headers.map((header) => {
                   const canSort = header.column.getCanSort();
+                  const colSize = header.column.columnDef.size;
+                  const isCompact = colSize !== undefined && colSize <= 100;
                   return (
                     <th
                       key={header.id}
-                      style={{ width: header.column.columnDef.size }}
+                      style={isCompact ? { width: colSize, minWidth: colSize } : undefined}
                       className={cn(
                         "px-3 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground select-none whitespace-nowrap",
                         canSort && "group cursor-pointer hover:text-foreground transition-colors"
@@ -198,14 +200,22 @@ export function DataTable({
                     row.getIsSelected() && "bg-primary/5 hover:bg-primary/8"
                   )}
                 >
-                  {row.getVisibleCells().map((cell) => (
-                    <td
-                      key={cell.id}
-                      className="px-3 py-2.5 align-middle"
-                    >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
-                  ))}
+                  {row.getVisibleCells().map((cell) => {
+                    const colSize = cell.column.columnDef.size;
+                    const isCompact = colSize !== undefined && colSize <= 100;
+                    return (
+                      <td
+                        key={cell.id}
+                        style={isCompact ? { width: colSize, minWidth: colSize } : undefined}
+                        className={cn(
+                          "px-3 py-2.5 align-middle",
+                          isCompact && "whitespace-nowrap"
+                        )}
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </td>
+                    );
+                  })}
                 </tr>
               ))
             )}

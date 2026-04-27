@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { toast } from "react-toastify";
 import { FormDrawer, FormDrawerFooter, FormSection, FormField } from "../../components/ui/form-layout";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { Label } from "../../components/ui/label";
-import { Plus } from "lucide-react";
-import { Pencil, Trash2, Circle, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2 } from "lucide-react";
+import { DataTable } from "../../components/data-table/data-table";
+import { DataTableToolbar } from "../../components/data-table/toolbar";
 const Clientfacing = () => {
   const CLIENT_FACING_API = process.env.REACT_APP_CLIENT_FACING_URL;
   const [clientFacingJobs, setClientFacingJobs] = useState([]);
@@ -286,58 +287,88 @@ const validateForm = () => {
       console.error("Error fetching job details:", error);
     }
   };
-  console.log(jobId);
+  const [globalFilter, setGlobalFilter] = useState("");
+
+  const clientFacingColumns = useMemo(() => [
+    {
+      id: "color",
+      header: "Color",
+      size: 60,
+      enableSorting: false,
+      cell: ({ row }) => (
+        <span
+          className="inline-block h-4 w-4 rounded-full border border-border/50 shrink-0"
+          style={{ backgroundColor: row.original.clientfacingColour }}
+        />
+      ),
+    },
+    {
+      accessorKey: "clientfacingName",
+      header: "Name",
+      cell: ({ getValue, row }) => (
+        <button
+          onClick={() => handleEdit(row.original._id)}
+          className="text-sm font-medium text-primary hover:text-primary/80 hover:underline transition-colors text-left"
+        >
+          {getValue()}
+        </button>
+      ),
+    },
+    {
+      accessorKey: "clientfacingdescription",
+      header: "Description",
+      cell: ({ getValue }) => (
+        <span className="text-xs text-muted-foreground truncate block max-w-[300px]">{getValue() || "—"}</span>
+      ),
+    },
+    {
+      id: "actions",
+      header: "Actions",
+      size: 80,
+      enableSorting: false,
+      cell: ({ row }) => (
+        <div className="flex items-center gap-0.5">
+          <button
+            onClick={() => handleEdit(row.original._id)}
+            className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-foreground hover:bg-muted"
+            title="Edit"
+          >
+            <Pencil className="h-3.5 w-3.5" />
+          </button>
+          <button
+            onClick={() => deleteJobFacing(row.original._id)}
+            className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-destructive hover:bg-destructive/10"
+            title="Delete"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      ),
+    },
+  ], []);
+
   return (
     <div>
-      <div className="space-y-4">
+      <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <Button onClick={handleDrawerOpen}>
-             <Plus className="h-4 w-4" />
-            Create New Status
+          <Button size="sm" onClick={handleDrawerOpen}>
+            <Plus className="h-3.5 w-3.5 mr-1.5" /> Create New Status
           </Button>
         </div>
 
-        {/* Display Current Status */}
-        {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
-          </div>
-        ) : (
-          <div className="space-y-3">
-      {clientFacingJobs.map((job) => (
-              <div
-          key={job._id}
-                className="flex items-center justify-between p-4 rounded-xl border border-border bg-white shadow-sm transition-all hover:shadow-md"
-              >
-                <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <Circle
-                    className="h-5 w-5 shrink-0"
-                    fill={job.clientfacingColour}
-                    stroke={job.clientfacingColour}
-                  />
-                  <div className="min-w-0">
-                    <p className="font-semibold text-sm truncate">{job.clientfacingName}</p>
-                    <p className="text-xs text-muted-foreground">{job.clientfacingdescription}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => handleEdit(job._id)}
-                    className="rounded-md p-2 text-primary transition-colors hover:bg-primary/10"
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => deleteJobFacing(job._id)}
-                    className="rounded-md p-2 text-destructive transition-colors hover:bg-destructive/10"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        <DataTableToolbar globalFilter={globalFilter} onGlobalFilterChange={setGlobalFilter} />
+        <DataTable
+          columns={clientFacingColumns}
+          data={clientFacingJobs}
+          loading={loading}
+          globalFilter={globalFilter}
+          onGlobalFilterChange={setGlobalFilter}
+          enableRowSelection={false}
+          getRowId={(row) => row._id}
+          emptyMessage="No client-facing statuses found"
+          emptyDescription="Create your first status to get started"
+          pageSize={25}
+        />
 
         {/* ===== CREATE DRAWER ===== */}
         <FormDrawer

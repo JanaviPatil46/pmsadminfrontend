@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import CreatableSelect from "react-select/creatable";
@@ -11,7 +11,9 @@ import { Button } from "../../components/ui/button";
 import { Label } from "../../components/ui/label";
 import { Switch } from "../../components/ui/switch";
 
-import { Eye, X, FileText, Receipt, MoreVertical, Plus, Percent, Pencil, Trash2, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Eye, X, Plus, Percent, Pencil, Trash2, MoreVertical } from "lucide-react";
+import { DataTable } from "../../components/data-table/data-table";
+import { DataTableToolbar } from "../../components/data-table/toolbar";
 const InvoiceTemp = () => {
   const INVOICE_API = process.env.REACT_APP_INVOICE_TEMP_URL;
   const SERVICE_API = process.env.REACT_APP_SERVICES_URL;
@@ -391,7 +393,6 @@ const InvoiceTemp = () => {
         })
         .then((result) => {
           toast.success("Item deleted successfully");
-          handleCloseOptions();
           fetchInvoiceTemplates();
         })
         .catch((error) => {
@@ -558,18 +559,46 @@ const InvoiceTemp = () => {
     setClientmsg("");
     setselectedService("");
   };
-  const [tempIdget, setTempIdGet] = useState("");
-  const [openMenuId, setOpenMenuId] = useState(null);
-  const toggleMenu = (event, _id) => {
-    setAnchorEl(event.currentTarget);
-    setOpenMenuId(_id);
-    setTempIdGet(_id);
-  };
-    const handleCloseOptions = () => {
-    setAnchorEl(null);
-    setOpenMenuId(null);
-    setTempIdGet(null);
-  };
+  const [globalFilter, setGlobalFilter] = useState("");
+
+  const invoiceColumns = useMemo(() => [
+    {
+      accessorKey: "templatename",
+      header: "Name",
+      cell: ({ getValue, row }) => (
+        <button
+          onClick={() => handleEdit(row.original._id)}
+          className="text-sm font-medium text-primary hover:text-primary/80 hover:underline transition-colors text-left"
+        >
+          {getValue()}
+        </button>
+      ),
+    },
+    {
+      id: "actions",
+      header: "Actions",
+      size: 80,
+      enableSorting: false,
+      cell: ({ row }) => (
+        <div className="flex items-center gap-0.5">
+          <button
+            onClick={() => handleEdit(row.original._id)}
+            className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-foreground hover:bg-muted"
+            title="Edit"
+          >
+            <Pencil className="h-3.5 w-3.5" />
+          </button>
+          <button
+            onClick={() => handleDelete(row.original._id)}
+            className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-destructive hover:bg-destructive/10"
+            title="Delete"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      ),
+    },
+  ], []);
  
   const [templatenameError, setTemplatenameError] = useState("");
   const [descriptionError, setDescriptionError] = useState("");
@@ -866,20 +895,6 @@ const InvoiceTemp = () => {
   };
 
 
-  const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(30);
-  
-  
-     const handleChangePage = (_, newPage) => {
-      setPage(newPage);
-    };
-  
-    const handleChangeRowsPerPage = (event) => {
-      setRowsPerPage(parseInt(event.target.value, 10));
-      setPage(0);
-    };
-     // Compute paginated tasks
-     const paginatedInvoices = invoiceTemplates.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
   
  const checkTemplateName = async (name) => {
      try {
@@ -924,109 +939,19 @@ const InvoiceTemp = () => {
             </Button>
           </div>
 
-          {loading ? (
-            <div className="flex items-center justify-center py-20">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-          ) : (
-            <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left">
-                  <thead>
-                    <tr className="border-b border-border bg-muted/40">
-                      <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Name</th>
-                      <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-24 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border">
-                    {paginatedInvoices.length === 0 ? (
-                      <tr>
-                        <td colSpan={2} className="px-5 py-10 text-center text-sm text-muted-foreground">No invoice templates found.</td>
-                      </tr>
-                    ) : (
-                      paginatedInvoices.map((row) => (
-                        <tr key={row._id} className="group transition-colors hover:bg-muted/50">
-                          <td className="px-5 py-3">
-                            <button
-                              onClick={() => handleEdit(row._id)}
-                              className="text-sm font-medium text-primary hover:text-primary/80 hover:underline transition-colors"
-                            >
-                              {row.templatename}
-                            </button>
-                          </td>
-                          <td className="px-5 py-3 text-right">
-                            <div className="relative inline-block">
-                              <button
-                                onClick={(event) => toggleMenu(event, row._id)}
-                                className="inline-flex items-center justify-center rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                              >
-                                <MoreVertical className="h-4 w-4" />
-                              </button>
-                              {openMenuId === row._id && (
-                                <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-border bg-card py-1 shadow-lg animate-in fade-in-0 zoom-in-95">
-                                  <button
-                                    onClick={() => { handleEdit(tempIdget); handleCloseOptions(); }}
-                                    className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors"
-                                  >
-                                    <Pencil className="h-3.5 w-3.5" /> Edit
-                                  </button>
-                                  <button
-                                    onClick={() => { handleDelete(tempIdget); }}
-                                    className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors"
-                                  >
-                                    <Trash2 className="h-3.5 w-3.5" /> Delete
-                                  </button>
-                                </div>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
-
-              {invoiceTemplates.length > 0 && (
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-border bg-muted/30 px-5 py-3">
-                  <p className="text-xs text-muted-foreground">
-                    Showing <span className="font-semibold text-foreground">{page * rowsPerPage + 1}</span>–<span className="font-semibold text-foreground">{Math.min((page + 1) * rowsPerPage, invoiceTemplates.length)}</span> of{" "}
-                    <span className="font-semibold text-foreground">{invoiceTemplates.length}</span>
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <select
-                      value={rowsPerPage}
-                      onChange={(e) => handleChangeRowsPerPage({ target: { value: e.target.value } })}
-                      className="rounded-lg border border-border bg-card px-2 py-1.5 text-xs text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    >
-                      {[30, 40, 50, 60, 100].map((opt) => (
-                        <option key={opt} value={opt}>{opt} / page</option>
-                      ))}
-                    </select>
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => handleChangePage(null, page - 1)}
-                        disabled={page === 0}
-                        className="inline-flex items-center justify-center rounded-lg border border-border bg-card p-1.5 text-muted-foreground shadow-sm transition-colors hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed"
-                      >
-                        <ChevronLeft className="h-4 w-4" />
-                      </button>
-                      <span className="min-w-[3rem] text-center text-xs font-medium text-muted-foreground">
-                        {page + 1} / {Math.max(1, Math.ceil(invoiceTemplates.length / rowsPerPage))}
-                      </span>
-                      <button
-                        onClick={() => handleChangePage(null, page + 1)}
-                        disabled={(page + 1) * rowsPerPage >= invoiceTemplates.length}
-                        className="inline-flex items-center justify-center rounded-lg border border-border bg-card p-1.5 text-muted-foreground shadow-sm transition-colors hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed"
-                      >
-                        <ChevronRight className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
+          <DataTableToolbar globalFilter={globalFilter} onGlobalFilterChange={setGlobalFilter} />
+          <DataTable
+            columns={invoiceColumns}
+            data={invoiceTemplates}
+            loading={loading}
+            globalFilter={globalFilter}
+            onGlobalFilterChange={setGlobalFilter}
+            enableRowSelection={false}
+            getRowId={(row) => row._id}
+            emptyMessage="No invoice templates found"
+            emptyDescription="Create your first invoice template to get started"
+            pageSize={30}
+          />
         </div>
       ) : (
         <>
