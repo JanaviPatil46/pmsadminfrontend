@@ -54,8 +54,9 @@ const FormDrawer = ({
     <Sheet open={open} onOpenChange={(isOpen) => !isOpen && onClose?.()}>
       <SheetContent
         side="right"
+        aria-describedby={undefined}
         className={cn(
-          "flex h-full w-full flex-col overflow-hidden p-0",
+          "flex h-full w-full flex-col p-0",
           widthMap[width] || widthMap.lg,
           className
         )}

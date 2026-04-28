@@ -9,9 +9,10 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
-import { X, ArrowLeft, GripVertical, Trash2, PlusCircle } from "lucide-react";
+import { GripVertical, Trash2, PlusCircle } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
 import { Checkbox } from "../components/ui/checkbox";
 import { Switch } from "../components/ui/switch";
 const AccountTask = ({ handleNewDrawerClose, handleDrawerClose }) => {
@@ -543,188 +544,216 @@ const [errors, setErrors] = useState({ account: false, template: false });
       })
       .catch((error) => console.error(error));
   };
+  const selectCls = "h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring";
+
   return (
-    <div className="flex flex-col h-full">
-      {/* Header */}
-      <div className="flex items-center justify-between px-5 py-4 border-b">
-        <h2 className="text-lg font-semibold text-foreground">Create Task</h2>
-        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleClose}>
-          <X className="h-4 w-4" />
-        </Button>
-      </div>
+    <div className="space-y-5">
 
-      {/* Scrollable Body */}
-      <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
-        {/* Account */}
-        <div>
-          <label className="block text-sm font-medium text-foreground mb-1.5">Account</label>
-          <select
-            value={selectedaccount?.value || ""}
-            onChange={(e) => {
-              const match = accountoptions.find((a) => a.value === e.target.value);
-              handleAccountChange(match || null);
-              setErrors((prev) => ({ ...prev, account: !match }));
-            }}
-            className={`flex h-10 w-full rounded-lg border bg-background text-foreground px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow ${errors.account ? "border-destructive" : "border-input"}`}
-          >
-            <option value="">Select Account</option>
-            {accountoptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
-          {errors.account && <p className="mt-1 text-xs text-destructive">Account is required</p>}
+      {/* ── Source ── */}
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Source</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="at-account">
+              Account <span className="text-destructive">*</span>
+            </Label>
+            <select
+              id="at-account"
+              value={selectedaccount?.value || ""}
+              onChange={(e) => {
+                const match = accountoptions.find((a) => a.value === e.target.value);
+                handleAccountChange(match || null);
+                setErrors((prev) => ({ ...prev, account: !match }));
+              }}
+              className={selectCls + (errors.account ? " border-destructive" : "")}
+            >
+              <option value="">Select account</option>
+              {accountoptions.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+            {errors.account && <p className="text-xs text-destructive">Account is required</p>}
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="at-job">Job</Label>
+            <select
+              id="at-job"
+              disabled={!selectedaccount}
+              value={selectedJob?.value || ""}
+              onChange={(e) => {
+                const match = jobsoptions.find((j) => j.value === e.target.value);
+                handleJobChange(match || null);
+              }}
+              className={selectCls + " disabled:opacity-50 disabled:cursor-not-allowed"}
+            >
+              <option value="">Select job</option>
+              {jobsoptions.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        {/* Job */}
-        <div>
-          <label className="block text-sm font-medium text-foreground mb-1.5">Job</label>
+        <div className="space-y-1.5 mt-4">
+          <Label htmlFor="at-template">
+            Template <span className="text-destructive">*</span>
+          </Label>
           <select
-            value={selectedJob?.value || ""}
-            disabled={!selectedaccount}
-            onChange={(e) => {
-              const match = jobsoptions.find((j) => j.value === e.target.value);
-              handleJobChange(match || null);
-            }}
-            className="flex h-10 w-full rounded-lg border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <option value="">Select Job</option>
-            {jobsoptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* Template */}
-        <div>
-          <label className="block text-sm font-medium text-foreground mb-1.5">Template</label>
-          <select
+            id="at-template"
             value={selectedtemp?.value || ""}
             onChange={(e) => {
               const match = taskTemplateOptions.find((t) => t.value === e.target.value);
               handletemp(e, match || null);
               setErrors((prev) => ({ ...prev, template: !match }));
             }}
-            className={`flex h-10 w-full rounded-lg border bg-background text-foreground px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow ${errors.template ? "border-destructive" : "border-input"}`}
+            className={selectCls + (errors.template ? " border-destructive" : "")}
           >
-            <option value="">Select Template</option>
+            <option value="">Select template</option>
             {taskTemplateOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
             ))}
           </select>
-          {errors.template && <p className="mt-1 text-xs text-destructive">Template is required</p>}
+          {errors.template && <p className="text-xs text-destructive">Template is required</p>}
+        </div>
+      </div>
+
+      {/* ── Assignment ── */}
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Assignment</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="at-taskname">Task Name</Label>
+            <Input
+              id="at-taskname"
+              placeholder="Enter task name"
+              value={tempNameNew}
+              onChange={(e) => setTempNameNew(e.target.value)}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Assignees</Label>
+            <MultiSelectDropdown value={selectedUser} onChange={handleUserChange} placeholder="Select assignees" />
+          </div>
         </div>
 
-        {/* Assignee + Status Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1.5">Task Assignee</label>
-            <MultiSelectDropdown value={selectedUser} onChange={handleUserChange} placeholder="Assignees" />
-          </div>
-          <div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+          <div className="space-y-1.5">
+            <Label>Status</Label>
             <Status onStatusChange={handleStatusChange} selectedStatus={status} />
           </div>
-        </div>
-
-        {/* Template Name + Priority Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1.5">Template Name</label>
-            <Input placeholder="Template Name" value={tempNameNew} onChange={(e) => setTempNameNew(e.target.value)} />
-          </div>
-          <div>
+          <div className="space-y-1.5">
+            <Label>Priority</Label>
             <Priority onPriorityChange={handlePriorityChange} selectedPriority={priority} />
           </div>
         </div>
+      </div>
 
-        {/* Description */}
-        <div>
-          <label className="block text-sm font-medium text-foreground mb-1.5">Description</label>
-          <Editor initialContent={taskDiscription} onChange={handleEditorChange} />
-        </div>
-
-        {/* Tags */}
-        <div>
-          <label className="block text-sm font-medium text-foreground mb-1.5">Tags</label>
-          <TagsMultiSelectDropDown value={tagsNew} onChange={handleTagChange} placeholder="Tags" />
-        </div>
-
-        {/* Dates */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1.5">Start Date</label>
-            <input
-              type="date"
-              value={StartsDateNew ? dayjs(StartsDateNew).format("YYYY-MM-DD") : ""}
-              onChange={(e) => handleStartDateChange(e.target.value ? dayjs(e.target.value) : null)}
-              className="flex h-10 w-full rounded-lg border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow"
-            />
+      {/* ── Details ── */}
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Details</p>
+        <div className="space-y-4">
+          <div className="space-y-1.5">
+            <Label>Description</Label>
+            <Editor initialContent={taskDiscription} onChange={handleEditorChange} />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1.5">Due Date</label>
-            <input
-              type="date"
-              value={DueDateNew ? dayjs(DueDateNew).format("YYYY-MM-DD") : ""}
-              onChange={(e) => handleDueDateChange(e.target.value ? dayjs(e.target.value) : null)}
-              className="flex h-10 w-full rounded-lg border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow"
-            />
-          </div>
-        </div>
 
-        {/* Subtasks */}
-        <div>
-          <DragDropContext onDragEnd={handleDragEnd}>
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-base font-semibold text-foreground">Subtasks</h3>
-              <Switch checked={SubtaskSwitch} onCheckedChange={handleSubtaskSwitch} />
+          <div className="space-y-1.5">
+            <Label>Tags</Label>
+            <TagsMultiSelectDropDown value={tagsNew} onChange={handleTagChange} placeholder="Select or search tags" />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label>Start Date</Label>
+              <Input
+                type="date"
+                value={StartsDateNew ? dayjs(StartsDateNew).format("YYYY-MM-DD") : ""}
+                onChange={(e) => handleStartDateChange(e.target.value ? dayjs(e.target.value) : null)}
+              />
             </div>
-
-            {SubtaskSwitch && (
-              <Droppable droppableId="subtaskList">
-                {(provided) => (
-                  <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
-                    {subtasks.map((subtask, index) => (
-                      <Draggable key={subtask.id} draggableId={subtask.id} index={index}>
-                        {(provided) => (
-                          <div ref={provided.innerRef} {...provided.draggableProps} className="flex items-center gap-2 rounded-lg border bg-card p-2">
-                            <Checkbox
-                              checked={subtask.checked || false}
-                              onCheckedChange={() => handleCheckboxChange(subtask.id)}
-                            />
-                            <Input
-                              placeholder="Things to do"
-                              value={subtask.text}
-                              onChange={(e) => handleInputChange(subtask.id, e.target.value)}
-                              className="flex-1"
-                            />
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => handleDeleteSubtask(subtask.id)}>
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                            <div {...provided.dragHandleProps} className="cursor-grab text-muted-foreground hover:text-foreground">
-                              <GripVertical className="h-4 w-4" />
-                            </div>
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                    <button onClick={handleAddSubtask} className="flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors mt-2">
-                      <PlusCircle className="h-4 w-4" /> Add Subtask
-                    </button>
-                  </div>
-                )}
-              </Droppable>
-            )}
-          </DragDropContext>
+            <div className="space-y-1.5">
+              <Label>Due Date</Label>
+              <Input
+                type="date"
+                value={DueDateNew ? dayjs(DueDateNew).format("YYYY-MM-DD") : ""}
+                onChange={(e) => handleDueDateChange(e.target.value ? dayjs(e.target.value) : null)}
+              />
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="flex items-center gap-3 px-5 py-4 border-t bg-muted/30">
-        <Button variant="outline" onClick={handleClose}>
-          <ArrowLeft className="h-4 w-4 mr-1.5" /> Back
-        </Button>
-        <Button onClick={createTask}>Create Task</Button>
+      {/* ── Subtasks ── */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Subtasks</p>
+          <Switch checked={SubtaskSwitch} onCheckedChange={handleSubtaskSwitch} />
+        </div>
+
+        {SubtaskSwitch && (
+          <DragDropContext onDragEnd={handleDragEnd}>
+            <Droppable droppableId="subtaskList">
+              {(provided) => (
+                <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
+                  {subtasks.map((subtask, index) => (
+                    <Draggable key={subtask.id} draggableId={subtask.id} index={index}>
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          className="flex items-center gap-2 rounded-lg border border-border bg-card p-2"
+                        >
+                          <Checkbox
+                            checked={subtask.checked || false}
+                            onCheckedChange={() => handleCheckboxChange(subtask.id)}
+                          />
+                          <Input
+                            placeholder="Subtask description"
+                            value={subtask.text}
+                            onChange={(e) => handleInputChange(subtask.id, e.target.value)}
+                            className="flex-1 h-8 text-sm"
+                          />
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
+                            onClick={() => handleDeleteSubtask(subtask.id)}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                          <div {...provided.dragHandleProps} className="cursor-grab text-muted-foreground hover:text-foreground">
+                            <GripVertical className="h-4 w-4" />
+                          </div>
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                  <button
+                    type="button"
+                    onClick={handleAddSubtask}
+                    className="flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors mt-1"
+                  >
+                    <PlusCircle className="h-4 w-4" /> Add Subtask
+                  </button>
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
+        )}
       </div>
+
+      {/* ── Footer actions ── */}
+      <div className="flex items-center justify-end gap-2 pt-2 border-t border-border/40">
+        <Button variant="ghost" size="sm" onClick={handleClose}>
+          Cancel
+        </Button>
+        <Button size="sm" onClick={createTask}>
+          Create Task
+        </Button>
+      </div>
+
     </div>
   );
 };

@@ -37,12 +37,13 @@ export function SideSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
+        aria-describedby={undefined}
         className={cn(
           "p-0 flex flex-col border-l border-border/40 shadow-lg bg-background [&>button]:hidden",
           sizeMap[size] ?? sizeMap.md
         )}
       >
-        <div className="flex h-full flex-col">
+        <div className="flex flex-1 min-h-0 flex-col">
           {/* Header */}
           <SheetHeader className="flex-row items-center justify-between px-5 py-4 border-b border-border/40 space-y-0 shrink-0">
             <div className="flex flex-col gap-0.5">
@@ -65,12 +66,12 @@ export function SideSheet({
           </SheetHeader>
 
           {/* Scrollable content */}
-          <div className="flex-1 overflow-y-auto px-5 py-4">
+          <div className="flex-1 min-h-0 overflow-y-auto px-5 py-4">
             {children}
           </div>
 
           {/* Footer */}
-          {!hideDefaultFooter && (
+          {(!hideDefaultFooter || footer) && (
             <SheetFooter className="border-t border-border/40 px-5 py-3.5 bg-muted/20 shrink-0">
               <div className="flex items-center justify-end gap-2 w-full">
                 <Button

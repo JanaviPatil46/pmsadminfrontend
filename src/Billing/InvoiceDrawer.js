@@ -1,11 +1,16 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Plus, Tag, MoreVertical, X, Eye, ArrowLeft, Loader2 } from "lucide-react";
+import { Plus, Tag, Pencil, Trash2, X, Eye, ChevronDown } from "lucide-react";
 import { toast } from "react-toastify";
-import CreatableSelect from "react-select/creatable";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import Cookies from "js-cookie";
 import { LoginContext } from "../Sidebar/Context/Context";
+import { SideSheet } from "../components/ui/side-sheet";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { Switch } from "../components/ui/switch";
+import { Textarea } from "../components/ui/textarea";
 const InvoiceDrawer = ({
   isDrawerOpen,
   setDrawerOpen,
@@ -43,8 +48,7 @@ const InvoiceDrawer = ({
   const [taxRate, setTaxRate] = useState(0);
   const [taxTotal, setTaxTotal] = useState(0);
   const [totalAmount, setTotalAmount] = useState(0);
-  const [anchorElNew, setAnchorElNew] = useState(null);
-  const [selectedRow, setSelectedRow] = useState(null);
+  const [openServiceDropdown, setOpenServiceDropdown] = useState(null);
   const [selectedRowData, setSelectedRowData] = useState(null);
   const [selectedRowIndex, setSelectedRowIndex] = useState(null);
   const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
@@ -342,20 +346,20 @@ const InvoiceDrawer = ({
   }));
 
 
-  const handlePayInvoiceChange = (event) => {
-    setIsPayInvoice(event.target.checked);
+  const handlePayInvoiceChange = (checked) => {
+    setIsPayInvoice(checked);
   };
 
-  const handleEmailInvoiceChange = (event) => {
-    setIsEmailInvoice(event.target.checked);
+  const handleEmailInvoiceChange = (checked) => {
+    setIsEmailInvoice(checked);
   };
 
-  const handleRemindersChange = (event) => {
-    setReminders(event.target.checked);
+  const handleRemindersChange = (checked) => {
+    setReminders(checked);
   };
 
-  const handleScheduledInvoiceChange = (event) => {
-    setScheduledInvoice(event.target.checked);
+  const handleScheduledInvoiceChange = (checked) => {
+    setScheduledInvoice(checked);
   };
 
   const handleChange = (event) => {
@@ -402,22 +406,14 @@ const InvoiceDrawer = ({
     fetchinvoicetempbyid(selectedOptions.value);
   };
 
- const handleServiceChange = (index, selectedOptions) => {
+  const handleServiceChange = (index, value) => {
     const newRows = [...rows];
-    newRows[index].productName = selectedOptions ? selectedOptions.label : "";
+    newRows[index].productName = value;
     setRows(newRows);
-     setselectedService(selectedOptions);
-    // fetchservicebyid(selectedOptions.value, index);
-     // Call fetch only if an option is actually selected
-  if (selectedOptions && selectedOptions.value) {
-    fetchservicebyid(selectedOptions.value, index);
-  }
-  };
-  const handleServiceInputChange = (inputValue, actionMeta, index) => {
-    if (actionMeta.action === "input-change") {
-      const newRows = [...rows];
-      newRows[index].productName = inputValue;
-      setRows(newRows);
+    const matched = serviceoptions.find(o => o.label === value);
+    if (matched) {
+      setselectedService(matched);
+      fetchservicebyid(matched.value, index);
     }
   };
 
@@ -486,20 +482,9 @@ const InvoiceDrawer = ({
     setTotalAmount((subtotal + tax).toFixed(2));
   };
 
-  const handleMenuOpen = (event, index) => {
-    setAnchorElNew(event.currentTarget);
-    setSelectedRow(index);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorElNew(null);
-    setSelectedRow(null);
-  };
-
   const handleEditService = (row, index) => {
     setSelectedRowData(row);
     setSelectedRowIndex(index);
-    handleMenuClose();
     setIsEditDrawerOpen(true);
   };
 
@@ -520,29 +505,9 @@ const InvoiceDrawer = ({
     handleEditDrawerClose();
   };
 
-  const handleDeleteService = () => {
-    deleteRow(selectedRow);
-    handleMenuClose();
-  };
-
-  const handleDuplicate = () => {
-    if (selectedRow !== null) {
-      const duplicatedRow = {
-        ...rows[selectedRow],
-        productName: rows[selectedRow].productName
-          ? `${rows[selectedRow].productName} Copy`
-          : "Copy",
-      };
-      setRows([...rows, duplicatedRow]);
-    }
-    handleMenuClose();
-  };
-
   const handleSaveAsNewService = (row) => {
-    console.log("Row data:", row);
     setSelectedRowData(row);
-    setIsNewDrawerOpen(true); // Open the drawer if required
-    handleMenuClose();
+    setIsNewDrawerOpen(true);
   };
 
   const handleEditDrawerClose = () => {
@@ -870,476 +835,476 @@ const [lineItemsError, setLineItemsError]= useState("")
     const qty = selectedRowData?.qty || 0;
     setTotalamount(`$${(rate * qty).toFixed(2)}`);
   }, [selectedRowData?.rate, selectedRowData?.qty]);
-  const inputCls = "w-full border border-input rounded-lg px-3 py-2 text-sm bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow shadow-sm";
-  const labelCls = "block text-sm font-medium text-foreground mb-1.5";
-  const btnPrimary = "inline-flex items-center justify-center rounded-lg px-5 py-2 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 transition-colors shadow-sm";
-  const btnOutline = "inline-flex items-center justify-center rounded-lg px-5 py-2 text-sm font-medium border border-border text-foreground hover:bg-muted transition-colors";
-  const switchEl = (checked, onChange) => (
-    <label className="relative inline-flex items-center cursor-pointer">
-      <input type="checkbox" checked={checked} onChange={onChange} className="sr-only peer" />
-      <div className="w-10 h-5 bg-muted rounded-full peer peer-checked:bg-primary transition-colors after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-background after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5" />
-    </label>
-  );
-
-  if (!isDrawerOpen) return null;
+  const selectCls = "h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring";
 
   return (
     <>
-      {/* Main Invoice Drawer */}
-      <div className="fixed inset-0 z-40 overflow-hidden">
-        <div className="absolute inset-0 bg-black/30" onClick={() => setDrawerOpen(false)} />
-        <div className="absolute right-0 top-0 h-full bg-card shadow-2xl overflow-y-auto w-full md:w-[60%]">
-
-          {/* Header */}
-          <div className="flex items-center justify-between px-5 py-4 border-b border-border sticky top-0 bg-card z-10">
-            <h2 className="text-base font-semibold text-foreground">Create Invoice</h2>
-            <div className="flex items-center gap-2">
-              <button type="button" onClick={handleOpenpreviewDrawer}
-                className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
-                <Eye className="h-4 w-4" /> Preview
-              </button>
-              <button type="button" onClick={handleDrawerClose} className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
-                <X className="h-4 w-4" />
-              </button>
+      {/* ══════════ Main Invoice Sheet ══════════ */}
+      <SideSheet
+        open={isDrawerOpen}
+        onOpenChange={(v) => { if (!v) { setDrawerOpen(false); handleDrawerClose(); } }}
+        title="Create Invoice"
+        description={`Account: ${selectedAccount?.label || "—"}`}
+        size="xl"
+        hideDefaultFooter
+        footer={
+          <div className="flex items-center gap-2 w-full">
+            <Button variant="outline" size="sm" onClick={handleOpenpreviewDrawer}>
+              <Eye className="h-3.5 w-3.5 mr-1.5" /> Preview
+            </Button>
+            <div className="ml-auto flex items-center gap-2">
+              <Button variant="ghost" size="sm" onClick={() => { setDrawerOpen(false); handleDrawerClose(); }}>Cancel</Button>
+              <Button size="sm" onClick={createinvoice}>Save Invoice</Button>
             </div>
           </div>
+        }
+      >
+        <div className="space-y-5">
 
-          {/* Body */}
-          <div className="p-5 space-y-5 create-invoice">
-
-            {/* Row 1: Account + Invoice Template */}
+          {/* ── Invoice Info ── */}
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Invoice Info</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className={labelCls}>Account name, ID or email</label>
-                <input readOnly value={selectedAccount?.label || ""} placeholder="Select Account" className={inputCls + " bg-muted cursor-default"} />
+              <div className="space-y-1.5">
+                <Label>Account</Label>
+                <Input readOnly value={selectedAccount?.label || ""} placeholder="Select Account" className="bg-muted cursor-default" />
               </div>
-              <div>
-                <label className={labelCls}>Invoice Template</label>
-                <select value={selectInvoiceTemp?.value || ""}
+              <div className="space-y-1.5">
+                <Label htmlFor="id-inv-temp">Invoice Template</Label>
+                <select id="id-inv-temp" value={selectInvoiceTemp?.value || ""}
                   onChange={(e) => { const opt = invoiceoptions.find(o => o.value === e.target.value); if (opt) handleInvoiceTempChange(null, opt); }}
-                  className={inputCls}>
-                  <option value="">Invoice Template</option>
+                  className={selectCls}>
+                  <option value="">Select template</option>
                   {invoiceoptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
               </div>
-            </div>
-
-            {/* Row 2: Invoice Number + Payment Method */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className={labelCls}>Invoice Number</label>
-                <input readOnly value={isLoadingInvoiceNumber ? "Loading..." : invoicenumber}
-                  placeholder="Invoice Number" className={inputCls + " bg-muted cursor-default"} />
-                <p className="text-xs text-muted-foreground mt-1">Auto-generated invoice number</p>
+              <div className="space-y-1.5">
+                <Label>Invoice Number</Label>
+                <Input readOnly value={isLoadingInvoiceNumber ? "Loading..." : invoicenumber} className="bg-muted cursor-default" />
+                <p className="text-xs text-muted-foreground">Auto-generated</p>
               </div>
-              <div>
-                <label className={labelCls}>Payment Method</label>
-                <select value={paymentMode?.value || ""}
+              <div className="space-y-1.5">
+                <Label htmlFor="id-payment">Payment Method</Label>
+                <select id="id-payment" value={paymentMode?.value || ""}
                   onChange={(e) => { const opt = paymentsOptions.find(o => o.value === e.target.value); handlePaymentOptionChange(null, opt || null); }}
-                  className={inputCls}>
-                  <option value="">Select Payment Mode</option>
+                  className={selectCls}>
+                  <option value="">Select payment mode</option>
                   {paymentsOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
               </div>
-            </div>
-
-            {/* Row 3: Date + Team Member */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className={labelCls}>Date</label>
-                <input type="date" className={inputCls}
+              <div className="space-y-1.5">
+                <Label htmlFor="id-date">Invoice Date</Label>
+                <Input id="id-date" type="date"
                   value={startDate ? startDate.format("YYYY-MM-DD") : ""}
                   onChange={(e) => handleStartDateChange(dayjs(e.target.value))} />
               </div>
-              <div>
-                <label className={labelCls}>Team Member</label>
-                <select value={selecteduser?.value || ""}
+              <div className="space-y-1.5">
+                <Label htmlFor="id-member">Team Member</Label>
+                <select id="id-member" value={selecteduser?.value || ""}
                   onChange={(e) => { const opt = useroptions.find(o => o.value === e.target.value); handleuserChange(null, opt || null); }}
-                  className={inputCls}>
-                  <option value="">Team Member</option>
+                  className={selectCls}>
+                  <option value="">Select team member</option>
                   {useroptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
               </div>
             </div>
+          </div>
 
-            {/* Description + Shortcode */}
-            <div className="relative">
-              <label className={labelCls}>Description</label>
-              <textarea value={description} onChange={handleChange} placeholder="Description" rows={3} className={inputCls} />
-              <p className="text-xs text-muted-foreground text-right mt-1">{charCount}/{charLimit}</p>
-              <div className="relative mt-1">
-                <button type="button" onClick={toggleDropdown} className={btnPrimary + " !rounded-full px-4 py-1.5 text-xs"}>
-                  Add Shortcode
-                </button>
+          {/* ── Description ── */}
+          <div className="space-y-1.5">
+            <Label>Description</Label>
+            <Textarea value={description} onChange={handleChange} placeholder="Invoice description" rows={3} />
+            <div className="flex items-center justify-between">
+              <div className="relative">
+                <Button type="button" variant="outline" size="sm" onClick={toggleDropdown}>
+                  Add Shortcode <ChevronDown className="ml-1.5 h-3.5 w-3.5" />
+                </Button>
                 {showDropdown && (
                   <>
                     <div className="fixed inset-0 z-30" onClick={handleCloseDropdown} />
-                    <div className="absolute left-0 z-40 bg-popover border border-border rounded-lg shadow-lg w-[300px] h-[300px] overflow-y-auto">
-                      <ul>
-                        {filteredShortcuts.map((shortcut, index) => (
-                          <li key={index} onClick={() => handleAddShortcut(shortcut.value)}
-                            className="px-4 py-2 text-sm text-popover-foreground cursor-pointer hover:bg-muted"
-                            style={{ fontWeight: shortcut.isBold ? "bold" : "normal" }}>
-                            {shortcut.title}
-                          </li>
-                        ))}
-                      </ul>
+                    <div className="absolute left-0 z-40 bg-popover border border-border rounded-lg shadow-lg w-72 max-h-72 overflow-y-auto">
+                      {filteredShortcuts.map((s, i) => (
+                        <div key={i} onClick={() => handleAddShortcut(s.value)}
+                          className={`px-4 py-2 text-sm cursor-pointer hover:bg-muted transition-colors ${
+                            s.isBold ? "font-semibold text-foreground" : "text-muted-foreground"
+                          }`}>
+                          {s.title}
+                        </div>
+                      ))}
                     </div>
                   </>
                 )}
               </div>
+              <p className="text-xs text-muted-foreground">{charCount}/{charLimit}</p>
+            </div>
+          </div>
+
+          {/* ── Settings ── */}
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Settings</p>
+            <div className="space-y-3">
+              {[
+                { label: "Pay invoice using client credits", checked: payInvoice, onChange: handlePayInvoiceChange },
+                { label: "Email invoice to client", checked: emailInvoice, onChange: handleEmailInvoiceChange },
+                { label: "Send reminders", checked: reminders, onChange: handleRemindersChange },
+                { label: "Scheduled invoice", checked: scheduledInvoice, onChange: handleScheduledInvoiceChange },
+              ].map(({ label, checked, onChange }) => (
+                <div key={label} className="flex items-center justify-between">
+                  <span className="text-sm text-foreground">{label}</span>
+                  <Switch checked={checked} onCheckedChange={onChange} />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ── Line Items ── */}
+          <div>
+            <div className="mb-3">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Line Items</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Client-facing itemized list of products and services</p>
             </div>
 
-            {/* Additional toggles */}
-            <div>
-              <h3 className="text-sm font-semibold text-foreground mb-3">Additional</h3>
-              <div className="space-y-3">
-                <label className="flex items-center gap-3 cursor-pointer">
-                  {switchEl(payInvoice, handlePayInvoiceChange)}
-                  <span className="text-sm text-foreground">Pay invoice using client credits</span>
-                </label>
-                <label className="flex items-center gap-3 cursor-pointer">
-                  {switchEl(emailInvoice, handleEmailInvoiceChange)}
-                  <span className="text-sm text-foreground">Email invoice to client</span>
-                </label>
-                <label className="flex items-center gap-3 cursor-pointer">
-                  {switchEl(reminders, handleRemindersChange)}
-                  <span className="text-sm text-foreground">Reminders</span>
-                </label>
-                <label className="flex items-center gap-3 cursor-pointer">
-                  {switchEl(scheduledInvoice, handleScheduledInvoiceChange)}
-                  <span className="text-sm text-foreground">Scheduled invoice</span>
-                </label>
-              </div>
+            <div className="rounded-lg border border-border">
+              <table className="w-full text-sm table-fixed">
+                <colgroup>
+                  <col className="w-[30%]" />
+                  <col className="w-[22%]" />
+                  <col className="w-[10%]" />
+                  <col className="w-[8%]" />
+                  <col className="w-[12%]" />
+                  <col className="w-[6%]" />
+                  <col className="w-[12%]" />
+                </colgroup>
+                <thead className="bg-muted/40">
+                  <tr>
+                    <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Product / Service</th>
+                    <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Description</th>
+                    <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Rate</th>
+                    <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Qty</th>
+                    <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Amount</th>
+                    <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Tax</th>
+                    <th className="px-3 py-2" />
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {rows.map((row, index) => (
+                    <tr key={index} className="hover:bg-muted/30 transition-colors">
+                      <td className="px-2 py-1.5 relative">
+                        <Input
+                          value={row.productName}
+                          placeholder={row.isDiscount ? "Reason for discount" : "Product or Service"}
+                          className="h-8 text-xs"
+                          onChange={(e) => {
+                            handleServiceChange(index, e.target.value);
+                            setOpenServiceDropdown(index);
+                          }}
+                          onFocus={() => setOpenServiceDropdown(index)}
+                          onBlur={() => setTimeout(() => setOpenServiceDropdown(null), 150)}
+                        />
+                        {openServiceDropdown === index && serviceoptions.length > 0 && (
+                          <div className="absolute left-0 top-full mt-1 z-50 w-full min-w-[200px] rounded-md border border-border bg-card shadow-md overflow-y-auto max-h-48">
+                            {serviceoptions
+                              .filter(o =>
+                                !row.productName ||
+                                o.label.toLowerCase().includes(row.productName.toLowerCase())
+                              )
+                              .map(o => (
+                                <div
+                                  key={o.value}
+                                  onMouseDown={() => {
+                                    handleServiceChange(index, o.label);
+                                    setOpenServiceDropdown(null);
+                                  }}
+                                  className="px-3 py-2 text-sm text-foreground cursor-pointer hover:bg-muted transition-colors"
+                                >
+                                  {o.label}
+                                </div>
+                              ))
+                            }
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-2 py-1.5">
+                        <input type="text" name="description" value={row.description} onChange={(e) => handleInputChange(index, e)}
+                          className="w-full border-none outline-none text-sm bg-transparent text-foreground placeholder:text-muted-foreground" placeholder="Description" />
+                      </td>
+                      <td className="px-2 py-1.5">
+                        <input type="text" name="rate" value={row.rate} onChange={(e) => handleInputChange(index, e)}
+                          className="w-full border-none outline-none text-sm bg-transparent text-foreground" />
+                      </td>
+                      <td className="px-2 py-1.5">
+                        <input type="text" name="qty" value={row.qty} onChange={(e) => handleInputChange(index, e)}
+                          className="w-full border-none outline-none text-sm bg-transparent text-foreground" />
+                      </td>
+                      <td className={`px-2 py-1.5 text-sm font-medium ${row.isDiscount ? "text-destructive" : "text-foreground"}`}>
+                        {row.amount}
+                      </td>
+                      <td className="px-2 py-1.5">
+                        <input type="checkbox" name="tax" checked={row.tax} onChange={(e) => handleInputChange(index, e)} className="h-4 w-4 accent-primary" />
+                      </td>
+                      <td className="px-2 py-1.5">
+                        <div className="flex items-center justify-end gap-0.5">
+                          <Button type="button" variant="ghost" size="icon" className="h-7 w-7 shrink-0 text-muted-foreground hover:text-primary hover:bg-primary/10" title="Edit" onClick={() => handleEditService(row, index)}>
+                            <Pencil className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button type="button" variant="ghost" size="icon" className="h-7 w-7 shrink-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10" title="Delete" onClick={() => deleteRow(index)}>
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
 
-            {/* Line Items */}
-            <div className="invoice-section-three">
-              <h3 className="text-base font-semibold text-foreground mb-1">Line Items</h3>
-              <p className="text-xs text-muted-foreground mb-3">Client-facing itemized list of products and services</p>
-              <div className="overflow-x-auto">
+            <div className="flex items-center gap-4 mt-3">
+              <button type="button" onClick={() => addRow()} className="flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors">
+                <Plus className="h-4 w-4" /> Line item
+              </button>
+              <button type="button" onClick={() => addRow(true)} className="flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors">
+                <Tag className="h-4 w-4" /> Discount
+              </button>
+            </div>
+
+            {/* Summary */}
+            <div className="mt-5">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Summary</p>
+              <div className="overflow-x-auto rounded-lg border border-border">
                 <table className="w-full text-sm">
                   <thead className="bg-muted/40">
-                    <tr>
-                      <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground sticky left-0 bg-muted/40">Product or Service</th>
-                      <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Description</th>
-                      <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Rate</th>
-                      <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Qty</th>
-                      <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Amount</th>
-                      <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Tax</th>
-                      <th className="px-3 py-2"></th>
-                      <th className="px-3 py-2"></th>
+                    <tr className="border-b border-border">
+                      <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Subtotal</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Tax Rate</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Tax Total</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Total</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-border">
-                    {rows.map((row, index) => (
-                      <tr key={index} className="hover:bg-muted/30 transition-colors">
-                        <td className="px-2 py-1 sticky left-0 bg-card">
-                          <CreatableSelect
-                            placeholder={row.isDiscount ? "Reason for discount" : "Product or Service"}
-                            options={serviceoptions}
-                            value={row.productName ? serviceoptions.find(o => o.label === row.productName) || { label: row.productName, value: row.productName } : null}
-                            onChange={(selectedOption) => handleServiceChange(index, selectedOption)}
-                            onInputChange={(inputValue, actionMeta) => handleServiceInputChange(inputValue, actionMeta, index)}
-                            isClearable
-                            styles={{
-                              container: (p) => ({ ...p, width: "180px" }),
-                              control: (p) => ({ ...p, width: "180px" }),
-                              menuPortal: (p) => ({ ...p, zIndex: 9999 }),
-                            }}
-                            menuPortalTarget={document.body}
-                          />
-                        </td>
-                        <td className="px-2 py-1">
-                          <input type="text" name="description" value={row.description} onChange={(e) => handleInputChange(index, e)} className="border-none outline-none text-sm w-full bg-transparent text-foreground placeholder:text-muted-foreground" placeholder="Description" />
-                        </td>
-                        <td className="px-2 py-1">
-                          <input type="text" name="rate" value={row.rate} onChange={(e) => handleInputChange(index, e)} className="border-none outline-none text-sm w-20 bg-transparent text-foreground" />
-                        </td>
-                        <td className="px-2 py-1">
-                          <input type="text" name="qty" value={row.qty} onChange={(e) => handleInputChange(index, e)} className="border-none outline-none text-sm w-12 bg-transparent text-foreground" />
-                        </td>
-                        <td className={`px-2 py-1 text-sm ${row.isDiscount ? "text-red-500 discount-amount" : ""}`}>{row.amount}</td>
-                        <td className="px-2 py-1">
-                          <input type="checkbox" name="tax" checked={row.tax} onChange={(e) => handleInputChange(index, e)} className="h-4 w-4" />
-                        </td>
-                        <td className="px-2 py-1 relative">
-                          <button type="button" onClick={(e) => handleMenuOpen(e, index)} className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
-                            <MoreVertical className="h-3.5 w-3.5" />
-                          </button>
-                          {Boolean(anchorElNew) && selectedRow === index && (
-                            <>
-                              <div className="fixed inset-0 z-30" onClick={handleMenuClose} />
-                              <div className="absolute right-0 z-40 bg-popover border border-border rounded-lg shadow-lg py-1 min-w-[160px]">
-                                <button type="button" className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors" onClick={() => handleEditService(row, index)}>Edit</button>
-                                <button type="button" className="w-full text-left px-3 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors" onClick={handleDeleteService}>Delete</button>
-                                <button type="button" className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors" onClick={() => handleSaveAsNewService(row)}>Save as new service</button>
-                                <button type="button" className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors" onClick={handleDuplicate}>Duplicate</button>
-                              </div>
-                            </>
-                          )}
-                        </td>
-                        <td className="px-2 py-1">
-                          <button type="button" onClick={() => deleteRow(index)} className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors">
-                            <X className="h-3.5 w-3.5" />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              <div className="flex items-center gap-5 mt-3">
-                <button type="button" onClick={() => addRow()} className="flex items-center gap-1.5 text-primary text-sm hover:text-primary/80 transition-colors">
-                  <Plus className="h-4 w-4" /> Line item
-                </button>
-                <button type="button" onClick={() => addRow(true)} className="flex items-center gap-1.5 text-primary text-sm hover:text-primary/80 transition-colors">
-                  <Tag className="h-4 w-4" /> Discount
-                </button>
-              </div>
-
-              {/* Summary */}
-              <div className="mt-5">
-                <h3 className="text-base font-semibold text-foreground mb-2">Summary</h3>
-                <div className="overflow-x-auto rounded-lg border border-border">
-                  <table className="w-full text-sm">
-                    <thead className="bg-muted/40">
-                      <tr className="border-b border-border">
-                        <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">SUBTOTAL</th>
-                        <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">TAX RATE</th>
-                        <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">TAX TOTAL</th>
-                        <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">TOTAL</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td className="px-3 py-2 text-foreground"><div className="flex items-center">$<input type="number" value={subtotal} onChange={handleSubtotalChange} className="border-none outline-none text-sm w-20 ml-1 bg-transparent text-foreground" /></div></td>
-                        <td className="px-3 py-2 text-foreground"><div className="flex items-center"><input type="number" value={taxRate} onChange={handleTaxRateChange} className="border-none outline-none text-sm w-16 bg-transparent text-foreground" />%</div></td>
-                        <td className="px-3 py-2 text-foreground">${taxTotal.toFixed(2)}</td>
-                        <td className="px-3 py-2 font-semibold text-foreground">${totalAmount}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-
-            {/* Footer Actions */}
-            <div className="flex gap-4 pt-4 pb-6">
-              <button type="button" className={btnPrimary} onClick={createinvoice}>Save</button>
-              <button type="button" className={btnOutline} onClick={handleDrawerClose}>Cancel</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Preview Drawer */}
-      {previewDrawerOpen && (
-        <div className="fixed inset-0 z-50 overflow-hidden">
-          <div className="absolute inset-0 bg-black/30" onClick={handleClosepreviewDrawer} />
-          <div className="absolute right-0 top-0 h-full bg-card shadow-2xl overflow-y-auto w-full md:w-[800px]">
-            <div className="p-8">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-base font-semibold text-foreground">Preview</span>
-                <button type="button" onClick={handleClosepreviewDrawer} className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-              <hr className="border-border mb-6" />
-
-              <div className="bg-background border border-border rounded-xl shadow-sm p-6 mb-6">
-                <h2 className="text-xl font-bold text-[#ff6700] mb-4">Invoice</h2>
-                <div className="flex justify-between text-sm text-muted-foreground mb-1">
-                  <span>{selectedAccount?.label || "[ACCOUNT NAME]"}</span>
-                  <span>Invoice number: <span className="text-muted-foreground">{invoicenumber || "[INVOICE_NUMBER]"}</span></span>
-                </div>
-                <div className="flex justify-between text-sm text-muted-foreground mb-1">
-                  <span>{firstContactEmail || "[CONTACT EMAIL]"}</span>
-                  <span>Date: {startDate ? startDate.format("YYYY-MM-DD") : ""}</span>
-                </div>
-                <p className="text-sm text-muted-foreground mb-5">Description: {description}</p>
-
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm mb-4">
-                    <thead className="bg-muted/40">
-                      <tr>
-                        <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Product/Service</th>
-                        <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Description</th>
-                        <th className="text-right px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Rate ($)</th>
-                        <th className="text-right px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Qty</th>
-                        <th className="text-right px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Amount</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border">
-                      {rows.map((row, index) => (
-                        <tr key={index}>
-                          <td className="px-3 py-2">{row.productName}</td>
-                          <td className="px-3 py-2">{row.description}</td>
-                          <td className="px-3 py-2 text-right">{row.rate || "$0.00"}</td>
-                          <td className="px-3 py-2 text-right">{row.qty || "1"}</td>
-                          <td className="px-3 py-2 text-right">{row.amount || "$0.00"}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-
-                <table className="ml-auto w-1/2 text-sm">
                   <tbody>
-                    <tr><td className="px-3 py-1 font-semibold">Subtotal:</td><td className="px-3 py-1">${subtotal || "0.00"}</td></tr>
-                    <tr><td className="px-3 py-1 font-semibold">Tax Rate:</td><td className="px-3 py-1">{taxRate || "0.00"}%</td></tr>
-                    <tr><td className="px-3 py-1 font-semibold">Tax Total:</td><td className="px-3 py-1">${taxTotal?.toFixed(2) || "0.00"}</td></tr>
-                    <tr className="font-bold"><td className="px-3 py-1">Total:</td><td className="px-3 py-1">${totalAmount || "0.00"}</td></tr>
+                    <tr>
+                      <td className="px-3 py-2">
+                        <div className="flex items-center gap-0.5 text-foreground">
+                          $<input type="number" value={subtotal} onChange={handleSubtotalChange}
+                            className="border-none outline-none text-sm w-20 ml-1 bg-transparent text-foreground" />
+                        </div>
+                      </td>
+                      <td className="px-3 py-2">
+                        <div className="flex items-center text-foreground">
+                          <input type="number" value={taxRate} onChange={handleTaxRateChange}
+                            className="border-none outline-none text-sm w-16 bg-transparent text-foreground" />%
+                        </div>
+                      </td>
+                      <td className="px-3 py-2 text-foreground">${taxTotal.toFixed(2)}</td>
+                      <td className="px-3 py-2 font-semibold text-foreground">${totalAmount}</td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
-
-              <button type="button" className={btnPrimary} onClick={createinvoice}>Save &amp; Exit</button>
             </div>
           </div>
-        </div>
-      )}
 
-      {/* Create Service Drawer */}
-      {isNewDrawerOpen && (
-        <div className="fixed inset-0 z-50 overflow-hidden">
-          <div className="absolute inset-0 bg-black/30" onClick={handleNewDrawerClose} />
-          <div className="absolute right-0 top-0 h-full bg-card shadow-2xl overflow-y-auto w-full md:w-[650px]">
-            <div className="flex justify-between items-center p-4 border-b border-border">
-              <h2 className="text-base font-semibold text-foreground">Create Service</h2>
-              <button type="button" onClick={handleNewDrawerClose} className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"><X className="h-4 w-4" /></button>
-            </div>
-            <form className="p-4 space-y-4">
-              <div>
-                <label className={labelCls}>Service Name</label>
-                <input placeholder="Service Name" className={inputCls}
-                  value={selectedRowData?.productName || ""}
-                  onChange={(e) => setSelectedRowData({ ...selectedRowData, productName: e.target.value })} />
-              </div>
-              <div>
-                <label className={labelCls}>Description</label>
-                <input placeholder="Description" className={inputCls}
-                  value={selectedRowData?.description || ""}
-                  onChange={(e) => setSelectedRowData({ ...selectedRowData, description: e.target.value })} />
-              </div>
-              <div className="flex gap-4">
-                <div className="w-1/2">
-                  <label className={labelCls}>Rate</label>
-                  <input placeholder="Rate" className={inputCls}
-                    value={selectedRowData?.rate || ""}
-                    onChange={(e) => setSelectedRowData({ ...selectedRowData, rate: e.target.value })} />
-                </div>
-                <div className="w-1/2">
-                  <label className={labelCls}>Rate Type</label>
-                  <select value={selectedRateOption?.value || ""}
-                    onChange={(e) => { const opt = options.find(o => o.value === e.target.value); handleRateTypeChange(null, opt); }}
-                    className={inputCls}>
-                    <option value="">Select Rate Type</option>
-                    {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-                  </select>
-                </div>
-              </div>
-              <label className="flex items-center gap-3 cursor-pointer">
-                {switchEl(selectedRowData?.tax || false, (e) => handleServiceSwitch(e.target.checked))}
-                <span className="text-sm text-gray-700">Tax</span>
-              </label>
-              <div>
-                <h3 className="text-lg font-bold mt-3 mb-2">Category</h3>
-                <label className={labelCls}>Category Name</label>
-                <select value={selectedCategory?.value || ""}
-                  onChange={(e) => { const opt = categoryoptions.find(o => o.value === e.target.value); handleCategoryChange(null, opt || null); }}
-                  className={inputCls}>
-                  <option value="">Category Name</option>
-                  {categoryoptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-                </select>
-              </div>
-              <button type="button" onClick={() => setCategoryFormOpen(true)} className={btnPrimary + " !rounded-full px-4 py-1.5 text-xs"}>
-                Create category
-              </button>
-              <div className="flex gap-4 pt-2">
-                <button type="button" className={btnPrimary} onClick={createservicetemp}>Save</button>
-                <button type="button" className={btnOutline} onClick={handleNewDrawerClose}>Cancel</button>
-              </div>
-            </form>
+        </div>
+      </SideSheet>
+
+      {/* ══════════ Preview Sheet ══════════ */}
+      <SideSheet
+        open={previewDrawerOpen}
+        onOpenChange={(v) => !v && handleClosepreviewDrawer()}
+        title="Invoice Preview"
+        description={selectedAccount?.label}
+        size="xl"
+        hideDefaultFooter
+        footer={
+          <div className="flex items-center justify-end gap-2 w-full">
+            <Button variant="ghost" size="sm" onClick={handleClosepreviewDrawer}>Close</Button>
+            <Button size="sm" onClick={createinvoice}>Save &amp; Exit</Button>
           </div>
-        </div>
-      )}
-
-      {/* Category Drawer */}
-      {isCategoryFormOpen && (
-        <div className="fixed inset-0 z-[60] overflow-hidden">
-          <div className="absolute inset-0 bg-black/30" onClick={handleCategoryFormClose} />
-          <div className="absolute right-0 top-0 h-full bg-card shadow-2xl overflow-y-auto w-full md:w-[650px]">
-            <div className="flex items-center p-5">
-              <button type="button" onClick={handleCategoryFormClose} className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
-                <ArrowLeft className="h-4 w-4" />
-              </button>
-            </div>
-            <hr className="border-border" />
-            <div className="p-6 space-y-4">
-              <div>
-                <label className={labelCls}>Category Name</label>
-                <input placeholder="Category Name" className={inputCls}
-                  value={categorycreate} onChange={(e) => setcategorycreate(e.target.value)} />
-              </div>
-              <div className="flex gap-4 pt-2">
-                <button type="button" className={btnPrimary} onClick={createCategory}>Create</button>
-                <button type="button" className={btnOutline} onClick={handleCategoryFormClose}>Cancel</button>
-              </div>
-            </div>
+        }
+      >
+        <div className="bg-background border border-border rounded-xl shadow-sm p-6 space-y-4">
+          <h2 className="text-xl font-bold text-primary">Invoice</h2>
+          <div className="flex justify-between text-sm text-muted-foreground">
+            <span>{selectedAccount?.label || "[ACCOUNT NAME]"}</span>
+            <span>Invoice #: <span className="font-medium text-foreground">{invoicenumber || "—"}</span></span>
           </div>
-        </div>
-      )}
+          <div className="flex justify-between text-sm text-muted-foreground">
+            <span>{firstContactEmail || "[CONTACT EMAIL]"}</span>
+            <span>Date: {startDate ? startDate.format("YYYY-MM-DD") : "—"}</span>
+          </div>
+          {description && <p className="text-sm text-muted-foreground border-t border-border pt-3">{description}</p>}
 
-      {/* Edit Service Drawer */}
-      {isEditDrawerOpen && (
-        <div className="fixed inset-0 z-50 overflow-hidden">
-          <div className="absolute inset-0 bg-black/30" onClick={handleEditDrawerClose} />
-          <div className="absolute right-0 top-0 h-full bg-card shadow-2xl overflow-y-auto w-full md:w-[650px]">
-            <div className="flex justify-between items-center p-4 border-b border-border">
-              <h2 className="text-base font-semibold text-foreground">Edit Item</h2>
-              <button type="button" onClick={handleEditDrawerClose} className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"><X className="h-4 w-4" /></button>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-muted/40">
+                <tr>
+                  <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Product/Service</th>
+                  <th className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Description</th>
+                  <th className="text-right px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Rate</th>
+                  <th className="text-right px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Qty</th>
+                  <th className="text-right px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Amount</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {rows.map((row, i) => (
+                  <tr key={i}>
+                    <td className="px-3 py-2">{row.productName}</td>
+                    <td className="px-3 py-2">{row.description}</td>
+                    <td className="px-3 py-2 text-right">{row.rate || "$0.00"}</td>
+                    <td className="px-3 py-2 text-right">{row.qty || "1"}</td>
+                    <td className={`px-3 py-2 text-right ${row.isDiscount ? "text-destructive" : ""}`}>{row.amount || "$0.00"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <table className="ml-auto w-48 text-sm">
+            <tbody>
+              <tr><td className="py-1 font-medium">Subtotal:</td><td className="py-1 text-right">${subtotal || "0.00"}</td></tr>
+              <tr><td className="py-1 font-medium">Tax Rate:</td><td className="py-1 text-right">{taxRate || "0.00"}%</td></tr>
+              <tr><td className="py-1 font-medium">Tax Total:</td><td className="py-1 text-right">${taxTotal?.toFixed(2) || "0.00"}</td></tr>
+              <tr className="border-t border-border font-bold"><td className="py-1">Total:</td><td className="py-1 text-right">${totalAmount || "0.00"}</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </SideSheet>
+
+      {/* ══════════ Create Service Sheet ══════════ */}
+      <SideSheet
+        open={isNewDrawerOpen}
+        onOpenChange={(v) => !v && handleNewDrawerClose()}
+        title="Create Service"
+        description="Save this line item as a reusable service template"
+        size="md"
+        hideDefaultFooter
+        footer={
+          <div className="flex items-center justify-end gap-2 w-full">
+            <Button variant="ghost" size="sm" onClick={handleNewDrawerClose}>Cancel</Button>
+            <Button size="sm" onClick={createservicetemp}>Save Service</Button>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          <div className="space-y-1.5">
+            <Label>Service Name</Label>
+            <Input placeholder="Service Name"
+              value={selectedRowData?.productName || ""}
+              onChange={(e) => setSelectedRowData({ ...selectedRowData, productName: e.target.value })} />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Description</Label>
+            <Input placeholder="Description"
+              value={selectedRowData?.description || ""}
+              onChange={(e) => setSelectedRowData({ ...selectedRowData, description: e.target.value })} />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label>Rate</Label>
+              <Input placeholder="Rate"
+                value={selectedRowData?.rate || ""}
+                onChange={(e) => setSelectedRowData({ ...selectedRowData, rate: e.target.value })} />
             </div>
-            <div className="p-4 space-y-3">
-              <div>
-                <p className="text-sm font-bold mb-1">Product or service</p>
-                <input className={inputCls} value={selectedRowData?.productName || ""}
-                  onChange={(e) => setSelectedRowData({ ...selectedRowData, productName: e.target.value })} />
-              </div>
-              <div>
-                <p className="text-sm mb-1">Description</p>
-                <textarea className={inputCls} rows={2} value={selectedRowData?.description || ""}
-                  onChange={(e) => setSelectedRowData({ ...selectedRowData, description: e.target.value })} />
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="flex-1">
-                  <p className="text-sm mb-1">Rate</p>
-                  <input className={inputCls} value={selectedRowData?.rate || ""}
-                    onChange={(e) => setSelectedRowData({ ...selectedRowData, rate: e.target.value })} />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm mb-1">QTY</p>
-                  <input className={inputCls} value={selectedRowData?.qty || ""}
-                    onChange={(e) => setSelectedRowData({ ...selectedRowData, qty: e.target.value })} />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm mb-1">Amount</p>
-                  <input className={inputCls + " bg-muted cursor-not-allowed"} disabled value={totalamount} />
-                </div>
-              </div>
-              <label className="flex items-center gap-3 cursor-pointer">
-                {switchEl(selectedRowData?.tax || false, (e) => handleServiceWitch(e.target.checked))}
-                <span className="text-sm text-foreground">Tax</span>
-              </label>
-              <div className="flex gap-3 mt-4">
-                <button type="button" className={btnPrimary} onClick={handleSaveChanges}>Save</button>
-                <button type="button" className={btnOutline} onClick={handleEditDrawerClose}>Cancel</button>
-              </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="cs-rate-type">Rate Type</Label>
+              <select id="cs-rate-type" value={selectedRateOption?.value || ""}
+                onChange={(e) => { const opt = options.find(o => o.value === e.target.value); handleRateTypeChange(null, opt); }}
+                className={selectCls}>
+                <option value="">Select rate type</option>
+                {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
             </div>
           </div>
+          <div className="flex items-center justify-between">
+            <Label>Taxable</Label>
+            <Switch checked={selectedRowData?.tax || false} onCheckedChange={(checked) => handleServiceSwitch(checked)} />
+          </div>
+
+          <div className="space-y-2 pt-2 border-t border-border/40">
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Category</p>
+            <div className="space-y-1.5">
+              <Label htmlFor="cs-category">Category Name</Label>
+              <select id="cs-category" value={selectedCategory?.value || ""}
+                onChange={(e) => { const opt = categoryoptions.find(o => o.value === e.target.value); handleCategoryChange(null, opt || null); }}
+                className={selectCls}>
+                <option value="">Select category</option>
+                {categoryoptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            </div>
+            <Button type="button" variant="outline" size="sm" onClick={() => setCategoryFormOpen(true)}>
+              + Create Category
+            </Button>
+          </div>
         </div>
-      )}
+      </SideSheet>
+
+      {/* ══════════ Category Sheet ══════════ */}
+      <SideSheet
+        open={isCategoryFormOpen}
+        onOpenChange={(v) => !v && handleCategoryFormClose()}
+        title="Create Category"
+        size="sm"
+        hideDefaultFooter
+        footer={
+          <div className="flex items-center justify-end gap-2 w-full">
+            <Button variant="ghost" size="sm" onClick={handleCategoryFormClose}>Cancel</Button>
+            <Button size="sm" onClick={createCategory}>Create</Button>
+          </div>
+        }
+      >
+        <div className="space-y-1.5">
+          <Label htmlFor="cat-name">Category Name</Label>
+          <Input id="cat-name" placeholder="e.g. Consulting"
+            value={categorycreate} onChange={(e) => setcategorycreate(e.target.value)} />
+        </div>
+      </SideSheet>
+
+      {/* ══════════ Edit Item Sheet ══════════ */}
+      <SideSheet
+        open={isEditDrawerOpen}
+        onOpenChange={(v) => !v && handleEditDrawerClose()}
+        title="Edit Line Item"
+        size="sm"
+        hideDefaultFooter
+        footer={
+          <div className="flex items-center justify-end gap-2 w-full">
+            <Button variant="ghost" size="sm" onClick={handleEditDrawerClose}>Cancel</Button>
+            <Button size="sm" onClick={handleSaveChanges}>Save Changes</Button>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          <div className="space-y-1.5">
+            <Label>Product or Service</Label>
+            <Input value={selectedRowData?.productName || ""}
+              onChange={(e) => setSelectedRowData({ ...selectedRowData, productName: e.target.value })} />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Description</Label>
+            <Textarea rows={2} value={selectedRowData?.description || ""}
+              onChange={(e) => setSelectedRowData({ ...selectedRowData, description: e.target.value })} />
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            <div className="space-y-1.5">
+              <Label>Rate</Label>
+              <Input value={selectedRowData?.rate || ""}
+                onChange={(e) => setSelectedRowData({ ...selectedRowData, rate: e.target.value })} />
+            </div>
+            <div className="space-y-1.5">
+              <Label>QTY</Label>
+              <Input value={selectedRowData?.qty || ""}
+                onChange={(e) => setSelectedRowData({ ...selectedRowData, qty: e.target.value })} />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Amount</Label>
+              <Input disabled value={totalamount} className="bg-muted cursor-not-allowed" />
+            </div>
+          </div>
+          <div className="flex items-center justify-between">
+            <Label>Taxable</Label>
+            <Switch checked={selectedRowData?.tax || false} onCheckedChange={(checked) => handleServiceWitch(checked)} />
+          </div>
+        </div>
+      </SideSheet>
     </>
   );
 };

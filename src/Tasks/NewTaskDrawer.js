@@ -9,21 +9,13 @@ import dayjs from "dayjs";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import {
-  FormDrawer,
-  FormDrawerFooter,
-  FormSection,
-  FormField,
-  FormRow,
-  FormSelect,
-  FormDatePicker,
-  FormSwitchRow,
-  FormSubtaskItem,
-  FormSubtaskAdd,
-  FormDivider,
-} from "../components/ui/form-layout";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
+import { Label } from "../components/ui/label";
+import { Switch } from "../components/ui/switch";
+import { Checkbox } from "../components/ui/checkbox";
+import { GripVertical, Trash2, PlusCircle } from "lucide-react";
+import { SideSheet } from "../components/ui/side-sheet";
 const NewTaskDrawer = ({ open, onClose, isEditMode, taskData }) => {
 
  
@@ -471,190 +463,243 @@ const accountoptions = accountdata.map((account) => ({
       })
       .finally(() => setIsSubmitting(false));
   };
+  const selectCls = "h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring";
+
   return (
-    <FormDrawer
+    <SideSheet
       open={open}
-      onClose={onClose}
+      onOpenChange={(v) => !v && onClose?.()}
       title={isEditMode ? "Edit Task" : "New Task"}
-      description={isEditMode ? "Update task details" : "Fill in the fields below to create a task"}
-      width="lg"
+      description={isEditMode ? "Update task details below" : "Fill in the details to create a new task"}
+      size="lg"
+      hideDefaultFooter
+      footer={
+        <div className="flex items-center justify-end gap-2 w-full">
+          <Button variant="ghost" size="sm" onClick={onClose} disabled={isSubmitting}>
+            Cancel
+          </Button>
+          <Button size="sm" onClick={createTask} disabled={isSubmitting}>
+            {isSubmitting
+              ? (isEditMode ? "Saving..." : "Creating...")
+              : (isEditMode ? "Save Changes" : "Create Task")
+            }
+          </Button>
+        </div>
+      }
     >
-      {/* ── Unified panel: all form groups in one flat container ── */}
-      <FormSection flat>
+      <div className="space-y-5">
 
-        {/* SOURCE */}
-        <FormDivider label="Source" />
+        {/* ── Source ── */}
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Source</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="nt-account">
+                Account <span className="text-destructive">*</span>
+              </Label>
+              <select
+                id="nt-account"
+                value={selectedaccount?.value || ""}
+                onChange={(e) => {
+                  const newValue = accountoptions.find((o) => o.value === e.target.value) || null;
+                  handleAccountChange(newValue);
+                  setErrors((prev) => ({ ...prev, account: !newValue }));
+                }}
+                className={selectCls + (errors.account ? " border-destructive" : "")}
+              >
+                <option value="">Select account</option>
+                {accountoptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+              {errors.account && <p className="text-xs text-destructive">Account is required</p>}
+            </div>
 
-        <FormRow cols={2}>
-          <FormField label="Account" required error={errors.account ? "Account is required" : ""}>
-            <FormSelect
-              value={selectedaccount?.value || ""}
+            <div className="space-y-1.5">
+              <Label htmlFor="nt-job">Job</Label>
+              <select
+                id="nt-job"
+                disabled={!selectedaccount}
+                value={selectedJob?.value || ""}
+                onChange={(e) => {
+                  const newValue = jobsoptions.find((o) => o.value === e.target.value) || null;
+                  handleJobChange(newValue);
+                }}
+                className={selectCls + " disabled:opacity-50 disabled:cursor-not-allowed"}
+              >
+                <option value="">Select job</option>
+                {jobsoptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="space-y-1.5 mt-4">
+            <Label htmlFor="nt-template">
+              Template <span className="text-destructive">*</span>
+            </Label>
+            <select
+              id="nt-template"
+              value={selectedtemp?.value || ""}
               onChange={(e) => {
-                const newValue = accountoptions.find((o) => o.value === e.target.value) || null;
-                handleAccountChange(newValue);
-                setErrors((prev) => ({ ...prev, account: !newValue }));
+                const newValue = taskTemplateOptions.find((o) => o.value === e.target.value) || null;
+                handletemp(e, newValue);
+                setErrors((prev) => ({ ...prev, template: !newValue }));
               }}
-              error={errors.account}
+              className={selectCls + (errors.template ? " border-destructive" : "")}
             >
-              <option value="">Select account</option>
-              {accountoptions.map((opt) => (
+              <option value="">Select template</option>
+              {taskTemplateOptions.map((opt) => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
               ))}
-            </FormSelect>
-          </FormField>
+            </select>
+            {errors.template && <p className="text-xs text-destructive">Template is required</p>}
+          </div>
+        </div>
 
-          <FormField label="Job">
-            <FormSelect
-              disabled={!selectedaccount}
-              value={selectedJob?.value || ""}
-              onChange={(e) => {
-                const newValue = jobsoptions.find((o) => o.value === e.target.value) || null;
-                handleJobChange(newValue);
-              }}
-            >
-              <option value="">Select job</option>
-              {jobsoptions.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </FormSelect>
-          </FormField>
-        </FormRow>
+        {/* ── Assignment ── */}
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Assignment</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="nt-taskname">Task Name</Label>
+              <Input
+                id="nt-taskname"
+                placeholder="Enter task name"
+                value={tempNameNew}
+                onChange={(e) => setTempNameNew(e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Assignees</Label>
+              <MultiSelectDropdown
+                value={selectedUser}
+                onChange={handleUserChange}
+                placeholder="Select assignees"
+              />
+            </div>
+          </div>
 
-        <FormField label="Template" required error={errors.template ? "Template is required" : ""}>
-          <FormSelect
-            value={selectedtemp?.value || ""}
-            onChange={(e) => {
-              const newValue = taskTemplateOptions.find((o) => o.value === e.target.value) || null;
-              handletemp(e, newValue);
-              setErrors((prev) => ({ ...prev, template: !newValue }));
-            }}
-            error={errors.template}
-          >
-            <option value="">Select template</option>
-            {taskTemplateOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </FormSelect>
-        </FormField>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+            <div className="space-y-1.5">
+              <Label>Status</Label>
+              <Status onStatusChange={handleStatusChange} selectedStatus={status} />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Priority</Label>
+              <Priority onPriorityChange={handlePriorityChange} selectedPriority={priority} />
+            </div>
+          </div>
+        </div>
 
-        {/* ASSIGNMENT */}
-        <FormDivider label="Assignment" />
+        {/* ── Details ── */}
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Details</p>
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <Label>Description</Label>
+              <Editor initialContent={taskDiscription} onChange={handleEditorChange} />
+            </div>
 
-        <FormRow cols={2}>
-          <FormField label="Task Name">
-            <Input
-              name="TaskName"
-              placeholder="Enter task name"
-              onChange={(e) => setTempNameNew(e.target.value)}
-              value={tempNameNew}
-            />
-          </FormField>
-          <FormField label="Assignees">
-            <MultiSelectDropdown
-              value={selectedUser}
-              onChange={handleUserChange}
-              placeholder="Select assignees"
-            />
-          </FormField>
-        </FormRow>
+            <div className="space-y-1.5">
+              <Label>Tags</Label>
+              <TagsMultiSelectDropDown
+                value={tagsNew}
+                onChange={handleTagChange}
+                placeholder="Select or search tags"
+              />
+            </div>
 
-        <FormRow cols={2}>
-          <FormField label="Status">
-            <Status onStatusChange={handleStatusChange} selectedStatus={status} />
-          </FormField>
-          <FormField label="Priority">
-            <Priority onPriorityChange={handlePriorityChange} selectedPriority={priority} />
-          </FormField>
-        </FormRow>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label>Start Date</Label>
+                <Input
+                  type="date"
+                  value={StartsDateNew ? dayjs(StartsDateNew).format("YYYY-MM-DD") : ""}
+                  onChange={(e) => handleStartDateChange(e.target.value ? dayjs(e.target.value) : null)}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Due Date</Label>
+                <Input
+                  type="date"
+                  value={DueDateNew ? dayjs(DueDateNew).format("YYYY-MM-DD") : ""}
+                  onChange={(e) => handleDueDateChange(e.target.value ? dayjs(e.target.value) : null)}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
 
-        {/* DETAILS */}
-        <FormDivider label="Details" />
+        {/* ── Subtasks ── */}
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Subtasks</p>
+            </div>
+            <Switch checked={SubtaskSwitch} onCheckedChange={handleSubtaskSwitch} />
+          </div>
 
-        <FormField label="Description">
-          <Editor initialContent={taskDiscription} onChange={handleEditorChange} />
-        </FormField>
+          {SubtaskSwitch && (
+            <DragDropContext onDragEnd={handleDragEnd}>
+              <Droppable droppableId="subtaskList">
+                {(provided) => (
+                  <div
+                    className="space-y-2"
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                  >
+                    {subtasks.map((subtask, index) => (
+                      <Draggable key={subtask.id} draggableId={subtask.id} index={index}>
+                        {(provided) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            className="flex items-center gap-2 rounded-lg border border-border bg-card p-2"
+                          >
+                            <Checkbox
+                              checked={subtask.checked || false}
+                              onCheckedChange={() => handleCheckboxChange(subtask.id)}
+                            />
+                            <Input
+                              placeholder="Subtask description"
+                              value={subtask.text}
+                              onChange={(e) => handleInputChange(subtask.id, e.target.value)}
+                              className="flex-1 h-8 text-sm"
+                            />
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
+                              onClick={() => handleDeleteSubtask(subtask.id)}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                            <div {...provided.dragHandleProps} className="cursor-grab text-muted-foreground hover:text-foreground">
+                              <GripVertical className="h-4 w-4" />
+                            </div>
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                    <button
+                      type="button"
+                      onClick={handleAddSubtask}
+                      className="flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors mt-1"
+                    >
+                      <PlusCircle className="h-4 w-4" /> Add Subtask
+                    </button>
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
+          )}
+        </div>
 
-        <FormField label="Tags">
-          <TagsMultiSelectDropDown
-            value={tagsNew}
-            onChange={handleTagChange}
-            placeholder="Select or search tags"
-          />
-        </FormField>
-
-        <FormRow cols={2}>
-          <FormField label="Start Date">
-            <FormDatePicker
-              value={StartsDateNew ? dayjs(StartsDateNew).format("YYYY-MM-DD") : ""}
-              onChange={(val) => handleStartDateChange(val ? dayjs(val) : null)}
-            />
-          </FormField>
-          <FormField label="Due Date">
-            <FormDatePicker
-              value={DueDateNew ? dayjs(DueDateNew).format("YYYY-MM-DD") : ""}
-              onChange={(val) => handleDueDateChange(val ? dayjs(val) : null)}
-            />
-          </FormField>
-        </FormRow>
-
-        {/* SUBTASKS */}
-        <FormDivider label="Subtasks" />
-
-        <FormSwitchRow
-          label="Enable Subtasks"
-          description="Break this task into smaller checklist steps"
-          checked={SubtaskSwitch}
-          onCheckedChange={handleSubtaskSwitch}
-        />
-
-        {SubtaskSwitch && (
-          <DragDropContext onDragEnd={handleDragEnd}>
-            <Droppable droppableId="subtaskList">
-              {(provided) => (
-                <div
-                  className="space-y-2"
-                  {...provided.droppableProps}
-                  ref={provided.innerRef}
-                >
-                  {subtasks.map((subtask, index) => (
-                    <Draggable key={subtask.id} draggableId={subtask.id} index={index}>
-                      {(provided) => (
-                        <div ref={provided.innerRef} {...provided.draggableProps}>
-                          <FormSubtaskItem
-                            text={subtask.text}
-                            checked={subtask.checked}
-                            onTextChange={(val) => handleInputChange(subtask.id, val)}
-                            onCheckedChange={() => handleCheckboxChange(subtask.id)}
-                            onDelete={() => handleDeleteSubtask(subtask.id)}
-                            dragHandleProps={provided.dragHandleProps}
-                          />
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
-                  <FormSubtaskAdd onClick={handleAddSubtask} />
-                </div>
-              )}
-            </Droppable>
-          </DragDropContext>
-        )}
-
-      </FormSection>
-
-      {/* ── Footer ── */}
-      <FormDrawerFooter>
-        <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
-          Cancel
-        </Button>
-        <Button onClick={createTask} disabled={isSubmitting}>
-          {isSubmitting
-            ? (isEditMode ? "Saving..." : "Creating...")
-            : (isEditMode ? "Save Changes" : "Create Task")
-          }
-        </Button>
-      </FormDrawerFooter>
-    </FormDrawer>
+      </div>
+    </SideSheet>
   );
 };
 

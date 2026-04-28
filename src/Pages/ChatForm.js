@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { PiDotsSixVerticalBold } from "react-icons/pi";
-import { FiPlusCircle } from "react-icons/fi";
-import { RiDeleteBin6Line } from "react-icons/ri";
-import { X } from "lucide-react";
+import { GripVertical, Trash2, PlusCircle, ChevronDown } from "lucide-react";
 import AccountMultiSelectDropdown from "../Templates/AccountMultiSelectDropdown";
 import { toast } from "react-toastify";
 import EditorShortcodes from "../Templates/Texteditor/EditorShortcodes";
 import { LoginContext } from "../Sidebar/Context/Context";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { Switch } from "../components/ui/switch";
+import { Checkbox } from "../components/ui/checkbox";
 const ChatForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   const { logindata } = useContext(LoginContext);
   console.log("login data", logindata);
@@ -496,300 +498,194 @@ useEffect(() => {
       .then((result) => console.log(result))
       .catch((error) => console.error(error));
   };
-  const inputCls = "w-full border border-border rounded px-3 py-1.5 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-primary/40";
-  const labelCls = "block text-sm font-medium text-foreground mb-1";
+  const selectCls = "h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring";
 
   return (
-    <>
-      <div>
-        <div className="flex justify-between items-center px-4 py-3 border-b border-border">
-          <h2 className="text-base font-semibold text-foreground">New Chat</h2>
-          <button type="button" onClick={handleClose} className="text-muted-foreground hover:text-foreground">
-            <X size={18} />
-          </button>
-        </div>
-        <div className="px-2.5 overflow-y-auto" style={{ height: "83vh" }}>
-          <div className="p-1 space-y-4">
+    <div className="space-y-5">
 
-            <div className="mx-1 mr-3">
-              <label className={labelCls}>To</label>
-              <AccountMultiSelectDropdown
-                value={selectedaccount}
-                onChange={handleAccountChange}
-                placeholder="Accounts"
-              />
-            </div>
-
-            <div className="mx-1">
-              <label className={labelCls}>Template</label>
-              <select
-                className={inputCls + " mt-1"}
-                value={selectInvoiceTemp?.value || ""}
-                onChange={(e) => {
-                  const opt = invoiceoptions.find(o => o.value === e.target.value);
-                  handleInvoiceTempChange(null, opt || null);
-                }}
-              >
-                <option value="">Job Template</option>
-                {invoiceoptions.map(o => (
-                  <option key={o.value} value={o.value}>{o.label}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="mx-1">
-              <label className={labelCls}>Subject</label>
-              <input
-                className={inputCls + " mt-1" + (inputTextError ? " border-destructive" : "")}
-                name="subject"
-                value={inputText + selectedShortcut}
-                onChange={handlechatsubject}
-                placeholder="Subject"
-              />
-            </div>
-
-            <div className="mx-1 relative" ref={shortcodeRef}>
-              <button
-                type="button"
-                onClick={toggleDropdown}
-                className="rounded-full px-4 py-1.5 text-sm font-medium text-white bg-primary hover:bg-primary/90 transition-colors"
-              >
-                Add Shortcode
-              </button>
-
-              {showDropdown && (
-                <div className="absolute left-0 top-full mt-1 z-50 w-[300px] max-h-[300px] overflow-y-auto bg-card border border-border rounded-lg shadow-lg">
-                  {filteredShortcuts.map((shortcut, index) => (
-                    <div
-                      key={index}
-                      onClick={() => handleAddShortcut(shortcut.value)}
-                      className={`px-4 py-2 text-sm cursor-pointer hover:bg-muted ${
-                        shortcut.isBold ? "font-bold text-foreground" : "font-normal text-muted-foreground"
-                      }`}
-                    >
-                      {shortcut.title}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="mx-1">
-              <EditorShortcodes
-                initialContent={description}
-                onChange={handleEditorChange}
-              />
-            </div>
-
-            <div className="mt-5">
-              <div className="flex items-center gap-3">
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={absoluteDate}
-                    onChange={(e) => handleAbsolutesDates(e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-10 h-5 bg-muted rounded-full peer peer-checked:bg-primary transition-colors after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5" />
-                </label>
-                <span className="text-base font-semibold text-foreground">Send reminders to clients</span>
-              </div>
-              {absoluteDate && (
-                <div className="flex items-center gap-4 mt-3 mx-1">
-                  <div className="flex-1">
-                    <label className={labelCls}>Days until next reminder</label>
-                    <input
-                      className={inputCls + " mt-1"}
-                      name="Daysuntilnextreminder"
-                      value={daysuntilNextReminder}
-                      onChange={(e) => setDaysuntilNextReminder(e.target.value)}
-                      placeholder="Days until next reminder"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <label className={labelCls}>No Of reminders</label>
-                    <input
-                      className={inputCls + " mt-1"}
-                      name="No Of reminders"
-                      value={noOfReminder}
-                      onChange={(e) => setNoOfReminder(e.target.value)}
-                      placeholder="No of reminders"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* <DragDropContext onDragEnd={handleDragEnd}>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  m: 2,
-                }}
-              >
-                <Typography variant="h6">Client tasks</Typography>
-                <Box
-                  sx={{ cursor: "pointer" }}
-                  onClick={handleAddSubtask}
-                  style={{ margin: "10px", color: "#1976d3" }}
-                >
-                  <FiPlusCircle /> Add Subtasks
-                </Box>
-              </Box>
-
-              <Droppable droppableId="subtaskList">
-                {(provided) => (
-                  <div
-                    className="subtask-input"
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                  >
-                    {(subtasks.length > 0
-                      ? subtasks
-                      : [{ id: "default", text: "" }]
-                    ).map((subtask, index) => (
-                      <Draggable
-                        key={subtask.id}
-                        draggableId={subtask.id}
-                        index={index}
-                      >
-                        {(provided) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                          >
-                            <Box
-                              display="flex"
-                              gap="30px"
-                              alignItems="center"
-                              m={1}
-                            >
-                              <Checkbox
-                                style={{ cursor: "pointer" }}
-                                checked={checkedSubtasks.includes(subtask.id)}
-                                onChange={() =>
-                                  handleCheckboxChange(
-                                    subtask.id,
-                                    subtask.checked
-                                  )
-                                }
-                              />
-                              <TextField
-                                placeholder="Things To do"
-                                value={subtask.text}
-                                size="small"
-                                margin="normal"
-                                fullWidth
-                                onChange={(e) =>
-                                  handleInputChange(subtask.id, e.target.value)
-                                }
-                                variant="outlined"
-                              />
-                              <IconButton
-                                onClick={() => handleDeleteSubtask(subtask.id)}
-                                style={{ cursor: "pointer" }}
-                              >
-                                <RiDeleteBin6Line />
-                              </IconButton>
-                              <IconButton style={{ cursor: "move" }}>
-                                <PiDotsSixVerticalBold />
-                              </IconButton>
-                            </Box>
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </DragDropContext> */}
-            <DragDropContext onDragEnd={handleDragEnd}>
-              <div className="flex items-center justify-between mx-2 my-2">
-                <span className="text-base font-semibold text-foreground">Client tasks</span>
-                <button
-                  type="button"
-                  onClick={handleAddSubtask}
-                  className="flex items-center gap-1 text-sm text-primary hover:text-primary/80 cursor-pointer"
-                >
-                  <FiPlusCircle /> Add Subtasks
-                </button>
-              </div>
-
-              <Droppable droppableId="subtaskList">
-                {(provided) => (
-                  <div
-                    className="subtask-input"
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                  >
-                    {(subtasks.length > 0 ? subtasks : []).map((subtask, index) => (
-                      <Draggable key={subtask.id} draggableId={subtask.id} index={index}>
-                        {(provided) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                          >
-                            <div className="flex items-center gap-4 mx-1 my-1">
-                              <input
-                                type="checkbox"
-                                className="h-4 w-4 accent-primary cursor-pointer shrink-0"
-                                checked={checkedSubtasks.includes(subtask.id)}
-                                onChange={() => handleCheckboxChange(subtask.id, subtask.checked)}
-                              />
-                              <input
-                                className={inputCls}
-                                placeholder="Things To do"
-                                value={subtask.text}
-                                onChange={(e) => handleInputChange(subtask.id, e.target.value)}
-                              />
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteSubtask(subtask.id)}
-                                className="text-muted-foreground hover:text-destructive cursor-pointer shrink-0"
-                              >
-                                <RiDeleteBin6Line size={16} />
-                              </button>
-                              <span className="text-muted-foreground cursor-move shrink-0">
-                                <PiDotsSixVerticalBold size={16} />
-                              </span>
-                            </div>
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </DragDropContext>
-
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3 px-4 py-3 border-t border-border">
-          <button
-            type="button"
-            onClick={saveChat}
-            className="rounded-full px-5 py-1.5 text-sm font-medium text-white bg-primary hover:bg-primary/90 transition-colors"
-          >
-            Create Chat
-          </button>
-          <button
-            type="button"
-            onClick={handleClose}
-            className="rounded-full px-5 py-1.5 text-sm font-medium border border-border text-primary hover:bg-primary hover:text-white hover:border-transparent transition-colors"
-          >
-            Cancel
-          </button>
-        </div>
+      {/* ── Recipients ── */}
+      <div className="space-y-1.5">
+        <Label>To</Label>
+        <AccountMultiSelectDropdown
+          value={selectedaccount}
+          onChange={handleAccountChange}
+          placeholder="Select accounts"
+        />
       </div>
-    </>
+
+      {/* ── Template ── */}
+      <div className="space-y-1.5">
+        <Label htmlFor="cf-template">Template</Label>
+        <select
+          id="cf-template"
+          className={selectCls}
+          value={selectInvoiceTemp?.value || ""}
+          onChange={(e) => {
+            const opt = invoiceoptions.find(o => o.value === e.target.value);
+            handleInvoiceTempChange(null, opt || null);
+          }}
+        >
+          <option value="">Select template</option>
+          {invoiceoptions.map(o => (
+            <option key={o.value} value={o.value}>{o.label}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* ── Subject ── */}
+      <div className="space-y-1.5">
+        <Label htmlFor="cf-subject">Subject</Label>
+        <Input
+          id="cf-subject"
+          name="subject"
+          value={inputText + selectedShortcut}
+          onChange={handlechatsubject}
+          placeholder="Enter subject"
+          className={inputTextError ? "border-destructive" : ""}
+        />
+      </div>
+
+      {/* ── Shortcode picker ── */}
+      <div className="relative" ref={shortcodeRef}>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={toggleDropdown}
+        >
+          Add Shortcode <ChevronDown className="ml-1.5 h-3.5 w-3.5" />
+        </Button>
+
+        {showDropdown && (
+          <div className="absolute left-0 top-full mt-1 z-50 w-72 max-h-64 overflow-y-auto rounded-lg border border-border bg-card shadow-lg">
+            {filteredShortcuts.map((shortcut, index) => (
+              <div
+                key={index}
+                onClick={() => handleAddShortcut(shortcut.value)}
+                className={`px-4 py-2 text-sm cursor-pointer hover:bg-muted transition-colors ${
+                  shortcut.isBold ? "font-semibold text-foreground" : "text-muted-foreground"
+                }`}
+              >
+                {shortcut.title}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ── Message body ── */}
+      <div className="space-y-1.5">
+        <Label>Message</Label>
+        <EditorShortcodes
+          initialContent={description}
+          onChange={handleEditorChange}
+        />
+      </div>
+
+      {/* ── Reminders ── */}
+      <div>
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-foreground">Send reminders to clients</p>
+            <p className="text-xs text-muted-foreground">Automatically follow up with clients</p>
+          </div>
+          <Switch checked={absoluteDate} onCheckedChange={handleAbsolutesDates} />
+        </div>
+
+        {absoluteDate && (
+          <div className="grid grid-cols-2 gap-4 mt-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="cf-days">Days until next reminder</Label>
+              <Input
+                id="cf-days"
+                type="number"
+                value={daysuntilNextReminder}
+                onChange={(e) => setDaysuntilNextReminder(e.target.value)}
+                placeholder="e.g. 3"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="cf-count">Number of reminders</Label>
+              <Input
+                id="cf-count"
+                type="number"
+                value={noOfReminder}
+                onChange={(e) => setNoOfReminder(e.target.value)}
+                placeholder="e.g. 2"
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ── Client tasks ── */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Client Tasks</p>
+          <button
+            type="button"
+            onClick={handleAddSubtask}
+            className="flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+          >
+            <PlusCircle className="h-4 w-4" /> Add Task
+          </button>
+        </div>
+
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <Droppable droppableId="subtaskList">
+            {(provided) => (
+              <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
+                {subtasks.map((subtask, index) => (
+                  <Draggable key={subtask.id} draggableId={subtask.id} index={index}>
+                    {(provided) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        className="flex items-center gap-2 rounded-lg border border-border bg-card p-2"
+                      >
+                        <Checkbox
+                          checked={checkedSubtasks.includes(subtask.id)}
+                          onCheckedChange={() => handleCheckboxChange(subtask.id, subtask.checked)}
+                        />
+                        <Input
+                          placeholder="Things to do"
+                          value={subtask.text}
+                          onChange={(e) => handleInputChange(subtask.id, e.target.value)}
+                          className="flex-1 h-8 text-sm"
+                        />
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
+                          onClick={() => handleDeleteSubtask(subtask.id)}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                        <div {...provided.dragHandleProps} className="cursor-grab text-muted-foreground hover:text-foreground">
+                          <GripVertical className="h-4 w-4" />
+                        </div>
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
+      </div>
+
+      {/* ── Footer actions ── */}
+      <div className="flex items-center justify-end gap-2 pt-2 border-t border-border/40">
+        <Button variant="ghost" size="sm" onClick={handleClose}>
+          Cancel
+        </Button>
+        <Button size="sm" onClick={saveChat}>
+          Create Chat
+        </Button>
+      </div>
+
+    </div>
   );
 };
 
