@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useMemo, useContext } from 'react';
-import './tag.css'
 import { toast } from 'react-toastify';
 import { LoginContext } from "../../Sidebar/Context/Context";
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from '../../components/ui/sheet';
-import { Pencil, Trash2, Loader2, Plus, X, Tag, AlertCircle } from 'lucide-react';
+import { SideSheet } from '../../components/ui/side-sheet';
+import { Pencil, Trash2, Loader2, Plus, Tag, AlertCircle } from 'lucide-react';
 import { DataTable } from '../../components/data-table/data-table';
 import { DataTableToolbar } from '../../components/data-table/toolbar';
 const Tags = () => {
@@ -379,134 +378,130 @@ const Tags = () => {
         pageSize={30}
       />
 
-      {/* ===== CREATE TAG SHEET ===== */}
-      <Sheet open={isDrawerOpen} onOpenChange={(open) => { if (!open) handleDrawerClose(); }}>
-        <SheetContent className="sm:max-w-md overflow-y-auto">
-          <SheetHeader>
-            <SheetTitle className="flex items-center gap-2">
-              <Tag className="h-5 w-5 text-blue-500" /> Create Tag
-            </SheetTitle>
-            <SheetDescription>Add a new tag with a name and color.</SheetDescription>
-          </SheetHeader>
-
-          <div className="mt-6 space-y-5">
-            <div className="space-y-2">
-              <Label>Name</Label>
-              <Input
-                placeholder="Tag Name"
-                value={inputValue}
-                onChange={(e) => handleInputChange(e.target.value)}
-                className={tagNameError ? 'border-red-400 focus-visible:ring-red-400' : ''}
-              />
-              {tagNameError && (
-                <p className="flex items-center gap-1 text-xs text-red-500 mt-1">
-                  <AlertCircle className="h-3 w-3" /> {tagNameError}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label>Color</Label>
-              {selectedOption && (
-                <div className="mb-2">
-                  <span
-                    className="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold text-white shadow-sm"
-                    style={{ backgroundColor: selectedOption.tagColour }}
-                  >
-                    {selectedOption.tagName || inputValue}
-                  </span>
-                </div>
-              )}
-              <div className="flex flex-wrap gap-2">
-                {colors.map((color) => (
-                  <button
-                    key={color}
-                    type="button"
-                    onClick={() => {
-                      const opt = options.find(o => o.tagColour === color) || { value: `${inputValue}-${color}`, tagName: inputValue, tagColour: color };
-                      setSelectedOption(opt);
-                      if (color) setTagColourError('');
-                    }}
-                    className={`h-8 w-8 rounded-full border-2 transition-all hover:scale-110 ${selectedOption?.tagColour === color ? 'border-slate-800 ring-2 ring-offset-2 ring-slate-400' : 'border-transparent'}`}
-                    style={{ backgroundColor: color }}
-                  />
-                ))}
-              </div>
-              {tagColourError && (
-                <p className="flex items-center gap-1 text-xs text-red-500 mt-1">
-                  <AlertCircle className="h-3 w-3" /> {tagColourError}
-                </p>
-              )}
-            </div>
+      {/* ===== CREATE TAG — SideSheet ===== */}
+      <SideSheet
+        open={isDrawerOpen}
+        onOpenChange={(v) => !v && handleDrawerClose()}
+        title="Create Tag"
+        description="Add a new tag with a name and color."
+        size="md"
+        confirmLabel={loading ? undefined : "Submit"}
+        cancelLabel="Clear"
+        onConfirm={handleSubmit}
+        onCancel={handleClear}
+        isSubmitting={loading}
+      >
+        <div className="space-y-5">
+          <div className="space-y-2">
+            <Label>Name</Label>
+            <Input
+              placeholder="Tag Name"
+              value={inputValue}
+              onChange={(e) => handleInputChange(e.target.value)}
+              className={tagNameError ? 'border-destructive focus-visible:ring-destructive' : ''}
+            />
+            {tagNameError && (
+              <p className="flex items-center gap-1 text-xs text-destructive mt-1">
+                <AlertCircle className="h-3 w-3" /> {tagNameError}
+              </p>
+            )}
           </div>
 
-          <SheetFooter className="mt-8 flex gap-3 sm:justify-start">
-            <Button onClick={handleSubmit} disabled={loading}>
-              {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-              Submit
-            </Button>
-            <Button variant="outline" onClick={handleClear} disabled={loading}>
-              Clear
-            </Button>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
-
-      {/* ===== EDIT TAG SHEET ===== */}
-      <Sheet open={isUpdateDrawerOpen} onOpenChange={(open) => { if (!open) handleUpdateDrawerClose(); }}>
-        <SheetContent className="sm:max-w-md overflow-y-auto">
-          <SheetHeader>
-            <SheetTitle className="flex items-center gap-2">
-              <Pencil className="h-5 w-5 text-blue-500" /> Edit Tag
-            </SheetTitle>
-            <SheetDescription>Update the tag name and color.</SheetDescription>
-          </SheetHeader>
-
-          <div className="mt-6 space-y-5">
-            <div className="space-y-2">
-              <Label>Name</Label>
-              <Input
-                placeholder="Tag Name"
-                value={inputValue}
-                onChange={(e) => handleInputChange(e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Color</Label>
-              {selectedOption && (
-                <div className="mb-2">
-                  <span
-                    className="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold text-white shadow-sm"
-                    style={{ backgroundColor: selectedOption.tagColour }}
-                  >
-                    {selectedOption.tagName || inputValue}
-                  </span>
-                </div>
-              )}
-              <div className="flex flex-wrap gap-2">
-                {colors.map((color) => (
-                  <button
-                    key={color}
-                    type="button"
-                    onClick={() => {
-                      const opt = options.find(o => o.tagColour === color) || { value: `${inputValue}-${color}`, tagName: inputValue, tagColour: color };
-                      setSelectedOption(opt);
-                    }}
-                    className={`h-8 w-8 rounded-full border-2 transition-all hover:scale-110 ${selectedOption?.tagColour === color ? 'border-slate-800 ring-2 ring-offset-2 ring-slate-400' : 'border-transparent'}`}
-                    style={{ backgroundColor: color }}
-                  />
-                ))}
+          <div className="space-y-2">
+            <Label>Color</Label>
+            {selectedOption && (
+              <div className="mb-2">
+                <span
+                  className="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold text-white shadow-sm"
+                  style={{ backgroundColor: selectedOption.tagColour }}
+                >
+                  {selectedOption.tagName || inputValue}
+                </span>
               </div>
+            )}
+            <div className="flex flex-wrap gap-2">
+              {colors.map((color) => (
+                <button
+                  key={color}
+                  type="button"
+                  onClick={() => {
+                    const opt = options.find(o => o.tagColour === color) || { value: `${inputValue}-${color}`, tagName: inputValue, tagColour: color };
+                    setSelectedOption(opt);
+                    if (color) setTagColourError('');
+                  }}
+                  className={`h-8 w-8 rounded-full border-2 transition-all hover:scale-110 ${
+                    selectedOption?.tagColour === color
+                      ? 'border-foreground ring-2 ring-offset-2 ring-border'
+                      : 'border-transparent'
+                  }`}
+                  style={{ backgroundColor: color }}
+                />
+              ))}
             </div>
+            {tagColourError && (
+              <p className="flex items-center gap-1 text-xs text-destructive mt-1">
+                <AlertCircle className="h-3 w-3" /> {tagColourError}
+              </p>
+            )}
+          </div>
+        </div>
+      </SideSheet>
+
+      {/* ===== EDIT TAG — SideSheet ===== */}
+      <SideSheet
+        open={isUpdateDrawerOpen}
+        onOpenChange={(v) => !v && handleUpdateDrawerClose()}
+        title="Edit Tag"
+        description="Update the tag name and color."
+        size="md"
+        confirmLabel="Save"
+        cancelLabel="Cancel"
+        onConfirm={handleUpdatesumbit}
+        onCancel={handleFormClose}
+      >
+        <div className="space-y-5">
+          <div className="space-y-2">
+            <Label>Name</Label>
+            <Input
+              placeholder="Tag Name"
+              value={inputValue}
+              onChange={(e) => handleInputChange(e.target.value)}
+            />
           </div>
 
-          <SheetFooter className="mt-8 flex gap-3 sm:justify-start">
-            <Button onClick={handleUpdatesumbit}>Save</Button>
-            <Button variant="outline" onClick={handleFormClose}>Cancel</Button>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
+          <div className="space-y-2">
+            <Label>Color</Label>
+            {selectedOption && (
+              <div className="mb-2">
+                <span
+                  className="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold text-white shadow-sm"
+                  style={{ backgroundColor: selectedOption.tagColour }}
+                >
+                  {selectedOption.tagName || inputValue}
+                </span>
+              </div>
+            )}
+            <div className="flex flex-wrap gap-2">
+              {colors.map((color) => (
+                <button
+                  key={color}
+                  type="button"
+                  onClick={() => {
+                    const opt = options.find(o => o.tagColour === color) || { value: `${inputValue}-${color}`, tagName: inputValue, tagColour: color };
+                    setSelectedOption(opt);
+                  }}
+                  className={`h-8 w-8 rounded-full border-2 transition-all hover:scale-110 ${
+                    selectedOption?.tagColour === color
+                      ? 'border-foreground ring-2 ring-offset-2 ring-border'
+                      : 'border-transparent'
+                  }`}
+                  style={{ backgroundColor: color }}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </SideSheet>
     </div>
   );
 };

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { LoginContext } from "../Sidebar/Context/Context";
 import { Facebook, Linkedin, Twitter, Instagram, PlusCircle, Upload } from "lucide-react";
 import { Switch } from "../components/ui/switch";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "../components/ui/tabs";
 import { toast } from "react-toastify";
 import axios from "axios";
 import dayjs from "dayjs";
@@ -842,292 +843,364 @@ const FirmSetting = () => {
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-semibold text-foreground mb-8">Firm Settings</h1>
+    <div className="mx-auto w-full max-w-4xl">
+      <h1 className="text-xl font-semibold text-foreground mb-5">Firm Settings</h1>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left Column */}
-        <div className="space-y-6">
-          {/* Contact Details */}
-          <SettingsCard title="Contact details">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <InputField label="Firm Name" value={firmName} onChange={(e) => setFirmName(e.target.value)} placeholder="Enter Your Firm Name" />
-              <InputField label="Firm Email" value={firmEmail} onChange={(e) => setFirmEmail(e.target.value)} placeholder="Enter Your Firm Email" />
-            </div>
-            <InputField label="Street address" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Street address" />
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <InputField label="City" value={City} onChange={(e) => setCity(e.target.value)} placeholder="City" />
+      <Tabs defaultValue="firm" className="w-full">
+        {/* ── Tab Bar ── */}
+        <TabsList className="mb-6 h-10 w-fit gap-1 bg-muted/60 border border-border rounded-lg p-1">
+          <TabsTrigger value="firm" className="text-sm px-5">Firm</TabsTrigger>
+          <TabsTrigger value="security" className="text-sm px-5">Security</TabsTrigger>
+          <TabsTrigger value="preferences" className="text-sm px-5">Preferences</TabsTrigger>
+          <TabsTrigger value="notifications" className="text-sm px-5">Notifications</TabsTrigger>
+        </TabsList>
+
+        {/* ══════════════════════════════════════
+             FIRM TAB
+        ══════════════════════════════════════ */}
+        <TabsContent value="firm">
+          <div className="space-y-6">
+
+            {/* Contact Details */}
+            <SettingsCard title="Contact details">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <InputField label="Firm Name" value={firmName} onChange={(e) => setFirmName(e.target.value)} placeholder="Enter Your Firm Name" />
+                <InputField label="Firm Email" value={firmEmail} onChange={(e) => setFirmEmail(e.target.value)} placeholder="Enter Your Firm Email" />
+              </div>
+              <InputField label="Street address" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Street address" />
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <InputField label="City" value={City} onChange={(e) => setCity(e.target.value)} placeholder="City" />
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1.5">State</label>
+                  <select
+                    value={selectedState?.label || ""}
+                    onChange={(e) => {
+                      const match = states.find((s) => s.name === e.target.value);
+                      setSelectedState(match ? { label: match.name } : null);
+                    }}
+                    className="flex h-10 w-full rounded-lg border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow"
+                  >
+                    <option value="">Select State</option>
+                    {states.map((s) => (
+                      <option key={s.name} value={s.name}>{s.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <InputField label="Zip/Postal code" value={zipCode} onChange={(e) => setZipCode(e.target.value)} placeholder="Zip/Postal code" />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <InputField label="Firm phone number" value={firmPhoneNumber} onChange={(e) => setFirmPhoneNumber(e.target.value)} placeholder="Firm phone number" />
+                <InputField label="Firm Website" value={firmwebsite} onChange={(e) => setFirmWebsite(e.target.value)} placeholder="Firm Website" />
+              </div>
+              <InputField label="Default reply-to address for system emails" value={defaultreplytoemails} onChange={(e) => setDefaultreplytoemails(e.target.value)} placeholder="Default reply-to address" />
+              <div className="flex items-start gap-3 rounded-lg bg-muted/50 p-3">
+                <span className="text-xs text-muted-foreground flex-1">Receive copies (BCC) of system emails sent to clients.</span>
+                <SettingsSwitch checked={false} onChange={() => {}} />
+              </div>
+              <SaveBtn onClick={Contactdetails} />
+            </SettingsCard>
+
+            {/* About Us */}
+            <SettingsCard title="About us">
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1.5">State</label>
+                <label className="block text-sm font-medium text-foreground mb-1.5">Description</label>
+                <textarea
+                  value={discription || ""}
+                  onChange={(e) => setDescription(e.target.value)}
+                  rows={3}
+                  className="flex w-full rounded-lg border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow resize-none"
+                />
+              </div>
+              <CheckboxRow checked={showfirmownerphototologin} onChange={handleAboutusCheckbox} label="Show firm owner photo on the login page" />
+              <SaveBtn onClick={AboutUs} />
+            </SettingsCard>
+
+            {/* Firm Portal URL */}
+            <SettingsCard title="Firm portal URL">
+              <p className="text-sm text-muted-foreground">Your firm's portal URL:</p>
+              <p className="text-sm font-medium text-primary">https://anuja.taxdome.com/</p>
+              <p className="text-xs text-muted-foreground">To modify this address, please contact support.</p>
+            </SettingsCard>
+
+            {/* Custom Domain */}
+            <SettingsCard title="Custom domain">
+              <p className="text-sm text-muted-foreground">
+                White-label your portal with your own domain. Before adding your domain, see{" "}
+                <span className="text-primary cursor-pointer hover:underline">how to configure DNS</span>.
+              </p>
+              <InputField label="Domain name" value={domainname} onChange={(e) => setDomainName(e.target.value)} placeholder="Domain name" />
+              <button onClick={CustomDomain} className="inline-flex items-center justify-center rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium text-primary shadow-sm hover:bg-muted transition-colors">
+                Link Custom Domain
+              </button>
+            </SettingsCard>
+
+            {/* Social Media Links */}
+            <SettingsCard title="Social media links">
+              <InputField label="Facebook" value={facebooklink} onChange={(e) => setFacebooklink(e.target.value)} placeholder="Facebook URL" icon={Facebook} iconColor="#1877f2" />
+              <InputField label="LinkedIn" value={linkedinlink} onChange={(e) => setLinkedinlink(e.target.value)} placeholder="LinkedIn URL" icon={Linkedin} iconColor="#0077b5" />
+              <InputField label="X" value={xlink} onChange={(e) => setXlink(e.target.value)} placeholder="X URL" icon={Twitter} iconColor="#000" />
+              <InputField label="Instagram" value={instagramlink} onChange={(e) => setInstagramlink(e.target.value)} placeholder="Instagram URL" icon={Instagram} iconColor="#da2b79" />
+              <SaveBtn onClick={SocialMediaLinks} />
+            </SettingsCard>
+
+            {/* Logo Upload */}
+            <SettingsCard title="Logo upload">
+              <div
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-muted/30 p-8 gap-3 transition-colors hover:border-primary/50 hover:bg-primary/5"
+              >
+                <Upload className="h-8 w-8 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">Drag & Drop file here</p>
+                <button onClick={handleButtonClick} className="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors">
+                  Browse Files
+                </button>
+                <input id="fileInput" type="file" className="hidden" onChange={handleFileChange} />
+                {selectedFile && <p className="mt-2 text-xs text-muted-foreground break-all">Selected: {selectedFile.name}</p>}
+              </div>
+            </SettingsCard>
+
+          </div>
+        </TabsContent>
+
+        {/* ══════════════════════════════════════
+             SECURITY TAB
+        ══════════════════════════════════════ */}
+        <TabsContent value="security">
+          <div className="space-y-6">
+
+            {/* Two-factor Authentication */}
+            <SettingsCard title="Two-factor authentication (2FA)">
+              <div className="flex items-center justify-between rounded-lg border border-border/40 bg-muted/20 px-4 py-3">
+                <div>
+                  <p className="text-sm font-medium text-foreground">Require 2FA for all team members</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">2FA will be turned on for team members at next login.</p>
+                </div>
+                <SettingsSwitch checked={require2FAforallteam} onChange={handlefor2FA} />
+              </div>
+              <InputField label="Email address to receive manual 2FA disable requests" value={defaultreplytoemails} onChange={(e) => setDefaultreplytoemails(e.target.value)} placeholder="Email address" />
+              <SaveBtn onClick={TwoFactorAuthentication} />
+            </SettingsCard>
+
+            {/* Editor Access */}
+            <SettingsCard title="Editor access">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between rounded-lg border border-border/40 bg-muted/20 px-4 py-3">
+                  <p className="text-sm text-foreground">Allow the support team to set up landing</p>
+                  <SettingsSwitch checked={allowsupportteamsetuplanding} onChange={handleallowsupportteamsetuplanding} />
+                </div>
+                {allowsupportteamsetuplanding && (
+                  <div className="pl-4">
+                    <label className="block text-sm font-medium text-foreground mb-1.5">Until</label>
+                    <input
+                      type="date"
+                      value={allowsupportteamsetuplandingdate ? dayjs(allowsupportteamsetuplandingdate).format("YYYY-MM-DD") : ""}
+                      onChange={(e) => setAllowsupportteamsetuplandingdate(e.target.value ? dayjs(e.target.value) : null)}
+                      className="flex h-10 w-full max-w-xs rounded-lg border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow"
+                    />
+                  </div>
+                )}
+                <div className="flex items-center justify-between rounded-lg border border-border/40 bg-muted/20 px-4 py-3">
+                  <p className="text-sm text-foreground">Allow the support team to log in with owner-like permissions</p>
+                  <SettingsSwitch checked={allowsupportteamownerlikepermission} onChange={handleallowsupportteamownerlikepermission} />
+                </div>
+                {allowsupportteamownerlikepermission && (
+                  <div className="pl-4">
+                    <label className="block text-sm font-medium text-foreground mb-1.5">Until</label>
+                    <input
+                      type="date"
+                      value={allowsupportteamownerlikepermissiondate ? dayjs(allowsupportteamownerlikepermissiondate).format("YYYY-MM-DD") : ""}
+                      onChange={(e) => setAllowsupportteamownerlikepermissiondate(e.target.value ? dayjs(e.target.value) : null)}
+                      className="flex h-10 w-full max-w-xs rounded-lg border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow"
+                    />
+                  </div>
+                )}
+              </div>
+              <SaveBtn onClick={EditorAccess} />
+            </SettingsCard>
+
+          </div>
+        </TabsContent>
+
+        {/* ══════════════════════════════════════
+             PREFERENCES TAB
+        ══════════════════════════════════════ */}
+        <TabsContent value="preferences">
+          <div className="space-y-6">
+
+            {/* International Settings */}
+            <SettingsCard title="International settings">
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1.5">Default language</label>
                 <select
-                  value={selectedState?.label || ""}
+                  value={selectedLanguage?.value || ""}
                   onChange={(e) => {
-                    const match = states.find((s) => s.name === e.target.value);
-                    setSelectedState(match ? { label: match.name } : null);
+                    const lang = languages.find(l => l.value === e.target.value);
+                    handleLanguageChange(lang);
                   }}
-                  className="flex h-10 w-full rounded-lg border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow"
+                  className="flex h-10 w-full rounded-lg border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow"
                 >
-                  <option value="">Select State</option>
-                  {states.map((s) => (
-                    <option key={s.name} value={s.name}>{s.name}</option>
+                  {languages.map((lang) => (
+                    <option key={lang.value} value={lang.value}>{lang.label}</option>
                   ))}
                 </select>
               </div>
-              <InputField label="Zip/Postal code" value={zipCode} onChange={(e) => setZipCode(e.target.value)} placeholder="Zip/Postal code" />
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <InputField label="Firm phone number" value={firmPhoneNumber} onChange={(e) => setFirmPhoneNumber(e.target.value)} placeholder="Enter Your Firm phone number" />
-              <InputField label="Firm Website" value={firmwebsite} onChange={(e) => setFirmWebsite(e.target.value)} placeholder="Firm Website" />
-            </div>
-            <InputField label="Default reply-to address for system emails" value={defaultreplytoemails} onChange={(e) => setDefaultreplytoemails(e.target.value)} placeholder="Default reply-to address for system emails" />
-            <div className="flex items-start gap-3 rounded-lg bg-muted/50 p-3">
-              <span className="text-xs text-muted-foreground flex-1">Receive copies (BCC) of system emails sent to clients. These emails include requests and reminders to fill out forms, upload documents, and complete other pending actions.</span>
-              <SettingsSwitch checked={false} onChange={() => {}} />
-            </div>
-            <SaveBtn onClick={Contactdetails} />
-          </SettingsCard>
+              <InputField label="Time Zone" placeholder="Time Zone" />
+              <SaveBtn onClick={InternationalSettings} />
+            </SettingsCard>
 
-          {/* About Us */}
-          <SettingsCard title="About us">
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">Description</label>
-              <textarea
-                value={discription || ""}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={3}
-                className="flex w-full rounded-lg border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow resize-none"
-              />
-            </div>
-            <CheckboxRow checked={showfirmownerphototologin} onChange={handleAboutusCheckbox} label="Show firm owner photo on the login page" />
-            <SaveBtn onClick={AboutUs} />
-          </SettingsCard>
-
-          {/* Firm Portal URL */}
-          <SettingsCard title="Firm portal URL">
-            <p className="text-sm text-muted-foreground">Your firm's TaxDome portal URL:</p>
-            <p className="text-sm font-medium text-primary">https://anuja.taxdome.com/</p>
-            <p className="text-xs text-muted-foreground">To modify this address, please contact support.</p>
-          </SettingsCard>
-
-          {/* Custom Domain */}
-          <SettingsCard title="Custom domain">
-            <p className="text-sm text-muted-foreground">
-              You can white-label your TaxDome portal with your own domain name (for example, anuja.com instead of anuja.taxdome.com). Before adding your domain name, please see <span className="text-primary cursor-pointer hover:underline">how to configure DNS</span>.
-            </p>
-            <InputField label="Domain name" value={domainname} onChange={(e) => setDomainName(e.target.value)} placeholder="Domain name" />
-            <button onClick={CustomDomain} className="inline-flex items-center justify-center rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium text-primary shadow-sm hover:bg-muted transition-colors">
-              Link Custom Domain
-            </button>
-          </SettingsCard>
-
-          {/* Two-factor Authentication */}
-          <SettingsCard title="Two-factor authentication (2FA)">
-            <InputField label="Email address to receive manual 2FA disable requests" value={defaultreplytoemails} onChange={(e) => setDefaultreplytoemails(e.target.value)} placeholder="Email address" />
-            <CheckboxRow checked={require2FAforallteam} onChange={handlefor2FA} label="Require 2FA for all team members" />
-            <p className="text-xs text-muted-foreground ml-6">2FA will be turned on for team members at next login.</p>
-            <SaveBtn onClick={TwoFactorAuthentication} />
-          </SettingsCard>
-
-          {/* Chats */}
-          <SettingsCard title="Chats">
-            <p className="text-sm text-muted-foreground">Chats are a secure way to communicate and exchange documents with your clients. You can allow clients to start new chats, or have them only respond to messages sent by your firm.</p>
-            <SwitchRow checked={allowclienttocreatenewchat} onChange={handlechat} label="Allow clients to create new chat threads" />
-            <SaveBtn onClick={chat} />
-          </SettingsCard>
-        </div>
-
-        {/* Right Column */}
-        <div className="space-y-6">
-          {/* Social Media Links */}
-          <SettingsCard title="Social media links">
-            <InputField label="Facebook" value={facebooklink} onChange={(e) => setFacebooklink(e.target.value)} placeholder="Facebook URL" icon={Facebook} iconColor="#1877f2" />
-            <InputField label="LinkedIn" value={linkedinlink} onChange={(e) => setLinkedinlink(e.target.value)} placeholder="LinkedIn URL" icon={Linkedin} iconColor="#0077b5" />
-            <InputField label="X" value={xlink} onChange={(e) => setXlink(e.target.value)} placeholder="X URL" icon={Twitter} iconColor="#000" />
-            <InputField label="Instagram" value={instagramlink} onChange={(e) => setInstagramlink(e.target.value)} placeholder="Instagram URL" icon={Instagram} iconColor="#da2b79" />
-            <SaveBtn onClick={SocialMediaLinks} />
-          </SettingsCard>
-
-          {/* Logo Upload */}
-          <SettingsCard title="Logo upload">
-            <div
-              onDrop={handleDrop}
-              onDragOver={handleDragOver}
-              className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-muted/30 p-8 gap-3 transition-colors hover:border-primary/50 hover:bg-primary/5"
-            >
-              <Upload className="h-8 w-8 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">Drag & Drop file here</p>
-              <button onClick={handleButtonClick} className="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors">
-                Browse Files
-              </button>
-              <input id="fileInput" type="file" className="hidden" onChange={handleFileChange} />
-              {selectedFile && <p className="mt-2 text-xs text-muted-foreground break-all">Selected file: {selectedFile.name}</p>}
-            </div>
-          </SettingsCard>
-
-          {/* International Settings */}
-          <SettingsCard title="International settings">
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">Default language</label>
-              <select
-                value={selectedLanguage?.value || ""}
-                onChange={(e) => {
-                  const lang = languages.find(l => l.value === e.target.value);
-                  handleLanguageChange(lang);
-                }}
-                className="flex h-10 w-full rounded-lg border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow"
-              >
-                {languages.map((lang) => (
-                  <option key={lang.value} value={lang.value}>{lang.label}</option>
-                ))}
-              </select>
-            </div>
-            <InputField label="Time Zone" placeholder="Time Zone" />
-            <SaveBtn onClick={InternationalSettings} />
-          </SettingsCard>
-
-          {/* Contact Name Formatting */}
-          <SettingsCard title="Contact name formatting">
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">The next generated contact name will have the following format</label>
-              <select
-                value={selectedFormat || ""}
-                onChange={(e) => setSelectedFormat(e.target.value)}
-                className="flex h-10 w-full rounded-lg border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow"
-              >
-                {contactNameOptions.map((opt) => (
-                  <option key={opt} value={opt}>{opt}</option>
-                ))}
-              </select>
-            </div>
-            <CheckboxRow checked={applytoallcontacts} onChange={handleapplytoallcontacts} label="Apply to all Contacts" />
-            <SaveBtn onClick={ContactNameFormatting} />
-          </SettingsCard>
-
-          {/* Signatures */}
-          <SettingsCard title="Signatures">
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">Default date format for e-signature</label>
-              <select
-                value={selectedSignatures || ""}
-                onChange={(e) => setSelectedSignatures(e.target.value)}
-                className="flex h-10 w-full rounded-lg border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow"
-              >
-                {SignaturesOptions.map((opt) => (
-                  <option key={opt} value={opt}>{opt}</option>
-                ))}
-              </select>
-            </div>
-            <SwitchRow checked={showKBAverification} onChange={handleshowKBAverification} label="Show KBA verification as option" />
-            <SwitchRow checked={showQESAdESverification} onChange={handleshowQESAdESverification} label="Show QES/AdES verification as option" />
-            <SaveBtn onClick={Signatures} />
-          </SettingsCard>
-
-          {/* Default Account Access */}
-          <SettingsCard title="Default account access">
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">Team Members</label>
-              <select
-                multiple
-                value={combinedValues}
-                onChange={(e) => {
-                  const selected = Array.from(e.target.selectedOptions, (opt) => opt.value);
-                  setCombinedValues(selected);
-                  const selectedOpts = options.filter(o => selected.includes(o.value));
-                  setSelectedUser(selectedOpts);
-                }}
-                className="flex min-h-[80px] w-full rounded-lg border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow"
-              >
-                {options.map((opt) => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
-              {selectedUser.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mt-2">
-                  {selectedUser.map((u) => (
-                    <span key={u.value} className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">{u.label}</span>
+            {/* Contact Name Formatting */}
+            <SettingsCard title="Contact name formatting">
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1.5">Contact name format</label>
+                <select
+                  value={selectedFormat || ""}
+                  onChange={(e) => setSelectedFormat(e.target.value)}
+                  className="flex h-10 w-full rounded-lg border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow"
+                >
+                  {contactNameOptions.map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
                   ))}
+                </select>
+              </div>
+              <CheckboxRow checked={applytoallcontacts} onChange={handleapplytoallcontacts} label="Apply to all Contacts" />
+              <SaveBtn onClick={ContactNameFormatting} />
+            </SettingsCard>
+
+            {/* Signatures */}
+            <SettingsCard title="Signatures">
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1.5">Default date format for e-signature</label>
+                <select
+                  value={selectedSignatures || ""}
+                  onChange={(e) => setSelectedSignatures(e.target.value)}
+                  className="flex h-10 w-full rounded-lg border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow"
+                >
+                  {SignaturesOptions.map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-2">
+                <SwitchRow checked={showKBAverification} onChange={handleshowKBAverification} label="Show KBA verification as option" />
+                <SwitchRow checked={showQESAdESverification} onChange={handleshowQESAdESverification} label="Show QES/AdES verification as option" />
+              </div>
+              <SaveBtn onClick={Signatures} />
+            </SettingsCard>
+
+            {/* Default Account Access */}
+            <SettingsCard title="Default account access">
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1.5">Team Members</label>
+                <select
+                  multiple
+                  value={combinedValues}
+                  onChange={(e) => {
+                    const selected = Array.from(e.target.selectedOptions, (opt) => opt.value);
+                    setCombinedValues(selected);
+                    const selectedOpts = options.filter(o => selected.includes(o.value));
+                    setSelectedUser(selectedOpts);
+                  }}
+                  className="flex min-h-[80px] w-full rounded-lg border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow"
+                >
+                  {options.map((opt) => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+                {selectedUser.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    {selectedUser.map((u) => (
+                      <span key={u.value} className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">{u.label}</span>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <SaveBtn onClick={teammember} />
+            </SettingsCard>
+
+            {/* Default Folder Template */}
+            <SettingsCard title="Default folder template">
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1.5">Folder Templates</label>
+                <select multiple className="flex min-h-[80px] w-full rounded-lg border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow">
+                </select>
+              </div>
+              <SaveBtn />
+            </SettingsCard>
+
+          </div>
+        </TabsContent>
+
+        {/* ══════════════════════════════════════
+             NOTIFICATIONS TAB
+        ══════════════════════════════════════ */}
+        <TabsContent value="notifications">
+          <div className="space-y-6">
+
+            {/* System-generated Emails */}
+            <SettingsCard title="System-generated emails">
+              <div className="space-y-1 divide-y divide-border/40">
+                {[
+                  { checked: showfirmcontactdetails, onChange: handleshowfirmcontactdetails, label: "Show firm contact details" },
+                  { checked: showsocialnetworklinks, onChange: handleshowsocialnetworklinks, label: "Show social network links" },
+                  { checked: showfirmlogo, onChange: handleshowfirmlogo, label: "Show firm logo" },
+                  { checked: showmesscontextinternalnotification, onChange: handleshowmesscontextinternalnotification, label: "Show message context in internal notifications" },
+                  { checked: showmesscontextclientfacingnotification, onChange: handleshowmesscontextclientfacingnotification, label: "Show message context in client-facing notifications" },
+                ].map(({ checked, onChange, label }) => (
+                  <div key={label} className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
+                    <span className="text-sm text-foreground">{label}</span>
+                    <SettingsSwitch checked={checked} onChange={onChange} />
+                  </div>
+                ))}
+              </div>
+              <SaveBtn onClick={SystemGeneratedEmails} />
+            </SettingsCard>
+
+            {/* Sending Limit */}
+            <SettingsCard title="Sending limit">
+              <InputField label="Emails each firm member can send (max 10,000)" value={emailfirmmembercansend} onChange={(e) => setEmailfirmmembercansend(e.target.value)} placeholder="400" endAdornment="per day" />
+              <SaveBtn onClick={SendingLimit} />
+            </SettingsCard>
+
+            {/* Client Portal Settings */}
+            <SettingsCard title="Client portal settings">
+              <div className="space-y-1 divide-y divide-border/40">
+                <div className="flex items-center justify-between py-3 first:pt-0">
+                  <span className="text-sm text-foreground">Show 'Done uploading' button in interface</span>
+                  <SettingsSwitch checked={showdoneuploadingbutton} onChange={handleshowdoneuploadingbutton} />
                 </div>
-              )}
-            </div>
-            <SaveBtn onClick={teammember} />
-          </SettingsCard>
-
-          {/* Editor Access */}
-          <SettingsCard title="Editor access">
-            <div className="space-y-3">
-              <SwitchRow checked={allowsupportteamsetuplanding} onChange={handleallowsupportteamsetuplanding} label="Allow the support team to set up landing" />
-              {allowsupportteamsetuplanding && (
-                <div className="ml-11">
-                  <label className="block text-sm font-medium text-foreground mb-1.5">Until</label>
-                  <input
-                    type="date"
-                    value={allowsupportteamsetuplandingdate ? dayjs(allowsupportteamsetuplandingdate).format("YYYY-MM-DD") : ""}
-                    onChange={(e) => setAllowsupportteamsetuplandingdate(e.target.value ? dayjs(e.target.value) : null)}
-                    className="flex h-10 w-full rounded-lg border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow"
-                  />
+                <div className="flex items-center justify-between py-3 last:pb-0">
+                  <span className="text-sm text-foreground">Show 'Done uploading' checkbox in document upload menu</span>
+                  <SettingsSwitch checked={showdoneuploadingcheckbox} onChange={handleshowdoneuploadingcheckbox} />
                 </div>
-              )}
-              <SwitchRow checked={allowsupportteamownerlikepermission} onChange={handleallowsupportteamownerlikepermission} label="Allow the support team to log in with owner-like permissions" />
-              {allowsupportteamownerlikepermission && (
-                <div className="ml-11">
-                  <label className="block text-sm font-medium text-foreground mb-1.5">Until</label>
-                  <input
-                    type="date"
-                    value={allowsupportteamownerlikepermissiondate ? dayjs(allowsupportteamownerlikepermissiondate).format("YYYY-MM-DD") : ""}
-                    onChange={(e) => setAllowsupportteamownerlikepermissiondate(e.target.value ? dayjs(e.target.value) : null)}
-                    className="flex h-10 w-full rounded-lg border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow"
-                  />
-                </div>
-              )}
-            </div>
-            <SaveBtn onClick={EditorAccess} />
-          </SettingsCard>
+              </div>
+              <SaveBtn onClick={ClientPortalSettingst} />
+            </SettingsCard>
 
-          {/* Default Folder Template */}
-          <SettingsCard title="Default folder template">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Folder Templates</label>
-              <select multiple className="flex min-h-[80px] w-full rounded-lg border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow">
-                {/* Add folder template options here */}
-              </select>
-            </div>
-            <SaveBtn />
-          </SettingsCard>
+            {/* Client Portal Announcement */}
+            <SettingsCard title="Client portal announcement">
+              <p className="text-sm text-muted-foreground">Announcement is visible in the client portal and mobile app upon login.</p>
+              <button onClick={() => setNewChat(true)} className="flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors">
+                <PlusCircle className="h-4 w-4" />
+                Create announcement
+              </button>
+              <SaveBtn />
+            </SettingsCard>
 
-          {/* System-generated Emails */}
-          <SettingsCard title="System-generated emails">
-            <SwitchRow checked={showfirmcontactdetails} onChange={handleshowfirmcontactdetails} label="Show firm contact details" />
-            <SwitchRow checked={showsocialnetworklinks} onChange={handleshowsocialnetworklinks} label="Show social network links" />
-            <SwitchRow checked={showfirmlogo} onChange={handleshowfirmlogo} label="Show firm logo" />
-            <SwitchRow checked={showmesscontextinternalnotification} onChange={handleshowmesscontextinternalnotification} label="Show firm message context in internal notifications" />
-            <SwitchRow checked={showmesscontextclientfacingnotification} onChange={handleshowmesscontextclientfacingnotification} label="Show firm message context in client facing notifications" />
-            <SaveBtn onClick={SystemGeneratedEmails} />
-          </SettingsCard>
+            {/* Chats */}
+            <SettingsCard title="Chats">
+              <p className="text-sm text-muted-foreground">You can allow clients to start new chats, or have them only respond to messages sent by your firm.</p>
+              <div className="flex items-center justify-between rounded-lg border border-border/40 bg-muted/20 px-4 py-3">
+                <p className="text-sm text-foreground">Allow clients to create new chat threads</p>
+                <SettingsSwitch checked={allowclienttocreatenewchat} onChange={handlechat} />
+              </div>
+              <SaveBtn onClick={chat} />
+            </SettingsCard>
 
-          {/* Sending Limit */}
-          <SettingsCard title="Sending limit">
-            <InputField label="Emails each firm member can send (max 10,000)" value={emailfirmmembercansend} onChange={(e) => setEmailfirmmembercansend(e.target.value)} placeholder="400" endAdornment="per day" />
-            <SaveBtn onClick={SendingLimit} />
-          </SettingsCard>
+          </div>
+        </TabsContent>
 
-          {/* Client Portal Settings */}
-          <SettingsCard title="Client portal settings">
-            <SwitchRow checked={showdoneuploadingbutton} onChange={handleshowdoneuploadingbutton} label="Show 'Done uploading' button in interface" />
-            <SwitchRow checked={showdoneuploadingcheckbox} onChange={handleshowdoneuploadingcheckbox} label="Show 'Done uploading' checkbox in document upload menu" />
-            <SaveBtn onClick={ClientPortalSettingst} />
-          </SettingsCard>
-
-          {/* Client Portal Announcement */}
-          <SettingsCard title="Client portal announcement">
-            <p className="text-sm text-muted-foreground">Announcement is visible in the client portal and mobile app upon login.</p>
-            <button onClick={() => setNewChat(true)} className="flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors">
-              <PlusCircle className="h-4 w-4" />
-              Create announcement
-            </button>
-            <SaveBtn />
-          </SettingsCard>
-        </div>
-      </div>
+      </Tabs>
     </div>
   );
 };
