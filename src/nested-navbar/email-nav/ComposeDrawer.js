@@ -2,7 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import Editor from "./Editor";
-import { SideSheet } from "../../components/ui/side-sheet";
+import { SideSheet} from "../../components/ui/side-sheet";
+import { SheetTitle , SheetHeader} from "../../components/ui/sheet";
 import { Button } from "../../components/ui/button";
 import { Separator } from "../../components/ui/separator";
 import { Input } from "../../components/ui/input";
@@ -179,7 +180,8 @@ const [sending, setSending] = useState(false);
 
           {/* Email Template */}
           <div>
-            <label className={labelCls}>Template</label>
+            {/* <SheetTitle></SheetTitle> */}
+            <SheetHeader>Template </SheetHeader>
             <select
               value={emailTemplate?.value || ""}
               onChange={(e) => {

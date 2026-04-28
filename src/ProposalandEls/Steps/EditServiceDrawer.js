@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '../../components/ui/sheet';
+import { SideSheet } from '../../components/ui/side-sheet';
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '../../components/ui/form';
 import { Input } from '../../components/ui/input';
 import { Textarea } from '../../components/ui/textarea';
@@ -65,14 +65,21 @@ const EditServiceDrawer = ({ open, onClose, selectedRowData, onSave }) => {
   const calculatedAmount = (parseFloat(watchRate) * parseFloat(watchQty)).toFixed(2);
 
   return (
-    <Sheet open={open} onOpenChange={o => { if (!o) handleClose(); }}>
-      <SheetContent className="sm:max-w-md overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle>Edit Line Item</SheetTitle>
-        </SheetHeader>
-
+    <SideSheet
+      open={open}
+      onOpenChange={o => { if (!o) handleClose(); }}
+      title="Edit Line Item"
+      size="md"
+      hideDefaultFooter
+      footer={
+        <div className="flex items-center gap-2">
+          <Button type="button" variant="ghost" size="sm" onClick={handleClose}>Cancel</Button>
+          <Button type="button" size="sm" onClick={() => form.handleSubmit(onSubmit)()}>Save Changes</Button>
+        </div>
+      }
+    >
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="mt-4 space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
               name="productorService"
@@ -164,14 +171,9 @@ const EditServiceDrawer = ({ open, onClose, selectedRowData, onSave }) => {
               )}
             />
 
-            <div className="flex items-center gap-3 pt-2">
-              <Button type="button" variant="outline" className="flex-1" onClick={handleClose}>Cancel</Button>
-              <Button type="submit" className="flex-1">Save Changes</Button>
-            </div>
           </form>
         </Form>
-      </SheetContent>
-    </Sheet>
+    </SideSheet>
   );
 };
 

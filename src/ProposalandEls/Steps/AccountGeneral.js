@@ -1,12 +1,19 @@
 import React, { useState, useEffect, useRef,useContext } from "react";
-import { Info } from "lucide-react";
-import { Loader2 } from "lucide-react";
+import { Info, Loader2 } from "lucide-react";
 import { useParams } from "react-router-dom";
 import Cookies from "js-cookie";
 import MultiSelectDropdown from "../../Templates/MultiSelectDropdown";
-import CreatableSelect from "react-select/creatable";
-
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '../../components/ui/form';
+import { Input } from '../../components/ui/input';
+import { Checkbox } from '../../components/ui/checkbox';
 import { LoginContext } from "../../Sidebar/Context/Context";
+const accountGeneralSchema = z.object({
+  proposalName: z.string().min(1, 'Proposal name is required'),
+});
+
 const GeneralStep = ({
   formData,
   updateFormData,
@@ -17,6 +24,13 @@ const GeneralStep = ({
   const { data } = useParams();
   console.log("selected account", data);
   const [touched, setTouched] = useState({});
+
+  const form = useForm({
+    resolver: zodResolver(accountGeneralSchema),
+    defaultValues: {
+      proposalName: formData.general?.proposalName || '',
+    },
+  });
   const [accounts, setAccounts] = useState([]);
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -731,11 +745,9 @@ console.log("logindata",logindata);
   const StepCard = ({ title, description, checked, onChange, name }) => (
     <div className={`rounded-xl border p-4 mb-3 transition-all hover:shadow-sm ${checked ? 'border-primary/60 bg-primary/5 border-2' : 'border-border bg-card'}`}>
       <div className="flex items-center gap-3 mb-2">
-        <input
-          type="checkbox"
+        <Checkbox
           checked={checked}
-          onChange={(e) => onChange(name, e.target.checked)}
-          className="h-4 w-4 rounded border-border text-primary focus:ring-ring"
+          onCheckedChange={(val) => onChange(name, val)}
         />
         <span className="text-base font-semibold text-foreground">{title}</span>
       </div>
@@ -771,57 +783,68 @@ console.log("logindata",logindata);
       <div className="rounded-xl border border-border bg-muted/20 p-6 space-y-4">
         <h3 className="text-base font-semibold text-primary mb-3">Basic Details</h3>
 
-        {/* Account Selection */}
-        <div className="space-y-1.5">
-          <label className="text-sm font-medium text-foreground">Select Account *</label>
-          <CreatableSelect
-            isMulti
-            options={accountOptions}
-            value={formData.general.account || []}
-            onChange={(value) => handleAccountChange(value || [])}
-            placeholder="Search for an account..."
-            styles={{
-              control: (provided) => ({ ...provided, borderColor: stepErrors.account ? 'red' : '#e2e8f0', borderRadius: '0.5rem', minHeight: '40px', fontSize: '0.875rem' }),
-              menuPortal: (provided) => ({ ...provided, zIndex: 9999 }),
-            }}
-            menuPortalTarget={document.body}
-          />
-          {stepErrors.account && <p className="text-xs text-red-500">{stepErrors.account}</p>}
-        </div>
+        <Form {...form}>
+          <form className="space-y-4">
+            {/* Account Selection */}
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-foreground">Select Account *</label>
+              <select
+                multiple
+                value={(formData.general.account || []).map(a => a.value)}
+                onChange={(e) => {
+                  const selected = Array.from(e.target.selectedOptions).map(o => ({ value: o.value, label: o.text }));
+                  handleAccountChange(selected);
+                }}
+                className={`w-full rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring min-h-[80px] ${stepErrors?.account ? 'border-destructive' : 'border-input'}`}
+              >
+                {accountOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+              {stepErrors?.account && <p className="text-xs text-destructive">{stepErrors.account}</p>}
+            </div>
 
-        {/* Template Selection */}
-        <div className="space-y-1.5">
-          <label className="text-sm font-medium text-slate-700">Select Template (Optional)</label>
-          <CreatableSelect
-            isClearable
-            options={templateOptions}
-            value={getCurrentTemplateValue()}
-            onChange={(selected) => handleTemplateChange(null, selected)}
-            placeholder="Search for a template..."
-            styles={{
-              control: (provided) => ({ ...provided, borderColor: stepErrors.proposalTemp ? 'red' : '#e2e8f0', borderRadius: '0.5rem', minHeight: '40px', fontSize: '0.875rem' }),
-              menuPortal: (provided) => ({ ...provided, zIndex: 9999 }),
-            }}
-            menuPortalTarget={document.body}
-          />
-          <p className="text-xs text-muted-foreground">{stepErrors.proposalTemp || 'Choose a template to pre-fill the proposal'}</p>
-        </div>
+            {/* Template Selection */}
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-foreground">Select Template (Optional)</label>
+              <select
+                value={getCurrentTemplateValue()?.value || ''}
+                onChange={(e) => {
+                  const found = templateOptions.find(o => o.value === e.target.value);
+                  handleTemplateChange(null, found || null);
+                }}
+                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              >
+                <option value="">Search for a template...</option>
+                {templateOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+              <p className="text-xs text-muted-foreground">{stepErrors?.proposalTemp || 'Choose a template to pre-fill the proposal'}</p>
+            </div>
 
-        {/* Proposal Name */}
-        <div className="space-y-1.5">
-          <label className="text-sm font-medium text-foreground">Proposal name (visible to clients) *</label>
-          <input
-            type="text"
-            value={formData.general.proposalName || ""}
-            onChange={(e) => { handleInputChange("proposalName", e.target.value); handleTextFieldClick(); }}
-            onClick={handleTextFieldClick}
-            ref={textFieldRef}
-            placeholder="Proposal name (visible to clients)"
-            required
-            className={`flex h-10 w-full rounded-lg border bg-background px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring ${stepErrors.proposalName ? 'border-destructive' : 'border-input'}`}
-          />
-          {stepErrors.proposalName && <p className="text-xs text-destructive">{stepErrors.proposalName}</p>}
-        </div>
+            {/* Proposal Name */}
+            <FormField
+              control={form.control}
+              name="proposalName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Proposal name (visible to clients) *</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      ref={textFieldRef}
+                      placeholder="Proposal name (visible to clients)"
+                      value={formData.general.proposalName || ''}
+                      className={stepErrors?.proposalName ? 'border-destructive' : ''}
+                      onChange={e => { field.onChange(e); handleInputChange('proposalName', e.target.value); handleTextFieldClick(); }}
+                      onClick={handleTextFieldClick}
+                    />
+                  </FormControl>
+                  {stepErrors?.proposalName
+                    ? <p className="text-xs text-destructive">{stepErrors.proposalName}</p>
+                    : <FormMessage />}
+                </FormItem>
+              )}
+            />
+          </form>
+        </Form>
 
         {/* Shortcode Button + Dropdown */}
         <div className="relative">

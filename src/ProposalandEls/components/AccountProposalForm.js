@@ -940,9 +940,9 @@ const transformDataForForm = (apiData, accounts = [], templates = []) => {
                       onClick={() => goToStep(index)}
                       className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
                         isActive
-                          ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200'
+                          ? 'bg-primary text-white shadow-md shadow-indigo-200'
                           : isCompleted
-                          ? 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
+                          ? 'bg-primary text-white hover:bg-indigo-100'
                           : hasError
                           ? 'bg-red-50 text-red-600 hover:bg-red-100'
                           : 'bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700'
@@ -952,7 +952,7 @@ const transformDataForForm = (apiData, accounts = [], templates = []) => {
                         isActive
                           ? 'bg-white/20 text-white'
                           : isCompleted
-                          ? 'bg-indigo-600 text-white'
+                          ? 'bg-primary text-white'
                           : hasError
                           ? 'bg-red-500 text-white'
                           : 'bg-slate-300 text-white'
@@ -1000,7 +1000,7 @@ const transformDataForForm = (apiData, accounts = [], templates = []) => {
           </button>
           <button
             onClick={nextStep}
-            className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 hover:shadow-md active:scale-[0.98]"
+            className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 hover:shadow-md active:scale-[0.98]"
           >
             {isLastStep ? (proposalId ? 'Update Proposal' : 'Submit Proposal') : 'Next'}
             {!isLastStep && <ChevronRight className="h-4 w-4" />}

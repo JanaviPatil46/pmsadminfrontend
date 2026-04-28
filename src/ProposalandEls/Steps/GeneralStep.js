@@ -1,7 +1,17 @@
 import React, { useState, useRef, useEffect } from "react";
-import { FaCaretUp, FaCaretDown, FaTimes, FaSearch } from "react-icons/fa";
 import { Info } from "lucide-react";
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '../../components/ui/form';
+import { Input } from '../../components/ui/input';
+import { Checkbox } from '../../components/ui/checkbox';
 import MultiSelectDropdown from "../../Templates/MultiSelectDropdown"
+const generalSchema = z.object({
+  templateName: z.string().min(1, 'Template name is required'),
+  proposalName: z.string().min(1, 'Proposal name is required'),
+});
+
 const GeneralStep = ({
   formData,
   updateFormData,
@@ -10,6 +20,14 @@ const GeneralStep = ({
   setStepErrors,
 }) => {
   const [touched, setTouched] = useState({});
+
+  const form = useForm({
+    resolver: zodResolver(generalSchema),
+    defaultValues: {
+      templateName: formData.general?.templateName || '',
+      proposalName: formData.general?.proposalName || '',
+    },
+  });
   const [internalOptions, setInternalOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   // === SHORTCODES States ===
@@ -192,15 +210,12 @@ const GeneralStep = ({
     setShowDropdown(false);
   };
 
-  // Step Card Component
   const StepCard = ({ title, description, checked, onChange, name }) => (
     <div className={`rounded-xl border p-4 mb-3 transition-all hover:shadow-sm ${checked ? 'border-primary/60 bg-primary/5 border-2' : 'border-border bg-card'}`}>
       <div className="flex items-center gap-3 mb-2">
-        <input
-          type="checkbox"
+        <Checkbox
           checked={checked}
-          onChange={(e) => onChange(name, e.target.checked)}
-          className="h-4 w-4 rounded border-border text-primary focus:ring-ring"
+          onCheckedChange={(val) => onChange(name, val)}
         />
         <span className="text-base font-semibold text-foreground">{title}</span>
       </div>
@@ -218,34 +233,56 @@ const GeneralStep = ({
       <div className="rounded-xl border border-border bg-muted/20 p-6 space-y-4">
         <h3 className="text-base font-semibold text-primary mb-3">Basic Details</h3>
 
-        <div className="space-y-1.5">
-          <label className="text-sm font-medium text-foreground">Template Name *</label>
-          <input
-            type="text"
-            value={formData.general.templateName || ""}
-            onChange={(e) => handleInputChange("templateName", e.target.value)}
-            onBlur={() => handleBlur("templateName")}
-            placeholder="Template Name"
-            required
-            className={`flex h-10 w-full rounded-lg border bg-background px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring ${stepErrors.templateName ? 'border-destructive' : 'border-input'}`}
-          />
-          {stepErrors.templateName && <p className="text-xs text-destructive">{stepErrors.templateName}</p>}
-        </div>
+        <Form {...form}>
+          <form className="space-y-4">
+            <FormField
+              control={form.control}
+              name="templateName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Template Name *</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder="Template Name"
+                      value={formData.general.templateName || ''}
+                      className={stepErrors?.templateName ? 'border-destructive' : ''}
+                      onChange={e => { field.onChange(e); handleInputChange('templateName', e.target.value); }}
+                      onBlur={() => handleBlur('templateName')}
+                    />
+                  </FormControl>
+                  {stepErrors?.templateName
+                    ? <p className="text-xs text-destructive">{stepErrors.templateName}</p>
+                    : <FormMessage />}
+                </FormItem>
+              )}
+            />
 
-        <div className="space-y-1.5">
-          <label className="text-sm font-medium text-foreground">Proposal name (visible to clients) *</label>
-          <input
-            type="text"
-            value={formData.general.proposalName || ""}
-            onChange={(e) => { handleInputChange("proposalName", e.target.value); handleTextFieldClick(); }}
-            onClick={handleTextFieldClick}
-            ref={textFieldRef}
-            placeholder="Proposal name (visible to clients)"
-            required
-            className={`flex h-10 w-full rounded-lg border bg-background px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring ${stepErrors.proposalName ? 'border-destructive' : 'border-input'}`}
-          />
-          {stepErrors.proposalName && <p className="text-xs text-destructive">{stepErrors.proposalName}</p>}
-        </div>
+            <FormField
+              control={form.control}
+              name="proposalName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Proposal name (visible to clients) *</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      ref={textFieldRef}
+                      placeholder="Proposal name (visible to clients)"
+                      value={formData.general.proposalName || ''}
+                      className={stepErrors?.proposalName ? 'border-destructive' : ''}
+                      onChange={e => { field.onChange(e); handleInputChange('proposalName', e.target.value); handleTextFieldClick(); }}
+                      onClick={handleTextFieldClick}
+                    />
+                  </FormControl>
+                  {stepErrors?.proposalName
+                    ? <p className="text-xs text-destructive">{stepErrors.proposalName}</p>
+                    : <FormMessage />}
+                </FormItem>
+              )}
+            />
+          </form>
+        </Form>
 
         <div className="relative">
           <button type="button" onClick={toggleDropdown} className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90">

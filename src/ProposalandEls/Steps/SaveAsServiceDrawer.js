@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '../../components/ui/sheet';
+import { SideSheet } from '../../components/ui/side-sheet';
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '../../components/ui/form';
 import { Input } from '../../components/ui/input';
 import { Textarea } from '../../components/ui/textarea';
@@ -139,13 +139,21 @@ const SaveAsServiceDrawer = ({
 
   return (
     <>
-      <Sheet open={open} onOpenChange={o => { if (!o) handleDrawerClose(); }}>
-        <SheetContent className="sm:max-w-lg overflow-y-auto">
-          <SheetHeader>
-            <SheetTitle>Create Service</SheetTitle>
-          </SheetHeader>
+      <SideSheet
+        open={open}
+        onOpenChange={o => { if (!o) handleDrawerClose(); }}
+        title="Create Service"
+        size="lg"
+        hideDefaultFooter
+        footer={
+          <div className="flex items-center gap-2">
+            <Button type="button" variant="ghost" size="sm" onClick={handleDrawerClose} disabled={isLoading}>Cancel</Button>
+            <Button type="button" size="sm" onClick={() => serviceForm.handleSubmit(onServiceSubmit)()} disabled={isLoading}>{isLoading ? 'Saving…' : 'Save'}</Button>
+          </div>
+        }
+      >
           <Form {...serviceForm}>
-            <form onSubmit={serviceForm.handleSubmit(onServiceSubmit)} className="mt-4 space-y-4">
+            <form onSubmit={serviceForm.handleSubmit(onServiceSubmit)} className="space-y-4">
               <FormField
                 control={serviceForm.control}
                 name="serviceName"
@@ -227,22 +235,25 @@ const SaveAsServiceDrawer = ({
               <Button type="button" variant="outline" size="sm" onClick={() => setIsCategoryFormOpen(true)} disabled={isLoading}>
                 + Create category
               </Button>
-              <div className="flex items-center gap-3 pt-2">
-                <Button type="submit" className="flex-1" disabled={isLoading}>{isLoading ? 'Saving...' : 'Save'}</Button>
-                <Button type="button" variant="outline" className="flex-1" onClick={handleDrawerClose} disabled={isLoading}>Cancel</Button>
-              </div>
             </form>
           </Form>
-        </SheetContent>
-      </Sheet>
+      </SideSheet>
 
-      <Sheet open={isCategoryFormOpen} onOpenChange={o => { if (!o) { categoryForm.reset(); setIsCategoryFormOpen(false); } }}>
-        <SheetContent className="sm:max-w-md overflow-y-auto">
-          <SheetHeader>
-            <SheetTitle>Create Category</SheetTitle>
-          </SheetHeader>
+      <SideSheet
+        open={isCategoryFormOpen}
+        onOpenChange={o => { if (!o) { categoryForm.reset(); setIsCategoryFormOpen(false); } }}
+        title="Create Category"
+        size="md"
+        hideDefaultFooter
+        footer={
+          <div className="flex items-center gap-2">
+            <Button type="button" variant="ghost" size="sm" onClick={() => { categoryForm.reset(); setIsCategoryFormOpen(false); }} disabled={isCategoryLoading}>Cancel</Button>
+            <Button type="button" size="sm" onClick={() => categoryForm.handleSubmit(onCategorySubmit)()} disabled={isCategoryLoading}>{isCategoryLoading ? 'Creating…' : 'Create'}</Button>
+          </div>
+        }
+      >
           <Form {...categoryForm}>
-            <form onSubmit={categoryForm.handleSubmit(onCategorySubmit)} className="mt-4 space-y-4">
+            <form onSubmit={categoryForm.handleSubmit(onCategorySubmit)} className="space-y-4">
               <FormField
                 control={categoryForm.control}
                 name="categoryName"
@@ -254,14 +265,9 @@ const SaveAsServiceDrawer = ({
                   </FormItem>
                 )}
               />
-              <div className="flex items-center gap-3">
-                <Button type="submit" className="flex-1" disabled={isCategoryLoading}>{isCategoryLoading ? 'Creating...' : 'Create'}</Button>
-                <Button type="button" variant="outline" className="flex-1" onClick={() => { categoryForm.reset(); setIsCategoryFormOpen(false); }} disabled={isCategoryLoading}>Cancel</Button>
-              </div>
             </form>
           </Form>
-        </SheetContent>
-      </Sheet>
+      </SideSheet>
     </>
   );
 };
