@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { MoreHorizontal, X, ChevronLeft, FileText, Plus, Percent, Pencil, Trash2 } from "lucide-react";
+import { MoreHorizontal, X, ChevronLeft, FileText, Plus, Percent, Pencil, Trash2, ChevronsUpDown, Check, Copy, Save, Trash } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Switch } from "../components/ui/switch";
+import { Input } from "../components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../components/ui/dropdown-menu";
+import { SideSheet } from "../components/ui/side-sheet";
 import { DataTable } from "../components/data-table/data-table";
 import { DataTableToolbar } from "../components/data-table/toolbar";
 import { toast } from "react-toastify";
-import { RxCross2 } from "react-icons/rx";
-import CreatableSelect from "react-select/creatable";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import dayjs from "dayjs";
@@ -325,6 +327,16 @@ const Invoices = ({ charLimit = 4000 }) => {
       })
       .catch((error) => console.error(error));
   };
+  const [openComboboxIndex, setOpenComboboxIndex] = useState(null);
+  const [comboboxSearch, setComboboxSearch] = useState({});
+
+  const handleComboboxOpen = (index, isOpen) => {
+    setOpenComboboxIndex(isOpen ? index : null);
+    if (isOpen) {
+      setComboboxSearch((prev) => ({ ...prev, [index]: rows[index]?.productName || "" }));
+    }
+  };
+
   const [selectedservice, setselectedService] = useState();
   const handleServiceChange = (index, selectedOptions) => {
     const newRows = [...rows];
@@ -1482,25 +1494,23 @@ const fetchInvoiceData = async () => {
       </div>
 
       {/* Create Invoice Drawer */}
-      {open && (
-        <div className="fixed inset-0 z-50 flex">
-          <div className="fixed inset-0 bg-black/40" onClick={handleClose} />
-          <div className="ml-auto relative z-50 w-full max-w-[60%] bg-background h-full flex flex-col shadow-2xl">
-            {/* Drawer Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-              <h2 className="text-lg font-semibold text-foreground">Create Invoice</h2>
-              <div className="flex items-center gap-3">
-                <button onClick={handleOpenpreviewDrawer} className="flex items-center gap-1.5 text-sm text-primary hover:text-primary/80 transition-colors">
-                  <FileText className="h-4 w-4" /> Preview
-                </button>
-                <button onClick={handleClose} className="text-muted-foreground hover:text-foreground transition-colors">
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-            </div>
-
-            {/* Drawer Body */}
-            <div className="flex-1 overflow-y-auto p-5 space-y-5 create-invoice">
+      <SideSheet
+        open={open}
+        onOpenChange={(o) => !o && handleClose()}
+        title="Create Invoice"
+        size="xl"
+        hideDefaultFooter
+        footer={
+          <div className="flex items-center gap-2">
+            <button onClick={handleOpenpreviewDrawer} className="inline-flex items-center gap-1.5 text-sm text-primary hover:text-primary/80 transition-colors mr-2">
+              <FileText className="h-4 w-4" /> Preview
+            </button>
+            <Button variant="ghost" size="sm" onClick={handleClose}>Cancel</Button>
+            <Button size="sm" onClick={createinvoice}>Save</Button>
+          </div>
+        }
+      >
+            <div className="space-y-5">
               {/* Row 1: Account + Invoice Template */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
@@ -1660,21 +1670,88 @@ const fetchInvoiceData = async () => {
                     <tbody>
                       {rows.map((row, index) => (
                         <tr key={index} className="border-b hover:bg-muted/20 transition-colors">
-                          <td className="px-3 py-2">
-                            <CreatableSelect
-                              placeholder={row.isDiscount ? "Reason for discount" : "Product or Service"}
-                              options={serviceoptions}
-                              value={row.productName ? serviceoptions.find(o => o.label === row.productName) || { label: row.productName, value: row.productName } : null}
-                              onChange={(sel) => handleServiceChange(index, sel)}
-                              onInputChange={(val, meta) => handleServiceInputChange(val, meta, index)}
-                              isClearable
-                              styles={{
-                                container: (p) => ({ ...p, minWidth: "160px" }),
-                                control: (p) => ({ ...p, minWidth: "160px", fontSize: "13px" }),
-                                menuPortal: (p) => ({ ...p, zIndex: 9999 }),
-                              }}
-                              menuPortalTarget={document.body}
-                            />
+                          <td className="px-3 py-2 min-w-[180px]">
+                            <Popover open={openComboboxIndex === index} onOpenChange={(open) => handleComboboxOpen(index, open)}>
+                              <PopoverTrigger asChild>
+                                <button
+                                  type="button"
+                                  className="flex w-full min-w-[160px] items-center justify-between rounded-md border border-input bg-background px-2.5 py-1.5 text-sm text-left hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-ring transition-colors"
+                                >
+                                  <span className={row.productName ? "text-foreground truncate" : "text-muted-foreground"}>
+                                    {row.productName || (row.isDiscount ? "Reason for discount" : "Product or Service")}
+                                  </span>
+                                  <ChevronsUpDown className="ml-2 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                                </button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-64 p-0" align="start">
+                                <div className="p-2 border-b border-border">
+                                  <Input
+                                    autoFocus
+                                    placeholder="Search or type new..."
+                                    value={comboboxSearch[index] ?? ""}
+                                    onChange={(e) => {
+                                      const val = e.target.value;
+                                      setComboboxSearch((prev) => ({ ...prev, [index]: val }));
+                                      handleServiceInputChange(val, { action: "input-change" }, index);
+                                    }}
+                                    className="h-8 text-sm"
+                                  />
+                                </div>
+                                <div className="max-h-52 overflow-y-auto py-1">
+                                  {serviceoptions
+                                    .filter((o) =>
+                                      o.label.toLowerCase().includes((comboboxSearch[index] ?? "").toLowerCase())
+                                    )
+                                    .map((opt) => (
+                                      <button
+                                        key={opt.value}
+                                        type="button"
+                                        className="flex w-full items-center gap-2 px-3 py-1.5 text-sm hover:bg-muted transition-colors text-left"
+                                        onClick={() => {
+                                          handleServiceChange(index, opt);
+                                          setOpenComboboxIndex(null);
+                                        }}
+                                      >
+                                        <Check className={`h-3.5 w-3.5 shrink-0 ${row.productName === opt.label ? "opacity-100 text-primary" : "opacity-0"}`} />
+                                        {opt.label}
+                                      </button>
+                                    ))}
+                                  {comboboxSearch[index] &&
+                                    !serviceoptions.some((o) => o.label.toLowerCase() === (comboboxSearch[index] ?? "").toLowerCase()) && (
+                                      <button
+                                        type="button"
+                                        className="flex w-full items-center gap-2 px-3 py-1.5 text-sm hover:bg-muted transition-colors text-left text-primary"
+                                        onClick={() => {
+                                          handleServiceChange(index, { value: comboboxSearch[index], label: comboboxSearch[index] });
+                                          setOpenComboboxIndex(null);
+                                        }}
+                                      >
+                                        <Plus className="h-3.5 w-3.5 shrink-0" />
+                                        Create "{comboboxSearch[index]}"
+                                      </button>
+                                    )}
+                                  {serviceoptions.filter((o) =>
+                                    o.label.toLowerCase().includes((comboboxSearch[index] ?? "").toLowerCase())
+                                  ).length === 0 && !comboboxSearch[index] && (
+                                    <p className="px-3 py-2 text-xs text-muted-foreground">No services found</p>
+                                  )}
+                                </div>
+                                {row.productName && (
+                                  <div className="border-t border-border p-2">
+                                    <button
+                                      type="button"
+                                      className="flex w-full items-center gap-2 px-2 py-1 text-xs text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded transition-colors"
+                                      onClick={() => {
+                                        handleServiceChange(index, { value: "", label: "" });
+                                        setOpenComboboxIndex(null);
+                                      }}
+                                    >
+                                      <X className="h-3 w-3" /> Clear
+                                    </button>
+                                  </div>
+                                )}
+                              </PopoverContent>
+                            </Popover>
                           </td>
                           <td className="px-3 py-2">
                             <input type="text" name="description" value={row.description} onChange={(e) => handleInputChange(index, e)} placeholder="Description" className="w-full border-0 bg-transparent text-sm focus:outline-none focus:ring-1 focus:ring-ring rounded px-1" />
@@ -1690,19 +1767,31 @@ const fetchInvoiceData = async () => {
                             <input type="checkbox" name="tax" checked={row.tax} onChange={(e) => handleInputChange(index, e)} className="w-4 h-4 accent-primary" />
                           </td>
                           <td className="px-3 py-2">
-                            <div className="relative">
-                              <button onClick={(e) => handleMenuOpen(e, index)} className="p-1 rounded hover:bg-muted text-muted-foreground">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </button>
-                              {Boolean(anchorElNew) && selectedRow === index && (
-                                <div className="absolute right-0 top-7 z-50 min-w-[160px] bg-background border rounded-lg shadow-lg py-1">
-                                  <button className="w-full text-left px-4 py-2 text-sm hover:bg-muted transition-colors" onClick={() => handleEditService(row, index)}>Edit</button>
-                                  <button className="w-full text-left px-4 py-2 text-sm hover:bg-muted transition-colors" onClick={handleDeleteService}>Delete</button>
-                                  <button className="w-full text-left px-4 py-2 text-sm hover:bg-muted transition-colors" onClick={() => handleSaveAsNewService(row)}>Save as new service</button>
-                                  <button className="w-full text-left px-4 py-2 text-sm hover:bg-muted transition-colors" onClick={handleDuplicate}>Duplicate</button>
-                                </div>
-                              )}
-                            </div>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <button className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" side="bottom" className="w-44">
+                                <DropdownMenuItem onClick={() => handleEditService(row, index)}>
+                                  <Pencil className="mr-2 h-3.5 w-3.5" /> Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={handleDuplicate}>
+                                  <Copy className="mr-2 h-3.5 w-3.5" /> Duplicate
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleSaveAsNewService(row)}>
+                                  <Save className="mr-2 h-3.5 w-3.5" /> Save as new service
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                  onClick={() => { setSelectedRow(index); handleDeleteService(); }}
+                                  className="text-destructive focus:text-destructive focus:bg-destructive/10"
+                                >
+                                  <Trash className="mr-2 h-3.5 w-3.5" /> Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </td>
                         </tr>
                       ))}
@@ -1721,56 +1810,58 @@ const fetchInvoiceData = async () => {
                 </div>
 
                 {/* Summary */}
-                <div className="space-y-2">
-                  <h3 className="text-lg font-bold text-foreground">Summary</h3>
-                  <div className="rounded-xl border border-border overflow-hidden">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b bg-muted/40">
-                          {["Subtotal", "Tax Rate", "Tax Total", "Total"].map(h => (
-                            <th key={h} className="text-xs font-semibold text-left px-4 py-2.5 text-muted-foreground uppercase tracking-wide">{h}</th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td className="px-4 py-3 text-sm">
-                            <span className="mr-1 text-muted-foreground">$</span>
-                            <input type="number" value={subtotal} onChange={handleSubtotalChange} className="w-20 border-0 bg-transparent text-sm focus:outline-none focus:ring-1 focus:ring-ring rounded px-1" />
-                          </td>
-                          <td className="px-4 py-3 text-sm">
-                            <input type="number" value={taxRate} onChange={handleTaxRateChange} className="w-16 border-0 bg-transparent text-sm focus:outline-none focus:ring-1 focus:ring-ring rounded px-1" />
-                            <span className="ml-1 text-muted-foreground">%</span>
-                          </td>
-                          <td className="px-4 py-3 text-sm font-medium">${taxTotal.toFixed(2)}</td>
-                          <td className="px-4 py-3 text-sm font-bold">${totalAmount}</td>
-                        </tr>
-                      </tbody>
-                    </table>
+                <div className="flex justify-end pt-2">
+                  <div className="w-full max-w-xs rounded-xl border border-border bg-muted/30 divide-y divide-border overflow-hidden">
+                    <div className="flex items-center justify-between px-4 py-2.5">
+                      <span className="text-sm text-muted-foreground">Subtotal</span>
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm text-muted-foreground">$</span>
+                        <input
+                          type="number"
+                          value={subtotal}
+                          onChange={handleSubtotalChange}
+                          className="w-20 bg-transparent text-sm text-right focus:outline-none focus:ring-1 focus:ring-ring rounded px-1"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between px-4 py-2.5">
+                      <span className="text-sm text-muted-foreground">Tax Rate</span>
+                      <div className="flex items-center gap-1">
+                        <input
+                          type="number"
+                          value={taxRate}
+                          onChange={handleTaxRateChange}
+                          className="w-16 bg-transparent text-sm text-right focus:outline-none focus:ring-1 focus:ring-ring rounded px-1"
+                        />
+                        <span className="text-sm text-muted-foreground">%</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between px-4 py-2.5">
+                      <span className="text-sm text-muted-foreground">Tax</span>
+                      <span className="text-sm font-medium">${taxTotal.toFixed(2)}</span>
+                    </div>
+                    <div className="flex items-center justify-between px-4 py-3 bg-muted/60">
+                      <span className="text-sm font-semibold text-foreground">Total</span>
+                      <span className="text-base font-bold text-foreground">${totalAmount}</span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-
-            {/* Drawer Footer */}
-            <div className="flex items-center gap-3 px-5 py-4 border-t border-border">
-              <Button onClick={createinvoice} className="rounded-full px-5 bg-primary text-white hover:bg-primary/90">Save</Button>
-              <Button onClick={handleClose} variant="outline" className="rounded-full px-5">Cancel</Button>
-            </div>
-          </div>
-        </div>
-      )}
+      </SideSheet>
 
       {/* Preview Drawer */}
-      {previewDrawerOpen && (
-        <div className="fixed inset-0 z-[60] flex">
-          <div className="fixed inset-0 bg-black/40" onClick={handleClosepreviewDrawer} />
-          <div className="ml-auto relative z-[61] w-full max-w-[800px] bg-background h-full flex flex-col shadow-2xl overflow-y-auto">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-border">
-              <h2 className="text-base font-semibold">Preview</h2>
-              <button onClick={handleClosepreviewDrawer} className="text-muted-foreground hover:text-foreground"><X className="h-5 w-5" /></button>
-            </div>
-            <div className="p-6 space-y-4">
+      <SideSheet
+        open={previewDrawerOpen}
+        onOpenChange={(o) => !o && handleClosepreviewDrawer()}
+        title="Preview"
+        size="xl"
+        hideDefaultFooter
+        footer={
+          <Button size="sm" onClick={createinvoice}>Save &amp; Exit</Button>
+        }
+      >
+            <div className="space-y-4">
               <h2 className="text-2xl font-bold text-primary">Invoice</h2>
               <div className="flex items-center justify-between">
                 <span className="text-sm">{selectedaccount?.label || "[ACCOUNT NAME]"}</span>
@@ -1811,23 +1902,19 @@ const fetchInvoiceData = async () => {
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-3 px-6 py-4 border-t border-border">
-              <Button onClick={createinvoice} className="rounded-full px-5 bg-primary text-white hover:bg-primary/90">Save &amp; Exit</Button>
-            </div>
-          </div>
-        </div>
-      )}
+      </SideSheet>
 
       {/* Save as New Service Drawer */}
-      {isNewDrawerOpen && (
-        <div className="fixed inset-0 z-[60] flex">
-          <div className="fixed inset-0 bg-black/40" onClick={handleNewDrawerClose} />
-          <div className="ml-auto relative z-[61] w-full max-w-[650px] bg-background h-full flex flex-col shadow-2xl">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-              <h2 className="text-lg font-semibold">Create Service</h2>
-              <button onClick={handleNewDrawerClose} className="text-muted-foreground hover:text-foreground"><X className="h-5 w-5" /></button>
-            </div>
-            <div className="flex-1 overflow-y-auto p-5 space-y-4">
+      <SideSheet
+        open={isNewDrawerOpen}
+        onOpenChange={(o) => !o && handleNewDrawerClose()}
+        title="Create Service"
+        size="lg"
+        onCancel={handleNewDrawerClose}
+        onConfirm={createservicetemp}
+        confirmLabel="Save"
+      >
+            <div className="space-y-4">
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-foreground">Service Name</label>
                 <input type="text" placeholder="Service Name" value={selectedRowData?.productName || ""} onChange={(e) => setSelectedRowData({ ...selectedRowData, productName: e.target.value })} className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
@@ -1865,48 +1952,37 @@ const fetchInvoiceData = async () => {
                 <Button onClick={() => setCategoryFormOpen(true)} variant="outline" className="rounded-full px-4 text-sm">Create Category</Button>
               </div>
             </div>
-            <div className="flex items-center gap-3 px-5 py-4 border-t border-border">
-              <Button onClick={createservicetemp} className="rounded-full px-5 bg-primary text-white hover:bg-primary/90">Save</Button>
-              <Button onClick={handleNewDrawerClose} variant="outline" className="rounded-full px-5">Cancel</Button>
-            </div>
-          </div>
-        </div>
-      )}
+      </SideSheet>
 
       {/* Category Form Drawer */}
-      {isCategoryFormOpen && (
-        <div className="fixed inset-0 z-[70] flex">
-          <div className="fixed inset-0 bg-black/40" onClick={handleCategoryFormClose} />
-          <div className="ml-auto relative z-[71] w-full max-w-[650px] bg-background h-full flex flex-col shadow-2xl">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-              <button onClick={handleCategoryFormClose} className="text-muted-foreground hover:text-foreground"><ChevronLeft className="h-5 w-5" /></button>
-              <h2 className="text-lg font-semibold">Create Category</h2>
-              <div className="w-5" />
-            </div>
-            <div className="flex-1 p-5 space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-foreground">Category Name</label>
-                <input type="text" placeholder="Category Name" value={categorycreate || ""} onChange={(e) => setcategorycreate(e.target.value)} className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
-              </div>
-            </div>
-            <div className="flex items-center gap-3 px-5 py-4 border-t border-border">
-              <Button onClick={createCategory} className="rounded-full px-5 bg-primary text-white hover:bg-primary/90">Create</Button>
-              <Button onClick={handleCategoryFormClose} variant="outline" className="rounded-full px-5">Cancel</Button>
-            </div>
+      <SideSheet
+        open={isCategoryFormOpen}
+        onOpenChange={(o) => !o && handleCategoryFormClose()}
+        title="Create Category"
+        size="lg"
+        onCancel={handleCategoryFormClose}
+        onConfirm={createCategory}
+        confirmLabel="Create"
+      >
+        <div className="space-y-4">
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-foreground">Category Name</label>
+            <input type="text" placeholder="Category Name" value={categorycreate || ""} onChange={(e) => setcategorycreate(e.target.value)} className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
           </div>
         </div>
-      )}
+      </SideSheet>
 
       {/* Edit Line Item Drawer */}
-      {isEditDrawerOpen && (
-        <div className="fixed inset-0 z-[60] flex">
-          <div className="fixed inset-0 bg-black/40" onClick={handleEditDrawerClose} />
-          <div className="ml-auto relative z-[61] w-full max-w-[650px] bg-background h-full flex flex-col shadow-2xl">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-              <h2 className="text-lg font-semibold">Edit Item</h2>
-              <button onClick={handleEditDrawerClose} className="text-muted-foreground hover:text-foreground"><X className="h-5 w-5" /></button>
-            </div>
-            <div className="flex-1 overflow-y-auto p-5 space-y-4">
+      <SideSheet
+        open={isEditDrawerOpen}
+        onOpenChange={(o) => !o && handleEditDrawerClose()}
+        title="Edit Item"
+        size="lg"
+        onCancel={handleEditDrawerClose}
+        onConfirm={handleSaveChanges}
+        confirmLabel="Save"
+      >
+            <div className="space-y-4">
               <div className="space-y-1.5">
                 <label className="text-sm font-semibold text-foreground">Product or Service</label>
                 <input type="text" value={selectedRowData?.productName || ""} onChange={(e) => setSelectedRowData({ ...selectedRowData, productName: e.target.value })} className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
@@ -1934,13 +2010,7 @@ const fetchInvoiceData = async () => {
                 <span className="text-sm text-foreground">Tax</span>
               </label>
             </div>
-            <div className="flex items-center gap-3 px-5 py-4 border-t border-border">
-              <Button onClick={handleSaveChanges} className="rounded-full px-5 bg-primary text-white hover:bg-primary/90">Save</Button>
-              <Button onClick={handleEditDrawerClose} variant="outline" className="rounded-full px-5">Cancel</Button>
-            </div>
-          </div>
-        </div>
-      )}
+      </SideSheet>
     </div>
   );
 };

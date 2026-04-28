@@ -194,32 +194,32 @@ const GeneralStep = ({
 
   // Step Card Component
   const StepCard = ({ title, description, checked, onChange, name }) => (
-    <div className={`rounded-xl border p-4 mb-3 transition-all hover:shadow-sm ${checked ? 'border-indigo-400 bg-indigo-50/50 border-2' : 'border-slate-200 bg-white'}`}>
+    <div className={`rounded-xl border p-4 mb-3 transition-all hover:shadow-sm ${checked ? 'border-primary/60 bg-primary/5 border-2' : 'border-border bg-card'}`}>
       <div className="flex items-center gap-3 mb-2">
         <input
           type="checkbox"
           checked={checked}
           onChange={(e) => onChange(name, e.target.checked)}
-          className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+          className="h-4 w-4 rounded border-border text-primary focus:ring-ring"
         />
-        <span className="text-base font-semibold text-slate-800">{title}</span>
+        <span className="text-base font-semibold text-foreground">{title}</span>
       </div>
       <div className="flex items-start gap-1.5 ml-7">
-        <Info className="h-4 w-4 text-slate-400 mt-0.5 shrink-0" />
-        <p className="text-xs text-slate-500 leading-relaxed">{description}</p>
+        <Info className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+        <p className="text-xs text-muted-foreground leading-relaxed">{description}</p>
       </div>
     </div>
   );
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-semibold text-indigo-600">General Information</h2>
+      <h2 className="text-2xl font-semibold text-primary">General Information</h2>
 
-      <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-6 space-y-4">
-        <h3 className="text-base font-semibold text-indigo-600 mb-3">Basic Details</h3>
+      <div className="rounded-xl border border-border bg-muted/20 p-6 space-y-4">
+        <h3 className="text-base font-semibold text-primary mb-3">Basic Details</h3>
 
         <div className="space-y-1.5">
-          <label className="text-sm font-medium text-slate-700">Template Name *</label>
+          <label className="text-sm font-medium text-foreground">Template Name *</label>
           <input
             type="text"
             value={formData.general.templateName || ""}
@@ -227,13 +227,13 @@ const GeneralStep = ({
             onBlur={() => handleBlur("templateName")}
             placeholder="Template Name"
             required
-            className={`flex h-10 w-full rounded-lg border bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${stepErrors.templateName ? 'border-red-400' : 'border-slate-200'}`}
+            className={`flex h-10 w-full rounded-lg border bg-background px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring ${stepErrors.templateName ? 'border-destructive' : 'border-input'}`}
           />
-          {stepErrors.templateName && <p className="text-xs text-red-500">{stepErrors.templateName}</p>}
+          {stepErrors.templateName && <p className="text-xs text-destructive">{stepErrors.templateName}</p>}
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-sm font-medium text-slate-700">Proposal name (visible to clients) *</label>
+          <label className="text-sm font-medium text-foreground">Proposal name (visible to clients) *</label>
           <input
             type="text"
             value={formData.general.proposalName || ""}
@@ -242,22 +242,22 @@ const GeneralStep = ({
             ref={textFieldRef}
             placeholder="Proposal name (visible to clients)"
             required
-            className={`flex h-10 w-full rounded-lg border bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${stepErrors.proposalName ? 'border-red-400' : 'border-slate-200'}`}
+            className={`flex h-10 w-full rounded-lg border bg-background px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring ${stepErrors.proposalName ? 'border-destructive' : 'border-input'}`}
           />
-          {stepErrors.proposalName && <p className="text-xs text-red-500">{stepErrors.proposalName}</p>}
+          {stepErrors.proposalName && <p className="text-xs text-destructive">{stepErrors.proposalName}</p>}
         </div>
 
         <div className="relative">
-          <button type="button" onClick={toggleDropdown} className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-2 text-xs font-medium text-white shadow-sm transition-colors hover:bg-indigo-700">
+          <button type="button" onClick={toggleDropdown} className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90">
             Add Shortcode
           </button>
           {showDropdown && (
-            <div className="absolute left-0 top-full z-50 mt-1 w-72 max-h-72 overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-lg">
+            <div className="absolute left-0 top-full z-50 mt-1 w-72 max-h-72 overflow-y-auto rounded-lg border border-border bg-background shadow-lg">
               {filteredShortcuts.map((shortcut, index) => (
                 <button
                   key={index}
                   onClick={() => !shortcut.isBold && handleAddShortcut(shortcut.value)}
-                  className={`block w-full text-left px-4 py-2 text-sm transition-colors ${shortcut.isBold ? 'font-bold text-slate-800 bg-slate-50 cursor-default' : 'text-slate-600 hover:bg-slate-50 cursor-pointer'}`}
+                  className={`block w-full text-left px-4 py-2 text-sm transition-colors ${shortcut.isBold ? 'font-bold text-foreground bg-muted/40 cursor-default' : 'text-muted-foreground hover:bg-muted/60 cursor-pointer'}`}
                 >
                   {shortcut.title}
                 </button>
@@ -267,7 +267,7 @@ const GeneralStep = ({
         </div>
 
         <div className="mt-4 space-y-1.5">
-          <label className="text-sm font-semibold text-slate-700">Team Members *</label>
+          <label className="text-sm font-semibold text-foreground">Team Members *</label>
           <MultiSelectDropdown
             value={getSelectedUsers()}
             onChange={handleTeamMembersChange}
@@ -276,10 +276,10 @@ const GeneralStep = ({
         </div>
       </div>
 
-      <div className="rounded-xl border border-slate-200 p-6">
-        <h3 className="text-base font-semibold text-indigo-600 mb-2">Configure Proposal Steps</h3>
-        <p className="text-xs text-slate-500 mb-4">
-          Customize which steps to include in your proposal. Each step helps
+      <div className="rounded-xl border border-border p-6">
+        <h3 className="text-base font-semibold text-primary mb-2">Configure Proposal Steps</h3>
+        <p className="text-xs text-muted-foreground mb-4">
+          Customi which steps to include in your proposal. Each step helps
           communicate different aspects of your service to clients.
         </p>
 

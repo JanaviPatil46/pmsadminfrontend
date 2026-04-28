@@ -1,395 +1,25 @@
-
-
 import React, { useState, useEffect, useMemo } from 'react';
-
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import InvoiceComponent from './InvoiceComponent';
 import ServicesComponent from './ServicesComponent';
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '../../components/ui/form';
+import { RadioGroup, RadioGroupItem } from '../../components/ui/radio-group';
 
 const INVOICE_API = process.env.REACT_APP_INVOICE_API || 'https://www.snptaxes.com';
 const SERVICE_API = process.env.REACT_APP_SERVICES_URL || 'https://www.snptaxes.com';
 
+const servicesSchema = z.object({
+  option: z.enum(['invoice', 'services'], { required_error: 'Please select a service option' }),
+});
 
-// const ServicesInvoicesStep = ({ 
-//   formData, 
-//   updateFormData, 
-//   nextStep, 
-//   prevStep, 
-//   handleSubmit, 
-//   isLastStep,
-//   stepErrors,
-//   setStepErrors
-// }) => {
-//   const [invoices, setInvoices] = useState(formData.services.invoices || [{ id: 1, ...getEmptyInvoice() }]);
-//   const [invoiceTemplates, setInvoiceTemplates] = useState([]);
-//   const [teammemberoption, setTeammemberoption] = useState([]);
-//   const [servicedata, setServiceData] = useState([]);
-//   const [touched, setTouched] = useState({});
-
-//   function getEmptyInvoice() {
-//     return {
-//       invoiceTemplate: null,
-//       teamMember: null,
-//       issueInvoice: 'immediately',
-//       specificDate: null,
-//       selectedTime: null,
-//       description: '',
-//       charCount: 0,
-//       charLimit: 1000,
-//       rows: [getEmptyRow()],
-//       subtotal: '0.00',
-//       taxRate: '0',
-//       taxTotal: '0.00',
-//       totalAmount: '0.00',
-//       clientNote: '',
-//     };
-//   }
-
-//   function getEmptyRow() {
-//     return {
-//       productorService: '',
-//       description: '',
-//       rate: '0.00',
-//       quantity: '1',
-//       amount: '0.00',
-//       tax: false,
-//       isDiscount: false,
-//     };
-//   }
-
-//   // Fetch initial data - runs once on mount
-//   useEffect(() => {
-//     fetchInvoiceTemplates();
-//     fetchTeamMembers();
-//     fetchServiceData();
-//   }, []);
-
-//   // Initialize invoices from formData - runs when formData.services.invoices changes
-//   useEffect(() => {
-//     if (formData.services.invoices && formData.services.invoices.length > 0) {
-//       setInvoices(formData.services.invoices);
-//     }
-//   }, [formData.services.invoices]);
-
-//   // Sync invoices with parent form data - runs when invoices change
-//   useEffect(() => {
-//     updateFormData('services', { 
-//       option: formData.services.option,
-//       invoices: invoices,
-//       itemizedData: formData.services.itemizedData
-//     });
-//   }, [invoices]);
-
-//   // Auto-enable payments when invoice option is selected
-//   useEffect(() => {
-//     if (formData.services.option === 'invoice') {
-//       updateFormData('general', { paymentsEnabled: true });
-//     } else {
-//       updateFormData('general', { paymentsEnabled: false });
-//     }
-//   }, [formData.services.option]);
-
-//   // Clear option error when option is selected
-//   useEffect(() => {
-//     if (formData.services.option && stepErrors.option) {
-//       setStepErrors(prev => {
-//         const newErrors = { ...prev };
-//         delete newErrors.option;
-//         return newErrors;
-//       });
-//     }
-//   }, [formData.services.option]);
-
-//   // Validate invoices when they change
-//   // useEffect(() => {
-//   //   if (formData.services.option === 'invoice' && invoices.length > 0) {
-//   //     validateInvoices();
-//   //   }
-//   // }, [invoices, formData.services.option]);
-
-//   // Validate itemized data when it changes
-//   useEffect(() => {
-//     if (formData.services.option === 'services' && formData.services.itemizedData) {
-//       validateItemizedData();
-//     }
-//   }, [formData.services.itemizedData, formData.services.option]);
-
-//   // Memoized service options to prevent unnecessary recalculations
-//   const serviceoptions = useMemo(() => {
-//     return servicedata.map((service) => ({
-//       value: service._id,
-//       label: service.serviceName,
-//     }));
-//   }, [servicedata]);
-
-//   const fetchInvoiceTemplates = async () => {
-//     try {
-//       const url = `${INVOICE_API}/workflow/invoicetemp/invoicetemplate`;
-//       const response = await fetch(url);
-//       if (!response.ok) throw new Error("Failed to fetch templates");
-//       const result = await response.json();
-//       setInvoiceTemplates(result.invoiceTemplate || result || []);
-//     } catch (error) {
-//       console.error("Error:", error);
-//     }
-//   };
-
-//   const fetchTeamMembers = async () => {
-//     // Implement your team members fetch logic
-//     setTeammemberoption([]); // Placeholder
-//   };
-
-//   const fetchServiceData = async () => {
-//     try {
-//       const url = `${SERVICE_API}/workflow/services/servicetemplate`;
-//       const response = await fetch(url);
-//       const data = await response.json();
-//       console.log(data.serviceTemplate);
-//       setServiceData(data.serviceTemplate);
-//     } catch (error) {
-//       console.error("Error fetching data:", error);
-//     }
-//   };
-
-//   // Validate invoice data
-//   const validateInvoices = () => {
-//     const newErrors = { ...stepErrors };
-    
-//     if (formData.services.option === 'invoice') {
-//       if (!invoices || invoices.length === 0) {
-//         newErrors.invoices = 'At least one invoice is required';
-//       } else {
-//         // Check each invoice for required fields
-//         const invoiceErrors = invoices.map((invoice, index) => {
-//           const invoiceError = {};
-          
-//           if (!invoice.invoiceTemplate) {
-//             invoiceError.invoiceTemplate = 'Invoice template is required';
-//           }
-          
-//           if (!invoice.teamMember) {
-//             invoiceError.teamMember = 'Team member is required';
-//           }
-          
-//           // Validate line items
-//           if (!invoice.rows || invoice.rows.length === 0) {
-//             invoiceError.rows = 'At least one line item is required';
-//           } else {
-//             const rowErrors = invoice.rows.map((row, rowIndex) => {
-//               const rowError = {};
-//               if (!row.productorService?.trim()) {
-//                 rowError.productorService = 'Product/Service name is required';
-//               }
-//               if (!row.rate || parseFloat(row.rate) <= 0) {
-//                 rowError.rate = 'Valid rate is required';
-//               }
-//               if (!row.quantity || parseFloat(row.quantity) <= 0) {
-//                 rowError.quantity = 'Valid quantity is required';
-//               }
-//               return Object.keys(rowError).length > 0 ? rowError : null;
-//             }).filter(Boolean);
-            
-//             if (rowErrors.length > 0) {
-//               invoiceError.lineItems = 'Please fix line item errors';
-//             }
-//           }
-          
-//           return Object.keys(invoiceError).length > 0 ? invoiceError : null;
-//         }).filter(Boolean);
-        
-//         if (invoiceErrors.length > 0) {
-//           newErrors.invoiceDetails = 'Please fix invoice errors';
-//         } else {
-//           delete newErrors.invoices;
-//           delete newErrors.invoiceDetails;
-//         }
-//       }
-//     }
-    
-//     setStepErrors(newErrors);
-//   };
-
-//   // Validate itemized data
-//   const validateItemizedData = () => {
-//     const newErrors = { ...stepErrors };
-//     const itemizedData = formData.services.itemizedData || {};
-    
-//     if (formData.services.option === 'services') {
-//       if (!itemizedData.rows || itemizedData.rows.length === 0) {
-//         newErrors.itemized = 'At least one line item is required';
-//       } else {
-//         const rowErrors = itemizedData.rows.map((row, index) => {
-//           const rowError = {};
-//           if (!row.productorService?.trim()) {
-//             rowError.productorService = 'Product/Service name is required';
-//           }
-//           if (!row.rate || parseFloat(row.rate) <= 0) {
-//             rowError.rate = 'Valid rate is required';
-//           }
-//           if (!row.quantity || parseFloat(row.quantity) <= 0) {
-//             rowError.quantity = 'Valid quantity is required';
-//           }
-//           return Object.keys(rowError).length > 0 ? rowError : null;
-//         }).filter(Boolean);
-        
-//         // if (rowErrors.length > 0) {
-//         //   newErrors.itemizedDetails = 'Please fix line item errors';
-//         // } else {
-//         //   delete newErrors.itemized;
-//         //   delete newErrors.itemizedDetails;
-//         // }
-//       }
-//     }
-    
-//     setStepErrors(newErrors);
-//   };
-
-//   const handleServiceTypeChange = (option) => {
-//     // Clear all errors when option changes
-//     setStepErrors({});
-//     setTouched({});
-//     updateFormData('services', { option });
-//   };
-
-//   const handleOptionBlur = () => {
-//     setTouched(prev => ({ ...prev, option: true }));
-//   };
-
-//   // Check if the step has any validation errors
-//   const hasStepErrors = () => {
-//     return Object.keys(stepErrors).length > 0;
-//   };
-
-//   return (
-//     <Box>
-//       <Typography variant="h4" gutterBottom color="primary" fontWeight="600" sx={{ mb: 4 }}>
-//         Services & Invoices
-//       </Typography>
-
-//       {/* Show general step errors */}
-//       {/* {hasStepErrors() && (
-//         <Alert severity="error" sx={{ mb: 3 }}>
-//           Please fix the validation errors before proceeding.
-//           {stepErrors.option && <Box>- {stepErrors.option}</Box>}
-//           {stepErrors.invoices && <Box>- {stepErrors.invoices}</Box>}
-//           {stepErrors.invoiceDetails && <Box>- {stepErrors.invoiceDetails}</Box>}
-//           {stepErrors.itemized && <Box>- {stepErrors.itemized}</Box>}
-//           {stepErrors.itemizedDetails && <Box>- {stepErrors.itemizedDetails}</Box>}
-//         </Alert>
-//       )} */}
-
-//       <Paper elevation={0} sx={{ p: 3, mb: 3, backgroundColor: 'grey.50' }}>
-//         <FormControl 
-//           component="fieldset" 
-//           error={!!stepErrors.option} 
-//           fullWidth
-//           onBlur={handleOptionBlur}
-//         >
-//           <FormLabel component="legend" sx={{ mb: 2, fontWeight: 600 }}>
-//             Select Option *
-//           </FormLabel>
-//           <RadioGroup
-//             value={formData.services.option || ''}
-//             onChange={(e) => handleServiceTypeChange(e.target.value)}
-//             sx={{ gap: 2 }}
-//           >
-//             <Paper 
-//               variant="outlined" 
-//               sx={{ 
-//                 p: 2, 
-//                 borderColor: formData.services.option === 'invoice' ? 'primary.main' : 'grey.300',
-//                 backgroundColor: formData.services.option === 'invoice' ? 'primary.50' : 'background.paper',
-//                 borderWidth: formData.services.option === 'invoice' ? 2 : 1,
-//                 ...(stepErrors.option && formData.services.option !== 'invoice' ? {
-//                   borderColor: 'error.main',
-//                   backgroundColor: 'error.light'
-//                 } : {})
-//               }}
-//             >
-//               <FormControlLabel
-//                 value="invoice"
-//                 control={<Radio />}
-//                 label={
-//                   <Box>
-//                     <Typography variant="subtitle1" fontWeight="600">
-//                       Add Invoice
-//                     </Typography>
-//                     <Typography variant="body2" color="text.secondary">
-//                      Create one-time or recurring invoice, or ask for deposit to sign
-//                     </Typography>
-//                   </Box>
-//                 }
-//                 sx={{ width: '100%', m: 0 }}
-//               />
-//             </Paper>
-            
-//             <Paper 
-//               variant="outlined" 
-//               sx={{ 
-//                 p: 2,
-//                 borderColor: formData.services.option === 'services' ? 'primary.main' : 'grey.300',
-//                 backgroundColor: formData.services.option === 'services' ? 'primary.50' : 'background.paper',
-//                 borderWidth: formData.services.option === 'services' ? 2 : 1,
-//                 ...(stepErrors.option && formData.services.option !== 'services' ? {
-//                   borderColor: 'error.main',
-//                   backgroundColor: 'error.light'
-//                 } : {})
-//               }}
-//             >
-//               <FormControlLabel
-//                 value="services"
-//                 control={<Radio />}
-//                 label={
-//                   <Box>
-//                     <Typography variant="subtitle1" fontWeight="600">
-//                       Itemized Services
-//                     </Typography>
-//                     <Typography variant="body2" color="text.secondary">
-//                       No invoice or deposit request will be created
-//                     </Typography>
-//                   </Box>
-//                 }
-//                 sx={{ width: '100%', m: 0 }}
-//               />
-//             </Paper>
-//           </RadioGroup>
-//           {stepErrors.option && (
-//             <FormHelperText error>{stepErrors.option}</FormHelperText>
-//           )}
-//         </FormControl>
-//       </Paper>
-
-//       {formData.services.option === 'invoice' && (
-//         <InvoiceComponent
-//           invoices={invoices}
-//           setInvoices={setInvoices}
-//           invoiceTemplates={invoiceTemplates}
-//           teammemberoption={teammemberoption}
-//           serviceoptions={serviceoptions}
-//           formData={formData}
-//           updateFormData={updateFormData}
-//           stepErrors={stepErrors}
-//           setStepErrors={setStepErrors}
-//         />
-//       )}
-
-//       {formData.services.option === 'services' && (
-//         <ServicesComponent
-//           formData={formData}
-//           updateFormData={updateFormData}
-//           stepErrors={stepErrors}
-//           setStepErrors={setStepErrors}
-//           serviceoptions={serviceoptions}
-//         />
-//       )}
-//     </Box>
-//   );
-// };
-const ServicesInvoicesStep = ({ 
-  formData, 
-  updateFormData, 
-  nextStep, 
-  prevStep, 
-  handleSubmit, 
+const ServicesInvoicesStep = ({
+  formData,
+  updateFormData,
+  nextStep,
+  prevStep,
+  handleSubmit,
   isLastStep,
   stepErrors,
   setStepErrors
@@ -398,9 +28,13 @@ const ServicesInvoicesStep = ({
   const [invoiceTemplates, setInvoiceTemplates] = useState([]);
   const [teammemberoption, setTeammemberoption] = useState([]);
   const [servicedata, setServiceData] = useState([]);
-  const [touched, setTouched] = useState({});
-console.log("servicesinvoices",invoices)
+
   const LOGIN_API = process.env.REACT_APP_USER_LOGIN || 'https://www.snptaxes.com';
+
+  const form = useForm({
+    resolver: zodResolver(servicesSchema),
+    defaultValues: { option: formData.services?.option || undefined },
+  });
 
   function getEmptyInvoice() {
     return {
@@ -465,23 +99,12 @@ console.log("servicesinvoices",invoices)
     }
   }, [formData.services.option]);
 
-  // Clear option error when option is selected
+  // Clear option error when option changes
   useEffect(() => {
-    if (formData.services.option && stepErrors.option) {
-      setStepErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors.option;
-        return newErrors;
-      });
+    if (formData.services.option && stepErrors?.option) {
+      setStepErrors(prev => { const e = { ...prev }; delete e.option; return e; });
     }
   }, [formData.services.option]);
-
-  // Validate itemized data when it changes
-  useEffect(() => {
-    if (formData.services.option === 'services' && formData.services.itemizedData) {
-      validateItemizedData();
-    }
-  }, [formData.services.itemizedData, formData.services.option]);
 
   // Memoized service options to prevent unnecessary recalculations
   const serviceoptions = useMemo(() => {
@@ -532,161 +155,74 @@ console.log("servicesinvoices",invoices)
     }
   };
 
-  // Validate invoice data
-  const validateInvoices = () => {
-    const newErrors = { ...stepErrors };
-    
-    if (formData.services.option === 'invoice') {
-      if (!invoices || invoices.length === 0) {
-        newErrors.invoices = 'At least one invoice is required';
-      } else {
-        // Check each invoice for required fields
-        const invoiceErrors = invoices.map((invoice, index) => {
-          const invoiceError = {};
-          
-          if (!invoice.invoiceTemplate) {
-            invoiceError.invoiceTemplate = 'Invoice template is required';
-          }
-          
-          // Updated validation for teamMembers array
-          if (!invoice.teamMembers || invoice.teamMembers.length === 0) {
-            invoiceError.teamMembers = 'At least one team member is required';
-          }
-          
-          // Validate line items
-          if (!invoice.rows || invoice.rows.length === 0) {
-            invoiceError.rows = 'At least one line item is required';
-          } else {
-            const rowErrors = invoice.rows.map((row, rowIndex) => {
-              const rowError = {};
-              if (!row.productorService?.trim()) {
-                rowError.productorService = 'Product/Service name is required';
-              }
-              if (!row.rate || parseFloat(row.rate) <= 0) {
-                rowError.rate = 'Valid rate is required';
-              }
-              if (!row.quantity || parseFloat(row.quantity) <= 0) {
-                rowError.quantity = 'Valid quantity is required';
-              }
-              return Object.keys(rowError).length > 0 ? rowError : null;
-            }).filter(Boolean);
-            
-            if (rowErrors.length > 0) {
-              invoiceError.lineItems = 'Please fix line item errors';
-            }
-          }
-          
-          return Object.keys(invoiceError).length > 0 ? invoiceError : null;
-        }).filter(Boolean);
-        
-        if (invoiceErrors.length > 0) {
-          newErrors.invoiceDetails = 'Please fix invoice errors';
-        } else {
-          delete newErrors.invoices;
-          delete newErrors.invoiceDetails;
-        }
-      }
-    }
-    
-    setStepErrors(newErrors);
-  };
-
-  // Validate itemized data
-  const validateItemizedData = () => {
-    const newErrors = { ...stepErrors };
-    const itemizedData = formData.services.itemizedData || {};
-    
-    if (formData.services.option === 'services') {
-      if (!itemizedData.rows || itemizedData.rows.length === 0) {
-        newErrors.itemized = 'At least one line item is required';
-      } else {
-        const rowErrors = itemizedData.rows.map((row, index) => {
-          const rowError = {};
-          if (!row.productorService?.trim()) {
-            rowError.productorService = 'Product/Service name is required';
-          }
-          if (!row.rate || parseFloat(row.rate) <= 0) {
-            rowError.rate = 'Valid rate is required';
-          }
-          if (!row.quantity || parseFloat(row.quantity) <= 0) {
-            rowError.quantity = 'Valid quantity is required';
-          }
-          return Object.keys(rowError).length > 0 ? rowError : null;
-        }).filter(Boolean);
-        
-        // if (rowErrors.length > 0) {
-        //   newErrors.itemizedDetails = 'Please fix line item errors';
-        // } else {
-        //   delete newErrors.itemized;
-        //   delete newErrors.itemizedDetails;
-        // }
-      }
-    }
-    
-    setStepErrors(newErrors);
-  };
-
   const handleServiceTypeChange = (option) => {
-    // Clear all errors when option changes
     setStepErrors({});
-    setTouched({});
     updateFormData('services', { option });
-  };
-
-  const handleOptionBlur = () => {
-    setTouched(prev => ({ ...prev, option: true }));
-  };
-
-  // Check if the step has any validation errors
-  const hasStepErrors = () => {
-    return Object.keys(stepErrors).length > 0;
+    form.setValue('option', option, { shouldValidate: true });
   };
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-semibold text-indigo-600">Services & Invoices</h2>
+      <h2 className="text-xl font-semibold text-foreground">Services & Invoices</h2>
 
-      <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-6" onBlur={handleOptionBlur}>
-        <label className="text-sm font-semibold text-slate-700 mb-3 block">Select Option *</label>
-        <div className="space-y-3">
-          {/* Invoice Option */}
-          <div
-            onClick={() => handleServiceTypeChange('invoice')}
-            className={`rounded-xl border p-4 cursor-pointer transition-all ${
-              formData.services.option === 'invoice'
-                ? 'border-indigo-400 bg-indigo-50 shadow-md ring-1 ring-indigo-200 border-2'
-                : stepErrors.option ? 'border-red-300 bg-red-50/30' : 'border-slate-200 bg-white hover:border-slate-300'
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              <input type="radio" name="serviceOption" value="invoice" checked={formData.services.option === 'invoice'} onChange={() => handleServiceTypeChange('invoice')} className="h-4 w-4 text-indigo-600 focus:ring-indigo-500" />
-              <div>
-                <p className="text-sm font-semibold text-slate-800">Add Invoice</p>
-                <p className="text-xs text-slate-500 mt-0.5">Create one-time or recurring invoice, or ask for deposit to sign</p>
-              </div>
-            </div>
-          </div>
+      <Form {...form}>
+        <form className="space-y-4">
+          <FormField
+            control={form.control}
+            name="option"
+            render={({ field }) => (
+              <FormItem className="rounded-xl border border-border bg-muted/20 p-6">
+                <FormLabel className="text-sm font-semibold text-foreground">Select Option *</FormLabel>
+                <FormControl>
+                  <RadioGroup
+                    value={field.value || formData.services?.option || ''}
+                    onValueChange={(val) => {
+                      field.onChange(val);
+                      handleServiceTypeChange(val);
+                    }}
+                    className="space-y-3 mt-2"
+                  >
+                    <div
+                      onClick={() => { field.onChange('invoice'); handleServiceTypeChange('invoice'); }}
+                      className={`rounded-xl border p-4 cursor-pointer transition-all ${
+                        (field.value || formData.services?.option) === 'invoice'
+                          ? 'border-primary bg-primary/5 border-2'
+                          : 'border-border bg-background hover:border-muted-foreground/30'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <RadioGroupItem value="invoice" id="opt-invoice" />
+                        <div>
+                          <label htmlFor="opt-invoice" className="text-sm font-semibold text-foreground cursor-pointer">Add Invoice</label>
+                          <p className="text-xs text-muted-foreground mt-0.5">Create one-time or recurring invoice, or ask for deposit to sign</p>
+                        </div>
+                      </div>
+                    </div>
 
-          {/* Services Option */}
-          <div
-            onClick={() => handleServiceTypeChange('services')}
-            className={`rounded-xl border p-4 cursor-pointer transition-all ${
-              formData.services.option === 'services'
-                ? 'border-indigo-400 bg-indigo-50 shadow-md ring-1 ring-indigo-200 border-2'
-                : stepErrors.option ? 'border-red-300 bg-red-50/30' : 'border-slate-200 bg-white hover:border-slate-300'
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              <input type="radio" name="serviceOption" value="services" checked={formData.services.option === 'services'} onChange={() => handleServiceTypeChange('services')} className="h-4 w-4 text-indigo-600 focus:ring-indigo-500" />
-              <div>
-                <p className="text-sm font-semibold text-slate-800">Itemized Services</p>
-                <p className="text-xs text-slate-500 mt-0.5">No invoice or deposit request will be created</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        {stepErrors.option && <p className="text-xs text-red-500 mt-2">{stepErrors.option}</p>}
-      </div>
+                    <div
+                      onClick={() => { field.onChange('services'); handleServiceTypeChange('services'); }}
+                      className={`rounded-xl border p-4 cursor-pointer transition-all ${
+                        (field.value || formData.services?.option) === 'services'
+                          ? 'border-primary bg-primary/5 border-2'
+                          : 'border-border bg-background hover:border-muted-foreground/30'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <RadioGroupItem value="services" id="opt-services" />
+                        <div>
+                          <label htmlFor="opt-services" className="text-sm font-semibold text-foreground cursor-pointer">Itemized Services</label>
+                          <p className="text-xs text-muted-foreground mt-0.5">No invoice or deposit request will be created</p>
+                        </div>
+                      </div>
+                    </div>
+                  </RadioGroup>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </form>
+      </Form>
 
       {formData.services.option === 'invoice' && (
         <InvoiceComponent
@@ -714,4 +250,5 @@ console.log("servicesinvoices",invoices)
     </div>
   );
 };
+
 export default ServicesInvoicesStep;

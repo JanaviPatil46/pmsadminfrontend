@@ -1,11 +1,15 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { useNavigate, } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useNavigate } from "react-router-dom";
 import Editor from '../Texteditor/EditorShortcodes';
 import { toast } from "react-toastify";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import axios from "axios";
 import debounce from "lodash.debounce";
-import { FormPage, FormSection, FormField, FormRow, FormGrid, ShortcodePopover, FormSelect } from "../../components/ui/form-layout";
+import { FormPage, FormSection, FormRow, FormGrid, ShortcodePopover, FormSelect } from "../../components/ui/form-layout";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "../../components/ui/form";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { Switch } from "../../components/ui/switch";
@@ -14,23 +18,39 @@ import { Checkbox } from "../../components/ui/checkbox";
 import { Trash2, Plus, GripVertical, ListChecks, Pencil, Loader2 } from "lucide-react";
 import { DataTable } from "../../components/data-table/data-table";
 import { DataTableToolbar } from "../../components/data-table/toolbar";
+
+const chatSchema = z.object({
+  templateName: z.string().min(1, "Template name is required"),
+  selecteduser: z.any().refine((v) => v && v.value, { message: "Please select a sender" }),
+  inputText: z.string().min(1, "Chat subject is required"),
+  description: z.string().optional(),
+  sendReminders: z.boolean().optional(),
+  daysuntilNextReminder: z.string().optional(),
+  noOfReminder: z.string().optional(),
+  SubtaskSwitch: z.boolean().optional(),
+});
 const ChatTemp = () => {
   const navigate = useNavigate();
   const CHAT_API = process.env.REACT_APP_CHAT_TEMP_URL;
   const USER_API = process.env.REACT_APP_USER_URL;
   const [chatTemplates, setChatTemplates] = useState([]);
-  const [templateName, setTemplateName] = useState('');
-  const [selecteduser, setSelectedUser] = useState('');
-  const [inputText, setInputText] = useState('');
   const [userData, setUserData] = useState([]);
-
-  // const [emailBody, setEmailBody] = useState('');
-  const [daysuntilNextReminder, setDaysuntilNextReminder] = useState('3');
-  const [noOfReminder, setNoOfReminder] = useState(1);
-  const [description, setDescription] = useState('');
   const [showForm, setShowForm] = useState(false);
-  const [isFormDirty, setIsFormDirty] = useState(false);
-  const [selectedShortcut, setSelectedShortcut] = useState('');
+  const [description, setDescription] = useState("");
+
+  const form = useForm({
+    resolver: zodResolver(chatSchema),
+    defaultValues: {
+      templateName: "",
+      selecteduser: null,
+      inputText: "",
+      description: "",
+      sendReminders: false,
+      daysuntilNextReminder: "3",
+      noOfReminder: "1",
+      SubtaskSwitch: false,
+    },
+  });
   const handleCreateChat = () => {
     setShowForm(true);
   };
@@ -66,12 +86,11 @@ const ChatTemp = () => {
     setSubtasks(subtasks.filter((subtask) => subtask.id !== id));
   };
 
-  const [SubtaskSwitch, setSubtaskSwitch] = useState(false);
   const handleSubtaskSwitch = (checked) => {
-    setSubtaskSwitch(checked);
-     if (checked && subtasks.length === 0) {
-    setSubtasks([{ id: '1', text: '', checked: false }]);
-  }
+    form.setValue("SubtaskSwitch", checked);
+    if (checked && subtasks.length === 0) {
+      setSubtasks([{ id: '1', text: '', checked: false }]);
+    }
   };
   const handleDragEnd = (result) => {
     // Ensure a valid drop location
@@ -87,30 +106,21 @@ const ChatTemp = () => {
   };
 
   const handleCloseChatTemp = () => {
-    if (isFormDirty) {
+    if (form.formState.isDirty) {
       const confirmClose = window.confirm('You have unsaved changes. Are you sure you want to cancel?');
-      if (!confirmClose) {
-        return;
-      }
+      if (!confirmClose) return;
     }
     setShowForm(false);
+    form.reset();
+    setDescription("");
+    setSubtasks([]);
+    setCheckedSubtasks([]);
   };
-
-  // Detect form changes
-  useEffect(() => {
-    if (templateName || selecteduser || description) {
-      setIsFormDirty(true);
-    } else {
-      setIsFormDirty(false);
-    }
-  }, [templateName, selecteduser, description]);
 
   //  for shortcodes
   const [showDropdown, setShowDropdown] = useState(false);
   const [shortcuts, setShortcuts] = useState([]);
   const [filteredShortcuts, setFilteredShortcuts] = useState([]);
-  const [selectedOption, setSelectedOption] = useState('contacts');
-
   const [anchorEl, setAnchorEl] = useState(null);
   const toggleDropdown = (event) => {
     setAnchorEl(event.currentTarget);
@@ -118,34 +128,25 @@ const ChatTemp = () => {
   };
   const [cursorPosition, setCursorPosition] = useState(0);
   const textFieldRef = useRef(null);
-  const handlesubject = (e) => {
-    const { value,selectionStart  } = e.target;
-    setInputText(value);
-    setCursorPosition(selectionStart);
-  };
   const handleAddShortcut = (shortcut) => {
-    setInputText((prevText) => {
-        const newText =
-            prevText.slice(0, cursorPosition) + `[${shortcut}]` + prevText.slice(cursorPosition);
-        return newText;
-    });
-
+    const current = form.getValues("inputText") || "";
+    const newText = current.slice(0, cursorPosition) + `[${shortcut}]` + current.slice(cursorPosition);
+    form.setValue("inputText", newText, { shouldDirty: true });
     setTimeout(() => {
-        if (textFieldRef.current) {
-            textFieldRef.current.focus();
-            textFieldRef.current.setSelectionRange(cursorPosition + shortcut.length + 2, cursorPosition + shortcut.length + 2);
-        }
+      if (textFieldRef.current) {
+        textFieldRef.current.focus();
+        textFieldRef.current.setSelectionRange(cursorPosition + shortcut.length + 2, cursorPosition + shortcut.length + 2);
+      }
     }, 0);
-
     setShowDropdown(false);
-};
+  };
 
   useEffect(() => {
     // Simulate filtered shortcuts based on some logic (e.g., search)
     setFilteredShortcuts(shortcuts.filter((shortcut) => shortcut.title.toLowerCase().includes('')));
   }, [shortcuts]);
 useEffect(() => {
-  if (selectedOption === "contacts" || selectedOption === "account") {
+  {
     const accountShortcuts = [
       { title: "Account Shortcodes", isBold: true },
       { title: "Account Name", isBold: false, value: "ACCOUNT_NAME" },
@@ -178,17 +179,11 @@ useEffect(() => {
     ];
     setShortcuts(accountShortcuts);
   }
-}, [selectedOption]);
+}, []);
 
   const handleCloseDropdown = () => {
     setAnchorEl(null);
     setShowDropdown(false);
-  };
-  //Integration 
-
-  const handlechatsubject = (e) => {
-    const { value } = e.target;
-    setInputText(value);
   };
 
   const options = userData.map((user) => ({
@@ -196,17 +191,9 @@ useEffect(() => {
     label: user.username,
   }));
 
-  const handleuserChange = (event, selectedOptions) => {
-    setSelectedUser(selectedOptions);
-
-  };
-  const [absoluteDate, setAbsoluteDates] = useState(false);
-  const handleAbsolutesDates = (checked) => {
-    setAbsoluteDates(checked);
-  };
-
   const handleEditorChange = (content) => {
     setDescription(content);
+    form.setValue("description", content, { shouldDirty: true });
   };
 
   const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
@@ -251,131 +238,54 @@ useEffect(() => {
     fetchChatTemplates();
   }, []);
 
-  const handleClearTemplate = () => {
-    setTemplateName('');
-    setSelectedUser('');
-    setInputText('');
-    setNoOfReminder('');
-    setSubtaskSwitch(false)
-    setDescription('');
-    setDaysuntilNextReminder('');
-    // subtasks([])
-    setCheckedSubtasks([])
-  }
-const savechat = async () => {
-  if (!validateForm()) {
-    return; // Prevent form submission if validation fails
-  }
-  
-  const myHeaders = new Headers();
-  myHeaders.append("Content-Type", "application/json");
+  const submitChat = async (values, exitAfterSave) => {
+    const subtaskData = subtasks.map(({ id, text }) => ({
+      id,
+      text,
+      checked: checkedSubtasks.includes(id),
+    }));
 
-  const subtaskData = subtasks.map(({ id, text }) => ({
-    id,
-    text,
-    checked: checkedSubtasks.includes(id),
-  }));
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    const raw = JSON.stringify({
+      templatename: values.templateName,
+      from: values.selecteduser.value,
+      chatsubject: values.inputText,
+      description: description,
+      sendreminderstoclient: values.sendReminders,
+      daysuntilnextreminder: values.daysuntilNextReminder,
+      numberofreminders: values.noOfReminder,
+      clienttasks: subtaskData,
+      isclienttaskchecked: values.SubtaskSwitch,
+      active: "true",
+    });
 
-  const raw = JSON.stringify({
-    templatename: templateName,
-    from: selecteduser.value,
-    chatsubject: inputText,
-    description: description,
-    sendreminderstoclient: absoluteDate,
-    daysuntilnextreminder: daysuntilNextReminder,
-    numberofreminders: noOfReminder,
-    clienttasks: subtaskData,
-    isclienttaskchecked: SubtaskSwitch,
-    active: "true"
-  });
-
-  const requestOptions = {
-    method: "POST",
-    headers: myHeaders,
-    body: raw,
-    redirect: "follow"
+    try {
+      const response = await fetch(`${CHAT_API}/workflow/chats/chattemplate`, {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message || "Failed to save Chat Template");
+      toast.success(result.message || "Chat Template saved successfully");
+      if (exitAfterSave) {
+        setShowForm(false);
+        form.reset();
+        setDescription("");
+        setSubtasks([]);
+        setCheckedSubtasks([]);
+      }
+      fetchChatTemplates();
+    } catch (error) {
+      console.error(error);
+      toast.error(error.message || "Error saving Chat Template");
+    }
   };
 
-  const url = `${CHAT_API}/workflow/chats/chattemplate`;
-  
-  try {
-    const response = await fetch(url, requestOptions);
-    const result = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(result.message || "Failed to save Chat Template");
-    }
-
-    if (result.message === "ChatTemplate created successfully" || 
-        result.message === "ChatTemplate updated successfully") {
-      toast.success(result.message);
-      handleClearTemplate();
-      fetchChatTemplates();
-      setShowForm(false);
-    } else {
-      toast.error(result.message || "Unexpected response from server");
-    }
-  } catch (error) {
-    console.error(error);
-    toast.error(error.message || "Error saving Chat Template");
-  }
-}
-
-const saveSchat = async () => {
-  if (!validateForm()) {
-    return;
-  }
-  
-  const myHeaders = new Headers();
-  myHeaders.append("Content-Type", "application/json");
-
-  const subtaskData = subtasks.map(({ id, text }) => ({
-    id,
-    text,
-    checked: checkedSubtasks.includes(id),
-  }));
-
-  const raw = JSON.stringify({
-    templatename: templateName,
-    from: selecteduser.value,
-    chatsubject: inputText,
-    description: description,
-    sendreminderstoclient: absoluteDate,
-    daysuntilnextreminder: daysuntilNextReminder,
-    numberofreminders: noOfReminder,
-    clienttasks: subtaskData,
-    isclienttaskchecked: SubtaskSwitch,
-    active: "true"
-  });
-  const requestOptions = {
-    method: "POST",
-    headers: myHeaders,
-    body: raw,
-    redirect: "follow"
-  };
-
-  const url = `${CHAT_API}/workflow/chats/chattemplate`;
-  
-  try {
-    const response = await fetch(url, requestOptions);
-    const result = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(result.message || "Failed to save Chat Template");
-    }
-
-    if (result.message === "ChatTemplate created successfully" || 
-        result.message === "ChatTemplate updated successfully") {
-      toast.success(result.message);
-      fetchChatTemplates();
-    } else {
-      toast.error(result.message || "Unexpected response from server");
-    }
-  } catch (error) {
-    console.error(error);
-    toast.error(error.message || "Error saving Chat Template");
-  }
-}
+  const savechat = form.handleSubmit((values) => submitChat(values, true));
+  const saveSchat = form.handleSubmit((values) => submitChat(values, false));
   //Edit
   const handleEdit = (_id) => {
     navigate("chatTemplateUpdate/" + _id);
@@ -455,66 +365,30 @@ const saveSchat = async () => {
       ),
     },
   ], []);
-  const [templateNameError, setTemplateNameError] = useState('');
-  const [selectedUserError, setSelectedUserError] = useState('');
-  const [inputTextError, setInputTextError] = useState('');
-
-// Debounced function to check template name existence
-const checkTemplateName = async (name) => {
+  const checkTemplateName = async (name) => {
     try {
-      const res = await axios.get(`${CHAT_API}/workflow/chats/check-name`, {
-        params: { name },
-      });
+      const res = await axios.get(`${CHAT_API}/workflow/chats/check-name`, { params: { name } });
       if (res.data.exists) {
-        setTemplateNameError('Template name already exists');
+        form.setError("templateName", { type: "manual", message: "Template name already exists" });
       } else {
-        setTemplateNameError('');
+        form.clearErrors("templateName");
       }
     } catch (err) {
       console.error(err);
-      setTemplateNameError('');
     }
   };
 
- const debouncedCheck = debounce((name) => {
+  const debouncedCheck = debounce((name) => {
     if (name.trim()) checkTemplateName(name);
-    else setTemplateNameError('');
+    else form.clearErrors("templateName");
   }, 500);
 
   useEffect(() => {
-    debouncedCheck(templateName);
-    return debouncedCheck.cancel;
-  }, [templateName]);
-  const validateForm = () => {
-    let isValid = true;
-
-  
-    if (!templateName) {
-      setTemplateNameError("Template name is required");
-      
-      isValid = false;
-    } else {
-      setTemplateNameError('');
-    }
-
-    if (!selecteduser) {
-      setSelectedUserError('Please select a user');
-      isValid = false;
-    } else {
-      setSelectedUserError('');
-    }
-
-    if (inputText.trim() === '') {
-      setInputTextError('Chat subject is required');
-      isValid = false;
-    } else {
-      setInputTextError('');
-    }
-
-
-
-    return isValid;
-  };
+    const subscription = form.watch((value, { name }) => {
+      if (name === "templateName") debouncedCheck(value.templateName);
+    });
+    return () => { subscription.unsubscribe(); debouncedCheck.cancel(); };
+  }, [form.watch]);
 
 
   return (
@@ -541,181 +415,211 @@ const checkTemplateName = async (name) => {
           />
         </div>
       ) : (
-        <FormPage
-          title="Create Chat Template"
-          subtitle="Configure your new chat template"
-          actions={
-            <>
-              <Button variant="outline" onClick={handleCloseChatTemp}>
-                Cancel
-              </Button>
-              <Button variant="secondary" onClick={saveSchat}>
-                Save
-              </Button>
-              <Button onClick={savechat}>
-                Save & Exit
-              </Button>
-            </>
-          }
-        >
-          <FormGrid>
-            {/* ===== LEFT COLUMN: Chat Form ===== */}
-            <FormGrid.Main>
-              <FormSection title="Template Details">
-                <FormField label="Name" error={templateNameError}>
-                  <Input
-                    value={templateName}
-                    onChange={(e) => setTemplateName(e.target.value)}
-                    name="TemplateName"
-                    placeholder="Template Name"
-                    error={!!templateNameError}
+        <Form {...form}>
+          <FormPage
+            title="Create Chat Template"
+            subtitle="Configure your new chat template"
+            actions={
+              <>
+                <Button type="button" variant="outline" onClick={handleCloseChatTemp}>Cancel</Button>
+                <Button type="button" variant="secondary" onClick={saveSchat}>Save</Button>
+                <Button type="button" onClick={savechat}>Save & Exit</Button>
+              </>
+            }
+          >
+            <FormGrid>
+              {/* ===== LEFT COLUMN ===== */}
+              <FormGrid.Main>
+                <FormSection title="Template Details">
+                  <FormField
+                    control={form.control}
+                    name="templateName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Template Name" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </FormField>
 
-                <FormField label="From" error={selectedUserError}>
-                  <FormSelect
-                    value={selecteduser?.value || ""}
-                    onChange={(e) => {
-                      const selected = options.find((o) => o.value === e.target.value) || null;
-                      handleuserChange(null, selected);
-                    }}
-                    error={!!selectedUserError}
-                  >
-                    <option value="">Select Sender</option>
-                    {options.map((opt) => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
-                    ))}
-                  </FormSelect>
-                </FormField>
-
-                <FormField label="Subject" error={inputTextError}>
-                  <div className="space-y-2">
-                    <Input
-                      name="subject"
-                      ref={textFieldRef}
-                      value={inputText}
-                      onChange={handlesubject}
-                      onClick={(e) => setCursorPosition(e.target.selectionStart)}
-                      placeholder="Subject"
-                      error={!!inputTextError}
-                    />
-                    <ShortcodePopover
-                      shortcuts={filteredShortcuts}
-                      onSelect={handleAddShortcut}
-                    />
-                  </div>
-                </FormField>
-              </FormSection>
-
-              {/* Description */}
-              <FormSection title="Description">
-                <Editor onChange={handleEditorChange} />
-              </FormSection>
-
-              {/* Reminders */}
-              <FormSection title="Reminders">
-                <div className="flex items-center justify-between">
-                  <Label className="text-sm font-medium">Send reminders to clients</Label>
-                  <Switch
-                    checked={absoluteDate}
-                    onCheckedChange={handleAbsolutesDates}
-                  />
-                </div>
-
-                {absoluteDate && (
-                  <FormRow cols={2}>
-                    <FormField label="Days until next reminder">
-                      <Input
-                        name="Daysuntilnextreminder"
-                        value={daysuntilNextReminder}
-                        onChange={(e) => setDaysuntilNextReminder(e.target.value)}
-                        placeholder="Days until next reminder"
-                      />
-                    </FormField>
-                    <FormField label="No. of reminders">
-                      <Input
-                        name="NoOfreminders"
-                        value={noOfReminder}
-                        onChange={(e) => setNoOfReminder(e.target.value)}
-                        placeholder="Number of reminders"
-                      />
-                    </FormField>
-                  </FormRow>
-                )}
-              </FormSection>
-            </FormGrid.Main>
-
-            {/* ===== RIGHT COLUMN: Client Tasks ===== */}
-            <FormGrid.Sidebar>
-              <FormSection title="Client Tasks">
-                <div className="flex items-center justify-between">
-                  <Label className="text-sm font-medium">Enable Client Tasks</Label>
-                  <Switch
-                    checked={SubtaskSwitch}
-                    onCheckedChange={handleSubtaskSwitch}
-                  />
-                </div>
-
-                {SubtaskSwitch && (
-                  <DragDropContext onDragEnd={handleDragEnd}>
-                    <Droppable droppableId="subtaskList">
-                      {(provided) => (
-                        <div className="space-y-2" {...provided.droppableProps} ref={provided.innerRef}>
-                          {subtasks.map((subtask, index) => (
-                            <Draggable key={subtask.id} draggableId={String(subtask.id)} index={index}>
-                              {(provided) => (
-                                <div
-                                  ref={provided.innerRef}
-                                  {...provided.draggableProps}
-                                  className="flex items-center gap-2 rounded-lg border border-border bg-card p-2 shadow-sm"
-                                >
-                                  <Checkbox
-                                    checked={checkedSubtasks.includes(subtask.id)}
-                                    onCheckedChange={() => handleCheckboxChange(subtask.id, subtask.checked)}
-                                  />
-                                  <Input
-                                    placeholder="Things to do"
-                                    value={subtask.text}
-                                    onChange={(e) => handleInputChange(subtask.id, e.target.value)}
-                                    className="flex-1 border-0 shadow-none focus-visible:ring-0"
-                                  />
-                                  <button
-                                    type="button"
-                                    onClick={() => handleDeleteSubtask(subtask.id)}
-                                    className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </button>
-                                  <div
-                                    {...provided.dragHandleProps}
-                                    className="cursor-grab rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent"
-                                  >
-                                    <GripVertical className="h-4 w-4" />
-                                  </div>
-                                </div>
-                              )}
-                            </Draggable>
-                          ))}
-                          {provided.placeholder}
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={handleAddSubtask}
-                            className="mt-2 w-full text-primary"
+                  <FormField
+                    control={form.control}
+                    name="selecteduser"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>From</FormLabel>
+                        <FormControl>
+                          <FormSelect
+                            value={field.value?.value || ""}
+                            onChange={(e) => {
+                              const selected = options.find((o) => o.value === e.target.value) || null;
+                              field.onChange(selected);
+                            }}
                           >
-                            <Plus className="h-4 w-4" />
-                            Add Subtask
-                          </Button>
-                        </div>
-                      )}
-                    </Droppable>
-                  </DragDropContext>
-                )}
-              </FormSection>
-            </FormGrid.Sidebar>
-          </FormGrid>
-        </FormPage>
+                            <option value="">Select Sender</option>
+                            {options.map((opt) => (
+                              <option key={opt.value} value={opt.value}>{opt.label}</option>
+                            ))}
+                          </FormSelect>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="inputText"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Subject</FormLabel>
+                        <FormControl>
+                          <div className="space-y-2">
+                            <Input
+                              placeholder="Subject"
+                              ref={textFieldRef}
+                              onClick={(e) => setCursorPosition(e.target.selectionStart)}
+                              {...field}
+                              onChange={(e) => { setCursorPosition(e.target.selectionStart); field.onChange(e); }}
+                            />
+                            <ShortcodePopover shortcuts={filteredShortcuts} onSelect={handleAddShortcut} />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </FormSection>
+
+                <FormSection title="Description">
+                  <Editor onChange={handleEditorChange} />
+                </FormSection>
+
+                <FormSection title="Reminders">
+                  <FormField
+                    control={form.control}
+                    name="sendReminders"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <div className="flex items-center justify-between">
+                            <Label className="text-sm font-medium">Send reminders to clients</Label>
+                            <Switch checked={!!field.value} onCheckedChange={field.onChange} />
+                          </div>
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  {form.watch("sendReminders") && (
+                    <FormRow cols={2}>
+                      <FormField
+                        control={form.control}
+                        name="daysuntilNextReminder"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Days until next reminder</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Days until next reminder" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="noOfReminder"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>No. of reminders</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Number of reminders" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </FormRow>
+                  )}
+                </FormSection>
+              </FormGrid.Main>
+
+              {/* ===== RIGHT COLUMN: Client Tasks ===== */}
+              <FormGrid.Sidebar>
+                <FormSection title="Client Tasks">
+                  <FormField
+                    control={form.control}
+                    name="SubtaskSwitch"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <div className="flex items-center justify-between">
+                            <Label className="text-sm font-medium">Enable Client Tasks</Label>
+                            <Switch
+                              checked={!!field.value}
+                              onCheckedChange={(val) => { field.onChange(val); handleSubtaskSwitch(val); }}
+                            />
+                          </div>
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  {form.watch("SubtaskSwitch") && (
+                    <DragDropContext onDragEnd={handleDragEnd}>
+                      <Droppable droppableId="subtaskList">
+                        {(provided) => (
+                          <div className="space-y-2" {...provided.droppableProps} ref={provided.innerRef}>
+                            {subtasks.map((subtask, index) => (
+                              <Draggable key={subtask.id} draggableId={String(subtask.id)} index={index}>
+                                {(provided) => (
+                                  <div
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    className="flex items-center gap-2 rounded-lg border border-border bg-card p-2 shadow-sm"
+                                  >
+                                    <Checkbox
+                                      checked={checkedSubtasks.includes(subtask.id)}
+                                      onCheckedChange={() => handleCheckboxChange(subtask.id)}
+                                    />
+                                    <Input
+                                      placeholder="Things to do"
+                                      value={subtask.text}
+                                      onChange={(e) => handleInputChange(subtask.id, e.target.value)}
+                                      className="flex-1 border-0 shadow-none focus-visible:ring-0"
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() => handleDeleteSubtask(subtask.id)}
+                                      className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </button>
+                                    <div {...provided.dragHandleProps} className="cursor-grab rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent">
+                                      <GripVertical className="h-4 w-4" />
+                                    </div>
+                                  </div>
+                                )}
+                              </Draggable>
+                            ))}
+                            {provided.placeholder}
+                            <Button type="button" variant="ghost" size="sm" onClick={handleAddSubtask} className="mt-2 w-full text-primary">
+                              <Plus className="h-4 w-4" />
+                              Add Subtask
+                            </Button>
+                          </div>
+                        )}
+                      </Droppable>
+                    </DragDropContext>
+                  )}
+                </FormSection>
+              </FormGrid.Sidebar>
+            </FormGrid>
+          </FormPage>
+        </Form>
       )}
     </div>
   );

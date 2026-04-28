@@ -1,4 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { useNavigate } from "react-router-dom";
 import Editor from "../Texteditor/Editor";
@@ -9,36 +12,59 @@ import axios from "axios";
 import debounce from "lodash.debounce";
 import MultiSelectDropdown from "../MultiSelectDropdown";
 import TagsMultiSelectDropDown from "../TagsMultiSelectDropDown";
-import { FormPage, FormSection, FormField, FormRow, FormGrid, FormSwitchRow, FormSubtaskItem, FormSubtaskAdd } from "../../components/ui/form-layout";
+import { FormPage, FormSection, FormRow, FormGrid, FormSwitchRow, FormSubtaskItem, FormSubtaskAdd } from "../../components/ui/form-layout";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "../../components/ui/form";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { FileText, Calendar, ListChecks, Pencil, Loader2, Plus, Trash2 } from "lucide-react";
 import { DataTable } from "../../components/data-table/data-table";
 import { DataTableToolbar } from "../../components/data-table/toolbar";
 
+const taskSchema = z.object({
+  templatename: z.string().min(1, "Template name is required"),
+  status: z.string().optional(),
+  assignees: z.array(z.any()).optional(),
+  priority: z.string().optional(),
+  description: z.string().optional(),
+  tags: z.array(z.any()).optional(),
+  absoluteDate: z.boolean().optional(),
+  startDate: z.string().optional(),
+  dueDate: z.string().optional(),
+  startsin: z.string().optional(),
+  startsInDuration: z.string().optional(),
+  duein: z.string().optional(),
+  dueinduration: z.string().optional(),
+  SubtaskSwitch: z.boolean().optional(),
+});
+
 const Tasks = () => {
   const TASK_API = process.env.REACT_APP_TASK_TEMP_URL;
-
   const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
 
   const navigate = useNavigate();
-  const [isFormDirty, setIsFormDirty] = useState(false);
-  const [templatename, settemplatename] = useState("");
   const [showForm, setShowForm] = useState(false);
-  const [startsin, setstartsin] = useState("");
-  const [duein, setduein] = useState("");
-  const [startDate, setStartDate] = useState(null);
-  const [dueDate, setDueDate] = useState(null);
-  const [absoluteDate, setAbsoluteDates] = useState(false);
-  const [priority, setPriority] = useState("Medium");
-  const [status, setStatus] = useState("No status");
-  const [startsInDuration, setStartsInDuration] = useState("Days");
-  const [dueinduration, setdueinduration] = useState("Days");
-  const [description, setDescription] = useState("");
-  const [selectedUser, setSelectedUser] = useState([]);
-  const [combinedValues, setCombinedValues] = useState();
   const [userData, setUserData] = useState([]);
   const [checkedSubtasks, setCheckedSubtasks] = useState([]);
+
+  const form = useForm({
+    resolver: zodResolver(taskSchema),
+    defaultValues: {
+      templatename: "",
+      status: "No status",
+      assignees: [],
+      priority: "Medium",
+      description: "",
+      tags: [],
+      absoluteDate: false,
+      startDate: "",
+      dueDate: "",
+      startsin: "",
+      startsInDuration: "Days",
+      duein: "",
+      dueinduration: "Days",
+      SubtaskSwitch: false,
+    },
+  });
 
   const handleCheckboxChange = (id) => {
     setCheckedSubtasks((prevChecked) =>
@@ -66,12 +92,10 @@ const Tasks = () => {
     setSubtasks(subtasks.filter((subtask) => subtask.id !== id));
   };
 
-  const [SubtaskSwitch, setSubtaskSwitch] = useState(false);
   const handleSubtaskSwitch = (checked) => {
-    setSubtaskSwitch(checked);
-     if (checked && subtasks.length === 0) {
-    setSubtasks([{ id: '1', text: '', checked: false }]);
-  }
+    if (checked && subtasks.length === 0) {
+      setSubtasks([{ id: "1", text: "", checked: false }]);
+    }
   };
   const handleDragEnd = (result) => {
     // Ensure a valid drop location
@@ -83,43 +107,18 @@ const Tasks = () => {
     // Update the state with the new order of subtasks
     setSubtasks(newSubtasks);
   };
-  const handleAbsolutesDates = (checked) => {
-    setAbsoluteDates(checked);
-  };
-
-  const handleStartDateChange = (date) => {
-    setStartDate(date);
-  };
-  const handleDueDateChange = (date) => {
-    setDueDate(date);
-  };
   const dayOptions = [
     { label: "Days", value: "Days" },
     { label: "Months", value: "Months" },
     { label: "Years", value: "Years" },
   ];
 
-  // Handler function to update state when dropdown value changes
-  const handleStartInDateChange = (event, newValue) => {
-    setStartsInDuration(newValue ? newValue.value : null);
-  };
-  // Handler function to update state when dropdown value changes
-  const handledueindateChange = (event, newValue) => {
-    setdueinduration(newValue ? newValue.value : null);
-  };
   const handleCreateTask = () => {
     setShowForm(true);
   };
 
-  const handlePriorityChange = (priority) => {
-    setPriority(priority);
-  };
-  const handleStatusChange = (status) => {
-    setStatus(status);
-  };
-
   const handleEditorChange = (content) => {
-    setDescription(content);
+    form.setValue("description", content);
   };
 
   useEffect(() => {
@@ -141,16 +140,8 @@ const Tasks = () => {
     label: user.username,
   }));
 
-// Add this handler function
-const handleUserChange = (newSelectedUsers) => {
-  setSelectedUser(newSelectedUsers);
-  const selectedValues = newSelectedUsers.map((option) => option.value);
-  setCombinedValues(selectedValues);
-};
   //Tag FetchData ================
   const [tags, setTags] = useState([]);
-  const [selectedTags, setSelectedTags] = useState([]);
-  const [combinedTagsValues, setCombinedTagsValues] = useState();
   useEffect(() => {
     fetchTagData();
   }, []);
@@ -164,12 +155,6 @@ const handleUserChange = (newSelectedUsers) => {
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  };
-  
-  const handleTagChange = (newSelectedTags) => {
-    setSelectedTags(newSelectedTags);
-    const selectedValues = newSelectedTags.map((option) => option.value);
-    setCombinedTagsValues(selectedValues);
   };
   const [TaskTemplates, setTaskTemplates] = useState([]);
   useEffect(() => {
@@ -196,199 +181,69 @@ const handleUserChange = (newSelectedUsers) => {
       setLoading(false); // Stop loader
     }
   };
-  const createTaskTemp = () => {
-    if (!validateForm()) return;
-
+  const submitTask = async (values, exitAfterSave) => {
     const subtaskData = subtasks.map(({ id, text }) => ({
       id,
       text,
       checked: checkedSubtasks.includes(id),
     }));
 
-    if (absoluteDate === true) {
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      const raw = JSON.stringify({
-        templatename: templatename,
-        status: status,
-        taskassignees: combinedValues,
-        tasktags: combinedTagsValues,
-        priority: priority,
-        description: description,
-        absolutedates: absoluteDate,
-        startdate: startDate,
-        enddate: dueDate,
-        subtasks: subtaskData,
-        issubtaskschecked: SubtaskSwitch,
-      });
-      const requestOptions = {
+    const payload = values.absoluteDate
+      ? {
+          templatename: values.templatename,
+          status: values.status,
+          taskassignees: (values.assignees || []).map((o) => o.value),
+          tasktags: (values.tags || []).map((o) => o.value),
+          priority: values.priority,
+          description: values.description,
+          absolutedates: true,
+          startdate: values.startDate,
+          enddate: values.dueDate,
+          subtasks: subtaskData,
+          issubtaskschecked: values.SubtaskSwitch,
+        }
+      : {
+          templatename: values.templatename,
+          status: values.status,
+          taskassignees: (values.assignees || []).map((o) => o.value),
+          tasktags: (values.tags || []).map((o) => o.value),
+          priority: values.priority,
+          description: values.description,
+          absolutedates: false,
+          startsin: values.startsin,
+          startsinduration: values.startsInDuration,
+          duein: values.duein,
+          dueinduration: values.dueinduration,
+          subtasks: subtaskData,
+          issubtaskschecked: values.SubtaskSwitch,
+        };
+
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    try {
+      const response = await fetch(`${TASK_API}/workflow/tasks/tasktemplate/`, {
         method: "POST",
         headers: myHeaders,
-        body: raw,
+        body: JSON.stringify(payload),
         redirect: "follow",
-      };
-      const url = `${TASK_API}/workflow/tasks/tasktemplate/`;
-      fetch(url, requestOptions)
-        .then((response) => {
-          if (!response.ok) throw new Error("Network response was not ok");
-          return response.json();
-        })
-        .then(() => {
-          toast.success("Task Template created successfully");
-          setShowForm(false);
-          resetFields();
-          fetchTaskData();
-        })
-        .catch((error) => {
-          console.error(error);
-          toast.error("Failed to create Task Template");
-        });
-    } else if (absoluteDate === false) {
-      if (!validateForm()) return;
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      const raw = JSON.stringify({
-        templatename: templatename,
-        status: status,
-        taskassignees: combinedValues,
-        tasktags: combinedTagsValues,
-        priority: priority,
-        description: description,
-        absolutedates: absoluteDate,
-        startsin: startsin,
-        startsinduration: startsInDuration,
-        duein: duein,
-        dueinduration: dueinduration,
-        subtasks: subtaskData,
-        issubtaskschecked: SubtaskSwitch,
       });
-      const requestOptions2 = {
-        method: "POST",
-        headers: myHeaders,
-        body: raw,
-        redirect: "follow",
-      };
-      const url2 = `${TASK_API}/workflow/tasks/tasktemplate/`;
-      fetch(url2, requestOptions2)
-        .then((response) => {
-          if (!response.ok) throw new Error("Network response was not ok");
-          return response.json();
-        })
-        .then(() => {
-          toast.success("Task Template created successfully");
-          setShowForm(false);
-          resetFields();
-          fetchTaskData();
-        })
-        .catch((error) => {
-          console.error(error);
-          toast.error("Failed to create Task Template");
-        });
+      if (!response.ok) throw new Error("Network response was not ok");
+      toast.success("Task Template created successfully");
+      if (exitAfterSave) {
+        setShowForm(false);
+        form.reset();
+        setSubtasks([]);
+        setCheckedSubtasks([]);
+      }
+      fetchTaskData();
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to create Task Template");
     }
   };
-  const resetFields = () => {
-    setDescription("");
-    setSelectedTags([]);
-    setAbsoluteDates(false);
-    setStartDate(null);
-    setDueDate(null);
-    setstartsin("");
-    setduein("");
-    setPriority("Medium");
-    setSelectedUser([]);
-    setStartsInDuration("Days");
-    settemplatename("");
-    setdueinduration("Days");
-    setStatus("No status");
-    setSubtaskSwitch(false);
-    setSubtasks([]);
-  };
-  const createSaveTaskTemp = () => {
-    if (!validateForm()) return;
 
-    const subtaskData = subtasks.map(({ id, text }) => ({
-      id,
-      text,
-      checked: checkedSubtasks.includes(id),
-    }));
-
-    if (absoluteDate === true) {
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      const raw = JSON.stringify({
-        templatename: templatename,
-        status: status,
-        taskassignees: combinedValues,
-        tasktags: combinedTagsValues,
-        priority: priority,
-        description: description,
-        absolutedates: absoluteDate,
-        startdate: startDate,
-        enddate: dueDate,
-        subtasks: subtaskData,
-        issubtaskschecked: SubtaskSwitch,
-      });
-      const requestOptions = {
-        method: "POST",
-        headers: myHeaders,
-        body: raw,
-        redirect: "follow",
-      };
-      const url = `${TASK_API}/workflow/tasks/tasktemplate/`;
-      fetch(url, requestOptions)
-        .then((response) => {
-          if (!response.ok) throw new Error("Network response was not ok");
-          return response.json();
-        })
-        .then(() => {
-          toast.success("Task Template created successfully");
-          fetchTaskData();
-        })
-        .catch((error) => {
-          console.error(error);
-          toast.error("Failed to create Task Template");
-        });
-    } else if (absoluteDate === false) {
-      if (!validateForm()) return;
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      const raw = JSON.stringify({
-        templatename: templatename,
-        status: status,
-        taskassignees: combinedValues,
-        tasktags: combinedTagsValues,
-        priority: priority,
-        description: description,
-        absolutedates: absoluteDate,
-        startsin: startsin,
-        startsinduration: startsInDuration,
-        duein: duein,
-        dueinduration: dueinduration,
-        subtasks: subtaskData,
-        issubtaskschecked: SubtaskSwitch,
-      });
-      const requestOptions2 = {
-        method: "POST",
-        headers: myHeaders,
-        body: raw,
-        redirect: "follow",
-      };
-      const url2 = `${TASK_API}/workflow/tasks/tasktemplate/`;
-      fetch(url2, requestOptions2)
-        .then((response) => {
-          if (!response.ok) throw new Error("Network response was not ok");
-          return response.json();
-        })
-        .then(() => {
-          toast.success("Task Template created successfully");
-          fetchTaskData();
-        })
-        .catch((error) => {
-          console.error(error);
-          toast.error("Failed to create Task Template");
-        });
-    }
-  };
+  const createTaskTemp = form.handleSubmit((values) => submitTask(values, true));
+  const createSaveTaskTemp = form.handleSubmit((values) => submitTask(values, false));
 
   const handleEdit = (_id) => {
     navigate("taskTempUpdate/" + _id);
@@ -465,69 +320,42 @@ const handleUserChange = (newSelectedUsers) => {
       ),
     },
   ], []);
-  const [templateNameError, setTemplateNameError] = useState("");
-
-  const validateForm = () => {
-    let isValid = true;
-    if (!templatename) {
-      setTemplateNameError("Name can't be blank");
-      toast.error("Name can't be blank");
-      isValid = false;
-    } else {
-      setTemplateNameError("");
-    }
-
-    return isValid;
-  };
-
   const handleTaskCancel = () => {
-    if (isFormDirty) {
+    if (form.formState.isDirty) {
       const confirmClose = window.confirm(
         "You have unsaved changes. Are you sure you want to cancel?"
       );
-      if (!confirmClose) {
-        return;
-      }
+      if (!confirmClose) return;
     }
     setShowForm(false);
+    form.reset();
   };
 
-  // Detect form changes
-  useEffect(() => {
-    if (templatename || priority || description || status || absoluteDate) {
-      setIsFormDirty(true);
-    } else {
-      setIsFormDirty(false);
-    }
-  }, [templatename, priority, description, status, absoluteDate]);
-
-
-  // Debounced function to check template name existence
+  // Debounced async name check — sets RHF error directly
   const checkTemplateName = async (name) => {
-      try {
-        const res = await axios.get(`${TASK_API}/workflow/tasks/check-name`, {
-          params: { name },
-        });
-        if (res.data.exists) {
-          setTemplateNameError('Template name already exists');
-        } else {
-          setTemplateNameError('');
-        }
-      } catch (err) {
-        console.error(err);
-        setTemplateNameError('');
+    try {
+      const res = await axios.get(`${TASK_API}/workflow/tasks/check-name`, { params: { name } });
+      if (res.data.exists) {
+        form.setError("templatename", { type: "manual", message: "Template name already exists" });
+      } else {
+        form.clearErrors("templatename");
       }
-    };
-  
-   const debouncedCheck = debounce((name) => {
-      if (name.trim()) checkTemplateName(name);
-      else setTemplateNameError('');
-    }, 500);
-  
-    useEffect(() => {
-      debouncedCheck(templatename);
-      return debouncedCheck.cancel;
-    }, [templatename]);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const debouncedCheck = debounce((name) => {
+    if (name.trim()) checkTemplateName(name);
+    else form.clearErrors("templatename");
+  }, 500);
+
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (name === "templatename") debouncedCheck(value.templatename);
+    });
+    return () => { subscription.unsubscribe(); debouncedCheck.cancel(); };
+  }, [form.watch]);
   return (
     <div>
         {!showForm ? (
@@ -553,204 +381,309 @@ const handleUserChange = (newSelectedUsers) => {
             />
           </div>
         ) : (
-          <FormPage
-            title="Create Task Template"
-            subtitle="Configure your task template settings"
-            actions={
-              <>
-                <Button variant="outline" onClick={handleTaskCancel}>Cancel</Button>
-                <Button variant="secondary" onClick={createSaveTaskTemp}>Save</Button>
-                <Button onClick={createTaskTemp}>Save & Exit</Button>
-              </>
-            }
-          >
-            <FormGrid sidebarWidth="sm">
-              {/* ===== LEFT COLUMN (70%): Main form ===== */}
-              <FormGrid.Main>
+          <Form {...form}>
+            <FormPage
+              title="Create Task Template"
+              subtitle="Configure your task template settings"
+              actions={
+                <>
+                  <Button type="button" variant="outline" onClick={handleTaskCancel}>Cancel</Button>
+                  <Button type="button" variant="secondary" onClick={createSaveTaskTemp}>Save</Button>
+                  <Button type="button" onClick={createTaskTemp}>Save & Exit</Button>
+                </>
+              }
+            >
+              <FormGrid sidebarWidth="sm">
+                {/* ===== LEFT COLUMN (70%): Main form ===== */}
+                <FormGrid.Main>
 
-                {/* ── General: name + status in a row, assignee + priority in a row ── */}
-                <FormSection
-                  title="General"
-                  icon={<FileText className="h-4 w-4" />}
-                >
-                  <FormRow cols={2}>
-                    <FormField label="Template Name" required error={templateNameError}>
-                      <Input
-                        name="TemplateName"
-                        placeholder="Enter template name"
-                        value={templatename}
-                        onChange={(e) => settemplatename(e.target.value)}
-                      />
-                    </FormField>
-                    <FormField label="Status">
-                      <Status onStatusChange={handleStatusChange} selectedStatus={status} />
-                    </FormField>
-                  </FormRow>
-
-                  <FormRow cols={2}>
-                    <FormField label="Assignees">
-                      <MultiSelectDropdown
-                        value={selectedUser}
-                        onChange={handleUserChange}
-                        placeholder="Select assignees"
-                      />
-                    </FormField>
-                    <FormField label="Priority">
-                      <Priority onPriorityChange={handlePriorityChange} selectedPriority={priority} />
-                    </FormField>
-                  </FormRow>
-                </FormSection>
-
-                {/* ── Description ── */}
-                <FormSection title="Description">
-                  <Editor onChange={handleEditorChange} content={description} />
-                </FormSection>
-
-                {/* ── Tags ── */}
-                <FormSection title="Tags">
-                  <TagsMultiSelectDropDown
-                    value={selectedTags}
-                    onChange={handleTagChange}
-                    placeholder="Select or search tags"
-                  />
-                </FormSection>
-
-                {/* ── Start & Due Date ── */}
-                <FormSection
-                  title="Dates"
-                  icon={<Calendar className="h-4 w-4" />}
-                >
-                  <FormSwitchRow
-                    label="Use absolute dates"
-                    description="Set fixed calendar dates instead of relative offsets"
-                    checked={absoluteDate}
-                    onCheckedChange={handleAbsolutesDates}
-                  />
-
-                  {absoluteDate ? (
+                  {/* ── General ── */}
+                  <FormSection title="General" icon={<FileText className="h-4 w-4" />}>
                     <FormRow cols={2}>
-                      <FormField label="Start Date">
-                        <input
-                          type="date"
-                          value={startDate ? startDate.format?.("YYYY-MM-DD") ?? startDate : ""}
-                          onChange={(e) => setStartDate(e.target.value)}
-                          className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm focus:outline-none focus:ring-1 focus:ring-ring transition-shadow"
-                        />
-                      </FormField>
-                      <FormField label="Due Date">
-                        <input
-                          type="date"
-                          value={dueDate ? dueDate.format?.("YYYY-MM-DD") ?? dueDate : ""}
-                          onChange={(e) => setDueDate(e.target.value)}
-                          className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm focus:outline-none focus:ring-1 focus:ring-ring transition-shadow"
-                        />
-                      </FormField>
-                    </FormRow>
-                  ) : (
-                    <div className="space-y-3">
-                      <div className="grid grid-cols-[80px_1fr_140px] items-center gap-3">
-                        <span className="text-sm font-medium text-foreground">Start in</span>
-                        <Input
-                          value={startsin}
-                          onChange={(e) => setstartsin(e.target.value)}
-                          placeholder="0"
-                          type="number"
-                          min="0"
-                        />
-                        <select
-                          className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-                          value={startsInDuration || ""}
-                          onChange={(e) => setStartsInDuration(e.target.value)}
-                        >
-                          <option value="">Unit</option>
-                          {dayOptions.map((opt) => (
-                            <option key={opt.value} value={opt.value}>{opt.label}</option>
-                          ))}
-                        </select>
-                      </div>
-                      <div className="grid grid-cols-[80px_1fr_140px] items-center gap-3">
-                        <span className="text-sm font-medium text-foreground">Due in</span>
-                        <Input
-                          value={duein}
-                          onChange={(e) => setduein(e.target.value)}
-                          placeholder="0"
-                          type="number"
-                          min="0"
-                        />
-                        <select
-                          className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-                          value={dueinduration || ""}
-                          onChange={(e) => setdueinduration(e.target.value)}
-                        >
-                          <option value="">Unit</option>
-                          {dayOptions.map((opt) => (
-                            <option key={opt.value} value={opt.value}>{opt.label}</option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                  )}
-                </FormSection>
-
-              </FormGrid.Main>
-
-              {/* ===== RIGHT COLUMN (30%): Controls panel ===== */}
-              <FormGrid.Sidebar>
-                <FormSection
-                  title="Subtasks"
-                  icon={<ListChecks className="h-4 w-4" />}
-                  description="Add checklist items to this task template"
-                >
-                  <FormSwitchRow
-                    label="Enable subtasks"
-                    description="Show a subtask checklist on every task created from this template"
-                    checked={SubtaskSwitch}
-                    onCheckedChange={handleSubtaskSwitch}
-                  />
-
-                  {SubtaskSwitch && (
-                    <DragDropContext onDragEnd={handleDragEnd}>
-                      <Droppable droppableId="subtaskList">
-                        {(provided) => (
-                          <div
-                            className="space-y-2 mt-1"
-                            {...provided.droppableProps}
-                            ref={provided.innerRef}
-                          >
-                            {subtasks.map((subtask, index) => (
-                              <Draggable
-                                key={subtask.id}
-                                draggableId={subtask.id}
-                                index={index}
-                              >
-                                {(provided) => (
-                                  <div
-                                    ref={provided.innerRef}
-                                    {...provided.draggableProps}
-                                  >
-                                    <FormSubtaskItem
-                                      text={subtask.text}
-                                      checked={checkedSubtasks.includes(subtask.id)}
-                                      onTextChange={(val) => handleInputChange(subtask.id, val)}
-                                      onCheckedChange={() => handleCheckboxChange(subtask.id)}
-                                      onDelete={() => handleDeleteSubtask(subtask.id)}
-                                      dragHandleProps={provided.dragHandleProps}
-                                    />
-                                  </div>
-                                )}
-                              </Draggable>
-                            ))}
-                            {provided.placeholder}
-                            <FormSubtaskAdd onClick={handleAddSubtask} />
-                          </div>
+                      <FormField
+                        control={form.control}
+                        name="templatename"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Template Name <span className="text-destructive">*</span></FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter template name" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
                         )}
-                      </Droppable>
-                    </DragDropContext>
-                  )}
-                </FormSection>
-              </FormGrid.Sidebar>
-            </FormGrid>
-          </FormPage>
+                      />
+                      <FormField
+                        control={form.control}
+                        name="status"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Status</FormLabel>
+                            <FormControl>
+                              <Status
+                                onStatusChange={(val) => field.onChange(val)}
+                                selectedStatus={field.value}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </FormRow>
+
+                    <FormRow cols={2}>
+                      <FormField
+                        control={form.control}
+                        name="assignees"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Assignees</FormLabel>
+                            <FormControl>
+                              <MultiSelectDropdown
+                                value={field.value || []}
+                                onChange={field.onChange}
+                                placeholder="Select assignees"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="priority"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Priority</FormLabel>
+                            <FormControl>
+                              <Priority
+                                onPriorityChange={(val) => field.onChange(val)}
+                                selectedPriority={field.value}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </FormRow>
+                  </FormSection>
+
+                  {/* ── Description ── */}
+                  <FormSection title="Description">
+                    <Editor onChange={handleEditorChange} content={form.watch("description")} />
+                  </FormSection>
+
+                  {/* ── Tags ── */}
+                  <FormSection title="Tags">
+                    <FormField
+                      control={form.control}
+                      name="tags"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <TagsMultiSelectDropDown
+                              value={field.value || []}
+                              onChange={field.onChange}
+                              placeholder="Select or search tags"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </FormSection>
+
+                  {/* ── Dates ── */}
+                  <FormSection title="Dates" icon={<Calendar className="h-4 w-4" />}>
+                    <FormField
+                      control={form.control}
+                      name="absoluteDate"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <FormSwitchRow
+                              label="Use absolute dates"
+                              description="Set fixed calendar dates instead of relative offsets"
+                              checked={!!field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    {form.watch("absoluteDate") ? (
+                      <FormRow cols={2}>
+                        <FormField
+                          control={form.control}
+                          name="startDate"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Start Date</FormLabel>
+                              <FormControl>
+                                <input
+                                  type="date"
+                                  className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm focus:outline-none focus:ring-1 focus:ring-ring transition-shadow"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="dueDate"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Due Date</FormLabel>
+                              <FormControl>
+                                <input
+                                  type="date"
+                                  className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm focus:outline-none focus:ring-1 focus:ring-ring transition-shadow"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </FormRow>
+                    ) : (
+                      <div className="space-y-3">
+                        <div className="grid grid-cols-[80px_1fr_140px] items-end gap-3">
+                          <span className="text-sm font-medium text-foreground pb-2">Start in</span>
+                          <FormField
+                            control={form.control}
+                            name="startsin"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormControl>
+                                  <Input placeholder="0" type="number" min="0" {...field} />
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="startsInDuration"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormControl>
+                                  <select
+                                    className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                                    {...field}
+                                  >
+                                    <option value="">Unit</option>
+                                    {dayOptions.map((opt) => (
+                                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                    ))}
+                                  </select>
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                        <div className="grid grid-cols-[80px_1fr_140px] items-end gap-3">
+                          <span className="text-sm font-medium text-foreground pb-2">Due in</span>
+                          <FormField
+                            control={form.control}
+                            name="duein"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormControl>
+                                  <Input placeholder="0" type="number" min="0" {...field} />
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="dueinduration"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormControl>
+                                  <select
+                                    className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                                    {...field}
+                                  >
+                                    <option value="">Unit</option>
+                                    {dayOptions.map((opt) => (
+                                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                    ))}
+                                  </select>
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </FormSection>
+
+                </FormGrid.Main>
+
+                {/* ===== RIGHT COLUMN (30%): Controls panel ===== */}
+                <FormGrid.Sidebar>
+                  <FormSection
+                    title="Subtasks"
+                    icon={<ListChecks className="h-4 w-4" />}
+                    description="Add checklist items to this task template"
+                  >
+                    <FormField
+                      control={form.control}
+                      name="SubtaskSwitch"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <FormSwitchRow
+                              label="Enable subtasks"
+                              description="Show a subtask checklist on every task created from this template"
+                              checked={!!field.value}
+                              onCheckedChange={(val) => { field.onChange(val); handleSubtaskSwitch(val); }}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    {form.watch("SubtaskSwitch") && (
+                      <DragDropContext onDragEnd={handleDragEnd}>
+                        <Droppable droppableId="subtaskList">
+                          {(provided) => (
+                            <div
+                              className="space-y-2 mt-1"
+                              {...provided.droppableProps}
+                              ref={provided.innerRef}
+                            >
+                              {subtasks.map((subtask, index) => (
+                                <Draggable key={subtask.id} draggableId={subtask.id} index={index}>
+                                  {(provided) => (
+                                    <div ref={provided.innerRef} {...provided.draggableProps}>
+                                      <FormSubtaskItem
+                                        text={subtask.text}
+                                        checked={checkedSubtasks.includes(subtask.id)}
+                                        onTextChange={(val) => handleInputChange(subtask.id, val)}
+                                        onCheckedChange={() => handleCheckboxChange(subtask.id)}
+                                        onDelete={() => handleDeleteSubtask(subtask.id)}
+                                        dragHandleProps={provided.dragHandleProps}
+                                      />
+                                    </div>
+                                  )}
+                                </Draggable>
+                              ))}
+                              {provided.placeholder}
+                              <FormSubtaskAdd onClick={handleAddSubtask} />
+                            </div>
+                          )}
+                        </Droppable>
+                      </DragDropContext>
+                    )}
+                  </FormSection>
+                </FormGrid.Sidebar>
+              </FormGrid>
+            </FormPage>
+          </Form>
         )}
       </div>
   );

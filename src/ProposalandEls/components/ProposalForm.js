@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, ChevronRight, ChevronLeft, Check, AlertCircle } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Button } from '../../components/ui/button';
 
 // Import your step components (make sure they're also converted to MUI)
 import GeneralStep from '../Steps/GeneralStep';
@@ -718,8 +719,8 @@ const findFirstErrorStep = (validationErrors) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen gap-3">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
-        <span className="text-base font-medium text-slate-500">Loading proposal data...</span>
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        <span className="text-base font-medium text-muted-foreground">Loading proposal data...</span>
       </div>
     );
   }
@@ -731,20 +732,20 @@ const findFirstErrorStep = (validationErrors) => {
     }
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <span className="text-sm text-slate-500">Loading...</span>
+        <span className="text-sm text-muted-foreground">Loading...</span>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50/50">
+    <div className="min-h-screen bg-background">
       {/* Top Header Bar */}
-      <div className="sticky top-0 z-30 border-b border-slate-200 bg-white/80 backdrop-blur-lg">
-        <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6 lg:px-8">
-          <button onClick={handleBackToList} className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700">
-            <ArrowLeft className="h-5 w-5" />
-          </button>
-          <h1 className="text-lg font-semibold text-slate-900 truncate">
+      <div className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur-lg">
+        <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4 sm:px-6 lg:px-8">
+          <Button variant="ghost" size="icon" onClick={handleBackToList} className="shrink-0">
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <h1 className="text-base font-semibold text-foreground truncate">
             {proposalId ? `Edit Proposal: ${formData.general.proposalName}` : 'Create New Proposal'}
           </h1>
         </div>
@@ -752,16 +753,16 @@ const findFirstErrorStep = (validationErrors) => {
 
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
         {error && (
-          <div className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
-            <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
-            <span className="text-sm text-red-700">{error}</span>
+          <div className="flex items-start gap-3 rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-3">
+            <AlertCircle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
+            <span className="text-sm text-destructive">{error}</span>
           </div>
         )}
 
         {/* Stepper */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
+        <div className="rounded-xl border border-border bg-card p-4 sm:p-5 shadow-sm">
           <nav aria-label="Progress">
-            <ol className="flex items-center flex-wrap gap-y-3">
+            <ol className="flex items-center flex-wrap gap-y-2">
               {availableSteps.map((step, index) => {
                 const isActive = index === currentStep;
                 const isCompleted = index < currentStep;
@@ -770,31 +771,31 @@ const findFirstErrorStep = (validationErrors) => {
                   <li key={step.key} className="flex items-center">
                     <button
                       onClick={() => goToStep(index)}
-                      className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                      className={`flex items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-medium transition-all ${
                         isActive
-                          ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200'
+                          ? 'bg-primary text-primary-foreground shadow-sm'
                           : isCompleted
-                          ? 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
+                          ? 'bg-primary/10 text-primary hover:bg-primary/20'
                           : hasError
-                          ? 'bg-red-50 text-red-600 hover:bg-red-100'
-                          : 'bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700'
+                          ? 'bg-destructive/10 text-destructive hover:bg-destructive/20'
+                          : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground'
                       }`}
                     >
-                      <span className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
+                      <span className={`flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold ${
                         isActive
-                          ? 'bg-white/20 text-white'
+                          ? 'bg-primary-foreground/20 text-primary-foreground'
                           : isCompleted
-                          ? 'bg-indigo-600 text-white'
+                          ? 'bg-primary text-primary-foreground'
                           : hasError
-                          ? 'bg-red-500 text-white'
-                          : 'bg-slate-300 text-white'
+                          ? 'bg-destructive text-destructive-foreground'
+                          : 'bg-muted-foreground/30 text-muted-foreground'
                       }`}>
-                        {isCompleted ? <Check className="h-3.5 w-3.5" /> : hasError ? <AlertCircle className="h-3.5 w-3.5" /> : index + 1}
+                        {isCompleted ? <Check className="h-3 w-3" /> : hasError ? <AlertCircle className="h-3 w-3" /> : index + 1}
                       </span>
                       <span className="hidden sm:inline">{step.name}</span>
                     </button>
                     {index < availableSteps.length - 1 && (
-                      <ChevronRight className="mx-1 h-4 w-4 text-slate-300 shrink-0" />
+                      <ChevronRight className="mx-1 h-4 w-4 text-border shrink-0" />
                     )}
                   </li>
                 );
@@ -804,7 +805,7 @@ const findFirstErrorStep = (validationErrors) => {
         </div>
 
         {/* Step Content */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+        <div className="rounded-xl border border-border bg-card p-6 sm:p-8 shadow-sm">
           <CurrentStepComponent
             formData={formData}
             updateFormData={updateFormData}
@@ -823,20 +824,21 @@ const findFirstErrorStep = (validationErrors) => {
 
         {/* Navigation Buttons */}
         <div className="flex items-center justify-between">
-          <button
+          <Button
+            variant="outline"
             onClick={prevStep}
             disabled={currentStep === 0}
-            className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition-all hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+            className="rounded-full px-5 gap-2"
           >
             <ChevronLeft className="h-4 w-4" /> Previous
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={nextStep}
-            className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 hover:shadow-md active:scale-[0.98]"
+            className="rounded-full px-6 gap-2"
           >
             {isLastStep ? (proposalId ? 'Update Proposal' : 'Submit Proposal') : 'Next'}
             {!isLastStep && <ChevronRight className="h-4 w-4" />}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

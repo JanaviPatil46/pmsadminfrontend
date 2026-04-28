@@ -278,15 +278,23 @@
 
 // export default FolderTemplateList;
 
-import React, { useEffect, useState, useRef, useMemo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "../../components/ui/form";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Pencil, PenLine, Trash2, FolderOpen, Plus } from "lucide-react";
 import { DataTable } from "../../components/data-table/data-table";
 import { DataTableToolbar } from "../../components/data-table/toolbar";
+
+const renameSchema = z.object({
+  templatename: z.string().min(1, "Template name is required"),
+});
 
 const FolderTemplateList = () => {
   const [templates, setTemplates] = useState([]);
@@ -296,7 +304,11 @@ const FolderTemplateList = () => {
   const [globalFilter, setGlobalFilter] = useState("");
 
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
-  const [renameValue, setRenameValue] = useState("");
+
+  const renameForm = useForm({
+    resolver: zodResolver(renameSchema),
+    defaultValues: { templatename: "" },
+  });
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
@@ -330,11 +342,11 @@ const FolderTemplateList = () => {
 
   const handleRenameOpen = (template) => {
     setSelectedTemplate(template);
-    setRenameValue(template.templatename || "");
+    renameForm.reset({ templatename: template.templatename || "" });
     setRenameDialogOpen(true);
   };
 
-  const handleRenameSubmit = async () => {
+  const handleRenameSubmit = async ({ templatename }) => {
     if (!selectedTemplate || !selectedTemplate._id) {
       console.error("No template selected for rename");
       return;
@@ -343,7 +355,7 @@ const FolderTemplateList = () => {
     try {
       const response = await axios.patch(
         `https://www.snptaxes.com/api/foldertemp/rename/${selectedTemplate._id}`,
-        { newName: renameValue }
+        { newName: templatename }
       );
       console.log("Rename response:", response.data);
 
@@ -351,7 +363,7 @@ const FolderTemplateList = () => {
       setTemplates((prev) =>
         prev.map((t) =>
           t._id === selectedTemplate._id
-            ? { ...t, templatename: renameValue }
+            ? { ...t, templatename }
             : t
         )
       );
@@ -464,18 +476,29 @@ const FolderTemplateList = () => {
       {/* Rename Dialog */}
       {renameDialogOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-full max-w-md rounded-xl border border-border bg-white p-6 shadow-xl space-y-4">
+          <div className="w-full max-w-md rounded-xl border border-border bg-background p-6 shadow-xl space-y-4">
             <h3 className="text-lg font-semibold">Rename Template</h3>
-            <Input
-            autoFocus
-              placeholder="New Template Name"
-            value={renameValue}
-            onChange={(e) => setRenameValue(e.target.value)}
-          />
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setRenameDialogOpen(false)}>Cancel</Button>
-              <Button onClick={handleRenameSubmit}>Save</Button>
-            </div>
+            <Form {...renameForm}>
+              <form onSubmit={renameForm.handleSubmit(handleRenameSubmit)} className="space-y-4">
+                <FormField
+                  control={renameForm.control}
+                  name="templatename"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Template Name</FormLabel>
+                      <FormControl>
+                        <Input autoFocus placeholder="New template name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="flex justify-end gap-2">
+                  <Button type="button" variant="outline" onClick={() => setRenameDialogOpen(false)}>Cancel</Button>
+                  <Button type="submit">Save</Button>
+                </div>
+              </form>
+            </Form>
           </div>
         </div>
       )}
@@ -483,7 +506,7 @@ const FolderTemplateList = () => {
       {/* Delete Confirmation Dialog */}
       {deleteDialogOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-full max-w-md rounded-xl border border-border bg-white p-6 shadow-xl space-y-4">
+          <div className="w-full max-w-md rounded-xl border border-border bg-background p-6 shadow-xl space-y-4">
             <h3 className="text-lg font-semibold">Delete Template</h3>
             <p className="text-sm text-muted-foreground">
               Are you sure you want to delete <strong>{selectedTemplate?.templatename}</strong>?

@@ -1191,7 +1191,7 @@ const Invoice = ({ charLimit = 4000, serviceandinvoiceSettings, serviceandinvoic
                 },
                 width:'80px',borderRadius:'15px'
               }}>
-                  Save
+                  Sav
                 </Button>
                 <Button variant="outlined" onClick={handleNewDrawerClose} sx={{
                   borderColor: 'var(--color-border-cancel-btn)',  // Normal background

@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import CreatableSelect from "react-select/creatable";
 import Editor from "../Texteditor/Editor";
 import axios from "axios";
 import debounce from "lodash.debounce";
 import { FormPage, FormSection, FormField, FormRow, FormGrid, FormDrawer, FormDrawerFooter, ShortcodePopover } from "../../components/ui/form-layout";
 import { Input } from "../../components/ui/input";
+import { ServiceCombobox } from "../../components/ui/service-combobox";
 import { Button } from "../../components/ui/button";
 import { Label } from "../../components/ui/label";
 import { Switch } from "../../components/ui/switch";
@@ -457,8 +457,8 @@ const InvoiceTemp = () => {
     setselectedService(selectedOptions);
     fetchservicebyid(selectedOptions.value, index);
   };
-  const handleServiceInputChange = (inputValue, actionMeta, index) => {
-    if (actionMeta.action === "input-change") {
+  const handleServiceInputChange = (inputValue, index) => {
+    {
       const newRows = [...rows];
       newRows[index].productName = inputValue;
       setRows(newRows);
@@ -1100,20 +1100,13 @@ const InvoiceTemp = () => {
                     <tbody>
                       {rows.map((row, index) => (
                         <tr key={index} className="border-b border-border last:border-0">
-                          <td className="sticky left-0 bg-card px-2 py-1.5" style={{ minWidth: 180 }}>
-                            <CreatableSelect
-                              placeholder={row.isDiscount ? "Reason for discount" : "Product or Service"}
+                          <td className="sticky left-0 bg-card px-2 py-1.5" style={{ minWidth: 200 }}>
+                            <ServiceCombobox
                               options={serviceoptions}
-                              value={row.productName ? serviceoptions.find((option) => option.label === row.productName) || { label: row.productName, value: row.productName } : null}
-                              onChange={(selectedOption) => handleServiceChange(index, selectedOption)}
-                              onInputChange={(inputValue, actionMeta) => handleServiceInputChange(inputValue, actionMeta, index)}
-                              isClearable
-                              styles={{
-                                container: (provided) => ({ ...provided, minWidth: "160px" }),
-                                control: (provided) => ({ ...provided, minHeight: "34px", borderColor: "#e2e8f0" }),
-                                menuPortal: (provided) => ({ ...provided, zIndex: 9999 }),
-                              }}
-                              menuPortalTarget={document.body}
+                              value={row.productName || ''}
+                              placeholder={row.isDiscount ? 'Reason for discount' : 'Product or Service'}
+                              onChange={label => handleServiceChange(index, { label, value: label })}
+                              onInputChange={text => handleServiceInputChange(text, index)}
                             />
                           </td>
                           <td className="px-2 py-1.5" style={{ minWidth: 140 }}>

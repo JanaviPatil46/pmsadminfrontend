@@ -1,85 +1,93 @@
-import React, { useState } from 'react';
-import Editor from '../components/Editor'; // Adjust the import path as needed
+import React from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import Editor from '../components/Editor';
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '../../components/ui/form';
+import { Input } from '../../components/ui/input';
 
+const termsSchema = z.object({
+  title: z.string().min(1, 'Title is required'),
+  description: z.string().optional(),
+});
 
-const TermsStep = ({ formData, updateFormData, nextStep, prevStep, stepErrors, setStepErrors }) => {
-  const [touched, setTouched] = useState({});
+const TermsStep = ({ formData, updateFormData, stepErrors, setStepErrors }) => {
+  const form = useForm({
+    resolver: zodResolver(termsSchema),
+    defaultValues: {
+      title: formData.terms?.title || '',
+      description: formData.terms?.description || '',
+    },
+  });
 
-  // Handle field blur
-  const handleBlur = (fieldName) => {
-    setTouched(prev => ({
-      ...prev,
-      [fieldName]: true
-    }));
-  };
-
-  // Handle title change
-  const handleTitleChange = (e) => {
-    const value = e.target.value;
-    updateFormData('terms', { 
-      ...formData.terms, 
-      title: value 
-    });
-
-    // Clear error when user starts typing
-    if (value.trim() !== '' && stepErrors.title) {
-      setStepErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors.title;
-        return newErrors;
-      });
+  const handleTitleChange = (value) => {
+    updateFormData('terms', { ...formData.terms, title: value });
+    if (value.trim() && stepErrors?.title) {
+      setStepErrors(prev => { const e = { ...prev }; delete e.title; return e; });
     }
   };
 
-  // Handle description change from editor
   const handleDescriptionChange = (content) => {
-    updateFormData('terms', { 
-      ...formData.terms, 
-      description: content 
-    });
-
-    // Clear error when user starts typing
-    const textContent = content.replace(/<[^>]*>/g, '').trim();
-    if (textContent !== '' && stepErrors.description) {
-      setStepErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors.description;
-        return newErrors;
-      });
+    updateFormData('terms', { ...formData.terms, description: content });
+    const text = content.replace(/<[^>]*>/g, '').trim();
+    if (text && stepErrors?.description) {
+      setStepErrors(prev => { const e = { ...prev }; delete e.description; return e; });
     }
   };
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-semibold text-indigo-600">Terms & Conditions</h2>
+      <h2 className="text-xl font-semibold text-foreground">Terms & Conditions</h2>
 
-      <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-6 space-y-4">
-        <p className="text-sm text-slate-500">
+      <div className="rounded-xl border border-border bg-muted/20 p-6 space-y-4">
+        <p className="text-sm text-muted-foreground">
           Engagement letter or contractual agreement that outlines the terms of the relationship
           between your firm and clients. The section title can be renamed.
         </p>
 
-        <div className="space-y-1.5">
-          <input
-            type="text"
-            value={formData.terms?.title || ''}
-            onChange={handleTitleChange}
-            onBlur={() => handleBlur('title')}
-            placeholder="Enter terms title"
-            required
-            className={`flex h-10 w-full rounded-lg border bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${stepErrors.title ? 'border-red-400' : 'border-slate-200'}`}
-          />
-          {stepErrors.title && <p className="text-xs text-red-500">{stepErrors.title}</p>}
-        </div>
+        <Form {...form}>
+          <form className="space-y-4">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Title *</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder="Enter terms title"
+                      value={formData.terms?.title || ''}
+                      className={stepErrors?.title ? 'border-destructive' : ''}
+                      onChange={e => { field.onChange(e); handleTitleChange(e.target.value); }}
+                    />
+                  </FormControl>
+                  {stepErrors?.title
+                    ? <p className="text-xs text-destructive">{stepErrors.title}</p>
+                    : <FormMessage />}
+                </FormItem>
+              )}
+            />
 
-        <div className="space-y-1.5 mt-4">
-          <Editor
-            initialContent={formData.terms?.description || ''}
-            onChange={handleDescriptionChange}
-            onBlur={() => handleBlur('description')}
-          />
-          {stepErrors.description && <p className="text-xs text-red-500">{stepErrors.description}</p>}
-        </div>
+            <FormField
+              control={form.control}
+              name="description"
+              render={() => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Editor
+                      initialContent={formData.terms?.description || ''}
+                      onChange={handleDescriptionChange}
+                    />
+                  </FormControl>
+                  {stepErrors?.description && <p className="text-xs text-destructive">{stepErrors.description}</p>}
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </form>
+        </Form>
       </div>
     </div>
   );

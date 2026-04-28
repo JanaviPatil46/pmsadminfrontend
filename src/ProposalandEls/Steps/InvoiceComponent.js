@@ -1162,11 +1162,10 @@
 // };
 // export default InvoiceComponent;
 import React, { useState,useEffect } from 'react';
-import { RiCloseLine } from 'react-icons/ri';
-import { AiOutlinePlusCircle } from 'react-icons/ai';
-import { CiDiscount1 } from 'react-icons/ci';
-import { BsThreeDotsVertical } from 'react-icons/bs';
-import CreatableSelect from 'react-select/creatable';
+import { PlusCircle, Tag, MoreVertical, X } from 'lucide-react';
+import { Input } from '../../components/ui/input';
+import { Checkbox } from '../../components/ui/checkbox';
+import { ServiceCombobox } from '../../components/ui/service-combobox';
 import Select from 'react-select';
 import Editor from '../components/Editor';
 import SaveAsServiceDrawer from "./SaveAsServiceDrawer"
@@ -1966,7 +1965,7 @@ const handleSaveChanges = (updatedRowData = null) => {
     
     return (
       <div className="mt-1 space-y-1.5">
-        <label className="text-sm font-medium text-slate-700">Team Members *</label>
+        <label className="text-sm font-medium text-foreground">Team Members *</label>
         <Select
           isMulti
           options={teammemberoption}
@@ -1983,9 +1982,9 @@ const handleSaveChanges = (updatedRowData = null) => {
           menuPortalTarget={document.body}
         />
         {getInvoiceError(invoice.id, 'teamMembers') && (
-          <p className="text-xs text-red-500">{getInvoiceError(invoice.id, 'teamMembers')}</p>
+          <p className="text-xs text-destructive">{getInvoiceError(invoice.id, 'teamMembers')}</p>
         )}
-        <p className="text-xs text-slate-400">{selectedTeamMembers.length} team member(s) selected</p>
+        <p className="text-xs text-muted-foreground">{selectedTeamMembers.length} team member(s) selected</p>
       </div>
     );
   };
@@ -1994,7 +1993,7 @@ const handleSaveChanges = (updatedRowData = null) => {
     <div className="mt-4 space-y-4">
       {/* Show validation errors */}
       {(stepErrors.invoices || stepErrors.invoiceDetails) && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
           {stepErrors.invoices && <div>- {stepErrors.invoices}</div>}
           {stepErrors.invoiceDetails && <div>- {stepErrors.invoiceDetails}</div>}
         </div>
@@ -2009,20 +2008,20 @@ const handleSaveChanges = (updatedRowData = null) => {
       )}
 
       {invoices.map((invoice, invoiceIndex) => (
-        <div key={invoice.id} className="relative rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div key={invoice.id} className="relative rounded-xl border border-border bg-card p-5 shadow-sm">
           {invoices.length > 1 && (
-            <button type="button" onClick={() => removeInvoice(invoice.id)} className="absolute top-3 right-3 rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600">
-              <RiCloseLine className="h-5 w-5" />
+            <button type="button" onClick={() => removeInvoice(invoice.id)} className="absolute top-3 right-3 rounded-lg p-1 text-muted-foreground hover:bg-muted hover:text-foreground">
+              <X className="h-5 w-5" />
             </button>
           )}
 
-          <h4 className="text-base font-semibold text-slate-800 mb-4">Invoice #{invoiceIndex + 1}</h4>
+          <h4 className="text-base font-semibold text-foreground mb-4">Invoice #{invoiceIndex + 1}</h4>
 
           <div className="space-y-4">
             {/* Invoice Template & Team Members */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-slate-700">Invoice Template *</label>
+                <label className="text-sm font-medium text-foreground">Invoice Template *</label>
                 <Select
                   options={invoiceOptions}
                   value={invoice.invoiceTemplate}
@@ -2035,7 +2034,7 @@ const handleSaveChanges = (updatedRowData = null) => {
                   }}
                   menuPortalTarget={document.body}
                 />
-                {getInvoiceError(invoice.id, 'invoiceTemplate') && <p className="text-xs text-red-500">{getInvoiceError(invoice.id, 'invoiceTemplate')}</p>}
+                {getInvoiceError(invoice.id, 'invoiceTemplate') && <p className="text-xs text-destructive">{getInvoiceError(invoice.id, 'invoiceTemplate')}</p>}
               </div>
               <TeamMembersSelector invoice={invoice} />
             </div>
@@ -2043,20 +2042,20 @@ const handleSaveChanges = (updatedRowData = null) => {
             {/* Issue Invoice, Date, Time */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-slate-700">Issue invoice</label>
-                <select value={invoice.issueInvoice || ''} onChange={(e) => handleIssueChange(invoice.id, e.target.value)} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <label className="text-sm font-medium text-foreground">Issue invoice</label>
+                <select value={invoice.issueInvoice || ''} onChange={(e) => handleIssueChange(invoice.id, e.target.value)} className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring">
                   {invoiceissueoptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                 </select>
               </div>
               {invoice.issueInvoice === "specific date" && (
                 <>
                   <div className="space-y-1.5">
-                    <label className="text-sm font-medium text-slate-700">Date</label>
-                    <input type="date" value={invoice.specificDate ? (typeof invoice.specificDate === 'string' ? invoice.specificDate : invoice.specificDate.format?.('YYYY-MM-DD') || '') : ''} onChange={(e) => handleDateChange(invoice.id, e.target.value)} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                    <label className="text-sm font-medium text-foreground">Date</label>
+                    <input type="date" value={invoice.specificDate ? (typeof invoice.specificDate === 'string' ? invoice.specificDate : invoice.specificDate.format?.('YYYY-MM-DD') || '') : ''} onChange={(e) => handleDateChange(invoice.id, e.target.value)} className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring" />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-sm font-medium text-slate-700">Time</label>
-                    <select value={invoice.selectedTime || ''} onChange={(e) => handleTimeChange(invoice.id, e.target.value)} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <label className="text-sm font-medium text-foreground">Time</label>
+                    <select value={invoice.selectedTime || ''} onChange={(e) => handleTimeChange(invoice.id, e.target.value)} className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring">
                       <option value="">Select Time</option>
                       {timeOptions.map(t => <option key={t} value={t}>{t}</option>)}
                     </select>
@@ -2067,87 +2066,85 @@ const handleSaveChanges = (updatedRowData = null) => {
 
             {/* Description */}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-slate-700">Description</label>
+              <label className="text-sm font-medium text-foreground">Description</label>
               <div className="relative">
-                <input type="text" value={invoice.description} onChange={(e) => handleDescriptionChange(invoice.id, e)} placeholder="Description" className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 pr-20 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">{invoice.charCount}/{invoice.charLimit}</span>
+                <input type="text" value={invoice.description} onChange={(e) => handleDescriptionChange(invoice.id, e)} placeholder="Description" className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 pr-20 text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">{invoice.charCount}/{invoice.charLimit}</span>
               </div>
             </div>
 
             {/* Line Items Table */}
             <div>
               <div className="mb-2">
-                <h5 className="text-sm font-semibold text-slate-800">Line items</h5>
-                <p className="text-xs text-slate-500">Client-facing itemized list of products and services</p>
-                {getInvoiceError(invoice.id, 'rows') && <p className="text-xs text-red-500 mt-1">{getInvoiceError(invoice.id, 'rows')}</p>}
+                <h5 className="text-sm font-semibold text-foreground">Line items</h5>
+                <p className="text-xs text-muted-foreground">Client-facing itemized list of products and services</p>
+                {getInvoiceError(invoice.id, 'rows') && <p className="text-xs text-destructive mt-1">{getInvoiceError(invoice.id, 'rows')}</p>}
               </div>
-              <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+              <div className="rounded-xl border border-border bg-background shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left">
                     <thead>
-                      <tr className="border-b border-slate-100 bg-slate-50/60">
-                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Product / Service</th>
-                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Description</th>
-                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Rate</th>
-                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Qty</th>
-                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Amount</th>
-                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Tax</th>
+                      <tr className="border-b border-border bg-muted/40">
+                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Product / Service</th>
+                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Description</th>
+                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Rate</th>
+                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Qty</th>
+                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Amount</th>
+                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Tax</th>
                         <th className="px-4 py-3"></th>
                         <th className="px-4 py-3"></th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-border">
                       {invoice.rows.map((row, rowIndex) => (
-                        <tr key={rowIndex} className="hover:bg-slate-50/70">
-                          <td className="px-4 py-2 min-w-[200px]">
-                            <CreatableSelect
-                              placeholder={row.isDiscount ? "Reason for discount" : "Product or Service"}
+                        <tr key={rowIndex} className="hover:bg-muted/20">
+                          <td className="px-4 py-2 min-w-[220px]">
+                            <ServiceCombobox
                               options={serviceoptions}
-                              value={row.productorService ? serviceoptions.find((option) => option.label === row.productorService) || { label: row.productorService, value: row.productorService } : null}
-                              onChange={(selectedOption) => handleServiceChange(invoice.id, rowIndex, selectedOption)}
-                              onInputChange={(inputValue, actionMeta) => handleServiceInputChange(invoice.id, rowIndex, inputValue, actionMeta)}
-                              isClearable
-                              styles={{
-                                control: (provided) => ({ ...provided, minWidth: 180, borderColor: getInvoiceRowError(invoice.id, rowIndex, 'productorService') ? 'red' : '#e2e8f0' }),
-                                menuPortal: (provided) => ({ ...provided, zIndex: 9999 }),
-                              }}
-                              menuPortalTarget={document.body}
+                              value={row.productorService}
+                              placeholder={row.isDiscount ? 'Reason for discount' : 'Product or Service'}
+                              hasError={!!getInvoiceRowError(invoice.id, rowIndex, 'productorService')}
+                              onChange={label => handleServiceChange(invoice.id, rowIndex, { label, value: label })}
+                              onInputChange={text => handleServiceInputChange(invoice.id, rowIndex, text, { action: 'input-change' })}
                             />
-                            {getInvoiceRowError(invoice.id, rowIndex, 'productorService') && <p className="text-xs text-red-500 mt-0.5">{getInvoiceRowError(invoice.id, rowIndex, 'productorService')}</p>}
+                            {getInvoiceRowError(invoice.id, rowIndex, 'productorService') && <p className="text-xs text-destructive mt-0.5">{getInvoiceRowError(invoice.id, rowIndex, 'productorService')}</p>}
                           </td>
                           <td className="px-4 py-2">
-                            <input type="text" name="description" value={row.description} onChange={(e) => handleInputChange(invoice.id, rowIndex, e)} placeholder="Description" className="w-full border-0 bg-transparent text-sm focus:outline-none focus:ring-0" />
+                            <Input name="description" value={row.description} onChange={(e) => handleInputChange(invoice.id, rowIndex, e)} placeholder="Description" className="border-0 bg-transparent shadow-none focus-visible:ring-0" />
                           </td>
                           <td className="px-4 py-2">
-                            <input type="text" name="rate" value={row.rate} onChange={(e) => handleInputChange(invoice.id, rowIndex, e)} className={`w-20 rounded border bg-transparent px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 ${getInvoiceRowError(invoice.id, rowIndex, 'rate') ? 'border-red-400' : 'border-slate-200'}`} />
-                            {getInvoiceRowError(invoice.id, rowIndex, 'rate') && <p className="text-xs text-red-500 mt-0.5">{getInvoiceRowError(invoice.id, rowIndex, 'rate')}</p>}
+                            <Input name="rate" value={row.rate} onChange={(e) => handleInputChange(invoice.id, rowIndex, e)} className={`w-20 ${getInvoiceRowError(invoice.id, rowIndex, 'rate') ? 'border-destructive' : ''}`} />
+                            {getInvoiceRowError(invoice.id, rowIndex, 'rate') && <p className="text-xs text-destructive mt-0.5">{getInvoiceRowError(invoice.id, rowIndex, 'rate')}</p>}
                           </td>
                           <td className="px-4 py-2">
-                            <input type="text" name="quantity" value={row.quantity} onChange={(e) => handleInputChange(invoice.id, rowIndex, e)} className={`w-16 rounded border bg-transparent px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 ${getInvoiceRowError(invoice.id, rowIndex, 'quantity') ? 'border-red-400' : 'border-slate-200'}`} />
-                            {getInvoiceRowError(invoice.id, rowIndex, 'quantity') && <p className="text-xs text-red-500 mt-0.5">{getInvoiceRowError(invoice.id, rowIndex, 'quantity')}</p>}
+                            <Input name="quantity" value={row.quantity} onChange={(e) => handleInputChange(invoice.id, rowIndex, e)} className={`w-16 ${getInvoiceRowError(invoice.id, rowIndex, 'quantity') ? 'border-destructive' : ''}`} />
+                            {getInvoiceRowError(invoice.id, rowIndex, 'quantity') && <p className="text-xs text-destructive mt-0.5">{getInvoiceRowError(invoice.id, rowIndex, 'quantity')}</p>}
                           </td>
-                          <td className="px-4 py-2 text-sm text-slate-700">${row.amount}</td>
+                          <td className="px-4 py-2 text-sm text-foreground">${row.amount}</td>
                           <td className="px-4 py-2">
-                            <input type="checkbox" name="tax" checked={row.tax} onChange={(e) => handleInputChange(invoice.id, rowIndex, e)} className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+                            <Checkbox
+                              checked={row.tax}
+                              onCheckedChange={checked => handleInputChange(invoice.id, rowIndex, { target: { name: 'tax', type: 'checkbox', checked } })}
+                            />
                           </td>
                           <td className="px-4 py-2">
                             <div className="relative">
-                              <button type="button" onClick={(event) => handleMenuOpen(event, rowIndex, invoice.id)} className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600">
-                                <BsThreeDotsVertical className="h-4 w-4" />
+                              <button type="button" onClick={(event) => handleMenuOpen(event, rowIndex, invoice.id)} className="rounded-lg p-1 text-muted-foreground hover:bg-muted hover:text-foreground">
+                                <MoreVertical className="h-4 w-4" />
                               </button>
                               {isMenuOpen(rowIndex, invoice.id) && (
-                                <div className="absolute right-0 top-full z-50 mt-1 w-44 rounded-lg border border-slate-200 bg-white py-1 shadow-lg">
-                                  <button type="button" onClick={() => { handleEditService(row, rowIndex, invoice.id); handleMenuClose(); }} className="block w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">Edit</button>
-                                  <button type="button" onClick={() => { handleDuplicate(invoice.id, rowIndex); handleMenuClose(); }} className="block w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">Duplicate</button>
-                                  <button type="button" onClick={() => { deleteRow(invoice.id, rowIndex); handleMenuClose(); }} className="block w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50">Delete</button>
-                                  <button type="button" onClick={() => { setSelectedRowData(row); setIsNewServiceDrawerOpen(true); handleMenuClose(); }} className="block w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">Save as new service</button>
+                                <div className="absolute right-0 top-full z-50 mt-1 w-44 rounded-lg border border-border bg-background py-1 shadow-lg">
+                                  <button type="button" onClick={() => { handleEditService(row, rowIndex, invoice.id); handleMenuClose(); }} className="block w-full text-left px-3 py-2 text-sm text-foreground hover:bg-muted/60">Edit</button>
+                                  <button type="button" onClick={() => { handleDuplicate(invoice.id, rowIndex); handleMenuClose(); }} className="block w-full text-left px-3 py-2 text-sm text-foreground hover:bg-muted/60">Duplicate</button>
+                                  <button type="button" onClick={() => { deleteRow(invoice.id, rowIndex); handleMenuClose(); }} className="block w-full text-left px-3 py-2 text-sm text-destructive hover:bg-destructive/10">Delete</button>
+                                  <button type="button" onClick={() => { setSelectedRowData(row); setIsNewServiceDrawerOpen(true); handleMenuClose(); }} className="block w-full text-left px-3 py-2 text-sm text-foreground hover:bg-muted/60">Save as new service</button>
                                 </div>
                               )}
                             </div>
                           </td>
                           <td className="px-4 py-2">
-                            <button type="button" onClick={() => deleteRow(invoice.id, rowIndex)} className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-red-500">
-                              <RiCloseLine className="h-4 w-4" />
+                            <button type="button" onClick={() => deleteRow(invoice.id, rowIndex)} className="rounded-lg p-1 text-muted-foreground hover:bg-muted hover:text-destructive">
+                              <X className="h-4 w-4" />
                             </button>
                           </td>
                         </tr>
@@ -2159,37 +2156,37 @@ const handleSaveChanges = (updatedRowData = null) => {
 
               {/* Add Row Buttons */}
               <div className="flex items-center gap-4 mt-2">
-                <button type="button" onClick={() => addRow(invoice.id)} className="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-700">
-                  <AiOutlinePlusCircle className="h-4 w-4" /> Line item
+                <button type="button" onClick={() => addRow(invoice.id)} className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80">
+                  <PlusCircle className="h-4 w-4" /> Line item
                 </button>
-                <button type="button" onClick={() => addRow(invoice.id, true)} className="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-700">
-                  <CiDiscount1 className="h-4 w-4" /> Discount
+                <button type="button" onClick={() => addRow(invoice.id, true)} className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80">
+                  <Tag className="h-4 w-4" /> Discount
                 </button>
               </div>
 
               {/* Summary */}
-              <h5 className="text-sm font-semibold text-slate-800 mt-4">Summary</h5>
-              <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden max-w-lg mt-2">
+              <h5 className="text-sm font-semibold text-foreground mt-4">Summary</h5>
+              <div className="rounded-xl border border-border bg-background shadow-sm overflow-hidden max-w-lg mt-2">
                 <table className="w-full text-left">
                   <thead>
-                    <tr className="border-b border-slate-100 bg-slate-50/60">
-                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Subtotal</th>
-                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Tax Rate</th>
-                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Tax Total</th>
-                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Total</th>
+                    <tr className="border-b border-border bg-muted/40">
+                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Subtotal</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Tax Rate</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Tax Total</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Total</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
-                      <td className="px-4 py-3 text-sm font-medium text-slate-700">${invoice.subtotal}</td>
+                      <td className="px-4 py-3 text-sm font-medium text-foreground">${invoice.subtotal}</td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1">
-                          <input type="text" value={invoice.taxRate} onChange={(e) => handleTaxRateChange(invoice.id, e.target.value)} className="w-16 rounded border border-slate-200 bg-transparent px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500" />
-                          <span className="text-sm text-slate-500">%</span>
+                          <Input type="text" value={invoice.taxRate} onChange={(e) => handleTaxRateChange(invoice.id, e.target.value)} className="w-16" />
+                          <span className="text-sm text-muted-foreground">%</span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-sm text-slate-700">${invoice.taxTotal}</td>
-                      <td className="px-4 py-3 text-sm font-bold text-slate-900">${invoice.totalAmount}</td>
+                      <td className="px-4 py-3 text-sm text-foreground">${invoice.taxTotal}</td>
+                      <td className="px-4 py-3 text-sm font-bold text-foreground">${invoice.totalAmount}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -2198,7 +2195,7 @@ const handleSaveChanges = (updatedRowData = null) => {
 
             {/* Client Note Editor */}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-slate-700">Note for Client</label>
+              <label className="text-sm font-medium text-foreground">Note for Client</label>
               <Editor
                 onChange={(content) => handleEditorChange(invoice.id, content)}
                 initialContent={invoice.clientNote}
@@ -2210,13 +2207,13 @@ const handleSaveChanges = (updatedRowData = null) => {
 
       {/* Add Invoice Button */}
       <div className="flex items-center gap-3 mt-2">
-        <button type="button" onClick={addInvoice} className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-200 bg-white px-4 py-2 text-sm font-medium text-indigo-600 shadow-sm transition-colors hover:bg-indigo-50">
+        <button type="button" onClick={addInvoice} className="inline-flex items-center gap-1.5 rounded-lg border border-primary/30 bg-background px-4 py-2 text-sm font-medium text-primary shadow-sm transition-colors hover:bg-primary/10">
           Add invoice
         </button>
       </div>
 
       {/* Invoice Count Display */}
-      <p className="text-xs text-slate-400">{invoices.length} invoice(s) added</p>
+      <p className="text-xs text-muted-foreground">{invoices.length} invoice(s) added</p>
 
       <SaveAsServiceDrawer
         open={isNewServiceDrawerOpen}

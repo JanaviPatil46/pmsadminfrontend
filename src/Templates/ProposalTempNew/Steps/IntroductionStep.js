@@ -1,375 +1,111 @@
 
 
-// import React, { useState, useEffect } from 'react';
-// import Editor from '../components/Editor'; // Adjust the import path as needed
-
-// const IntroductionStep = ({ formData, updateFormData, nextStep, prevStep }) => {
-//   const [errors, setErrors] = useState({});
-//   const [touched, setTouched] = useState({});
-
-//   // Validation rules
-//   const validateField = (name, value) => {
-//     const newErrors = { ...errors };
-
-//     switch (name) {
-//       case 'title':
-//         if (!value || value.trim() === '') {
-//           newErrors.title = 'Title is required';
-//         }  else {
-//           delete newErrors.title;
-//         }
-//         break;
-
-//       case 'description':
-//         // Remove HTML tags for validation
-//         const textContent = value.replace(/<[^>]*>/g, '').trim();
-//         if (!textContent) {
-//           newErrors.description = 'Description is required';
-//         }  else {
-//           delete newErrors.description;
-//         }
-//         break;
-
-//       default:
-//         break;
-//     }
-
-//     return newErrors;
-//   };
-
-//   // Handle field blur
-//   const handleBlur = (fieldName) => (e) => {
-//     setTouched(prev => ({
-//       ...prev,
-//       [fieldName]: true
-//     }));
-
-//     const value = fieldName === 'description' 
-//       ? formData.introduction?.description || '' 
-//       : e.target.value;
-
-//     const newErrors = validateField(fieldName, value);
-//     setErrors(newErrors);
-//   };
-
-//   // Handle title change
-//   const handleTitleChange = (e) => {
-//     const value = e.target.value;
-//     updateFormData('introduction', { 
-//       ...formData.introduction, 
-//       title: value 
-//     });
-
-//     // Validate immediately if field was already touched
-//     if (touched.title) {
-//       const newErrors = validateField('title', value);
-//       setErrors(newErrors);
-//     }
-//   };
-
-//   // Handle description change from editor
-//   const handleDescriptionChange = (content) => {
-//     updateFormData('introduction', { 
-//       ...formData.introduction, 
-//       description: content 
-//     });
-
-//     // Validate immediately if field was already touched
-//     if (touched.description) {
-//       const newErrors = validateField('description', content);
-//       setErrors(newErrors);
-//     }
-//   };
-
-//   // Validate all fields before proceeding
-//   const handleNext = () => {
-//     // Mark all fields as touched
-//     const allTouched = {
-//       title: true,
-//       description: true
-//     };
-//     setTouched(allTouched);
-
-//     // Validate all fields
-//     const titleErrors = validateField('title', formData.introduction?.title || '');
-//     const descriptionErrors = validateField('description', formData.introduction?.description || '');
-    
-//     const allErrors = { ...titleErrors, ...descriptionErrors };
-
-//     if (Object.keys(allErrors).length === 0) {
-//       nextStep();
-//     } else {
-//       setErrors(allErrors);
-//     }
-//   };
-
-//   // Check if form is valid
-//   const isFormValid = () => {
-//     return Object.keys(errors).length === 0;
-//   };
-
-//   return (
-//     <div className="step-container">
-//       <h2>Introduction</h2>
-      
-//       <div className="form-group">
-//         <label htmlFor="title">Title *</label>
-//         <input
-//           id="title"
-//           type="text"
-//           value={formData.introduction?.title || ''}
-//           onChange={handleTitleChange}
-//           onBlur={handleBlur('title')}
-//           placeholder="Enter introduction title"
-//           className={touched.title && errors.title ? 'error' : ''}
-//         />
-//         {touched.title && errors.title && (
-//           <div className="error-text">{errors.title}</div>
-//         )}
-//       </div>
-
-//       <div className="form-group">
-//         <label htmlFor="description">Description *</label>
-//         <Editor
-//           initialContent={formData.introduction?.description || ''}
-//           onChange={handleDescriptionChange}
-//           onBlur={() => handleBlur('description')()}
-//         />
-//         {touched.description && errors.description && (
-//           <div className="error-text">{errors.description}</div>
-//         )}
-//         {/* <div className="character-count">
-//           {formData.introduction?.description 
-//             ? `Characters: ${formData.introduction.description.replace(/<[^>]*>/g, '').length}`
-//             : 'Characters: 0'
-//           }
-//         </div> */}
-//       </div>
-
-//       <div className="navigation-buttons">
-//         <button onClick={prevStep} className="btn-secondary">
-//           Previous
-//         </button>
-//         <button 
-//           onClick={handleNext} 
-//           className="btn-primary"
-//           disabled={!isFormValid()}
-//         >
-//           Next
-//         </button>
-//       </div>
-// import Editor from '../components/Editor'; // Adjust the import path as needed
-
-
-//   // Validation rules
-//   const validateField = (name, value) => {
-//     const newErrors = { ...errors };
-
-//     switch (name) {
-//       case 'title':
-//         if (!value || value.trim() === '') {
-//           newErrors.title = 'Title is required';
-//         } else {
-//           delete newErrors.title;
-//         }
-//         break;
-
-//       case 'description':
-//         // Remove HTML tags for validation
-//         const textContent = value.replace(/<[^>]*>/g, '').trim();
-//         if (!textContent) {
-//           newErrors.description = 'Description is required';
-//         } else {
-//           delete newErrors.description;
-//         }
-//         break;
-
-//       default:
-//         break;
-//     }
-
-//     return newErrors;
-//   };
-
-//   // Handle field blur
-//   const handleBlur = (fieldName) => (e) => {
-//     setTouched(prev => ({
-//       ...prev,
-//       [fieldName]: true
-//     }));
-
-//     const value = fieldName === 'description' 
-//       ? formData.introduction?.description || '' 
-//       : e.target.value;
-
-//     const newErrors = validateField(fieldName, value);
-//     setErrors(newErrors);
-//   };
-
-//   // Handle title change
-//   const handleTitleChange = (e) => {
-//     const value = e.target.value;
-//     updateFormData('introduction', { 
-//       ...formData.introduction, 
-//       title: value 
-//     });
-
-//     // Validate immediately if field was already touched
-//     if (touched.title) {
-//       const newErrors = validateField('title', value);
-//       setErrors(newErrors);
-//     }
-//   };
-
-//   // Handle description change from editor
-//   const handleDescriptionChange = (content) => {
-//     updateFormData('introduction', { 
-//       ...formData.introduction, 
-//       description: content 
-//     });
-
-//     // Validate immediately if field was already touched
-//     if (touched.description) {
-//       const newErrors = validateField('description', content);
-//       setErrors(newErrors);
-//     }
-//   };
-
-  
-
-//   return (
-//     <Box>
-//       <Typography variant="h4" gutterBottom color="primary" fontWeight="600" sx={{ mb: 4 }}>
-//         Introduction
-//       </Typography>
-
-  
-
-//       <Paper elevation={0} sx={{ p: 3, mb: 3, backgroundColor: 'grey.50' }}>
-//         <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-//           Explain to your clients who you are, what services you provide, the value you bring, 
-//           and any other information you want to share.
-//         </Typography>
-
-//         <TextField
-//           fullWidth
-//           label="Introduction Title"
-//           value={formData.introduction?.title || ''}
-//           onChange={handleTitleChange}
-//           onBlur={handleBlur('title')}
-//           error={touched.title && !!errors.title}
-//           helperText={touched.title && errors.title}
-//           placeholder="Enter introduction title"
-//           required
-//           margin="normal"
-//           sx={{ mb: 3 }}
-//         />
-
-//         <FormControl fullWidth error={touched.description && !!errors.description}>
-          
-//           <Box sx={{ mt: 2, mb: 1 }}>
-//             <Editor
-//               initialContent={formData.introduction?.description || ''}
-//               onChange={handleDescriptionChange}
-//               onBlur={() => handleBlur('description')()}
-//             />
-//           </Box>
-//           {touched.description && errors.description && (
-//             <FormHelperText error>{errors.description}</FormHelperText>
-//           )}
-         
-//         </FormControl>
-//       </Paper>
-
-      
-//     </Box>
-//   );
-// };
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import Editor from '../components/Editor';
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '../../../components/ui/form';
+import { Input } from '../../../components/ui/input';
 
-const IntroductionStep = ({ formData, updateFormData, nextStep, prevStep, stepErrors, setStepErrors }) => {
-  const [touched, setTouched] = useState({});
+const introductionSchema = z.object({
+  title: z.string().min(1, 'Title is required'),
+  description: z.string().optional(),
+});
 
-  // Handle field blur
-  const handleBlur = (fieldName) => {
-    setTouched(prev => ({
-      ...prev,
-      [fieldName]: true
-    }));
-  };
+const IntroductionStep = ({ formData, updateFormData, stepErrors, setStepErrors }) => {
+  const form = useForm({
+    resolver: zodResolver(introductionSchema),
+    defaultValues: {
+      title: formData.introduction?.title || '',
+      description: formData.introduction?.description || '',
+    },
+  });
 
-  // Handle title change
-  const handleTitleChange = (e) => {
-    const value = e.target.value;
-    updateFormData('introduction', { 
-      ...formData.introduction, 
-      title: value 
+  useEffect(() => {
+    form.reset({
+      title: formData.introduction?.title || '',
+      description: formData.introduction?.description || '',
     });
+  }, [formData.introduction?.title, formData.introduction?.description]);
 
-    // Clear error when user starts typing
-    if (value.trim() !== '' && stepErrors.title) {
-      setStepErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors.title;
-        return newErrors;
-      });
+  useEffect(() => {
+    if (stepErrors?.title) form.setError('title', { message: stepErrors.title });
+    if (stepErrors?.description) form.setError('description', { message: stepErrors.description });
+  }, [stepErrors]);
+
+  const handleTitleChange = (value) => {
+    updateFormData('introduction', { ...formData.introduction, title: value });
+    if (value.trim() && stepErrors?.title) {
+      setStepErrors(prev => { const e = { ...prev }; delete e.title; return e; });
     }
   };
 
-  // Handle description change from editor
   const handleDescriptionChange = (content) => {
-    updateFormData('introduction', { 
-      ...formData.introduction, 
-      description: content 
-    });
-
-    // Clear error when user starts typing
-    const textContent = content.replace(/<[^>]*>/g, '').trim();
-    if (textContent !== '' && stepErrors.description) {
-      setStepErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors.description;
-        return newErrors;
-      });
+    updateFormData('introduction', { ...formData.introduction, description: content });
+    const text = content.replace(/<[^>]*>/g, '').trim();
+    if (text && stepErrors?.description) {
+      setStepErrors(prev => { const e = { ...prev }; delete e.description; return e; });
     }
   };
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-semibold text-blue-600">Introduction</h2>
+      <h2 className="text-xl font-semibold text-foreground">Introduction</h2>
 
-      <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-6 space-y-4">
-        <p className="text-sm text-slate-500">
+      <div className="rounded-xl border border-border bg-muted/20 p-6 space-y-5">
+        <p className="text-sm text-muted-foreground">
           Explain to your clients who you are, what services you provide, the value you bring,
           and any other information you want to share.
         </p>
 
-        <div className="space-y-1.5">
-          <label className="text-sm font-medium text-slate-700">Introduction Title *</label>
-          <input
-            type="text"
-            value={formData.introduction?.title || ''}
-            onChange={handleTitleChange}
-            onBlur={() => handleBlur('title')}
-            placeholder="Enter introduction title"
-            required
-            className={`flex h-10 w-full rounded-lg border bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${stepErrors.title ? 'border-red-400' : 'border-slate-200'}`}
-          />
-          {stepErrors.title && <p className="text-xs text-red-500">{stepErrors.title}</p>}
-        </div>
+        <Form {...form}>
+          <form className="space-y-5">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Introduction Title *</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter introduction title"
+                      {...field}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        handleTitleChange(e.target.value);
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <div className="space-y-1.5">
-          <label className="text-sm font-medium text-slate-700">Description</label>
-          <Editor
-            initialContent={formData.introduction?.description || ''}
-            onChange={handleDescriptionChange}
-            onBlur={() => handleBlur('description')}
-          />
-          {stepErrors.description && <p className="text-xs text-red-500">{stepErrors.description}</p>}
-        </div>
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Editor
+                      initialContent={field.value || ''}
+                      onChange={(content) => {
+                        field.onChange(content);
+                        handleDescriptionChange(content);
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </form>
+        </Form>
       </div>
     </div>
   );
 };
+
 export default IntroductionStep;

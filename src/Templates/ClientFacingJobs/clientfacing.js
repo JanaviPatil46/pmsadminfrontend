@@ -1,22 +1,39 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { toast } from "react-toastify";
-import { FormDrawer, FormDrawerFooter, FormSection, FormField } from "../../components/ui/form-layout";
+import { SideSheet } from "../../components/ui/side-sheet";
+import { FormSection } from "../../components/ui/form-layout";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "../../components/ui/form";
 import { Input } from "../../components/ui/input";
+import { Textarea } from "../../components/ui/textarea";
 import { Button } from "../../components/ui/button";
-import { Label } from "../../components/ui/label";
-import { Plus, Pencil, Trash2, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2 } from "lucide-react";
 import { DataTable } from "../../components/data-table/data-table";
 import { DataTableToolbar } from "../../components/data-table/toolbar";
+const clientFacingSchema = z.object({
+  clientfacingName: z.string().min(1, "Name is required"),
+  clientfacingdescription: z.string().min(1, "Description is required").max(200, "Description must be 200 characters or less"),
+  clientfacingColour: z.string().min(1, "Please select a color"),
+});
+
 const Clientfacing = () => {
   const CLIENT_FACING_API = process.env.REACT_APP_CLIENT_FACING_URL;
   const [clientFacingJobs, setClientFacingJobs] = useState([]);
-  const [clientFacingName, setClientFacingName] = useState("");
-
-  const [clientFacingDescription, setClientFacingDescription] = useState("");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isNewDrawerOpen, setIsNewDrawerOpen] = useState(false);
   const [jobId, setJobId] = useState(null);
-  const [selectedColor, setSelectedColor] = useState("");
+
+  const createForm = useForm({
+    resolver: zodResolver(clientFacingSchema),
+    defaultValues: { clientfacingName: "", clientfacingdescription: "", clientfacingColour: "" },
+  });
+
+  const editForm = useForm({
+    resolver: zodResolver(clientFacingSchema),
+    defaultValues: { clientfacingName: "", clientfacingdescription: "", clientfacingColour: "" },
+  });
 
   
 
@@ -30,26 +47,12 @@ const Clientfacing = () => {
     "#FF5722",
     "#212529",
   ];
-  const handleDrawerOpen = () => {
-    setIsDrawerOpen(true);
-  };
 
-  
+  const handleDrawerOpen = () => setIsDrawerOpen(true);
+  const handleDrawerClose = () => { setIsDrawerOpen(false); createForm.reset(); };
+  const handleNewDrawerOpen = () => setIsNewDrawerOpen(true);
+  const handleNewDrawerClose = () => { setIsNewDrawerOpen(false); editForm.reset(); };
 
- 
-
-  const handleNewDrawerOpen = (jobId) => {
-    console.log("Opening drawer for job ID:", jobId); // Log the job ID
-    setIsNewDrawerOpen(true);
-  };
-
-  const handleNewDrawerClose = () => {
-    setIsNewDrawerOpen(false);
-  };
-
-  const handleColorChange = (event) => {
-    setSelectedColor(event.target.value);
-  };
   const [loading, setLoading] = useState(true);
   // const fetchData = async () => {
   const fetchData = async () => {
@@ -77,151 +80,35 @@ const Clientfacing = () => {
   useEffect(() => {
     fetchData();
   }, []);
-  const [errors, setErrors] = useState({
-  name: "",
-  description: "",
-  color: ""
-});
-
-const validateForm = () => {
-  let valid = true;
-  let newErrors = { name: "", description: "", color: "" };
-
-  if (!selectedColor) {
-    newErrors.color = "Please select a color";
-    valid = false;
-  }
-  if (!clientFacingName.trim()) {
-    newErrors.name = "Name is required";
-    valid = false;
-  }
-  if (!clientFacingDescription.trim()) {
-    newErrors.description = "Description is required";
-    valid = false;
-  } else if (clientFacingDescription.length > 200) {
-    newErrors.description = "Description must be 200 characters or less";
-    valid = false;
-  }
-
-  setErrors(newErrors);
-  return valid;
-};
-
-  // const createJobFacing = () => {
-  //   const myHeaders = new Headers();
-  //   myHeaders.append("Content-Type", "application/json");
-
-  //   const raw = JSON.stringify({
-  //     clientfacingName: clientFacingName,
-  //     clientfacingColour: selectedColor,
-  //     clientfacingdescription: clientFacingDescription,
-  //   });
-
-  //   const requestOptions = {
-  //     method: "POST",
-  //     headers: myHeaders,
-  //     body: raw,
-  //     redirect: "follow",
-  //   };
-
-  //   fetch(
-  //     `${CLIENT_FACING_API}/workflow/clientfacingjobstatus/`,
-  //     requestOptions
-  //   )
-  //     .then((response) => response.json())
-  //     .then((result) => {
-  //       console.log(result);
-  //       fetchData();
-  //       handleClearTemp();
-  //       handleDrawerClose();
-  //       toast.success("Client Facing Jobs created successfully");
-  //     })
-  //     .catch((error) => console.error(error));
-  // };
-
- const createJobFacing = () => {
-  if (!validateForm()) return; // stop if invalid
-
-  const myHeaders = new Headers();
-  myHeaders.append("Content-Type", "application/json");
-
-  const raw = JSON.stringify({
-    clientfacingName: clientFacingName.trim(),
-    clientfacingColour: selectedColor,
-    clientfacingdescription: clientFacingDescription.trim(),
-  });
-
-  const requestOptions = {
-    method: "POST",
-    headers: myHeaders,
-    body: raw,
-    redirect: "follow",
-  };
-
-  fetch(`${CLIENT_FACING_API}/workflow/clientfacingjobstatus/`, requestOptions)
-    .then((response) => response.json())
-    .then((result) => {
-      console.log(result);
-      fetchData();
-      // handleClearTemp();
-      handleDrawerClose();
-       setClientFacingName("");
-    setClientFacingDescription("");
-    setSelectedColor("");
-      toast.success("Client Facing Job created successfully");
-    })
-    .catch((error) => console.error(error));
-};
-
-
-  const handleClearTemp = () => {
-    setClientFacingName("");
-    setClientFacingDescription("");
-    setSelectedColor("");
-    handleDrawerClose();
-  };
-
-  const handleDrawerClose = () => {
-    setIsDrawerOpen(false);
-     setClientFacingName("");
-    setClientFacingDescription("");
-    setSelectedColor("");
-    setErrors({
-  name: "",
-  description: "",
-  color: ""
-})
-  };
-  const handleupdateclientstatus = () => {
-    updateJobFacing(jobId);
-  };
-
-  const updateJobFacing = async (jobId) => {
-    console.log(jobId);
+  const createJobFacing = (data) => {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
-    const raw = JSON.stringify({
-      clientfacingName: clientFacingName,
-      clientfacingColour: selectedColor,
-      clientfacingdescription: clientFacingDescription,
-    });
-
-    const requestOptions = {
-      method: "PATCH",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-    };
-    console.log(jobId);
-    fetch(
-      `${CLIENT_FACING_API}/workflow/clientfacingjobstatus/${jobId}`,
-      requestOptions
-    )
+    const raw = JSON.stringify(data);
+    const requestOptions = { method: "POST", headers: myHeaders, body: raw, redirect: "follow" };
+    fetch(`${CLIENT_FACING_API}/workflow/clientfacingjobstatus/`, requestOptions)
       .then((response) => response.json())
       .then((result) => {
         console.log(result);
         fetchData();
-        handleClearTemp();
+        handleDrawerClose();
+        toast.success("Client Facing Job created successfully");
+      })
+      .catch((error) => console.error(error));
+  };
+
+  const updateJobFacing = async (data) => {
+    console.log(jobId);
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    const raw = JSON.stringify(data);
+
+    const requestOptions = { method: "PATCH", headers: myHeaders, body: raw, redirect: "follow" };
+    console.log(jobId);
+    fetch(`${CLIENT_FACING_API}/workflow/clientfacingjobstatus/${jobId}`, requestOptions)
+      .then((response) => response.json())
+      .then((result) => {
+        console.log(result);
+        fetchData();
         handleNewDrawerClose();
         toast.success("Client Facing Jobs Updated successfully");
       })
@@ -235,19 +122,8 @@ const validateForm = () => {
 
     // Proceed with deletion if confirmed
     if (isConfirmed) {
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-
-      const raw = JSON.stringify({
-        clientfacingName: clientFacingName,
-        clientfacingColour: selectedColor,
-        clientfacingdescription: clientFacingDescription,
-      });
-
       const requestOptions = {
         method: "DELETE",
-        headers: myHeaders,
-        body: raw,
         redirect: "follow",
       };
 
@@ -266,23 +142,20 @@ const validateForm = () => {
   };
   //
 
-  const handleEdit = async (jobId) => {
-    console.log(jobId);
-    handleNewDrawerOpen(jobId);
+  const handleEdit = async (id) => {
+    console.log(id);
+    handleNewDrawerOpen();
     try {
-      const response = await fetch(
-        `${CLIENT_FACING_API}/workflow/clientfacingjobstatus/${jobId}`
-      );
+      const response = await fetch(`${CLIENT_FACING_API}/workflow/clientfacingjobstatus/${id}`);
       const data = await response.json();
       console.log("Fetched job data:", data);
-      setJobId(data.clientfacingjobstatuses._id);
-      setSelectedColor(data.clientfacingjobstatuses.clientfacingColour);
-      console.log(data.clientfacingjobstatuses.clientfacingColour);
-      setClientFacingName(data.clientfacingjobstatuses.clientfacingName);
-      setClientFacingDescription(
-        data.clientfacingjobstatuses.clientfacingdescription
-      );
-      console.log(data.clientfacingjobstatuses.clientfacingdescription);
+      const s = data.clientfacingjobstatuses;
+      setJobId(s._id);
+      editForm.reset({
+        clientfacingName: s.clientfacingName,
+        clientfacingdescription: s.clientfacingdescription,
+        clientfacingColour: s.clientfacingColour,
+      });
     } catch (error) {
       console.error("Error fetching job details:", error);
     }
@@ -370,147 +243,167 @@ const validateForm = () => {
           pageSize={25}
         />
 
-        {/* ===== CREATE DRAWER ===== */}
-        <FormDrawer
+        {/* ===== CREATE SHEET ===== */}
+        <SideSheet
           open={isDrawerOpen}
-          onClose={handleDrawerClose}
+          onOpenChange={(open) => !open && handleDrawerClose()}
           title="Create Client-Facing Job Status"
-          width="md"
+          description="Add a new status visible to clients"
+          size="md"
+          hideDefaultFooter
+          footer={
+            <>
+              <Button type="button" variant="ghost" size="sm" onClick={handleDrawerClose}>Cancel</Button>
+              <Button type="submit" size="sm" form="create-clientfacing-form">Submit</Button>
+            </>
+          }
         >
-          <FormSection title="Status Details">
-            <div className="flex items-start gap-4">
-              <FormField label="Color" error={errors.color} className="w-1/3">
-                <div className="relative">
-                  <select
-                    className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                        value={selectedColor}
-                        onChange={(e) => {
-      setSelectedColor(e.target.value);
-      if (e.target.value) {
-                        setErrors((prev) => ({ ...prev, color: "" }));
-                      }
-                    }}
-                    style={{ color: selectedColor || undefined }}
-                  >
-                    <option value="">Select</option>
-                        {colors.map((color) => (
-                      <option key={color} value={color} style={{ color: color, fontWeight: "bold" }}>
-                        ● {color}
-                      </option>
-                    ))}
-                  </select>
-                  {selectedColor && (
-                    <div
-                      className="absolute right-8 top-1/2 -translate-y-1/2 h-4 w-4 rounded-full border border-border"
-                      style={{ backgroundColor: selectedColor }}
-                    />
-                  )}
+          <Form {...createForm}>
+            <form id="create-clientfacing-form" onSubmit={createForm.handleSubmit(createJobFacing)} className="space-y-6">
+              <FormSection title="Status Details">
+                <div className="flex items-start gap-4">
+                  <FormField
+                    control={createForm.control}
+                    name="clientfacingColour"
+                    render={({ field }) => (
+                      <FormItem className="w-1/3">
+                        <FormLabel>Color</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <select
+                              className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                              {...field}
+                              style={{ color: field.value || undefined }}
+                            >
+                              <option value="">Select</option>
+                              {colors.map((color) => (
+                                <option key={color} value={color} style={{ color, fontWeight: "bold" }}>
+                                  ● {color}
+                                </option>
+                              ))}
+                            </select>
+                            {field.value && (
+                              <div className="absolute right-8 top-1/2 -translate-y-1/2 h-4 w-4 rounded-full border border-border" style={{ backgroundColor: field.value }} />
+                            )}
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={createForm.control}
+                    name="clientfacingName"
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter a name" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
-              </FormField>
-
-              <FormField label="Name" error={errors.name} className="flex-1">
-                <Input
-                      placeholder="Enter a name"
-                      value={clientFacingName}
-                      onChange={(e) => {
-    setClientFacingName(e.target.value);
-    if (e.target.value.trim()) {
-                      setErrors((prev) => ({ ...prev, name: "" }));
-    }
-  }}
-                    error={!!errors.name}
+                <FormField
+                  control={createForm.control}
+                  name="clientfacingdescription"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Status Description</FormLabel>
+                      <FormControl>
+                        <Textarea placeholder="Status description for client" maxLength={200} rows={5} className="resize-none" {...field} />
+                      </FormControl>
+                      <p className="text-xs text-muted-foreground text-right">{(field.value || "").length}/200</p>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </FormField>
-            </div>
+              </FormSection>
+            </form>
+          </Form>
+        </SideSheet>
 
-            <FormField label="Status Description" error={errors.description}>
-              <textarea
-                className="flex min-h-[120px] w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none"
-  placeholder="Status description for client"
-                maxLength={200}
-  rows={5}
-  value={clientFacingDescription}
-   onChange={(e) => {
-    setClientFacingDescription(e.target.value);
-    if (e.target.value.trim() && e.target.value.length <= 200) {
-                    setErrors((prev) => ({ ...prev, description: "" }));
-                  }
-                }}
-              />
-              <p className="text-xs text-muted-foreground mt-1 text-right">
-                {clientFacingDescription.length}/200
-              </p>
-            </FormField>
-          </FormSection>
-
-          <FormDrawerFooter>
-            <Button variant="outline" onClick={handleClearTemp}>Cancel</Button>
-            <Button onClick={createJobFacing}>Submit</Button>
-          </FormDrawerFooter>
-        </FormDrawer>
-
-        {/* ===== EDIT DRAWER ===== */}
-        <FormDrawer
+        {/* ===== EDIT SHEET ===== */}
+        <SideSheet
           open={isNewDrawerOpen}
-          onClose={handleNewDrawerClose}
+          onOpenChange={(open) => !open && handleNewDrawerClose()}
           title="Update Client-Facing Job Status"
-          width="md"
+          description="Edit the details of this status"
+          size="md"
+          hideDefaultFooter
+          footer={
+            <>
+              <Button type="button" variant="ghost" size="sm" onClick={handleNewDrawerClose}>Cancel</Button>
+              <Button type="submit" size="sm" form="edit-clientfacing-form">Save Changes</Button>
+            </>
+          }
         >
-          <FormSection title="Status Details">
-            <div className="flex items-start gap-4">
-              <FormField label="Color" className="w-1/3">
-                <div className="relative">
-                  <select
-                    className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                        value={selectedColor}
-                        onChange={handleColorChange}
-                    style={{ color: selectedColor || undefined }}
-                  >
-                    <option value="">Select</option>
-                        {colors.map((color) => (
-                      <option key={color} value={color} style={{ color: color, fontWeight: "bold" }}>
-                        ● {color}
-                      </option>
-                    ))}
-                  </select>
-                  {selectedColor && (
-                    <div
-                      className="absolute right-8 top-1/2 -translate-y-1/2 h-4 w-4 rounded-full border border-border"
-                      style={{ backgroundColor: selectedColor }}
-                    />
-                  )}
+          <Form {...editForm}>
+            <form id="edit-clientfacing-form" onSubmit={editForm.handleSubmit(updateJobFacing)} className="space-y-6">
+              <FormSection title="Status Details">
+                <div className="flex items-start gap-4">
+                  <FormField
+                    control={editForm.control}
+                    name="clientfacingColour"
+                    render={({ field }) => (
+                      <FormItem className="w-1/3">
+                        <FormLabel>Color</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <select
+                              className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                              {...field}
+                              style={{ color: field.value || undefined }}
+                            >
+                              <option value="">Select</option>
+                              {colors.map((color) => (
+                                <option key={color} value={color} style={{ color, fontWeight: "bold" }}>
+                                  ● {color}
+                                </option>
+                              ))}
+                            </select>
+                            {field.value && (
+                              <div className="absolute right-8 top-1/2 -translate-y-1/2 h-4 w-4 rounded-full border border-border" style={{ backgroundColor: field.value }} />
+                            )}
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={editForm.control}
+                    name="clientfacingName"
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter a name" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
-              </FormField>
-
-              <FormField label="Name" className="flex-1">
-                <Input
-                      placeholder="Enter a name"
-                      value={clientFacingName}
-                      onChange={(e) => setClientFacingName(e.target.value)}
-                    />
-              </FormField>
-            </div>
-
-            <FormField label="Status Description">
-              <textarea
-                className="flex min-h-[120px] w-full rounded-lg border border-input bg-white px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none"
-  placeholder="Status description for client"
-                maxLength={200}
-  rows={5}
-  value={clientFacingDescription}
-  onChange={(e) => setClientFacingDescription(e.target.value)}
-              />
-              <p className="text-xs text-muted-foreground mt-1 text-right">
-                {clientFacingDescription.length}/200
-              </p>
-            </FormField>
-          </FormSection>
-
-          <FormDrawerFooter>
-            <Button variant="outline" onClick={handleNewDrawerClose}>Cancel</Button>
-            <Button onClick={handleupdateclientstatus}>Submit</Button>
-          </FormDrawerFooter>
-        </FormDrawer>
+                <FormField
+                  control={editForm.control}
+                  name="clientfacingdescription"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Status Description</FormLabel>
+                      <FormControl>
+                        <Textarea placeholder="Status description for client" maxLength={200} rows={5} className="resize-none" {...field} />
+                      </FormControl>
+                      <p className="text-xs text-muted-foreground text-right">{(field.value || "").length}/200</p>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </FormSection>
+            </form>
+          </Form>
+        </SideSheet>
       </div>
     </div>
   );

@@ -1,20 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
-import { AiOutlinePlusCircle } from "react-icons/ai";
-import { CiDiscount1 } from "react-icons/ci";
-import { BsThreeDotsVertical } from "react-icons/bs";
-import { RiCloseLine } from "react-icons/ri";
 import { toast } from "react-toastify";
-import { RxCross2 } from "react-icons/rx";
 import { useNavigate, useParams } from "react-router-dom";
-import CreatableSelect from "react-select/creatable";
 import Editor from "../Texteditor/Editor";
 import { FormPage, FormSection, FormField, FormRow, FormGrid, FormDrawer, FormDrawerFooter, ShortcodePopover } from "../../components/ui/form-layout";
 import { Input } from "../../components/ui/input";
+import { ServiceCombobox } from "../../components/ui/service-combobox";
 import { Button } from "../../components/ui/button";
 import { Label } from "../../components/ui/label";
 import { Switch } from "../../components/ui/switch";
 import { Checkbox } from "../../components/ui/checkbox";
-import { Eye, X, FileText, Receipt, MoreVertical, ArrowLeft, Plus, Percent } from "lucide-react";
+import { Eye, X, FileText, Receipt, MoreVertical, ArrowLeft, Plus, Percent, PlusCircle, Tag } from "lucide-react";
 
 const InvoiceTempUpdate = () => {
   const INVOICE_API = process.env.REACT_APP_INVOICE_TEMP_URL;
@@ -482,12 +477,10 @@ const InvoiceTempUpdate = () => {
     setselectedService(selectedOptions);
     fetchservicebyid(selectedOptions.value, index);
   };
-  const handleServiceInputChange = (inputValue, actionMeta, index) => {
-    if (actionMeta.action === "input-change") {
-      const newRows = [...rows];
-      newRows[index].productName = inputValue;
-      setRows(newRows);
-    }
+  const handleServiceInputChange = (inputValue, index) => {
+    const newRows = [...rows];
+    newRows[index].productName = inputValue;
+    setRows(newRows);
   };
 
   const handleInputChange = (index, event) => {
@@ -1028,20 +1021,13 @@ const InvoiceTempUpdate = () => {
                   <tbody>
                     {rows.map((row, index) => (
                       <tr key={index} className="border-b border-border last:border-0">
-                        <td className="sticky left-0 bg-white px-2 py-1.5" style={{ minWidth: 180 }}>
-                          <CreatableSelect
-                            placeholder={row.isDiscount ? "Reason for discount" : "Product or Service"}
+                        <td className="sticky left-0 bg-card px-2 py-1.5" style={{ minWidth: 200 }}>
+                          <ServiceCombobox
                             options={serviceoptions}
-                            value={row.productName ? serviceoptions.find((option) => option.label === row.productName) || { label: row.productName, value: row.productName } : null}
-                            onChange={(selectedOption) => handleServiceChange(index, selectedOption)}
-                            onInputChange={(inputValue, actionMeta) => handleServiceInputChange(inputValue, actionMeta, index)}
-                            isClearable
-                            styles={{
-                              container: (provided) => ({ ...provided, minWidth: "160px" }),
-                              control: (provided) => ({ ...provided, minHeight: "34px", borderColor: "#e2e8f0" }),
-                              menuPortal: (provided) => ({ ...provided, zIndex: 9999 }),
-                            }}
-                            menuPortalTarget={document.body}
+                            value={row.productName || ''}
+                            placeholder={row.isDiscount ? 'Reason for discount' : 'Product or Service'}
+                            onChange={label => handleServiceChange(index, { label, value: label })}
+                            onInputChange={text => handleServiceInputChange(text, index)}
                           />
                         </td>
                         <td className="px-2 py-1.5">

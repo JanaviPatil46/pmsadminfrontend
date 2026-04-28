@@ -1,10 +1,15 @@
-import React from 'react';
-import { RiCloseLine } from 'react-icons/ri';
-import { AiOutlinePlusCircle } from 'react-icons/ai';
-import { CiDiscount1 } from 'react-icons/ci';
-import CreatableSelect from 'react-select/creatable';
-import Select from 'react-select';
+import React, { useState } from 'react';
+import { X, PlusCircle, Tag } from 'lucide-react';
 import Editor from '../components/Editor';
+import { Input } from '../../../components/ui/input';
+import { Checkbox } from '../../../components/ui/checkbox';
+import {
+  Select as ShadSelect,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../components/ui/select';
 
 
 // const InvoiceComponent = ({ 
@@ -608,11 +613,11 @@ import Editor from '../components/Editor';
 //     </LocalizationProvider>
 //   );
 // };
-const InvoiceComponent = ({ 
-  invoices, 
-  setInvoices, 
-  invoiceTemplates, 
-  teammemberoption, 
+const InvoiceComponent = ({
+  invoices,
+  setInvoices,
+  invoiceTemplates,
+  teammemberoption,
   serviceoptions,
   formData,
   updateFormData,
@@ -621,142 +626,57 @@ const InvoiceComponent = ({
 }) => {
   const invoiceissueoptions = ['immediately', 'specific date'];
   const timeOptions = ['09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM'];
+  const [serviceSearch, setServiceSearch] = useState({});
 
-  // Validate invoices
-  const validateInvoices = () => {
-    const newErrors = {};
-    
-    // Check if at least one invoice exists
-    if (!invoices || invoices.length === 0) {
-      newErrors.invoices = 'At least one invoice is required';
-    } else {
-      // Check each invoice for required fields
-      const invoiceErrors = invoices.map((invoice, index) => {
-        const invoiceError = {};
-        
-        if (!invoice.invoiceTemplate) {
-          invoiceError.invoiceTemplate = 'Invoice template is required';
-        }
-        
-        if (!invoice.teamMember) {
-          invoiceError.teamMember = 'Team member is required';
-        }
-        
-        // Validate line items
-        if (!invoice.rows || invoice.rows.length === 0) {
-          invoiceError.rows = 'At least one line item is required';
-        } else {
-          const rowErrors = invoice.rows.map((row, rowIndex) => {
-            const rowError = {};
-            if (!row.productorService?.trim()) {
-              rowError.productorService = 'Product/Service name is required';
-            }
-            if (!row.rate || parseFloat(row.rate) <= 0) {
-              rowError.rate = 'Valid rate is required';
-            }
-            if (!row.quantity || parseFloat(row.quantity) <= 0) {
-              rowError.quantity = 'Valid quantity is required';
-            }
-            return Object.keys(rowError).length > 0 ? { rowIndex, ...rowError } : null;
-          }).filter(Boolean);
-          
-          if (rowErrors.length > 0) {
-            invoiceError.rowErrors = rowErrors;
-          }
-        }
-        
-        return Object.keys(invoiceError).length > 0 ? { invoiceIndex: index, ...invoiceError } : null;
-      }).filter(Boolean);
-      
-      if (invoiceErrors.length > 0) {
-        newErrors.invoiceErrors = invoiceErrors;
-        newErrors.invoiceDetails = 'Please fix invoice errors';
-      }
-    }
-    
-    setStepErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  // Clear specific error when field is updated
   const clearInvoiceError = (invoiceId, field) => {
-    if (stepErrors.invoiceErrors) {
+    if (stepErrors?.invoiceErrors) {
       setStepErrors(prev => {
-        const newErrors = { ...prev };
-        const invoiceIndex = invoices.findIndex(inv => inv.id === invoiceId);
-        if (invoiceIndex !== -1) {
-          newErrors.invoiceErrors = newErrors.invoiceErrors.filter(error => 
-            !(error.invoiceIndex === invoiceIndex && error[field])
-          );
-          if (newErrors.invoiceErrors.length === 0) {
-            delete newErrors.invoiceErrors;
-            delete newErrors.invoiceDetails;
-          }
+        const e = { ...prev };
+        const idx = invoices.findIndex(inv => inv.id === invoiceId);
+        if (idx !== -1) {
+          e.invoiceErrors = e.invoiceErrors.filter(err => !(err.invoiceIndex === idx && err[field]));
+          if (e.invoiceErrors.length === 0) { delete e.invoiceErrors; delete e.invoiceDetails; }
         }
-        return newErrors;
+        return e;
       });
     }
   };
 
-  // Clear the "at least one invoice required" error
   const clearInvoicesError = () => {
-    if (stepErrors.invoices) {
-      setStepErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors.invoices;
-        return newErrors;
-      });
-    }
+    if (stepErrors?.invoices) setStepErrors(prev => { const e = { ...prev }; delete e.invoices; return e; });
   };
 
-  // Clear row errors when a row is updated
   const clearInvoiceRowErrors = (invoiceId, rowIndex) => {
-    if (stepErrors.invoiceErrors) {
+    if (stepErrors?.invoiceErrors) {
       setStepErrors(prev => {
-        const newErrors = { ...prev };
-        const invoiceIndex = invoices.findIndex(inv => inv.id === invoiceId);
-        if (invoiceIndex !== -1) {
-          newErrors.invoiceErrors = newErrors.invoiceErrors.map(error => {
-            if (error.invoiceIndex === invoiceIndex && error.rowErrors) {
-              error.rowErrors = error.rowErrors.filter(rowError => rowError.rowIndex !== rowIndex);
-              if (error.rowErrors.length === 0) {
-                delete error.rowErrors;
-              }
+        const e = { ...prev };
+        const idx = invoices.findIndex(inv => inv.id === invoiceId);
+        if (idx !== -1) {
+          e.invoiceErrors = e.invoiceErrors.map(err => {
+            if (err.invoiceIndex === idx && err.rowErrors) {
+              err.rowErrors = err.rowErrors.filter(re => re.rowIndex !== rowIndex);
+              if (!err.rowErrors.length) delete err.rowErrors;
             }
-            return Object.keys(error).length > 2 ? error : null; // Keep only if there are other errors
+            return Object.keys(err).length > 2 ? err : null;
           }).filter(Boolean);
-          
-          if (newErrors.invoiceErrors.length === 0) {
-            delete newErrors.invoiceErrors;
-            delete newErrors.invoiceDetails;
-          }
+          if (!e.invoiceErrors.length) { delete e.invoiceErrors; delete e.invoiceDetails; }
         }
-        return newErrors;
+        return e;
       });
     }
   };
 
-  // Get error for specific invoice and field
   const getInvoiceError = (invoiceId, field) => {
-    if (stepErrors.invoiceErrors) {
-      const invoiceIndex = invoices.findIndex(inv => inv.id === invoiceId);
-      const invoiceError = stepErrors.invoiceErrors.find(error => error.invoiceIndex === invoiceIndex);
-      return invoiceError ? invoiceError[field] : null;
-    }
-    return null;
+    const idx = invoices.findIndex(inv => inv.id === invoiceId);
+    const err = stepErrors?.invoiceErrors?.find(e => e.invoiceIndex === idx);
+    return err ? err[field] : null;
   };
 
-  // Get error for specific row in an invoice
   const getInvoiceRowError = (invoiceId, rowIndex, field) => {
-    if (stepErrors.invoiceErrors) {
-      const invoiceIndex = invoices.findIndex(inv => inv.id === invoiceId);
-      const invoiceError = stepErrors.invoiceErrors.find(error => error.invoiceIndex === invoiceIndex);
-      if (invoiceError && invoiceError.rowErrors) {
-        const rowError = invoiceError.rowErrors.find(error => error.rowIndex === rowIndex);
-        return rowError ? rowError[field] : null;
-      }
-    }
-    return null;
+    const idx = invoices.findIndex(inv => inv.id === invoiceId);
+    const err = stepErrors?.invoiceErrors?.find(e => e.invoiceIndex === idx);
+    const rowErr = err?.rowErrors?.find(e => e.rowIndex === rowIndex);
+    return rowErr ? rowErr[field] : null;
   };
 
   // Invoice management functions
@@ -794,80 +714,27 @@ const InvoiceComponent = ({
   const addInvoice = () => {
     const newId = invoices.length > 0 ? Math.max(...invoices.map(inv => inv.id)) + 1 : 1;
     setInvoices(prev => [...prev, { id: newId, ...getEmptyInvoice() }]);
-    
-    // Clear invoices error when adding new invoice
     clearInvoicesError();
   };
 
   const removeInvoice = (id) => {
     if (invoices.length > 1) {
       setInvoices(prev => prev.filter(invoice => invoice.id !== id));
-      
-      // Clear errors for removed invoice
-      if (stepErrors.invoiceErrors) {
-        setStepErrors(prev => {
-          const newErrors = { ...prev };
-          const invoiceIndex = invoices.findIndex(inv => inv.id === id);
-          if (invoiceIndex !== -1) {
-            newErrors.invoiceErrors = newErrors.invoiceErrors.filter(error => error.invoiceIndex !== invoiceIndex);
-            if (newErrors.invoiceErrors.length === 0) {
-              delete newErrors.invoiceErrors;
-              delete newErrors.invoiceDetails;
-            }
-          }
-          return newErrors;
-        });
-      }
-      
-      // Check if we still have invoices after removal
-      if (invoices.length - 1 > 0) {
-        clearInvoicesError();
-      }
+      if (invoices.length - 1 > 0) clearInvoicesError();
     } else {
-      // If trying to remove the last invoice, show error
-      setStepErrors(prev => ({
-        ...prev,
-        invoices: 'At least one invoice is required'
-      }));
+      setStepErrors(prev => ({ ...prev, invoices: 'At least one invoice is required' }));
     }
   };
 
   const updateInvoice = (id, field, value) => {
-    setInvoices(prev => prev.map(invoice => 
-      invoice.id === id ? { ...invoice, [field]: value } : invoice
-    ));
-    
-    // Clear errors when fields are updated
-    if (field === 'invoiceTemplate' && value) {
-      clearInvoiceError(id, 'invoiceTemplate');
-    }
-    if (field === 'teamMember' && value) {
-      clearInvoiceError(id, 'teamMember');
-    }
+    setInvoices(prev => prev.map(invoice => invoice.id === id ? { ...invoice, [field]: value } : invoice));
+    if ((field === 'invoiceTemplate' || field === 'teamMember') && value) clearInvoiceError(id, field);
   };
 
   // Handler functions for individual invoices
-  const handleInvoiceTemplateChange = (id, selectedOption) => {
-    updateInvoice(id, 'invoiceTemplate', selectedOption);
-    if (selectedOption) {
-      fetchInvoiceTemplateDetails(id, selectedOption.value);
-    }
-  };
-
-  const handleTeamMemberChange = (id, selectedOption) => {
-    updateInvoice(id, 'teamMember', selectedOption);
-  };
-
-  const handleIssueChange = (id, value) => {
-    updateInvoice(id, 'issueInvoice', value);
-  };
-
-  const handleDateChange = (id, date) => {
-    updateInvoice(id, 'specificDate', date);
-  };
-
-  const handleTimeChange = (id, time) => {
-    updateInvoice(id, 'selectedTime', time);
+  const handleInvoiceTemplateChange = (id, value) => {
+    updateInvoice(id, 'invoiceTemplate', value);
+    if (value) fetchInvoiceTemplateDetails(id, value);
   };
 
   const handleDescriptionChange = (id, e) => {
@@ -876,235 +743,71 @@ const InvoiceComponent = ({
     updateInvoice(id, 'charCount', value.length);
   };
 
-  const handleEditorChange = (id, content) => {
-    updateInvoice(id, 'clientNote', content);
+  const handleEditorChange = (id, content) => updateInvoice(id, 'clientNote', content);
+
+  const handleServiceSelect = (invoiceId, rowIndex, option) => {
+    updateInvoiceRow(invoiceId, rowIndex, 'productorService', option.label);
+    setServiceSearch(prev => ({ ...prev, [`${invoiceId}-${rowIndex}`]: option.label }));
+    if (option.value) fetchservicebyid(invoiceId, rowIndex, option.value);
+    clearInvoiceRowErrors(invoiceId, rowIndex);
   };
 
-  // New handler functions for CreatableSelect
-  const handleServiceChange = (id, rowIndex, selectedOption) => {
+  const updateInvoiceRow = (id, rowIndex, name, value) => {
     setInvoices(prev => prev.map(invoice => {
-      if (invoice.id === id) {
-        const updatedRows = invoice.rows.map((row, index) => 
-          index === rowIndex 
-            ? { ...row, productorService: selectedOption ? selectedOption.label : "" }
-            : row
-        );
-        
-        const summary = calculateSummary(updatedRows, invoice.taxRate);
-        
-        return {
-          ...invoice,
-          rows: updatedRows,
-          ...summary
-        };
-      }
-      return invoice;
+      if (invoice.id !== id) return invoice;
+      const updatedRows = invoice.rows.map((row, i) =>
+        i === rowIndex ? { ...row, [name]: value } : row
+      );
+      const recalc = recalculateRowAmounts(updatedRows);
+      return { ...invoice, rows: recalc, ...calculateSummary(recalc, invoice.taxRate) };
     }));
-    
-    // Clear errors when service is selected
-    if (selectedOption && selectedOption.label) {
-      clearInvoiceRowErrors(id, rowIndex);
-    }
-    
-    // Call fetch only if an option is actually selected and has a value
-    if (selectedOption && selectedOption.value) {
-      fetchservicebyid(id, rowIndex, selectedOption.value);
-    }
   };
 
-  const handleServiceInputChange = (id, rowIndex, inputValue, actionMeta) => {
-    if (actionMeta.action === "input-change") {
-      setInvoices(prev => prev.map(invoice => {
-        if (invoice.id === id) {
-          const updatedRows = invoice.rows.map((row, index) => 
-            index === rowIndex 
-              ? { ...row, productorService: inputValue }
-              : row
-          );
-          
-          const summary = calculateSummary(updatedRows, invoice.taxRate);
-          
-          return {
-            ...invoice,
-            rows: updatedRows,
-            ...summary
-          };
-        }
-        return invoice;
-      }));
-      
-      // Clear errors when user types
-      if (inputValue.trim() !== '') {
-        clearInvoiceRowErrors(id, rowIndex);
-      }
-    }
-  };
-
-  // Fetch service by ID function
   const fetchservicebyid = async (invoiceId, rowIndex, serviceId) => {
-    const SERVICE_API = process.env.REACT_APP_SERVICE_API || 'https://www.snptaxes.com';
-    const requestOptions = {
-      method: "GET",
-      redirect: "follow",
-    };
-    const url = `${SERVICE_API}/workflow/services/servicetemplate/${serviceId}`;
-    
-    fetch(url, requestOptions)
-      .then((response) => response.json())
-      .then((result) => {
-        const service = Array.isArray(result.serviceTemplate)
-          ? result.serviceTemplate[0]
-          : result.serviceTemplate;
-        const rate = service.rate
-          ? parseFloat(service.rate.replace("$", ""))
-          : 0;
-        
-        // Create updated row data
-        const updatedRowData = {
-          productorService: service.serviceName || "",
-          description: service.description || "",
-          rate: rate.toFixed(2),
-          quantity: "1",
-          amount: rate.toFixed(2),
-          tax: service.tax || false,
-          isDiscount: false,
-        };
-
-        // Update the invoice with the fetched service data
-        setInvoices(prev => prev.map(invoice => {
-          if (invoice.id === invoiceId) {
-            const updatedRows = invoice.rows.map((row, index) => 
-              index === rowIndex 
-                ? { ...row, ...updatedRowData }
-                : row
-            );
-            
-            const summary = calculateSummary(updatedRows, invoice.taxRate);
-            
-            return {
-              ...invoice,
-              rows: updatedRows,
-              ...summary
-            };
-          }
-          return invoice;
-        }));
-        
-        // Clear errors after successful fetch
-        clearInvoiceRowErrors(invoiceId, rowIndex);
-      })
-      .catch((error) => console.error(error));
+    try {
+      const SERVICE_API = process.env.REACT_APP_SERVICE_API || 'https://www.snptaxes.com';
+      const res = await fetch(`${SERVICE_API}/workflow/services/servicetemplate/${serviceId}`);
+      const result = await res.json();
+      const service = Array.isArray(result.serviceTemplate) ? result.serviceTemplate[0] : result.serviceTemplate;
+      const rate = service.rate ? parseFloat(service.rate.replace('$', '')) : 0;
+      const rowData = { productorService: service.serviceName || '', description: service.description || '', rate: rate.toFixed(2), quantity: '1', amount: rate.toFixed(2), tax: service.tax || false, isDiscount: false };
+      setInvoices(prev => prev.map(invoice => {
+        if (invoice.id !== invoiceId) return invoice;
+        const rows = invoice.rows.map((row, i) => i === rowIndex ? { ...row, ...rowData } : row);
+        const recalc = recalculateRowAmounts(rows);
+        return { ...invoice, rows: recalc, ...calculateSummary(recalc, invoice.taxRate) };
+      }));
+      clearInvoiceRowErrors(invoiceId, rowIndex);
+    } catch (err) { console.error(err); }
   };
 
-  // Row management for individual invoices
   const addRow = (id, isDiscount = false) => {
     const newRow = getEmptyRow();
-    if (isDiscount) {
-      newRow.isDiscount = true;
-      newRow.productorService = 'Discount';
-    }
-    
-    setInvoices(prev => prev.map(invoice => 
-      invoice.id === id 
-        ? { ...invoice, rows: [...invoice.rows, newRow] }
-        : invoice
-    ));
-    
-    // Clear rows error when adding new row
+    if (isDiscount) { newRow.isDiscount = true; newRow.productorService = 'Discount'; }
+    setInvoices(prev => prev.map(invoice => invoice.id === id ? { ...invoice, rows: [...invoice.rows, newRow] } : invoice));
     clearInvoiceError(id, 'rows');
   };
 
   const deleteRow = (id, rowIndex) => {
-    setInvoices(prev => prev.map(invoice => 
-      invoice.id === id 
-        ? { 
-            ...invoice, 
-            rows: invoice.rows.filter((_, index) => index !== rowIndex)
-          }
-        : invoice
-    ));
-    
-    // Clear errors for deleted row
+    setInvoices(prev => prev.map(invoice => invoice.id === id ? { ...invoice, rows: invoice.rows.filter((_, i) => i !== rowIndex) } : invoice));
     clearInvoiceRowErrors(id, rowIndex);
-  };
-
-  const handleInputChange = (id, rowIndex, e) => {
-    const { name, value, type, checked } = e.target;
-    
-    setInvoices(prev => prev.map(invoice => {
-      if (invoice.id === id) {
-        const updatedRows = invoice.rows.map((row, index) => 
-          index === rowIndex 
-            ? { 
-                ...row, 
-                [name]: type === 'checkbox' ? checked : value,
-                // Recalculate amount if rate or quantity changes
-                ...((name === 'rate' || name === 'quantity') ? {
-                  amount: ((parseFloat(name === 'rate' ? value : row.rate) || 0) * 
-                          (parseFloat(name === 'quantity' ? value : row.quantity) || 0)).toFixed(2)
-                } : {})
-              }
-            : row
-        );
-        
-        const summary = calculateSummary(updatedRows, invoice.taxRate);
-        
-        return {
-          ...invoice,
-          rows: updatedRows,
-          ...summary
-        };
-      }
-      return invoice;
-    }));
-    
-    // Clear errors when user starts typing
-    if (name === 'productorService' && value.trim() !== '') {
-      clearInvoiceRowErrors(id, rowIndex);
-    }
-    if ((name === 'rate' || name === 'quantity') && value && parseFloat(value) > 0) {
-      clearInvoiceRowErrors(id, rowIndex);
-    }
   };
 
   const calculateSummary = (rows, taxRate = 0) => {
     const subtotal = rows.reduce((sum, row) => sum + (parseFloat(row.amount) || 0), 0);
     const taxRateValue = parseFloat(taxRate) || 0;
-    
-    const taxableAmount = rows.reduce((sum, row) => {
-      return row.tax ? sum + (parseFloat(row.amount) || 0) : sum;
-    }, 0);
-    
+    const taxableAmount = rows.reduce((sum, row) => row.tax ? sum + (parseFloat(row.amount) || 0) : sum, 0);
     const taxTotal = taxableAmount * (taxRateValue / 100);
-    const totalAmount = subtotal + taxTotal;
-    
-    return {
-      subtotal: subtotal.toFixed(2),
-      taxTotal: taxTotal.toFixed(2),
-      totalAmount: totalAmount.toFixed(2)
-    };
+    return { subtotal: subtotal.toFixed(2), taxTotal: taxTotal.toFixed(2), totalAmount: (subtotal + taxTotal).toFixed(2) };
   };
+
+  const recalculateRowAmounts = (rows) =>
+    rows.map(row => ({ ...row, amount: ((parseFloat(row.rate) || 0) * (parseFloat(row.quantity) || 0)).toFixed(2) }));
 
   const handleTaxRateChange = (id, value) => {
     setInvoices(prev => prev.map(invoice => {
-      if (invoice.id === id) {
-        const taxRateValue = parseFloat(value) || 0;
-        const subtotal = invoice.rows.reduce((sum, row) => sum + (parseFloat(row.amount) || 0), 0);
-        const taxableAmount = invoice.rows.reduce((sum, row) => {
-          return row.tax ? sum + (parseFloat(row.amount) || 0) : sum;
-        }, 0);
-        
-        const taxTotal = taxableAmount * (taxRateValue / 100);
-        const totalAmount = subtotal + taxTotal;
-        
-        return {
-          ...invoice,
-          taxRate: value,
-          taxTotal: taxTotal.toFixed(2),
-          totalAmount: totalAmount.toFixed(2)
-        };
-      }
-      return invoice;
+      if (invoice.id !== id) return invoice;
+      return { ...invoice, taxRate: value, ...calculateSummary(invoice.rows, value) };
     }));
   };
 
@@ -1151,168 +854,168 @@ const InvoiceComponent = ({
     }
   };
 
-  const invoiceOptions = invoiceTemplates.map(template => ({
-    value: template._id,
-    label: template.templatename,
-  }));
+  const invoiceOptions = invoiceTemplates.map(t => ({ value: t._id, label: t.templatename }));
 
   return (
     <div className="mt-4 space-y-4">
-      {/* Show validation errors */}
-      {(stepErrors.invoices || stepErrors.invoiceDetails) && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+      {(stepErrors?.invoices || stepErrors?.invoiceDetails) && (
+        <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
           {stepErrors.invoices && <div>- {stepErrors.invoices}</div>}
           {stepErrors.invoiceDetails && <div>- {stepErrors.invoiceDetails}</div>}
         </div>
       )}
 
-      {/* Show warning if no invoices exist */}
       {invoices.length === 0 && (
         <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
           <p className="text-sm font-semibold text-amber-800">No Invoices Added</p>
-          <p className="text-xs text-amber-700 mt-1">You need to add at least one invoice to proceed. Click the "Add invoice" button below to get started.</p>
+          <p className="text-xs text-amber-700 mt-1">Add at least one invoice to proceed.</p>
         </div>
       )}
 
       {invoices.map((invoice, invoiceIndex) => (
-        <div key={invoice.id} className="relative rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div key={invoice.id} className="relative rounded-xl border border-border bg-background p-5 shadow-sm">
           {invoices.length > 1 && (
-            <button type="button" onClick={() => removeInvoice(invoice.id)} className="absolute top-3 right-3 rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600">
-              <RiCloseLine className="h-5 w-5" />
+            <button type="button" onClick={() => removeInvoice(invoice.id)} className="absolute top-3 right-3 rounded-lg p-1 text-muted-foreground hover:bg-muted hover:text-foreground">
+              <X className="h-5 w-5" />
             </button>
           )}
 
-          <h4 className="text-base font-semibold text-slate-800 mb-4">Invoice #{invoiceIndex + 1}</h4>
+          <h4 className="text-base font-semibold text-foreground mb-4">Invoice #{invoiceIndex + 1}</h4>
 
           <div className="space-y-4">
-            {/* Invoice Template & Team Member */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-slate-700">Invoice Template *</label>
-                <Select
-                  options={invoiceOptions}
-                  value={invoice.invoiceTemplate}
-                  onChange={(value) => handleInvoiceTemplateChange(invoice.id, value)}
-                  isClearable
-                  placeholder="Invoice Template"
-                  styles={{
-                    control: (provided) => ({ ...provided, borderColor: getInvoiceError(invoice.id, 'invoiceTemplate') ? 'red' : '#e2e8f0', borderRadius: '0.5rem', minHeight: '38px', fontSize: '0.875rem' }),
-                    menuPortal: (provided) => ({ ...provided, zIndex: 9999 }),
-                  }}
-                  menuPortalTarget={document.body}
-                />
-                {getInvoiceError(invoice.id, 'invoiceTemplate') && <p className="text-xs text-red-500">{getInvoiceError(invoice.id, 'invoiceTemplate')}</p>}
+                <label className="text-sm font-medium text-foreground">Invoice Template *</label>
+                <ShadSelect
+                  value={invoice.invoiceTemplate || ''}
+                  onValueChange={(val) => handleInvoiceTemplateChange(invoice.id, val)}
+                >
+                  <SelectTrigger className={getInvoiceError(invoice.id, 'invoiceTemplate') ? 'border-destructive' : ''}>
+                    <SelectValue placeholder="Invoice Template" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {invoiceOptions.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+                  </SelectContent>
+                </ShadSelect>
+                {getInvoiceError(invoice.id, 'invoiceTemplate') && <p className="text-xs text-destructive">{getInvoiceError(invoice.id, 'invoiceTemplate')}</p>}
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-slate-700">Team Member *</label>
-                <Select
-                  options={teammemberoption}
-                  value={invoice.teamMember}
-                  onChange={(value) => handleTeamMemberChange(invoice.id, value)}
-                  isClearable
-                  placeholder="Team Member"
-                  styles={{
-                    control: (provided) => ({ ...provided, borderColor: getInvoiceError(invoice.id, 'teamMember') ? 'red' : '#e2e8f0', borderRadius: '0.5rem', minHeight: '38px', fontSize: '0.875rem' }),
-                    menuPortal: (provided) => ({ ...provided, zIndex: 9999 }),
-                  }}
-                  menuPortalTarget={document.body}
-                />
-                {getInvoiceError(invoice.id, 'teamMember') && <p className="text-xs text-red-500">{getInvoiceError(invoice.id, 'teamMember')}</p>}
+                <label className="text-sm font-medium text-foreground">Team Member *</label>
+                <ShadSelect
+                  value={invoice.teamMember || ''}
+                  onValueChange={(val) => updateInvoice(invoice.id, 'teamMember', val)}
+                >
+                  <SelectTrigger className={getInvoiceError(invoice.id, 'teamMember') ? 'border-destructive' : ''}>
+                    <SelectValue placeholder="Team Member" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {teammemberoption.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+                  </SelectContent>
+                </ShadSelect>
+                {getInvoiceError(invoice.id, 'teamMember') && <p className="text-xs text-destructive">{getInvoiceError(invoice.id, 'teamMember')}</p>}
               </div>
             </div>
 
-            {/* Issue Invoice, Date, Time */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-slate-700">Issue invoice</label>
-                <select value={invoice.issueInvoice || ''} onChange={(e) => handleIssueChange(invoice.id, e.target.value)} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                  {invoiceissueoptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                </select>
+                <label className="text-sm font-medium text-foreground">Issue invoice</label>
+                <ShadSelect value={invoice.issueInvoice || 'immediately'} onValueChange={(val) => updateInvoice(invoice.id, 'issueInvoice', val)}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {invoiceissueoptions.map(opt => <SelectItem key={opt} value={opt}>{opt}</SelectItem>)}
+                  </SelectContent>
+                </ShadSelect>
               </div>
-              {invoice.issueInvoice === "specific date" && (
+              {invoice.issueInvoice === 'specific date' && (
                 <>
                   <div className="space-y-1.5">
-                    <label className="text-sm font-medium text-slate-700">Date</label>
-                    <input type="date" value={invoice.specificDate ? (typeof invoice.specificDate === 'string' ? invoice.specificDate : invoice.specificDate.format?.('YYYY-MM-DD') || '') : ''} onChange={(e) => handleDateChange(invoice.id, e.target.value)} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <label className="text-sm font-medium text-foreground">Date</label>
+                    <Input type="date" value={invoice.specificDate || ''} onChange={(e) => updateInvoice(invoice.id, 'specificDate', e.target.value)} />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-sm font-medium text-slate-700">Time</label>
-                    <select value={invoice.selectedTime || ''} onChange={(e) => handleTimeChange(invoice.id, e.target.value)} className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                      <option value="">Select Time</option>
-                      {timeOptions.map(t => <option key={t} value={t}>{t}</option>)}
-                    </select>
+                    <label className="text-sm font-medium text-foreground">Time</label>
+                    <ShadSelect value={invoice.selectedTime || ''} onValueChange={(val) => updateInvoice(invoice.id, 'selectedTime', val)}>
+                      <SelectTrigger><SelectValue placeholder="Select Time" /></SelectTrigger>
+                      <SelectContent>
+                        {timeOptions.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                      </SelectContent>
+                    </ShadSelect>
                   </div>
                 </>
               )}
             </div>
 
-            {/* Description */}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-slate-700">Description</label>
+              <label className="text-sm font-medium text-foreground">Description</label>
               <div className="relative">
-                <input type="text" value={invoice.description} onChange={(e) => handleDescriptionChange(invoice.id, e)} placeholder="Description" className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 pr-20 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">{invoice.charCount}/{invoice.charLimit}</span>
+                <Input value={invoice.description} onChange={(e) => handleDescriptionChange(invoice.id, e)} placeholder="Description" className="pr-20" />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">{invoice.charCount}/{invoice.charLimit}</span>
               </div>
             </div>
 
-            {/* Line Items Table */}
             <div>
               <div className="mb-2">
-                <h5 className="text-sm font-semibold text-slate-800">Line items</h5>
-                <p className="text-xs text-slate-500">Client-facing itemized list of products and services</p>
-                {getInvoiceError(invoice.id, 'rows') && <p className="text-xs text-red-500 mt-1">{getInvoiceError(invoice.id, 'rows')}</p>}
+                <h5 className="text-sm font-semibold text-foreground">Line items</h5>
+                <p className="text-xs text-muted-foreground">Client-facing itemized list of products and services</p>
+                {getInvoiceError(invoice.id, 'rows') && <p className="text-xs text-destructive mt-1">{getInvoiceError(invoice.id, 'rows')}</p>}
               </div>
-              <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+              <div className="rounded-xl border border-border bg-background shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left">
                     <thead>
-                      <tr className="border-b border-slate-100 bg-slate-50/60">
-                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Product / Service</th>
-                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Description</th>
-                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Rate</th>
-                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Qty</th>
-                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Amount</th>
-                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Tax</th>
+                      <tr className="border-b border-border bg-muted/40">
+                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Product / Service</th>
+                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Description</th>
+                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Rate</th>
+                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Qty</th>
+                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Amount</th>
+                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Tax</th>
                         <th className="px-4 py-3"></th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-border">
                       {invoice.rows.map((row, rowIndex) => (
-                        <tr key={rowIndex} className="hover:bg-slate-50/70">
+                        <tr key={rowIndex} className="hover:bg-muted/20">
                           <td className="px-4 py-2 min-w-[200px]">
-                            <CreatableSelect
-                              placeholder={row.isDiscount ? "Reason for discount" : "Product or Service"}
-                              options={serviceoptions}
-                              value={row.productorService ? serviceoptions.find((option) => option.label === row.productorService) || { label: row.productorService, value: row.productorService } : null}
-                              onChange={(selectedOption) => handleServiceChange(invoice.id, rowIndex, selectedOption)}
-                              onInputChange={(inputValue, actionMeta) => handleServiceInputChange(invoice.id, rowIndex, inputValue, actionMeta)}
-                              isClearable
-                              styles={{
-                                control: (provided) => ({ ...provided, minWidth: 180, borderColor: getInvoiceRowError(invoice.id, rowIndex, 'productorService') ? 'red' : '#e2e8f0' }),
-                                menuPortal: (provided) => ({ ...provided, zIndex: 9999 }),
-                              }}
-                              menuPortalTarget={document.body}
-                            />
-                            {getInvoiceRowError(invoice.id, rowIndex, 'productorService') && <p className="text-xs text-red-500 mt-0.5">{getInvoiceRowError(invoice.id, rowIndex, 'productorService')}</p>}
+                            <div className="relative">
+                              <Input
+                                value={serviceSearch[`${invoice.id}-${rowIndex}`] ?? row.productorService}
+                                placeholder={row.isDiscount ? 'Reason for discount' : 'Product or Service'}
+                                className={`h-8 text-sm ${getInvoiceRowError(invoice.id, rowIndex, 'productorService') ? 'border-destructive' : ''}`}
+                                onChange={e => {
+                                  setServiceSearch(prev => ({ ...prev, [`${invoice.id}-${rowIndex}`]: e.target.value }));
+                                  updateInvoiceRow(invoice.id, rowIndex, 'productorService', e.target.value);
+                                }}
+                              />
+                              {(serviceSearch[`${invoice.id}-${rowIndex}`] || '').length > 0 &&
+                                serviceoptions.filter(o => o.label.toLowerCase().includes((serviceSearch[`${invoice.id}-${rowIndex}`] || '').toLowerCase())).length > 0 && (
+                                  <div className="absolute left-0 top-full z-50 mt-1 w-full rounded-lg border border-border bg-popover shadow-lg max-h-40 overflow-y-auto">
+                                    {serviceoptions.filter(o => o.label.toLowerCase().includes((serviceSearch[`${invoice.id}-${rowIndex}`] || '').toLowerCase())).map(o => (
+                                      <button key={o.value} type="button" onMouseDown={() => handleServiceSelect(invoice.id, rowIndex, o)} className="block w-full px-3 py-1.5 text-left text-sm hover:bg-muted">{o.label}</button>
+                                    ))}
+                                  </div>
+                              )}
+                            </div>
+                            {getInvoiceRowError(invoice.id, rowIndex, 'productorService') && <p className="text-xs text-destructive mt-0.5">{getInvoiceRowError(invoice.id, rowIndex, 'productorService')}</p>}
                           </td>
                           <td className="px-4 py-2">
-                            <input type="text" name="description" value={row.description} onChange={(e) => handleInputChange(invoice.id, rowIndex, e)} placeholder="Description" className="w-full border-0 bg-transparent text-sm focus:outline-none focus:ring-0" />
+                            <Input value={row.description} placeholder="Description" className="h-8 border-0 bg-transparent text-sm" onChange={e => updateInvoiceRow(invoice.id, rowIndex, 'description', e.target.value)} />
                           </td>
                           <td className="px-4 py-2">
-                            <input type="text" name="rate" value={row.rate} onChange={(e) => handleInputChange(invoice.id, rowIndex, e)} className={`w-20 rounded border bg-transparent px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 ${getInvoiceRowError(invoice.id, rowIndex, 'rate') ? 'border-red-400' : 'border-slate-200'}`} />
-                            {getInvoiceRowError(invoice.id, rowIndex, 'rate') && <p className="text-xs text-red-500 mt-0.5">{getInvoiceRowError(invoice.id, rowIndex, 'rate')}</p>}
+                            <Input value={row.rate} className={`h-8 w-20 text-sm ${getInvoiceRowError(invoice.id, rowIndex, 'rate') ? 'border-destructive' : ''}`} onChange={e => updateInvoiceRow(invoice.id, rowIndex, 'rate', e.target.value)} />
+                            {getInvoiceRowError(invoice.id, rowIndex, 'rate') && <p className="text-xs text-destructive mt-0.5">{getInvoiceRowError(invoice.id, rowIndex, 'rate')}</p>}
                           </td>
                           <td className="px-4 py-2">
-                            <input type="text" name="quantity" value={row.quantity} onChange={(e) => handleInputChange(invoice.id, rowIndex, e)} className={`w-16 rounded border bg-transparent px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 ${getInvoiceRowError(invoice.id, rowIndex, 'quantity') ? 'border-red-400' : 'border-slate-200'}`} />
-                            {getInvoiceRowError(invoice.id, rowIndex, 'quantity') && <p className="text-xs text-red-500 mt-0.5">{getInvoiceRowError(invoice.id, rowIndex, 'quantity')}</p>}
+                            <Input value={row.quantity} className={`h-8 w-16 text-sm ${getInvoiceRowError(invoice.id, rowIndex, 'quantity') ? 'border-destructive' : ''}`} onChange={e => updateInvoiceRow(invoice.id, rowIndex, 'quantity', e.target.value)} />
+                            {getInvoiceRowError(invoice.id, rowIndex, 'quantity') && <p className="text-xs text-destructive mt-0.5">{getInvoiceRowError(invoice.id, rowIndex, 'quantity')}</p>}
                           </td>
-                          <td className="px-4 py-2 text-sm text-slate-700">${row.amount}</td>
+                          <td className="px-4 py-2 text-sm text-foreground">${row.amount}</td>
                           <td className="px-4 py-2">
-                            <input type="checkbox" name="tax" checked={row.tax} onChange={(e) => handleInputChange(invoice.id, rowIndex, e)} className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
+                            <Checkbox checked={row.tax} onCheckedChange={val => updateInvoiceRow(invoice.id, rowIndex, 'tax', val)} />
                           </td>
                           <td className="px-4 py-2">
-                            <button type="button" onClick={() => deleteRow(invoice.id, rowIndex)} className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-red-500">
-                              <RiCloseLine className="h-4 w-4" />
+                            <button type="button" onClick={() => deleteRow(invoice.id, rowIndex)} className="rounded-lg p-1 text-muted-foreground hover:bg-muted hover:text-destructive">
+                              <X className="h-4 w-4" />
                             </button>
                           </td>
                         </tr>
@@ -1322,66 +1025,58 @@ const InvoiceComponent = ({
                 </div>
               </div>
 
-              {/* Add Row Buttons */}
               <div className="flex items-center gap-4 mt-2">
-                <button type="button" onClick={() => addRow(invoice.id)} className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700">
-                  <AiOutlinePlusCircle className="h-4 w-4" /> Line item
+                <button type="button" onClick={() => addRow(invoice.id)} className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80">
+                  <PlusCircle className="h-4 w-4" /> Line item
                 </button>
-                <button type="button" onClick={() => addRow(invoice.id, true)} className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700">
-                  <CiDiscount1 className="h-4 w-4" /> Discount
+                <button type="button" onClick={() => addRow(invoice.id, true)} className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80">
+                  <Tag className="h-4 w-4" /> Discount
                 </button>
               </div>
 
-              {/* Summary */}
-              <h5 className="text-sm font-semibold text-slate-800 mt-4">Summary</h5>
-              <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden max-w-lg mt-2">
+              <h5 className="text-sm font-semibold text-foreground mt-4">Summary</h5>
+              <div className="rounded-xl border border-border bg-background shadow-sm overflow-hidden max-w-lg mt-2">
                 <table className="w-full text-left">
                   <thead>
-                    <tr className="border-b border-slate-100 bg-slate-50/60">
-                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Subtotal</th>
-                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Tax Rate</th>
-                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Tax Total</th>
-                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Total</th>
+                    <tr className="border-b border-border bg-muted/40">
+                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Subtotal</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Tax Rate</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Tax Total</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Total</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
-                      <td className="px-4 py-3 text-sm font-medium text-slate-700">${invoice.subtotal}</td>
+                      <td className="px-4 py-3 text-sm font-medium text-foreground">${invoice.subtotal}</td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1">
-                          <input type="text" value={invoice.taxRate} onChange={(e) => handleTaxRateChange(invoice.id, e.target.value)} className="w-16 rounded border border-slate-200 bg-transparent px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" />
-                          <span className="text-sm text-slate-500">%</span>
+                          <Input value={invoice.taxRate} className="h-8 w-16 text-sm" onChange={e => handleTaxRateChange(invoice.id, e.target.value)} />
+                          <span className="text-sm text-muted-foreground">%</span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-sm text-slate-700">${invoice.taxTotal}</td>
-                      <td className="px-4 py-3 text-sm font-bold text-slate-900">${invoice.totalAmount}</td>
+                      <td className="px-4 py-3 text-sm text-foreground">${invoice.taxTotal}</td>
+                      <td className="px-4 py-3 text-sm font-bold text-foreground">${invoice.totalAmount}</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
             </div>
 
-            {/* Client Note Editor */}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-slate-700">Note for Client</label>
-              <Editor
-                onChange={(content) => handleEditorChange(invoice.id, content)}
-                initialContent={invoice.clientNote}
-              />
+              <label className="text-sm font-medium text-foreground">Note for Client</label>
+              <Editor onChange={(content) => handleEditorChange(invoice.id, content)} initialContent={invoice.clientNote} />
             </div>
           </div>
         </div>
       ))}
 
-      {/* Add Invoice Button */}
       <div className="flex items-center gap-3 mt-2">
-        <button type="button" onClick={addInvoice} className="inline-flex items-center gap-1.5 rounded-lg border border-blue-200 bg-white px-4 py-2 text-sm font-medium text-blue-600 shadow-sm transition-colors hover:bg-blue-50">
+        <button type="button" onClick={addInvoice} className="inline-flex items-center gap-1.5 rounded-lg border border-primary/30 bg-background px-4 py-2 text-sm font-medium text-primary shadow-sm transition-colors hover:bg-primary/5">
           Add invoice
         </button>
       </div>
 
-      {/* Invoice Count Display */}
-      <p className="text-xs text-slate-400">{invoices.length} invoice(s) added</p>
+      <p className="text-xs text-muted-foreground">{invoices.length} invoice(s) added</p>
     </div>
   );
 };

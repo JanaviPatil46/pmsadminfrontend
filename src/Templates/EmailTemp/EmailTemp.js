@@ -1,11 +1,15 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import EditorShortcodes from "../Texteditor/EditorShortcodes";
 import { useDropzone } from "react-dropzone";
 import debounce from "lodash.debounce";
 import axios from "axios";
-import { FormPage, FormSection, FormField, FormRow, FormGrid, ShortcodePopover, FormSelect } from "../../components/ui/form-layout";
+import { FormPage, FormSection, FormRow, FormGrid, ShortcodePopover, FormSelect } from "../../components/ui/form-layout";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "../../components/ui/form";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { Label } from "../../components/ui/label";
@@ -14,28 +18,38 @@ import { RadioGroup, RadioGroupItem } from "../../components/ui/radio-group";
 import { Upload, Trash2, FileText, Pencil, Loader2 } from "lucide-react";
 import { DataTable } from "../../components/data-table/data-table";
 import { DataTableToolbar } from "../../components/data-table/toolbar";
+
+const emailSchema = z.object({
+  templateName: z.string().min(1, "Template name is required"),
+  selecteduser: z.any().refine((v) => v && v.value, { message: "Please select a sender" }),
+  inputText: z.string().min(1, "Email subject is required"),
+  selectedOption: z.string().optional(),
+});
 const EmailTemp = () => {
   const EMAIL_API = process.env.REACT_APP_EMAIL_TEMP_URL;
   const USER_API = process.env.REACT_APP_USER_URL;
 
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
-  const [inputText, setInputText] = useState("");
-  const [selectedShortcut, setSelectedShortcut] = useState("");
-  const [templateName, setTemplateName] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [shortcuts, setShortcuts] = useState([]);
   const [filteredShortcuts, setFilteredShortcuts] = useState([]);
-  const [selectedOption, setSelectedOption] = useState("contacts");
-  const [isFormDirty, setIsFormDirty] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [emailBody, setEmailBody] = useState("");
+  const [files, setFiles] = useState([]);
+
+  const form = useForm({
+    resolver: zodResolver(emailSchema),
+    defaultValues: {
+      templateName: "",
+      selecteduser: null,
+      inputText: "",
+      selectedOption: "contacts",
+    },
+  });
 
   const handleCreateTemplate = () => {
     setShowForm(true); // Show the form when button is clicked
-  };
-
-  const handleChange = (event) => {
-    setSelectedOption(event.target.value);
   };
 
   const toggleDropdown = (event) => {
@@ -43,21 +57,11 @@ const EmailTemp = () => {
     setShowDropdown(!showDropdown);
   };
   const [cursorPosition, setCursorPosition] = useState(0);
-  const handlesubject = (e) => {
-    const { value, selectionStart } = e.target;
-    setInputText(value);
-    setCursorPosition(selectionStart);
-  };
   const textFieldRef = useRef(null);
   const handleAddShortcut = (shortcut) => {
-    setInputText((prevText) => {
-      const newText =
-        prevText.slice(0, cursorPosition) +
-        `[${shortcut}]` +
-        prevText.slice(cursorPosition);
-      return newText;
-    });
-
+    const current = form.getValues("inputText") || "";
+    const newText = current.slice(0, cursorPosition) + `[${shortcut}]` + current.slice(cursorPosition);
+    form.setValue("inputText", newText, { shouldDirty: true });
     setTimeout(() => {
       if (textFieldRef.current) {
         textFieldRef.current.focus();
@@ -67,18 +71,17 @@ const EmailTemp = () => {
         );
       }
     }, 0);
-
     setShowDropdown(false);
   };
+  const selectedOption = form.watch("selectedOption");
+
   useEffect(() => {
-    // Simulate filtered shortcuts based on some logic (e.g., search)
     setFilteredShortcuts(
       shortcuts.filter((shortcut) => shortcut.title.toLowerCase().includes(""))
     );
   }, [shortcuts]);
 
   useEffect(() => {
-    // Set shortcuts based on selected option
     if (selectedOption === "contacts") {
       const contactShortcuts = [
         { title: "Account Shortcodes", isBold: true },
@@ -234,16 +237,10 @@ const EmailTemp = () => {
       setShortcuts(accountShortcuts);
     }
   }, [selectedOption]);
-  const handlechatsubject = (e) => {
-    const { value } = e.target;
-    setInputText(value);
-  };
   const handleCloseDropdown = () => {
     setAnchorEl(null);
     setShowDropdown(false);
   };
-
-  const [selecteduser, setSelectedUser] = useState("");
 
   const [userData, setUserData] = useState([]);
 
@@ -262,112 +259,48 @@ const EmailTemp = () => {
     }
   };
 
-  const handleuserChange = (event, selectedOptions) => {
-    setSelectedUser(selectedOptions);
-  };
   const options = userData.map((user) => ({
     value: user._id,
     label: user.username,
   }));
 
-  const handleSaveExitTemplate = async (e) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      return; // Prevent form submission if validation fails
-    }
-
-    // Create a FormData object
+  const submitEmail = async (values, exitAfterSave) => {
     const formData = new FormData();
-
-    // Append form fields to FormData
-    formData.append("templatename", templateName);
-    formData.append("from", selecteduser.value);
-    formData.append("emailsubject", inputText);
+    formData.append("templatename", values.templateName);
+    formData.append("from", values.selecteduser.value);
+    formData.append("emailsubject", values.inputText);
     formData.append("emailbody", emailBody);
-    formData.append("mode", selectedOption)
-
-    // Append files to FormData
+    formData.append("mode", values.selectedOption || "contacts");
     if (files && files.length > 0) {
-      files.forEach((file) => {
-        formData.append("attachments", file); // Use "attachments" as the field name
-      });
+      files.forEach((file) => formData.append("attachments", file));
     }
-
     try {
       const response = await fetch(`${EMAIL_API}/workflow/emailtemplate`, {
         method: "POST",
-        body: formData, // Send FormData instead of JSON
+        body: formData,
         redirect: "follow",
       });
       const result = await response.json();
-
       if (result && result.message === "EmailTemplate already exists") {
         toast.success("Email Template already exists");
       } else {
         toast.success("Email Template created successfully");
-        setShowForm(false);
-        handleClearTemplate();
-        fetchEmailTemplates();
+        if (exitAfterSave) {
+          setShowForm(false);
+          form.reset();
+          setEmailBody("");
+          setFiles([]);
+          fetchEmailTemplates();
+        }
       }
     } catch (error) {
       console.error(error);
       toast.error(error.message);
     }
   };
-
-  const handleSaveTemplate = async(e) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      return; // Prevent form submission if validation fails
-    }
-
-    // Create a FormData object
-    const formData = new FormData();
-
-    // Append form fields to FormData
-    formData.append("templatename", templateName);
-    formData.append("from", selecteduser.value);
-    formData.append("emailsubject", inputText);
-    formData.append("emailbody", emailBody);
-    formData.append("mode", selectedOption)
-
-    // Append files to FormData
-    if (files && files.length > 0) {
-      files.forEach((file) => {
-        formData.append("attachments", file); // Use "attachments" as the field name
-      });
-    }
-
-    try {
-      const response = await fetch(`${EMAIL_API}/workflow/emailtemplate`, {
-        method: "POST",
-        body: formData, // Send FormData instead of JSON
-        redirect: "follow",
-      });
-      const result = await response.json();
-
-      if (result && result.message === "EmailTemplate already exists") {
-        toast.success("Email Template already exists");
-      } else {
-        toast.success("Email Template created successfully");
-      }
-    } catch (error) {
-      console.error(error);
-      toast.error(error.message);
-    }
-  };
-  const [emailBody, setEmailBody] = useState("");
 
   const handleEditorChange = (content) => {
     setEmailBody(content);
-  };
-  const handleClearTemplate = () => {
-    setTemplateName("");
-    setSelectedUser("");
-    setInputText("");
-    setEmailBody("");
   };
   const [emailTemplates, setEmailTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -471,88 +404,28 @@ const EmailTemp = () => {
     },
   ], []);
   const handleTempCancle = () => {
-    if (isFormDirty) {
+    if (form.formState.isDirty) {
       const confirmClose = window.confirm(
         "You have unsaved changes. Are you sure you want to cancel?"
       );
-      if (!confirmClose) {
-        return;
-      }
+      if (!confirmClose) return;
     }
     setShowForm(false);
-  };
-
-  // Detect form changes
-  useEffect(() => {
-    if (templateName || selecteduser || inputText) {
-      setIsFormDirty(true);
-    } else {
-      setIsFormDirty(false);
-    }
-  }, [templateName, selecteduser, inputText]);
-
-  const [templateNameError, setTemplateNameError] = useState("");
-  const [selectedUserError, setSelectedUserError] = useState("");
-  const [inputTextError, setInputTextError] = useState("");
-
-  const validateForm = () => {
-    let isValid = true;
-
-    if (templateName.trim() === "") {
-      setTemplateNameError("Template name is required");
-      isValid = false;
-    } else {
-      setTemplateNameError("");
-    }
-
-    if (!selecteduser) {
-      setSelectedUserError("Please select a user");
-      isValid = false;
-    } else {
-      setSelectedUserError("");
-    }
-
-    if (inputText.trim() === "") {
-      setInputTextError("Email subject is required");
-      isValid = false;
-    } else {
-      setInputTextError("");
-    }
-
-    return isValid;
+    form.reset();
+    setEmailBody("");
+    setFiles([]);
   };
 
   //*********************** */
 
-  const [selectedFiles, setSelectedFiles] = useState([]);
-
-  // Handle file drop
-  const onDrop = useCallback((acceptedFiles) => {
-    setSelectedFiles((prevFiles) => [...prevFiles, ...acceptedFiles]);
-  }, []);
-
-
   const { getRootProps, getInputProps } = useDropzone({
     onDrop: (acceptedFiles) => {
-      handleFileChange(acceptedFiles); // Pass the array of files to handleFileChange
+      handleFileChange(acceptedFiles);
     },
     accept:
       "application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,image/jpeg,image/png",
     multiple: true,
   });
-
-  const handleRemoveFile = (index) => {
-    setSelectedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
-  };
-
-  const handleButtonClick = (event) => {
-    event.stopPropagation(); // Prevent click event from bubbling up
-    document.getElementById("file-input").click(); // Trigger click on the hidden file input
-  };
-
-  const [files, setFiles] = useState([]);
-
-  
 
   const handleFileChange = (acceptedFiles) => {
     if (!acceptedFiles || !Array.isArray(acceptedFiles)) return;
@@ -560,32 +433,33 @@ const EmailTemp = () => {
   };
 
 
-  // Debounced function to check template name existence
   const checkTemplateName = async (name) => {
-      try {
-        const res = await axios.get(`${EMAIL_API}/workflow/check-name`, {
-          params: { name },
-        });
-        if (res.data.exists) {
-          setTemplateNameError('Template name already exists');
-        } else {
-          setTemplateNameError('');
-        }
-      } catch (err) {
-        console.error(err);
-        setTemplateNameError('');
+    try {
+      const res = await axios.get(`${EMAIL_API}/workflow/check-name`, { params: { name } });
+      if (res.data.exists) {
+        form.setError("templateName", { type: "manual", message: "Template name already exists" });
+      } else {
+        form.clearErrors("templateName");
       }
-    };
-  
-   const debouncedCheck = debounce((name) => {
-      if (name.trim()) checkTemplateName(name);
-      else setTemplateNameError('');
-    }, 500);
-  
-    useEffect(() => {
-      debouncedCheck(templateName);
-      return debouncedCheck.cancel;
-    }, [templateName]);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const debouncedCheck = debounce((name) => {
+    if (name.trim()) checkTemplateName(name);
+    else form.clearErrors("templateName");
+  }, 500);
+
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (name === "templateName") debouncedCheck(value.templateName);
+    });
+    return () => { subscription.unsubscribe(); debouncedCheck.cancel(); };
+  }, [form.watch]);
+
+  const handleSaveExitTemplate = form.handleSubmit((values) => submitEmail(values, true));
+  const handleSaveTemplate = form.handleSubmit((values) => submitEmail(values, false));
   return (
     <div>
       {!showForm ? (
@@ -610,94 +484,120 @@ const EmailTemp = () => {
           />
         </div>
       ) : (
-        <FormPage
-          title="Create Email Template"
-          subtitle="Configure your new email template"
-          actions={
-            <>
-              <Button variant="outline" onClick={handleTempCancle}>
-                Cancel
-              </Button>
-              <Button variant="secondary" onClick={handleSaveTemplate}>
-                Save
-              </Button>
-              <Button onClick={handleSaveExitTemplate}>
-                Save & Exit
-              </Button>
-            </>
-          }
-        >
-          <FormGrid>
-            {/* ===== LEFT COLUMN: Email Form ===== */}
-            <FormGrid.Main>
-              <FormSection title="Template Details">
-                <FormField label="Template Name" error={templateNameError}>
-                  <Input
+        <Form {...form}>
+          <FormPage
+            title="Create Email Template"
+            subtitle="Configure your new email template"
+            actions={
+              <>
+                <Button type="button" variant="outline" onClick={handleTempCancle}>Cancel</Button>
+                <Button type="button" variant="secondary" onClick={handleSaveTemplate}>Save</Button>
+                <Button type="button" onClick={handleSaveExitTemplate}>Save & Exit</Button>
+              </>
+            }
+          >
+            <FormGrid>
+              {/* ===== LEFT COLUMN: Email Form ===== */}
+              <FormGrid.Main>
+                <FormSection title="Template Details">
+                  <FormField
+                    control={form.control}
                     name="templateName"
-                    value={templateName}
-                    onChange={(e) => setTemplateName(e.target.value)}
-                    placeholder="Template Name"
-                    error={!!templateNameError}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Template Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Template Name" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </FormField>
 
-                <FormField label="Mode">
-                  <RadioGroup value={selectedOption} onValueChange={(val) => handleChange({ target: { value: val } })}>
-                    <div className="flex items-center gap-6">
-                      <div className="flex items-center gap-2">
-                        <RadioGroupItem value="contacts" id="contacts" />
-                        <Label htmlFor="contacts" className="cursor-pointer text-sm">Contact Shortcodes</Label>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <RadioGroupItem value="account" id="account" />
-                        <Label htmlFor="account" className="cursor-pointer text-sm">Account Shortcodes</Label>
-                      </div>
-                    </div>
-                  </RadioGroup>
-                </FormField>
-              </FormSection>
+                  <FormField
+                    control={form.control}
+                    name="selectedOption"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Mode</FormLabel>
+                        <FormControl>
+                          <RadioGroup value={field.value} onValueChange={field.onChange}>
+                            <div className="flex items-center gap-6">
+                              <div className="flex items-center gap-2">
+                                <RadioGroupItem value="contacts" id="contacts" />
+                                <Label htmlFor="contacts" className="cursor-pointer text-sm">Contact Shortcodes</Label>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <RadioGroupItem value="account" id="account" />
+                                <Label htmlFor="account" className="cursor-pointer text-sm">Account Shortcodes</Label>
+                              </div>
+                            </div>
+                          </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </FormSection>
 
-              <FormSection title="Sender & Subject">
-                <FormField label="From" error={selectedUserError}>
-                  <FormSelect
-                    value={selecteduser?.value || ""}
-                    onChange={(e) => {
-                      const selected = options.find((o) => o.value === e.target.value) || null;
-                      handleuserChange(null, selected);
-                    }}
-                    error={!!selectedUserError}
-                  >
-                    <option value="">Select Sender</option>
-                    {options.map((opt) => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
-                    ))}
-                  </FormSelect>
-                </FormField>
+                <FormSection title="Sender & Subject">
+                  <FormField
+                    control={form.control}
+                    name="selecteduser"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>From</FormLabel>
+                        <FormControl>
+                          <FormSelect
+                            value={field.value?.value || ""}
+                            onChange={(e) => {
+                              const selected = options.find((o) => o.value === e.target.value) || null;
+                              field.onChange(selected);
+                            }}
+                          >
+                            <option value="">Select Sender</option>
+                            {options.map((opt) => (
+                              <option key={opt.value} value={opt.value}>{opt.label}</option>
+                            ))}
+                          </FormSelect>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                <FormField label="Subject" error={inputTextError}>
-                  <div className="space-y-2">
-                    <Input
-                      name="subject"
-                      onChange={handlesubject}
-                      ref={textFieldRef}
-                      value={inputText}
-                      onClick={(e) => setCursorPosition(e.target.selectionStart)}
-                      placeholder="Subject"
-                      error={!!inputTextError}
-                    />
-                    <ShortcodePopover
-                      shortcuts={filteredShortcuts}
-                      onSelect={handleAddShortcut}
-                    />
-                  </div>
-                </FormField>
-              </FormSection>
+                  <FormField
+                    control={form.control}
+                    name="inputText"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Subject</FormLabel>
+                        <FormControl>
+                          <div className="space-y-2">
+                            <Input
+                              placeholder="Subject"
+                              ref={textFieldRef}
+                              onClick={(e) => setCursorPosition(e.target.selectionStart)}
+                              {...field}
+                              onChange={(e) => {
+                                setCursorPosition(e.target.selectionStart);
+                                field.onChange(e);
+                              }}
+                            />
+                            <ShortcodePopover shortcuts={filteredShortcuts} onSelect={handleAddShortcut} />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </FormSection>
 
-              {/* Email Body */}
-              <FormSection title="Email Body">
-                <EditorShortcodes onChange={handleEditorChange} />
-              </FormSection>
-            </FormGrid.Main>
+                {/* Email Body */}
+                <FormSection title="Email Body">
+                  <EditorShortcodes onChange={handleEditorChange} />
+                </FormSection>
+              </FormGrid.Main>
 
             {/* ===== RIGHT COLUMN: Attachments ===== */}
             <FormGrid.Sidebar>
@@ -753,6 +653,7 @@ const EmailTemp = () => {
             </FormGrid.Sidebar>
           </FormGrid>
         </FormPage>
+        </Form>
       )}
     </div>
   );
