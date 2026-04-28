@@ -74,7 +74,7 @@ export function SideSheet({
           {(!hideDefaultFooter || footer) && (
             <SheetFooter className="border-t border-border/40 px-5 py-3.5 bg-muted/20 shrink-0">
               <div className="flex items-center justify-end gap-2 w-full">
-                <Button
+                {/* <Button
                   type="button"
                   variant="ghost"
                   size="sm"
@@ -82,7 +82,7 @@ export function SideSheet({
                   disabled={isSubmitting}
                 >
                   {cancelLabel}
-                </Button>
+                </Button> */}
                 {onConfirm && (
                   <Button
                     type="button"
