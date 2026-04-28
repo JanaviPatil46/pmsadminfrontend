@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect, useContext } from "react";
-import "./myaccount.css";
 import { Eye, EyeOff, Pencil, X, Upload, HelpCircle, Loader2 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Checkbox } from "../components/ui/checkbox";
 import { Switch } from "../components/ui/switch";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "../components/ui/tabs";
 import user from "../Images/user.jpg";
 import { NavLink } from "react-router-dom";
 import { Link } from "react-router-dom";
@@ -1389,256 +1389,273 @@ const MyAccount = () => {
 
   return (
     <>
-      <div>
-        <h1 className="text-2xl font-bold text-foreground mb-6">Account Settings</h1>
-      </div>
-      <div className="account-settings">
-        {/* ===== PERSONAL DETAILS ===== */}
-        <div className="accounts-details-user rounded-xl border bg-card p-5 shadow-sm">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold text-foreground">Personal Details</h2>
-            <button onClick={handleEditClick} className="text-primary hover:text-primary/80 transition-colors">
-              <Pencil className="h-4 w-4" />
-            </button>
-          </div>
-          <hr className="border-border mb-4" />
-
-          {!isEditable && (
-            <div className="flex items-center gap-5 mt-4">
-              <img src={preview || currentImage || user} alt="Profile" className="w-[120px] h-[120px] rounded-full border-2 border-muted object-cover" />
-              <div>
-                <h3 className="text-xl font-semibold text-foreground">{firstName} {lastname}</h3>
-                <p className="text-sm text-muted-foreground">{phonenumber}</p>
+      {/* Authentication modal */}
+      {showAlert && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/40" onClick={handleCloseAlert} />
+          <div className="relative z-50 w-full max-w-md rounded-xl bg-background p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Authentication</h3>
+              <button onClick={handleCloseAlert}><X className="h-4 w-4" /></button>
+            </div>
+            <hr className="border-border" />
+            <p className="text-sm text-muted-foreground">In order to change your login details you must provide your current password.</p>
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-1.5">Password</label>
+              <div className="relative">
+                <Input type={passShow ? "text" : "password"} placeholder="Enter Your Password" />
+                <button type="button" onClick={() => setPassShow(!passShow)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                  {passShow ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
               </div>
             </div>
-          )}
+            <NavLink to="/forgotpass" className="text-sm text-primary hover:underline">Forgot Password?</NavLink>
+            <div className="flex items-center gap-3 pt-2">
+              <Button onClick={handleUpdatePasswordClick}>Submit</Button>
+              <Button variant="outline" onClick={handleCloseAlert}>Cancel</Button>
+            </div>
+          </div>
+        </div>
+      )}
 
-          {isEditable && (
-            <div className="mt-4 space-y-5">
-              <div className="flex flex-col items-center gap-3">
-                <div className="relative">
-                  <img src={preview || currentImage || user} alt="Profile" className="w-[120px] h-[120px] rounded-full border-2 border-muted object-cover" />
-                  <input accept="image/*" className="hidden" id="profile-picture-upload" type="file" onChange={handleImageChange} />
-                  <label htmlFor="profile-picture-upload" className="absolute bottom-0 right-0 rounded-lg bg-primary p-1.5 cursor-pointer hover:bg-primary/90 transition-colors">
-                    <Pencil className="h-3.5 w-3.5 text-white" />
-                  </label>
+      <div className="mx-auto w-full max-w-4xl">
+        <h1 className="text-xl font-semibold text-foreground mb-5">Account Settings</h1>
+
+        <Tabs defaultValue="profile" className="w-full">
+          {/* ── Tab Bar ── */}
+          <TabsList className="mb-6 h-10 w-fit gap-1 bg-muted/60 border border-border rounded-lg p-1">
+            <TabsTrigger value="profile" className="text-sm px-5">Profile</TabsTrigger>
+            <TabsTrigger value="security" className="text-sm px-5">Security</TabsTrigger>
+            <TabsTrigger value="notifications" className="text-sm px-5">Notifications</TabsTrigger>
+          </TabsList>
+
+          {/* ══════════════════════════════════════
+               PROFILE TAB
+          ══════════════════════════════════════ */}
+          <TabsContent value="profile">
+            <div className="space-y-6">
+
+              {/* Personal Details */}
+              <div className="rounded-xl border border-border/40 bg-background p-5">
+                <div className="flex items-center justify-between mb-4">
+                  <p className="text-sm font-semibold text-foreground">Personal Details</p>
+                  <button onClick={handleEditClick} className="text-muted-foreground hover:text-foreground transition-colors">
+                    <Pencil className="h-4 w-4" />
+                  </button>
                 </div>
-                {image && (
-                  <div className="text-center space-y-2">
-                    <p className="text-xs text-muted-foreground">{image.name} ({Math.round(image.size / 1024)} KB)</p>
-                    <Button onClick={handleUpload} disabled={isUploading} className="gap-1.5">
-                      {isUploading ? <><Loader2 className="h-4 w-4 animate-spin" /> Uploading...</> : <><Upload className="h-4 w-4" /> Upload Profile Picture</>}
-                    </Button>
+
+                {!isEditable && (
+                  <div className="flex items-center gap-4">
+                    <img src={preview || currentImage || user} alt="Profile" className="w-16 h-16 rounded-full border border-border object-cover shrink-0" />
+                    <div>
+                      <p className="text-sm font-medium text-foreground">{firstName} {lastname}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{phonenumber}</p>
+                    </div>
+                  </div>
+                )}
+
+                {isEditable && (
+                  <div className="space-y-4">
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="relative">
+                        <img src={preview || currentImage || user} alt="Profile" className="w-20 h-20 rounded-full border border-border object-cover" />
+                        <input accept="image/*" className="hidden" id="profile-picture-upload" type="file" onChange={handleImageChange} />
+                        <label htmlFor="profile-picture-upload" className="absolute bottom-0 right-0 rounded-lg bg-primary p-1.5 cursor-pointer hover:bg-primary/90 transition-colors">
+                          <Pencil className="h-3 w-3 text-primary-foreground" />
+                        </label>
+                      </div>
+                      {image && (
+                        <div className="text-center space-y-2">
+                          <p className="text-xs text-muted-foreground">{image.name} ({Math.round(image.size / 1024)} KB)</p>
+                          <Button size="sm" onClick={handleUpload} disabled={isUploading} className="gap-1.5">
+                            {isUploading ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Uploading...</> : <><Upload className="h-3.5 w-3.5" /> Upload</>}
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-3 gap-3">
+                      <div>
+                        <label className="block text-xs font-medium text-foreground mb-1">First name</label>
+                        <Input disabled={!isEditable} placeholder="First Name" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-foreground mb-1">Middle Name</label>
+                        <Input disabled={!isEditable} placeholder="Middle Name" value={middleName} onChange={(e) => setMiddleName(e.target.value)} />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-foreground mb-1">Last name</label>
+                        <Input disabled={!isEditable} placeholder="Last name" value={lastname} onChange={(e) => setLastName(e.target.value)} />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-foreground mb-1">Phone Number</label>
+                      <Input disabled={!isEditable} placeholder="Phone Number" value={phonenumber} onChange={(e) => { const onlyNums = e.target.value.replace(/\D/g, ""); setPhoneNumber(onlyNums); }} />
+                    </div>
+                  </div>
+                )}
+
+                {showSaveButtons && (
+                  <div className="flex items-center gap-2 mt-4">
+                    <Button size="sm" onClick={handleSaveButtonClick}>Save</Button>
+                    <Button size="sm" variant="outline" onClick={handleCancelButtonClick}>Cancel</Button>
                   </div>
                 )}
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-1.5">First name</label>
-                  <Input disabled={!isEditable} placeholder="First Name" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+              {/* Login Details */}
+              <div className="rounded-xl border border-border/40 bg-background p-5">
+                <div className="flex items-center justify-between mb-4">
+                  <p className="text-sm font-semibold text-foreground">Login Details</p>
+                  <button onClick={toggleAlert} className="text-muted-foreground hover:text-foreground transition-colors">
+                    <Pencil className="h-4 w-4" />
+                  </button>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-1.5">Middle Name</label>
-                  <Input disabled={!isEditable} placeholder="Middle Name" value={middleName} onChange={(e) => setMiddleName(e.target.value)} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-1.5">Last name</label>
-                  <Input disabled={!isEditable} placeholder="Last name" value={lastname} onChange={(e) => setLastName(e.target.value)} />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-1.5">Phone Number</label>
-                <Input disabled={!isEditable} placeholder="Phone Number" value={phonenumber} onChange={(e) => { const onlyNums = e.target.value.replace(/\D/g, ""); setPhoneNumber(onlyNums); }} />
-              </div>
-            </div>
-          )}
-
-          {showSaveButtons && (
-            <div className="flex items-center gap-3 mt-4">
-              <Button onClick={handleSaveButtonClick}>Save</Button>
-              <Button variant="outline" onClick={handleCancelButtonClick}>Cancel</Button>
-            </div>
-          )}
-        </div>
-
-        {/* ===== LOGIN DETAILS ===== */}
-        <div className="login-details-user rounded-xl border bg-card p-5 shadow-sm">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold text-foreground">Login Details</h2>
-            <button onClick={toggleAlert} className="text-primary hover:text-primary/80 transition-colors">
-              <Pencil className="h-4 w-4" />
-            </button>
-          </div>
-
-          {showAlert && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center">
-              <div className="fixed inset-0 bg-black/40" onClick={handleCloseAlert} />
-              <div className="relative z-50 w-full max-w-md rounded-xl bg-background p-6 shadow-2xl space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold">Authentication</h3>
-                  <button onClick={handleCloseAlert}><X className="h-4 w-4" /></button>
-                </div>
-                <hr className="border-border" />
-                <p className="text-sm text-muted-foreground">In order to change your login details you must provide your current password.</p>
-                <div className="relative">
-                  <label className="block text-sm font-medium text-foreground mb-1.5">Password</label>
-                  <div className="relative">
-                    <Input type={passShow ? "text" : "password"} placeholder="Enter Your Password" />
-                    <button type="button" onClick={() => setPassShow(!passShow)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
-                      {passShow ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-1.5">Email</label>
+                    <Input disabled value={email} onChange={(e) => setEmail(e.target.value)} type="email" />
                   </div>
-                </div>
-                <NavLink to="/forgotpass" className="text-sm text-primary hover:underline">Forgot Password?</NavLink>
-                <div className="flex items-center gap-3 pt-2">
-                  <Button onClick={handleUpdatePasswordClick}>Submit</Button>
-                  <Button variant="outline" onClick={handleCloseAlert}>Cancel</Button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <hr className="border-border mb-4" />
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">Email</label>
-              <Input disabled value={email} onChange={(e) => setEmail(e.target.value)} type="email" />
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-1.5">Password</label>
-                <div className="relative">
-                  <Input type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} disabled={!isLoginEditable} placeholder="Password" />
-                  <button type="button" onClick={handleTogglePasswordVisibility} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-1.5">Confirm Password</label>
-                <div className="relative">
-                  <Input type={showConfirmPassword ? "text" : "password"} value={cpassword} onChange={(e) => setCpassword(e.target.value)} disabled={!isLoginEditable} placeholder="Confirm Password" />
-                  <button type="button" onClick={handleToggleCPasswordVisibility} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
-                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-sm font-medium text-foreground mb-1.5">Password</label>
+                      <div className="relative">
+                        <Input type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} disabled={!isLoginEditable} placeholder="Password" />
+                        <button type="button" onClick={handleTogglePasswordVisibility} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                          {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-foreground mb-1.5">Confirm Password</label>
+                      <div className="relative">
+                        <Input type={showConfirmPassword ? "text" : "password"} value={cpassword} onChange={(e) => setCpassword(e.target.value)} disabled={!isLoginEditable} placeholder="Confirm Password" />
+                        <button type="button" onClick={handleToggleCPasswordVisibility} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                          {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-1.5">Stay signed in for</label>
+                    <Input disabled value={signedtime} placeholder="Stay signed in for" />
+                  </div>
+                  {showUpdatePassButton && (
+                    <Button size="sm" onClick={updatePassword}>Update Password</Button>
+                  )}
                 </div>
               </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">Stay signed in for</label>
-              <Input disabled value={signedtime} placeholder="Stay signed in for" />
-            </div>
-            {showUpdatePassButton && (
-              <Button onClick={updatePassword}>Update Password</Button>
-            )}
-          </div>
-        </div>
 
-        {/* ===== TWO-FACTOR AUTH ===== */}
-        <div className="authentication rounded-xl border bg-card p-5 shadow-sm">
-          <h2 className="text-lg font-semibold text-foreground mb-3">Two-factor authentication</h2>
-          <hr className="border-border mb-4" />
-          <div className="flex items-center gap-3 cursor-pointer">
-            <Switch onCheckedChange={handleAuthentication} />
-            <span className="text-sm text-foreground" onClick={handleAuthentication}>Turn on two-factor authentication</span>
-            <HelpCircle className="h-4 w-4 text-primary" />
-          </div>
-        </div>
+            </div>
+          </TabsContent>
 
-        {/* ===== NOTIFICATION PREFERENCES ===== */}
-        <div className="preferences rounded-xl border bg-card p-5 shadow-sm">
-          <div className="flex items-center gap-2 mb-3">
-            <h2 className="text-lg font-semibold text-foreground">Notification preferences</h2>
-            <HelpCircle className="h-4 w-4 text-primary" />
-          </div>
-          <hr className="border-border mb-4" />
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[360px] text-left">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="py-3 px-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground"></th>
-                  <th className="py-3 px-4 w-28 text-xs font-semibold uppercase tracking-wider text-muted-foreground text-center">INBOX+</th>
-                  <th className="py-3 px-4 w-28 text-xs font-semibold uppercase tracking-wider text-muted-foreground text-center">EMAIL</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {notificationRows.map((row) =>
-                  row.isSpacer ? (
-                    <tr key={row.label} className="bg-muted/40">
-                      <td colSpan={3} className="py-3 px-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                        {row.label}
-                      </td>
-                    </tr>
-                  ) : (
-                    <tr key={row.label} className="hover:bg-muted/30 transition-colors">
-                      <td className="py-3 px-4 text-sm text-foreground align-middle">
-                        {row.indent
-                          ? <span className="pl-4 block">{row.label}</span>
-                          : row.label
-                        }
-                      </td>
-                      <td className="py-3 px-4 w-28 align-middle">
-                        <div className="flex justify-center items-center">
-                          <Checkbox checked={row.inboxChecked} onCheckedChange={row.onInboxChange} />
+          {/* ══════════════════════════════════════
+               SECURITY TAB
+          ══════════════════════════════════════ */}
+          <TabsContent value="security">
+            <div className="space-y-6">
+
+              {/* Two-factor auth */}
+              <div className="flex items-center justify-between rounded-xl border border-border/40 bg-background p-5">
+                <div>
+                  <p className="text-sm font-medium text-foreground">Two-factor authentication</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Add an extra layer of security to your account</p>
+                </div>
+                <Switch onCheckedChange={handleAuthentication} />
+              </div>
+
+              {/* International settings */}
+              <div className="rounded-xl border border-border/40 bg-background p-5">
+                <p className="text-sm font-semibold text-foreground mb-3">International Settings</p>
+                <div>
+                  <label className="block text-xs font-medium text-foreground mb-1">System Language</label>
+                  <select value={SystemLang} onChange={(e) => setSystemLang(e.target.value)} className="flex h-9 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring">
+                    <option value="">Select Language</option>
+                    {options.map((option) => (
+                      <option key={option.value} value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Download App */}
+              <div className="rounded-xl border border-border/40 bg-background p-5">
+                <p className="text-sm font-semibold text-foreground mb-2">Download Windows App</p>
+                <p className="text-xs text-muted-foreground mb-1">TaxDome Windows App help</p>
+                <Link to="#" className="text-xs text-primary hover:underline break-all">
+                  https://help.taxdome.com/article/164-taxdome-windows-application
+                </Link>
+              </div>
+
+            </div>
+          </TabsContent>
+
+          {/* ══════════════════════════════════════
+               NOTIFICATIONS TAB
+          ══════════════════════════════════════ */}
+          <TabsContent value="notifications">
+            <div className="space-y-6">
+
+              {/* Notification Preferences */}
+              <div className="rounded-xl border border-border/40 bg-background p-5">
+                <div className="flex items-center gap-2 mb-4">
+                  <p className="text-sm font-semibold text-foreground">Notification Preferences</p>
+                  <HelpCircle className="h-3.5 w-3.5 text-muted-foreground" />
+                </div>
+                {/* Grid header */}
+                <div className="grid grid-cols-[1fr_80px_80px] border-b border-border pb-2 mb-1">
+                  <span className="px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground"></span>
+                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground text-center">Inbox</span>
+                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground text-center">Email</span>
+                </div>
+                {/* Grid rows */}
+                <div className="divide-y divide-border/40">
+                  {notificationRows.map((row) =>
+                    row.isSpacer ? (
+                      <div key={row.label} className="px-3 py-2 bg-muted/40">
+                        <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{row.label}</span>
+                      </div>
+                    ) : (
+                      <div key={row.label} className="grid grid-cols-[1fr_80px_80px] items-center hover:bg-muted/40 transition-colors rounded-sm">
+                        <span className="px-3 py-2.5 text-sm text-foreground truncate">{row.label}</span>
+                        <div className="flex justify-center py-2.5">
+                          <Checkbox
+                            checked={row.inboxChecked}
+                            onCheckedChange={row.onInboxChange}
+                            className="scale-110 border-2 border-border hover:border-primary data-[state=checked]:bg-primary data-[state=checked]:border-primary data-[state=checked]:text-primary-foreground transition-colors"
+                          />
                         </div>
-                      </td>
-                      <td className="py-3 px-4 w-28 align-middle">
-                        <div className="flex justify-center items-center">
-                          <Checkbox checked={row.emailChecked} onCheckedChange={row.onEmailChange} />
+                        <div className="flex justify-center py-2.5">
+                          <Checkbox
+                            checked={row.emailChecked}
+                            onCheckedChange={row.onEmailChange}
+                            className="scale-110 border-2 border-border hover:border-primary data-[state=checked]:bg-primary data-[state=checked]:border-primary data-[state=checked]:text-primary-foreground transition-colors"
+                          />
                         </div>
-                      </td>
-                    </tr>
-                  )
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
 
-        {/* ===== EMAIL SYNC ===== */}
-        <div className="emailsyns rounded-xl border bg-card p-5 shadow-sm">
-          <h2 className="text-lg font-semibold text-foreground mb-3">Email Sync</h2>
-          <hr className="border-border mb-4" />
-          <div className="flex items-center gap-1.5 mb-4">
-            <p className="text-sm text-muted-foreground">Sync your existing email with TaxDome — all your client messages in one place.</p>
-            <HelpCircle className="h-4 w-4 text-primary shrink-0" />
-          </div>
-          <div className="space-y-3">
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">Email for sync</label>
-              <Input value={emailsync} onChange={(e) => setEmailSync(e.target.value)} placeholder="Email for sync" />
+              {/* Email Sync */}
+              <div className="rounded-xl border border-border/40 bg-background p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <p className="text-sm font-semibold text-foreground">Email Sync</p>
+                  <HelpCircle className="h-3.5 w-3.5 text-muted-foreground" />
+                </div>
+                <p className="text-xs text-muted-foreground mb-3">Sync your existing email — all your client messages in one place.</p>
+                <div className="flex items-center gap-2">
+                  <Input value={emailsync} onChange={(e) => setEmailSync(e.target.value)} placeholder="Email for sync" className="max-w-xs" />
+                  <Button size="sm" onClick={handleEmailSync}>Sync</Button>
+                </div>
+              </div>
+
             </div>
-            <Button onClick={handleEmailSync}>Sync your email</Button>
-          </div>
-        </div>
+          </TabsContent>
 
-        {/* ===== DOWNLOAD APP ===== */}
-        <div className="emailsyns rounded-xl border bg-card p-5 shadow-sm">
-          <h2 className="text-lg font-semibold text-foreground mb-3">Download Windows app</h2>
-          <hr className="border-border mb-4" />
-          <p className="text-sm text-muted-foreground">TaxDome Windows App help</p>
-          <Link to="#" className="text-sm text-primary hover:underline">
-            https://help.taxdome.com/article/164-taxdome-windows-application
-          </Link>
-        </div>
-
-        {/* ===== INTERNATIONAL SETTINGS ===== */}
-        <div className="emailsyns rounded-xl border bg-card p-5 shadow-sm">
-          <h2 className="text-lg font-semibold text-foreground mb-3">International settings</h2>
-          <hr className="border-border mb-4" />
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1.5">From</label>
-            <select value={SystemLang} onChange={(e) => setSystemLang(e.target.value)} className="flex h-10 w-full rounded-lg border border-input bg-card px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring">
-              <option value="">Select Language</option>
-              {options.map((option) => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </select>
-          </div>
-        </div>
+        </Tabs>
       </div>
-      <ToastContainer/>
+      <ToastContainer />
     </>
   );
 };
