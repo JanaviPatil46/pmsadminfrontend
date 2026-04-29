@@ -1,21 +1,23 @@
 import React, { useState, useEffect, useMemo } from "react";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import axios from "axios";
 import countryList from "react-select-country-list";
-import { AiOutlinePlusCircle, AiOutlineDelete } from "react-icons/ai";
 import { toast } from "react-toastify";
+import { Plus, Trash2 } from "lucide-react";
+import { Button } from "../components/ui/button";
 import TagsMultiSelectDropDown from "../Templates/TagsMultiSelectDropDown.js";
+
+const inputCls = "w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring";
+const labelCls = "block text-sm font-medium text-foreground mb-1";
+
 const ContactForm = ({
   onContactUpdated,
   selectedContact,
   handleClose,
   isSmallScreen,
 }) => {
-  const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
   const CONTACT_API = process.env.REACT_APP_CONTACTS_URL;
-  console.log("selected contact in update form", selectedContact);
-  // State variables for form fields
+
   const [firstName, setFirstName] = useState("");
   const [middleName, setMiddleName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -25,21 +27,19 @@ const ContactForm = ({
   const [ssn, setSsn] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumbers, setPhoneNumbers] = useState([]);
-  // const [selectedCountry, setSelectedCountry] = useState('');
   const [selectedCountry, setSelectedCountry] = useState(null);
-  console.log("selectedcountry", selectedCountry);
   const [streetAddress, setStreetAddress] = useState("");
   const [city, setCity] = useState("");
-
   const [state, setState] = useState("");
   const [postalCode, setPostalCode] = useState("");
   const [tagsNew, setTagsNew] = useState([]);
-  // const [tags, setTags] = useState([]);
-  const [contactId, setContactId] = useState(null); // Added state for contact ID
+  const [contactId, setContactId] = useState(null);
   const [combinedTagsValues, setCombinedTagsValues] = useState(null);
+
+  const options = useMemo(() => countryList().getData(), []);
+
   useEffect(() => {
     if (selectedContact) {
-      console.log(selectedContact);
       setFirstName(selectedContact.firstName || "");
       setMiddleName(selectedContact.middleName || "");
       setLastName(selectedContact.lastName || "");
@@ -48,7 +48,6 @@ const ContactForm = ({
       setNote(selectedContact.note || "");
       setSsn(selectedContact.ssn || "");
       setEmail(selectedContact.email || "");
-
       setSelectedCountry({
         value: selectedContact.country?.code,
         label: selectedContact.country?.name,
@@ -57,257 +56,217 @@ const ContactForm = ({
       setCity(selectedContact.city || "");
       setState(selectedContact.state || "");
       setPostalCode(selectedContact.postalCode || "");
-      setContactId(selectedContact._id || null); // Set contact ID
+      setContactId(selectedContact._id || null);
 
       const flatPhoneNumbers = selectedContact.phoneNumbers || [];
-
       setPhoneNumbers(
         flatPhoneNumbers.map((phone) => ({
           id: Date.now() + Math.random(),
-          phone: phone.toString().startsWith("+")
-            ? phone.toString()
-            : `+${phone}`,
+          phone: phone.toString().startsWith("+") ? phone.toString() : `+${phone}`,
           isPrimary: false,
-          country: "us", // default since no country info in DB
+          country: "us",
         }))
       );
 
-      console.log("phone numbers", flatPhoneNumbers);
-
-      const tags = selectedContact.tags; // Since data is nested inside an array
-      console.log("Tags with IDs:", tags);
+      const tags = selectedContact.tags;
       const tagList = tags.map((tag) => ({
         value: tag._id,
         label: tag.tagName,
         color: tag.tagColour,
       }));
       setTagsNew(tagList);
-
-      const selectedTagsValues = tagList.map((option) => option.value);
-      setCombinedTagsValues(selectedTagsValues);
-      // console.log("Tags with IDs:", tagList);
+      setCombinedTagsValues(tagList.map((option) => option.value));
     }
   }, [selectedContact]);
 
-  const [countries, setCountries] = useState([]);
-
-  const options = useMemo(() => countryList().getData(), []);
-
-  const handleCountryChange = (event) => {
-    const selectedCode = event.target.value;
-    const selectedCountryObj = countries.find(
-      (country) => country.code === selectedCode
-    );
-
-    // Set the selected country as an object with name and code
-    setSelectedCountry({
-      name: selectedCountryObj.name,
-      code: selectedCode,
-    });
-  };
-
   const handlePhoneNumberChange = (phoneValue, countryData, id) => {
-    setPhoneNumbers((prevPhoneNumbers) =>
-      prevPhoneNumbers.map((item) =>
+    setPhoneNumbers((prev) =>
+      prev.map((item) =>
         item.id === id
-          ? {
-              ...item,
-              phone: phoneValue,
-              countryCode: countryData.dialCode, // Store country dial code
-              country: countryData.countryCode.toLowerCase(), // Store country code (e.g., 'us')
-            }
+          ? { ...item, phone: phoneValue, countryCode: countryData.dialCode, country: countryData.countryCode.toLowerCase() }
           : item
       )
     );
   };
 
   const handleAddPhoneNumber = () => {
-    setPhoneNumbers((prevPhoneNumbers) => [
-      ...prevPhoneNumbers,
-      {
-        id: Date.now(),
-        phone: "",
-        country: "us", // Default country
-        isPrimary: false,
-      },
-    ]);
+    setPhoneNumbers((prev) => [...prev, { id: Date.now(), phone: "", country: "us", isPrimary: false }]);
   };
 
   const handleDeletePhoneNumber = (id) => {
-    setPhoneNumbers((prevPhoneNumbers) =>
-      prevPhoneNumbers.filter((item) => item.id !== id)
-    );
+    setPhoneNumbers((prev) => prev.filter((item) => item.id !== id));
   };
 
   const handleTagChange = (newSelectedTags) => {
     setTagsNew(newSelectedTags);
-    console.log(newSelectedTags);
-    const selectedValues = newSelectedTags.map((option) => option.value);
-    setCombinedTagsValues(selectedValues);
-    console.log(selectedValues);
+    setCombinedTagsValues(newSelectedTags.map((option) => option.value));
   };
 
   const handleSave = async (e) => {
     e.preventDefault();
 
-    // if (!validateForm()) return;
-
-    // handleNewDrawerClose();
-    // handleDrawerClose();
-
     const formattedPhoneNumbers = phoneNumbers.map((item) => item.phone);
-
     const countryPayload = selectedCountry
       ? { name: selectedCountry.label, code: selectedCountry.value }
       : null;
 
     const payload = JSON.stringify({
-      firstName,
-      middleName,
-      lastName,
-      contactName,
-      companyName,
-      note,
-      ssn,
-      email,
-      tags: combinedTagsValues,
-      country: countryPayload,
-      streetAddress,
-      city,
-      state,
-      postalCode,
+      firstName, middleName, lastName, contactName, companyName,
+      note, ssn, email, tags: combinedTagsValues,
+      country: countryPayload, streetAddress, city, state, postalCode,
       phoneNumbers: formattedPhoneNumbers,
     });
 
-    const requestOptions = {
+    fetch(`https://www.snptaxes.com/api/contacts/contact/${contactId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: payload,
-    };
-    console.log("payload", requestOptions);
-    const url = `https://www.snptaxes.com/api/contacts/contact/${contactId}`; // <-- Update existing contact ID
-
-    fetch(url, requestOptions)
-      .then((res) => {
-        if (!res.ok) throw new Error("Request failed");
-        return res.json();
-      })
-      .then(() => {
-        toast.success("Contact updated successfully!");
-        handleClose();
-        onContactUpdated();
-        // navigate("/clients/contacts");
-      })
-      .catch(() => {
-        toast.error("Failed to update contact");
-      });
+    })
+      .then((res) => { if (!res.ok) throw new Error("Request failed"); return res.json(); })
+      .then(() => { toast.success("Contact updated successfully!"); handleClose(); onContactUpdated(); })
+      .catch(() => { toast.error("Failed to update contact"); });
   };
 
-  const inputCls = "w-full mt-1 rounded border border-gray-200 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-400";
-  const labelCls = "block text-sm font-medium text-gray-700 mb-0.5";
-
   return (
-    <form
-      style={{ paddingRight: "3%", paddingLeft: "3%", height: "90vh", overflowY: "auto" }}
-      className="contact-form"
-    >
-      <div className={`mt-1 flex ${isSmallScreen ? "flex-col gap-2" : "flex-row gap-5"} px-1`}>
-        <div className="flex-1">
-          <label className={labelCls}>First name</label>
-          <input className={inputCls} name="firstName" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="First Name" />
-        </div>
-        <div className="flex-1">
-          <label className={labelCls}>Middle Name</label>
-          <input className={inputCls} name="middleName" value={middleName} onChange={(e) => setMiddleName(e.target.value)} placeholder="Middle Name" />
-        </div>
-        <div className="flex-1">
-          <label className={labelCls}>Last Name</label>
-          <input className={inputCls} name="lastName" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Last name" />
+    <div className="flex flex-col h-full overflow-y-auto px-5 py-5 space-y-5 bg-background">
+
+      {/* ── Basic Info ── */}
+      <div>
+        <p className="text-sm font-semibold text-foreground mb-3">Basic Info</p>
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <label className={labelCls}>First Name</label>
+            <input className={inputCls} name="firstName" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="First Name" />
+          </div>
+          <div>
+            <label className={labelCls}>Middle Name</label>
+            <input className={inputCls} name="middleName" value={middleName} onChange={(e) => setMiddleName(e.target.value)} placeholder="Middle Name" />
+          </div>
+          <div>
+            <label className={labelCls}>Last Name</label>
+            <input className={inputCls} name="lastName" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Last Name" />
+          </div>
         </div>
       </div>
 
-      {[{label:"Contact Name",val:contactName,set:setContactName,name:"contactName",ph:"Contact Name"},
-        {label:"Company Name",val:companyName,set:setCompanyName,name:"companyName",ph:"Company Name"},
-        {label:"Note",val:note,set:setNote,name:"note",ph:"Note"},
-        {label:"SSN",val:ssn,set:setSsn,name:"ssn",ph:"SSN"},
-        {label:"Email",val:email,set:setEmail,name:"email",ph:"Email"},
-      ].map(({label,val,set,name,ph}) => (
-        <div key={name} className="mt-2">
-          <label className={labelCls}>{label}</label>
-          <input className={inputCls} name={name} value={val} onChange={(e) => set(e.target.value)} placeholder={ph} />
+      {/* ── Contact Details ── */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className={labelCls}>Contact Name</label>
+          <input className={inputCls} name="contactName" value={contactName} onChange={(e) => setContactName(e.target.value)} placeholder="Contact Name" />
         </div>
-      ))}
+        <div>
+          <label className={labelCls}>Company Name</label>
+          <input className={inputCls} name="companyName" value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="Company Name" />
+        </div>
+        <div>
+          <label className={labelCls}>Email</label>
+          <input className={inputCls} type="email" name="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
+        </div>
+        <div>
+          <label className={labelCls}>SSN</label>
+          <input className={inputCls} name="ssn" value={ssn} onChange={(e) => setSsn(e.target.value)} placeholder="SSN" />
+        </div>
+      </div>
 
-      <div className="mt-2">
+      {/* ── Note ── */}
+      <div>
+        <label className={labelCls}>Note</label>
+        <textarea className={`${inputCls} min-h-[72px] resize-none`} name="note" value={note} onChange={(e) => setNote(e.target.value)} placeholder="Note" />
+      </div>
+
+      {/* ── Tags ── */}
+      <div>
         <label className={labelCls}>Tags</label>
         <TagsMultiSelectDropDown value={tagsNew} onChange={handleTagChange} placeholder="Tags" />
       </div>
 
-      <h6 className="ml-1 font-bold mt-5 mb-2 text-base">Phone Numbers</h6>
-      {phoneNumbers.map((phone) => (
-        <div key={phone.id} className="flex flex-row items-center gap-2 ml-1 mb-3">
-          {phone.isPrimary && (
-            <span className="absolute -mt-6 inline-block rounded-full bg-blue-600 px-2 py-0.5 text-[10px] font-semibold text-white">Primary phone</span>
-          )}
-          <PhoneInput
-            country={"us"}
-            value={phone.phone}
-            onChange={(value, country) => handlePhoneNumberChange(value, country, phone.id)}
-            inputStyle={{ width: "100%" }}
-            buttonStyle={{ borderTopLeftRadius: "8px", borderBottomLeftRadius: "8px" }}
-            containerStyle={{ display: "flex", alignItems: "center", gap: "8px" }}
-          />
-          <AiOutlineDelete onClick={() => handleDeletePhoneNumber(phone.id)} style={{ cursor: "pointer", color: "red" }} />
+      {/* ── Phone Numbers ── */}
+      <div>
+        <p className="text-sm font-semibold text-foreground mb-3">Phone Numbers</p>
+        <div className="space-y-2">
+          {phoneNumbers.map((phone) => (
+            <div key={phone.id} className="flex items-center gap-2">
+              {phone.isPrimary && (
+                <span className="shrink-0 rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold text-primary-foreground">Primary</span>
+              )}
+              <div className="flex-1">
+                <PhoneInput
+                  country="us"
+                  value={phone.phone}
+                  onChange={(value, country) => handlePhoneNumberChange(value, country, phone.id)}
+                  inputStyle={{ width: "100%", height: "36px", fontSize: "14px", borderRadius: "6px", border: "1px solid hsl(var(--border))", background: "hsl(var(--background))", color: "hsl(var(--foreground))" }}
+                  buttonStyle={{ borderRadius: "6px 0 0 6px", border: "1px solid hsl(var(--border))", background: "hsl(var(--muted))" }}
+                  containerStyle={{ width: "100%" }}
+                />
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 shrink-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                onClick={() => handleDeletePhoneNumber(phone.id)}
+              >
+                <Trash2 size={14} />
+              </Button>
+            </div>
+          ))}
         </div>
-      ))}
-      <div className="flex gap-2 items-center ml-1 cursor-pointer text-blue-600 font-semibold" onClick={handleAddPhoneNumber}>
-        <AiOutlinePlusCircle className="mt-1" />
-        <p>Add phone number</p>
-      </div>
-
-      <h6 className="ml-1 font-bold mt-5 mb-2 text-base">Address</h6>
-      <div className="mt-2">
-        <label className={labelCls}>Country</label>
-        <select
-          className={inputCls}
-          value={selectedCountry?.value || ""}
-          onChange={(e) => {
-            const opt = options.find((o) => o.value === e.target.value);
-            setSelectedCountry(opt || null);
-          }}
+        <button
+          type="button"
+          onClick={handleAddPhoneNumber}
+          className="mt-3 flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 transition-colors"
         >
-          <option value="">Select Country</option>
-          {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-        </select>
+          <Plus size={13} /> Add phone number
+        </button>
       </div>
-      <div className="mt-2">
-        <label className={labelCls}>Street Address</label>
-        <input className={inputCls} name="streetAddress" value={streetAddress} onChange={(e) => setStreetAddress(e.target.value)} placeholder="Street Address" />
-      </div>
-      <div className={`mt-2 flex ${isSmallScreen ? "flex-col gap-2" : "flex-row gap-5"} px-0.5`}>
-        <div className="flex-1">
-          <label className={labelCls}>City</label>
-          <input className={inputCls} name="city" value={city} onChange={(e) => setCity(e.target.value)} placeholder="City" />
-        </div>
-        <div className="flex-1">
-          <label className={labelCls}>State</label>
-          <input className={inputCls} name="state" value={state} onChange={(e) => setState(e.target.value)} placeholder="State" />
-        </div>
-        <div className="flex-1">
-          <label className={labelCls}>Postal Code</label>
-          <input className={inputCls} name="postalCode" value={postalCode} onChange={(e) => setPostalCode(e.target.value)} placeholder="Postal Code" />
+
+      {/* ── Address ── */}
+      <div>
+        <p className="text-sm font-semibold text-foreground mb-3">Address</p>
+        <div className="space-y-4">
+          <div>
+            <label className={labelCls}>Country</label>
+            <select
+              className={inputCls}
+              value={selectedCountry?.value || ""}
+              onChange={(e) => {
+                const opt = options.find((o) => o.value === e.target.value);
+                setSelectedCountry(opt || null);
+              }}
+            >
+              <option value="">Select Country</option>
+              {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className={labelCls}>Street Address</label>
+            <input className={inputCls} name="streetAddress" value={streetAddress} onChange={(e) => setStreetAddress(e.target.value)} placeholder="Street Address" />
+          </div>
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <label className={labelCls}>City</label>
+              <input className={inputCls} name="city" value={city} onChange={(e) => setCity(e.target.value)} placeholder="City" />
+            </div>
+            <div>
+              <label className={labelCls}>State</label>
+              <input className={inputCls} name="state" value={state} onChange={(e) => setState(e.target.value)} placeholder="State" />
+            </div>
+            <div>
+              <label className={labelCls}>Postal Code</label>
+              <input className={inputCls} name="postalCode" value={postalCode} onChange={(e) => setPostalCode(e.target.value)} placeholder="Postal Code" />
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="flex gap-3 mt-4 mb-4">
-        <button type="button" onClick={handleSave} className="rounded-full px-5 py-1.5 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)]">
-          Save
-        </button>
-        <button type="button" onClick={handleClose} className="rounded-full px-5 py-1.5 text-sm font-medium border border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white">
-          Cancel
-        </button>
+      {/* ── Footer ── */}
+      <div className="flex items-center gap-3 pt-2 pb-6">
+        <Button onClick={handleSave}>Save</Button>
+        <Button variant="outline" type="button" onClick={handleClose}>Cancel</Button>
       </div>
-    </form>
+
+    </div>
   );
 };
 

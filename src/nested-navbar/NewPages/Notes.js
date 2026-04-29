@@ -5,6 +5,8 @@ import { useParams } from "react-router-dom";
 import { LoginContext } from "../../Sidebar/Context/Context";
 import { toast } from "react-toastify";
 import { MdPushPin, MdOutlinePushPin, MdArchive, MdUnarchive, MdDelete } from "react-icons/md";
+import { Button } from "../../components/ui/button"  
+import {Plus} from "lucide-react"
 
 const NoteApp = () => {
   const ACC_NOTE = process.env.REACT_APP_ACCOUNT_NOTE_URL
@@ -289,9 +291,10 @@ const handleConfirmDelete = async () => {
             >{label}</button>
           ))}
         </div>
-        <button type="button" onClick={() => setNewNoteVisible(true)} className={saveBtnCls}>
+        <Button type="button" onClick={() => setNewNoteVisible(true)} size = "sm">
+          <Plus className="w-3 h-4 mr-2" />
           New note
-        </button>
+        </Button>
       </div>
 
       {/* New note editor */}
@@ -299,8 +302,8 @@ const handleConfirmDelete = async () => {
         <div className="mb-4">
           <Editor onChange={handleEditorChange} content={newNoteText} />
           <div className="flex gap-2 mt-2">
-            <button type="button" onClick={handleAddNote} className={saveBtnCls}>Save</button>
-            <button type="button" onClick={() => setNewNoteVisible(false)} className={cancelBtnCls}>Cancel</button>
+            <Button type="button" onClick={handleAddNote} size="sm">Save</Button>
+            <Button type="button" onClick={() => setNewNoteVisible(false)} size="sm" className="bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90">Cancel</Button>
           </div>
         </div>
       )}
