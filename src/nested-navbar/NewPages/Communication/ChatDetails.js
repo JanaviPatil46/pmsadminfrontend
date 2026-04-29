@@ -1,19 +1,3 @@
-// import {
-//   Box,
-//   Typography,
-//   Divider,
-//   Grid,
-//   Checkbox,
-//   IconButton,
-//   Button,
-//   Menu,
-//   MenuItem,
-//   List,
-//   ListItem,
-//   ListItemText,
-//   TextField,
-// } from "@mui/material";
-// import { toast } from "react-toastify";
 // import React, { useEffect, useState, useRef, useContext } from "react";
 // import MoreVertIcon from "@mui/icons-material/MoreVert";
 // import CloseIcon from "@mui/icons-material/Close";
@@ -903,13 +887,20 @@
 
 // export default ChatDetails;
 
-import { toast } from "react-toastify";
 import React, { useEffect, useState, useRef, useContext } from "react";
+import { toast } from "react-toastify";
 import Editor from "./Texteditor";
 import { LoginContext } from "../../../Sidebar/Context/Context";
 import axios from "axios";
-import { IoClose } from "react-icons/io5";
-import { MdMoreVert, MdAdd, MdDeleteOutline } from "react-icons/md";
+import { MoreVertical, X, Plus, Trash2, Archive, RotateCcw, SendHorizonal } from "lucide-react";
+import { Button } from "../../../components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../../../components/ui/dropdown-menu";
 
 const ChatDetails = ({
   chat,
@@ -1431,21 +1422,16 @@ const ChatDetails = ({
           <div className="absolute inset-0 bg-black/30" onClick={handleCancelEdit} />
           <div className="relative bg-card rounded-lg shadow-xl w-full max-w-2xl p-6">
             <h2 className="text-base font-semibold mb-3">Edit Message</h2>
-            <div className="mt-2 min-h-[200px]">
+            <div className="mt-2">
               <Editor onChange={setEditContent} value={editContent} />
             </div>
             <div className="flex justify-end gap-2 mt-4">
-              <button type="button" onClick={handleCancelEdit}
-                className="rounded-full px-5 py-1.5 text-sm font-medium border border-border text-foreground hover:bg-muted">
+              <Button variant="outline" className="rounded-full" onClick={handleCancelEdit}>
                 Cancel
-              </button>
-              <button type="button" onClick={handleSaveEdit}
-                disabled={!editContent.trim()}
-                className={`rounded-full px-5 py-1.5 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] ${
-                  !editContent.trim() ? 'opacity-50 cursor-not-allowed' : ''
-                }`}>
+              </Button>
+              <Button className="rounded-full" onClick={handleSaveEdit} disabled={!editContent.trim()}>
                 Save Changes
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -1460,36 +1446,36 @@ const ChatDetails = ({
           </div>
           <div className="flex items-center gap-3">
             <button type="button" onClick={toggleTasks}
-              className="text-sm font-semibold cursor-pointer text-[var(--color-save-btn)] hover:underline">
+              className="text-sm font-semibold text-primary hover:underline">
               {tasks.length > 0
                 ? `Client Tasks: ${tasks.filter(t => t.checked).length}/${tasks.length}`
                 : "+ Add Client Task"}
             </button>
-            <div className="relative">
-              <button type="button" onClick={(e) => setChatAnchorEl(e.currentTarget)}
-                className="p-1 rounded hover:bg-muted text-muted-foreground">
-                <MdMoreVert size={20} />
-              </button>
-              {Boolean(chatanchorEl) && (
-                <div className="absolute right-0 top-8 z-50 bg-card border border-border rounded-lg shadow-md w-44">
-                  <button type="button" className="block w-full text-left px-4 py-2 text-sm hover:bg-muted"
-                    onClick={() => handleArchiveThread(chatId)}>
-                    {chat.active ? "Archive Thread" : "Activate Thread"}
-                  </button>
-                  <button type="button" className="block w-full text-left px-4 py-2 text-sm text-destructive hover:bg-muted"
-                    onClick={() => { handleDeleteThread(); handleChatMenuClose(); }}>
-                    Delete
-                  </button>
-                </div>
-              )}
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground">
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-44">
+                <DropdownMenuItem onClick={() => handleArchiveThread(chatId)}>
+                  {chat.active ? <Archive className="h-3.5 w-3.5 mr-2" /> : <RotateCcw className="h-3.5 w-3.5 mr-2" />}
+                  {chat.active ? "Archive Thread" : "Activate Thread"}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="text-destructive focus:text-destructive"
+                  onClick={() => { handleDeleteThread(); handleChatMenuClose(); }}>
+                  <Trash2 className="h-3.5 w-3.5 mr-2" />Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
         <hr className="my-2 border-border" />
 
         {/* Messages */}
-        <div className="overflow-y-auto mt-1 mb-1" style={{ height: '40vh' }}>
+        <div className="overflow-y-auto mt-1 mb-1 h-[40vh]">
           {Array.isArray(chat.description) && chat.description.length > 0 &&
             chat.description.map((desc, index) => (
               <MessageItem
@@ -1516,14 +1502,14 @@ const ChatDetails = ({
         </div>
 
         {/* Reply + Editor */}
-        <div className="grid gap-2 overflow-y-auto" style={{ gridTemplateColumns: '1fr auto', height: '35vh' }}>
+        <div className="space-y-2 mt-2">
           {replyTo && <ReplyPreview replyTo={replyTo} setReplyTo={setReplyTo} />}
-          <div className="flex gap-3 items-end">
-            <Editor onChange={handleEditorChange} value={editorContent} />
-            <button type="button" onClick={() => updateChatDescription()}
-              className="rounded-full px-5 py-1.5 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] self-end shrink-0">
+          <Editor onChange={handleEditorChange} value={editorContent} />
+          <div className="flex justify-end">
+            <Button onClick={() => updateChatDescription()} className="rounded-full px-5 gap-2">
+              <SendHorizonal className="h-4 w-4" />
               Send
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -1534,12 +1520,12 @@ const ChatDetails = ({
           <div className="flex items-center justify-between pt-3 pb-2">
             <span className="text-base font-semibold">Client Tasks</span>
             <div className="flex items-center gap-1">
-              <button type="button" onClick={handleAddTask} className="p-1 rounded hover:bg-muted text-primary">
-                <MdAdd size={18} />
-              </button>
-              <button type="button" onClick={toggleTasks} className="p-1 rounded hover:bg-muted text-primary">
-                <IoClose size={18} />
-              </button>
+              <Button size="icon" variant="ghost" className="h-7 w-7" onClick={handleAddTask}>
+                <Plus className="h-3.5 w-3.5" />
+              </Button>
+              <Button size="icon" variant="ghost" className="h-7 w-7" onClick={toggleTasks}>
+                <X className="h-3.5 w-3.5" />
+              </Button>
             </div>
           </div>
           <div className="space-y-1">
@@ -1556,17 +1542,16 @@ const ChatDetails = ({
                   value={task.text}
                   onChange={(e) => handleTaskTextChange(task.id, e.target.value)}
                 />
-                <button type="button" onClick={() => handleDeleteTask(task.id)}
-                  className="p-1 text-destructive/60 hover:text-destructive">
-                  <MdDeleteOutline size={16} />
-                </button>
+                <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive/60 hover:text-destructive"
+                  onClick={() => handleDeleteTask(task.id)}>
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
               </div>
             ))}
           </div>
-          <button type="button" onClick={resendClientTask}
-            className="mt-3 rounded-full px-4 py-1.5 text-sm font-medium border border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white">
+          <Button variant="outline" size="sm" className="mt-3 rounded-full" onClick={resendClientTask}>
             Resend Client Task
-          </button>
+          </Button>
         </div>
       )}
     </div>
@@ -1608,8 +1593,6 @@ const MessageItem = ({
     senderDisplayName = "You";
   }
 
-  const [menuOpen, setMenuOpen] = useState(false);
-
   return (
     <div
       ref={(el) => { if (desc._id) messageRefs.current[desc._id] = el; }}
@@ -1617,8 +1600,11 @@ const MessageItem = ({
     >
       <div
         className={`max-w-[75%] p-3 rounded-xl shadow-sm relative ${
-          desc._id === highlightedId ? 'bg-yellow-100' :
-          isAdmin ? 'bg-primary/10 rounded-tl-sm' : 'bg-secondary/20 rounded-tr-sm'
+          desc._id === highlightedId
+            ? 'bg-amber-100 dark:bg-amber-900/30'
+            : isAdmin
+            ? 'bg-primary/10'
+            : 'bg-muted'
         }`}
       >
         {desc.replyTo && (
@@ -1627,30 +1613,30 @@ const MessageItem = ({
         <div className="flex justify-between items-start gap-2 text-foreground">
           <p className="text-xs font-semibold mb-1">{senderDisplayName}</p>
           <div className="relative">
-            <button type="button" onClick={(e) => { handleMenuClick(e, desc); setMenuOpen(true); }}
-              className="text-muted-foreground hover:text-foreground">
-              <MdMoreVert size={16} />
-            </button>
-            {Boolean(anchorEl) && menuOpen && (
-              <div className="absolute right-0 top-5 z-50 bg-card border border-border rounded-lg shadow-md w-32">
-                <button type="button" className="block w-full text-left px-3 py-1.5 text-sm hover:bg-muted"
-                  onClick={() => { setReplyTo(selectedMessage); setAnchorEl(null); setMenuOpen(false); }}>
-                  Reply
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button type="button" className="p-0.5 rounded text-muted-foreground hover:text-foreground">
+                  <MoreVertical className="h-3.5 w-3.5" />
                 </button>
-                {selectedMessage?.fromwhome?.toLowerCase() === "admin" && canEditMessage(selectedMessage?.time) && (
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-32">
+                <DropdownMenuItem onClick={() => setReplyTo(desc)}>
+                  Reply
+                </DropdownMenuItem>
+                {desc.fromwhome?.toLowerCase() === "admin" && canEditMessage(desc.time) && (
                   <>
-                    <button type="button" className="block w-full text-left px-3 py-1.5 text-sm hover:bg-muted"
-                      onClick={() => { handleEditMessage(selectedMessage); setMenuOpen(false); }}>
+                    <DropdownMenuItem onClick={() => handleEditMessage(desc)}>
                       Edit
-                    </button>
-                    <button type="button" className="block w-full text-left px-3 py-1.5 text-sm text-destructive hover:bg-muted"
-                      onClick={() => { handleDeleteMessage(selectedMessage); setAnchorEl(null); setMenuOpen(false); }}>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem className="text-destructive focus:text-destructive"
+                      onClick={() => handleDeleteMessage(desc)}>
                       Delete
-                    </button>
+                    </DropdownMenuItem>
                   </>
                 )}
-              </div>
-            )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
         <div
@@ -1713,8 +1699,8 @@ const ReplyPreview = ({ replyTo, setReplyTo }) => (
       }}
     />
     <button type="button" onClick={() => setReplyTo(null)}
-      className="absolute top-1.5 right-1.5 p-1 text-muted-foreground hover:text-foreground">
-      <IoClose size={14} />
+      className="absolute top-1.5 right-1.5 p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+      <X className="h-3.5 w-3.5" />
     </button>
   </div>
 );
