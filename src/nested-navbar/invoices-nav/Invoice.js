@@ -1,12 +1,11 @@
-import React, { useEffect, useState, useRef } from "react";
-import { CiMenuKebab } from "react-icons/ci";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { useNavigate, useParams, useRouteLoaderData } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import CreateInvoice from "../invoices-nav/CreateInvoice";
 import UpdateInvoice from "../invoices-nav/UpdateInvoice";
 import { jsPDF } from "jspdf";
 import { Button } from "../../components/ui/button";
-import { Plus, Tag, Pencil, Trash2, X, Eye, ChevronLeft, Check, ChevronsUpDown } from "lucide-react";
+import { Plus, Pencil, Trash2, Copy, Printer, Download } from "lucide-react";
 import "jspdf-autotable";
 
 const Invoice = () => {
@@ -15,8 +14,6 @@ const Invoice = () => {
   const INVOICES_API = process.env.REACT_APP_INVOICES_URL;
   const [showInvoiceTemplateForm, setShowInvoiceTemplateForm] = useState(false);
   const [showInvoiceUpdateForm, setShowInvoiceUpdateForm] = useState(false);
-  const [openMenuId, setOpenMenuId] = useState(null);
-  const [tempIdget, setTempIdGet] = useState("");
   const [accountInvoicesData, setAccountInvoicesData] = useState([]);
   const { data } = useParams();
 
@@ -77,21 +74,6 @@ const Invoice = () => {
   };
 
   console.log(accountInvoicesData);
-  const [anchorEl, setAnchorEl] = useState(null);
-  // const toggleMenu = (_id) => {
-  //   setOpenMenuId(openMenuId === _id ? null : _id);
-  //   setTempIdGet(_id);
-  // };
-  const toggleMenu = (event, _id) => {
-    setAnchorEl(event.currentTarget);
-    setOpenMenuId(_id);
-    setTempIdGet(_id);
-  };
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    setOpenMenuId(null);
-    setTempIdGet(null);
-  };
   const handleDelete = async (_id) => {
     const isConfirmed = window.confirm(
       "Are you sure you want to delete this invoice?"
@@ -112,11 +94,7 @@ const Invoice = () => {
       }
 
       toast.success("Invoice deleted successfully");
-      handleMenuClose();
-      // ✅ Optimistic UI update: remove the deleted invoice from state
       setAccountInvoicesData((prev) => prev.filter((inv) => inv._id !== _id));
-
-      // ✅ Also refresh from backend to stay in sync
       await fetchInvoices(data);
     } catch (error) {
       console.error(error);
@@ -163,9 +141,7 @@ const Invoice = () => {
   const [invoiceId, SetInvoiceId] = useState();
   const handleEdit = (_id) => {
     setShowInvoiceUpdateForm(true);
-    handleMenuClose();
     SetInvoiceId(_id);
-    // navigate("/" + _id);
   };
   console.log(invoiceId);
 
@@ -207,8 +183,7 @@ const Invoice = () => {
       console.log(result);
       if (result.message === "Invoice created successfully") {
         toast.success("Invoice duplicated successfully");
-        handleMenuClose();
-        fetchInvoices(data); // Refresh the list after duplication
+        fetchInvoices(data);
       } else {
         toast.error(result.error || "Failed to duplicate Invoice");
       }
@@ -346,7 +321,6 @@ const Invoice = () => {
         </html>
       `);
       printWindow.document.close();
-      handleMenuClose();
     } catch (error) {
       console.error("Error printing invoice:", error);
       toast.error("Failed to print invoice");
@@ -429,7 +403,6 @@ const Invoice = () => {
       document.body.removeChild(a);
 
       toast.success("Invoice downloaded successfully");
-      handleMenuClose();
     } catch (error) {
       console.error("Error downloading invoice:", error);
       toast.error("Failed to download invoice");
@@ -446,76 +419,109 @@ const Invoice = () => {
   };
 
   return (
-    <div className="mt-2 ">
-      {/* <button
-        onClick={handleCreateInvoiceClick}
-        className="mb-4 px-5 py-2 rounded-full text-sm font-medium text-white bg-primary hover:bg-primary/90 transition-colors"
-      >
+    <div className="mt-2">
+      <Button onClick={handleCreateInvoiceClick} size="sm" className="mb-4">
+        <Plus className="h-3.5 w-3.5 mr-1.5" />
         New Invoice
-      </button> */}
-    <Button onClick={() => handleCreateInvoiceClick()} size="sm" className="mb-4 h-7 w-auto shrink-0">
-            <Plus className="h-4 w-4 mr-1.5" />
-            New Invoice
-          </Button>
-        {/* <Button type="button" variant="ghost" size="icon" className="h-7 w-7 shrink-0 text-muted-foreground hover:text-primary hover:bg-primary/10" title="New Invoice" onClick={() => handleCreateInvoiceClick()}>
-                                <Plus size={13} />
-                                New Invoice
-                              </Button> */}
+      </Button>
 
-      <div className="bg-white rounded-xl border border-border shadow-sm overflow-x-auto">
-        <table className="w-full text-left min-w-[900px]">
-          <thead>
-            <tr className="border-b border-border">
-              <th className="text-xs font-semibold tracking-wide uppercase text-left px-4 py-3 text-muted-foreground">Invoice #</th>
-              <th className="text-xs font-semibold tracking-wide uppercase text-left px-4 py-3 text-muted-foreground">Status</th>
-              <th className="text-xs font-semibold tracking-wide uppercase text-left px-4 py-3 text-muted-foreground">Posted</th>
-              <th className="text-xs font-semibold tracking-wide uppercase text-left px-4 py-3 text-muted-foreground">Total</th>
-              <th className="text-xs font-semibold tracking-wide uppercase text-left px-4 py-3 text-muted-foreground">Amount Paid</th>
-              <th className="text-xs font-semibold tracking-wide uppercase text-left px-4 py-3 text-muted-foreground">Balance Due</th>
-              <th className="text-xs font-semibold tracking-wide uppercase text-left px-4 py-3 text-muted-foreground">Last Paid</th>
-              <th className="text-xs font-semibold tracking-wide uppercase text-left px-4 py-3 text-muted-foreground">Description</th>
-              <th className="text-xs font-semibold tracking-wide uppercase text-left px-4 py-3 text-muted-foreground">Settings</th>
+      <div className="rounded-xl border border-border bg-background shadow-sm overflow-hidden">
+        <table className="w-full table-fixed text-sm">
+          <colgroup>
+            <col className="w-[12%]" />
+            <col className="w-[9%]" />
+            <col className="w-[9%]" />
+            <col className="w-[8%]" />
+            <col className="w-[10%]" />
+            <col className="w-[10%]" />
+            <col className="w-[9%]" />
+            <col className="w-[21%]" />
+            <col className="w-[12%]" />
+          </colgroup>
+          <thead className="bg-muted/40">
+            <tr>
+              <th className="text-left px-2 py-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Invoice #</th>
+              <th className="text-left px-2 py-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Status</th>
+              <th className="text-left px-2 py-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Posted</th>
+              <th className="text-left px-2 py-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Total</th>
+              <th className="text-left px-2 py-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Paid</th>
+              <th className="text-left px-2 py-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Balance Due</th>
+              <th className="text-left px-2 py-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Last Paid</th>
+              <th className="text-left px-2 py-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Description</th>
+              <th className="px-2 py-2.5" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {Array.isArray(accountInvoicesData) && accountInvoicesData.map((row, idx) => (
-              <tr key={row._id} className="bg-white transition-colors hover:bg-muted/30">
-                <td
-                  className="text-xs px-4 py-2.5 leading-tight cursor-pointer text-primary hover:text-primary/80 font-medium"
-                  onClick={() => handleEdit(row._id)}
-                >
-                  {row.invoicenumber}{" "}
+            {Array.isArray(accountInvoicesData) && accountInvoicesData.map((row) => (
+              <tr key={row._id} className="hover:bg-muted/30 transition-colors">
+                <td className="px-2 py-1.5 truncate">
+                  <span
+                    className="text-xs font-medium text-primary hover:text-primary/80 cursor-pointer"
+                    onClick={() => handleEdit(row._id)}
+                  >
+                    {row.invoicenumber}
+                  </span>
                   {row.invoiceLabel && (
-                    <span className="ml-1 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-warning/10 text-warning border border-warning/20">
+                    <span className="ml-1 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-warning/10 text-warning border border-warning/20">
                       {row.invoiceLabel}
                     </span>
                   )}
                 </td>
-                <td className="text-xs px-4 py-2.5 leading-tight">
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getStatusClass(row.invoiceStatus)}`}>
+                <td className="px-2 py-1.5">
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium ${getStatusClass(row.invoiceStatus)}`}>
                     {row.invoiceStatus}
                   </span>
                 </td>
-                <td className="text-xs px-4 py-2.5 leading-tight text-foreground">
-                  {new Intl.DateTimeFormat("en-US", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                  }).format(new Date(row.createdAt))}
+                <td className="px-2 py-1.5 text-xs text-foreground">
+                  {new Intl.DateTimeFormat("en-US", { day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(row.createdAt))}
                 </td>
-                <td className="text-xs px-4 py-2.5 leading-tight text-foreground">${row.summary.total}</td>
-                <td className="text-xs px-4 py-2.5 leading-tight text-foreground">${row.paidAmount}</td>
-                <td className="text-xs px-4 py-2.5 leading-tight text-foreground">${row.summary.total - row.paidAmount}</td>
-                <td className="text-xs px-4 py-2.5 leading-tight text-muted-foreground">{row.lastPaid}</td>
-                <td className="text-xs px-4 py-2.5 leading-tight text-muted-foreground max-w-[200px] truncate">{row.description}</td>
-                <td className="text-xs px-4 py-2.5 leading-tight">
-                  <div className="relative inline-block">
-                    <button
-                      onClick={(event) => toggleMenu(event, row._id)}
-                      className="p-1 rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                <td className="px-2 py-1.5 text-xs text-foreground">${row.summary.total}</td>
+                <td className="px-2 py-1.5 text-xs text-foreground">${row.paidAmount}</td>
+                <td className="px-2 py-1.5 text-xs text-foreground">${row.summary.total - row.paidAmount}</td>
+                <td className="px-2 py-1.5 text-xs text-muted-foreground">{row.lastPaid}</td>
+                <td className="px-2 py-1.5 text-xs text-muted-foreground truncate">{row.description}</td>
+                <td className="px-2 py-1.5">
+                  <div className="flex items-center justify-end gap-0.5">
+                    <Button
+                      type="button" variant="ghost" size="icon"
+                      className="h-7 w-7 text-muted-foreground hover:text-primary hover:bg-primary/10"
+                      title="Edit"
+                      onClick={() => handleEdit(row._id)}
                     >
-                      <CiMenuKebab className="text-base" />
-                    </button>
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button
+                      type="button" variant="ghost" size="icon"
+                      className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted"
+                      title="Duplicate"
+                      onClick={() => handleDuplicate(row._id)}
+                    >
+                      <Copy className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button
+                      type="button" variant="ghost" size="icon"
+                      className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted"
+                      title="Print"
+                      onClick={() => handlePrint(row._id)}
+                    >
+                      <Printer className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button
+                      type="button" variant="ghost" size="icon"
+                      className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted"
+                      title="Download"
+                      onClick={() => handleDownload(row._id)}
+                    >
+                      <Download className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button
+                      type="button" variant="ghost" size="icon"
+                      className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                      title="Delete"
+                      onClick={() => handleDelete(row._id)}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
                   </div>
                 </td>
               </tr>
@@ -523,26 +529,6 @@ const Invoice = () => {
           </tbody>
         </table>
       </div>
-
-      {/* Dropdown Menu */}
-      {Boolean(anchorEl) && (
-        <>
-          <div className="fixed inset-0 z-30" onClick={handleMenuClose} />
-          <div
-            className="fixed z-40 bg-card border border-border rounded-lg shadow-lg py-1 min-w-[130px]"
-            style={{
-              top: anchorEl.getBoundingClientRect().bottom + 4,
-              left: anchorEl.getBoundingClientRect().left,
-            }}
-          >
-            <button onClick={() => handleEdit(tempIdget)} className="w-full text-left px-4 py-2 text-xs font-medium text-foreground hover:bg-muted transition-colors">Edit</button>
-            <button onClick={() => handleDelete(tempIdget)} className="w-full text-left px-4 py-2 text-xs font-medium text-destructive hover:bg-destructive/10 transition-colors">Delete</button>
-            <button onClick={() => handleDuplicate(tempIdget)} className="w-full text-left px-4 py-2 text-xs font-medium text-foreground hover:bg-muted transition-colors">Duplicate</button>
-            <button onClick={() => handlePrint(tempIdget)} className="w-full text-left px-4 py-2 text-xs font-medium text-foreground hover:bg-muted transition-colors">Print</button>
-            <button onClick={() => handleDownload(tempIdget)} className="w-full text-left px-4 py-2 text-xs font-medium text-foreground hover:bg-muted transition-colors">Download</button>
-          </div>
-        </>
-      )}
 
       {/* Update Status Dialog */}
       {openDialog && (
