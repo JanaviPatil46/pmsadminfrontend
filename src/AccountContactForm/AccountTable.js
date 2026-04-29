@@ -7,6 +7,7 @@ import Cookies from "js-cookie";
 import {
   Mail, Briefcase, Users, Tag, Archive,
   RotateCcw, Trash2, X,
+  UserSearch, AtSign, Building2, UserCog, TagsIcon,
 } from "lucide-react";
 import { DataTable } from "../components/data-table/data-table";
 import { DataTableToolbar } from "../components/data-table/toolbar";
@@ -328,34 +329,45 @@ const AccountTable = () => {
     },
   ], []);
 
-  const addFilter = (key) => {
-    if (!activeFilters.includes(key)) setActiveFilters((p) => [...p, key]);
+  const toggleFilter = (key) => {
+    if (activeFilters.includes(key)) {
+      setActiveFilters((p) => p.filter((f) => f !== key));
+      setFilters((p) => ({ ...p, [key]: key === "teamMember" || key === "tags" ? [] : "" }));
+    } else {
+      setActiveFilters((p) => [...p, key]);
+    }
   };
   const removeFilter = (key) => {
     setActiveFilters((p) => p.filter((f) => f !== key));
     setFilters((p) => ({ ...p, [key]: key === "teamMember" || key === "tags" ? [] : "" }));
   };
 
-  const filterContent = (
-    <div className="flex flex-col gap-1">
-      {[
-        { key: "accountName", label: "Account Name" },
-        { key: "email", label: "Email" },
-        { key: "type", label: "Client Type" },
-        { key: "teamMember", label: "Team Member" },
-        { key: "tags", label: "Tags" },
-      ].map(({ key, label }) => (
-        <button
-          key={key}
-          onClick={() => addFilter(key)}
-          disabled={activeFilters.includes(key)}
-          className="text-left px-2 py-1.5 text-sm rounded-md hover:bg-muted text-foreground transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-        >
-          {label}
-        </button>
-      ))}
-    </div>
-  );
+  const FILTER_DEFS = [
+    { key: "accountName", label: "Name",        Icon: UserSearch  },
+    { key: "email",       label: "Email",       Icon: AtSign      },
+    { key: "type",        label: "Type",        Icon: Building2   },
+    { key: "teamMember",  label: "Team Member", Icon: UserCog     },
+    { key: "tags",        label: "Tags",        Icon: TagsIcon    },
+  ];
+
+  const filterButtons = FILTER_DEFS.map(({ key, label, Icon }) => {
+    const active = activeFilters.includes(key);
+    return (
+      <button
+        key={key}
+        onClick={() => toggleFilter(key)}
+        className={cn(
+          "inline-flex items-center gap-1.5 h-8 px-2.5 text-xs font-medium rounded-lg border transition-colors",
+          active
+            ? "bg-primary/10 text-primary border-primary/30"
+            : "bg-background text-muted-foreground border-border hover:bg-muted hover:text-foreground"
+        )}
+      >
+        <Icon className="h-3.5 w-3.5" />
+        {label}
+      </button>
+    );
+  });
 
   const bulkActions = (
     <>
@@ -416,7 +428,7 @@ const AccountTable = () => {
       <DataTableToolbar
         globalFilter={globalFilter}
         onGlobalFilterChange={setGlobalFilter}
-        filterContent={filterContent}
+        filterButtons={filterButtons}
         selectedCount={selectedIds.length}
         bulkActions={bulkActions}
       >
@@ -461,18 +473,18 @@ const AccountTable = () => {
               </div>
             )}
             {activeFilters.includes("teamMember") && (
-              <div className="inline-flex items-center gap-1.5 h-8 border border-border rounded-lg pl-1 pr-1.5 bg-background">
+              <div className="flex items-center gap-1.5 min-h-8 border border-border rounded-lg pl-1 pr-1.5 bg-background">
                 <TeamMemberMultiSelectDropDown
                   value={filters.teamMember}
                   onChange={(v) => setFilters((p) => ({ ...p, teamMember: v }))}
                   width="200px"
                   LOGIN_API={LOGIN_API}
                 />
-                <button onClick={() => removeFilter("teamMember")} className="text-muted-foreground hover:text-foreground"><X className="h-3.5 w-3.5" /></button>
+                <button onClick={() => removeFilter("teamMember")} className="text-muted-foreground hover:text-foreground shrink-0"><X className="h-3.5 w-3.5" /></button>
               </div>
             )}
             {activeFilters.includes("tags") && (
-              <div className="inline-flex items-center gap-1.5 h-8 border border-border rounded-lg pl-1 pr-1.5 bg-background">
+              <div className="flex items-center gap-1.5 min-h-8 border border-border rounded-lg pl-1 pr-1.5 bg-background">
                 <TagsMultiSelectDropDown
                   value={filters.tags}
                   onChange={(v) => setFilters((p) => ({ ...p, tags: v }))}
@@ -480,7 +492,7 @@ const AccountTable = () => {
                   width="200px"
                   placeholder="Tags…"
                 />
-                <button onClick={() => removeFilter("tags")} className="text-muted-foreground hover:text-foreground"><X className="h-3.5 w-3.5" /></button>
+                <button onClick={() => removeFilter("tags")} className="text-muted-foreground hover:text-foreground shrink-0"><X className="h-3.5 w-3.5" /></button>
               </div>
             )}
           </div>

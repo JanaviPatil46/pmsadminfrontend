@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { Trash2, X } from "lucide-react";
+import { Trash2, X, UserSearch, AtSign, Building2, Hash, TagsIcon } from "lucide-react";
 import { DataTable } from "../components/data-table/data-table";
 import { DataTableToolbar } from "../components/data-table/toolbar";
 import TagMultiSelectDropDown from "../AccountContactForm/TagsMultiSelectDropDown";
@@ -106,8 +106,13 @@ const ContactsTable = () => {
     }
   };
 
-  const addFilter = (key) => {
-    if (!activeFilters.includes(key)) setActiveFilters((p) => [...p, key]);
+  const toggleFilter = (key) => {
+    if (activeFilters.includes(key)) {
+      setActiveFilters((p) => p.filter((f) => f !== key));
+      setFilters((p) => ({ ...p, [key]: key === "tags" ? [] : "" }));
+    } else {
+      setActiveFilters((p) => [...p, key]);
+    }
   };
   const removeFilter = (key) => {
     setActiveFilters((p) => p.filter((f) => f !== key));
@@ -179,26 +184,32 @@ const ContactsTable = () => {
     },
   ], [canManageContacts]);
 
-  const filterContent = (
-    <div className="flex flex-col gap-1">
-      {[
-        { key: "contactName", label: "Contact Name" },
-        { key: "email", label: "Email" },
-        { key: "company", label: "Company" },
-        { key: "contactCode", label: "Contact Code" },
-        { key: "tags", label: "Tags" },
-      ].map(({ key, label }) => (
-        <button
-          key={key}
-          onClick={() => addFilter(key)}
-          disabled={activeFilters.includes(key)}
-          className="text-left px-2 py-1.5 text-sm rounded-md hover:bg-muted text-foreground transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-        >
-          {label}
-        </button>
-      ))}
-    </div>
-  );
+  const FILTER_DEFS = [
+    { key: "contactName", label: "Name",    Icon: UserSearch },
+    { key: "email",       label: "Email",   Icon: AtSign     },
+    { key: "company",     label: "Company", Icon: Building2  },
+    { key: "contactCode", label: "Code",    Icon: Hash       },
+    { key: "tags",        label: "Tags",    Icon: TagsIcon   },
+  ];
+
+  const filterButtons = FILTER_DEFS.map(({ key, label, Icon }) => {
+    const active = activeFilters.includes(key);
+    return (
+      <button
+        key={key}
+        onClick={() => toggleFilter(key)}
+        className={cn(
+          "inline-flex items-center gap-1.5 h-8 px-2.5 text-xs font-medium rounded-lg border transition-colors",
+          active
+            ? "bg-primary/10 text-primary border-primary/30"
+            : "bg-background text-muted-foreground border-border hover:bg-muted hover:text-foreground"
+        )}
+      >
+        <Icon className="h-3.5 w-3.5" />
+        {label}
+      </button>
+    );
+  });
 
   const bulkActions = canManageContacts ? (
     <button
@@ -212,10 +223,13 @@ const ContactsTable = () => {
 
   return (
     <div className="p-4 md:p-6 space-y-4">
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-semibold text-foreground tracking-tight">Contacts</h1>
+      </div>
       <DataTableToolbar
         globalFilter={globalFilter}
         onGlobalFilterChange={setGlobalFilter}
-        filterContent={filterContent}
+        filterButtons={filterButtons}
         selectedCount={selectedIds.length}
         bulkActions={bulkActions}
       >
@@ -246,14 +260,14 @@ const ContactsTable = () => {
               </div>
             )}
             {activeFilters.includes("tags") && (
-              <div className="inline-flex items-center gap-1.5 h-8 border border-border rounded-lg pl-1 pr-1.5 bg-background">
+              <div className="flex items-center gap-1.5 min-h-8 border border-border rounded-lg pl-1 pr-1.5 bg-background">
                 <TagMultiSelectDropDown
                   value={filters.tags}
                   onChange={(v) => setFilters((p) => ({ ...p, tags: v }))}
                   options={uniqueTagOptions}
                   width="200px"
                 />
-                <button onClick={() => removeFilter("tags")} className="text-muted-foreground hover:text-foreground"><X className="h-3.5 w-3.5" /></button>
+                <button onClick={() => removeFilter("tags")} className="text-muted-foreground hover:text-foreground shrink-0"><X className="h-3.5 w-3.5" /></button>
               </div>
             )}
           </div>

@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { BsThreeDotsVertical, BsTrash, BsArrowsMove, BsFolderPlus, BsUpload, BsFolderSymlink, BsPencil } from "react-icons/bs";
-import { MdLock, MdLockOpen, MdInsertDriveFile, MdFolder, MdFolderOpen, MdUploadFile, MdDriveFolderUpload } from "react-icons/md";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import FileUploadDrawer from "./FileUploadDrawer";
 import FolderUploadDrawer from "./FolderUploadDrawer";
@@ -8,11 +6,14 @@ import CreteFolderDrawer from "./CreteFolderDrawer";
 import RenameDrawer from "./RenameDrawer";
 import MoveDrawer from "./MoveDrawer";
 import { Button } from "../../components/ui/button";
-import { Eye, PenTool, Stamp, Lock, ArrowLeft, FolderPlus, Upload, FolderUp } from "lucide-react";
+import { Eye, PenTool, Stamp, Lock, LockOpen, ArrowLeft, FolderPlus, Upload, FolderUp, MoreVertical, Trash2, MoveRight, Pencil, File, FolderOpen as FolderOpenIcon, Folder as FolderClosedIcon, FolderIcon } from "lucide-react";
 import {
-  Folder as FolderClosedIcon,
-  FolderOpen as FolderOpenIcon,
-} from "lucide-react";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../../components/ui/dropdown-menu";
 const FolderTreeView = () => {
 const { templateId } = useParams();
 const location = useLocation();
@@ -72,12 +73,6 @@ console.log("hgjhg",templateId)
       ...prev,
       [path]: !prev[path],
     }));
-  };
-
-  const handleMenuOpen = (event, folder) => {
-    event.stopPropagation();
-    setMenuAnchorEl(event.currentTarget);
-    setSelectedFolderForMenu(folder);
   };
 
   const handleMenuClose = () => {
@@ -411,50 +406,81 @@ console.log("hgjhg",templateId)
         {items.map((item) => {
           const fullPath = parentPath ? `${parentPath}/${item.name}` : item.name;
           const meta = item.meta || {};
-          const getColor = (status) => (status ? "#1976d2" : "#9e9e9e");
+          const isLocked = meta.readOnly === true;
+          const isRestricted = ["Client Uploaded Documents", "Firm Documents Shared with Client", "Private"].includes(item.name);
 
           const StatusIcons = () => (
             <div className="flex gap-1 items-center ml-1">
-              <Eye size={16} color={getColor(meta.readStatus)} />
-              <PenTool size={16} color={getColor(meta.signStatus)} />
-              <Stamp size={16} color={getColor(meta.authStatus)} />
-              <Lock size={16} color={meta.readOnly ? "#e53935" : "#9e9e9e"} />
+              <Eye size={14} className={meta.readStatus ? "text-primary" : "text-muted-foreground"} />
+              <PenTool size={14} className={meta.signStatus ? "text-primary" : "text-muted-foreground"} />
+              <Stamp size={14} className={meta.authStatus ? "text-primary" : "text-muted-foreground"} />
+              <Lock size={14} className={meta.readOnly ? "text-destructive" : "text-muted-foreground"} />
             </div>
           );
 
           return (
-            <li key={fullPath} className="mb-2">
+            <li key={fullPath} className="mb-1">
               {item.type === "folder" ? (
                 <div
-                  className="p-1 flex items-center justify-between rounded cursor-pointer bg-white hover:bg-gray-50 transition-colors"
+                  className="flex items-center justify-between px-2 py-1.5 rounded-lg cursor-pointer hover:bg-muted/40 transition-colors"
                   onClick={() => toggleFolder(fullPath, meta.readOnly)}
                 >
-                  <div className="flex items-center gap-1 flex-1">
-                    {expandedFolders[fullPath] ? (
-                      <MdFolderOpen size={18} color="#1976d2" />
-                    ) : (
-                      <MdFolder size={18} color="#757575" />
-                    )}
-                    <span className="text-sm font-medium break-words">{item.name}</span>
+                  <div className="flex items-center gap-1.5 flex-1">
+                    {expandedFolders[fullPath]
+                      ? <FolderOpenIcon size={16} className="text-primary shrink-0" />
+                      : <FolderClosedIcon size={16} className="text-muted-foreground shrink-0" />}
+                    <span className="text-xs font-medium text-foreground break-words">{item.name}</span>
                     <StatusIcons />
                   </div>
-                  <button type="button" className="p-1 text-gray-500 hover:text-gray-700"
-                    onClick={(e) => { e.stopPropagation(); handleMenuOpen(e, { ...item, fullPath }); }}>
-                    <BsThreeDotsVertical size={14} />
-                  </button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                      <Button type="button" variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-foreground hover:bg-muted shrink-0">
+                        <MoreVertical size={13} />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-44">
+                      <DropdownMenuItem disabled={isLocked || isRestricted} onClick={() => { setSelectedFolderForMenu({ ...item, fullPath }); setMoveDrawerOpen(true); }}><MoveRight size={13} className="mr-2" />Move</DropdownMenuItem>
+                      <DropdownMenuItem disabled={isLocked} onClick={() => { setSelectedFolderForMenu({ ...item, fullPath }); setNewFolderDrawerOpen(true); }}><FolderPlus size={13} className="mr-2" />New Folder</DropdownMenuItem>
+                      <DropdownMenuItem disabled={isLocked} onClick={() => { setSelectedFolderForMenu({ ...item, fullPath }); setFileUploadDrawerOpen(true); }}><File size={13} className="mr-2" />New File</DropdownMenuItem>
+                      <DropdownMenuItem disabled={isLocked} onClick={() => { setSelectedFolderForMenu({ ...item, fullPath }); setFolderUploaDrawerOpen(true); }}><Upload size={13} className="mr-2" />Upload Folder</DropdownMenuItem>
+                      <DropdownMenuItem disabled={isLocked} onClick={() => { setSelectedFolderForMenu({ ...item, fullPath }); SetRenameDrawer(true); }}><Pencil size={13} className="mr-2" />Rename</DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => { setSelectedFolderForMenu({ ...item, fullPath }); toggleReadOnly({ ...item, fullPath }); }}>
+                        {isLocked ? <LockOpen size={13} className="mr-2" /> : <Lock size={13} className="mr-2" />}
+                        {isLocked ? "Unlock" : "Lock"}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem disabled={isLocked || isRestricted} className="text-destructive focus:text-destructive" onClick={() => { setSelectedFolderForMenu({ ...item, fullPath }); deleteItem({ ...item, fullPath }); }}><Trash2 size={13} className="mr-2" />Delete</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               ) : (
-                <div className="flex items-center pl-8 mb-1 rounded group">
-                  <MdInsertDriveFile size={16} color="#757575" style={{ marginRight: 6 }} />
-                  <span className="text-xs flex-1 break-words">{item.name}</span>
-                  <StatusIcons />
-                  <button type="button"
-                    className="w-2 h-2 rounded-full bg-blue-600 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer mx-1"
-                    onClick={(e) => handleMenuOpen(e, { ...item, fullPath })} />
+                <div className="flex items-center justify-between pl-8 pr-2 py-1 rounded-lg hover:bg-muted/40 group transition-colors">
+                  <div className="flex items-center gap-1.5 flex-1">
+                    <File size={14} className="text-muted-foreground shrink-0" />
+                    <span className="text-xs text-foreground break-words flex-1">{item.name}</span>
+                    <StatusIcons />
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button type="button" variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-foreground hover:bg-muted opacity-0 group-hover:opacity-100 shrink-0">
+                        <MoreVertical size={13} />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-44">
+                      <DropdownMenuItem disabled={isLocked} onClick={() => { setSelectedFolderForMenu({ ...item, fullPath }); SetRenameDrawer(true); }}><Pencil size={13} className="mr-2" />Rename</DropdownMenuItem>
+                      <DropdownMenuItem disabled={isLocked || isRestricted} onClick={() => { setSelectedFolderForMenu({ ...item, fullPath }); setMoveDrawerOpen(true); }}><MoveRight size={13} className="mr-2" />Move</DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => { setSelectedFolderForMenu({ ...item, fullPath }); toggleReadOnly({ ...item, fullPath }); }}>
+                        {isLocked ? <LockOpen size={13} className="mr-2" /> : <Lock size={13} className="mr-2" />}
+                        {isLocked ? "Unlock" : "Lock"}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="text-destructive focus:text-destructive" disabled={isLocked || isRestricted} onClick={() => { setSelectedFolderForMenu({ ...item, fullPath }); deleteItem({ ...item, fullPath }); }}><Trash2 size={13} className="mr-2" />Delete</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               )}
               {expandedFolders[fullPath] && item.children && item.children.length > 0 && (
-                <div className="ml-4 mt-1 border-l-2 border-dashed border-gray-300 pl-2">
+                <div className="ml-4 mt-0.5 border-l-2 border-dashed border-border pl-2">
                   {renderTree(item.children, level + 1, fullPath)}
                 </div>
               )}
@@ -470,14 +496,14 @@ console.log("hgjhg",templateId)
       <div className="flex items-center gap-3">
         <button
           type="button"
-          className="h-9 w-9 flex items-center justify-center rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-500 hover:text-gray-700 transition-colors shadow-sm"
+          className="h-9 w-9 flex items-center justify-center rounded-xl border border-border bg-background hover:bg-muted text-muted-foreground hover:text-foreground transition-colors shadow-sm"
           onClick={() => navigate("/firmtemp/templates/folders")}
         >
           <ArrowLeft className="h-4 w-4" />
         </button>
         <div>
-          <h1 className="text-lg font-semibold text-gray-900 tracking-tight">Template: {templateName}</h1>
-          <p className="text-xs text-gray-400 mt-0.5">Manage folders and files for this template</p>
+          <h1 className="text-lg font-semibold text-foreground tracking-tight">Template: {templateName}</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">Manage folders and files for this template</p>
         </div>
       </div>
 
@@ -564,76 +590,19 @@ console.log("hgjhg",templateId)
       </div>
 
       {/* Folder Explorer */}
-      <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
-        <div className="px-5 py-3.5 border-b border-gray-100 flex items-center gap-2">
-          <FolderClosedIcon size={15} className="text-gray-400" />
-          <h2 className="text-sm font-semibold text-gray-800">Folder Explorer</h2>
+      <div className="rounded-xl border border-border bg-background shadow-sm overflow-hidden">
+        <div className="px-5 py-3.5 border-b border-border flex items-center gap-2">
+          <FolderClosedIcon size={15} className="text-muted-foreground" />
+          <h2 className="text-sm font-semibold text-foreground">Folder Explorer</h2>
         </div>
         <div className="p-4">
           {folderTree && folderTree.length > 0 ? (
             renderTree(folderTree)
           ) : (
-            <p className="text-sm text-gray-400 py-6 text-center">No folders yet. Create one to get started.</p>
+            <p className="text-sm text-muted-foreground py-6 text-center">No folders yet. Create one to get started.</p>
           )}
         </div>
       </div>
-
-      {/* Context Menu */}
-      {Boolean(menuAnchorEl) && (() => {
-        const isLocked = selectedFolderForMenu?.meta?.readOnly === true;
-        const restrictedNames = ["Client Uploaded Documents", "Firm Documents Shared with Client", "Private"];
-        const isRestricted = restrictedNames.includes(selectedFolderForMenu?.name);
-        return (
-          <>
-            <div className="fixed inset-0 z-30" onClick={handleMenuClose} />
-            <div
-              className="fixed z-40 bg-white border border-gray-100 rounded-xl shadow-xl w-48 py-1.5 overflow-hidden"
-              style={{
-                top: menuAnchorEl?.getBoundingClientRect().bottom + window.scrollY + 4,
-                left: menuAnchorEl?.getBoundingClientRect().right - 192 + window.scrollX
-              }}
-            >
-              <button type="button" disabled={isLocked || isRestricted}
-                onClick={() => { setMoveDrawerOpen(true); handleMenuClose(); }}
-                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-40 transition-colors">
-                <BsArrowsMove size={13} /> Move
-              </button>
-              <button type="button" disabled={isLocked}
-                onClick={() => { setNewFolderDrawerOpen(true); handleMenuClose(); }}
-                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-40 transition-colors">
-                <MdFolder size={13} /> New Folder
-              </button>
-              <button type="button" disabled={isLocked}
-                onClick={() => { setFileUploadDrawerOpen(true); handleMenuClose(); }}
-                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-40 transition-colors">
-                <MdUploadFile size={13} /> New File
-              </button>
-              <button type="button" disabled={isLocked}
-                onClick={() => { setFolderUploaDrawerOpen(true); handleMenuClose(); }}
-                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-40 transition-colors">
-                <MdDriveFolderUpload size={13} /> Upload Folder
-              </button>
-              <button type="button" disabled={isLocked}
-                onClick={() => { SetRenameDrawer(true); handleMenuClose(); }}
-                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-40 transition-colors">
-                <BsPencil size={13} /> Rename
-              </button>
-              <div className="my-1 h-px bg-gray-100 mx-2" />
-              <button type="button"
-                onClick={() => { toggleReadOnly(selectedFolderForMenu); handleMenuClose(); }}
-                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                {isLocked ? <MdLockOpen size={13} /> : <MdLock size={13} />}
-                {isLocked ? "Unlock" : "Lock"}
-              </button>
-              <button type="button" disabled={isLocked || isRestricted}
-                onClick={() => { deleteItem(selectedFolderForMenu); handleMenuClose(); }}
-                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 disabled:opacity-40 transition-colors">
-                <BsTrash size={13} /> Delete
-              </button>
-            </div>
-          </>
-        );
-      })()}
     </div>
   );
 };

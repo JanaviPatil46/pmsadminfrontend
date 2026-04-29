@@ -1,10 +1,11 @@
-import React, { useRef, useState } from "react";
-import { Search, SlidersHorizontal, Eye, X, Plus } from "lucide-react";
+import React, { useRef, useState, useEffect } from "react";
+import { Search, Eye, X, Plus } from "lucide-react";
 import { cn } from "../../lib/utils";
 
 export function DataTableToolbar({
   globalFilter = "",
   onGlobalFilterChange,
+  filterButtons,
   filterContent,
   columnVisibility,
   onColumnVisibilityToggle,
@@ -15,10 +16,16 @@ export function DataTableToolbar({
   selectedCount = 0,
   children,
 }) {
-  const [filterOpen, setFilterOpen] = useState(false);
   const [visOpen, setVisOpen] = useState(false);
-  const filterRef = useRef(null);
   const visRef = useRef(null);
+
+  useEffect(() => {
+    const handleOutside = (e) => {
+      if (visRef.current && !visRef.current.contains(e.target)) setVisOpen(false);
+    };
+    document.addEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
+  }, []);
 
   return (
     <div className="flex flex-col gap-2 mb-3">
@@ -43,35 +50,19 @@ export function DataTableToolbar({
           )}
         </div>
 
-        <div className="flex items-center gap-1.5 ml-auto">
-          {/* Filter button */}
-          {filterContent && (
-            <div className="relative" ref={filterRef}>
-              <button
-                onClick={() => { setFilterOpen((o) => !o); setVisOpen(false); }}
-                className={cn(
-                  "inline-flex items-center gap-1.5 h-8 px-3 text-sm font-medium rounded-lg border transition-colors",
-                  filterOpen
-                    ? "bg-primary/10 text-primary border-primary/30"
-                    : "bg-background text-muted-foreground border-border hover:bg-muted hover:text-foreground"
-                )}
-              >
-                <SlidersHorizontal className="h-3.5 w-3.5" />
-                Filters
-              </button>
-              {filterOpen && (
-                <div className="absolute left-0 top-full mt-1.5 z-50 min-w-[220px] rounded-xl border border-border bg-background shadow-lg p-3">
-                  {filterContent}
-                </div>
-              )}
-            </div>
-          )}
+        {/* Inline filter toggle buttons */}
+        {filterButtons && (
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {filterButtons}
+          </div>
+        )}
 
+        <div className="flex items-center gap-1.5 ml-auto">
           {/* Column visibility */}
           {columnVisibility && onColumnVisibilityToggle && (
             <div className="relative" ref={visRef}>
               <button
-                onClick={() => { setVisOpen((o) => !o); setFilterOpen(false); }}
+                onClick={() => setVisOpen((o) => !o)}
                 className={cn(
                   "inline-flex items-center gap-1.5 h-8 px-3 text-sm font-medium rounded-lg border transition-colors",
                   visOpen

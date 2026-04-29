@@ -1,15 +1,21 @@
 import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
-import { CiMenuKebab } from "react-icons/ci";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
 import OrganizerUpdate from "../NewPages/OrganizerUpdate";
 import OrganizerDialog from "./OrganizerDialog";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
 import { Input } from "../../components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../../components/ui/dropdown-menu";
+import { MoreVertical, Pencil, Download, Archive, RotateCcw, Printer, Trash2, MessageSquare, Lock, LockOpen } from "lucide-react";
 const Organizers = () => {
   const [openMenuId, setOpenMenuId] = useState(null);
   const ORGANIZER_TEMP_API = process.env.REACT_APP_ORGANIZER_TEMP_URL;
@@ -132,18 +138,7 @@ console.log("raw",raw)
       })
       .catch((error) => console.error(error));
   };
- const [anchorEl, setAnchorEl] = useState(null);
-  // const toggleMenu = (_id) => {
-  //   setOpenMenuId(openMenuId === _id ? null : _id);
-  //   setTempIdGet(_id);
-  // };
-const toggleMenu = (event, _id) => {
-    setAnchorEl(event.currentTarget);
-    setOpenMenuId(_id);
-    setTempIdGet(_id);
-  };
   const handleMenuClose = () => {
-    setAnchorEl(null);
     setOpenMenuId(null);
     setTempIdGet(null);
   };
@@ -701,111 +696,115 @@ const handleOpenDialog = (organizer) => {
       {!showForm ? (
         <>
           {/* Organizers Table */}
-          <div className="rounded-2xl border border-border shadow-sm overflow-hidden bg-card">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-muted border-b border-border">
-                    <th className="text-left px-5 py-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Name</th>
-                    <th className="text-left px-4 py-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Last Updated</th>
-                    <th className="text-left px-4 py-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Status</th>
-                    <th className="text-left px-4 py-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Sections</th>
-                    <th className="text-left px-4 py-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Seal</th>
-                    <th className="text-right px-4 py-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Actions</th>
+          <div className="rounded-xl border border-border overflow-hidden bg-background">
+            <table className="w-full table-fixed text-sm">
+              <colgroup>
+                <col className="w-[30%]" />
+                <col className="w-[16%]" />
+                <col className="w-[16%]" />
+                <col className="w-[10%]" />
+                <col className="w-[12%]" />
+                <col className="w-[16%]" />
+              </colgroup>
+              <thead className="bg-muted/40">
+                <tr>
+                  <th className="text-left px-2 py-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Name</th>
+                  <th className="text-left px-2 py-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Last Updated</th>
+                  <th className="text-left px-2 py-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Status</th>
+                  <th className="text-left px-2 py-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Sections</th>
+                  <th className="text-left px-2 py-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Seal</th>
+                  <th className="px-2 py-2.5" />
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {organizerTemplatesData.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-2 py-12 text-center text-sm text-muted-foreground">
+                      No organizers found.
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="divide-y divide-border/50">
-                  {organizerTemplatesData.length === 0 ? (
-                    <tr>
-                      <td colSpan={6} className="px-5 py-12 text-center text-sm text-muted-foreground">
-                        No organizers found.
+                ) : (
+                  organizerTemplatesData.map((row) => (
+                    <tr key={row._id} className="hover:bg-muted/30 transition-colors">
+                      <td className="px-2 py-1.5">
+                        <span
+                          className="text-xs font-medium text-primary cursor-pointer hover:underline"
+                          onClick={() => handleEdit(row._id)}
+                        >
+                          {row.organizerName}
+                        </span>
+                      </td>
+                      <td className="px-2 py-1.5 text-xs text-muted-foreground">
+                        {new Intl.DateTimeFormat("en-US", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(row.updatedAt))}
+                      </td>
+                      <td className="px-2 py-1.5">
+                        <Badge
+                          className={`rounded-full text-[11px] font-medium border-0 ${
+                            row.status === "Completed"
+                              ? "bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300"
+                              : row.status === "In Progress"
+                              ? "bg-primary/10 text-primary"
+                              : "bg-muted text-muted-foreground"
+                          }`}
+                          variant="outline"
+                        >
+                          {row.status || "Pending"}
+                        </Badge>
+                      </td>
+                      <td className="px-2 py-1.5 text-xs text-muted-foreground">{row.sections.length}</td>
+                      <td className="px-2 py-1.5">
+                        {row.issealed && (
+                          <Badge className="rounded-full text-[11px] bg-primary text-primary-foreground border-0 font-medium">Sealed</Badge>
+                        )}
+                      </td>
+                      <td className="px-2 py-1.5">
+                        <div className="flex items-center justify-end gap-1">
+                          <Button size="icon" variant="ghost" className="h-7 w-7" title="View / Edit"
+                            onClick={() => handleEdit(row._id)}>
+                            <Pencil className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button size="icon" variant="ghost" className="h-7 w-7" title="Download"
+                            onClick={() => handleDownload(row)}>
+                            <Download className="h-3.5 w-3.5" />
+                          </Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground">
+                                <MoreVertical className="h-3.5 w-3.5" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-44">
+                              <DropdownMenuItem onClick={() => handleSealed(row._id, !row.issealed)}>
+                                {row.issealed ? <LockOpen className="h-3.5 w-3.5 mr-2" /> : <Lock className="h-3.5 w-3.5 mr-2" />}
+                                {row.issealed ? "Unseal" : "Seal"}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleOpenDialog(row)}>
+                                <MessageSquare className="h-3.5 w-3.5 mr-2" />Change Answers
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleArchive(row._id, row.active)}>
+                                {row.active ? <Archive className="h-3.5 w-3.5 mr-2" /> : <RotateCcw className="h-3.5 w-3.5 mr-2" />}
+                                {row.active ? "Archive" : "Restore"}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => printOrganizerData(row._id)}>
+                                <Printer className="h-3.5 w-3.5 mr-2" />Print
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => { setRenameRowId(row._id); setRenameValue(row.organizerName); setRenameDialogOpen(true); }}>
+                                <Pencil className="h-3.5 w-3.5 mr-2" />Rename
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem className="text-destructive focus:text-destructive"
+                                onClick={() => handleDelete(row._id)}>
+                                <Trash2 className="h-3.5 w-3.5 mr-2" />Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
                       </td>
                     </tr>
-                  ) : (
-                    organizerTemplatesData.map((row) => (
-                      <tr key={row._id} className="hover:bg-muted/50 transition-colors">
-                        <td className="px-5 py-3">
-                          <span
-                            className="text-sm font-medium text-primary cursor-pointer hover:underline"
-                            onClick={() => handleEdit(row._id)}
-                          >
-                            {row.organizerName}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-xs text-muted-foreground">
-                          {new Intl.DateTimeFormat("en-US", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(row.updatedAt))}
-                        </td>
-                        <td className="px-4 py-3">
-                          <Badge
-                            className={`rounded-full text-[11px] font-medium border-0 ${
-                              row.status === "Completed"
-                                ? "bg-success/10 text-success"
-                                : row.status === "In Progress"
-                                ? "bg-primary/10 text-primary"
-                                : "bg-muted text-muted-foreground"
-                            }`}
-                            variant="outline"
-                          >
-                            {row.status || "Pending"}
-                          </Badge>
-                        </td>
-                        <td className="px-4 py-3 text-xs text-muted-foreground">{row.sections.length}</td>
-                        <td className="px-4 py-3">
-                          {row.issealed && (
-                            <Badge className="rounded-full text-[11px] bg-primary text-white border-0 font-medium">Sealed</Badge>
-                          )}
-                        </td>
-                        <td className="px-4 py-3 text-right relative">
-                          <button
-                            type="button"
-                            onClick={(e) => toggleMenu(e, row._id)}
-                            className="h-7 w-7 inline-flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                          >
-                            <CiMenuKebab size={15} />
-                          </button>
-                          {openMenuId === row._id && (
-                            <>
-                              <div className="fixed inset-0 z-30" onClick={handleMenuClose} />
-                              <div className="absolute right-4 z-40 bg-card border border-border rounded-xl shadow-xl py-1.5 w-48 overflow-hidden">
-                                <button type="button" className="w-full text-left px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors"
-                                  onClick={() => { handleSealed(row._id, !row.issealed); handleMenuClose(); }}>
-                                  {row.issealed ? "Unseal" : "Seal"}
-                                </button>
-                                <button type="button" className="w-full text-left px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors"
-                                  onClick={() => { handleDownload(row); handleMenuClose(); }}>
-                                  Download
-                                </button>
-                                <button type="button" className="w-full text-left px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors"
-                                  onClick={() => { handleOpenDialog(row); handleMenuClose(); }}>
-                                  Change Answers
-                                </button>
-                                <button type="button" className="w-full text-left px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors"
-                                  onClick={() => { handleArchive(row._id, row.active); handleMenuClose(); }}>
-                                  {row.active ? "Archive" : "Restore"}
-                                </button>
-                                <button type="button" className="w-full text-left px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors"
-                                  onClick={() => { printOrganizerData(row._id); handleMenuClose(); }}>
-                                  Print
-                                </button>
-                                <button type="button" className="w-full text-left px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors"
-                                  onClick={() => { setRenameRowId(row._id); setRenameValue(row.organizerName); setRenameDialogOpen(true); handleMenuClose(); }}>
-                                  Rename
-                                </button>
-                                <div className="my-1 h-px bg-border mx-2" />
-                                <button type="button" className="w-full text-left px-4 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors"
-                                  onClick={() => { handleDelete(row._id); handleMenuClose(); }}>
-                                  Delete
-                                </button>
-                              </div>
-                            </>
-                          )}
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
 
           {/* Rename Dialog */}

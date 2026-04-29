@@ -623,7 +623,7 @@ const AccountOrganizer = () => {
 
   const fieldCls = "w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent placeholder:text-muted-foreground transition-colors";
   const labelCls = "block text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-1.5";
-  const saveBtnCls = "rounded-lg px-4 py-2 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] transition-colors";
+  const saveBtnCls = "rounded-lg px-4 py-2 text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors";
   const cancelBtnCls = "rounded-lg px-4 py-2 text-sm font-medium border border-border text-foreground hover:bg-muted transition-colors";
 
   return (
@@ -746,7 +746,7 @@ const AccountOrganizer = () => {
                 <p className="text-xs text-white/70 mt-0.5">This is how clients will see this organizer</p>
               </div>
               <button type="button" onClick={handleClosePreview}
-                className="rounded-lg px-3 py-1.5 text-xs font-semibold bg-white text-primary hover:bg-white/90 transition-colors">
+                className="rounded-lg px-3 py-1.5 text-xs font-semibold bg-background text-primary border border-primary/20 hover:bg-muted transition-colors">
                 ← Back to Edit
               </button>
             </div>
@@ -811,9 +811,9 @@ const AccountOrganizer = () => {
                                   {/* Free Entry or Email */}
                                   {(element.type === "Free Entry" || element.type === "Email") && (
                                     <div className="my-2">
-                                      <p className="text-lg mb-1 mt-1">{element.text}</p>
+                                      <p className="text-sm font-medium text-foreground mb-1">{element.text}</p>
                                       <textarea
-                                        className="w-full border border-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                                        className="w-full border border-border rounded-lg bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring/50 placeholder:text-muted-foreground"
                                         rows={3}
                                         placeholder={`${element.type} Answer`}
                                         value={inputValues[`${section.id}_${element.text}`] || ""}
@@ -825,11 +825,11 @@ const AccountOrganizer = () => {
                                   {/* Number */}
                                   {element.type === "Number" && (
                                     <div className="my-2">
-                                      <p className="text-lg mb-1 mt-1">{element.text}</p>
+                                      <p className="text-sm font-medium text-foreground mb-1">{element.text}</p>
                                       <input
                                         type="text"
                                         inputMode="numeric"
-                                        className="w-full border border-border rounded px-3 py-2 text-sm mt-2 focus:outline-none focus:ring-1 focus:ring-ring"
+                                        className="w-full border border-border rounded-lg bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring/50 placeholder:text-muted-foreground"
                                         placeholder={`${element.type} Answer`}
                                         value={inputValues[`${section.id}_${element.text}`] || ""}
                                         onChange={(e) => {
@@ -843,15 +843,15 @@ const AccountOrganizer = () => {
                                   {/* Radio Buttons */}
                                   {element.type === "Radio Buttons" && (
                                     <div className="my-2">
-                                      <p className="text-lg mb-1 mt-1">{element.text}</p>
+                                      <p className="text-sm font-medium text-foreground mb-1">{element.text}</p>
                                       <div className="flex flex-wrap gap-2">
                                         {element.options.map((option) => (
                                           <button key={option.text} type="button"
                                             onClick={() => handleRadioChange(option.text, element.text, section.id)}
                                             className={`rounded-full px-4 py-1.5 text-sm font-medium border transition-colors ${
                                               radioValues[`${section.id}_${element.text}`] === option.text
-                                                ? "text-white bg-[var(--color-save-btn)] border-transparent"
-                                                : "border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white"
+                                                ? "bg-primary text-primary-foreground border-transparent"
+                                                : "border-primary text-primary hover:bg-primary hover:text-primary-foreground"
                                             }`}>
                                             {option.text}
                                           </button>
@@ -863,15 +863,15 @@ const AccountOrganizer = () => {
                                   {/* Checkboxes */}
                                   {element.type === "Checkboxes" && (
                                     <div className="my-2">
-                                      <p className="text-lg">{element.text}</p>
+                                      <p className="text-sm font-medium text-foreground mb-1">{element.text}</p>
                                       <div className="flex flex-wrap gap-2">
                                         {element.options.map((option) => (
                                           <button key={option.text} type="button"
                                             onClick={() => handleCheckboxChange(option.text, element.text, section.id)}
                                             className={`rounded-full px-4 py-1.5 text-sm font-medium border transition-colors ${
                                               checkboxValues[`${section.id}_${element.text}`]?.[option.text]
-                                                ? "text-white bg-[var(--color-save-btn)] border-transparent"
-                                                : "border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white"
+                                                ? "bg-primary text-primary-foreground border-transparent"
+                                                : "border-primary text-primary hover:bg-primary hover:text-primary-foreground"
                                             }`}>
                                             {option.text}
                                           </button>
@@ -883,15 +883,15 @@ const AccountOrganizer = () => {
                                   {/* Yes/No */}
                                   {element.type === "Yes/No" && (
                                     <div className="my-2">
-                                      <p className="text-lg">{element.text}</p>
+                                      <p className="text-sm font-medium text-foreground mb-1">{element.text}</p>
                                       <div className="flex gap-2">
                                         {element.options.map((option) => (
                                           <button key={option.text} type="button"
                                             onClick={() => handleYesNoChange(option.text, element.text, section.id)}
                                             className={`rounded-full px-4 py-1.5 text-sm font-medium border transition-colors ${
                                               selectedYesNoValues[`${section.id}_${element.text}`] === option.text
-                                                ? "text-white bg-[var(--color-save-btn)] border-transparent"
-                                                : "border-[var(--color-border-cancel-btn)] text-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] hover:text-white"
+                                                ? "bg-primary text-primary-foreground border-transparent"
+                                                : "border-primary text-primary hover:bg-primary hover:text-primary-foreground"
                                             }`}>
                                             {option.text}
                                           </button>
@@ -903,11 +903,11 @@ const AccountOrganizer = () => {
                                   {/* Dropdown */}
                                   {element.type === "Dropdown" && (
                                     <div className="my-2">
-                                      <p className="text-lg">{element.text}</p>
+                                      <p className="text-sm font-medium text-foreground mb-1">{element.text}</p>
                                       <select
                                         value={selectedDropdownValues[`${section.id}_${element.text}`] || ""}
                                         onChange={(event) => handleDropdownValueChange(event, element.text, section.id)}
-                                        className="w-full border border-border rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                                        className="w-full border border-border rounded-lg bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring/50"
                                       >
                                         {element.options.map((option) => (
                                           <option key={option.text} value={option.text}>{option.text}</option>
@@ -919,10 +919,10 @@ const AccountOrganizer = () => {
                                   {/* Date */}
                                   {element.type === "Date" && (
                                     <div className="my-2">
-                                      <p className="text-lg">{element.text}</p>
+                                      <p className="text-sm font-medium text-foreground mb-1">{element.text}</p>
                                       <input
                                         type="date"
-                                        className="w-full border border-border rounded px-3 py-2 text-sm bg-card"
+                                        className="w-full border border-border rounded-lg bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring/50"
                                         value={startDate ? startDate.format("YYYY-MM-DD") : ""}
                                         onChange={(e) => {
                                           handleStartDateChange(e.target.value);
@@ -935,7 +935,7 @@ const AccountOrganizer = () => {
                                   {/* File Upload */}
                                   {element.type === "File Upload" && (
                                     <div className="my-2">
-                                      <p className="text-lg mb-1 mt-2">{element.text}</p>
+                                      <p className="text-sm font-medium text-foreground mb-1">{element.text}</p>
                                       <div title="Unavailable in preview mode">
                                         <input
                                           type="text"
@@ -961,7 +961,7 @@ const AccountOrganizer = () => {
                       Section {activeStep + 1} of {totalSteps}
                     </span>
                     <button type="button" disabled={activeStep === totalSteps - 1} onClick={handleNext}
-                      className="rounded-lg px-4 py-2 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                      className="rounded-lg px-4 py-2 text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
                       Next →
                     </button>
                   </div>

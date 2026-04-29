@@ -8,19 +8,17 @@ import RenameDrawer from "./drawers/RenameDrawer";
 import MoveDrawer from "./drawers/MoveDrawer";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import { Eye, PenTool, Stamp, Lock, FolderOpen as FolderOpenIcon, FolderClosed as FolderClosedIcon, Folder as FolderIcon, Upload, FolderPlus, Download, MoveRight, Trash2, LockOpen, X, ChevronDown, Loader2 } from "lucide-react";
-import { BsThreeDotsVertical } from "react-icons/bs";
+import { Eye, PenTool, Stamp, Lock, FolderOpen as FolderOpenIcon, FolderClosed as FolderClosedIcon, Folder as FolderIcon, Upload, FolderPlus, Download, MoveRight, Trash2, LockOpen, X, ChevronDown, Loader2, MoreVertical, FileText, FileImage, FileType, FileSpreadsheet, File } from "lucide-react";
 import { toast } from "react-toastify";
-import {
-  FaFilePdf,
-  FaFileWord,
-  FaFileExcel,
-  FaFileImage,
-  FaFileAlt,
-} from "react-icons/fa";
-import { AiFillFileUnknown } from "react-icons/ai";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../../components/ui/dropdown-menu";
 
 const DOCS_MANAGMENTS = process.env.REACT_APP_CLIENT_DOCS_MANAGE;
 const DocsFolderTree = () => {
@@ -163,12 +161,6 @@ const DocsFolderTree = () => {
         ...prev,
         [path]: !prev[path],
       }));
-    };
-
-    const handleMenuOpen = (event, folder) => {
-      event.stopPropagation();
-      setMenuAnchorEl(event.currentTarget);
-      setSelectedFolderForMenu(folder);
     };
 
     const handleMenuClose = () => {
@@ -1020,109 +1012,102 @@ const handleBulkTrash = async () => {
     // };
     const getFileIcon = (fileName) => {
       const ext = fileName.split(".").pop().toLowerCase();
-
       switch (ext) {
-        case "pdf":
-          return <FaFilePdf color="#d32f2f" size={18} />;
-        case "jpg":
-        case "jpeg":
-        case "png":
-        case "gif":
-          return <FaFileImage color="#1976d2" size={18} />;
-        case "doc":
-        case "docx":
-          return <FaFileWord color="#1565c0" size={18} />;
-        case "xls":
-        case "xlsx":
-          return <FaFileExcel color="#2e7d32" size={18} />;
-        case "txt":
-        case "md":
-          return <FaFileAlt color="#616161" size={18} />;
-        default:
-          return <AiFillFileUnknown color="#757575" size={18} />;
+        case "pdf": return <FileText size={16} className="text-red-500 shrink-0" />;
+        case "jpg": case "jpeg": case "png": case "gif": return <FileImage size={16} className="text-blue-500 shrink-0" />;
+        case "doc": case "docx": return <FileType size={16} className="text-blue-700 shrink-0" />;
+        case "xls": case "xlsx": return <FileSpreadsheet size={16} className="text-green-600 shrink-0" />;
+        default: return <File size={16} className="text-muted-foreground shrink-0" />;
       }
     };
     const renderTree = (items, level = 0, parentPath = "") => {
-      const getStatusBadge = (meta) => {
-        const badges = [];
-        const signColorMap = { pendingSignature: "bg-amber-50 text-amber-700 border-amber-200", signatureCompleted: "bg-green-50 text-green-700 border-green-200" };
-        const approvalColorMap = { pendingApproval: "bg-amber-50 text-amber-700 border-amber-200", approvalCompleted: "bg-green-50 text-green-700 border-green-200", canceledApproval: "bg-red-50 text-red-700 border-red-200" };
-        const invoiceColorMap = { pendingpayment: "bg-amber-50 text-amber-700 border-amber-200", paymentcompleted: "bg-green-50 text-green-700 border-green-200" };
-        if (SIGN_STATUSES.includes(meta.signStatus)) badges.push(<span key="sign" className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border ${signColorMap[meta.signStatus] || "bg-gray-50 text-gray-600 border-gray-200"}`}>{statusTextMap[meta.signStatus]}</span>);
-        if (APPROVAL_STATUSES.includes(meta.authStatus)) {
-          const cls = approvalColorMap[meta.authStatus] || "bg-gray-50 text-gray-600 border-gray-200";
-          const label = meta.authStatus === "canceledApproval" && meta.cancelReason ? `Canceled: ${meta.cancelReason}` : approvalStatusTextMap[meta.authStatus];
-          badges.push(<span key="approval" title={meta.cancelReason || ""} className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border cursor-default ${cls}`}>{label}</span>);
-        }
-        if (INVOICE_LOCK_STATUSES.includes(meta.lockInvoiceStatus)) badges.push(<span key="invoice" className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border ${invoiceColorMap[meta.lockInvoiceStatus] || "bg-gray-50 text-gray-600 border-gray-200"}`}>{invoiceStatusTextMap[meta.lockInvoiceStatus]}</span>);
-        if (badges.length === 0) return null;
-        return <div className="flex items-center gap-1 ml-1">{badges}</div>;
-      };
-
       return (
-        <>
-          <ul className="list-none" style={{ paddingLeft: level * 16 }}>
-            {items.map((item) => {
-              const fullPath = parentPath ? `${parentPath}/${item.name}` : item.name;
-              const meta = item.meta || {};
-              const getColor = (status) => (status ? "#1976d2" : "#9e9e9e");
-              const handleSafeFileClick = () => {
-                if (meta.readOnly) { alert("This file is locked and cannot be opened."); return; }
-                handleFileClick(fullPath, item.name, meta);
-              };
-              return (
-                <li key={fullPath} className="mb-1">
-                  {item.type === "folder" ? (
-                    <div
-                      className="flex items-center justify-between px-2 py-1.5 rounded-lg cursor-pointer bg-white hover:bg-gray-50 transition-colors"
-                      onClick={() => toggleFolder(fullPath, meta.readOnly)}
-                    >
-                      <div className="flex items-center gap-2 flex-1">
-                        {expandedFolders[fullPath] ? <FolderOpenIcon size={16} className="text-blue-500 shrink-0" /> : <FolderClosedIcon size={16} className="text-gray-500 shrink-0" />}
-                        <span className="text-sm font-medium text-gray-700">{item.name}</span>
-                        {meta.readOnly && <span className="text-[10px] font-semibold text-red-500">(Locked)</span>}
-                      </div>
-                      <button type="button" onClick={(e) => { e.stopPropagation(); handleMenuOpen(e, { ...item, fullPath }); }} className="h-6 w-6 flex items-center justify-center rounded text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
-                        <BsThreeDotsVertical size={13} />
-                      </button>
+        <ul className="list-none" style={{ paddingLeft: level * 16 }}>
+          {items.map((item) => {
+            const fullPath = parentPath ? `${parentPath}/${item.name}` : item.name;
+            const meta = item.meta || {};
+            const isLocked = meta.readOnly === true;
+            const handleSafeFileClick = () => {
+              if (meta.readOnly) { alert("This file is locked and cannot be opened."); return; }
+              handleFileClick(fullPath, item.name, meta);
+            };
+            const menuItems = buildMenuItems({ ...item, fullPath });
+            return (
+              <li key={fullPath} className="mb-1">
+                {item.type === "folder" ? (
+                  <div
+                    className="flex items-center justify-between px-2 py-1.5 rounded-lg cursor-pointer hover:bg-muted/40 transition-colors"
+                    onClick={() => toggleFolder(fullPath, meta.readOnly)}
+                  >
+                    <div className="flex items-center gap-2 flex-1">
+                      {expandedFolders[fullPath] ? <FolderOpenIcon size={16} className="text-primary shrink-0" /> : <FolderClosedIcon size={16} className="text-muted-foreground shrink-0" />}
+                      <span className="text-xs font-medium text-foreground">{item.name}</span>
+                      {meta.readOnly && <span className="text-[10px] font-semibold text-destructive">(Locked)</span>}
                     </div>
-                  ) : (
-                    <div className="flex items-center justify-between pl-8 pr-2 py-1 rounded-lg hover:bg-gray-50 group transition-colors">
-                      <div className="flex items-center gap-2 mr-2">
-                        {getFileIcon(item.name)}
-                        <span
-                          className={`text-sm ${meta.readOnly ? "text-gray-400 cursor-not-allowed" : "text-blue-600 hover:underline cursor-pointer"}`}
-                          onClick={handleSafeFileClick}
-                        >
-                          {item.name}
-                        </span>
-                        {meta.readOnly && <span className="text-[10px] font-semibold text-red-500">(Locked)</span>}
-                      </div>
-                      <div className="flex items-center gap-2 ml-auto">
-                        <span className="text-[11px] font-semibold text-gray-400">{meta.uploadedAt}</span>
-                        {getStatusBadge(meta)}
-                        <div className="flex items-center gap-1">
-                          <Eye size={13} color={getColor(meta.readStatus)} />
-                          <PenTool size={13} color={getColor(meta.signStatus)} />
-                          <Stamp size={13} color={getColor(meta.authStatus)} />
-                          <Lock size={13} color={meta.readOnly ? "#e53935" : "#9e9e9e"} />
-                        </div>
-                        <button type="button" onClick={(e) => handleMenuOpen(e, { ...item, fullPath })} className="h-6 w-6 flex items-center justify-center rounded text-gray-400 hover:text-gray-600 hover:bg-gray-100 opacity-0 group-hover:opacity-100 transition-all">
-                          <BsThreeDotsVertical size={13} />
-                        </button>
-                      </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                        <Button type="button" variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-foreground hover:bg-muted shrink-0">
+                          <MoreVertical size={13} />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-44">
+                        {menuItems.map(({ label, action, disabled: d, danger }, idx) => (
+                          <DropdownMenuItem key={label + idx} disabled={(label !== "Unlock" && isLocked) || d}
+                            onClick={() => { if (action) { setSelectedFolderForMenu({ ...item, fullPath }); action(); } }}
+                            className={danger ? "text-destructive focus:text-destructive" : ""}>
+                            {label}
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between pl-8 pr-2 py-1 rounded-lg hover:bg-muted/40 group transition-colors">
+                    <div className="flex items-center gap-2 flex-1">
+                      {getFileIcon(item.name)}
+                      <span
+                        className={`text-xs ${meta.readOnly ? "text-muted-foreground cursor-not-allowed" : "text-primary hover:underline cursor-pointer"}`}
+                        onClick={handleSafeFileClick}
+                      >
+                        {item.name}
+                      </span>
+                      {meta.readOnly && <span className="text-[10px] font-semibold text-destructive">(Locked)</span>}
                     </div>
-                  )}
-                  {expandedFolders[fullPath] && item.children && item.children.length > 0 && (
-                    <div className="ml-4 mt-0.5 border-l-2 border-dashed border-gray-200 pl-2">
-                      {renderTree(item.children, level + 1, fullPath)}
+                    <div className="flex items-center gap-1.5 ml-auto">
+                      <div className="flex items-center gap-1">
+                        <Eye size={13} className={meta.readStatus ? "text-primary" : "text-muted-foreground"} />
+                        <PenTool size={13} className={meta.signStatus ? "text-primary" : "text-muted-foreground"} />
+                        <Stamp size={13} className={meta.authStatus ? "text-primary" : "text-muted-foreground"} />
+                        <Lock size={13} className={meta.readOnly ? "text-destructive" : "text-muted-foreground"} />
+                      </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button type="button" variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-foreground hover:bg-muted opacity-0 group-hover:opacity-100 shrink-0">
+                            <MoreVertical size={13} />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-44">
+                          {menuItems.map(({ label, action, disabled: d, danger }, idx) => (
+                            <DropdownMenuItem key={label + idx} disabled={(label !== "Unlock" && isLocked) || d}
+                              onClick={() => { if (action) { setSelectedFolderForMenu({ ...item, fullPath }); action(); } }}
+                              className={danger ? "text-destructive focus:text-destructive" : ""}>
+                              {label}
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        </>
+                  </div>
+                )}
+                {expandedFolders[fullPath] && item.children && item.children.length > 0 && (
+                  <div className="ml-4 mt-0.5 border-l-2 border-dashed border-border pl-2">
+                    {renderTree(item.children, level + 1, fullPath)}
+                  </div>
+                )}
+              </li>
+            );
+          })}
+        </ul>
       );
     };
     const formatUploadedAt = (dateValue) => {
@@ -1151,7 +1136,7 @@ const handleBulkTrash = async () => {
     };
     const UploadedInfo = ({ meta }) => {
       if (!meta?.uploadedAt) return null;
-      return <span className="text-[11px] font-semibold text-gray-400">{formatUploadedAt(meta.uploadedAt)}</span>;
+      return <span className="text-[11px] font-semibold text-muted-foreground">{formatUploadedAt(meta.uploadedAt)}</span>;
     };
     const getStatusChip = (meta, isFolder) => {
       if (isFolder) return null;
@@ -1159,13 +1144,14 @@ const handleBulkTrash = async () => {
       const signColorMap = { pendingSignature: "bg-amber-50 text-amber-700 border-amber-200", signatureCompleted: "bg-green-50 text-green-700 border-green-200" };
       const approvalColorMap = { pendingApproval: "bg-amber-50 text-amber-700 border-amber-200", approvalCompleted: "bg-green-50 text-green-700 border-green-200", canceledApproval: "bg-red-50 text-red-700 border-red-200" };
       const invoiceColorMap = { pendingpayment: "bg-amber-50 text-amber-700 border-amber-200", paymentcompleted: "bg-green-50 text-green-700 border-green-200" };
-      if (SIGN_STATUSES.includes(meta.signStatus)) badges.push(<span key="sign" className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border ${signColorMap[meta.signStatus] || "bg-gray-50 text-gray-600 border-gray-200"}`}>{statusTextMap[meta.signStatus]}</span>);
+      const fallback = "bg-muted text-muted-foreground border-border";
+      if (SIGN_STATUSES.includes(meta.signStatus)) badges.push(<span key="sign" className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border ${signColorMap[meta.signStatus] || fallback}`}>{statusTextMap[meta.signStatus]}</span>);
       if (APPROVAL_STATUSES.includes(meta.authStatus)) {
-        const cls = approvalColorMap[meta.authStatus] || "bg-gray-50 text-gray-600 border-gray-200";
+        const cls = approvalColorMap[meta.authStatus] || fallback;
         const label = meta.authStatus === "canceledApproval" && meta.cancelReason ? `Canceled: ${meta.cancelReason}` : approvalStatusTextMap[meta.authStatus];
         badges.push(<span key="approval" title={meta.cancelReason || ""} className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border cursor-default ${cls}`}>{label}</span>);
       }
-      if (INVOICE_LOCK_STATUSES.includes(meta.lockInvoiceStatus)) badges.push(<span key="invoice" className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border ${invoiceColorMap[meta.lockInvoiceStatus] || "bg-gray-50 text-gray-600 border-gray-200"}`}>{invoiceStatusTextMap[meta.lockInvoiceStatus]}</span>);
+      if (INVOICE_LOCK_STATUSES.includes(meta.lockInvoiceStatus)) badges.push(<span key="invoice" className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border ${invoiceColorMap[meta.lockInvoiceStatus] || fallback}`}>{invoiceStatusTextMap[meta.lockInvoiceStatus]}</span>);
       if (badges.length === 0) return null;
       return <div className="flex items-center gap-1">{badges}</div>;
     };
@@ -1189,11 +1175,100 @@ const handleBulkTrash = async () => {
       return null;
     };
 
+    const buildMenuItems = (item) => {
+      const isFolder = item.type === "folder";
+      const isLocked = item?.meta?.readOnly === true;
+      const path = item.path.toLowerCase();
+      let docType = "client";
+      if (path.includes("firm")) docType = "firm";
+      if (path.includes("private")) docType = "private";
+      const PROTECTED_FOLDERS = ["Client Uploaded Documents", "Firm Documents Shared with Client", "Private"];
+      const isProtectedFolder = isFolder && PROTECTED_FOLDERS.includes(item.name);
+      const menuItems = [];
+      if (isFolder) {
+        if (docType === "client") {
+          menuItems.push(
+            { label: "New Folder", action: () => setNewFolderDrawerOpen(true) },
+            { label: "Edit", action: () => SetRenameDrawer(true) },
+            { label: "Move", action: () => setMoveDrawerOpen(true) },
+            { label: "Delete", action: () => trashItem(item), disabled: isProtectedFolder, danger: true },
+            { label: "Download", action: () => handleDownload(item) },
+            { label: "New File", action: () => setFileUploadDrawerOpen(true) },
+            { label: "Upload Folder", action: () => setFolderUploaDrawerOpen(true) },
+            { label: isLocked ? "Unlock" : "Lock", action: () => toggleReadOnly(item) },
+          );
+        } else if (docType === "firm") {
+          menuItems.push(
+            { label: "New Folder", action: () => setNewFolderDrawerOpen(true) },
+            { label: "Edit", action: () => SetRenameDrawer(true) },
+            { label: "Move", action: () => setMoveDrawerOpen(true) },
+            { label: "New File", action: () => setFileUploadDrawerOpen(true) },
+            { label: "Download", action: () => handleDownload(item) },
+            { label: "Upload Folder", action: () => setFolderUploaDrawerOpen(true) },
+            { label: "Delete", action: () => trashItem(item), disabled: isProtectedFolder, danger: true },
+          );
+        } else if (docType === "private") {
+          menuItems.push(
+            { label: "New Folder", action: () => setNewFolderDrawerOpen(true) },
+            { label: "New File", action: () => setFileUploadDrawerOpen(true) },
+            { label: "Move", action: () => setMoveDrawerOpen(true) },
+            { label: "Edit", action: () => SetRenameDrawer(true) },
+            { label: "Delete", action: () => trashItem(item), disabled: isProtectedFolder, danger: true },
+            { label: "Download", action: () => handleDownload(item) },
+          );
+        }
+      } else {
+        if (docType === "client") {
+          menuItems.push(
+            { label: "Edit", action: () => SetRenameDrawer(true) },
+            { label: "Move", action: () => setMoveDrawerOpen(true) },
+            { label: isLocked ? "Unlock" : "Lock", action: () => toggleReadOnly(item) },
+            { label: "Delete", action: () => trashItem(item), danger: true },
+            { label: "Download", action: () => handleDownload(item) },
+          );
+        } else if (docType === "firm") {
+          const currentStatus = item.meta?.signStatus || "sendForSignature";
+          const approvalStatus = item.meta?.authStatus || "sendForApproval";
+          const invoiceStatus = item.meta?.lockInvoiceStatus;
+          const isSignatureDisabled = currentStatus === "pendingSignature" || currentStatus === "signatureCompleted";
+          const isApprovalCompleted = approvalStatus === "approvalCompleted";
+          const isApprovalCanceled = approvalStatus === "canceledApproval";
+          let invoiceLabel = "Lock Invoice";
+          if (invoiceStatus === "pendingpayment") invoiceLabel = "Unlock Invoice";
+          menuItems.push(
+            { label: "Edit", action: () => SetRenameDrawer(true) },
+            { label: "Move", action: () => setMoveDrawerOpen(true) },
+          );
+          if (currentStatus === "pendingSignature") {
+            menuItems.push({ label: "Cancel Signature Request", action: () => cancelSignature(item) });
+          } else {
+            menuItems.push({ label: statusTextMap[currentStatus], action: () => toggleSignStatus(item), disabled: isSignatureDisabled });
+          }
+          if (approvalStatus === "sendForApproval") menuItems.push({ label: "Send For Approval", action: () => toggleApprovalStatus(item) });
+          if (approvalStatus === "pendingApproval") menuItems.push({ label: "Cancel Approval Request", action: () => handleCancelApproval(item) });
+          if (isApprovalCompleted) menuItems.push({ label: "Approved", disabled: true });
+          if (isApprovalCanceled) menuItems.push({ label: "Approval Canceled", disabled: true });
+          menuItems.push({ label: invoiceLabel, action: () => toggleInvoiceLock(item) });
+          menuItems.push({ label: "Delete", action: () => trashItem(item), danger: true });
+          menuItems.push({ label: "Download", action: () => handleDownload(item) });
+        } else if (docType === "private") {
+          menuItems.push(
+            { label: "Edit", action: () => SetRenameDrawer(true) },
+            { label: "Delete", action: () => trashItem(item), danger: true },
+            { label: "Download", action: () => handleDownload(item) },
+            { label: "Move", action: () => setMoveDrawerOpen(true) },
+          );
+        }
+      }
+      return menuItems;
+    };
+
     const renderTableRows = (items, level = 0, parentPath = "") => {
       return items.map((item) => {
         const fullPath = item.path;
         const meta = item.meta || {};
         const isFolder = item.type === "folder";
+        const isLocked = meta.readOnly === true;
         const isSelected = selectedItems.has(fullPath);
         const isPartiallySelected = isFolder ? isFolderPartiallySelected(item) : false;
         const inheritedNewTag = isFolder ? findNewSystemTag(item) : null;
@@ -1201,59 +1276,74 @@ const handleBulkTrash = async () => {
           if (meta.readOnly) { alert("This file is locked and cannot be opened."); return; }
           if (!isFolder) handleFileClick(fullPath, item.name, meta);
         };
+        const menuItems = buildMenuItems({ ...item, fullPath });
         return (
           <React.Fragment key={fullPath}>
-            <tr className={`${level % 2 === 0 ? "bg-gray-50/60" : "bg-white"} hover:bg-blue-50/30 transition-colors`}>
-              {/* Checkbox */}
-              <td className="w-10 px-3 py-2">
-                <input
-                  type="checkbox"
-                  checked={isSelected}
-                  ref={(el) => { if (el) el.indeterminate = isPartiallySelected; }}
-                  onChange={() => isFolder ? handleFolderSelect(item) : handleSelectItem(fullPath)}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-300"
-                />
+            <tr className="hover:bg-muted/30 transition-colors">
+              <td className="px-2 py-1.5 align-middle">
+                <div className="flex items-center justify-center">
+                  <input
+                    type="checkbox"
+                    checked={isSelected}
+                    ref={(el) => { if (el) el.indeterminate = isPartiallySelected; }}
+                    onChange={() => isFolder ? handleFolderSelect(item) : handleSelectItem(fullPath)}
+                    className="h-3.5 w-3.5 rounded border-border cursor-pointer"
+                  />
+                </div>
               </td>
-              {/* Name */}
-              <td className="py-2" style={{ paddingLeft: `${level * 16 + 8}px` }}>
+              <td className="px-2 py-1.5" style={{ paddingLeft: `${level * 16 + 8}px` }}>
                 <div className="flex items-center gap-1.5">
                   {isFolder ? (
                     <>
                       <button type="button" onClick={() => toggleFolder(fullPath, meta.readOnly)} disabled={meta.readOnly} className="shrink-0 disabled:opacity-40">
-                        {expandedFolders[fullPath] ? <FolderOpenIcon size={16} className="text-blue-500" /> : <FolderClosedIcon size={16} className="text-gray-500" />}
+                        {expandedFolders[fullPath] ? <FolderOpenIcon size={16} className="text-primary" /> : <FolderClosedIcon size={16} className="text-muted-foreground" />}
                       </button>
-                      <button type="button" onClick={() => toggleFolder(fullPath, meta.readOnly)} className={`text-sm font-medium ${meta.readOnly ? "text-gray-400" : "text-gray-700 hover:text-gray-900"} flex items-center gap-1`}>
+                      <button type="button" onClick={() => toggleFolder(fullPath, meta.readOnly)} className={`text-xs font-medium flex items-center gap-1 ${meta.readOnly ? "text-muted-foreground" : "text-foreground hover:text-primary"}`}>
                         {item.name}
-                        {inheritedNewTag && <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-bold text-white" style={{ backgroundColor: inheritedNewTag.tagColour || "#1976d2" }}>{inheritedNewTag.tagName}</span>}
-                        {meta.readOnly && <span className="text-[10px] font-semibold text-red-500">(Locked)</span>}
+                        {inheritedNewTag && <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-bold text-white" style={{ backgroundColor: inheritedNewTag.tagColour || "hsl(var(--primary))" }}>{inheritedNewTag.tagName}</span>}
+                        {meta.readOnly && <span className="text-[10px] font-semibold text-destructive">(Locked)</span>}
                       </button>
                     </>
                   ) : (
                     <>
-                      <span className="shrink-0">{getFileIcon(item.name)}</span>
+                      {getFileIcon(item.name)}
                       <span
-                        className={`text-sm ${meta.readOnly ? "text-gray-400 cursor-not-allowed" : "text-blue-600 hover:underline cursor-pointer"} flex items-center gap-1 flex-wrap`}
+                        className={`text-xs flex items-center gap-1 flex-wrap ${meta.readOnly ? "text-muted-foreground cursor-not-allowed" : "text-primary hover:underline cursor-pointer"}`}
                         onClick={handleSafeFileClick}
                       >
                         {item.name}
-                        {meta.readOnly && <span className="text-[10px] font-semibold text-red-500">(Locked)</span>}
-                        {meta.tags?.map((tag, idx) => <span key={idx} className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-bold text-white ml-1" style={{ backgroundColor: tag.tagColour || "#9e9e9e" }}>{tag.tagName}</span>)}
+                        {meta.readOnly && <span className="text-[10px] font-semibold text-destructive">(Locked)</span>}
+                        {meta.tags?.map((tag, idx) => <span key={idx} className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-bold text-white ml-1" style={{ backgroundColor: tag.tagColour || "hsl(var(--muted-foreground))" }}>{tag.tagName}</span>)}
                       </span>
                     </>
                   )}
                 </div>
               </td>
-              {/* Status */}
-              <td className="py-2 px-2">{getStatusChip(meta, isFolder)}</td>
-              {/* Uploaded */}
-              <td className="py-2 px-2"><UploadedInfo meta={meta} /></td>
-              {/* User */}
-              <td className="py-2 px-2"><span className="text-[11px] font-semibold text-gray-500">{meta.uploadedBy}</span></td>
-              {/* Actions */}
-              <td className="py-2 px-2 text-right">
-                <button type="button" onClick={(e) => handleMenuOpen(e, { ...item, fullPath })} className="h-6 w-6 flex items-center justify-center rounded text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors ml-auto">
-                  <BsThreeDotsVertical size={13} />
-                </button>
+              <td className="px-2 py-1.5">{getStatusChip(meta, isFolder)}</td>
+              <td className="px-2 py-1.5"><UploadedInfo meta={meta} /></td>
+              <td className="px-2 py-1.5 text-xs text-muted-foreground">{meta.uploadedBy}</td>
+              <td className="px-2 py-1.5">
+                <div className="flex items-center justify-end">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button type="button" variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted">
+                        <MoreVertical className="h-3.5 w-3.5" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-44">
+                      {menuItems.map(({ label, action, disabled: d, danger }, idx) => (
+                        <DropdownMenuItem
+                          key={label + idx}
+                          disabled={(label !== "Unlock" && isLocked) || d}
+                          onClick={() => { if (action) { setSelectedFolderForMenu({ ...item, fullPath }); action(); } }}
+                          className={danger ? "text-destructive focus:text-destructive" : ""}
+                        >
+                          {label}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               </td>
             </tr>
             {isFolder && expandedFolders[fullPath] && item.children && item.children.length > 0 &&
@@ -1295,14 +1385,14 @@ const handleBulkTrash = async () => {
 
           {/* Bulk operations toolbar */}
           {selectedItems.size > 0 && (
-            <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 mb-4 rounded-xl bg-blue-50 border border-blue-200">
-              <span className="text-sm font-semibold text-blue-700">{selectedItems.size} item(s) selected</span>
+            <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 mb-4 rounded-xl bg-primary/5 border border-border">
+              <span className="text-sm font-semibold text-primary">{selectedItems.size} item(s) selected</span>
               <div className="flex flex-wrap gap-2">
-                <Button size="sm" variant="outline" disabled={bulkOperationLoading} onClick={() => setBulkMoveDrawerOpen(true)} className="gap-1.5 border-blue-200 text-blue-700 hover:bg-blue-100"><MoveRight size={13} /> Move</Button>
-                <Button size="sm" variant="outline" disabled={bulkOperationLoading} onClick={() => setBulkLockDialogOpen(true)} className="gap-1.5 border-blue-200 text-blue-700 hover:bg-blue-100"><Lock size={13} /> Lock/Unlock</Button>
+                <Button size="sm" variant="outline" disabled={bulkOperationLoading} onClick={() => setBulkMoveDrawerOpen(true)} className="gap-1.5"><MoveRight size={13} /> Move</Button>
+                <Button size="sm" variant="outline" disabled={bulkOperationLoading} onClick={() => setBulkLockDialogOpen(true)} className="gap-1.5"><Lock size={13} /> Lock/Unlock</Button>
                 <Button size="sm" variant="destructive" disabled={bulkOperationLoading} onClick={handleBulkTrash} className="gap-1.5"><Trash2 size={13} /> Delete</Button>
-                <Button size="sm" variant="outline" disabled={bulkOperationLoading} onClick={handleBulkDownload} className="gap-1.5 border-blue-200 text-blue-700 hover:bg-blue-100"><Download size={13} /> Download</Button>
-                <Button size="sm" variant="ghost" disabled={bulkOperationLoading} onClick={() => setSelectedItems(new Set())} className="gap-1.5 text-gray-500">Clear</Button>
+                <Button size="sm" variant="outline" disabled={bulkOperationLoading} onClick={handleBulkDownload} className="gap-1.5"><Download size={13} /> Download</Button>
+                <Button size="sm" variant="ghost" disabled={bulkOperationLoading} onClick={() => setSelectedItems(new Set())} className="gap-1.5 text-muted-foreground">Clear</Button>
               </div>
             </div>
           )}
@@ -1373,61 +1463,69 @@ const handleBulkTrash = async () => {
         </div>
 
         {/* Folder Explorer */}
-        <div className="bg-white rounded-2xl border border-gray-100 mt-4 overflow-hidden shadow-sm">
-          <div className="px-5 py-3.5 border-b border-gray-100 flex items-center gap-2">
-            <FolderIcon size={14} className="text-gray-400" />
-            <h3 className="text-sm font-semibold text-gray-800">Folder Explorer</h3>
+        <div className="rounded-xl border border-border bg-background mt-4 overflow-hidden shadow-sm">
+          <div className="px-5 py-3.5 border-b border-border flex items-center gap-2">
+            <FolderIcon size={14} className="text-muted-foreground" />
+            <h3 className="text-sm font-semibold text-foreground">Folder Explorer</h3>
           </div>
           {folderTree && folderTree.length > 0 ? (
             <>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="bg-gray-50 border-b border-gray-200">
-                      <th className="w-10 px-3 py-2">
+              <table className="w-full table-fixed text-sm">
+                <colgroup>
+                  <col className="w-[4%]" />
+                  <col className="w-[38%]" />
+                  <col className="w-[22%]" />
+                  <col className="w-[12%]" />
+                  <col className="w-[14%]" />
+                  <col className="w-[10%]" />
+                </colgroup>
+                <thead className="bg-muted/40">
+                  <tr>
+                    <th className="px-2 py-2.5 align-middle">
+                      <div className="flex items-center justify-center">
                         <input
                           type="checkbox"
                           checked={selectAll}
                           ref={(el) => { if (el) el.indeterminate = selectedItems.size > 0 && !selectAll; }}
                           onChange={handleSelectAll}
-                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-300"
+                          className="h-3.5 w-3.5 rounded border-border cursor-pointer"
                         />
-                      </th>
-                      <th className="py-2 px-2 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Name</th>
-                      <th className="py-2 px-2 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Status</th>
-                      <th className="py-2 px-2 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Uploaded</th>
-                      <th className="py-2 px-2 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">User</th>
-                      <th className="py-2 px-2 text-[11px] font-semibold text-gray-500 uppercase tracking-wide text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>{renderTableRows(folderTree)}</tbody>
-                </table>
-              </div>
+                      </div>
+                    </th>
+                    <th className="text-left px-2 py-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Name</th>
+                    <th className="text-left px-2 py-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Status</th>
+                    <th className="text-left px-2 py-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Uploaded</th>
+                    <th className="text-left px-2 py-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">User</th>
+                    <th className="px-2 py-2.5" />
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">{renderTableRows(folderTree)}</tbody>
+              </table>
               {selectedItems.size > 0 && (
-                <div className="px-4 py-2 bg-blue-50 border-t border-blue-100">
-                  <span className="text-xs font-medium text-blue-700">{selectedItems.size} item(s) selected</span>
+                <div className="px-4 py-2 bg-primary/5 border-t border-border">
+                  <span className="text-xs font-medium text-primary">{selectedItems.size} item(s) selected</span>
                 </div>
               )}
             </>
           ) : (
-            <p className="p-6 text-center text-sm text-gray-400">Loading folder data...</p>
+            <p className="p-6 text-center text-sm text-muted-foreground">Loading folder data...</p>
           )}
         </div>
         {/* Bulk Lock Dialog */}
         {bulkLockDialogOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/40" onClick={() => setBulkLockDialogOpen(false)} />
-            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm">
-              <div className="px-5 py-4 border-b border-gray-100">
-                <h2 className="text-sm font-semibold text-gray-800">Lock/Unlock Selected Items</h2>
+            <div className="relative bg-card rounded-xl border border-border shadow-2xl w-full max-w-sm">
+              <div className="px-5 py-4 border-b border-border">
+                <h2 className="text-sm font-semibold text-foreground">Lock/Unlock Selected Items</h2>
               </div>
               <div className="px-5 py-4">
-                <p className="text-sm text-gray-600">Do you want to lock or unlock the {selectedItems.size} selected item(s)?</p>
+                <p className="text-sm text-muted-foreground">Do you want to lock or unlock the {selectedItems.size} selected item(s)?</p>
               </div>
-              <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100">
-                <button type="button" onClick={() => setBulkLockDialogOpen(false)} className="rounded-lg px-4 py-2 text-sm font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">Cancel</button>
-                <button type="button" disabled={bulkOperationLoading} onClick={() => handleBulkLock("unlock")} className="rounded-lg px-4 py-2 text-sm font-medium text-blue-600 border border-blue-200 hover:bg-blue-50 disabled:opacity-50 transition-colors">Unlock</button>
-                <button type="button" disabled={bulkOperationLoading} onClick={() => handleBulkLock("lock")} className="rounded-lg px-4 py-2 text-sm font-medium text-white bg-amber-500 hover:bg-amber-600 disabled:opacity-50 transition-colors">Lock</button>
+              <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-border">
+                <Button type="button" variant="outline" size="sm" onClick={() => setBulkLockDialogOpen(false)}>Cancel</Button>
+                <Button type="button" variant="outline" size="sm" disabled={bulkOperationLoading} onClick={() => handleBulkLock("unlock")}>Unlock</Button>
+                <Button type="button" size="sm" disabled={bulkOperationLoading} onClick={() => handleBulkLock("lock")}>Lock</Button>
               </div>
             </div>
           </div>
@@ -1437,12 +1535,12 @@ const handleBulkTrash = async () => {
         {openDialog && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/40" onClick={() => setOpenDialog(false)} />
-            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-6xl flex flex-col max-h-[90vh]">
-              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0">
-                <h2 className="text-sm font-semibold text-gray-800">{selectedFolderForMenu?.name || "Document"}</h2>
-                <button type="button" onClick={() => setOpenDialog(false)} className="h-7 w-7 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+            <div className="relative bg-card rounded-xl border border-border shadow-2xl w-full max-w-6xl flex flex-col max-h-[90vh]">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
+                <h2 className="text-sm font-semibold text-foreground">{selectedFolderForMenu?.name || "Document"}</h2>
+                <Button type="button" variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground" onClick={() => setOpenDialog(false)}>
                   <X size={15} />
-                </button>
+                </Button>
               </div>
               <div className="flex-1 overflow-auto p-4">
                 {token && showBuilderFor && (
@@ -1457,186 +1555,81 @@ const handleBulkTrash = async () => {
         {openApprovalDialog && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/40" onClick={handleCloseDialog} />
-            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md flex flex-col">
-              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-                <h2 className="text-sm font-semibold text-gray-800">Request Approval</h2>
-                <button type="button" onClick={handleCloseDialog} className="h-7 w-7 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"><X size={15} /></button>
+            <div className="relative bg-card rounded-xl border border-border shadow-2xl w-full max-w-md flex flex-col">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+                <h2 className="text-sm font-semibold text-foreground">Request Approval</h2>
+                <Button type="button" variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground" onClick={handleCloseDialog}><X size={15} /></Button>
               </div>
               <div className="px-5 py-4">
-                <label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-1.5">Description / Note</label>
-                <textarea rows={4} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Type a short description or note..." className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 placeholder:text-gray-400 resize-none transition-colors" />
+                <label className="block text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">Description / Note</label>
+                <textarea rows={4} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Type a short description or note..." className="w-full rounded-lg border border-input bg-muted/50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground resize-none transition-colors" />
               </div>
-              <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100">
-                <button type="button" onClick={handleCloseDialog} className="rounded-lg px-4 py-2 text-sm font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">Cancel</button>
-                <button type="button" onClick={handleRequestApproval} disabled={!description.trim() || sending} className="rounded-lg px-4 py-2 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] disabled:opacity-50 transition-colors">Send</button>
+              <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-border">
+                <Button type="button" variant="outline" size="sm" onClick={handleCloseDialog}>Cancel</Button>
+                <Button type="button" size="sm" onClick={handleRequestApproval} disabled={!description.trim() || sending}>Send</Button>
               </div>
             </div>
           </div>
         )}
-        {/* Context Menu */}
-        {Boolean(menuAnchorEl) && (() => {
-          if (!selectedFolderForMenu) return null;
-          const item = selectedFolderForMenu;
-          const isFolder = item.type === "folder";
-          const isLocked = item?.meta?.readOnly === true;
-          const path = item.path.toLowerCase();
-          let docType = "client";
-          if (path.includes("firm")) docType = "firm";
-          if (path.includes("private")) docType = "private";
-          const PROTECTED_FOLDERS = ["Client Uploaded Documents", "Firm Documents Shared with Client", "Private"];
-          const isProtectedFolder = isFolder && PROTECTED_FOLDERS.includes(item.name);
-          const menuItems = [];
-          if (isFolder) {
-            if (docType === "client") {
-              menuItems.push(
-                { label: "New Folder", action: () => setNewFolderDrawerOpen(true) },
-                { label: "Edit", action: () => SetRenameDrawer(true) },
-                { label: "Move", action: () => setMoveDrawerOpen(true) },
-                { label: "Delete", action: () => trashItem(item), disabled: isProtectedFolder, danger: true },
-                { label: "Download", action: () => handleDownload(item) },
-                { label: "New File", action: () => setFileUploadDrawerOpen(true) },
-                { label: "Upload Folder", action: () => setFolderUploaDrawerOpen(true) },
-                { label: isLocked ? "Unlock" : "Lock", action: () => toggleReadOnly(item) },
-              );
-            } else if (docType === "firm") {
-              menuItems.push(
-                { label: "New Folder", action: () => setNewFolderDrawerOpen(true) },
-                { label: "Edit", action: () => SetRenameDrawer(true) },
-                { label: "Move", action: () => setMoveDrawerOpen(true) },
-                { label: "New File", action: () => setFileUploadDrawerOpen(true) },
-                { label: "Download", action: () => handleDownload(item) },
-                { label: "Upload Folder", action: () => setFolderUploaDrawerOpen(true) },
-                { label: "Delete", action: () => trashItem(item), disabled: isProtectedFolder, danger: true },
-              );
-            } else if (docType === "private") {
-              menuItems.push(
-                { label: "New Folder", action: () => setNewFolderDrawerOpen(true) },
-                { label: "New File", action: () => setFileUploadDrawerOpen(true) },
-                { label: "Move", action: () => setMoveDrawerOpen(true) },
-                { label: "Edit", action: () => SetRenameDrawer(true) },
-                { label: "Delete", action: () => trashItem(item), disabled: isProtectedFolder, danger: true },
-                { label: "Download", action: () => handleDownload(item) },
-              );
-            }
-          } else {
-            if (docType === "client") {
-              menuItems.push(
-                { label: "Edit", action: () => SetRenameDrawer(true) },
-                { label: "Move", action: () => setMoveDrawerOpen(true) },
-                { label: isLocked ? "Unlock" : "Lock", action: () => toggleReadOnly(item) },
-                { label: "Delete", action: () => trashItem(item), danger: true },
-                { label: "Download", action: () => handleDownload(item) },
-              );
-            } else if (docType === "firm") {
-              const currentStatus = item.meta?.signStatus || "sendForSignature";
-              const approvalStatus = item.meta?.authStatus || "sendForApproval";
-              const invoiceStatus = item.meta?.lockInvoiceStatus;
-              const isSignatureDisabled = currentStatus === "pendingSignature" || currentStatus === "signatureCompleted";
-              const isApprovalCompleted = approvalStatus === "approvalCompleted";
-              const isApprovalCanceled = approvalStatus === "canceledApproval";
-              let invoiceLabel = "Lock Invoice";
-              if (invoiceStatus === "pendingpayment") invoiceLabel = "Unlock Invoice";
-              menuItems.push(
-                { label: "Edit", action: () => SetRenameDrawer(true) },
-                { label: "Move", action: () => setMoveDrawerOpen(true) },
-              );
-              if (currentStatus === "pendingSignature") {
-                menuItems.push({ label: "Cancel Signature Request", action: () => cancelSignature(item) });
-              } else {
-                menuItems.push({ label: statusTextMap[currentStatus], action: () => toggleSignStatus(item), disabled: isSignatureDisabled });
-              }
-              if (approvalStatus === "sendForApproval") menuItems.push({ label: "Send For Approval", action: () => toggleApprovalStatus(item) });
-              if (approvalStatus === "pendingApproval") menuItems.push({ label: "Cancel Approval Request", action: () => handleCancelApproval(item) });
-              if (isApprovalCompleted) menuItems.push({ label: "Approved", disabled: true });
-              if (isApprovalCanceled) menuItems.push({ label: "Approval Canceled", disabled: true });
-              menuItems.push({ label: invoiceLabel, action: () => toggleInvoiceLock(item) });
-              menuItems.push({ label: "Delete", action: () => trashItem(item), danger: true });
-              menuItems.push({ label: "Download", action: () => handleDownload(item) });
-            } else if (docType === "private") {
-              menuItems.push(
-                { label: "Edit", action: () => SetRenameDrawer(true) },
-                { label: "Delete", action: () => trashItem(item), danger: true },
-                { label: "Download", action: () => handleDownload(item) },
-                { label: "Move", action: () => setMoveDrawerOpen(true) },
-              );
-            }
-          }
-          return (
-            <>
-              <div className="fixed inset-0 z-30" onClick={handleMenuClose} />
-              <div
-                className="fixed z-40 bg-white border border-gray-200 rounded-xl shadow-xl w-52 py-1 overflow-hidden"
-                style={{ top: menuAnchorEl?.getBoundingClientRect?.()?.bottom ?? 0, left: menuAnchorEl?.getBoundingClientRect?.()?.left ?? 0 }}
-              >
-                {menuItems.map(({ label, action, disabled: d, danger }) => (
-                  <button
-                    key={label}
-                    type="button"
-                    disabled={(label !== "Unlock" && isLocked) || d}
-                    onClick={() => { if (action) action(); handleMenuClose(); }}
-                    className={`w-full text-left px-4 py-2 text-sm ${danger ? "text-red-600 hover:bg-red-50" : "text-gray-700 hover:bg-gray-50"} disabled:opacity-40 disabled:cursor-not-allowed`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            </>
-          );
-        })()}
         {/* Invoice Lock Dialog */}
         {invoiceDialogOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/40" onClick={() => setInvoiceDialogOpen(false)} />
-            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl flex flex-col max-h-[85vh]">
-              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0">
-                <h2 className="text-sm font-semibold text-gray-800">Select Invoices To Lock</h2>
-                <button type="button" onClick={() => setInvoiceDialogOpen(false)} className="h-7 w-7 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"><X size={15} /></button>
+            <div className="relative bg-card rounded-xl border border-border shadow-2xl w-full max-w-3xl flex flex-col max-h-[85vh]">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
+                <h2 className="text-sm font-semibold text-foreground">Select Invoices To Lock</h2>
+                <Button type="button" variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground" onClick={() => setInvoiceDialogOpen(false)}><X size={15} /></Button>
               </div>
               <div className="flex-1 overflow-auto">
                 {invoiceList.length === 0 ? (
-                  <p className="p-6 text-center text-sm text-gray-400">No invoices found</p>
+                  <p className="p-6 text-center text-sm text-muted-foreground">No invoices found</p>
                 ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
-                      <thead>
-                        <tr className="bg-gray-50 border-b border-gray-200">
-                          <th className="py-2 px-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Select</th>
-                          <th className="py-2 px-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Invoice #</th>
-                          <th className="py-2 px-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Description</th>
-                          <th className="py-2 px-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Created At</th>
-                          <th className="py-2 px-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Amount</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {invoiceList.map((inv) => {
-                          const id = inv._id;
-                          const checked = selectedInvoices.includes(id);
-                          return (
-                            <tr
-                              key={id}
-                              className={`border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors ${checked ? "bg-blue-50" : ""}`}
-                              onClick={() => setSelectedInvoices((prev) => {
-                                const updated = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
-                                console.log("Selected invoices:", updated);
-                                return updated;
-                              })}
-                            >
-                              <td className="py-2 px-3"><input type="checkbox" checked={checked} readOnly className="rounded border-gray-300 text-blue-600" /></td>
-                              <td className="py-2 px-3 text-sm text-gray-700">{inv.invoicenumber}</td>
-                              <td className="py-2 px-3 text-sm text-gray-600">{inv.description || "—"}</td>
-                              <td className="py-2 px-3 text-sm text-gray-600">{new Date(inv.createdAt).toLocaleDateString()}</td>
-                              <td className="py-2 px-3 text-sm text-gray-700">₹{inv.summary?.total}</td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
+                  <table className="w-full table-fixed text-sm">
+                    <colgroup>
+                      <col className="w-[6%]" />
+                      <col className="w-[20%]" />
+                      <col className="w-[34%]" />
+                      <col className="w-[20%]" />
+                      <col className="w-[20%]" />
+                    </colgroup>
+                    <thead className="bg-muted/40">
+                      <tr>
+                        <th className="px-2 py-2.5 align-middle" />
+                        <th className="text-left px-2 py-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Invoice #</th>
+                        <th className="text-left px-2 py-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Description</th>
+                        <th className="text-left px-2 py-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Created At</th>
+                        <th className="text-left px-2 py-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border">
+                      {invoiceList.map((inv) => {
+                        const id = inv._id;
+                        const checked = selectedInvoices.includes(id);
+                        return (
+                          <tr
+                            key={id}
+                            className={`cursor-pointer hover:bg-muted/30 transition-colors ${checked ? "bg-primary/5" : ""}`}
+                            onClick={() => setSelectedInvoices((prev) => {
+                              const updated = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
+                              console.log("Selected invoices:", updated);
+                              return updated;
+                            })}
+                          >
+                            <td className="px-2 py-1.5 align-middle"><div className="flex items-center justify-center"><input type="checkbox" checked={checked} readOnly className="h-3.5 w-3.5 rounded border-border cursor-pointer" /></div></td>
+                            <td className="px-2 py-1.5 text-xs text-foreground">{inv.invoicenumber}</td>
+                            <td className="px-2 py-1.5 text-xs text-muted-foreground truncate">{inv.description || "—"}</td>
+                            <td className="px-2 py-1.5 text-xs text-muted-foreground">{new Date(inv.createdAt).toLocaleDateString()}</td>
+                            <td className="px-2 py-1.5 text-xs text-foreground">₹{inv.summary?.total}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
                 )}
               </div>
-              <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100 shrink-0">
-                <button type="button" onClick={() => setInvoiceDialogOpen(false)} className="rounded-lg px-4 py-2 text-sm font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">Cancel</button>
-                <button type="button" onClick={handleSubmit} className="rounded-lg px-4 py-2 text-sm font-medium text-white bg-[var(--color-save-btn)] hover:bg-[var(--color-save-hover-btn)] transition-colors">Lock Invoice</button>
+              <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-border shrink-0">
+                <Button type="button" variant="outline" size="sm" onClick={() => setInvoiceDialogOpen(false)}>Cancel</Button>
+                <Button type="button" size="sm" onClick={handleSubmit}>Lock Invoice</Button>
               </div>
             </div>
           </div>
@@ -1647,18 +1640,18 @@ const handleBulkTrash = async () => {
   return (
     <div className="p-4 md:p-6 space-y-6">
       {/* Apply Template Card */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+      <div className="rounded-xl border border-border bg-card shadow-sm p-5">
         <div className="mb-4">
-          <h2 className="text-base font-semibold text-gray-900 tracking-tight">Apply Folder Template</h2>
-          <p className="text-xs text-gray-400 mt-0.5">Assign a folder template structure to this account</p>
+          <h2 className="text-base font-semibold text-foreground tracking-tight">Apply Folder Template</h2>
+          <p className="text-xs text-muted-foreground mt-0.5">Assign a folder template structure to this account</p>
         </div>
         <div className="flex flex-col sm:flex-row items-end gap-3 max-w-lg">
           <div className="flex-1">
-            <label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-1.5">Select Template</label>
+            <label className="block text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">Select Template</label>
             <select
               value={selectedTemplate}
               onChange={(e) => setSelectedTemplate(e.target.value)}
-              className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 transition-colors"
+              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-colors"
             >
               <option value="">Choose a template...</option>
               {templates.map((template) => (
@@ -1683,78 +1676,3 @@ const handleBulkTrash = async () => {
 };
 
 export default DocsFolderTree;
-
-// else if (docType === "firm") {
-//   const currentStatus =
-//     item.meta?.signStatus || "sendForSignature";
-//   const currentApprovalStatus =
-//     item.meta?.authStatus || "sendForApproval";
-
-//   const isSignatureDisabled =
-//     currentStatus === "pendingSignature" ||
-//     currentStatus === "signatureCompleted";
-
-//   const isApprovalDisabled =
-//     currentApprovalStatus === "pendingApproval" ||
-//     currentApprovalStatus === "cancledApproval" ||
-//     currentApprovalStatus === "approvalCompleted";
-
-//   const invoiceStatus = item.meta?.lockInvoiceStatus; // pendingPayment / paymentCompleted / null
-//   console.log("invoiceStatus", invoiceStatus);
-//   let invoiceLabel = "Lock with Invoice";
-//   // If invoice is pending payment → show UNLOCK (enabled)
-//   if (invoiceStatus === "pendingpayment") {
-//     invoiceLabel = "Unlock Invoice";
-//   }
-
-//   // If invoice is completed or not locked → show LOCK (enabled)
-//   if (invoiceStatus === "paymentcompleted" || !invoiceStatus) {
-//     invoiceLabel = "Lock Invoice";
-//   }
-//   menuItems.push(
-//     {
-//       icon: <DriveFileMoveIcon />,
-//       label: "Edit",
-//       action: () => SetRenameDrawer(true),
-//     },
-//     {
-//       icon: <DriveFileMoveIcon />,
-//       label: "Move",
-//       action: () => setMoveDrawerOpen(true),
-//     },
-
-//     {
-//       icon: <PenTool size={16} />,
-//       label: statusTextMap[currentStatus],
-//       action: () => toggleSignStatus(item),
-//       custom: true, // flag to handle differently
-//       currentStatus, // pass for icon color
-//       disabled: isSignatureDisabled,
-//     },
-//     {
-//       icon: <Stamp size={16} />,
-//       label: approvalStatusTextMap[currentApprovalStatus],
-//       action: () => toggleApprovalStatus(item),
-//       type: "approval",
-//       currentApprovalStatus,
-//       disabled: isApprovalDisabled,
-//     },
-//     {
-//       icon:
-//         invoiceStatus === "pendingpayment" ? (
-//           <LockOpenIcon />
-//         ) : (
-//           <LockIcon />
-//         ),
-//       label: invoiceLabel,
-//       action: () => toggleInvoiceLock(item),
-//       disabled: false, // Unlock should NOT be disabled when pending
-//     },
-
-//     {
-//       icon: <DeleteIcon />,
-//       label: "Delete",
-//       action: () => deleteItem(item),
-//     }
-//   );
-// }
