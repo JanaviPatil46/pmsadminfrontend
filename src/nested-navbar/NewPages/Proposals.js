@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { BsThreeDotsVertical } from "react-icons/bs";
-import { Link, useParams } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import ProposalPreviewDialog from "./ProposalDialog";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { Button } from "../../components/ui/button";
+import { Plus, Pencil, Trash2, Download } from "lucide-react";
 
 const AccountProposalTable = () => {
   const { data } = useParams();
@@ -14,8 +14,6 @@ const AccountProposalTable = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const [openDialog, setOpenDialog] = useState(false);
-  // const [selectedProposal, setSelectedProposal] = useState(null);
-  const [anchorEl, setAnchorEl] = useState(null);
   const [selectedProposal, setSelectedProposal] = useState(null);
 
   const handleProposalNameClick = (proposal) => {
@@ -282,41 +280,21 @@ const handleDownload = async (proposal) => {
     );
   };
 
-  const handleMenuOpen = (event, proposal) => {
-    setAnchorEl(event.currentTarget);
-    setSelectedProposal(proposal);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    setSelectedProposal(null);
-  };
-
-  const handleDelete = async () => {
-    if (!selectedProposal) return;
-    if (!window.confirm("Are you sure you want to delete this proposal?")) {
-      handleMenuClose();
-      return;
-    }
+  const handleDelete = async (proposal) => {
+    if (!proposal) return;
+    if (!window.confirm("Are you sure you want to delete this proposal?")) return;
 
     try {
       const response = await fetch(
-        `https://www.snptaxes.com/account/proposals/${selectedProposal._id}`,
+        `https://www.snptaxes.com/account/proposals/${proposal._id}`,
         { method: "DELETE" }
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to delete proposal");
-      }
+      if (!response.ok) throw new Error("Failed to delete proposal");
       toast.success("Proposal Deleted Successfully");
-      // ✅ Remove from UI list instantly
-      setProposals((prev) =>
-        prev.filter((p) => p._id !== selectedProposal._id)
-      );
+      setProposals((prev) => prev.filter((p) => p._id !== proposal._id));
     } catch (err) {
       console.error(err);
-    } finally {
-      handleMenuClose();
     }
   };
 
@@ -341,66 +319,76 @@ const handleDownload = async (proposal) => {
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-semibold text-foreground">Proposals List</h1>
-        <button type="button" onClick={handleCreateNew}
-          className="px-4 py-2 rounded text-sm font-medium text-white bg-primary hover:bg-primary/90">
+        <Button type="button" size="sm" onClick={handleCreateNew}>
+          <Plus className="h-3.5 w-3.5 mr-1.5" />
           Create New Proposal
-        </button>
+        </Button>
       </div>
 
-      <div className="overflow-x-auto rounded-lg border border-border shadow-sm bg-white">
-        <table className="w-full text-sm min-w-[650px]">
-          <thead>
-            <tr className="border-b border-border">
-              <th className="text-left px-4 py-3 text-xs font-semibold tracking-wide uppercase text-muted-foreground">Proposal Name</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold tracking-wide uppercase text-muted-foreground">Status</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold tracking-wide uppercase text-muted-foreground">Actions</th>
+      <div className="rounded-xl border border-border bg-background shadow-sm overflow-hidden">
+        <table className="w-full table-fixed text-sm">
+          <colgroup>
+            <col className="w-[55%]" />
+            <col className="w-[20%]" />
+            <col className="w-[25%]" />
+          </colgroup>
+          <thead className="bg-muted/40">
+            <tr>
+              <th className="text-left px-2 py-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Proposal Name</th>
+              <th className="text-left px-2 py-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Status</th>
+              <th className="px-2 py-2.5" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {proposals.map((proposal, idx) => (
-              <tr key={proposal._id} className="bg-white transition-colors hover:bg-muted/30">
-                <td className="px-4 py-3">
+            {proposals.map((proposal) => (
+              <tr key={proposal._id} className="hover:bg-muted/30 transition-colors">
+                <td className="px-2 py-1.5 truncate">
                   <span
-                    className="text-sm font-medium text-primary cursor-pointer hover:underline"
+                    className="text-xs font-medium text-primary hover:text-primary/80 cursor-pointer"
                     onClick={() => handleOpenDialog(proposal)}
                   >
                     {proposal.general.proposalName}
                   </span>
                 </td>
-                <td className="px-4 py-3">
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                    proposal.status === "Signed" ? "bg-success/10 text-success border border-success/20" : "bg-muted text-muted-foreground"
+                <td className="px-2 py-1.5">
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium ${
+                    proposal.status === "Signed"
+                      ? "bg-green-500/10 text-green-600 border border-green-500/20"
+                      : "bg-muted text-muted-foreground"
                   }`}>
                     {proposal.status}
                   </span>
                 </td>
-                <td className="px-4 py-3 relative">
-                  <button type="button" onClick={(e) => handleMenuOpen(e, proposal)}
-                    className="p-1 text-muted-foreground hover:text-foreground">
-                    <BsThreeDotsVertical />
-                  </button>
-                  {Boolean(anchorEl) && selectedProposal?._id === proposal._id && (
-                    <>
-                      <div className="fixed inset-0 z-30" onClick={handleMenuClose} />
-                      <div className="absolute right-0 z-40 bg-card border border-border rounded-lg shadow-lg py-1 min-w-[120px]">
-                        {selectedProposal?.status === "Signed" ? (
-                          <button type="button" className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-muted"
-                            onClick={() => { handleDownload(selectedProposal); handleMenuClose(); }}>
-                            Download
-                          </button>
-                        ) : (
-                          <button type="button" className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-muted"
-                            onClick={() => { handleTemplateClick(selectedProposal); handleMenuClose(); }}>
-                            Edit
-                          </button>
-                        )}
-                        <button type="button" className="w-full text-left px-3 py-2 text-sm text-destructive hover:bg-destructive/10"
-                          onClick={handleDelete}>
-                          Delete
-                        </button>
-                      </div>
-                    </>
-                  )}
+                <td className="px-2 py-1.5">
+                  <div className="flex items-center justify-end gap-0.5">
+                    {proposal.status === "Signed" ? (
+                      <Button
+                        type="button" variant="ghost" size="icon"
+                        className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted"
+                        title="Download"
+                        onClick={() => handleDownload(proposal)}
+                      >
+                        <Download className="h-3.5 w-3.5" />
+                      </Button>
+                    ) : (
+                      <Button
+                        type="button" variant="ghost" size="icon"
+                        className="h-7 w-7 text-muted-foreground hover:text-primary hover:bg-primary/10"
+                        title="Edit"
+                        onClick={() => handleTemplateClick(proposal)}
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
+                    <Button
+                      type="button" variant="ghost" size="icon"
+                      className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                      title="Delete"
+                      onClick={() => handleDelete(proposal)}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -411,10 +399,10 @@ const handleDownload = async (proposal) => {
       {proposals.length === 0 && (
         <div className="text-center mt-8">
           <p className="text-base text-muted-foreground mb-3">No proposals available</p>
-          <button type="button" onClick={handleCreateNew}
-            className="px-4 py-2 rounded text-sm font-medium text-white bg-primary hover:bg-primary/90">
+          <Button type="button" size="sm" onClick={handleCreateNew}>
+            <Plus className="h-3.5 w-3.5 mr-1.5" />
             Create Your First Proposal
-          </button>
+          </Button>
         </div>
       )}
 

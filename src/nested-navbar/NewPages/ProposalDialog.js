@@ -4,8 +4,7 @@
 import React, { useState, useRef } from "react";
 import SignatureCanvas from "react-signature-canvas";
 import axios from "axios";
-import { IoClose } from "react-icons/io5";
-import { FaCheckCircle } from "react-icons/fa";
+import { X, CheckCircle2 } from "lucide-react";
 import HTMLReactParser from "html-react-parser";
 import { toast } from "react-toastify";
 
@@ -95,10 +94,12 @@ const ProposalPreviewDialog = ({ open, handleClose, proposal }) => {
       {/* Title bar */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-border">
         <span className="text-base font-semibold">{proposal?.general?.proposalName || "Proposal"}</span>
-        <IoClose className="cursor-pointer text-xl text-muted-foreground hover:text-foreground" onClick={handleClose} />
+        <button type="button" onClick={handleClose} className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+          <X size={18} />
+        </button>
       </div>
 
-      <div className="flex flex-1 overflow-hidden" style={{ height: "calc(100vh - 56px)" }}>
+      <div className="flex flex-1 overflow-hidden min-h-0">
         {/* LEFT SIDE MENU */}
         <div className="w-[28%] border-r border-border overflow-y-auto">
           <ul>
@@ -111,7 +112,7 @@ const ProposalPreviewDialog = ({ open, handleClose, proposal }) => {
                     activeStep === step.id ? "bg-primary/10 font-medium text-primary" : "hover:bg-muted"
                   } ${isSigned ? "text-success" : ""}`}
                 >
-                  {isSigned && <FaCheckCircle className="text-success shrink-0" size={14} />}
+                  {isSigned && <CheckCircle2 size={14} className="text-green-500 shrink-0" />}
                   {step.label}
                 </button>
               </li>
@@ -445,8 +446,7 @@ const ProposalPreviewDialog = ({ open, handleClose, proposal }) => {
                   <img src={proposal.signature} alt="signature"
                     className="max-w-[300px] border border-border bg-card p-2 mt-2" />
                 ) : (
-                  <div className="text-2xl mt-2 p-5 border border-border bg-muted rounded-md"
-                    style={{ fontFamily: "cursive" }}>
+                  <div className="text-2xl mt-2 p-5 border border-border bg-muted rounded-md font-[cursive]">
                     {proposal.signature}
                   </div>
                 )}
