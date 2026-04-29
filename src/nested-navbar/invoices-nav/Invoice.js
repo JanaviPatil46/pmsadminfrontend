@@ -5,6 +5,8 @@ import { useNavigate, useParams, useRouteLoaderData } from "react-router-dom";
 import CreateInvoice from "../invoices-nav/CreateInvoice";
 import UpdateInvoice from "../invoices-nav/UpdateInvoice";
 import { jsPDF } from "jspdf";
+import { Button } from "../../components/ui/button";
+import { Plus, Tag, Pencil, Trash2, X, Eye, ChevronLeft, Check, ChevronsUpDown } from "lucide-react";
 import "jspdf-autotable";
 
 const Invoice = () => {
@@ -444,13 +446,21 @@ const Invoice = () => {
   };
 
   return (
-    <div className="mt-2">
-      <button
+    <div className="mt-2 ">
+      {/* <button
         onClick={handleCreateInvoiceClick}
         className="mb-4 px-5 py-2 rounded-full text-sm font-medium text-white bg-primary hover:bg-primary/90 transition-colors"
       >
         New Invoice
-      </button>
+      </button> */}
+    <Button onClick={() => handleCreateInvoiceClick()} size="sm" className="mb-4 h-7 w-auto shrink-0">
+            <Plus className="h-4 w-4 mr-1.5" />
+            New Invoice
+          </Button>
+        {/* <Button type="button" variant="ghost" size="icon" className="h-7 w-7 shrink-0 text-muted-foreground hover:text-primary hover:bg-primary/10" title="New Invoice" onClick={() => handleCreateInvoiceClick()}>
+                                <Plus size={13} />
+                                New Invoice
+                              </Button> */}
 
       <div className="bg-white rounded-xl border border-border shadow-sm overflow-x-auto">
         <table className="w-full text-left min-w-[900px]">

@@ -6,6 +6,7 @@ import ContactForm from "../../Pages/UpdateContact";
 import MenuDropdown from "./MenuDropdown";
 import UploadProfilePicture from "./UploadProfilePicture";
 import { IoClose } from "react-icons/io5";
+import { Button } from "../../components/ui/button";
 const AccountDetails = () => {
   const { data } = useParams();
   const [account, setAccount] = useState(null);
@@ -357,10 +358,10 @@ const AccountDetails = () => {
         <div className="bg-card rounded-xl border border-border overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-border">
             <h2 className="text-sm font-semibold text-foreground">Contacts</h2>
-            <button type="button" onClick={() => setAddContactDrawerOpen(true)}
-              className="text-xs font-semibold text-[var(--color-save-btn)] hover:underline uppercase tracking-wide">
+            <Button type="button" size="sm" onClick={() => setAddContactDrawerOpen(true)}
+           >
               + Add Contact
-            </button>
+            </Button>
           </div>
 
           {/* Column headers */}
@@ -441,7 +442,7 @@ const AccountDetails = () => {
             </p>
             <div className="flex justify-end gap-2 mt-6">
               <button type="button" onClick={handleCancelToggle} className={cancelBtnCls}>Cancel</button>
-              <button type="button" onClick={handleConfirmToggle} className={saveBtnCls}>Confirm</button>
+              <Button type="button" onClick={handleConfirmToggle}>Confirm</Button>
             </div>
           </div>
         </div>
@@ -490,10 +491,10 @@ const AccountDetails = () => {
             </div>
             <div className="flex justify-end gap-2 px-5 py-4 border-t border-border">
               <button type="button" onClick={() => { setAddContactDrawerOpen(false); setSelectedContacts([]); setContactSearch(""); }} className={cancelBtnCls}>Cancel</button>
-              <button type="button" onClick={handleLinkContacts} disabled={selectedContacts.length === 0}
-                className={`${saveBtnCls} ${selectedContacts.length === 0 ? 'opacity-40 cursor-not-allowed' : ''}`}>
+              <Button type="button" onClick={handleLinkContacts} disabled={selectedContacts.length === 0}
+                className={`${selectedContacts.length === 0 ? 'opacity-40 cursor-not-allowed' : ''}`}>
                 Link {selectedContacts.length > 0 ? `${selectedContacts.length} ` : ""}Contact{selectedContacts.length !== 1 ? "s" : ""}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
