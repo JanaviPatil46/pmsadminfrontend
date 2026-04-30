@@ -3,9 +3,10 @@ module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
-      fontFamily: {
-        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-      },
+     fontFamily: {
+      sans: ['Geist', 'sans-serif'],
+    },
+
       colors: {
         transparent: "transparent",
         current: "currentColor",

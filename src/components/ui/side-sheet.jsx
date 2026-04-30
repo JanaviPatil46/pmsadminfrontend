@@ -42,6 +42,8 @@ export function SideSheet({
           "p-0 flex flex-col border-l border-border/40 shadow-lg bg-background [&>button]:hidden",
           sizeMap[size] ?? sizeMap.md
         )}
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onInteractOutside={(e) => e.preventDefault()}
       >
         <div className="flex flex-1 min-h-0 flex-col">
           {/* Header */}

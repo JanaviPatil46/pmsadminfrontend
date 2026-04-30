@@ -34,7 +34,6 @@ export default function ContactSelectionDialog({ open, onClose, onSelectContacts
     if (currentIndex === -1) newSelected.push(contact);
     else newSelected.splice(currentIndex, 1);
     setSelectedContacts(newSelected);
-    setSearchTerm("");
   };
   const handleRemoveChip = (contactId) => setSelectedContacts(selectedContacts.filter(c => c._id !== contactId));
   const handleSubmit = () => { onSelectContacts(selectedContacts); setSelectedContacts([]); setSearchTerm(""); onClose(); };
@@ -64,7 +63,7 @@ export default function ContactSelectionDialog({ open, onClose, onSelectContacts
                   {selectedContacts.map(contact => (
                     <span key={contact._id} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-200">
                       {contact.contactName || `${contact.firstName} ${contact.lastName}`}
-                      <button onClick={() => handleRemoveChip(contact._id)} className="text-indigo-400 hover:text-indigo-600">
+                      <button type="button" onClick={(e) => { e.stopPropagation(); handleRemoveChip(contact._id); }} className="text-indigo-400 hover:text-indigo-600">
                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                       </button>
                     </span>
