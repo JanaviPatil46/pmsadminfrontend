@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
+import ThemeSettings from "./ThemeSettings"; // ← add this line
 import { LoginContext } from "../Sidebar/Context/Context";
 import { Facebook, Linkedin, Twitter, Instagram, PlusCircle, Upload } from "lucide-react";
 import { Switch } from "../components/ui/switch";
@@ -853,6 +854,7 @@ const FirmSetting = () => {
           <TabsTrigger value="security" className="text-sm px-5">Security</TabsTrigger>
           <TabsTrigger value="preferences" className="text-sm px-5">Preferences</TabsTrigger>
           <TabsTrigger value="notifications" className="text-sm px-5">Notifications</TabsTrigger>
+          <TabsTrigger value="appearance"    className="text-sm px-5">Appearance</TabsTrigger>  
         </TabsList>
 
         {/* ══════════════════════════════════════
@@ -1199,6 +1201,13 @@ const FirmSetting = () => {
 
           </div>
         </TabsContent>
+
+        {/* ══════════════════════════════════════
+     APPEARANCE TAB
+══════════════════════════════════════ */}
+<TabsContent value="appearance">
+  <ThemeSettings />
+</TabsContent>
 
       </Tabs>
     </div>
